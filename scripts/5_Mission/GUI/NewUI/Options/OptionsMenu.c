@@ -62,6 +62,8 @@ class OptionsMenuNew extends UIScriptedMenu
 			m_Version.Show( false );
 		#ifdef PLATFORM_WINDOWS
 			SetFocus( layoutRoot );
+		#else
+			SliderFocus();
 		#endif
 		
 		m_Tabber.m_OnTabSwitch.Insert( OnTabSwitch );

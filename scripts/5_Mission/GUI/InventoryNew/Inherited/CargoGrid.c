@@ -418,21 +418,19 @@ class UICargoGrid
 				int showed_item = m_ShowedItems.Get( i );
 				if( showed_items.Find( showed_item ) == INDEX_NOT_FOUND )
 				{
-					int size_x, size_y;
 					Icon iconn = m_ItemsContainer.GetIcon( showed_item );
 					if( iconn )
 					{
 						EntityAI ent = EntityAI.Cast( iconn.GetObject() );
 						if( ent )
 						{
-							GetGame().GetInventoryItemSize( ItemBase.Cast( ent ), size_x, size_y );
-							int capacity = m_Entity.GetInventory().GetCargo().GetHeight() * m_Entity.GetInventory().GetCargo().GetWidth();
-							occupied_cargo = occupied_cargo - size_x * size_y;
-							
-							TextWidget tw = TextWidget.Cast( m_Parent.GetMainPanel().FindAnyWidget("CargoCount") );
-							string cargo_count = occupied_cargo.ToString() + "/" + capacity;
+							#ifdef PLATFORM_CONSOLE
+							int capacity		= CargoList.Cast( m_Entity.GetInventory().GetCargo() ).GetMaxWeight();
+							int occupied_cargo	= CargoList.Cast( m_Entity.GetInventory().GetCargo() ).GetTotalWeight();
+							TextWidget tw		= TextWidget.Cast( m_Parent.GetMainWidget().FindAnyWidget("CargoCount") );
 							if(tw)
-								tw.SetText( cargo_count );
+								tw.SetText( occupied_cargo.ToString() + "/" + capacity.ToString() );
+							#endif
 							
 							m_ItemsContainer.RemoveItem( showed_item );
 							ItemManager.GetInstance().HideTooltip();
@@ -505,13 +503,14 @@ class UICargoGrid
 			int pos_x, pos_y, size_x, size_y;
 			m_Entity.GetInventory().GetCargo().GetItemSize( index, size_x, size_y );
 			m_Entity.GetInventory().GetCargo().GetItemRowCol( index, pos_y, pos_x );
-			int capacity = m_Entity.GetInventory().GetCargo().GetHeight() * m_Entity.GetInventory().GetCargo().GetWidth();
-			occupied_cargo = occupied_cargo + size_x * size_y;
 			
-			TextWidget tw = TextWidget.Cast( m_Parent.GetMainPanel().FindAnyWidget("CargoCount") );
-			string cargo_count = occupied_cargo.ToString() + "/" + capacity;
+			#ifdef PLATFORM_CONSOLE
+			int capacity		= CargoList.Cast( m_Entity.GetInventory().GetCargo() ).GetMaxWeight();
+			int occupied_cargo	= CargoList.Cast( m_Entity.GetInventory().GetCargo() ).GetTotalWeight();
+			TextWidget tw		= TextWidget.Cast( m_Parent.GetMainWidget().FindAnyWidget("CargoCount") );
 			if(tw)
-				tw.SetText( cargo_count );
+				tw.SetText( occupied_cargo.ToString() + "/" + capacity.ToString() );
+			#endif
 
 			Icon icon = new Icon( m_ItemsContainer );
 			icon.Init( item );

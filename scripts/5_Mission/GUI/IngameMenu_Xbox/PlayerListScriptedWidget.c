@@ -128,7 +128,7 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 			for( int i = 0; i < player_list.Count(); i++ )
 			{
 				string uid = player_list.GetKey( i );
-				bool muted = player_list.Get( uid );
+				bool muted = OnlineServices.IsPlayerMuted( uid );
 				PlayerListEntryScriptedWidget player_widget;
 				m_Entries.Find( uid, player_widget );
 				if( player_widget )

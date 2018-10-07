@@ -496,6 +496,9 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			else
 				text += "there are no servers available with your current filter settings.";
 			m_LoadingText.SetText( text );
+			#ifdef PLATFORM_XBOX
+				m_Filters.Focus();
+			#endif
 			return;
 		}
 		
@@ -608,6 +611,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		}
 		else
 		{
+			m_LoadingText.SetText( "Unable to get servers, there are no servers available with your current filter settings." );
 			m_Filters.Focus();
 		}
 		

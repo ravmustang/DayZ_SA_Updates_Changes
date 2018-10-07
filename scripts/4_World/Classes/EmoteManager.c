@@ -267,8 +267,6 @@ class EmoteManager
 		m_CurrentGestureID = id;
 		if( id > 0)
 		{
-			m_bEmoteIsPlaying = true;
-			
 			switch ( id )
 			{
 				case ID_EMOTE_GREETING :
@@ -413,6 +411,9 @@ class EmoteManager
 						else if (suicideStr == "spear") 		suicideID = DayZPlayerConstants.CMD_SUICIDEFB_SPEAR;
 						
 						else if (suicideStr == "woodaxe") 		suicideID = DayZPlayerConstants.CMD_SUICIDEFB_WOODAXE;
+					
+						else //item in hands is not eligible for suicide
+							suicideID = -1;
 					}
 			
 					if (suicideID > -1)
@@ -733,7 +734,12 @@ class EmoteManager
 				m_LastMask = mask;  //character is probably not prone now
 				Class.CastTo(m_Callback, m_Player.AddCommandModifier_Action(id,callbacktype));
 			}
-			if (m_Callback) 	m_Callback.m_player = m_Player;
+			
+			if (m_Callback)
+			{
+				m_bEmoteIsPlaying = true;
+				m_Callback.m_player = m_Player;
+			}
 		}
 	}
 	
@@ -771,7 +777,7 @@ class EmoteManager
 		WeaponEventBase weapon_event = new WeaponEventTrigger;
 		
 		//firearm suicide
-		if (Weapon_Base.CastTo(weapon,m_Player.GetItemInHands()))
+		if ( Weapon_Base.CastTo(weapon,m_Player.GetItemInHands()) )
 		{
 			//TODO : check multiple muzzles for shotguns, eventually
 			if (weapon.CanFire())
@@ -788,7 +794,7 @@ class EmoteManager
 			}
 		}
 		//melee weapon suicide
-		else if (m_Player.GetItemInHands())
+		else if ( m_Player.GetItemInHands() && m_Player.GetItemInHands().ConfigIsExisting("suicideAnim") )
 		{
 			m_Callback.RegisterAnimationEvent("Death",1);
 			m_Player.SetSuicide(true);

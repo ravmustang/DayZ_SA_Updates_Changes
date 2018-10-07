@@ -2,7 +2,7 @@ class OptionsMenuKeybindings extends UIScriptedMenu
 {
 	protected TextWidget				m_Version;
 	
-	Widget Init()
+	override Widget Init()
 	{
 		layoutRoot			= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/pc/keybinding_menu.layout", null );
 		

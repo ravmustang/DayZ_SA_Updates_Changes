@@ -272,10 +272,10 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	{
 		m_TextMap = new map<int, ref Param2<string, string>>;
 		m_TextMap.Insert( AT_CONFIG_YAXIS, new Param2<string, string>( "Vertical Sensitivity", "#options_controls_vertical_sensitivity_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "Horizontal Sensitivity", "#options_controls_horizontal_sensitivity_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_XAXIS, new Param2<string, string>( "Horizontal Sensitivity", "#options_controls_horizontal_sensitivity_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_YREVERSED, new Param2<string, string>( "Invert Vertical View", "#options_controls_invert_vertical_view_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "Vertical Sensitivity", "#options_controls_vertical_sens_contr_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "Horizontal Sensitivity", "#options_controls_horizontal_sens_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "Vertical Sensitivity", "#options_controls_vertical_sens_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "Horizontal Sensitivity", "#options_controls_horizontal_sens_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_REVERSED_LOOK, new Param2<string, string>( "Invert Vertical View", "#options_controls_invert_vert_view_contr_desc" ) );
 	}
 	
