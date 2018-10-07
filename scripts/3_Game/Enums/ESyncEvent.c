@@ -1,0 +1,4 @@
+enum ESyncEvent
+{
+	PlayerList
+}
