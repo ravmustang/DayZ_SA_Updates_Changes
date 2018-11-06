@@ -35,15 +35,15 @@ class ActionSplintTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Apply splint";
+		return "#apply_splint";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		action_data.m_MainItem.TransferModifiers(ntarget);
 		ntarget.ApplySplint();
-		ntarget.m_NotifiersManager.DetachByType(NTF_FRACTURE);
+		//ntarget.m_NotifiersManager.DetachByType(eNotifiers.NTF_FRACTURE);
 		action_data.m_MainItem.Delete();
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

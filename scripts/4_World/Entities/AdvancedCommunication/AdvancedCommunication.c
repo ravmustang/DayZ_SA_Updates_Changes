@@ -62,7 +62,7 @@ class AdvancedCommunication extends EntityAI
 			return NULL;
 		}
 		
-		return player.m_HUD;
+		return player.m_Hud;
 	}
 	
 	void DisplayRadioInfo( string message, PlayerBase player )
@@ -78,6 +78,17 @@ class AdvancedCommunication extends EntityAI
 			hud.SetWalkieTalkieText( message );
 			hud.ShowWalkieTalkie( 3 );
 		}
+	}
+	
+	//control transmitter via user actions
+	void TurnOnTransmitter()
+	{
+		GetCompEM().SwitchOn();
+	}
+	
+	void TurnOffTransmitter()
+	{
+		GetCompEM().SwitchOff();
 	}
 }
 
@@ -102,4 +113,6 @@ class StaticTransmitter extends AdvancedCommunication
 	proto native void EnableReceive(bool state);
 	proto native bool IsBroadcasting();
 	proto native bool IsReceiving();
+	proto native int GetTunedFrequencyIndex();
+	proto native void SetFrequencyByIndex(int index);
 };

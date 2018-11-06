@@ -10,28 +10,76 @@ class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 		RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);
 	}
 	
-	override void OnFinish(bool pCanceled)
+	void ~ActionUnfoldMapCB()
 	{
-		if (m_player) 	m_player.m_MapOpen = false;
-		//Print("---------animation finished---------");
+		if (!m_player)
+			return;
+		
+		if (GetGame().IsClient())
+		{
+			GetGame().GetMission().PlayerControlEnable();
+		}
+		
+		m_player.m_MapOpen = false;
+		
+		if (!GetGame().IsServer())
+			return;
+		
+		ItemBase chernomap = m_player.GetItemInHands();
+		if (m_player.IsAlive() && chernomap && chernomap.GetType() == opened_map)
+		{
+			MiscGameplayFunctions.TurnItemIntoItem(chernomap, closed_map, m_player); //fallback, if animation event does not fire for any reason
+		}
 	}
+	
+	/*override void OnFinish(bool pCanceled)
+	{
+		if (!m_player)
+			return;
+		
+		m_player.m_MapOpen = false;
+		
+		if (!GetGame().IsServer())
+			return;
+		
+		ItemBase chernomap = m_player.GetItemInHands();
+		if (m_player.IsAlive() && chernomap && chernomap.GetType() == opened_map)
+		{
+			MiscGameplayFunctions.TurnItemIntoItem(chernomap, closed_map, m_player); //fallback, if animation event does not fire for any reason
+		}
+	}*/
 	
 	override void OnAnimationEvent(int pEventID)
 	{
+		if (!m_player)
+			return;
+			
+		ItemBase chernomap = m_player.GetItemInHands();
+		
 		switch (pEventID)
-		{
+		{			
 			case UA_ANIM_EVENT: 
-				if (GetGame().IsServer() && m_player)
+				if (m_player.IsSwimming() || m_player.IsFalling() || m_player.IsClimbingLadder() || m_player.IsUnconscious() || m_player.IsRestrained())
+					return;
+			
+				if (chernomap && chernomap.GetType() == closed_map)
 				{
-					ItemBase chernomap = m_player.GetItemInHands();
-					if (chernomap && chernomap.GetType() == closed_map)
-					{
+					if (GetGame().IsServer())
 						MiscGameplayFunctions.TurnItemIntoItem(chernomap, opened_map, m_player);
-					}
-					else if (chernomap && chernomap.GetType() == opened_map)
+			
+					if (!GetGame().IsMultiplayer() || GetGame().IsClient())
 					{
-						MiscGameplayFunctions.TurnItemIntoItem(chernomap, closed_map, m_player);
+						UIManager 	m_UIManager;
+						m_UIManager = GetGame().GetUIManager();
+						m_UIManager.CloseAll();
+						m_UIManager.EnterScriptedMenu(MENU_MAP, NULL);
 					}
+					m_player.m_MapOpen = true;
+				}
+				else if (chernomap && chernomap.GetType() == opened_map)
+				{
+					if (GetGame().IsServer())
+						MiscGameplayFunctions.TurnItemIntoItem(chernomap, closed_map, m_player);
 				}
 			break;
 		}
@@ -72,7 +120,7 @@ class ActionUnfoldMap: ActionSingleUseBase
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
-		if (player.m_hac)
+		if (player.m_hac || player.m_MapOpen)
 		{
 			return false;
 		}
@@ -104,13 +152,13 @@ class ActionUnfoldMap: ActionSingleUseBase
 		if (action_data.m_Player.m_hac)
 			action_data.m_Player.m_hac.m_player = action_data.m_Player;
 		
-		action_data.m_Player.m_MapOpen = true;
+		/*action_data.m_Player.m_MapOpen = true;
 		
 		if (!GetGame().IsMultiplayer() || GetGame().IsClient())
 		{
 			UIManager 	m_UIManager;
 			m_UIManager = GetGame().GetUIManager();
 			m_UIManager.EnterScriptedMenu(MENU_MAP, NULL);
-		}
+		}*/
 	}
 };

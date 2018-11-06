@@ -4,7 +4,6 @@ class HudDebugWinCharDebug extends HudDebugWinBase
 	
 	private TextWidget 		m_PlayerPosTextWidget;
 	private TextWidget 		m_ClipboardTextWidget;
-	private TextWidget 		m_GodModeTextWidget;
 
 	//============================================
 	// HudDebugWinCharDebug
@@ -13,7 +12,6 @@ class HudDebugWinCharDebug extends HudDebugWinBase
 	{	
 		m_PlayerPosTextWidget = TextWidget.Cast( widget_root.FindAnyWidget("txt_PlayerPos") );
 		m_ClipboardTextWidget = TextWidget.Cast( widget_root.FindAnyWidget("txt_Clipboard") );
-		m_GodModeTextWidget = TextWidget.Cast( widget_root.FindAnyWidget("txt_GodMode") );
 	}
 
 	//============================================
@@ -40,18 +38,9 @@ class HudDebugWinCharDebug extends HudDebugWinBase
 		
 		string clipboard;
 		GetGame().CopyFromClipboard(clipboard);
-		clipboard = clipboard.Substring( 0, Math.Min( clipboard.Length(), 64 ) );	//max 64 chars
+		clipboard = clipboard.Substring( 0, Math.Min( clipboard.Length(), 128 ) );	//max 128 chars
 		clipboard = "Clipboard: " + clipboard;
 		m_ClipboardTextWidget.SetText(clipboard);
-		
-		if ( PluginDeveloper.GetInstance().IsGodMode() )
-		{
-			m_GodModeTextWidget.SetText("God mode: ENABLED");
-		}
-		else
-		{
-			m_GodModeTextWidget.SetText("God mode: DISABLED");
-		}
 	}
 
 	//============================================

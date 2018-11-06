@@ -1,5 +1,6 @@
-class ImmuneSystem: ModifierBase
+class ImmuneSystemMdfr: ModifierBase
 {
+	bool m_HasDisease;
 	override void Init()
 	{
 		m_TrackActivatedTime = false;
@@ -30,9 +31,25 @@ class ImmuneSystem: ModifierBase
 	{
 		Debug.Log("ticking immune system", "agent");
 		float result 	= player.GetImmunity() * deltaT;
-		
-		
 		player.ImmuneSystemTick(result, deltaT);
 		Debug.Log("result: "+result.ToString(), "agent");
+		HandleSickBadge(player);
 	}
+	
+	void HandleSickBadge(PlayerBase player)
+	{
+		if( m_HasDisease != player.HasDisease() )
+		{
+			if(player.HasDisease())
+			{
+				if( player.GetNotifiersManager() ) player.GetNotifiersManager().AttachByType(eNotifiers.NTF_SICK);
+			}
+			else
+			{
+				if( player.GetNotifiersManager() ) player.GetNotifiersManager().DetachByType(eNotifiers.NTF_SICK);
+			}
+		}	
+		m_HasDisease = player.HasDisease();
+	}
+	
 };

@@ -1,0 +1,3 @@
+class SteakKnife extends ToolBase
+{
+}

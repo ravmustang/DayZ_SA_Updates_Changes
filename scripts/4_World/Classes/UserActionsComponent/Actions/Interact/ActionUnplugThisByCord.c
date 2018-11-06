@@ -13,7 +13,7 @@ class ActionUnplugThisByCord: ActionInteractBase
 		
 	override string GetText()
 	{
-		return "Unplug by cord";
+		return "#unplug_by_cord";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -39,7 +39,7 @@ class ActionUnplugThisByCord: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		ItemBase target_IB = ItemBase.Cast( action_data.m_Target.GetObject() ); // cast to ItemBase
 		target_IB.GetCompEM().UnplugThis();

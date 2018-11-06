@@ -8,6 +8,9 @@ class ActionRemovePlant: ActionInteractBase
 		m_MessageSuccess = "";
 		m_MessageFail = "";
 		m_MessageCancel = "";
+		
+		//m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
+		//m_FullBody = true;
 	}
 
 	override int GetType()
@@ -17,7 +20,7 @@ class ActionRemovePlant: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Remove plant";
+		return "#remove_plant";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -36,7 +39,7 @@ class ActionRemovePlant: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		if ( targetObject != NULL && targetObject.IsInherited(PlantBase) )

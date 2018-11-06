@@ -41,14 +41,14 @@ class ActionSplintSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Apply splint";
+		return "#apply_splint";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		action_data.m_MainItem.TransferModifiers(action_data.m_Player);
 		action_data.m_Player.ApplySplint();
-		action_data.m_Player.m_NotifiersManager.DetachByType(NTF_FRACTURE);
+		//action_data.m_Player.m_NotifiersManager.DetachByType(eNotifiers.NTF_FRACTURE);
 		action_data.m_MainItem.Delete();
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

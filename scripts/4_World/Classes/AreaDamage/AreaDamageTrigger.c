@@ -88,12 +88,18 @@ class AreaDamageTrigger extends Trigger
 	
 	protected void PreDamageActions()
 	{
-		m_AreaTriggerParent.PreAreaDamageActions();
+		if ( m_AreaTriggerParent )
+		{
+			m_AreaTriggerParent.PreAreaDamageActions();
+		}
 	}
 
 	protected void PostDamageActions()
 	{
-		m_AreaTriggerParent.PostAreaDamageActions();
+		if ( m_AreaTriggerParent )
+		{
+			m_AreaTriggerParent.PostAreaDamageActions();
+		}
 	}
 
 	override protected void UpdateInsiders(int timeout)
@@ -135,9 +141,13 @@ class AreaDamageTrigger extends Trigger
 
 		// stop all running timers
 		if ( m_DeferTimer && m_DeferTimer.IsRunning() )
-			{ m_DeferTimer.Stop(); }
+		{
+			m_DeferTimer.Stop();
+		}
 		if ( m_LoopTimer && m_LoopTimer.IsRunning() )
-			{ m_LoopTimer.Stop(); }
+		{
+			m_LoopTimer.Stop();
+		}
 	}
 	
 	protected string GetRandomHitZone(array<string> hitzones)
@@ -160,7 +170,7 @@ class AreaDamageTrigger extends Trigger
 		vector contact_pos;
 		vector contact_dir;
 		int contactComponent;
-		bool IsSteppedOn = false;
+		bool isSteppedOn = false;
 		
 		ref set<Object> victims = new set<Object>;
 		
@@ -177,9 +187,9 @@ class AreaDamageTrigger extends Trigger
 			vector raycast_start_pos = ModelToWorld( raycast_sources.Get(i) );
 			vector raycast_end_pos = "0 0.5 0" + raycast_start_pos;
 			
-			#ifdef DEVELOPER
-			Debug.DrawArrow( raycast_start_pos, raycast_end_pos );
-			#endif
+			//#ifdef DEVELOPER
+			//Debug.DrawArrow( raycast_start_pos, raycast_end_pos );
+			//#endif
 			DayZPhysics.RaycastRV( raycast_start_pos, raycast_end_pos, contact_pos, contact_dir, contactComponent, victims , NULL, this, true, false, ObjIntersectIFire);
 			
 			for ( int j = 0; j < victims.Count(); ++j )
@@ -188,19 +198,19 @@ class AreaDamageTrigger extends Trigger
 				
 				if ( contact_obj.IsInherited(Man) )
 				{
-					IsSteppedOn = true;
+					isSteppedOn = true;
 					break;
 				}
 			}
 			
-			if (IsSteppedOn)
+			if (isSteppedOn)
 			{
 				hitzone = victim.GetDamageZoneNameByComponentIndex(contactComponent);
 				break;
 			}
 		}
 		
-		if(IsSteppedOn)
+		if(isSteppedOn)
 		{
 			return hitzone;
 		}

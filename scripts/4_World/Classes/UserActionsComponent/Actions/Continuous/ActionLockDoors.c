@@ -13,8 +13,8 @@ class ActionLockDoors: ActionContinuousBase
 		m_CallbackClass = ActionLockDoorsCB;
 		m_MessageSuccess = "";
 		
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
-		m_FullBody = false;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
+		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
 	
@@ -31,7 +31,7 @@ class ActionLockDoors: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Lock door";
+		return "#lock_door";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -65,7 +65,7 @@ class ActionLockDoors: ActionContinuousBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		LockDoor(action_data.m_Target);
 	}

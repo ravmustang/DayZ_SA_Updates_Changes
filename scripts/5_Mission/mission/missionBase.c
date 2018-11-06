@@ -1,35 +1,34 @@
 class NotificationMessage
 {
-	const float FADE_TIMEOUT = 5;
-	const float FADE_OUT_DURATION = 1;
-	const float FADE_IN_DURATION = 0.5;
+	protected const float FADE_TIMEOUT = 5;
+	protected const float FADE_OUT_DURATION = 1;
+	protected const float FADE_IN_DURATION = 0.5;
 
-	Widget m_notification_widget;
+	protected Widget				m_NotificationWidget;
 
-	TextWidget m_text_widget;
-	private TextWidget m_notification_label;
-	private TextWidget m_notification_text;
+	protected TextWidget			m_NotificationLabel;
+	protected TextWidget			m_NotificationText;
 
-	private ref WidgetFadeTimer m_fade_timer;
-	private ref Timer m_timeout_timer;
+	protected ref WidgetFadeTimer	m_FadeTimer;
+	protected ref Timer				m_TimeoutTimer;
 
 	void NotificationMessage( Widget root_widget )
 	{
-		m_notification_widget = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/notification_info.layout", (Widget)root_widget.FindAnyWidget( "NotificationFrameWidget" ) );
-		m_notification_label = TextWidget.Cast( root_widget.FindAnyWidget( "NoticiationLabellTextWidget" ) );
-		m_notification_text = TextWidget.Cast( root_widget.FindAnyWidget( "NotificationMultilineTextWidget" ) );
-		m_notification_widget.Show(false);
+		m_NotificationWidget	= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/notification_info.layout", (Widget)root_widget.FindAnyWidget( "NotificationFrameWidget" ) );
+		m_NotificationLabel		= TextWidget.Cast( root_widget.FindAnyWidget( "NoticiationLabellTextWidget" ) );
+		m_NotificationText		= TextWidget.Cast( root_widget.FindAnyWidget( "NotificationMultilineTextWidget" ) );
+		m_NotificationWidget.Show(false);
 
-		m_fade_timer = new WidgetFadeTimer;
-		m_timeout_timer = new Timer(CALL_CATEGORY_GUI);
+		m_FadeTimer				= new WidgetFadeTimer;
+		m_TimeoutTimer			= new Timer(CALL_CATEGORY_GUI);
 	}
 
 	void ~NotificationMessage()
 	{
-		/*if (m_notification_widget) 
+		/*if (m_NotificationWidget) 
 		{
-			m_notification_widget.Destroy();
-			m_notification_widget = NULL;
+			m_NotificationWidget.Destroy();
+			m_NotificationWidget = NULL;
 		}*/
 	}
 
@@ -44,16 +43,16 @@ class NotificationMessage
 		switch( priority )
 		{
 		case EVENT_PRIORITY_ERROR:
-			m_notification_label.SetColor( COLOR_RED );
-			m_notification_text.SetColor( COLOR_RED );
+			m_NotificationLabel.SetColor( COLOR_RED );
+			m_NotificationText.SetColor( COLOR_RED );
 			break;
 		case EVENT_PRIORITY_WARNING:
-			m_notification_label.SetColor( COLOR_YELLOW );
-			m_notification_text.SetColor( COLOR_YELLOW );
+			m_NotificationLabel.SetColor( COLOR_YELLOW );
+			m_NotificationText.SetColor( COLOR_YELLOW );
 			break;
 		case EVENT_PRIORITY_INFO:
-			m_notification_label.SetColor( COLOR_GREEN );
-			m_notification_text.SetColor( COLOR_GREEN );
+			m_NotificationLabel.SetColor( COLOR_GREEN );
+			m_NotificationText.SetColor( COLOR_GREEN );
 			break;
 		 default:
 			do_show = false;
@@ -65,22 +64,22 @@ class NotificationMessage
 		{
 			if ( label != "" )
 			{
-				m_notification_label.SetText( label );
+				m_NotificationLabel.SetText( label );
 			}
 			if ( text != "" )	
 			{
-				m_notification_text.SetText(text);
+				m_NotificationText.SetText(text);
 			}
-			m_fade_timer.FadeIn( m_notification_widget, FADE_IN_DURATION);
-			m_timeout_timer.Run(FADE_TIMEOUT, m_fade_timer, "FadeOut", new Param2<Widget, float>(m_notification_widget, FADE_OUT_DURATION));
+			m_FadeTimer.FadeIn( m_NotificationWidget, FADE_IN_DURATION);
+			m_TimeoutTimer.Run(FADE_TIMEOUT, m_FadeTimer, "FadeOut", new Param2<Widget, float>(m_NotificationWidget, FADE_OUT_DURATION));
 		}
 	}
 	
 	void Hide()
 	{
-		m_notification_widget.Show(false);
-		m_timeout_timer.Stop();
-		m_fade_timer.Stop();
+		m_NotificationWidget.Show(false);
+		m_TimeoutTimer.Stop();
+		m_FadeTimer.Stop();
 	}
 }
 
@@ -90,7 +89,7 @@ class MissionBase extends Mission
 	PluginKeyBinding		m_ModuleKeyBinding
 	PluginAdditionalInfo	m_ModuleServerInfo;
 	
-	ref NotificationMessage m_notification_widget;
+	ref NotificationMessage m_NotificationWidget;
 	ref WidgetEventHandler 	m_WidgetEventHandler;
 	ref WorldData			m_WorldData;
 	
@@ -122,7 +121,6 @@ class MissionBase extends Mission
 	void ~MissionBase()
 	{
 		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(this.CheckNotification);
-		PPEffects.ResetAll();
 		PluginManagerDelete();
 	}
 	
@@ -151,19 +149,7 @@ class MissionBase extends Mission
 			menu = new CharacterCreationMenu;
 			break;
 		case MENU_OPTIONS:
-#ifdef NEW_UI
-			menu = new OptionsMenuNew;
-#else
-#ifdef PLATFORM_CONSOLE
-			menu = new OptionsMenuNew;
-#else
-#ifdef PLATFORM_PS4
-			menu = new OptionsMenuNew;
-#else
 			menu = new OptionsMenu;
-#endif
-#endif
-#endif
 			break;
 		case MENU_ASSIGNMENT:
 			menu = new AssignmentMenu;
@@ -175,14 +161,7 @@ class MissionBase extends Mission
 			menu = new LoadingMenu;
 			break;
 		case MENU_INVENTORY:
-		if(!GetGame().IsOldInventory())
-		{
-			menu = new InventoryMenuNew;
-		}
-		else
-		{
 			menu = new InventoryMenu;
-		}
 			break;
 		case MENU_INSPECT:
 			menu = new InspectMenuNew;
@@ -248,7 +227,7 @@ class MissionBase extends Mission
 			menu = new MainMenuVideo;
 			break;
 		case MENU_KEYBINDINGS:
-			menu = new OptionsMenuKeybindings;
+			menu = new KeybindingsMenu;
 			break;
 		case MENU_TUTORIAL:
 			menu = new TutorialsMenu;
@@ -419,9 +398,9 @@ class MissionBase extends Mission
 
 	void ShowNotification( string label, string text, int priority)
 	{
-		if ( m_notification_widget )
+		if ( m_NotificationWidget )
 		{
-			m_notification_widget.Show( label, text, priority );
+			m_NotificationWidget.Show( label, text, priority );
 		}
 	}
 	

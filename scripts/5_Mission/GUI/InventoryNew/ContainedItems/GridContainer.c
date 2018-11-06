@@ -1,40 +1,33 @@
-class GridContainer: ContainerBase
+class GridContainer: LayoutHolder
 {
 	protected int m_NumberRow;
 	protected int m_NumberColumnFocused;
 	protected EntityAI m_Entity;	
 	protected int m_Width;
-	protected ItemsContainer m_ParentContainer;
+	protected IconsContainer m_ParentContainer;
 	protected int m_MaxColumns;
 	
-	void GridContainer( ContainerBase parent )
+	void GridContainer( LayoutHolder parent )
 	{
-		m_ParentContainer = ItemsContainer.Cast( parent );
-		#ifdef PLATFORM_CONSOLE
-		m_MaxColumns = 8;
-		#else
+		m_ParentContainer = IconsContainer.Cast( parent );
 		m_MaxColumns = 10;
-		#endif
 		for ( int i = 0; i < m_MaxColumns; i++ )
 		{
-			WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "Icon" + i ),  this, "Column" + i );
-		}
-		
-		for ( i = 0; i < m_MaxColumns; i++ )
-		{
-			WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel().FindAnyWidget( "Icon" + i ),  this, "ColumnOnDraggingOver" + i );
+			WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "Icon" + i ),  this, "Column" + i );
+			WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "Icon" + i ),  this, "ColumnOnDraggingOver" + i );
 		}
 		
 		//TODO: create layout for GridContainer and set alpha to 225 there
-		m_ParentWidget.SetAlpha(255);
+		//m_ParentWidget.SetAlpha(255);
 	}
 	
 	void UnfocusAll()
 	{
 		for ( int i = 0; i < m_MaxColumns; i++ )
 		{
-			//GetMainPanel().FindAnyWidget( "Cursor" + i ).Show( false );
+			//GetMainWidget().FindAnyWidget( "Cursor" + i ).Show( false );
 			#ifdef PLATFORM_WINDOWS
+			#ifndef PLATFORM_CONSOLE
 			CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
 			if (grid)
 			{
@@ -51,9 +44,10 @@ class GridContainer: ContainerBase
 				}
 				else
 				{
-					GetMainPanel().FindAnyWidget( "Cursor" + i ).Show( false );
+					GetMainWidget().FindAnyWidget( "Cursor" + i ).Show( false );
 				}
 			}
+			#endif
 			#endif
 		}
 		
@@ -64,10 +58,11 @@ class GridContainer: ContainerBase
 	{	
 		m_NumberColumnFocused = column;
 		
-		//GetMainPanel().FindAnyWidget( "Cursor" + column ).Show( true );
+		//GetMainWidget().FindAnyWidget( "Cursor" + column ).Show( true );
 		
 		// Show selector
 		#ifdef PLATFORM_WINDOWS
+		#ifndef PLATFORM_CONSOLE
 		CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
 		if (grid)
 		{
@@ -83,15 +78,17 @@ class GridContainer: ContainerBase
 			}
 			else
 			{
-				GetMainPanel().FindAnyWidget( "Cursor" + column ).Show( true );
+				GetMainWidget().FindAnyWidget( "Cursor" + column ).Show( true );
 			}
 		}
+		#endif
 		#endif
 	}
 	
 	bool GetIconSize(int row, int column, out int width, out int height)
 	{
 		#ifdef PLATFORM_WINDOWS
+		#ifndef PLATFORM_CONSOLE
 		CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
 		if (grid)
 		{
@@ -110,6 +107,7 @@ class GridContainer: ContainerBase
 			}
 		}
 		#endif
+		#endif
 		
 		return false;
 	}
@@ -117,6 +115,7 @@ class GridContainer: ContainerBase
 	bool GetIconPosition(int row, int column, out int x, out int y)
 	{
 		#ifdef PLATFORM_WINDOWS
+		#ifndef PLATFORM_CONSOLE
 		CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
 		if (grid)
 		{
@@ -135,6 +134,7 @@ class GridContainer: ContainerBase
 			}
 			
 		}
+		#endif
 		#endif
 		return false;
 	}
@@ -160,13 +160,13 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver0( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ItemWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
 		}
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
+			ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -176,13 +176,13 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver1( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ItemWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
 		}		
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -192,13 +192,13 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver2( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ItemWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
 		}		
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
+			ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -208,13 +208,13 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver3( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ItemWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
 		}		
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -224,11 +224,11 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver4( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -238,11 +238,11 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver5( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -252,11 +252,11 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver6( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -266,11 +266,11 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver7( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -280,11 +280,11 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver8( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -294,11 +294,11 @@ class GridContainer: ContainerBase
 	
 	void ColumnOnDraggingOver9( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -308,11 +308,11 @@ class GridContainer: ContainerBase
 	
 	void Column0( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -322,11 +322,11 @@ class GridContainer: ContainerBase
 	
 	void Column1( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -336,11 +336,11 @@ class GridContainer: ContainerBase
 	
 	void Column2( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -350,11 +350,11 @@ class GridContainer: ContainerBase
 	
 	void Column3( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -364,11 +364,11 @@ class GridContainer: ContainerBase
 	
 	void Column4( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -378,11 +378,11 @@ class GridContainer: ContainerBase
 	
 	void Column5( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -392,11 +392,11 @@ class GridContainer: ContainerBase
 	
 	void Column6( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -406,11 +406,11 @@ class GridContainer: ContainerBase
 	
 	void Column7( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -420,11 +420,11 @@ class GridContainer: ContainerBase
 	
 	void Column8( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -434,11 +434,11 @@ class GridContainer: ContainerBase
 	
 	void Column9( Widget w )
 	{
-		if( m_Parent.m_Parent.IsInherited( ItemWithCargo ) )
-		( ItemWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
-		else if( m_Parent.m_Parent.IsInherited( ItemWithCargoAndAttachments ) )
+		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
+		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ItemWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
 		}
 		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
@@ -461,7 +461,7 @@ class GridContainer: ContainerBase
 		m_Width = width;
 		for ( int i = width; i < m_MaxColumns; i++ )
 		{
-			GetMainPanel().FindAnyWidget( "Icon" + i ).Show( false );
+			GetMainWidget().FindAnyWidget( "Icon" + i ).SetAlpha(0);
 		}
 	}
 }

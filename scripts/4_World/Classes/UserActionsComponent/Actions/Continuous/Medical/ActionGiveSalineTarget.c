@@ -38,10 +38,10 @@ class ActionGiveSalineTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Give saline";
+		return "#give_saline";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		//TODO Daniel: integrate ss 2.0
 		/*float efficiency = action_data.m_Player.GetQuantityEfficiency( GetType() );

@@ -19,7 +19,7 @@ class CASingleUseQuantityEdible : CASingleUseQuantity
 			if ( GetGame().IsServer() ) 
 			{
 				//action_data.m_MainItem.Consume(ntarget, m_QuantityUsedPerAction);
-				ntarget.Consume(action_data.m_MainItem, m_QuantityUsedPerAction);
+				ntarget.Consume(action_data.m_MainItem, m_QuantityUsedPerAction, EConsumeType.ITEM_SINGLE_TIME);
 			}
 		}
 		else
@@ -27,7 +27,7 @@ class CASingleUseQuantityEdible : CASingleUseQuantity
 			if ( GetGame().IsServer() ) 
 			{
 				//action_data.m_MainItem.Consume(action_data.m_Player, m_QuantityUsedPerAction);
-				action_data.m_Player.Consume(action_data.m_MainItem, m_QuantityUsedPerAction);
+				action_data.m_Player.Consume(action_data.m_MainItem, m_QuantityUsedPerAction, EConsumeType.ITEM_SINGLE_TIME);
 			}
 		}
 	}

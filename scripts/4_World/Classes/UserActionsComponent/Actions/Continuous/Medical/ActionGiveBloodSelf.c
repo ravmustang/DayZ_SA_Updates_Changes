@@ -42,12 +42,12 @@ class ActionGiveBloodSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Give blood";
+		return "#give_blood";
 	}
 
-	override void OnCompleteLoopServer( ActionData action_data )
+	override void OnEndAnimationLoopServer( ActionData action_data )
 	{
-		OnRepeatServer(action_data);
+		OnFinishProgressServer(action_data);
 
 		if ( action_data.m_MainItem.IsKindOf("BloodSyringe") )
 		{
@@ -55,11 +55,18 @@ class ActionGiveBloodSelf: ActionContinuousBase
 			lambda.SetTransferParams(true, true, true);
 			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, lambda);
 		}
-
+		else
+		{
+			if ( action_data.m_MainItem.GetQuantity() <= 0 )
+			{
+				GetGame().ObjectDelete( action_data.m_MainItem );
+			}	
+		}
+		
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
-	override void OnRepeatServer(ActionData action_data)
+	override void OnEndServer(ActionData action_data)
 	{
 		Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
 		float delta = nacdata.param1;
@@ -67,7 +74,7 @@ class ActionGiveBloodSelf: ActionContinuousBase
 		action_data.m_Player.AddHealth("","Blood",delta);
 		//action_data.m_Player.SetHealth("GlobalHealth", "Blood", action_data.m_Player.GetHealth("GlobalHealth", "Blood") );
 		
-		int itembloodtype = 0; //item.GetVar(BloodType);
+		int itembloodtype = action_data.m_MainItem.GetLiquidType();
 		int bloodtypetarget = action_data.m_Player.GetStatBloodType().Get();
 		bool bloodmatch = BloodTypes.MatchBloodCompatibility(itembloodtype, bloodtypetarget);
 
@@ -78,13 +85,8 @@ class ActionGiveBloodSelf: ActionContinuousBase
 		
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0.01 )
 		{
-			action_data.m_MainItem.SetQuantity(0);
+			action_data.m_MainItem.SetQuantity(0, false, false);
 		}
-	}
-	
-	override void OnCancelServer(ActionData action_data)
-	{
-		OnRepeatServer(action_data);
 	}
 };
 

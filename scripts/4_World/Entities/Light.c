@@ -5,9 +5,12 @@ class Light extends ItemBase
 	void Light()
 	{
 		SetPilotLight(true);
-		
+	}
+	
+	void SetLifetime(float lifetime)
+	{
 		m_DeleteTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
-		m_DeleteTimer.Run( 0.05 , this, "OnDeleteThis", NULL, false);
+		m_DeleteTimer.Run( lifetime , this, "OnDeleteThis", NULL, false);
 	}
 	
 	void OnDeleteThis()

@@ -39,7 +39,7 @@ class RifleLoadedCharged extends WeaponStableState
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
 };
-class RifleLoadedJammed extends WeaponStableState
+class RifleLoadedJammed extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { LoadedJammed L_J"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } LoadedJammed L_J"); }
@@ -76,10 +76,10 @@ class Rifle_Base extends Weapon_Base
 		m_abilities.Insert(new AbilityRecord(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_UNCOCKED));
 
 		// basic weapon states
-		E_D = new RifleEmptyDischarged(this);
-		E_C = new RifleEmptyCharged(this);
-		L_J = new RifleLoadedJammed(this);
-		L_C = new RifleLoadedCharged(this);
+		E_D = new RifleEmptyDischarged(this, NULL, RifleAnimState.DEFAULT);
+		E_C = new RifleEmptyCharged(this, NULL, RifleAnimState.DEFAULT);
+		L_J = new RifleLoadedJammed(this, NULL, RifleAnimState.DEFAULT);
+		L_C = new RifleLoadedCharged(this, NULL, RifleAnimState.DEFAULT);
 
 		// unstable (intermediate) states
 		WeaponStateBase		chg = new WeaponCharging(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);

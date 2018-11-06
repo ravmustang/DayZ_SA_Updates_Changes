@@ -4,21 +4,22 @@ class Explosion
 {
 	void SpawnEffect( vector position, Effect eff, vector pos, vector ori)
 	{
-		SEffectManager.PlayInWorld(eff, pos, ori);
+		SEffectManager.PlayInWorld(eff, pos);
 	}
 }
 
 class ExplosionTest : Building
 {
+	ref Timer m_Delay;
+	
 	void ExplosionTest()
 	{
-		SetEventMask(EntityEvent.INIT); // Enable EOnInit event
+		m_Delay = new Timer;
+		m_Delay.Run(1, this, "ExplodeNow", null, false);
 	}
 	
-	override void EOnInit(IEntity other, int extra)
+	void ExplodeNow()
 	{
-		//SetPosition("0 101 0");
-		Print(GetPosition());
 		Explode("Explosion_NonLethal");
 	}
 }

@@ -22,7 +22,7 @@ class ActionForceDrink: ActionForceConsume
 		m_MessageFail = "Player moved too far away.";
 		m_MessageCancel = "I stopped forcing target to drink.";	
 		
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_POURBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
@@ -40,7 +40,7 @@ class ActionForceDrink: ActionForceConsume
 		
 	override string GetText()
 	{
-		return "Give drink";
+		return "#give_drink";
 	}
 };
 	

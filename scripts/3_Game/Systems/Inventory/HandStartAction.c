@@ -22,12 +22,20 @@ class HandStartAction extends HandStateBase
 			HumanCommandWeapons hcw = hmn.GetCommandModifier_Weapons();
 			if (hcw)
 			{
-				hcw.StartAction(m_Action, m_ActionType);
-		
-				if (hcw.GetRunningAction() == m_Action && hcw.GetRunningActionType() == m_ActionType)
-					hndDebugPrint("HCW: playing A=" + typename.EnumToString(WeaponActions, m_Action) + " AT=" + WeaponActionTypeToString(m_Action, m_ActionType) + " fini=" + hcw.IsActionFinished());
+				if (m_ActionType == -1)
+				{
+					hcw.StartAction(-1, -1);
+					hndDebugPrint("HCW: playing A=-1 AT=-1 fini=" + hcw.IsActionFinished());
+				}
 				else
-					Error("HCW: NOT playing A=" + typename.EnumToString(WeaponActions, m_Action) + " AT=" + WeaponActionTypeToString(m_Action, m_ActionType) + " fini=" + hcw.IsActionFinished());
+				{
+					hcw.StartAction(m_Action, m_ActionType);
+		
+					if (hcw.GetRunningAction() == m_Action && hcw.GetRunningActionType() == m_ActionType)
+						hndDebugPrint("HCW: playing A=" + typename.EnumToString(WeaponActions, m_Action) + " AT=" + WeaponActionTypeToString(m_Action, m_ActionType) + " fini=" + hcw.IsActionFinished());
+					else
+						Error("HCW: NOT playing A=" + typename.EnumToString(WeaponActions, m_Action) + " AT=" + WeaponActionTypeToString(m_Action, m_ActionType) + " fini=" + hcw.IsActionFinished());
+				}
 			}
 			else
 				hndDebugPrint("---: remote playing A=" + typename.EnumToString(WeaponActions, m_Action) + " AT=" + WeaponActionTypeToString(m_Action, m_ActionType));

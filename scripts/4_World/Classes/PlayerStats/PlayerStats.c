@@ -6,9 +6,7 @@ enum EPSstatsFlags
 
 enum EPlayerStats
 {
-	TEMPERATURE,
 	HEATCOMFORT,
-	HEATISOLATION,
 	TREMOR,
 	WET,
 	ENERGY,
@@ -44,26 +42,10 @@ class PlayerStats
 		m_PlayerStats 	= new array<ref PlayerStatBase>;
 		m_Player 		= player;
 		
-		/*	VARIABLES TO BE ADDED
-		"feet",
-		"restrainedwith", 
-		"kzombies",
-		"kplayers",	
-		"bleedingsources",	
-		"myNotifiers",
-		"damageArray",
-		"musclecramp",
-		"penalties",	
-		"totalWeight"
-	*/
 		//																	min						max						initial					name				flag
-		//RegisterStat(EPlayerStats.SHOCK,	  		new PlayerStat<float>	(0,						5000, 					0, 						"Shock",			EPSstatsFlags.EMPTY) );
-		//RegisterStat(EPlayerStats.UNCONSCIOUS,  	new PlayerStat<float>	(0,						1,						0,						"Unconscious",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.TEMPERATURE,  	new PlayerStat<float>	(30,					45,						36.3,					"Temperature",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.HEATCOMFORT,  	new PlayerStat<float>	(-100,					300,					-20,					"HeatComfort",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.HEATISOLATION,  	new PlayerStat<float>	(0,						5000,					0,						"HeatIsolation",	EPSstatsFlags.EMPTY) );
+		RegisterStat(EPlayerStats.HEATCOMFORT,  	new PlayerStat<float>	(-1,					1,						0,						"HeatComfort",		EPSstatsFlags.EMPTY) );
 		RegisterStat(EPlayerStats.TREMOR,		  	new PlayerStat<float>	(0,						1,						0,						"Tremor",			EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.WET,  			new PlayerStat<float>	(0,						1,						0,						"Wet",				EPSstatsFlags.EMPTY) );
+		RegisterStat(EPlayerStats.WET,  			new PlayerStat<int>		(0,						1,						0,						"Wet",				EPSstatsFlags.EMPTY) );
 		RegisterStat(EPlayerStats.ENERGY,  			new PlayerStat<float>	(0,						20000,					600,					"Energy",			EPSstatsFlags.EMPTY) );
 		RegisterStat(EPlayerStats.WATER,  			new PlayerStat<float>	(0,						5000,					500,					"Water",			EPSstatsFlags.EMPTY) );
 		RegisterStat(EPlayerStats.STOMACH_SOLID,  	new PlayerStat<float>	(0,						5000,					0,						"StomachSolid",			EPSstatsFlags.EMPTY) );
@@ -72,7 +54,7 @@ class PlayerStats
 		RegisterStat(EPlayerStats.DIET,  			new PlayerStat<float>	(0,						5000,					2500,					"Diet",				EPSstatsFlags.EMPTY) );
 		RegisterStat(EPlayerStats.STAMINA,  		new PlayerStat<float>	(0,						STAMINA_MAX,			100,					"Stamina",			EPSstatsFlags.EMPTY) );
 		RegisterStat(EPlayerStats.SPECIALTY,  		new PlayerStat<float>	(-1,					1,						0,						"Specialty",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.BLOODTYPE,  		new PlayerStat<int>		(0,						7,				BloodTypes.GenerateBloodType(),	"BloodType",		EPSstatsFlags.EMPTY) );
+		RegisterStat(EPlayerStats.BLOODTYPE,  		new PlayerStat<int>		(0,						128,					BloodTypes.GenerateBloodType(),	"BloodType",		EPSstatsFlags.EMPTY) );
 	}
 
 	void ~PlayerStats()

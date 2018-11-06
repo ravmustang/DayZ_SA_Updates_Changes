@@ -7,6 +7,7 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 		m_MessageSuccess = "m_MessageSuccess";
 		m_MessageFail = "m_MessageFail";
 		m_MessageCancel = "m_MessageCancel";
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 	}
 	
 	override void CreateConditionComponents()  
@@ -66,12 +67,7 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 		return false;
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
-	{
-		Process(action_data);
-	}
-	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Process(action_data);
 	}

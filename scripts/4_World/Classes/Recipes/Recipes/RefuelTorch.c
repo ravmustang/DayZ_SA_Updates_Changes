@@ -4,7 +4,7 @@ class RefuelTorch extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "Refuel";
+		m_Name = "#STR_RefuelTorch0";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 0.25;//animation length in relative time units
 		m_Specialty = 0.02;// value > 0 for roughness, value < 0 for precision
@@ -61,7 +61,7 @@ class RefuelTorch extends RecipeBase
 		Rag rag = Rag.Cast(ingredients[0]);
 		Torch torch = Torch.Cast(ingredients[1]);
 		
-		if (!rag  ||  torch)
+		if (!rag  ||  !torch)
 			return false;
 		
 		Rag rag_on_torch = Rag.Cast(  torch.GetInventory().FindAttachment( rag.GetInventory().GetSlotId(0) )  );
@@ -90,7 +90,14 @@ class RefuelTorch extends RecipeBase
 		}
 		else
 		{
-			player.ServerTakeEntityToTargetAttachment(torch, rag);
+			if ( GetGame().IsServer()  &&  GetGame().IsMultiplayer() )
+			{
+				player.ServerTakeEntityToTargetAttachment(torch, rag); // multiplayer server side
+			}
+			else
+			{
+				player.LocalTakeEntityToTargetAttachment(torch, rag); // single player or multiplayer client side
+			}
 		}
 	}
 };

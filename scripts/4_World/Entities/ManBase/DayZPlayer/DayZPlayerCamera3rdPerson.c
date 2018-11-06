@@ -24,6 +24,7 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 		m_fCameraLRShoulderVel[0]	= 0.0;
 		m_fRoll						= 0.0;
 		m_WeaponSwayModifier		= 1;
+		m_fLeanDistance				= 0.3;
 	}
 		
 
@@ -44,6 +45,8 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 	//	
 	override void 		OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
 	{
+		m_pPlayer.GetMovementState(m_MovementState);
+		
 		//! update angles from input 
 		float 	udAngle 	= UpdateUDAngle(m_fUpDownAngle, m_fUpDownAngleAdd, CONST_UD_MIN, CONST_UD_MAX, pDt);
 		m_CurrentCameraPitch = udAngle;
@@ -59,7 +62,7 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 			m_fCameraLRShoulder = Math.SmoothCD(m_fCameraLRShoulder, -1.0, m_fCameraLRShoulderVel, 0.14, 1000, pDt);
 		}
 
-		float 	shoulderDist = m_fCameraLRShoulder * m_fShoulderWidth;
+		float 	shoulderDist = m_fCameraLRShoulder * m_fShoulderWidth + m_MovementState.m_fLeaning * m_fLeanDistance;
 		
 		//! 
 		vector rot;
@@ -101,7 +104,7 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 		pOutResult.m_fUseHeading 	= 1.0;
 		pOutResult.m_fInsideCamera 	= 0.0;
 
-		super.OnUpdate(pDt, pOutResult);
+		StdFovUpdate(pDt, pOutResult);
 	}
 
 	//
@@ -127,6 +130,7 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 	protected 	float 	m_fShoulderWidth;	//!< shoulder camera widths
 	protected 	bool	m_bShoulderInLS;	//!< true - shoulder is in local space
 	protected 	float 	m_fRoll;			//!< camera roll
+	protected	float	m_fLeanDistance;	//!< shift on leaning
 
 
 	//! runtime values 
@@ -137,6 +141,9 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 	//! shoulder offsets
 	protected float 	m_fCameraLRShoulder;			// -1..1 shoulderness :)
 	protected float 	m_fCameraLRShoulderVel[1];		// 0
+	
+	//! movement state
+	ref HumanMovementState m_MovementState = new HumanMovementState();
 }
 
 
@@ -156,6 +163,59 @@ class DayZPlayerCamera3rdPersonErc extends DayZPlayerCamera3rdPerson
 		m_CameraOffsetLS	= "0.0 0.3 0.0";
 		m_fShoulderWidth	= 0.3;
 	}
+}
+
+
+// *************************************************************************************
+// ! DayZPlayerCamera3rdPersonJump - 3rd person jump
+// *************************************************************************************
+class DayZPlayerCamera3rdPersonJump extends DayZPlayerCamera3rdPersonErc
+{
+	void DayZPlayerCamera3rdPersonJump(DayZPlayer pPlayer, HumanInputController pInput)
+	{
+		Print("new camera: DayZPlayerCamera3rdPersonJump");
+		
+		//! runtime config
+		m_fDelay			= 0.15;
+		m_fDamping			= 0.25;
+		
+		//! runtime values
+		m_fJumpStartY		= pPlayer.GetOrigin()[1];
+		m_fJumpOffset		= 0;
+		m_fDelayTimer		= 0;		
+	}
+	
+	//	
+	override void 		OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
+	{
+		super.OnUpdate(pDt, pOutResult);
+
+		float yPos = m_pPlayer.GetOrigin()[1];
+		float yDiff = yPos - m_fJumpStartY;
+		
+		if( m_fDelayTimer < m_fDelay )
+		{
+			m_fDelayTimer += pDt;
+			m_fJumpOffset = yDiff;
+		}
+		else
+		{
+			m_fJumpOffset = Math.SmoothCD(m_fJumpOffset, -(m_fDamping * yDiff), m_jumpOffsetVelocity, 0.3, 1000, pDt);
+		}
+		
+		float newY = pOutResult.m_CameraTM[3][1] - m_fJumpOffset;
+		pOutResult.m_CameraTM[3][1] = newY;		
+	}
+
+	//! runtime config
+	float m_fDelay;
+	float m_fDamping;
+
+	//! runtime values
+	float m_fDelayTimer;
+	float m_fJumpStartY;
+	float m_fJumpOffset;
+	float m_jumpOffsetVelocity[1];	
 }
 
 
@@ -302,12 +362,11 @@ class DayZPlayerCamera3rdPersonCrouch extends DayZPlayerCamera3rdPerson
 
 	//	
 	override void 		OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
-	{
-		ref HumanMovementState		state 	= new HumanMovementState();		
-		m_pPlayer.GetMovementState(state);
+	{				
+		m_pPlayer.GetMovementState(m_MovementState);
 
 		//! movement height 
-		float 	movement 	= (Limit(state.m_iMovement, 1, 3) - 1.0) * 0.5;
+		float 	movement 	= (Limit(m_MovementState.m_iMovement, 1, 3) - 1.0) * 0.5;
 		movement 			*= CONST_CAMERAMOVEMENTHEIGH;
 		m_fCameraHeight		= Math.SmoothCD(m_fCameraHeight, movement, m_fCameraHeightVel, 0.2, 1000, pDt);
 		m_CameraOffsetMS[1] = 0.7 + m_fCameraHeight;		
@@ -370,6 +429,7 @@ class DayZPlayerCamera3rdPersonProneBase extends DayZPlayerCamera3rdPerson
 	override void 		OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
 	{
 		//! update angles from input 
+		// 
 		float 	udAngle 	= UpdateUDAngle(m_fUpDownAngle, m_fUpDownAngleAdd, CONST_UD_MIN, CONST_UD_MAX, pDt);
 		m_CurrentCameraPitch = udAngle;
 
@@ -435,7 +495,7 @@ class DayZPlayerCamera3rdPersonProneBase extends DayZPlayerCamera3rdPerson
 		pOutResult.m_fPositionModelSpace = 1.0;
 		pOutResult.m_bUpdateWhenBlendOut	= false;
 		
-		super.OnUpdate(pDt, pOutResult);
+		StdFovUpdate(pDt, pOutResult);
 	}
 }
 
@@ -469,21 +529,5 @@ class DayZPlayerCamera3rdPersonProneRaised extends DayZPlayerCamera3rdPersonPron
 		m_CameraOffsetMS	= "0.0 0.4 0.0";
 		m_CameraOffsetLS	= "0.0 0.2 0.0";
 		m_fShoulderWidth	= 0.5;
-	}
-}
-
-// *************************************************************************************
-// ! DayZPlayerCamera3rdPersonVehicle - 3rd person in vehicle (generic)
-// *************************************************************************************
-class DayZPlayerCamera3rdPersonVehicle extends DayZPlayerCamera3rdPerson
-{
-	void DayZPlayerCamera3rdPersonVehicle (DayZPlayer pPlayer, HumanInputController pInput)
-	{
-		Print("new camera: DayZPlayerCamera3rdPersonVehicle");
-		
-		m_fDistance 		= 4.0;
-		m_CameraOffsetMS	= "0.0 0.7 0.0";
-		m_CameraOffsetLS	= "0.0 0.3 0.0";
-		m_fShoulderWidth	= 0.0;
 	}
 }

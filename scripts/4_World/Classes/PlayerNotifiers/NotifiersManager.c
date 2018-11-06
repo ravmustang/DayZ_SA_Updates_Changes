@@ -1,31 +1,48 @@
+enum eNotifiers
+{
+	NTF_HEALTHY,
+	NTF_BLEEDISH,
+	NTF_HUNGRY,
+	NTF_THIRSTY,
+	NTF_STUFFED,
+	NTF_SICK,
+	NTF_WETNESS,
+	NTF_WARMTH,
+	NTF_FEVERISH,
+	NTF_BLOOD,
+	NTF_LIVES,
+	NTF_STAMINA,
+	NTF_AGENT_INFECTION,
+	NTF_COUNT,// !!! LAST ITEM !!!
+
+}
+
+
 class NotifiersManager
 {
 
 	ref array<ref NotifierBase> 	m_Notifiers;
 	PlayerBase						m_Player;
-	ref DisplayStatus			m_DisplayStatus;
-	float							m_MinTickTime;
+	ref VirtualHud					m_VirtualHud;
+	int								m_MinTickTime;
 	string 							m_System = "Notifiers";
 	void NotifiersManager(PlayerBase player)
 	{
 		m_Player = player;
 
-		//this may be commented out on server
 		m_Notifiers = new array<ref NotifierBase>;
 		
-		m_Notifiers.Insert(new Hungry(this));
-		m_Notifiers.Insert(new Thirsty(this));
-		m_Notifiers.Insert(new Warmth(this));
-		m_Notifiers.Insert(new Wetness(this));
-		m_Notifiers.Insert(new Fracture(this));
-		m_Notifiers.Insert(new Healthy(this));
-		m_Notifiers.Insert(new Feverish(this));
-		m_Notifiers.Insert(new Sick(this));
-		m_Notifiers.Insert(new Bleedish(this));
-		m_Notifiers.Insert(new Stuffed(this));
-		m_Notifiers.Insert(new Blood(this));
-		m_Notifiers.Insert(new Lives(this));
-		m_Notifiers.Insert(new AgentInfectionTendency(this));
+		m_Notifiers.Insert(new HungerNotfr(this));
+		m_Notifiers.Insert(new ThirstNotfr(this));
+		m_Notifiers.Insert(new WarmthNotfr(this));
+		m_Notifiers.Insert(new WetnessNotfr(this));
+		m_Notifiers.Insert(new HealthNotfr(this));
+		m_Notifiers.Insert(new FeverNotfr(this));
+		m_Notifiers.Insert(new SickNotfr(this));
+		m_Notifiers.Insert(new BleedingNotfr(this));
+		m_Notifiers.Insert(new StuffedNotfr(this));
+		m_Notifiers.Insert(new BloodNotfr(this));
+		m_Notifiers.Insert(new AgentsNotfr(this));
 		
 		m_MinTickTime = MIN_TICK_NOTIFIERS;
 	}
@@ -35,9 +52,9 @@ class NotifiersManager
 		return m_Player;
 	}
 
-	DisplayStatus GetDisplayStatus()
+	VirtualHud GetVirtualHud()
 	{
-		return m_DisplayStatus;
+		return m_VirtualHud;
 	}
 
 
@@ -72,7 +89,7 @@ class NotifiersManager
 
 	void TickNotifiers()
 	{
-		float current_time = GetGame().GetTime();
+		int current_time = GetGame().GetTime();
 
 		for(int i = 0;i < m_Notifiers.Count(); i++)
 		{

@@ -20,16 +20,86 @@ class BarbedWire extends ItemBase
 	
 	private bool m_TriggerActive;
 	private bool m_IsPlaced;
+	private bool m_IsMounted;
 	
 	void BarbedWire()
 	{
 		m_SparkEvent 	= new Timer( CALL_CATEGORY_GAMEPLAY );
 		m_TriggerActive = false;
 		m_IsPlaced 		= false;
+		
+		//synchronized variables
+		RegisterNetSyncVariableInt( "m_IsMounted" );		
 	}
 	
 	void ~BarbedWire() {}
 	
+	bool IsMounted()
+	{
+		return m_IsMounted;
+	}
+	
+	void SetMountedState( bool is_mounted )
+	{
+		m_IsMounted = is_mounted;
+		
+		Synchronize();
+	}
+
+	// --- SYNCHRONIZATION
+	void Synchronize()
+	{
+		if ( GetGame().IsServer() )
+		{
+			SetSynchDirty();
+			
+			if ( GetGame().IsMultiplayer() )
+			{
+				RefreshParent();
+			}
+		}
+	}
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+
+		//update parent (client)
+		RefreshParent();
+	}	
+
+	void RefreshParent()
+	{
+		EntityAI parent = GetHierarchyParent();
+		
+		//Base building objects
+		BaseBuildingBase base_building = BaseBuildingBase.Cast( parent );
+		if ( base_building )
+		{
+			base_building.Refresh();
+		}
+	}
+	
+	// --- EVENTS
+	override void OnStoreSave( ParamsWriteContext ctx )
+	{   
+		super.OnStoreSave( ctx );
+		
+		//sync parts 01
+		ctx.Write( m_IsMounted );
+	}
+	
+	override void OnStoreLoad( ParamsReadContext ctx )
+	{
+		super.OnStoreLoad( ctx );
+		
+		//Restore synced parts data
+		bool mounted_state;
+		ctx.Read( mounted_state );
+		SetMountedState( mounted_state );
+	}
+	
+	// ---
 	override void OnWorkStart()
 	{
 		SoundBuzzLoopStart();
@@ -43,6 +113,11 @@ class BarbedWire extends ItemBase
 		}
 	}
 
+	override string GetDeploySoundset()
+	{
+		return "barbedwire_deploy_SoundSet";
+	}	
+	
 	override void OnWorkStop()
 	{
 		SoundBuzzLoopStop();

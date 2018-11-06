@@ -39,7 +39,7 @@ class PumpShotgunLoadedCharged extends WeaponStableState
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
 };
-class PumpShotgunJammed extends WeaponStableState
+class PumpShotgunJammed extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { LoadedJammed L_J"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } LoadedJammed L_J"); }
@@ -121,6 +121,32 @@ class ShotgunChambering extends WeaponStateBase
 	{
 		super.OnExit(e);
 	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
 };
 
 
@@ -172,7 +198,7 @@ ref WeaponStateBase J;
 		
 		WeaponStateBase		Trigger_E = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
 		WeaponStateBase		Trigger_F = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
-		WeaponStateBase		Trigger_L = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL);
+		WeaponStateBase		Trigger_L = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL, WeaponActionFireTypes.FIRE_JAM);
 		WeaponStateBase		Trigger_J = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
 		// extend Rifle_Base fsm
 		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
@@ -271,6 +297,7 @@ ref WeaponStateBase J;
 		m_fsm.AddTransition(new WeaponTransition(Trigger_E,	_abt_, E));
 		
 		m_fsm.AddTransition(new WeaponTransition(L,			__T__, Trigger_L)); // fire.cocked
+		m_fsm.AddTransition(new WeaponTransition(Trigger_L,	_fin_, J, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_L,	_fin_, F));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_L,	_rto_, J, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_L,	_rto_, F, NULL, new WeaponGuardChamberFiredOut(this)));

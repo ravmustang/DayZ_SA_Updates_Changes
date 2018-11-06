@@ -1,3 +1,8 @@
+class ActionTakeItemReciveData : ActionReciveData
+{
+	ref InventoryLocation		m_InventoryLocation;
+}
+
 class ActionTakeItem: ActionInteractBase
 {
 	string m_ItemName = "";
@@ -48,9 +53,9 @@ class ActionTakeItem: ActionInteractBase
 		EntityAI tgt_parent = EntityAI.Cast( target.GetParent() );
 		EntityAI tgt_entity = EntityAI.Cast( target.GetObject() );
 		
-		if ( (tgt_entity && !tgt_entity.GetParent()) || ( tgt_parent && tgt_parent.GetInventory().CanRemoveAttachment( tgt_entity ) ) )
+		if ( tgt_entity && !tgt_parent )
 		{
-			if( tgt_entity && tgt_entity.IsItemBase() && player.GetInventory().CanAddEntityIntoInventory(tgt_entity) && tgt_entity.GetHierarchyRootPlayer() != player )
+			if ( tgt_entity && tgt_entity.IsItemBase() && player.GetInventory().CanAddEntityIntoInventory(tgt_entity) && tgt_entity.GetHierarchyRootPlayer() != player )
 			{
 				return true;
 			}
@@ -58,28 +63,39 @@ class ActionTakeItem: ActionInteractBase
 		return false;
 	}
 	
-	override void WriteToContext(ParamsWriteContext ctx, ActionData action_data)
+	/*override void WriteToContext(ParamsWriteContext ctx, ActionData action_data)
 	{
 		super.WriteToContext(ctx, action_data);
 		InventoryLocation il = action_data.m_ReservedInventoryLocations.Get(0);
 		il.WriteToContext(ctx);
 	}
 	
-	override bool ReadFromContext(ParamsReadContext ctx, ActionData action_data)
+	override bool ReadFromContext(ParamsReadContext ctx, out ActionReciveData action_recive_data )
 	{
-		if(super.ReadFromContext(ctx, action_data))
+		if(!action_recive_data)
 		{
-			InventoryLocation il;
-			il = new InventoryLocation;
-			if(il.ReadFromContext(ctx))
+			action_recive_data = new ActionTakeItemReciveData;
+		}
+		
+		if(super.ReadFromContext(ctx, action_recive_data))
+		{
+			ActionTakeItemReciveData recive_data_ti = ActionTakeItemReciveData.Cast(action_recive_data);
+			recive_data_ti.m_InventoryLocation = new InventoryLocation;
+			if(recive_data_ti.m_InventoryLocation.ReadFromContext(ctx))
 			{
-				action_data.m_ReservedInventoryLocations.Insert(il);
 				return true;
 			}
 		}
 			
 		return false;
 	}
+	
+	override void HandleReciveData(ActionReciveData action_recive_data, ActionData action_data)
+	{
+		super.HandleReciveData(action_recive_data, action_data);
+		ActionTakeItemReciveData recive_data_ti = ActionTakeItemReciveData.Cast(action_recive_data);
+		action_data.m_ReservedInventoryLocations.Insert(recive_data_ti.m_InventoryLocation);
+	} */
 	
 	
 	
@@ -92,11 +108,15 @@ class ActionTakeItem: ActionInteractBase
 		ItemBase targetItem;
 		if ( ItemBase.CastTo(targetItem, action_data.m_Target.GetObject()) )
 		{
-			action_data.m_Player.GetInventory().FindFreeLocationFor( targetItem , FindInventoryLocationType.ANY, il );
-			if ( !action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, il, 10000) )
+			action_data.m_Player.GetInventory().FindFreeLocationFor( targetItem , FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, il );
+			if ( action_data.m_Player.GetInventory().HasInventoryReservation( targetItem, il) )
 			{
 				success = false;
-			}				
+			}
+			else
+			{
+				action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, il, 10000);
+			}			
 		}	
 		
 		if ( success )
@@ -110,31 +130,26 @@ class ActionTakeItem: ActionInteractBase
 	
 	override void OnExecuteServer( ActionData action_data )
 	{
-		ItemBase ntarget = ItemBase.Cast(action_data.m_Target.GetObject());
+		if (GetGame().IsMultiplayer())
+			return;
 		
-		if (!GetGame().IsMultiplayer())
-		{
-			ActionManagerClient am = ActionManagerClient.Cast(action_data.m_Player.GetActionManager());
-			am.UnlockInventory(action_data);
-		}
-		/*InventoryLocation targetInventoryLocation = new InventoryLocation;
+		//Debug.Log("[Action DEBUG] Start time stamp: " + action_data.m_Player.GetSimulationTimeStamp());
+		ItemBase ntarget = ItemBase.Cast(action_data.m_Target.GetObject());	
+		InventoryLocation il = action_data.m_ReservedInventoryLocations.Get(0);	
+		InventoryLocation targetInventoryLocation = new InventoryLocation;
 		ntarget.GetInventory().GetCurrentInventoryLocation(targetInventoryLocation);
 		
-		ntarget.GetInventory().TakeToDst(InventoryMode.PREDICTIVE,targetInventoryLocation, il);*/
-		
-		action_data.m_Player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY, ntarget);
+		action_data.m_Player.PredictiveTakeToDst(targetInventoryLocation, il);
 	}
 	
 	override void OnExecuteClient( ActionData action_data )
 	{
+		//Debug.Log("[Action DEBUG] Start time stamp: " + action_data.m_Player.GetSimulationTimeStamp());
 		ItemBase ntarget = ItemBase.Cast(action_data.m_Target.GetObject());
-
-		ActionManagerClient am = ActionManagerClient.Cast(action_data.m_Player.GetActionManager());
-		am.UnlockInventory(action_data);
-		/*InventoryLocation targetInventoryLocation = new InventoryLocation;
+		InventoryLocation il = action_data.m_ReservedInventoryLocations.Get(0);		
+		InventoryLocation targetInventoryLocation = new InventoryLocation;
 		ntarget.GetInventory().GetCurrentInventoryLocation(targetInventoryLocation);
 		
-		ntarget.LocalTakeToDst(targetInventoryLocation, il);*/
-		action_data.m_Player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY, ntarget);
+		action_data.m_Player.PredictiveTakeToDst(targetInventoryLocation, il);
 	}
 };

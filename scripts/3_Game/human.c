@@ -129,6 +129,8 @@ class HumanInputController
 	//! returns 1..12 if some gesture slot is used, 0 otherwise
 	proto native int 			IsGestureSlot();
 
+	//! returns true, if player controls other entity (vehicle for example)
+	proto native bool 			IsOtherController();
 
 	//--------------------------------------------------------------
 
@@ -433,6 +435,8 @@ class HumanCommandDeath
 class HumanCommandUnconscious
 {	
 	proto native void 	WakeUp();
+	proto native bool	IsOnLand();
+	proto native bool	IsInWater();
 }
 
 
@@ -493,6 +497,12 @@ class HumanCommandVehicle
 	
 	proto native void				GetOutVehicle();
 	proto native void				JumpOutVehicle();
+	proto native void				SwitchSeat(int pTransportPositionIndex, int pVehicleSeat);
+	proto native bool				IsGettingIn();
+	proto native bool				IsGettingOut();
+	proto native bool				IsSwitchSeat();
+	proto native bool				WasGearChange();
+	proto native void				SetClutchState(bool pState);
 }
 
 // *************************************************************************************
@@ -538,6 +548,7 @@ class HumanCommandFullBodyDamage
 //! actions
 enum WeaponActions
 {
+	INTERRUPT			= 15,
 	NONE                = -1,
 	RELOAD 				= 0,
 	MECHANISM			= 1,
@@ -626,6 +637,7 @@ enum WeaponActionUnjammingTypes
 	//! unjam action types
 	UNJAMMING_START 					= 1,		// CMD_Weapon_Jam - 0
 	UNJAMMING_END 						= 0,		// 1
+	UNJAMMING_INTERRUPT					= -1,
 };
 
 enum WeaponActionFireTypes
@@ -653,6 +665,7 @@ string WeaponActionTypeToString (int A, int AT)
 {
 	switch (A)
 	{
+		case WeaponActions.INTERRUPT: return "Weapon interrupt";
 		case WeaponActions.NONE: return "---";
 		case WeaponActions.RELOAD: return typename.EnumToString(WeaponActionReloadTypes, AT);
 		case WeaponActions.MECHANISM: return typename.EnumToString(WeaponActionMechanismTypes, AT);
@@ -720,6 +733,9 @@ class HumanCommandWeapons
 	//! sets head tilt to optics
 	proto native	void		SetADS(bool pState);
 
+	//! command for lifting weapon near obstacled (works only when weapon is raised)
+	proto native	void		LiftWeapon(bool pState);
+
 	//!
 	void 	RegisterDefaultEvents()
 	{
@@ -762,6 +778,16 @@ class HumanCommandWeapons
 
 
 	//----------------------------------------------------
+	// 
+
+	//! returns base aiming angle UD - without sway/offsets/...
+	proto native float 			GetBaseAimingAngleUD();
+
+	//! returns base aiming angle LR - without sway/offsets/...
+	proto native float 			GetBaseAimingAngleLR();
+
+
+	//----------------------------------------------------
 	// debug copy 
 
 	//! return -1 when there is no event, otherwise it returns pId of event from animation 
@@ -783,6 +809,9 @@ class HumanCommandAdditives
 
 	//! sets exhaustion level 0..1, interpolate == false -> resets the value, otherwise it's interpolating towards the new value
 	proto native void 	SetExhaustion(float pValue, bool pInterpolate);
+
+	//! sets talking
+	proto native void 	SetTalking(bool pValue);
 }
 
 
@@ -794,7 +823,8 @@ class HumanMovementState
 	int 		m_CommandTypeId;	//! current command's id 
 	int 		m_iStanceIdx;		//! current stance (DayZPlayer.STANCEIDX_ERECT, ...), only if the command has a stance
 	int 		m_iMovement;		//! current movement (0 idle, 1 walk, 2-run, 3-sprint), only if the command has a movement 
-
+	float		m_fLeaning;			//! leaning state (not all commands need to have all movements)
+	
 	//! 
 	bool		IsRaised()
 	{
@@ -925,7 +955,7 @@ class Human extends Man
 	//!----- Death -----
 
 	//! starts command - death
-	proto native 	HumanCommandDeath			StartCommand_Death();
+	proto native 	HumanCommandDeath			StartCommand_Death(int pType, float pDirection);
 
 	proto native 	HumanCommandDeath			GetCommand_Death();
 

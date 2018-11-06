@@ -37,7 +37,7 @@ class ActionDigStash: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Dig stash";
+		return "#dig_stash";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -117,12 +117,25 @@ class ActionDigStash: ActionContinuousBase
 	}
 	
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
+		EntityAI targetEntity = EntityAI.Cast(targetObject);
 		UndergroundStash target_stash;
+		if (!targetEntity)
+		{
+			Error("ActionDigStash - Cannot get inventory of targetObject=" + targetObject);
+			return;
+		}
 		
-		if ( Class.CastTo(target_stash, targetObject) )
+		InventoryLocation target_IL = new InventoryLocation;
+		if (!targetEntity.GetInventory().GetCurrentInventoryLocation(target_IL))
+		{
+			Error("ActionDigStash: Cannot get inventory location of targetObject=" + targetObject);
+			return;
+		}
+		
+		if ( Class.CastTo(target_stash, targetEntity) )
 		{
 			ItemBase chest = target_stash.GetStashedItem();
 			
@@ -138,19 +151,25 @@ class ActionDigStash: ActionContinuousBase
 		{
 			ItemBase stashed_item;
 			UndergroundStash stash;
-			vector pos = targetObject.GetPosition();
-			
-			Class.CastTo(stashed_item,  targetObject );
+			vector pos = targetEntity.GetPosition();
+						
+			Class.CastTo(stashed_item,  targetEntity );
 			Class.CastTo(stash,  GetGame().CreateObject("UndergroundStash", pos, false) );
 			  
 			if ( stash )
 			{
 				stash.PlaceOnGround();
-				action_data.m_Player.ServerTakeEntityToTargetCargo(stash, stashed_item);
+				
+				if (GameInventory.LocationCanRemoveEntity(target_IL))
+				{
+					action_data.m_Player.ServerTakeEntityToTargetCargo(stash, stashed_item);
+				}
+				else
+					Print("ActionDigStash: Cannot remove targetObject=" + targetObject + " obj from current location=" + target_IL.DumpToString());
 			}
 			else
 			{
-				Print("ERROR! Stash not spawned!");
+				Error("ERROR! ActionDigStash: Stash not spawned!");
 			}
 		}
 

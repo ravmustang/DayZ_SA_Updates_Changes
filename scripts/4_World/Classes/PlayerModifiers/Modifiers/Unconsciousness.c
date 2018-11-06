@@ -1,7 +1,5 @@
-class Unconsciousness: ModifierBase
+class UnconsciousnessMdfr: ModifierBase
 {
-	const float SHOCK_COOLDOWN_PER_SEC = -10;
-	
 	override void Init()
 	{
 		m_TrackActivatedTime = false;

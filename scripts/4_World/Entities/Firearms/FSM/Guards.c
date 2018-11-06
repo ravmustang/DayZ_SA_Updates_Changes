@@ -64,8 +64,9 @@ class WeaponGuardJammed extends WeaponGuardBase
 
 	override bool GuardCondition (WeaponEventBase e)
 	{
-		int mi = m_weapon.GetCurrentMuzzle();
-		if (m_weapon.IsChamberJammed(mi))
+		/*int mi = m_weapon.GetCurrentMuzzle();
+		if (m_weapon.IsChamberJammed(mi))*/
+		if(m_weapon.IsJammed())
 		{
 			wpnDebugPrint("[wpnfsm] guard - jammed");
 			return true;

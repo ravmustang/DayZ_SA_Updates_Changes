@@ -23,7 +23,7 @@ class ActionWashHandsWaterOne extends ActionInteractLoopBase
 
 	override string GetText()
 	{
-		return "Wash hands";
+		return "#wash_hands";
 	}
 
 	override void CreateConditionComponents()  
@@ -51,7 +51,7 @@ class ActionWashHandsWaterOne extends ActionInteractLoopBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
 		module_lifespan.UpdateBloodyHandsVisibility( action_data.m_Player, false );

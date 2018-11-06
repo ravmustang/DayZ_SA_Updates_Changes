@@ -44,7 +44,7 @@ class BotHunt extends BotStateBase
 		m_Target = BotSelectNearestTarget(GetPlayerOwner());
 		m_Tracking.m_Target = m_Target;
 		m_Hunting.m_Target = m_Target;
-		botDebugPrint("[bot] hunt SelectTarget target=" + m_Target);
+		botDebugPrint("[bot] + " + m_Owner + " hunt SelectTarget target=" + m_Target);
 	}
 
 	override void OnEntry (BotEventBase e)
@@ -126,7 +126,7 @@ class BotHunt_Tracking extends BotStateBase
 		{
 			m_Tracking = true;
 			vector targetPos = m_Target.GetPosition();
-			botDebugPrint("[bot] hunt Tracking target=" + m_Target + " pos=" + targetPos);
+			botDebugPrint("[bot] + " + m_Owner + " hunt Tracking target=" + m_Target + " pos=" + targetPos);
 
 			// tmp dist check
 			float d = vector.Distance(m_Target.GetPosition(), GetPlayerOwner().GetPosition());
@@ -241,8 +241,8 @@ Man BotSelectNearestTarget (EntityAI bot)
 
 	if (min_index != -1)
 	{
-		botDebugPrint("[bot] BotSelectNearestTarget idx=" + min_index + " dist=" + min_dist + " obj=" + o);
-		return objects.Get(min_index);
+		botDebugPrint("[bot] + " + bot + " BotSelectNearestTarget idx=" + min_index + " dist=" + min_dist + " obj=" + o);
+		return Man.Cast( objects.Get(min_index) );
 	}
 	return null;
 }

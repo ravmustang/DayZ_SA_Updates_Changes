@@ -5,15 +5,32 @@ class Megaphone extends ItemMegaphone
 		return true;
 	}	
 
+	//--- POWER EVENTS	
+	override void OnSwitchOn()
+	{
+		if ( !GetCompEM().CanWork() )
+		{
+			GetCompEM().SwitchOff();
+		}
+	}	
+	
 	override void OnWorkStart()
 	{
 		//turn device on
-		this.SwitchOn ( true ); // Note: This is not Energy Manager function. This is engine function.
+		SwitchOn ( true ); // Note: This is not Energy Manager function. This is engine function.
 	}
 	
 	override void OnWorkStop()
 	{
+		//auto switch off (EM)
+		GetCompEM().SwitchOff();
+		
 		//turn off device
-		this.SwitchOn ( false ); // Note: This is not Energy Manager function. This is engine function.
+		SwitchOn ( false ); // Note: This is not Energy Manager function. This is engine function.
 	}
+	
+	//TODO add turn on/off actions
+	//proto native bool CanSpeak();
+	//proto native void SetCanSpeak(bool onOff); 	
+	
 }

@@ -49,22 +49,19 @@ class ActionConsume: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Consume";
-	}
-
-	override void OnCancelServer(ActionData action_data)
-	{
-		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0.01 )
-		{
-			action_data.m_MainItem.SetQuantity(0);
-		}
+		return "#consume";
 	}
 	
-	override void OnCompleteLoopServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{	
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0.01 )
 		{
 			action_data.m_MainItem.SetQuantity(0);
 		}
+		
+		EntityAI item = action_data.m_MainItem;
+		PlayerBase player = action_data.m_Player;
+		PluginTransmissionAgents plugin = PluginTransmissionAgents.Cast( GetPlugin(PluginTransmissionAgents) );
+		plugin.TransmitAgents(player, item, AGT_UACTION_TO_ITEM);
 	}
 };

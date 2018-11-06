@@ -99,8 +99,10 @@ class Defibrillator extends ItemBase
 	
 	void Discharge(PlayerBase victim)
 	{
-		if (!GetGame().IsMultiplayer()  ||  GetGame().IsClient())
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{
 			PlaySound(SHOCK_SOUND, 40);
+		}
 		
 		bool has_heart_attack = victim.m_ModifiersManager.IsModifierActive(eModifiers.MDF_HEART_ATTACK);
 		
@@ -111,7 +113,6 @@ class Defibrillator extends ItemBase
 		else
 		{
 			victim.m_ModifiersManager.ActivateModifier ( eModifiers.MDF_HEART_ATTACK );
-			//OlD_SHOCK//victim.GetStatShock().Add(500);
 		}
 		
 		GetCompEM().SwitchOff();

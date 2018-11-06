@@ -1,4 +1,4 @@
-class Fever: ModifierBase
+class FeverMdfr: ModifierBase
 {
 	private const float	 	TEMPERATURE_INCREMENT_PER_SEC = 0.1;
 		
@@ -12,15 +12,16 @@ class Fever: ModifierBase
 	override bool ActivateCondition(PlayerBase player)
 	{
 		//Print(GetGame().GetTime());
+		return player.GetModifiersManager().IsModifierActive(eModifiers.MDF_INFLUENZA);
 		return false;
 	}
 
 	override void OnActivate(PlayerBase player)
 	{
 		//Print(GetGame().GetTime());
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(NTF_FEVERISH);
+		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(eNotifiers.NTF_FEVERISH);
 		
-		player.GetStateManager().QueueUpPrimaryState(StateIDs.STATE_FEVERBLUR);
+		player.GetSymptomManager().QueueUpSecondarySymptom(SymptomIDs.SYMPTOM_FEVERBLUR);
 		
 	}
 
@@ -32,18 +33,18 @@ class Fever: ModifierBase
 
 	override void OnDeactivate(PlayerBase player)
 	{
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(NTF_FEVERISH);
-		player.GetStateManager().RemoveSecondaryState(StateIDs.STATE_FEVERBLUR);
+		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(eNotifiers.NTF_FEVERISH);
+		player.GetSymptomManager().RemoveSecondarySymptom(SymptomIDs.SYMPTOM_FEVERBLUR);
 	}
 
 
 	override bool DeactivateCondition(PlayerBase player)
 	{
-		return false;
+		return !player.GetModifiersManager().IsModifierActive(eModifiers.MDF_INFLUENZA);
 	}
 
 	override void OnTick(PlayerBase player, float deltaT)
 	{
-		player.GetStatTemperature().Add( (TEMPERATURE_INCREMENT_PER_SEC*deltaT) );
+		//player.GetStatTemperature().Add( (TEMPERATURE_INCREMENT_PER_SEC*deltaT) );
 	}
 };

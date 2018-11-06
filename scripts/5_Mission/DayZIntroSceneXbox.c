@@ -4,16 +4,14 @@ class DayZIntroSceneXbox: Managed
 	protected int m_LastShavedSeconds;
 	protected int m_LastPlayedCharacterID;
 	
-	protected ref TStringAdvanceArray 	m_genderList;
-	protected ref TStringAdvanceArray 	m_CharPersonalityMaleList;
-	protected ref TStringAdvanceArray 	m_CharPersonalityFemaleList;
-	protected ref TStringAdvanceArray 	m_CharShirtList;
-	protected ref TStringAdvanceArray 	m_CharPantsList;
-	protected ref TStringAdvanceArray 	m_CharShoesList;
+	protected ref TStringArray 	m_genderList;
+	protected ref TStringArray 	m_CharPersonalityMaleList;
+	protected ref TStringArray 	m_CharPersonalityFemaleList;
+	protected ref TStringArray 	m_CharShirtList;
+	protected ref TStringArray 	m_CharPantsList;
+	protected ref TStringArray 	m_CharShoesList;
 	protected ref TStringArray			m_AllCharacters;
 	
-	protected ref EntityAnimEndEventHandler 	m_anim_end_event_handler;
-
 	protected Camera		m_SceneCamera;
 	protected PlayerBase	m_SceneCharacter;
 	protected Weather		m_Weather;
@@ -72,11 +70,11 @@ class DayZIntroSceneXbox: Managed
 		float character_distance = 2.1;
 		
 		// Date		
-		m_Date.Insert(2017);	// Year
-		m_Date.Insert(10);	// Month
-		m_Date.Insert(11);	// Day
-		m_Date.Insert(9);	// Hour
-		m_Date.Insert(20);	// Minite
+		m_Date.Insert(2020);	// Year
+		m_Date.Insert(03);	// Month
+		m_Date.Insert(15);	// Day
+		m_Date.Insert(15);	// Hour
+		m_Date.Insert(00);	// Minite
 		
 		// Weather
 		float weather_overcast			= 0.45;
@@ -91,12 +89,12 @@ class DayZIntroSceneXbox: Managed
 		m_Weather = g_Game.GetWeather();
 		m_Weather.GetOvercast().SetLimits( weather_overcast, weather_overcast );
 		m_Weather.GetOvercast().SetForecastTimeLimits(weather_overcast, weather_overcast);
-		m_Weather.GetOvercast().Set( weather_overcast, 1.0, 1000);		
+		m_Weather.GetOvercast().Set( weather_overcast, 1.0, 1.0);		
 		m_Weather.GetOvercast().SetNextChange( 1 );
 		m_Weather.GetRain().SetLimits( weather_rain, weather_rain );
-		m_Weather.GetRain().Set( weather_rain, 0, 1000);
+		m_Weather.GetRain().Set( weather_rain, 0, 0);
 		m_Weather.GetFog().SetLimits( weather_fog, weather_fog );
-		m_Weather.GetFog().Set( weather_fog, 0, 1000);
+		m_Weather.GetFog().Set( weather_fog, 0, 0);
 		m_Weather.SetStorm(weather_storm_density, weather_storm_threshold, weather_storm_time_out);
 		m_Weather.SetWindSpeed(weather_windspeed);
 		m_Weather.SetWindMaximumSpeed(weather_windspeed);
@@ -167,13 +165,13 @@ class DayZIntroSceneXbox: Managed
 	void Init()
 	{
 		//fill default lists
-		m_genderList = new TStringAdvanceArray;
-		m_CharPersonalityMaleList = new TStringAdvanceArray;
-		m_CharPersonalityFemaleList = new TStringAdvanceArray;
+		m_genderList = new TStringArray;
+		m_CharPersonalityMaleList = new TStringArray;
+		m_CharPersonalityFemaleList = new TStringArray;
 		m_AllCharacters = new TStringArray;
-		m_CharShirtList = new TStringAdvanceArray;
-		m_CharPantsList = new TStringAdvanceArray;
-		m_CharShoesList = new TStringAdvanceArray;
+		m_CharShirtList = new TStringArray;
+		m_CharPantsList = new TStringArray;
+		m_CharShoesList = new TStringArray;
 		
 		string character_CfgName;
 		string root_path = "cfgCharacterCreation";
@@ -200,7 +198,6 @@ class DayZIntroSceneXbox: Managed
 		ChangeCharacter(m_LastPlayedCharacterID);
 		
 		PPEffects.Init();
-		PPEffects.SetBlur(0);
 		PPEffects.DisableBurlapSackBlindness(); //HOTFIX
 	}
 	
@@ -214,7 +211,6 @@ class DayZIntroSceneXbox: Managed
 			vector v = m_SceneCharacter.GetOrientation();
 			v[0] = -75;
 			m_SceneCharacter.SetOrientation(v);
-			m_SceneCharacter.SetPosition(m_CharacterPos);
 		}
 	}
 	
@@ -392,9 +388,7 @@ class DayZIntroSceneXbox: Managed
 		{
 			g_Game.SetNewCharacter(false);
 			m_SceneCharacter.PlaceOnSurface();
-			m_SceneCharacter.SetPosition( m_CharacterPos );
 			m_SceneCharacter.SetDirection(m_CharacterDir);
-			m_SceneCharacter.SetEventHandler(m_anim_end_event_handler);
 			m_SceneCharacter.SetLastShavedSeconds(m_LastShavedSeconds);
 	
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
@@ -415,14 +409,12 @@ class DayZIntroSceneXbox: Managed
 		}
 
 		g_Game.PreloadObject(type, 1.0);
-		Class.CastTo(m_SceneCharacter, g_Game.CreateObject(type, m_CharacterPos, true));
-		Print("CreateNewCharacter");
+		Class.CastTo(m_SceneCharacter, g_Game.CreateObject(type, SnapToGround(Vector(m_CharacterPos[0],m_CharacterPos[1],m_CharacterPos[2]) + "0 0 333"), true));
 		
 		if (m_SceneCharacter)
 		{
 			m_SceneCharacter.PlaceOnSurface();
 			m_SceneCharacter.SetDirection(m_CharacterDir);
-			m_SceneCharacter.SetEventHandler(m_anim_end_event_handler);
 			m_SceneCharacter.SetLastShavedSeconds(m_LastShavedSeconds);
 
 			// NEW STATS API
@@ -452,12 +444,6 @@ class DayZIntroSceneXbox: Managed
 		{
 			m_MenuData.SetCharacterName(m_LastPlayedCharacterID, GetDayZGame().GetPlayerGameName());			
 		}
-	}
-	
-	// ------------------------------------------------------------
-	void Update()
-	{
-	
 	}
 	
 	// ------------------------------------------------------------

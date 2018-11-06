@@ -1,4 +1,4 @@
-class Poisoning: ModifierBase
+class PoisoningMdfr: ModifierBase
 {
 	private const float 	WATER_DECREMENT_PER_SEC = -50;
 	private const float 	BLOOD_DECREMENT_PER_SEC = -5;
@@ -7,25 +7,32 @@ class Poisoning: ModifierBase
 	
 	override void Init()
 	{
-		m_TrackActivatedTime			= true;
+		m_TrackActivatedTime	= true;
+		m_IsPersistent			= true;
 		m_ID 					= eModifiers.MDF_POISONING;
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
+		
 	}
+	
 	override bool ActivateCondition(PlayerBase player)
+	{
+		return false;
+	}
+	
+	override bool DeactivateCondition(PlayerBase player)
 	{
 		return false;
 	}
 
 	override void OnActivate(PlayerBase player)
 	{
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(NTF_SICK);
+		player.IncreaseDiseaseCount();
 	}
-
-	override bool DeactivateCondition(PlayerBase player)
+	
+	override void OnDeactivate(PlayerBase player)
 	{
-		return false;
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(NTF_SICK);
+		player.DecreaseDiseaseCount();
 	}
 
 	override void OnTick(PlayerBase player, float deltaT)

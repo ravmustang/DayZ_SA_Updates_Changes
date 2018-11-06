@@ -36,10 +36,10 @@ class ActionCollectBloodTarget: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Collect blood";
+		return "#collect_blood";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		Param1<float> nacdata;
@@ -49,11 +49,6 @@ class ActionCollectBloodTarget: ActionContinuousBase
 		ActionCollectBloodTargetLambda lambda = new ActionCollectBloodTargetLambda(action_data.m_MainItem, "BloodBagFull", action_data.m_Player, m_SpecialtyWeight, ntarget, delta);
 		action_data.m_Player.ServerReplaceItemInHandsWithNew(lambda);
 		//action_data.m_Player.GetItemInHands().SetQuantity();
-	}
-	
-	override void OnCancelServer( ActionData action_data )
-	{
-		OnCompleteServer( action_data );
 	}
 };
 

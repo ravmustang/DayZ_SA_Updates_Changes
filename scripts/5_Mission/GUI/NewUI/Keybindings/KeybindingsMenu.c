@@ -28,15 +28,56 @@ class KeybindingsMenu extends UIScriptedMenu
 		
 		string version;
 		GetGame().GetVersion( version );
-		if( version != "" )
-			m_Version.SetText( "#main_menu_version" + " " + version );
-		else
-			m_Version.Show( false );
+		#ifdef PLATFORM_CONSOLE
+			version = "#main_menu_version" + " " + version + " (" + g_Game.GetDatabaseID() + ")";
+		#else
+			version = "#main_menu_version" + " " + version;
+		#endif
+		m_Version.SetText( version );
 
 		#ifdef PLATFORM_PS4
 			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
 			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:circle" );
 		#endif
+		
+		layoutRoot.FindAnyWidget( "Tabber" ).GetScript( m_Tabber );
+		
+		Input input = GetGame().GetInput();
+		int group_count = input.GetActionGroupsCount();
+		
+		for( int i = 0; i < group_count; i++ )
+		{
+			string group_name;
+			input.GetActionGroupName( i, group_name );
+			m_Tabber.AddTab( group_name );
+			Widget tab = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_group.layout", m_Tabber.GetTab( i ) );
+			for( int j = 0; j < 1; j++ )
+			{
+				Widget subgroup = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_subgroup.layout", tab.FindAnyWidget( "group_root" ) );
+				TextWidget subgroup_name = TextWidget.Cast( subgroup.FindAnyWidget( "group_text" ) );
+				subgroup_name.SetText( "TestSubgroup" );
+				Widget subgroup_content = subgroup.FindAnyWidget( "group_content" );
+				
+				TIntArray actions = new TIntArray;
+				input.GetActionGroupItems( i, actions );
+				for( int k = 0; k < actions.Count(); k++ )
+				{
+					int action_id = actions.Get( k );
+					Widget option = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_option.layout", subgroup_content );
+					TextWidget option_name = TextWidget.Cast( option.FindAnyWidget( "setting_label" ) );
+					
+					string option_text;
+					input.GetActionDesc( action_id, option_text );
+					option_name.SetText( option_text );
+				}
+				subgroup_content.Update();
+				subgroup.Update();
+			}
+			tab.FindAnyWidget( "group_root" ).Update();
+		}
+		
+		m_Tabber.SelectTabControl( 0 );
+		m_Tabber.SelectTabPanel( 0 );
 		return layoutRoot;
 	}
 	
@@ -78,7 +119,7 @@ class KeybindingsMenu extends UIScriptedMenu
 		bool changed = false;
 
 		if( changed )
-			g_Game.GetUIManager().ShowDialog("#main_menu_configure", "You have unsaved changes in the configuration. Would you like to discard them?", 1337, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
+			g_Game.GetUIManager().ShowDialog("#main_menu_configure", "#main_menu_configure_desc", 1337, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
 		else
 		{
 			GetGame().GetUIManager().Back();

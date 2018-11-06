@@ -35,10 +35,17 @@ class ActionManagerClient: ActionManagerBase
 					// check pCurrentCommandID before start or reject 
 					if( m_ActionPossible && pCurrentCommandID != DayZPlayerConstants.COMMANDID_SWIM && pCurrentCommandID != DayZPlayerConstants.COMMANDID_LADDER )
 					{
-						m_CurrentActionData.m_State = UA_START;
-						m_CurrentActionData.m_Action.Start(m_CurrentActionData);
-						if( m_CurrentActionData.m_Action.IsInstant() )
+						if(!m_Player.IsRestrained() || m_CurrentActionData.m_Action.CanBeUsedInRestrain() )
+						{
+							m_CurrentActionData.m_State = UA_START;
+							m_CurrentActionData.m_Action.Start(m_CurrentActionData);
+							if( m_CurrentActionData.m_Action.IsInstant() )
+								OnActionEnd();
+						}
+						else
+						{
 							OnActionEnd();
+						}
 					}
 					else
 					{
@@ -83,7 +90,7 @@ class ActionManagerClient: ActionManagerBase
 	{
 		int AcknowledgmentID;
 		pCtx.Read(AcknowledgmentID);
-		if ( AcknowledgmentID == m_PendingActionAcknowledgmentID)
+		if ( m_CurrentActionData && AcknowledgmentID == m_PendingActionAcknowledgmentID)
 		{
 			if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_ACCEPT)
 				m_CurrentActionData.m_State = UA_AM_ACCEPTED;
@@ -208,8 +215,15 @@ class ActionManagerClient: ActionManagerBase
 			for( int i = 0; i < targetsCount; ++i )
 			{
 				action_target = m_Targets.GetTarget(i);
-				Object target = action_target.GetObject();					
-				if( target && (target.IsEntityAI() || target.IsWoodBase() || target.IsRock()) )
+				Object targetObject = action_target.GetObject();
+				Object targetParent = action_target.GetParent();
+
+				if( targetParent && targetParent.IsEntityAI() )
+				{
+					break;
+				}
+
+				if( targetObject && (targetObject.IsEntityAI() || targetObject.IsWoodBase() || targetObject.IsRock()) )
 				{
 					break;
 				}
@@ -239,7 +253,7 @@ class ActionManagerClient: ActionManagerBase
 		}
 			
 		
-		if ( (m_PrimaryActionEnabled || m_SecondaryActionEnabled || m_TertiaryActionEnabled) )
+		if ( (m_PrimaryActionEnabled || m_SecondaryActionEnabled || m_TertiaryActionEnabled ) && !GetRunningAction() )
 		{
 			ActionBase action;
 			ActionTarget 	target;
@@ -277,8 +291,6 @@ class ActionManagerClient: ActionManagerBase
 				return;
 			}
 			
-			
-			
 			ItemBase target_item;
 			Class.CastTo(target_item,  target.GetObject() );
 			
@@ -297,6 +309,10 @@ class ActionManagerClient: ActionManagerBase
 			{
 				FindSelectableActions(target);
 			}
+		}
+		else
+		{
+			m_SelectableActions.Clear();
 		}
 	}
 	
@@ -366,9 +382,12 @@ class ActionManagerClient: ActionManagerBase
 	protected void GetContextualInteractActions(out TSelectableActionInfoArray outarray, ActionTarget target)
 	{
 		Object targetObject;
+		Object targetParent;
+
 		if( target )
 		{
 			targetObject = target.GetObject();
+			targetParent = target.GetParent();
 		}
 		ref TIntArray tertiary_action_ids = new TIntArray;
 		ActionBase picked_action; 
@@ -377,11 +396,18 @@ class ActionManagerClient: ActionManagerBase
 		{
 			m_Player.GetInteractActions(tertiary_action_ids);	
 		}
+		
+		if (targetParent)
+		{
+			targetParent.GetInteractActions(tertiary_action_ids);
+		}
+
 		// Adding interact actions of items in the world
 		if ( targetObject )
-		{ 
+		{
 			targetObject.GetInteractActions(tertiary_action_ids);
 		}
+
 		// Looking for first possible interact action 
 		if ( tertiary_action_ids && tertiary_action_ids.Count() > 0 )
 		{
@@ -482,7 +508,7 @@ class ActionManagerClient: ActionManagerBase
 		//}
 	}
 	
-	protected void ActionStart(ActionBase action, ActionTarget target, ItemBase item , Param extraData = NULL )
+	protected void ActionStart(ActionBase action, ActionTarget target, ItemBase item, Param extra_data = NULL )
 	{
 		if ( action ) 
 		{	
@@ -495,13 +521,15 @@ class ActionManagerClient: ActionManagerBase
 				}
 			}
 			
-			if( !action.SetupAction(m_Player, target, item, m_CurrentActionData, extraData))
+			Debug.Log("[Action DEBUG] Start time stamp ++: " + m_Player.GetSimulationTimeStamp());
+			
+			if( !action.SetupAction(m_Player, target, item, m_CurrentActionData, extra_data ))
 			{
 				Print("Can not inicialize action - ActionManagerClient");
 				m_CurrentActionData = NULL;
 				return;
 			}
-			
+			Debug.Log("[AM] Action data created (" + m_Player + ")");
 			m_Player.SetActionEndInput();
 			
 			if ( GetGame().IsMultiplayer() && !action.IsLocal() )
@@ -514,7 +542,7 @@ class ActionManagerClient: ActionManagerBase
 				if (action.UseAcknowledgment())
 				{
 					m_CurrentActionData.m_State = UA_AM_PENDING;
-					m_PendingActionAcknowledgmentID = m_LastAcknowledgmentID++;
+					m_PendingActionAcknowledgmentID = ++m_LastAcknowledgmentID;
 						
 					ctx.Write(m_PendingActionAcknowledgmentID);
 				}
@@ -537,6 +565,21 @@ class ActionManagerClient: ActionManagerBase
 		}
 	}
 	
+	override void OnJumpStart()
+	{
+		if(m_CurrentActionData)
+		{
+			if( m_CurrentActionData.m_State == UA_AM_PENDING || m_CurrentActionData.m_State == UA_AM_REJECTED || m_CurrentActionData.m_State == UA_AM_ACCEPTED)
+			{
+				OnActionEnd();
+				m_PendingActionAcknowledgmentID = -1;
+			}
+			else
+			{
+				m_CurrentActionData.m_Action.Interrupt(m_CurrentActionData);
+			}
+		}
+	}
 	
 	//---------------------------------
 	// EVENTS
@@ -613,10 +656,17 @@ class ActionManagerClient: ActionManagerBase
 	
 	
 	//Instant Action (Debug Actions) ---------------------------------
-	override void OnInstantAction(int user_action_id, Param data)
+	override void OnInstantAction(int user_action_id, Param data = NULL)
 	{
 		ActionStart(GetAction(user_action_id),NULL,NULL, data);
 	}
+#ifdef BOT
+	/// used for bots
+	void PerformAction(int user_action_id, ActionTarget target, ItemBase item, Param extraData = NULL)
+	{
+		ActionStart(GetAction(user_action_id), target, item, extraData);
+	}
+#endif
 	
 	override void OnActionEnd()
 	{
@@ -874,6 +924,24 @@ class ActionManagerClient: ActionManagerBase
 	
 	}
 	
+	void ActionDropItemStart(ItemBase itemInHand, ItemBase targetItem)
+	{
+		ActionTarget target;
+		target = new ActionTarget(targetItem, null, -1, vector.Zero, -1);
+		bool hasTarget = targetItem != NULL;
+		
+		ActionBase picked_action;
+		
+		picked_action = GetAction(AT_DROP_ITEM);
+		if ( picked_action && picked_action.Can(m_Player,target,itemInHand) )
+		{
+			if( hasTarget == picked_action.HasTarget())
+			{
+				ActionStart(picked_action, target, itemInHand);
+				return;
+			}
+		}
+	}
 	
 	private ref ActionTarget m_ForceTarget;
 	private ref ActionTargets m_Targets;

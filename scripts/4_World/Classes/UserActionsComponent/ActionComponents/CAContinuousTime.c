@@ -50,6 +50,7 @@ class CAContinuousTime : CAContinuousBase
 				m_SpentUnits.param1 = m_TimeElpased;
 				SetACData(m_SpentUnits);
 			}
+			OnCompletePogress(action_data);
 			return UA_FINISHED;
 		}
 	}

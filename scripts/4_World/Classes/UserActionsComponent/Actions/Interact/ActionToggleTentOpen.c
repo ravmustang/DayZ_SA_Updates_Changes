@@ -4,7 +4,13 @@ class ActionToggleTentOpen: ActionInteractBase
 	{
 		m_MessageSuccess = "I've performed action.";
 		m_MessageFail = "I cannot perform action.";
-		//m_Animation = "open";
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
+	}
+
+	override void CreateConditionComponents()  
+	{
+		m_ConditionItem = new CCINone;
+		m_ConditionTarget = new CCTParent(10);
 	}
 
 	override int GetType()
@@ -14,63 +20,89 @@ class ActionToggleTentOpen: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Toggle";
+		return "#toggle_opening";
+	}
+	
+	override bool IsUsingProxies()
+	{
+		return true;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
 		Object targetObject = target.GetObject();
-		if ( player && targetObject )
+		Object targetParent = target.GetParent();
+
+		if ( player && targetObject && targetParent )
 		{
 			float max_action_distance = 1; //m_MaximalActionDistance;
 			
-			if ( targetObject.IsInherited(CarTent) ) max_action_distance = 5.0;
-			else if ( targetObject.IsInherited(LargeTent) ) max_action_distance = 4.0;
-			else if ( targetObject.IsInherited(MediumTent) ) max_action_distance = 3.0;
+			if ( targetParent.IsInherited(CarTent) ) max_action_distance = 10.0;
+			else if ( targetParent.IsInherited(LargeTent) ) max_action_distance = 10.0;
+			else if ( targetParent.IsInherited(MediumTent) ) max_action_distance = 6.0;
 			
-			float distance = Math.AbsInt(vector.Distance(targetObject.GetPosition(),player.GetPosition()));
+			float distance = Math.AbsFloat(vector.Distance(targetParent.GetPosition(),player.GetPosition()));
 			
-			if (  distance <= max_action_distance /*&& action_data.m_Player.IsFacingTarget(targetObject) */ )	
+			if (  distance <= max_action_distance )	
 			{
-				if ( targetObject.IsInherited(TentBase) ) 
+				if ( targetParent.IsInherited(TentBase) ) 
 				{
-					string selection = targetObject.GetActionComponentName(target.GetComponentIndex());
+					array<string> selections = new array<string>;
+					targetObject.GetActionComponentNameList(target.GetComponentIndex(), selections);
+					TentBase tent = TentBase.Cast( targetParent );
 					
-					TentBase tent = TentBase.Cast( targetObject );
-					
-					if ( tent.CanToggleSelection(selection) )
+					for (int s = 0; s < selections.Count(); s++)
 					{
-						return true;
+						if ( tent.CanToggleAnimations(selections[s]) )
+						{
+							//Print("nazov selekcie: " + selections[s]);
+							return true;
+						}
 					}
 				}
 			}
-			else
-			{
-				return false;
-			}
 		}
-
+		
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
-		if ( targetObject != NULL && targetObject.IsInherited(TentBase) ) 
+		Object targetParent = action_data.m_Target.GetParent();
+
+		if ( targetParent && targetParent.IsInherited(TentBase) ) 
 		{
-			string selection = targetObject.GetActionComponentName(action_data.m_Target.GetComponentIndex());
+			array<string> selections = new array<string>;
+			targetObject.GetActionComponentNameList(action_data.m_Target.GetComponentIndex(), selections);
 			
-			TentBase tent = TentBase.Cast( targetObject );
-			tent.ToggleSelection( selection );
-			
+			TentBase tent = TentBase.Cast( targetParent );
+			for ( int s = 0; s < selections.Count(); s++)
+			{
+				if ( tent.CanToggleAnimations(selections[s]) )
+				{
+					tent.ToggleAnimation( selections[s] );
+				}
+			}
+								
 			//regenerate pathgraph
 			tent.SetAffectPathgraph( true, false );
 			
-			if (action_data.m_MainItem.CanAffectPathgraph())
+			if ( tent.CanAffectPathgraph() )
 			{
 				//Start update
 				GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().UpdatePathgraphRegionByObject, 100, false, tent);
 			}
+		}
+	}
+	
+	override void OnEndServer( ActionData action_data )
+	{
+		Object target_object = action_data.m_Target.GetObject();
+		TentBase ntarget = TentBase.Cast( target_object );
+		if( ntarget )
+		{
+			ntarget.SoundSynchRemoteReset();
 		}
 	}
 };

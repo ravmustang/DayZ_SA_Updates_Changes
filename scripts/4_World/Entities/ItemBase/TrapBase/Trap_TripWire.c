@@ -44,6 +44,11 @@ class TripwireTrap : TrapBase
 		return true;
 	}
 	
+	override string GetDeploySoundset()
+	{
+		return "tripwire_deploy_SoundSet";
+	}
+	
 	override void CreateTrigger()
 	{
 		m_TrapTrigger = TrapTrigger.Cast( GetGame().CreateObject( "TrapTrigger", this.GetPosition(), false ) );

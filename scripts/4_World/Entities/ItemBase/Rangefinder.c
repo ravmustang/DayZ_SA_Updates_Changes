@@ -1,8 +1,8 @@
 class Rangefinder extends ItemOptics
 {
-	const float RANGEFINDER_MAX_DISTANCE = 900; //TODO adjust maximal distance to match RL rangefinder
+	static const float RANGEFINDER_MAX_DISTANCE = 913.4856; //TODO adjust maximal distance to match real life rangefinder
 	
-	protected ref Timer 				m_timer;
+	protected ref Timer 				m_Timer;
 	protected ref Param1<string> 		m_MessageParam;
 	protected PlayerBase 				m_Player;
 	
@@ -10,7 +10,7 @@ class Rangefinder extends ItemOptics
 	{
 	}
 	
-	void SetPlayer(PlayerBase player)
+	void SetPlayer( PlayerBase player )
 	{
 		m_Player = player;
 	}
@@ -23,12 +23,12 @@ class Rangefinder extends ItemOptics
 	// How frequently the measurement should be taken
 	float GetMeasurementUpdateInterval()
 	{
-		return 0.1;
+		return 1;
 	}
 	
 	override void OnWorkStart()
 	{
-		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer())
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			StartPeriodicMeasurement();
 		}
@@ -36,7 +36,7 @@ class Rangefinder extends ItemOptics
 	
 	override void OnWorkStop()
 	{
-		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer())
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			StopPeriodicMeasurement();
 		}
@@ -44,21 +44,22 @@ class Rangefinder extends ItemOptics
 	
 	void StartPeriodicMeasurement()
 	{
-		if ( m_timer == null )
+		if( !m_Timer )
 		{
-			m_timer = new Timer;
-
-					}
-		if ( m_MessageParam == null ) 	m_MessageParam = new Param1<string>("");
+			m_Timer = new Timer;
+		}
 		
-		m_timer.Run(GetMeasurementUpdateInterval(),this,"DoMeasurement",NULL,true);
+		if( !m_MessageParam )
+			m_MessageParam = new Param1<string>( "" );
+		
+		m_Timer.Run( GetMeasurementUpdateInterval(), this, "DoMeasurement", null, true );
 	}
 	
 	void StopPeriodicMeasurement()
 	{
-		if ( m_timer )
+		if( m_Timer )
 		{
-			m_timer.Stop();
+			m_Timer.Stop();
 		}
 	}
 	
@@ -67,12 +68,10 @@ class Rangefinder extends ItemOptics
 	{
 		PlayerBase player = GetPlayer();
 		
-		if (player)
+		if ( player )
 		{
-			const float	MAX_RANGE 		= 9999;
-			float 		energy_needed 	= GetCompEM().GetEnergyUsage() * GetMeasurementUpdateInterval();
 			vector 		from 			= GetGame().GetCurrentCameraPosition();
-			vector 		to 				= from + (GetGame().GetCurrentCameraDirection() * MAX_RANGE);
+			vector 		to 				= from + (GetGame().GetCurrentCameraDirection() * RANGEFINDER_MAX_DISTANCE);
 			vector 		contact_pos;
 			vector 		contact_dir;
 			int 		contactComponent;
@@ -91,7 +90,7 @@ class Rangefinder extends ItemOptics
 			{
 				m_MessageParam.param1 = "#range_finder_too_far";
 			}
-		
+			
 			player.MessageAction(m_MessageParam.param1);
 		}
 	}

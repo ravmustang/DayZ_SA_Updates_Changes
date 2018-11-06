@@ -7,6 +7,7 @@ class DayZSpectator : Camera
 	void DayZSpectator()
 	{
 		SetEventMask(EntityEvent.FRAME);
+		//GetGame().GetMission().PlayerControlEnable();
 	}
 	
 	override void EOnFrame(IEntity other, float timeSlice)
@@ -38,8 +39,8 @@ class DayZSpectator : Camera
 		
 		SetPosition(newPos);
 		
-		float yawDiff = input.GetAction(UAAimHeadLeft) - input.GetAction(UAAimHeadRight);
-		float pitchDiff = input.GetAction(UAAimHeadDown) - input.GetAction(UAAimHeadUp);
+		float yawDiff = input.GetAction(UAAimLeft) - input.GetAction(UAAimRight);
+		float pitchDiff = input.GetAction(UAAimDown) - input.GetAction(UAAimUp);
 		vector oldOrient = GetOrientation();
 		vector newOrient = oldOrient;
 		newOrient[0] = newOrient[0] - Math.RAD2DEG * yawDiff * timeSlice;

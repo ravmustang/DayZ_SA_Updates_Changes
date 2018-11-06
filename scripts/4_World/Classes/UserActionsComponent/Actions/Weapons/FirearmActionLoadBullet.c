@@ -19,7 +19,7 @@ class FirearmActionLoadBullet : FirearmActionBase
 
 	override string GetText() //text game displays in HUD hint 
 	{
-		return "Load bullet";
+		return "#load_bullet";
 	} 
 	
 	/*string GetTargetDescription()

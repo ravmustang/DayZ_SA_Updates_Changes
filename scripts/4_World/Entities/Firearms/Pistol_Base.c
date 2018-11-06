@@ -51,7 +51,7 @@ class Pistol_CLO_CHG_BU1_MA0 extends WeaponStableState
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
 };
-class Pistol_CLO_JAM_BU1_MA0 extends WeaponStableState
+class Pistol_CLO_JAM_BU1_MA0 extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnstate] { CJ10 closed jammed bullet nomag"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnstate] } CJ10 closed jammed bullet nomag"); }
@@ -87,7 +87,7 @@ class Pistol_CLO_DIS_BU0_MA1 extends WeaponStableState
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return false; }
 };
-class Pistol_CLO_JAM_BU1_MA1 extends WeaponStableState
+class Pistol_CLO_JAM_BU1_MA1 extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnstate] { CJ11 closed jammed bullet mag"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnstate] } CJ11 closed jammed bullet mag"); }
@@ -205,9 +205,9 @@ class Pistol_Base extends Weapon_Base
 		WeaponDryFire Trigger_CJ10 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_UNCOCKED);
 		WeaponDryFire Trigger_CJ11 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_UNCOCKED);
 		
-		WeaponFireAndChamberNext Trigger_CC11 = new WeaponFireAndChamberNext(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL);
-		WeaponStateBase Trigger_CC10 = new WeaponFireLast(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL); // fire last no mag
-		WeaponStateBase Trigger_CC11L = new WeaponFireLast(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_LAST); // fire last with mag
+		WeaponFireAndChamberNext Trigger_CC11 = new WeaponFireAndChamberNext(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL, WeaponActionFireTypes.FIRE_JAM);
+		WeaponStateBase Trigger_CC10 = new WeaponFireLast(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL, WeaponActionFireTypes.FIRE_JAM); // fire last no mag
+		WeaponStateBase Trigger_CC11L = new WeaponFireLast(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_LAST, WeaponActionFireTypes.FIRE_JAM); // fire last with mag
 
 		WeaponStateBase Unjam_CJ10 = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START);
 		WeaponStateBase Unjam_CJ11 = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START);
@@ -239,8 +239,8 @@ class Pistol_Base extends Weapon_Base
 		WeaponDetachingMag Detach_OD01 = new WeaponDetachingMag(this, NULL, WeaponActions.RELOAD, WeaponActionReloadTypes.RELOAD_MAGAZINE_DETACH);
 		WeaponDetachingMag Detach_CJ11 = new WeaponDetachingMag(this, NULL, WeaponActions.RELOAD, WeaponActionReloadTypes.RELOAD_MAGAZINE_DETACH);
 		
-		WeaponStateBase Trigger_CC10J = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM); // cock with clip
-		WeaponStateBase Trigger_CC11J = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM);
+		//WeaponStateBase Trigger_CC10J = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM); // cock with clip
+		//WeaponStateBase Trigger_CC11J = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM);
 
 		// events
 		WeaponEventBase __M__ = new WeaponEventMechanism;
@@ -333,32 +333,43 @@ class Pistol_Base extends Weapon_Base
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CJ11, _dto_,   CJ11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CJ11, _abt_,   CJ11));
 		
-		m_fsm.AddTransition(new WeaponTransition(   CC10, __T__,    Trigger_CC10J, NULL, new WeaponGuardJammed(this)));
+		/*m_fsm.AddTransition(new WeaponTransition(   CC10, __T__,    Trigger_CC10J, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10J, _fin_,    CJ10));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10J, _rto_,    CJ10));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10J, _abt_,    CJ10));
 		
-
-		m_fsm.AddTransition(new WeaponTransition(  CC10, __T__,    Trigger_CC10, NULL, new GuardNot(new WeaponGuardJammed(this)))); // or fire.last (if not jammed)
+		m_fsm.AddTransition(new WeaponTransition(   CC10, __T__,    Trigger_CC00, NULL, new WeaponGuardIsDestroyed(this)));*/
+		
+		m_fsm.AddTransition(new WeaponTransition(  CC10, __T__,    Trigger_CC10)); // or fire.last (if not jammed)
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10, _fin_,   CJ10, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10, _rto_,   CJ10, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10, _abt_,   CJ10, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10, _fin_,   CC00));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10, _rto_,   CC00));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC10, _abt_,   CC00));
 		
 		
-		m_fsm.AddTransition(new WeaponTransition(   CC11, __T__,    Trigger_CC11J, NULL, new WeaponGuardJammed(this)));
+		/*m_fsm.AddTransition(new WeaponTransition(   CC11, __T__,    Trigger_CC11J, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11J, _fin_,    CJ11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11J, _rto_,    CJ11));
-		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11J, _abt_,    CJ11));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11J, _abt_,    CJ11));*/
 		
+		//m_fsm.AddTransition(new WeaponTransition(   CC11, __T__,    Trigger_CC00, NULL, new WeaponGuardIsDestroyed(this)));
 		
 		//m_fsm.AddTransition(new WeaponTransition(  CC11, __T__,   CJ11, NULL, new WeaponGuardJammed(this))); // switch to jam
 		m_fsm.AddTransition(new WeaponTransition(  CC11, __T__,    Trigger_CC11, NULL, new WeaponGuardHasAmmo(this))); // fire.normal + chamber next
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11, _fin_,   CJ11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11, _rto_,   CJ11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11, _abt_,   CJ11, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11, _fin_,   CC11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11, _rto_,   CC11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11, _abt_,   CC11));
 			//Trigger_CC11.AddTransition(new WeaponTransition( Trigger_CC11.m_fire, _abt_,   CC01));
 			//Trigger_CC11.AddTransition(new WeaponTransition( Trigger_CC11.m_chamberNext, _abt_,   CC11));
 		m_fsm.AddTransition(new WeaponTransition(  CC11, __T__,    Trigger_CC11L, NULL, new GuardNot(new WeaponGuardHasAmmo(this)))); // fire.last with mag
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11L, _fin_,   CJ11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11L, _rto_,   CJ11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11L, _abt_,   CJ11, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11L, _fin_,   OD01));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11L, _rto_,   OD01));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_CC11L, _abt_,   OD01));
@@ -541,6 +552,23 @@ class Pistol_Base extends Weapon_Base
 		SelectionBulletHide();
 		SelectionMagazineHide();
 		m_fsm.Start();
+	}
+	
+	override float GetChanceToJam()
+	{
+		float chanceToJam = super.GetChanceToJam();
+		Magazine mag = GetMagazine(GetCurrentMuzzle());
+		
+		if(mag)
+		{
+			chanceToJam = chanceToJam + ((1.0 - chanceToJam) * mag.GetChanceToJam());
+		}
+		else
+		{
+			chanceToJam = chanceToJam + ((1.0 - chanceToJam) * 0.1);
+		}
+		
+		return chanceToJam;
 	}
 };
 

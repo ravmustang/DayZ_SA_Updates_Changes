@@ -1,24 +1,24 @@
-class HandsArea: ContainerBase
+class HandsArea: LayoutHolder
 {
 	ref HandsContainer		m_HandsContainer;
 	ref AutoHeightSpacer	m_Spacer;
 
-	void HandsArea( ContainerBase parent )
+	void HandsArea( LayoutHolder parent )
 	{
-		Widget root_panel = m_MainPanel;
+		Widget root_panel = m_MainWidget;
 		
-		m_MainPanel = m_MainPanel.FindAnyWidget( "Content" );
+		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
 
 		m_HandsContainer = new HandsContainer( this );
 
-		m_MainPanel.GetScript( m_Spacer );
-		m_MainPanel.Update();
+		m_MainWidget.GetScript( m_Spacer );
+		m_MainWidget.Update();
 		m_Spacer.Update();
 	}
 
 	override void SetActive( bool active )
 	{
-			m_HandsContainer.SetActive( active );
+		m_HandsContainer.SetActive( active );
 	}
 
 	override bool IsActive()
@@ -48,7 +48,7 @@ class HandsArea: ContainerBase
 
 	bool IsSwapActive()
 	{
-		Widget swap_cursor = m_MainPanel.FindAnyWidget("SwapCursor");
+		Widget swap_cursor = m_MainWidget.FindAnyWidget("SwapCursor");
 		if( swap_cursor )
 		{
 			return swap_cursor.IsVisible();
@@ -61,7 +61,7 @@ class HandsArea: ContainerBase
 
 	bool IsCombineActive()
 	{
-		Widget combine_cursor = m_MainPanel.FindAnyWidget("CombineCursor");
+		Widget combine_cursor = m_MainWidget.FindAnyWidget("CombineCursor");
 
 		if( combine_cursor )
 		{
@@ -124,12 +124,12 @@ class HandsArea: ContainerBase
 	override void UpdateInterval()
 	{
 		float x, y;
-		GetMainPanel().GetSize( x, y );
+		GetMainWidget().GetSize( x, y );
 		if( y > 500 )
 		{
 			y = 500;
 		}
-		GetMainPanel().GetParent().SetSize( x, y );
+		GetMainWidget().GetParent().SetSize( x, y );
 		m_HandsContainer.UpdateInterval();
 	}
 
@@ -145,7 +145,7 @@ class HandsArea: ContainerBase
 
 	override void SetParentWidget()
 	{
-		m_ParentWidget = m_Parent.GetMainPanel().FindAnyWidget( "HandsPanel" );
+		m_ParentWidget = m_Parent.GetMainWidget().FindAnyWidget( "HandsPanel" );
 	}
 
 	override void OnShow()
@@ -159,7 +159,7 @@ class HandsArea: ContainerBase
 	{
 		super.Refresh();
 		m_HandsContainer.Refresh();
-		m_MainPanel.Update();
+		m_MainWidget.Update();
 		m_Spacer.Update();
 	}
 	
@@ -191,7 +191,7 @@ class HandsArea: ContainerBase
 
 		ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
 		ItemManager.GetInstance().HideDropzones();
-		ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+		ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 	}
 	
 	void OnHandsPanelDropReceived( Widget w, int x, int y, Widget receiver )
@@ -216,7 +216,16 @@ class HandsArea: ContainerBase
 		
 		if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( ipw.GetItem() ) )
 		{
-			GetGame().GetPlayer().PredictiveTakeEntityToHands( ipw.GetItem() );		
+			ItemBase item_base = ItemBase.Cast( ipw.GetItem() );
+			float stackable = item_base.ConfigGetFloat("varStackMax");
+			if( stackable == 0 && item_base.GetQuantity() >= stackable )
+			{
+				GetGame().GetPlayer().PredictiveTakeEntityToHands( item_base );		
+			}
+			else if( stackable != 0 && stackable <= item_base.GetQuantity() )
+			{
+				item_base.SplitIntoStackMaxHandsClient( PlayerBase.Cast( GetGame().GetPlayer() ) );
+			}
 		}
 	}
 }

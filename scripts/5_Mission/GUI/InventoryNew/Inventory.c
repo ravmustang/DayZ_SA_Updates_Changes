@@ -40,7 +40,7 @@ enum ConsoleToolbarType
 	VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY
 }
 
-class Inventory: ContainerBase
+class Inventory: LayoutHolder
 {
 	protected ref LeftArea			m_LeftArea;
 	protected ref RightArea			m_RightArea;
@@ -53,10 +53,10 @@ class Inventory: ContainerBase
 
 	protected ref ContextMenu m_context_menu;
 	
-	void Inventory( ContainerBase parent )
+	void Inventory( LayoutHolder parent )
 	{
 		m_ControllerRightStickTimer = new Timer();
-		new ItemManager( GetMainPanel() );
+		new ItemManager( GetMainWidget() );
 		new ColorManager();
 		//Deserialize();
 		m_LeftArea = new LeftArea( this );
@@ -66,31 +66,39 @@ class Inventory: ContainerBase
 
 #ifdef PLATFORM_CONSOLE
 #else
-		m_QuickbarWidget = GetMainPanel().FindAnyWidget( "QuickbarGrid" );
+		m_QuickbarWidget = GetMainWidget().FindAnyWidget( "QuickbarGrid" );
 		m_Quickbar = new InventoryQuickbar( m_QuickbarWidget );
 		m_Quickbar.UpdateItems( m_QuickbarWidget );
 #endif			
 		
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "LeftBackground" ),  this, "OnLeftPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel().FindAnyWidget( "LeftBackground" ),  this, "DraggingOverLeftPanel" );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "RightBackground" ),  this, "OnRightPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel().FindAnyWidget( "RightBackground" ),  this, "DraggingOverRightPanel" );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "CharacterPanel" ),  this, "OnCenterPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel().FindAnyWidget( "CharacterPanel" ),  this, "DraggingOverCenterPanel" );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "HandsPanel" ),  this, "OnHandsPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel().FindAnyWidget( "HandsPanel" ),  this, "DraggingOverHandsPanel" );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "InventoryWindow" ),  this, "OnLeftPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel().FindAnyWidget( "InventoryWindow" ),  this, "DraggingOverLeftPanel" );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "LeftBackground" ),  this, "OnLeftPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "LeftBackground" ),  this, "DraggingOverLeftPanel" );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "rootFrame" ),  this, "OnLeftPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "rootFrame" ),  this, "DraggingOverLeftPanel" );
+		
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "RightBackground" ),  this, "OnRightPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "RightBackground" ),  this, "DraggingOverRightPanel" );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "rootFrame" ),  this, "OnRightPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "rootFrame" ),  this, "DraggingOverRightPanel" );
+		
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "CharacterPanel" ),  this, "OnCenterPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "CharacterPanel" ),  this, "DraggingOverCenterPanel" );
+		
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "HandsPanel" ),  this, "OnHandsPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "HandsPanel" ),  this, "DraggingOverHandsPanel" );
+		
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "InventoryWindow" ),  this, "OnLeftPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "InventoryWindow" ),  this, "DraggingOverLeftPanel" );
 		
 		#ifdef PLATFORM_CONSOLE
 		
 				PluginDiagMenu plugin_diag_menu = PluginDiagMenu.Cast( GetPlugin(PluginDiagMenu) );
 				GetGame().GetUIManager().ShowUICursor( false );
 				ResetFocusedContainers();
-				GetMainPanel().FindAnyWidget( "CursorCharacter" ).Show( false );
+				GetMainWidget().FindAnyWidget( "CursorCharacter" ).Show( false );
 		
 				//console inventory toolbar
-				m_ConsoleToolbar = GetMainPanel().FindAnyWidget( "ConsoleToolbar" );
+				m_ConsoleToolbar = GetMainWidget().FindAnyWidget( "ConsoleToolbar" );
 				m_ConsoleToolbar.Show( true );
 				UpdateConsoleToolbar();
 		#endif
@@ -214,7 +222,7 @@ class Inventory: ContainerBase
 
 		if( control == ControlID.CID_BACK && value != 0 )
 		{
-			if( GetMainPanel().IsVisible() )
+			if( GetMainWidget().IsVisible() )
 			{
 				if( m_RightArea.IsActive() )
 				{
@@ -230,7 +238,6 @@ class Inventory: ContainerBase
 			}
 			return true;
 		}
-
 		return false;
 	}
 
@@ -269,7 +276,7 @@ class Inventory: ContainerBase
 	void DraggingOverHandsPanel( Widget w, int x, int y, Widget receiver )
 	{
 		ItemManager.GetInstance().HideDropzones();
-		//GetMainPanel().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+		//GetMainWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 		m_HandsArea.DraggingOverHandsPanel( w, x, y, receiver );
 	}
 	
@@ -386,7 +393,7 @@ class Inventory: ContainerBase
 			if( player && item && player.CanDropEntity( item ) )
 			{
 				ItemManager.GetInstance().HideDropzones();
-				GetMainPanel().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+				GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 				ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
 			}
 			else if( item )
@@ -426,11 +433,11 @@ class Inventory: ContainerBase
 				player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, inv_loc );
 	
 				ItemManager.GetInstance().HideDropzones();
-				GetMainPanel().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+				GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 				if( inv_loc.GetType() == 4 )
 				{
 					ItemManager.GetInstance().HideDropzones();
-					GetMainPanel().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+					GetMainWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 				}
 	
 				ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
@@ -478,11 +485,11 @@ class Inventory: ContainerBase
 					player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ATTACHMENT, inv_loc );
 		
 					ItemManager.GetInstance().HideDropzones();
-					GetMainPanel().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+					GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 					if( inv_loc.GetType() == 4 )
 					{
 						ItemManager.GetInstance().HideDropzones();
-						GetMainPanel().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+						GetMainWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 					}
 		
 					ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
@@ -768,15 +775,6 @@ class Inventory: ContainerBase
 		}
 #endif
 
-		//Open InGame menu
-		if( GetGame().GetInput().GetActionDown( UAUIMenu, false ) )
-		{
-			if ( !GetGame().GetUIManager().IsMenuOpen( MENU_INGAME ) )
-			{
-				GetGame().GetMission().Pause();
-			}
-		}
-		
 		m_LeftArea.UpdateInterval();
 		m_RightArea.UpdateInterval();
 		m_HandsArea.UpdateInterval();
@@ -812,9 +810,9 @@ class Inventory: ContainerBase
 	override void OnShow()
 	{
 		//start update
-		SetFocus( GetMainPanel() );
+		SetFocus( GetMainWidget() );
 		Deserialize();
-		//m_MainPanel.Update(); 
+		//m_MainWidget.Update(); 
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		if ( player && player.IsPlacingLocal() )
 		{
@@ -989,7 +987,7 @@ class Inventory: ContainerBase
 			VicinityContainer vicinity_container = m_LeftArea.GetVicinityContainer();
 			if( vicinity_container.IsVicinityContainerIconsActive() )
 			{
-				VicinityIconsContainer vicinity_icons_container = vicinity_container.GetVicinityIconsContainer();
+				VicinitySlotsContainer vicinity_icons_container = vicinity_container.GetVicinityIconsContainer();
 				if( vicinity_icons_container.IsItemWithContainerActive() )
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM_WITH_CONTAINER );
@@ -1024,9 +1022,9 @@ class Inventory: ContainerBase
 					context_text += combine;
 				}
 			}
-			else if( vicinity_container.IsItemWithCargoActive()	)
+			else if( vicinity_container.IsContainerWithCargoActive()	)
 			{
-				ItemWithCargo iwc = ItemWithCargo.Cast( vicinity_container.GetFocusedContainer() );
+				ContainerWithCargo iwc = ContainerWithCargo.Cast( vicinity_container.GetFocusedContainer() );
 				if( iwc.IsEmpty() )
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY );
@@ -1059,7 +1057,7 @@ class Inventory: ContainerBase
 			}
 			else if( vicinity_container.IsItemWithAttachmentsActive() )
 			{
-				ItemWithCargoAndAttachments iwca = ItemWithCargoAndAttachments.Cast( vicinity_container.GetFocusedContainer() );
+				ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( vicinity_container.GetFocusedContainer() );
 				if( iwca.IsEmpty() )
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY );
@@ -1109,9 +1107,9 @@ class Inventory: ContainerBase
 					context_text += combine;
 				}
 			}
-			else if( player_container.IsItemWithCargoActive() )
+			else if( player_container.IsContainerWithCargoActive() )
 			{
-				ItemWithCargo iwc1 = ItemWithCargo.Cast( player_container.GetFocusedContainer() );
+				ContainerWithCargo iwc1 = ContainerWithCargo.Cast( player_container.GetFocusedContainer() );
 				if( iwc1.IsEmpty() )
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_EMPTY_CONTAINER );
@@ -1144,7 +1142,7 @@ class Inventory: ContainerBase
 			}
 			else if( player_container.IsItemWithAttachmentsActive() )
 			{
-				ItemWithCargoAndAttachments iwca1 = ItemWithCargoAndAttachments.Cast( player_container.GetFocusedContainer() );
+				ContainerWithCargoAndAttachments iwca1 = ContainerWithCargoAndAttachments.Cast( player_container.GetFocusedContainer() );
 				if( iwca1.IsEmpty() )
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_EMPTY_CONTAINER );

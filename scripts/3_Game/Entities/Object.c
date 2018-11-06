@@ -38,18 +38,10 @@ class Object extends IEntity
 		return NULL;
 	}
 	
-	/**
-	\brief Creates a explosion by ammoType in config of object. If object dont have this parameter ("ammoType" like grenade) explsotion is default "G_GrenadeHand"
-		\return \p void
-		@code
-			ItemBase item = GetGame().GetPlayer().CreateInInventory("GrenadeRGD5");
-			
-			item.Explode();
-		@endcode
-	*/
+	
+	//! Creates an explosion on this object by its ammoType in config.
 	void Explode(string ammoType = "")
 	{
-		
 		if (ammoType == "")
 			ammoType = this.ConfigGetString("ammoType");
 		
@@ -58,34 +50,71 @@ class Object extends IEntity
 		
 		if ( GetGame().IsServer() )
 		{
-			DamageSystem.ExplosionDamage(Class.Cast(this), NULL, ammoType, GetPosition());
+			SynchExplosion();
+			DamageSystem.ExplosionDamage(EntityAI.Cast(this), NULL, ammoType, GetPosition());
 		}
-		
-		if ( !GetGame().IsMultiplayer()  ||  GetGame().IsServer() )
-		{
-			string path = "cfgAmmo " + ammoType + " particle";
-			string particle_path;
-			GetGame().ConfigGetText(path, particle_path);
-			
-			int particle_ID = ParticleList.GetParticleID(ParticleList.GetPathToParticles() + particle_path);
-			
-			if (particle_ID > 0)
-			{
-				Particle.Play(particle_ID, GetPosition());
-			}
-		}
-		
-		GetGame().ObjectDelete(this);
 	}
 	
-	//! returns action component name by given component index
-	proto native string GetActionComponentName(int componentIndex);
-
-	//! returns action component name list by given component index
-	proto native void GetActionComponentNameList(int componentIndex, TStringArray nameList);
+	void SynchExplosion()
+	{
+		if ( GetGame().IsServer()  &&  GetGame().IsMultiplayer() ) // Multiplayer server
+		{
+			Param1<EntityAI> p = new Param1<EntityAI>(NULL);
+			
+			GetGame().RPCSingleParam( this, ERPCs.RPC_EXPLODE_EVENT, p, true);
+		}
+		
+		if ( GetGame().IsServer()  &&  !GetGame().IsMultiplayer() ) // Singleplayer
+		{
+			OnExplodeClient();
+		}
+	}
 	
-	//! return true if selection containts action component
-	proto native bool IsActionComponentPartOfSelection(int componentIndex, string selectionName);
+	//! Called on clients when this object explodes
+	void OnExplodeClient()
+	{
+		string ammoType = this.ConfigGetString("ammoType");
+		
+		if (ammoType == "")
+			ammoType = "Dummy_Heavy";
+		
+		// Handle spawn of particle
+		string particle_path = "cfgAmmo " + ammoType + " particle";
+		string particle_name;
+		GetGame().ConfigGetText(particle_path, particle_name);
+		
+		int particle_ID = ParticleList.GetParticleID(ParticleList.GetPathToParticles() + particle_name);
+		
+		if (particle_ID > 0)
+		{
+			Particle.Play(particle_ID, GetPosition());
+		}
+		
+		// Handle spawn of Effect, which allows more complex behavior
+		string effect_path = "cfgAmmo " + ammoType + " effect";
+		string effect_name;
+		
+		GetGame().ConfigGetText(effect_path, effect_name);
+		
+		typename effect_type_name = effect_name.ToType();
+		
+		if ( effect_type_name )
+		{
+			Effect eff; 
+			Class.CastTo(eff, effect_type_name.Spawn());
+			
+			SEffectManager.PlayInWorld(eff, GetPosition() );
+		}
+	}
+	
+	//! returns action component name by given component index, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
+	proto native string GetActionComponentName(int componentIndex, string geometry = "");
+
+	//! returns action component name list by given component index, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
+	proto native void GetActionComponentNameList(int componentIndex, TStringArray nameList, string geometry = "");
+	
+	//! return true if selection containts action component, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
+	proto native bool IsActionComponentPartOfSelection(int componentIndex, string selectionName, string geometry = "");
 	
 	//! Flag to determine this object is marked to be deleted soon
 	proto native bool ToDelete();
@@ -245,7 +274,15 @@ class Object extends IEntity
 	
 	proto native int GetMemoryPointIndex(string memoryPointName);
 	proto native vector GetMemoryPointPos(string memoryPointName);
+	proto native vector GetMemoryPointPosByIndex(int pointIndex);
+	proto native bool MemoryPointExists(string memoryPoint);
 
+	//! Called when tree is chopped down.
+	void OnTreeCutDown( EntityAI cutting_tool )
+	{
+		
+	}
+	
 	//! Get config class of object
 	string GetType()
 	{
@@ -671,9 +708,11 @@ class Object extends IEntity
 	proto native bool IsPlainObject();
 	
 	/**
-  \brief Returns damage level (range 0..4, 0 = pristine, 1 = worn, 2 = damaged, 3 = badly damaged, 4 = ruined).
+  	\brief Returns global health level specified in object's config class parameter healthLevels
+	     (range is usually 0..4, 0 = pristine, 1 = worn, 2 = damaged, 3 = badly damaged, 4 = ruined but can be changed).
+	@param zoneName if empty string, returns state of global health level
 	*/
-	proto native int GetHealthLabel();
+	proto native int GetHealthLevel(string zone = "");
 	
 	/**
   \brief Enable or disable object to receive damage
@@ -725,10 +764,51 @@ class Object extends IEntity
 		return GetGame().CreateSoundOnObject(this, sound_name, range, true, create_local);
 	}
 	
-	void PlayFallingPlantSound()
+	//! EffectSound - plays soundset on this object and returns state of the sound (true - played, false - not played)
+	bool PlaySoundSet( out EffectSound sound, string sound_set, float fade_in, float fade_out, bool loop = false )
 	{
+		if ( !sound && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+		{
+			sound = SEffectManager.PlaySoundOnObject( sound_set, this, fade_in, fade_out, loop );
+			sound.SetSoundAutodestroy( true );
+			
+			return true;
+		}
+		
+		return false;
+	}	
+
+	//! EffectSound - plays soundset on this object in loop and returns state of the sound (true - played, false - not played)
+	bool PlaySoundSetLoop( out EffectSound sound, string sound_set, float fade_in, float fade_out )
+	{
+		return PlaySoundSet( sound, sound_set, fade_in, fade_out, true );
+	}
+	
+	//! EffectSound - stops soundset and returns state of the sound (true - stopped, false - not playing)
+	bool StopSoundSet( out EffectSound sound )
+	{
+		if ( sound && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+		{
+			sound.SoundStop();
+			sound = NULL;
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	void PostAreaDamageActions() {}
 	void PreAreaDamageActions() {}
+	
+	
+	void SpawnDamageDealtEffect() { }
+	
+	bool HasNetworkID()
+	{
+		int lo = 0;
+		int hi = 0;
+		GetNetworkID(lo, hi);
+		return lo | hi;
+	}
 };

@@ -9,14 +9,6 @@ class InventoryItem extends EntityAI
 	
 	proto native MeleeCombatData GetMeleeCombatData();	
 	
-	override void EEUsed(Man owner)
-	{
-		if (GetGame().GetMission())
-		{
-			GetGame().GetMission().OnItemUsed(this, owner);
-		}
-	}
-	
 	void OnRightClick()
 	{
 	

@@ -36,7 +36,7 @@ class ActionUncoverHeadTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Uncover player's head";
+		return "#uncover_players_head";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -52,7 +52,7 @@ class ActionUncoverHeadTarget: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		//setaperture will be called from here, or from statemachine
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );

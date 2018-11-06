@@ -185,7 +185,7 @@ class DayZPhysics
 	proto static bool	RaycastRVProxy( notnull RaycastRVParams in, out notnull array< ref RaycastRVResult> results );
 
 
-	proto static bool	RayCastBullet(vector begPos, vector endPos, PhxInteractionLayers layerMask, out Object hitObject, out vector hitPosition, out vector hitNormal, out float hitFraction);
+	proto static bool	RayCastBullet(vector begPos, vector endPos, PhxInteractionLayers layerMask, Object ignoreObj, out Object hitObject, out vector hitPosition, out vector hitNormal, out float hitFraction);
 
-	proto static bool	SphereCastBullet(vector begPos, vector endPos, float radius, PhxInteractionLayers layerMask, out Object hitObject, out vector hitPosition, out vector hitNormal, out float hitFraction);
+	proto static bool	SphereCastBullet(vector begPos, vector endPos, float radius, PhxInteractionLayers layerMask, Object ignoreObj, out Object hitObject, out vector hitPosition, out vector hitNormal, out float hitFraction);
 }

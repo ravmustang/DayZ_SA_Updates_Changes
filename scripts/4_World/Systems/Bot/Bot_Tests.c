@@ -27,12 +27,12 @@ class BotTestSwapInternal : BotStateBase
 		{
 			if (m_Owner.GetInventory().CanSwapEntities(m_Entity1, m_Entity2))
 			{
-				botDebugPrint("[bot] -> swap item=" + m_Entity1 + " bot=" + m_Owner);
+				botDebugPrint("[bot] + " + m_Owner + " -> swap item=" + m_Entity1 + " bot=" + m_Owner);
 				m_Owner.PredictiveSwapEntities(m_Entity1, m_Entity2);
 			}
 			else if (m_Owner.GetInventory().CanSwapEntities(m_Entity2, m_Entity1))
 			{
-				botDebugPrint("[bot] <- swap item=" + m_Entity2 + " bot=" + m_Owner);
+				botDebugPrint("[bot] + " + m_Owner + " <- swap item=" + m_Entity2 + " bot=" + m_Owner);
 				m_Owner.PredictiveSwapEntities(m_Entity2, m_Entity1);
 			}
 		}
@@ -66,12 +66,12 @@ class BotTestSwapInternalC2H : BotStateBase
 		{
 			if (m_Owner.GetInventory().CanSwapEntities(m_Entity1, m_Entity2))
 			{
-				botDebugPrint("[bot] -> swap item=" + m_Entity1 + " bot=" + m_Owner);
+				botDebugPrint("[bot] + " + m_Owner + " -> swap item=" + m_Entity1 + " bot=" + m_Owner);
 				m_Owner.PredictiveSwapEntities(m_Entity1, m_Entity2);
 			}
 			else if (m_Owner.GetInventory().CanSwapEntities(m_Entity2, m_Entity1))
 			{
-				botDebugPrint("[bot] <- swap item=" + m_Entity2 + " bot=" + m_Owner);
+				botDebugPrint("[bot] + " + m_Owner + " <- swap item=" + m_Entity2 + " bot=" + m_Owner);
 				m_Owner.PredictiveSwapEntities(m_Entity2, m_Entity1);
 			}
 		}
@@ -105,12 +105,12 @@ class BotTestSwapG2H : BotStateBase
 		{
 			if (m_Owner.GetInventory().CanSwapEntities(m_Entity1, m_Entity2))
 			{
-				botDebugPrint("[bot] -> swap item=" + m_Entity1 + " bot=" + m_Owner);
+				botDebugPrint("[bot] + " + m_Owner + " -> swap item=" + m_Entity1 + " bot=" + m_Owner);
 				m_Owner.PredictiveSwapEntities(m_Entity1, m_Entity2);
 			}
 			else if (m_Owner.GetInventory().CanSwapEntities(m_Entity2, m_Entity1))
 			{
-				botDebugPrint("[bot] <- swap item=" + m_Entity2 + " bot=" + m_Owner);
+				botDebugPrint("[bot] + " + m_Owner + " <- swap item=" + m_Entity2 + " bot=" + m_Owner);
 				m_Owner.PredictiveSwapEntities(m_Entity2, m_Entity1);
 			}
 		}*/

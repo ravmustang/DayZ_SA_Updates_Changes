@@ -2,22 +2,20 @@ class LeftArea: Container
 {
 	protected ref VicinityContainer m_VicinityContainer;
 	
-	void LeftArea( ContainerBase parent )
+	void LeftArea( LayoutHolder parent )
 	{
-		m_MainPanel.Show( true );
-		m_MainPanel = m_MainPanel.FindAnyWidget( "Content" );
+		m_MainWidget.Show( true );
+		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
 
 		m_VicinityContainer = new VicinityContainer( this );
 		m_Body.Insert( m_VicinityContainer );
-
-		m_MainPanel.GetScript( m_Spacer );
+		m_ActiveIndex = 0;
 	}
 	
 	override void RefreshItemPosition( EntityAI item_to_refresh )
 	{
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
 		active_container.RefreshItemPosition( item_to_refresh );
-		m_Spacer.Update();
 	}
 	
 	override void RefreshQuantity( EntityAI item_to_refresh )
@@ -30,7 +28,6 @@ class LeftArea: Container
 	{
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
 		active_container.MoveGridCursor( direction );
-		//m_VicinityContainer.MoveGridCursor( direction );
 	}
 	
 	override void SelectItem()
@@ -86,15 +83,23 @@ class LeftArea: Container
 	
 	override bool IsActive()
 	{
+		if( m_Body.Count() <= m_ActiveIndex )
+		{
+			m_ActiveIndex = 0;
+		}
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
 		return active_container.IsActive( );
 	}
 	
 	override void SetActive( bool active )
 	{
+		if( m_Body.Count() <= m_ActiveIndex )
+		{
+			m_ActiveIndex = 0;
+		}
+		
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
 		active_container.SetActive( active );
-		m_ActiveIndex = 0;
 		if( active )
 		{
 			if( active_container.IsInherited( CollapsibleContainer ) )
@@ -102,12 +107,8 @@ class LeftArea: Container
 				CollapsibleContainer.Cast( active_container ).SetFirstActive();
 			}	
 		}
-		ScrollBarContainer scroll_bar_container;
-		GetMainPanel().GetParent().GetScript( scroll_bar_container );
-		scroll_bar_container.ScrollToTop();
 	}
 	
-	int m_ActiveIndex;
 	override void SetNextActive()
 	{
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
@@ -115,6 +116,7 @@ class LeftArea: Container
 		{
 			return;
 		}
+
 		if( active_container.IsLastContainerFocused() )
 		{
 			++m_ActiveIndex;
@@ -126,28 +128,18 @@ class LeftArea: Container
 				m_ActiveIndex = 0;
 			}
 
-				active_container.SetActive( false );
-				active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
-				active_container.SetActive( true );
-				if( active_container.IsInherited( CollapsibleContainer ) )
-				{
-					CollapsibleContainer.Cast( active_container ).SetFirstActive();
-				}
-				ScrollBarContainer scroll_bar_container;
-				GetMainPanel().GetParent().GetScript( scroll_bar_container );
-				scroll_bar_container.ScrollToTop();
+			active_container.SetActive( false );
+			active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
+			active_container.SetActive( true );
+			if( active_container.IsInherited( CollapsibleContainer ) )
+			{
+				CollapsibleContainer.Cast( active_container ).SetFirstActive();
+			}
 		}
 		else
 		{
-			scroll_bar_container;
-			GetMainPanel().GetParent().GetScript( scroll_bar_container );
 			active_container.SetNextActive();
-			
 			float amount = active_container.GetFocusedContainerHeight() + active_container.GetFocusedContainerYPos();
-			if( amount > scroll_bar_container.GetRootHeight() )
-			{
-				scroll_bar_container.ScrollToPos( amount );
-			}
 		}
 	}
 	
@@ -174,23 +166,9 @@ class LeftArea: Container
 			{
 				CollapsibleContainer.Cast( active_container ).SetLastActive();
 			}
-			ScrollBarContainer scroll_bar_container;
-			GetMainPanel().GetParent().GetScript( scroll_bar_container );
-			scroll_bar_container.ScrollToBottom();
 		}
 		else
 		{
-			scroll_bar_container;
-			float amount = active_container.GetFocusedContainerHeight() + active_container.GetFocusedContainerYPos();
-			GetMainPanel().GetParent().GetScript( scroll_bar_container );
-			if( amount > scroll_bar_container.GetRootHeight() )
-			{
-				scroll_bar_container.ScrollToPos( amount );
-			}
-			if( active_container.IsFirstContainerFocused() )
-			{
-				scroll_bar_container.ScrollToBottom();
-			}
 			active_container.SetPreviousActive();
 		}
 		
@@ -199,7 +177,6 @@ class LeftArea: Container
 	void OnLeftPanelDropReceived( Widget w, int x, int y, Widget receiver )
 	{
 		m_VicinityContainer.OnLeftPanelDropReceived( w, x, y, receiver );
-		m_Spacer.Update();
 	}
 	
 	override void SetLayoutName()
@@ -214,7 +191,7 @@ class LeftArea: Container
 	
 	override void SetParentWidget()
 	{
-		m_ParentWidget = m_Parent.GetMainPanel().FindAnyWidget( "LeftPanel" );
+		m_ParentWidget = m_Parent.GetMainWidget().FindAnyWidget( "LeftPanel" );
 	}
 	
 	override void OnShow()

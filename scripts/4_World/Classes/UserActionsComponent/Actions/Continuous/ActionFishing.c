@@ -34,7 +34,7 @@ class ActionFishing: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Pull";
+		return "#pull";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -50,7 +50,7 @@ class ActionFishing: ActionContinuousBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}

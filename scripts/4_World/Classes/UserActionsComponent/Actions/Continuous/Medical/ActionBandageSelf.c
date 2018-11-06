@@ -41,14 +41,19 @@ class ActionBandageSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Bandage";
+		return "#bandage";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		return player.IsBleeding();
+	}
+	
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		if (action_data.m_Player.GetBleedingManager() )
+		if (action_data.m_Player.GetBleedingManagerServer() )
 		{
-			action_data.m_Player.GetBleedingManager().RemoveSingleBleedingSource();	
+			action_data.m_Player.GetBleedingManagerServer().RemoveAnyBleedingSource();	
 		}
 		
 		if (action_data.m_MainItem.GetQuantity() > 0)

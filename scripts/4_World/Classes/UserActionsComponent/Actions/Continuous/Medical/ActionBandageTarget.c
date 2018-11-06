@@ -36,15 +36,21 @@ class ActionBandageTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Bandage target";
+		return "#bandage_target";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		PlayerBase other_player = PlayerBase.Cast(target.GetObject());
+		return other_player.IsBleeding();
+	}
+	
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PlayerBase ntarget = PlayerBase.Cast(action_data.m_Target.GetObject());
-		if (ntarget.GetBleedingManager() )
+		if (ntarget.GetBleedingManagerServer() )
 		{
-			ntarget.GetBleedingManager().RemoveSingleBleedingSource();
+			ntarget.GetBleedingManagerServer().RemoveAnyBleedingSource();
 		}
 		
 		if (action_data.m_MainItem.GetQuantity() > 0)

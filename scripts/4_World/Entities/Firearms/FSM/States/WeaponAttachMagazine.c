@@ -60,7 +60,34 @@ class WeaponAttachingMagStartAction extends WeaponStartAction
 		m_newSrc = NULL;
 		super.OnExit(e);
 	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!OptionalLocationWriteToContext(m_newSrc, ctx))
+		{
+			Error("[wpnfsm] WeaponAttachingMagStartAction.SaveCurrentFSMState: cannot write m_newSrc for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!OptionalLocationReadFromContext(m_newSrc, ctx))
+		{
+			Error("[wpnfsm] WeaponAttachingMagStartAction.LoadCurrentFSMState: cannot read m_newSrc for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
 };
+
 
 class RemoveNewMagazineFromInventory extends WeaponStateBase
 {
@@ -134,6 +161,44 @@ class RemoveNewMagazineFromInventory extends WeaponStateBase
 		m_newMagazine = NULL;
 		m_newSrc = NULL;
 		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_newMagazine))
+		{
+			Error("[wpnfsm] RemoveNewMagazineFromInventory.SaveCurrentFSMState: cannot write m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationWriteToContext(m_newSrc, ctx))
+		{
+			Error("[wpnfsm] RemoveNewMagazineFromInventory.SaveCurrentFSMState: cannot write m_newSrc for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_newMagazine))
+		{
+			Error("[wpnfsm] RemoveNewMagazineFromInventory.LoadCurrentFSMState: cannot read m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationReadFromContext(m_newSrc, ctx))
+		{
+			Error("[wpnfsm] RemoveNewMagazineFromInventory.LoadCurrentFSMState: cannot read m_newSrc for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -224,6 +289,32 @@ class WeaponAttachMagazine extends WeaponStateBase
 		m_newMagazine = NULL;
 
 		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_newMagazine))
+		{
+			Error("[wpnfsm] WeaponAttachMagazine.SaveCurrentFSMState: cannot write m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_newMagazine))
+		{
+			Error("[wpnfsm] WeaponAttachMagazine.LoadCurrentFSMState: cannot read m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 

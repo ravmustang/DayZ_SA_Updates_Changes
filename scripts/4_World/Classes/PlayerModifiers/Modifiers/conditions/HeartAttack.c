@@ -1,4 +1,4 @@
-class HeartAttack: ModifierBase
+class HeartAttackMdfr: ModifierBase
 {
 	private const float 	HEALTH_DECREMENT_PER_SEC = -0.2;
 	private const float 	SHOCK_DECREMENT_PER_SEC = -2;
@@ -10,6 +10,7 @@ class HeartAttack: ModifierBase
 		m_ID 					= eModifiers.MDF_HEART_ATTACK;
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
+		m_IsPersistent = true;
 	}
 	override bool ActivateCondition(PlayerBase player)
 	{
@@ -30,13 +31,13 @@ class HeartAttack: ModifierBase
 		if ( player.GetHealth("GlobalHealth","Shock") <= SHOCK_LIMIT )
 		{
 			float currenthealth = player.GetHealth("GlobalHealth", "Health");
-			player.SetHealth("GlobalHealth", "Health" , ( currenthealth + (HEALTH_DECREMENT_PER_SEC*deltaT) ) );
+			player.SetHealth("GlobalHealth", "Health" , ( currenthealth + (HEALTH_DECREMENT_PER_SEC * deltaT) ) );
 			
 		}
 		else
 		{
 			float currentshock =  player.GetHealth("GlobalHealth", "Shock");
-			player.SetHealth("GlobalHealth", "Shock" , ( currentshock + (SHOCK_DECREMENT_PER_SEC*deltaT) ) );
+			player.SetHealth("GlobalHealth", "Shock" , ( currentshock + (SHOCK_DECREMENT_PER_SEC * deltaT) ) );
 		}
 	}
 };

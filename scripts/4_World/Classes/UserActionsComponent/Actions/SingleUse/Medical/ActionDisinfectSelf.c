@@ -41,7 +41,7 @@ class ActionDisinfectSelf: ActionSingleUseBase
 		return "#disinfect";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		//RemoveModifiers(target, item); ?
 

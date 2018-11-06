@@ -43,8 +43,7 @@ class WeaponUnjamming_Start extends WeaponStartAction
 		else
 		{
 			wpnDebugPrint("[wpnfsm] Unjamming failed, weapon still jammed");
-			//TODO MW here add jamming interrupt insted jamming end
-			hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_END);
+			hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_INTERRUPT);
 			m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingFailedTimeout(p));
 		}
 	}
@@ -69,11 +68,14 @@ class WeaponUnjamming_Cartridge extends WeaponStateBase
 		
 		float dmg;
 		string type;
+		
+		m_weapon.SetJammed(false);
 	
-		DayZPlayer p = e.m_player;
+		//DayZPlayer p = e.m_player;
 		int mi = m_weapon.GetCurrentMuzzle();
-		m_weapon.EjectCartridge(mi,dmg,type);
 		m_weapon.SelectionBulletHide();
+		m_weapon.EjectCasing(mi);
+		//m_weapon.EjectCartridge(mi,dmg,type);
 		//ejectBulletAndStoreInMagazine(m_weapon, mi, NULL, p);
 	}
 	override void OnExit (WeaponEventBase e)
@@ -81,6 +83,43 @@ class WeaponUnjamming_Cartridge extends WeaponStateBase
 		m_type = string.Empty;
 		super.OnExit(e);
 	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_damage))
+		{
+			Error("[wpnfsm] WeaponUnjamming_Cartridge.SaveCurrentFSMState: cannot write m_damage for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Write(m_type))
+		{
+			Error("[wpnfsm] WeaponUnjamming_Cartridge.SaveCurrentFSMState: cannot write m_type for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_damage))
+		{
+			Error("[wpnfsm] WeaponUnjamming_Cartridge.LoadCurrentFSMState: cannot read m_damage for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Read(m_type))
+		{
+			Error("[wpnfsm] WeaponUnjamming_Cartridge.LoadCurrentFSMState: cannot read m_type for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
 };
 
 class WeaponUnjamming_Cartridge_W4T extends WeaponUnjamming_Cartridge

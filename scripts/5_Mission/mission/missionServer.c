@@ -22,8 +22,6 @@ class MissionServer extends MissionBase
 	ref TStringArray shoesArray;
 	ref TStringArray backpackArray  = {"TaloonBag_Blue","TaloonBag_Green","TaloonBag_Orange","TaloonBag_Violet"}; //only for testing equips, will remove eventually
 	
-	float m_SavePlayerPositionTimer;
-	
 	void MissionServer()
 	{
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(this.UpdatePlayersStats, 30000, true);
@@ -36,21 +34,11 @@ class MissionServer extends MissionBase
 		m_LogoutPlayers = new map<PlayerBase, ref LogoutInfo>;
 		
 		InitEquipArrays();
-		
-		if ( GetDayZGame().IsDebugPlayerPosition() )
-		{
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater( ServerDebugPos.SavePlayerPositions, 20000, true );
-		}
 	}
 
 	void ~MissionServer()
 	{
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Remove(this.UpdatePlayersStats);
-		
-		if ( GetDayZGame().IsDebugPlayerPosition() )
-		{
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Remove( ServerDebugPos.SavePlayerPositions );
-		}
 	}
 
 	void InitEquipArrays()
@@ -82,7 +70,7 @@ class MissionServer extends MissionBase
 	{
 		UpdateDummyScheduler();
 		TickScheduler(timeslice);
-		UpdateLogoutPlayers();	
+		UpdateLogoutPlayers();
 	}
 
 	override bool IsServer()
@@ -101,12 +89,14 @@ class MissionServer extends MissionBase
 		{
 			PlayerBase player;
 			Class.CastTo(player, players.Get(i));
+			if( player )
+			{
+				// NEW STATS API
+				player.StatUpdateByTime("playtime");
+				player.StatUpdateByPosition("dist");
 
-			// NEW STATS API
-			player.StatUpdateByTime("playtime");
-			player.StatUpdateByPosition("dist");
-
-			module_lifespan.UpdateLifespan( player );
+				module_lifespan.UpdateLifespan( player );
+			}
 		}
 	}
 	
@@ -125,6 +115,10 @@ class MissionServer extends MissionBase
 				{
 					identity = player.GetIdentity();
 				}
+				
+				// disable reconnecting to old char
+				GetGame().RemoveFromReconnectCache(info.param2);
+	
 				PlayerDisconnected(player, identity, info.param2);
 					
 				m_LogoutPlayers.RemoveElement(i);
@@ -217,10 +211,11 @@ class MissionServer extends MissionBase
 				
 			Class.CastTo(logoutCancelParams, params);				
 			Class.CastTo(player, logoutCancelParams.param1);
-			
 			identity = player.GetIdentity();
 			if (identity)
 			{
+				// disable reconnecting to old char
+				GetGame().RemoveFromReconnectCache(identity.GetId());
 				Print("[Logout]: Player " + identity.GetId() + " cancelled"); 
 			}
 			else
@@ -228,6 +223,7 @@ class MissionServer extends MissionBase
 				Print("[Logout]: Player cancelled"); 
 			}
 			m_LogoutPlayers.Remove(player);
+			
 			break;
 		}
 	}
@@ -366,11 +362,6 @@ class MissionServer extends MissionBase
 	
 	void OnClientRespawnEvent(PlayerIdentity identity, PlayerBase player)
 	{
-		// note: player is now killed in db right after the actual kill happens 
-		/*if (GetHive() && player)
-		{
-			GetHive().CharacterKill(player);
-		}*/
 		if(player)
 		{
 			if (player.IsUnconscious() || player.IsRestrained())
@@ -383,24 +374,44 @@ class MissionServer extends MissionBase
 	
 	void OnClientDisconnectedEvent(PlayerIdentity identity, PlayerBase player, int queueTime, bool authFailed)
 	{
+		bool disconnectNow = true;
+		
 		// TODO: get out of vehicle
 		// using database and no saving if authorization failed
-		if (GetHive() && !authFailed && queueTime > 0)
-		{
-			// player alive
-			if (player.GetPlayerState() == EPlayerStates.ALIVE && !player.IsRestrained())
-			{
+		if (GetHive() && !authFailed)
+		{			
+			if (player.IsAlive())
+			{	
 				if (!m_LogoutPlayers.Contains(player))
 				{
+					Print("[Logout]: New player " + identity.GetId() + " with logout time " + queueTime.ToString());
+					
+					// inform client about logout time
+					GetGame().SendLogoutTime(player, queueTime);
+			
 					// wait for some time before logout and save
 					LogoutInfo params = new LogoutInfo(GetGame().GetTime() + queueTime * 1000, identity.GetId());
 					m_LogoutPlayers.Insert(player, params);
-					Print("[Logout]: New player " + identity.GetId() + " with logout time " + queueTime.ToString());
-				}		
+					
+					// allow reconnecting to old char
+					GetGame().AddToReconnectCache(identity);
+					
+					// wait until logout timer runs out
+					disconnectNow = false;		
+				}
 				return;
-			}
+			}		
 		}
-		PlayerDisconnected(player, identity, identity.GetId());
+		
+		if (disconnectNow)
+		{
+			Print("[Logout]: New player " + identity.GetId() + " with instant logout");
+			
+			// inform client about instant logout
+			GetGame().SendLogoutTime(player, 0);
+			
+			PlayerDisconnected(player, identity, identity.GetId());
+		}
 	}
 
 	void PlayerDisconnected(PlayerBase player, PlayerIdentity identity, string uid)
@@ -411,7 +422,6 @@ class MissionServer extends MissionBase
 			Print("[Logout]: Skipping player " + uid + ", already removed");
 			return;
 		}
-		
 		Print("[Logout]: Player " + uid + " finished");
 
 		if (GetHive())
@@ -423,6 +433,8 @@ class MissionServer extends MissionBase
 			GetHive().CharacterExit(player);		
 		}
 		
+		// handle player's existing char in the world
+		player.ReleaseNetworkControls();
 		HandleBody(player);
 		
 		// remove player from server

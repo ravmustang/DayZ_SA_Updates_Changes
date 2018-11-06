@@ -156,11 +156,43 @@ class LoopedChambering extends WeaponStateBase
 	}
 	override void OnExit (WeaponEventBase e)
 	{
+		m_srcMagazine = NULL;
+		m_chamber.m_srcMagazine = NULL;
 		super.OnExit(e);
+		
 	}
 	override void OnAbort (WeaponEventBase e)
 	{
+		m_srcMagazine = NULL;
+		m_chamber.m_srcMagazine = NULL;
 		super.OnAbort(e);
+		
+	}
+	
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 /*

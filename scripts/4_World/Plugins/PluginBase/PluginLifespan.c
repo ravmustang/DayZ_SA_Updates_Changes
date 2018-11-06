@@ -9,26 +9,35 @@ enum LifeSpanState
 	BEARD_NONE		= 0,
 	BEARD_MEDIUM	= 1,
 	BEARD_LARGE		= 2,	
-	COUNT			= 3,
+	BEARD_EXTRA		= 3,	
+	COUNT			= 4,
 }
 
 class PluginLifespan extends PluginBase
 {
 	protected static const int LIFESPAN_MIN = 0;
 	protected static const int LIFESPAN_MAX = 60; // value in minutes when player achieved maximum age in order to have full beard
-	
-	protected static const int HANDS_OBJECT_SLOT = 7; // hands object slot index for setting and unsetting bloody hands
+	protected int m_FakePlaytime;
 	
 	protected ref map<PlayerBase, ref LifespanLevel> m_PlayerCurrentLevel;
 	protected ref map<string, ref array< ref LifespanLevel>> m_LifespanLevels;
 	protected ref map<string, ref BloodyHands> m_BloodyHands;
 	protected ref map<PlayerBase, int> m_BloodType;
 
+	//========================================
+	// GetInstance
+	//========================================
+	static PluginLifespan GetInstance()
+	{
+		return PluginLifespan.Cast( GetPlugin(PluginLifespan) );
+	}
+	
 	void PluginLifespan()
 	{
 		LoadFromCfg();
 		m_PlayerCurrentLevel = new map<PlayerBase, ref LifespanLevel>;
 		m_BloodType = new map<PlayerBase, int>;
+		m_FakePlaytime = 0;
 	}
 
 //-----------------------------
@@ -41,60 +50,83 @@ class PluginLifespan extends PluginBase
 		
 		const int LIFESPAN_LENGTH = LIFESPAN_MAX - LIFESPAN_MIN;
 
-		string cfg_name = "CfgVehicles";
-		int cfg_class_count = GetGame().ConfigGetChildrenCount( cfg_name );
-		
-		int i, j, k, l, m;
-		for ( i = 0; i < cfg_class_count; i++ )
-		{
-			string cfg_class_name = "";
-			GetGame().ConfigGetChildName( cfg_name, i, cfg_class_name );
+		//cfg_name = 'CfgVehicles'
+		//	config_name = 'CfgVehicles'
+		//cfg_class_count = 2348
+		//	config_count = 2348
+		//cfg_class_name = 'SurvivorMale_Base'
+		//	survivor_name = 'SurvivorMale_Base'
+		//cfg_class_fullname = 'CfgVehicles SurvivorMale_Base'
+		//	survivor_path = 'CfgVehicles SurvivorMale_Base'
+		//cfg_class_member_count = 10
+		//	survivor_lifespan_count = 10
+		//cfg_class_member_name = 'Lifespan'
+		//	survivor_lifespan_name = 'Lifespan'
+		//cfg_class_member_fullname = 'CfgVehicles SurvivorMale_Base Lifespan';
+		//	survivor_lifespan_path = 'CfgVehicles SurvivorMale_Base Lifespan';
+		//cfg_class_member_member_count = 1
+		//	survivor_lifespan_beard_count = 1
+		//cfg_class_member_member_name = 'Beard'
+		//	survivor_lifespan_beard_name = 'Beard'
+		//cfg_class_member_member_fullname = 'CfgVehicles SurvivorMale_Base Lifespan Beard'
+		//	survivor_lifespan_beard_path = 'CfgVehicles SurvivorMale_Base Lifespan Beard'
+		//cfg_class_member_member_variable_name = 'mat'
+		//	survivor_lifespan_beard_material_name = 'mat'
+		//cfg_class_member_member_variable_fullname = 'CfgVehicles SurvivorMale_Base Lifespan Beard mat'
+		//	survivor_lifespan_beard_material_path = 'CfgVehicles SurvivorMale_Base Lifespan Beard mat'
+
+		string config_name = "CfgVehicles";
+		int config_count = GetGame().ConfigGetChildrenCount( config_name );
 			
-			if ( cfg_class_name != "" && cfg_class_name != "access" )
+		int i, j, k, l, m;
+		
+		//Print( "config_count: " + config_count );
+		for ( i = 0; i < config_count; i++ )
+		{
+			string survivor_name = "";
+			GetGame().ConfigGetChildName( config_name, i, survivor_name );
+			
+			if ( survivor_name != "" && survivor_name != "access" )
 			{
-				if ( GetGame().IsKindOf(cfg_class_name, "SurvivorMale_Base") || GetGame().IsKindOf(cfg_class_name, "SurvivorFemale_Base") )
+				if ( GetGame().IsKindOf(survivor_name, "SurvivorMale_Base") )
 				{
-					string cfg_class_fullname = cfg_name + " " + cfg_class_name;
-					int cfg_class_member_count = GetGame().ConfigGetChildrenCount( cfg_class_fullname );
+					string survivor_path = config_name + " " + survivor_name;
+					int survivor_lifespan_count = GetGame().ConfigGetChildrenCount( survivor_path );
 
-					for ( j = 0; j < cfg_class_member_count; j++ )
+					//Print( "survivor_path: " + survivor_path );
+					for ( j = 0; j < survivor_lifespan_count; j++ )
 					{
-						string cfg_class_member_name = "";
-						GetGame().ConfigGetChildName( cfg_class_fullname, j, cfg_class_member_name );
+						string survivor_lifespan_name = "";
+						GetGame().ConfigGetChildName( survivor_path, j, survivor_lifespan_name );
 						
-						string cfg_class_member_fullname = cfg_class_fullname + " " + cfg_class_member_name;
+						string survivor_lifespan_path = survivor_path + " " + survivor_lifespan_name;
 
-						if ( cfg_class_member_name == "Lifespan" )
+						if ( survivor_lifespan_name == "Lifespan" )
 						{
-							int cfg_class_member_member_count = GetGame().ConfigGetChildrenCount( cfg_class_member_fullname );
+							int survivor_lifespan_beard_count = GetGame().ConfigGetChildrenCount( survivor_lifespan_path );
 							
-							for ( k = 0; k < cfg_class_member_member_count; k++ )
+							for ( k = 0; k < survivor_lifespan_beard_count; k++ )
 							{
-								string cfg_class_member_member_name = "";
-								GetGame().ConfigGetChildName( cfg_class_member_fullname, k, cfg_class_member_member_name );
+								string survivor_lifespan_beard_name = "";
+								GetGame().ConfigGetChildName( survivor_lifespan_path, k, survivor_lifespan_beard_name );
 								
-								string cfg_class_member_member_fullname = cfg_class_member_fullname + " " + cfg_class_member_member_name;
-								
-								//Print( cfg_class_member_member_name );
-								
-								if ( cfg_class_member_member_name == "Beard" )
-								{
-									//Print( cfg_class_name );
-									
+								string survivor_lifespan_beard_path = survivor_lifespan_path + " " + survivor_lifespan_beard_name;
+																
+								if ( survivor_lifespan_beard_name == "Beard" )
+								{									
 									ref TStringArray materials = new TStringArray;
-									int cfg_class_member_member_variable_count = GetGame().ConfigGetChildrenCount( cfg_class_member_member_fullname );
-									//Print( cfg_class_member_member_variable_count );
+									int cfg_class_member_member_variable_count = GetGame().ConfigGetChildrenCount( survivor_lifespan_beard_path );
 									
 									for ( l = 0; l < cfg_class_member_member_variable_count; l++ )
 									{
-										string cfg_class_member_member_variable_name = "";
-										GetGame().ConfigGetChildName( cfg_class_member_member_fullname, l, cfg_class_member_member_variable_name );
-										string cfg_class_member_member_variable_fullname = cfg_class_member_member_fullname + " " + cfg_class_member_member_variable_name;
+										string survivor_lifespan_beard_material_name = "";
+										GetGame().ConfigGetChildName( survivor_lifespan_beard_path, l, survivor_lifespan_beard_material_name );
+										string survivor_lifespan_beard_material_path = survivor_lifespan_beard_path + " " + survivor_lifespan_beard_material_name;
 										
-										if ( cfg_class_member_member_variable_name == "mat" )
+										if ( survivor_lifespan_beard_material_name == "mat" )
 										{
-											GetGame().ConfigGetTextArray( cfg_class_member_member_variable_fullname, materials );
-
+											GetGame().ConfigGetTextArray( survivor_lifespan_beard_material_path, materials );
+											
 											ref array<ref LifespanLevel> lifespan_levels = new array< ref LifespanLevel>;
 
 											int level_count = materials.Count() / 2;
@@ -106,27 +138,27 @@ class PluginLifespan extends PluginBase
 												{
 													float threshold = (((float)m / (float)(level_count - 1)) * (float)LIFESPAN_LENGTH) + (float)LIFESPAN_MIN;
 													lifespan_levels.Insert( new LifespanLevel(m, threshold, materials.Get(tex), materials.Get(mat)) );
+													//Print("material a textura a threshold: " + materials.Get(tex) + " " + materials.Get(mat) + " " + threshold );
 												}
 											}
 											
 											if ( lifespan_levels.Count() > 0 )
 											{
-												m_LifespanLevels.Set( cfg_class_name, lifespan_levels );
-												//Print( cfg_class_name );
+												m_LifespanLevels.Set( survivor_name, lifespan_levels );
 											}
 										}
 									}
 								}	
 							}
 						}
-						else if ( cfg_class_member_name == "BloodyHands" )
+						else if ( survivor_lifespan_name == "BloodyHands" )
 						{
 							string bloody_material, normal_material;
-							string path_normal = cfg_class_member_fullname + " mat_normal";
-							string path_bloody = cfg_class_member_fullname + " mat_blood";
+							string path_normal = survivor_lifespan_path + " mat_normal";
+							string path_bloody = survivor_lifespan_path + " mat_blood";
 							GetGame().ConfigGetText(path_normal, normal_material);
 							GetGame().ConfigGetText(path_bloody, bloody_material);
-							m_BloodyHands.Set( cfg_class_name, new BloodyHands(normal_material, bloody_material) );
+							m_BloodyHands.Set( survivor_name, new BloodyHands(normal_material, bloody_material) );
 						}
 					}
 				}
@@ -162,6 +194,15 @@ class PluginLifespan extends PluginBase
 		SynchShowBloodType( player, blood_type );
 	}
 	
+	void ChangeFakePlaytime( PlayerBase player, int change )
+	{
+		if ( !GetGame().IsMultiplayer() )
+		{
+			m_FakePlaytime = change;
+			UpdateLifespan( player, true );
+		}
+	}
+	
 //-----------------------------
 // Facial hair
 //-----------------------------
@@ -171,7 +212,14 @@ class PluginLifespan extends PluginBase
 		if ( player != NULL )
 		{
 			// NEW STATS API
-			float player_playtime = player.StatGet("playtime");
+			if ( GetGame().IsMultiplayer() )
+			{
+				float player_playtime = player.StatGet("playtime");
+			}
+			else
+			{
+				player_playtime = m_FakePlaytime;
+			}
 						
 			float player_beard = player_playtime - player.GetLastShavedSeconds();
 			player_beard = player_beard / 60.0;
@@ -213,11 +261,8 @@ class PluginLifespan extends PluginBase
 			
 				if ( next_level != NULL )
 				{
-					if( false ) // lifespan temporary disabled
-					{
-						SetPlayerLifespanLevel( player, next_level );
-						m_PlayerCurrentLevel.Set( player, next_level );
-					}
+					SetPlayerLifespanLevel( player, next_level );
+					m_PlayerCurrentLevel.Set( player, next_level );
 				}
 			}
 		}
@@ -229,11 +274,8 @@ class PluginLifespan extends PluginBase
 
 				if ( level != NULL )
 				{
-					if( false ) // lifespan temporary disabled
-					{
-						SetPlayerLifespanLevel( player, level );
-						m_PlayerCurrentLevel.Set( player, level );
-					}
+					SetPlayerLifespanLevel( player, level );
+					m_PlayerCurrentLevel.Set( player, level );
 				}
 			}
 		}
@@ -266,42 +308,62 @@ class PluginLifespan extends PluginBase
 
 	protected void SetPlayerLifespanLevel( PlayerBase player, LifespanLevel level )
 	{
-		/*
-		Print( "set level" );
+		int slot_id = InventorySlots.GetSlotIdFromString("Head");	
+		EntityAI players_head = player.GetInventory().FindPlaceholderForSlot( slot_id );
 		
-		Print( "level " + level.GetLevel() );
-		Print( "treshold " + level.GetThreshold() );
-		Print( "texture name " + level.GetTextureName() );
-		Print( "material name " + level.GetMaterialName() );
-		*/
-		player.SetFaceTexture( level.GetTextureName() );
-		player.SetFaceMaterial( level.GetMaterialName() );
-		
-		switch(level.GetLevel())
+		if( players_head )
 		{
-			case LifeSpanState.BEARD_NONE:
+			switch(level.GetLevel())
 			{
-				player.SetLifeSpanStateVisible(LifeSpanState.BEARD_NONE);
-				break;
-			}
-			case LifeSpanState.BEARD_MEDIUM:
-			{
-				player.SetLifeSpanStateVisible(LifeSpanState.BEARD_MEDIUM);
-				break;
-			}
-			
-			case LifeSpanState.BEARD_LARGE:
-			{
-				player.SetLifeSpanStateVisible(LifeSpanState.BEARD_LARGE);
-				break;
-			}
-								
-			default:
-			{
-				Print("Evil error");
-				break;
-			}
-		}	
+				case LifeSpanState.BEARD_NONE:
+				{
+					players_head.SetObjectTexture( 0, "");
+					players_head.SetObjectMaterial( 0, "");		
+					
+					player.SetFaceTexture( level.GetTextureName() );
+					player.SetFaceMaterial( level.GetMaterialName() );
+					
+					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_NONE);
+					//Print("LifeSpanState.BEARD_NONE");
+					break;
+				}
+				case LifeSpanState.BEARD_MEDIUM:
+				{
+					player.SetFaceTexture( level.GetTextureName() );
+					player.SetFaceMaterial( level.GetMaterialName() );
+					
+					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_MEDIUM);
+					//Print("LifeSpanState.BEARD_MEDIUM");
+					break;
+				}
+				
+				case LifeSpanState.BEARD_LARGE:
+				{			
+					player.SetFaceTexture( level.GetTextureName() );
+					player.SetFaceMaterial( level.GetMaterialName() );
+					
+					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_LARGE);
+					//Print("LifeSpanState.BEARD_LARGE");
+					break;
+				}
+				
+				case LifeSpanState.BEARD_EXTRA:
+				{
+					players_head.SetObjectTexture( 0, level.GetTextureName() );
+					players_head.SetObjectMaterial( 0, level.GetMaterialName() );
+					
+					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_EXTRA);
+					//Print("LifeSpanState.BEARD_EXTRA");
+					break;
+				}
+									
+				default:
+				{
+					Print("Lifespan state missing");
+					break;
+				}
+			}	
+		}
 	}
 	
 	void SynchBeardVisual( PlayerBase player, int state )
@@ -312,24 +374,34 @@ class PluginLifespan extends PluginBase
 		{
 			case LifeSpanState.BEARD_NONE:
 			{
+				// first out of 4 states
 				player_beard = LIFESPAN_MIN;
 				break;
 			}
 			case LifeSpanState.BEARD_MEDIUM:
 			{
-				player_beard = LIFESPAN_MAX/2;
+				// second out of 4 states
+				player_beard = LIFESPAN_MAX/3;
 				break;
 			}
 			
 			case LifeSpanState.BEARD_LARGE:
 			{
+				// third out of 4 states
+				player_beard = LIFESPAN_MAX/1.5;
+				break;
+			}
+			
+			case LifeSpanState.BEARD_EXTRA:
+			{
+				// fourth out of 4 states
 				player_beard = LIFESPAN_MAX;
 				break;
 			}
 								
 			default:
 			{
-				Print("Evil error");
+				Print("Lifespan state missing");
 				break;
 			}
 		}
@@ -406,9 +478,9 @@ class PluginLifespan extends PluginBase
 	{
 		player.SetBloodTypeVisible( show );
 		
-		if ( player.m_HUD )
+		if ( player.m_Hud )
 		{
-			player.m_HUD.UpdateBloodName();
+			player.m_Hud.UpdateBloodName();
 		}
 	}
 	

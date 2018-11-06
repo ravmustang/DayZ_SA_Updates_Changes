@@ -25,6 +25,16 @@ class ActionCPR: ActionContinuousBase
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
 	
+	override void OnStartClient(ActionData action_data)
+	{
+		action_data.m_Player.GetItemAccessor().HideItemInHands(true);
+	}
+	
+	override void OnStartServer(ActionData action_data)
+	{
+		action_data.m_Player.GetItemAccessor().HideItemInHands(true);
+	}
+	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINone;
@@ -38,7 +48,7 @@ class ActionCPR: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "CPR";
+		return "#cpr";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -46,17 +56,18 @@ class ActionCPR: ActionContinuousBase
 		PlayerBase other_player = PlayerBase.Cast(target.GetObject());
 		return other_player.IsUnconscious();
 	}
-
-	override void OnCompleteServer( ActionData action_data )
-	{	
-
+	
+	override void OnFinishProgressClient(ActionData action_data)
+	{
+		action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}
 	
-	override void OnRepeatServer(ActionData action_data)
+	override void OnFinishProgressServer(ActionData action_data)
 	{
 		PlayerBase other_player = PlayerBase.Cast(action_data.m_Target.GetObject());
 		other_player.GiveShock(5);
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}
 	
 	override void OnExecuteServer(ActionData action_data)

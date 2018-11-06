@@ -116,5 +116,11 @@ class Transport extends EntityAI
 	bool CrewCanGetThrough( int posIdx )
 	{
 		return false;
+
+	}
+
+	bool CanReachSeatFromSeat( int currentSeat, int nextSeat )
+	{
+		return false;
 	}
 };

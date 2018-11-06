@@ -32,7 +32,7 @@ class ActionForceConsumeSingle: ActionSingleUseBase
 		return "#give_one";
 	}
 		
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0 ) 
 		{

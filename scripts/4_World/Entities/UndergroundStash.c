@@ -22,7 +22,7 @@ class UndergroundStash extends ItemBase
 	ItemBase GetStashedItem()
 	{
 		ItemBase item;		
-		item = GetInventory().GetCargo().GetItem(0);
+		item = ItemBase.Cast( GetInventory().GetCargo().GetItem(0) );
 		Print("GetStashedItem()");
 		Print(item);
 		return item;

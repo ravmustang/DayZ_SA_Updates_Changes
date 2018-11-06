@@ -36,7 +36,7 @@ class ActionCookOnStick: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Cook on stick";
+		return "#cook_on_stick";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

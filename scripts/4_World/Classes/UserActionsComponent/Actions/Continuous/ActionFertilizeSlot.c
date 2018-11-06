@@ -19,6 +19,10 @@ class ActionFertilizeSlot: ActionContinuousBase
 		m_MessageFail = "There's not enough fertilizer.";
 		m_MessageCancel = "I stoped fertilizing.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_MEDIUM;
+		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
+		m_FullBody = true;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
 	
 	override void CreateConditionComponents()  
@@ -34,7 +38,7 @@ class ActionFertilizeSlot: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Fertilize slot";
+		return "#fertilize_slot";
 	}
 
 
@@ -56,7 +60,7 @@ class ActionFertilizeSlot: ActionContinuousBase
 		return false;
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		// The functionality is in the Execute event of this user action's component.
 	}

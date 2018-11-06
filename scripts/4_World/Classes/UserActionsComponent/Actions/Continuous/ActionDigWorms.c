@@ -11,7 +11,7 @@ class ActionDigWorms: ActionContinuousBase
 	void ActionDigWorms()
 	{
 		m_CallbackClass = ActionDigWormsCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGHOE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_MEDIUM;
@@ -60,10 +60,10 @@ class ActionDigWorms: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Dig up worms";
+		return "#dig_up_worms";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		ItemBase worms;
 		Class.CastTo(worms,  GetGame().CreateObject("Worm", action_data.m_Player.GetPosition()) );

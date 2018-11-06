@@ -11,6 +11,7 @@ class PPEffects
 	
 	static int	 	m_HitColor;
 	static int	 	m_BurlapBlindness;
+	static int 		m_DyingEffect;
 	
 	static float	m_BloodSaturation;
 	
@@ -48,6 +49,7 @@ class PPEffects
 		// add new color effects here
 		m_HitColor 			= RegisterColorEffect();
 		m_BurlapBlindness 	= RegisterColorEffect();
+		m_DyingEffect 		= RegisterColorEffect();
 	}
 	
 	static void ResetBlurEffects()
@@ -58,6 +60,7 @@ class PPEffects
 			{
 				m_BlurValues[i] = 0;
 			}
+			UpdateBlur();
 		}	
 	}
 		
@@ -169,6 +172,7 @@ class PPEffects
 			{
 				m_ColorEffect[i] = 0;
 			}
+			UpdateColor();
 		}
 	}
 	
@@ -195,7 +199,12 @@ class PPEffects
 	{
 		float color_value_total[4];
 		float color_overlay;
-	
+		
+		if( !GetGame() || !GetGame().GetWorld() )
+		{
+			return;
+		}
+		
 		Material matColors = GetGame().GetWorld().GetMaterial("graphics/materials/postprocess/glow");
 
 		for ( int i = 0; i < m_ColorValues.Count(); ++i )
@@ -269,12 +278,12 @@ class PPEffects
 
 	static void ResetPPMask()
 	{
-		GetGame().ResetPPMask();
+		if( GetGame() ) GetGame().ResetPPMask();
 	}
 	
 	static void ResetDOFOverride()
 	{
-		OverrideDOF(false,0,0,0,0,0);
+		OverrideDOF(false,0,0,0,0,1);
 	}
 	
 	static void ResetLensEffect()
@@ -300,6 +309,17 @@ class PPEffects
 		SetColorValue(m_BurlapBlindness, 0, 0, 0, 0, 0.0);
 		UpdateColor();
 		GetGame().SetEVUser(0);
+	}
+	
+	static void SetDeathDarkening(float value) 
+	{
+		SetColorValue(m_HitColor, 0, 0, 0, 0, 0); //workaround to colour addition of hit effect
+		SetColorValue(m_DyingEffect, 0, 0, 0, 1, value);
+		UpdateColor();
+		if (value > 0.99)
+			GetGame().SetEVUser(-5); //additional "darkness" to avoid lens flare
+		else
+			GetGame().SetEVUser(0);
 	}
 
 	static void UpdateSaturation()
@@ -342,7 +362,7 @@ class PPEffects
 	}
 	
 	static void ResetAll()
-	{		
+	{
 		ResetBlurEffects();
 		ResetColorEffects();
 		ResetVignette();
@@ -350,5 +370,6 @@ class PPEffects
 		ResetDOFOverride();
 		ResetLensEffect();
 		SetBloodSaturation(1);
+		RemoveUnconsciousnessVignette();
 	}	
 };

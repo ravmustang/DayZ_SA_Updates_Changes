@@ -14,7 +14,7 @@ class ActionExtinguishFireplaceByLiquid: ActionContinuousBase
 	void ActionExtinguishFireplaceByLiquid()
 	{
 		m_CallbackClass = ActionExtinguishFireplaceByLiquidCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_POURBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		m_FullBody = true;
 		m_MessageStartFail = "There's nothing to extinguish.";
 		m_MessageStart = "I have started extinguishing the fireplace.";
@@ -38,7 +38,7 @@ class ActionExtinguishFireplaceByLiquid: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Extinguish";
+		return "#extinguish";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -48,7 +48,7 @@ class ActionExtinguishFireplaceByLiquid: ActionContinuousBase
 		{
 			FireplaceBase fireplace_target = FireplaceBase.Cast( target_object );
 			
-			if ( fireplace_target.IsBurning() && !item.IsDamageDestroyed() && (item.GetLiquidType() & (GROUP_LIQUID_BLOOD | LIQUID_WATER | LIQUID_RIVERWATER | LIQUID_BEER)) ) 
+			if ( fireplace_target.CanExtinguishFire() && !item.IsDamageDestroyed() && (item.GetLiquidType() & (GROUP_LIQUID_BLOOD | LIQUID_WATER | LIQUID_RIVERWATER | LIQUID_BEER)) ) 
 			{
 				return true;
 			}		
@@ -56,4 +56,13 @@ class ActionExtinguishFireplaceByLiquid: ActionContinuousBase
 		
 		return false;
 	}
+	
+	override void OnEndServer( ActionData action_data )
+	{	
+		Object target_object = action_data.m_Target.GetObject();
+		FireplaceBase fireplace_target = FireplaceBase.Cast( target_object );
+
+		//reset fire state
+		fireplace_target.RefreshFireState();
+	}	
 }

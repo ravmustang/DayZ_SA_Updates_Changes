@@ -1,12 +1,14 @@
 class PluginPresenceNotifier extends PluginBase
 {
 	const int windowPosX = 0;
-	const int windowPosY = 50;
+	const int windowPosY = 10;
 	const int mainPanelSizeX = 200;
 	const int mainPanelSizeY = 1;
 	const int margin = 10;
 	
-	protected PlayerBase m_pPlayer;
+	protected static float 		m_LandNoise;
+	
+	protected PlayerBase 		m_pPlayer;
 
 	void PluginPresenceNotifier() {}
 	
@@ -21,15 +23,18 @@ class PluginPresenceNotifier extends PluginBase
 	
 	protected void ShowCoefsDbg(bool pEnabled)
 	{
+		ref HumanMovementState	hms = new HumanMovementState();
+		m_pPlayer.GetMovementState(hms);
+
 		DbgUI.BeginCleanupScope();
 
 		if (pEnabled)
 		{
 			float visualMean = (m_pPlayer.GetVisibilityCoef() + GetMovementSpeedVisualCoef() + GetMovementStanceVisualCoef()) / 3;
-			float noiseMean = (GetSurfaceNoiseCoef() + GetMovementSpeedNoiseCoef() + GetBootsNoiseCoef()) / 3;
+			float noiseMean = (GetSurfaceNoiseCoef() + GetMovementSpeedNoiseCoef() + GetBootsNoiseCoef() + GetLandNoise()) / 4;
 			float resultMean = (visualMean + noiseMean) / 2;
 
-			DbgUI.Begin("Presence Notifier", windowPosX, windowPosY);
+			DbgUI.Begin("Presence Notifier", windowPosX + 10, windowPosY);
 			DbgUI.Panel("MinimumSize", mainPanelSizeX, mainPanelSizeY);
 
 			DbgUI.Text("Visual: ");
@@ -69,6 +74,14 @@ class PluginPresenceNotifier extends PluginBase
 			}
 			
 			DbgUI.End();
+			
+			//! HumanMovementState content
+			DbgUI.Begin("HumanMovementState", windowPosX + 250, windowPosY);
+			DbgUI.Panel("MinimumSize", mainPanelSizeX, mainPanelSizeY);
+			DbgUI.Text("Command ID: " + hms.m_CommandTypeId);
+			DbgUI.Text("Stance: " + hms.m_iStanceIdx);
+			DbgUI.Text("Movement: " + hms.m_iMovement);
+			DbgUI.End();
 		}
 
 		DbgUI.EndCleanupScope();
@@ -81,7 +94,7 @@ class PluginPresenceNotifier extends PluginBase
 		float speedCoef = 1.0;
 
 		m_pPlayer.GetMovementState(hms);
-		switch(hms.m_iMovement)
+		switch(AITargetCallbacksPlayer.StanceToMovementIdxTranslation(hms))
 		{
 			case DayZPlayerConstants.MOVEMENTIDX_RUN:
 				speedCoef = 0.66;
@@ -90,7 +103,7 @@ class PluginPresenceNotifier extends PluginBase
 				speedCoef = 0.33;
 				break;
 			case DayZPlayerConstants.MOVEMENTIDX_IDLE:
-				speedCoef = 0.11;
+				speedCoef = 0;
 				break;
 		}
 		
@@ -107,12 +120,12 @@ class PluginPresenceNotifier extends PluginBase
 		{
 			case DayZPlayerConstants.STANCEIDX_CROUCH:
 			case DayZPlayerConstants.STANCEIDX_RAISEDCROUCH:
-				stanceCoef = 0.66;
+				stanceCoef = 0.33;
 				break;
 				
 			case DayZPlayerConstants.STANCEIDX_PRONE:
 			case DayZPlayerConstants.STANCEIDX_RAISEDPRONE:
-				stanceCoef = 0.33;
+				stanceCoef = 0.11;
 				break;
 		}
 		
@@ -128,16 +141,16 @@ class PluginPresenceNotifier extends PluginBase
 
 		//! noise multiplier based on player speed
 		m_pPlayer.GetMovementState(hms);
-		switch(hms.m_iMovement)
+		switch(AITargetCallbacksPlayer.StanceToMovementIdxTranslation(hms))
 		{
 			case DayZPlayerConstants.MOVEMENTIDX_SPRINT:
 				speedCoef = 1.0;
 				break;
 			case DayZPlayerConstants.MOVEMENTIDX_RUN:
-				speedCoef = 0.66;
+				speedCoef = 0.33;
 				break;
 			case DayZPlayerConstants.MOVEMENTIDX_WALK:
-				speedCoef = 0.33;
+				speedCoef = 0.11;
 				break;
 		}
 
@@ -146,12 +159,12 @@ class PluginPresenceNotifier extends PluginBase
 
 	protected float GetBootsNoiseCoef()
 	{
-		float bootsCoef = 0;
+		float bootsCoef = 0.0;
 
 		ref HumanMovementState	hms = new HumanMovementState();
 		m_pPlayer.GetMovementState(hms);
 
-		if (hms.m_iMovement == DayZPlayerConstants.MOVEMENTIDX_IDLE)
+		if (hms.m_iMovement == DayZPlayerConstants.MOVEMENT_IDLE)
 			return bootsCoef;
 		
 		//! noise multiplier based on type of boots
@@ -163,12 +176,14 @@ class PluginPresenceNotifier extends PluginBase
 			case AnimBootsType.Sneakers:
 				bootsCoef = 0.66;
 				break;
-			case AnimBootsType.None:
-				bootsCoef = 0.33;
-				break;
 		}
 		
 		return bootsCoef;
+	}
+	
+	protected float GetLandNoise()
+	{
+		return m_LandNoise;
 	}
 	
 	protected float GetSurfaceNoiseCoef()
@@ -180,5 +195,15 @@ class PluginPresenceNotifier extends PluginBase
 			return 0;
 		
 		return m_pPlayer.GetSurfaceNoise();
+	}
+	
+	static void SetLandNoise()
+	{
+		m_LandNoise = 2.0;
+	}
+
+	static void ClearLandNoise()
+	{
+		m_LandNoise = 0.0;
 	}
 }

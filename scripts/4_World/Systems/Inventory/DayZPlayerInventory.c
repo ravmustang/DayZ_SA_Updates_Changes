@@ -3,12 +3,13 @@
  **/
 class DayZPlayerInventory : HumanInventoryWithFSM
 {
-	protected ref HandEventBase m_PostedHandEvent; /// deferred hand event
-	ref WeaponEventBase m_PostedEvent; /// deferred event
+	protected ref HandEventBase m_PostedHandEvent = NULL; /// deferred hand event
+	ref WeaponEventBase m_PostedEvent = NULL; /// deferred weapon event
 	// states with animations
-	protected ref HandWeaponTakingFromAtt m_Taking;
-	protected ref HandWeaponMovingToAtt m_MovingTo;
-	protected ref HandWeaponSwapping m_Swapping;
+	protected ref HandAnimatedTakingFromAtt m_Taking;
+	protected ref HandAnimatedMovingToAtt m_MovingTo;
+	protected ref HandAnimatedSwapping m_Swapping;
+	protected ref HandAnimatedForceSwapping m_FSwapping;
 
 	void DayZPlayerInventory () { }
 
@@ -17,10 +18,13 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	override void Init ()
 	{
 		hndDebugPrint("[hndfsm] Creating DayZPlayer Inventory FSM");
+		
+		CreateStableStates(); // stable states needs to be created first
 
-		m_Taking = new HandWeaponTakingFromAtt(GetManOwner(), null);
-		m_MovingTo = new HandWeaponMovingToAtt(GetManOwner(), null);
-		m_Swapping = new HandWeaponSwapping(GetManOwner(), null);
+		m_Taking = new HandAnimatedTakingFromAtt(GetManOwner(), null);
+		m_MovingTo = new HandAnimatedMovingToAtt(GetManOwner(), null);
+		m_Swapping = new HandAnimatedSwapping(GetManOwner(), null);
+		m_FSwapping = new HandAnimatedForceSwapping(GetManOwner(), null);
 
 		// events
 		HandEventBase _fin_ = new HandEventHumanCommandActionFinished;
@@ -29,19 +33,20 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		HandEventBase __M__ = new HandEventMoveTo;
 		HandEventBase __W__ = new HandEventSwap;
 		//HandEventBase __D__ = new HandEventDropping;
-		//HandEventBase __F__ = new HandEventForceSwapping;
+		HandEventBase __F__ = new HandEventForceSwap;
 
 		// setup transitions
-		// @NOTE: commented out due to: https://jira.bistudio.com/browse/DAYZ-32423
-		/*m_FSM.AddTransition(new HandTransition( m_Empty   , __T__,    m_Taking, NULL, new HandGuardHasAttachedWeaponInEvent(GetManOwner())));
+		m_FSM.AddTransition(new HandTransition( m_Empty   , __T__,    m_Taking, NULL, new HandSelectAnimationOfTakeToHandsEvent(GetManOwner())));
 		m_FSM.AddTransition(new HandTransition( m_Taking  , _fin_,  m_Equipped, null, null));
 
-		m_FSM.AddTransition(new HandTransition( m_Equipped, __M__,  m_MovingTo, NULL, new HandGuardAnd(HandGuardHasWeaponInHands(GetManOwner()), new HandGuardHasRoomForAttachment(GetManOwner()))));
+		m_FSM.AddTransition(new HandTransition( m_Equipped, __M__,  m_MovingTo, NULL, new HandSelectAnimationOfMoveFromHandsEvent(GetManOwner())));
 		m_FSM.AddTransition(new HandTransition( m_MovingTo, _fin_,  m_Empty   , null, null));
 
-		HandGuardBase swapGuard = new HandGuardAnd(HandGuardHasWeaponInHands(GetManOwner()), new HandGuardHasAttachedWeaponInEvent(GetManOwner()));
-		m_FSM.AddTransition(new HandTransition( m_Equipped, __W__,  m_Swapping, NULL, swapGuard));
-		m_FSM.AddTransition(new HandTransition( m_Swapping, _fin_,  m_Equipped, null, null));*/
+		m_FSM.AddTransition(new HandTransition( m_Equipped, __W__,  m_Swapping, NULL, new HandSelectAnimationOfSwapInHandsEvent(GetManOwner())));
+		m_FSM.AddTransition(new HandTransition( m_Swapping, _fin_,  m_Equipped, null, null));
+
+		m_FSM.AddTransition(new HandTransition( m_Equipped, __F__, m_FSwapping, NULL, new HandSelectAnimationOfForceSwapInHandsEvent(GetManOwner())));
+		m_FSM.AddTransition(new HandTransition(m_FSwapping, _fin_,  m_Equipped, null, null));
 
 		super.Init(); // initialize ordinary human fsm (no anims)
 	}
@@ -388,7 +393,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 					e.m_Player.GetHumanInventory().PostHandEvent(e);
 				}
 				else
-					Error("OnInputData HandEvent - no inv loc");
+					Error("OnInputData HandEvent - no inv loc for entity=" + e.m_Entity.GetName() + "@" + this + " ev=" + e.DumpToString());
 				break;
 			}
 
@@ -551,7 +556,24 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			Weapon_Base wpn = Weapon_Base.Cast(GetEntityInHands());
 			if (wpn)
 			{
-				wpn.OnEventFromRemote(ctx);
+				PlayerBase pb = PlayerBase.Cast(GetDayZPlayerOwner());
+
+				WeaponEventBase e = CreateWeaponEventFromContext(ctx);
+				if (pb && e)
+				{
+					pb.GetWeaponManager().SetRunning(true);
+		
+					fsmDebugSpam("[wpnfsm] recv event from remote: created event=" + e);
+					if (e.GetEventID() == WeaponEventID.HUMANCOMMAND_ACTION_ABORTED)
+					{
+						wpn.ProcessWeaponAbortEvent(e);
+					}
+					else
+					{
+						wpn.ProcessWeaponEvent(e);
+					}
+					pb.GetWeaponManager().SetRunning(false);
+				}
 			}
 			else
 				Error("OnEventFromRemoteWeapon - entity in hands, but not weapon. item=" + GetEntityInHands());
@@ -561,28 +583,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		return true;
 	}
 
-	/**@fn			OnSyncFromRemoteWeapon
-	 * @brief		stable state synchronization from weapon on server
-	 **/
-	bool OnSyncFromRemoteWeapon (ParamsReadContext ctx)
-	{
-		syncDebugPrint("[syncinv] remote weapon handling of stable-sync-event from server");
 
-		if (GetEntityInHands())
-		{
-			Weapon_Base wpn = Weapon_Base.Cast(GetEntityInHands());
-			if (wpn)
-			{
-				wpn.OnSyncFromRemote(ctx);
-			}
-			else
-				Error("OnSyncFromRemoteWeapon - entity in hands, but not weapon. item=" + GetEntityInHands());
-		}
-		else
-			Error("OnSyncFromRemoteWeapon - no entity in hands");
-		return true;
-	}
-	
 	/**@fn			OnHandEventFromRemote
 	 * @brief		reaction of remote weapon to (common user/anim/...) event sent from server
 	 **/
@@ -622,5 +623,18 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			p.StoreInputForRemotes(ctx);
 		}
 	}
+	
+	override void OnHandsStateChanged (HandStateBase src, HandStateBase dst)
+	{
+#ifdef BOT
+		PlayerBase p = PlayerBase.Cast(GetDayZPlayerOwner());
+		if (p)
+		{
+			botDebugPrint("[bot] hand fsm changed state src=" + src + " ---> dst=" + dst);
+			p.m_Bot.ProcessEvent(new BotEventOnItemInHandsChanged(p));
+		}
+#endif
+	}
+
 };
 

@@ -270,6 +270,11 @@ class Weapon extends InventoryItemSuper
 	 * @return true if zeroing set
 	 **/
 	proto native bool StepZeroingDown ();
+	/**@fn		GetCurrentZeroing
+	 * @brief	returns currently used value of zeroing in config array of weapon or attached optics
+	 * @return	 currently used value in zeroing
+	 **/	
+	proto native float GetCurrentZeroing ();
 
 	/**
 	 * @fn		FlashlightOn

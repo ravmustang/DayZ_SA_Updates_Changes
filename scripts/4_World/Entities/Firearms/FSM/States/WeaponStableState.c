@@ -47,8 +47,6 @@ class WeaponStableState extends WeaponStateBase
 	{
 		super.OnEntry(e);
 		SyncAnimState();
-
-		m_weapon.OnStableStateEntry();
 	}
 	override void OnUpdate (float dt)
 	{

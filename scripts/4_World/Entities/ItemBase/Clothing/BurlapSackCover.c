@@ -16,7 +16,7 @@ class BurlapSackCover extends ClothingBase
 			GetGame().GetSoundScene().SetMusicVolume((g_Game.m_volume_music/2),1);
 			GetGame().GetSoundScene().SetVOIPVolume((g_Game.m_volume_VOIP/2),1);
 			GetGame().GetSoundScene().SetRadioVolume((g_Game.m_volume_radio/2),1);
-			player.m_InventorySoftLocked = true;
+			player.SetInventorySoftLock(true);
 			
 			if ( GetGame().GetUIManager().IsMenuOpen(MENU_INVENTORY) )
 			{
@@ -39,7 +39,7 @@ class BurlapSackCover extends ClothingBase
 			GetGame().GetSoundScene().SetVOIPVolume(g_Game.m_volume_VOIP,1);
 			GetGame().GetSoundScene().SetRadioVolume(g_Game.m_volume_radio,1);
 			//GetGame().GetWorld().SetAperture(0);
-			player.m_InventorySoftLocked = false;
+			player.SetInventorySoftLock(false);
 		}
 		// should change item to non-attachable one
 		if (GetGame().IsServer() && player && slot_id == InventorySlots.HEADGEAR)

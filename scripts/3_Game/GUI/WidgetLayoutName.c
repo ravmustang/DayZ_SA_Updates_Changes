@@ -1,8 +1,7 @@
 class WidgetLayoutName
 {
 	const string Inventory = "gui/layouts/inventory_new/day_z_inventory_new.layout";
-	const string InventoryIcon = "gui/layouts/inventory/dummy.layout";  
-	const string InventoryIconContainer = "gui/layouts/inventory_new/inventory_icons_container.layout";
+	const string InventorySlotsContainer = "gui/layouts/inventory_new/inventory_slots_container.layout";
 	const string HandsPreview = "gui/layouts/inventory_new/hands_preview.layout";
 	const string GridContainer = "gui/layouts/inventory_new/grid_container.layout";
 	const string GridContainerXbox = "gui/layouts/inventory_new/grid_container_xbox.layout";

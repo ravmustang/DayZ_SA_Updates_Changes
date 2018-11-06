@@ -4,4 +4,11 @@ class CAContinuousBase: CABase
 	{
 		return true;
 	}
+	
+	void OnCompletePogress(ActionData action_data)
+	{
+		ActionContinuousBase action = ActionContinuousBase.Cast(action_data.m_Action);
+		if(action)
+			action.OnFinishProgress(action_data);
+	}
 };

@@ -45,65 +45,88 @@ class DayZPlayerMeleeFightLogic_LightHeavy
 			return MeleeCombatHit.LIGHT;
 		}
 	}
+	
+	MeleeCombatHit GetAttackTypeByWeaponAttachments(EntityAI pEntity)
+	{
+		//! use stabbing if the bayonet/knife is attached to firearm
+		if (pEntity.GetAttachmentByType(Mosin_Bayonet))
+		{
+			return MeleeCombatHit.WPN_STAB;
+		}
+		else
+		{
+			return MeleeCombatHit.WPN_HIT;
+		}
+	}
 
-	
-	
 	bool Process(int pCurrentCommandID, HumanInputController pInputs, EntityAI pEntityInHands, HumanMovementState pMovementState)
 	{
 		InventoryItem itemInHands = InventoryItem.Cast(pEntityInHands);
 
-		if (pInputs.IsUseButtonDown())
+		bool isFireWeapon = itemInHands && itemInHands.IsInherited(Weapon);
+		bool isNotMeleeWeapon = itemInHands && !itemInHands.IsMeleeWeapon(); // TODO: allowed for everything that is not disabled in config (primarily for anim testing)
+
+		if (pInputs.IsUseButtonDown() || (pInputs.IsImmediateAction() && isFireWeapon))
 		{
 			EntityAI target;
 
-			bool isWeapon = itemInHands && itemInHands.IsInherited(Weapon);
-			bool isNotMeleeWeapon = itemInHands && !itemInHands.IsMeleeWeapon(); // TODO: allowed for everything that is not disabled in config (primarily for anim testing)
-
-			if (isWeapon)
-			{
-				//! no melee for firearm weapons right now - will be connected later
-				return false;
-			}
-
 			//! if the item in hands cannot be used as melee weapon
-			if (isNotMeleeWeapon)
+			if (isNotMeleeWeapon && !isFireWeapon)
 			{
 				return false;
 			}
 
 			if (pCurrentCommandID == DayZPlayerConstants.COMMANDID_MOVE)
 			{
-				//! first attack in raised erc (light or heavy if modifier is used)
-				if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDERECT)
+				//! melee with firearm
+				if (isFireWeapon)
 				{
-					m_HitMask = GetAttackTypeFromInputs(pInputs);
-					m_MeleeCombat.Update(itemInHands, m_HitMask);
-					target = m_MeleeCombat.GetTargetObject();
-					m_DZPlayer.StartCommand_Melee2(target, m_HitMask == MeleeCombatHit.HEAVY);
-					if(m_HitMask == MeleeCombatHit.HEAVY)
+					if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDERECT)
+					{
+						m_HitMask = GetAttackTypeByWeaponAttachments(pEntityInHands);
+						m_MeleeCombat.Update(itemInHands, m_HitMask);
+						target = m_MeleeCombat.GetTargetObject();
+						m_DZPlayer.StartCommand_Melee2(target, m_HitMask == MeleeCombatHit.WPN_HIT);
+						if(m_HitMask == MeleeCombatHit.WPN_HIT)
+							m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
+						m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_LIGHT);
+						return true;
+					}				
+				}
+				else
+				{
+					//! first attack in raised erc (light or heavy if modifier is used)
+					if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDERECT)
+					{
+						m_HitMask = GetAttackTypeFromInputs(pInputs);
+						m_MeleeCombat.Update(itemInHands, m_HitMask);
+						target = m_MeleeCombat.GetTargetObject();
+						m_DZPlayer.StartCommand_Melee2(target, m_HitMask == MeleeCombatHit.HEAVY);
+						if(m_HitMask == MeleeCombatHit.HEAVY)
+							m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
+						m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_LIGHT);
+						return true;
+					}
+					//! kick from raised pne
+					else if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDPRONE)
+					{
+						m_HitMask = MeleeCombatHit.KICK;
+						m_MeleeCombat.Update(itemInHands, m_HitMask);
+						target = m_MeleeCombat.GetTargetObject();
+						m_DZPlayer.StartCommand_Melee2(target, false);
 						m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
-					m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_LIGHT);
-					return true;
-				}
-				//! kick from raised pne
-				else if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDPRONE)
-				{
-					m_HitMask = MeleeCombatHit.KICK;
-					m_MeleeCombat.Update(itemInHands, m_HitMask);
-					target = m_MeleeCombat.GetTargetObject();
-					m_DZPlayer.StartCommand_Melee2(target, false);
-					m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
-					return true;
-				}
-				//! sprint attack in erc stance
-				else if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_ERECT && m_DZPlayer.IsSprintFull())
-				{
-					m_HitMask = MeleeCombatHit.SPRINT;
-					m_MeleeCombat.Update(itemInHands, m_HitMask);
-					target = m_MeleeCombat.GetTargetObject();
-					m_DZPlayer.StartCommand_Melee2(target, false);
-					m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
-					return true;
+						return true;
+					}
+					//! sprint attack in erc stance
+					else if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_ERECT && m_DZPlayer.IsSprintFull())
+					{
+						m_HitMask = MeleeCombatHit.SPRINT;
+						m_MeleeCombat.Update(itemInHands, m_HitMask);
+						target = m_MeleeCombat.GetTargetObject();
+						m_DZPlayer.StartCommand_Melee2(target, false);
+						m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
+						return true;
+					}
 				}
 			}
 			//! combo hits - when we are already in Melee command and clicking UseButton

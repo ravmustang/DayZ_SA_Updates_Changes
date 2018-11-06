@@ -5,6 +5,7 @@ class DayZInfectedAttackType
 	int m_Type; // int argument for attack command
 	float m_Subtype; // float argument for attack command
 	string m_AmmoType; // ammotype from config
+	int m_IsHeavy; // 0 - light attack; 1 - heavy attack;
 	float m_Cooldown; // [s]
 	float m_Probability; // [0..1]
 };
@@ -20,29 +21,57 @@ class DayZInfectedType extends DayZCreatureAIType
 	//--------------------------------------------------------
 	// Public
 	//--------------------------------------------------------
+	//! register hit components for AI melee (used by attacking AI)
+	void RegisterHitComponentsForAI()
+	{
+		m_HitComponentsForAI = new array<ref DayZAIHitComponent>;
+
+		//! registers default hit compoent for the entity
+		m_DefaultHitComponent = "Torso";
+
+		//! register hit components that are selected by probability
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "Head", 2);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "LeftArm", 50);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "Torso", 65);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "RightArm", 50);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "LeftLeg", 50);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "RightLeg", 50);
+	}
 
 	void RegisterAttacks()
 	{
+		//! --------------------------------------------------------------------------------
+		//!
+		//! RegisterAttack(Group Type, Distance, Pitch, Type, Subtype, AmmoType, Cooldown, Probability);
+		//!
+		//! --------------------------------------------------------------------------------
+
 		//! chase group
 		m_ChaseAttacksGroup = new array<ref DayZInfectedAttackType>;
 
-		//! Group Type, Distance, Pitch, Type, Subtype, AmmoType, Cooldown, Probability
-		RegisterAttack(DayZInfectedAttackGroupType.CHASE, 1.0,  0, 4, 1, "MeleeZombieMale", 1.0, 1.0); // Attack short center
-		RegisterAttack(DayZInfectedAttackGroupType.CHASE, 1.0,  0, 3, 1, "MeleeZombieMale", 1.0, 0.6); // Attack short medium center
-		RegisterAttack(DayZInfectedAttackGroupType.CHASE, 3.0, 0, 2, 1, "MeleeZombieMale_Heavy", 3.0, 0.2); // Attack long
-		
+		//! center attack
+		RegisterAttack(DayZInfectedAttackGroupType.CHASE, 1.5,  0, 0, 1, "MeleeZombie", 0, 1.0, 1.0); // center left & light
+		RegisterAttack(DayZInfectedAttackGroupType.CHASE, 1.5,  0, 1, 1, "MeleeZombie", 0, 1.0, 1.0); // center right & light
+
+		//! --------------------------------------------------------------------------------
 		//! fight group
 		m_FightAttacksGroup = new array<ref DayZInfectedAttackType>;
 
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 1.0,  1, 4, 0, "MeleeZombieMale", 1.0, 1.0); // Attack short up
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 1.0,  0, 4, 1, "MeleeZombieMale", 1.0, 1.0); // Attack short center
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 1.0, -1, 4, 2, "MeleeZombieMale", 1.0, 1.0); // Attack short down
+		//! up attack
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.0,  1, 0, 0, "MeleeZombie", 0, 1.0, 0.7); // up left & light
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.0,  1, 1, 0, "MeleeZombie", 0, 1.0, 0.7); // up right & light
 		
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.0,  0, 3, 1, "MeleeZombieMale", 2.0, 0.5); // Attack medium center
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.0, -1, 3, 2, "MeleeZombieMale", 2.0, 0.4); // Attack medium down
+		//! center attack
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.0,  0, 0, 1, "MeleeZombie", 0, 1.0, 1.0); // center left & light
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.0,  0, 1, 1, "MeleeZombie", 0, 1.0, 1.0); // center right & light
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.5,  0, 2, 1, "MeleeZombie_Heavy", 1, 2.0, 0.6); // center left & heavy
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.5,  0, 3, 1, "MeleeZombie_Heavy", 1, 2.0, 0.6); // center right & heavy
 		
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 3.0, 0, 2, 1, "MeleeZombieMale_Heavy", 3.0, 0.2); // Attack long
-		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 3.0, 0, 3, 1, "MeleeZombieMale_Heavy", 3.0, 0.3); // Attack medium center
+		//! down attack
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.5,  -1, 0, 2, "MeleeZombie", 0, 1.0, 1.0); // down left & light
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.5,  -1, 1, 2, "MeleeZombie", 0, 1.0, 1.0); // down right & light
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.5,  -1, 2, 2, "MeleeZombie_Heavy", 1, 2.0, 0.8); // down left & heavy
+		RegisterAttack(DayZInfectedAttackGroupType.FIGHT, 2.5,  -1, 3, 2, "MeleeZombie_Heavy", 1, 2.0, 0.8); // down right & heavy
 	}
 	
 	DayZInfectedAttackType ChooseAttack(DayZInfectedAttackGroupType pAttackGroupType, float pDistance, int pPitch)
@@ -68,12 +97,29 @@ class DayZInfectedType extends DayZCreatureAIType
 		
 		return mostSuitableAttack;
 	}
+
+	string GetHitComponentForAI()
+	{
+		string hitComp;
+		
+		if (DayZAIHitComponentHelpers.SelectMostProbableHitComponent(m_HitComponentsForAI, hitComp))
+		{
+			return hitComp;
+		}	
+		
+		return GetDefaultHitComponent();
+	}
+	
+	string GetDefaultHitComponent()
+	{
+		return m_DefaultHitComponent;
+	}
 	
 	//--------------------------------------------------------
 	// Protected
 	//--------------------------------------------------------
 	
-	protected void RegisterAttack(DayZInfectedAttackGroupType pAttackGroupType, float pDistance, int pPitch, int pType, float pSubtype, string pAmmoType, float pCooldown, float pProbability)
+	protected void RegisterAttack(DayZInfectedAttackGroupType pAttackGroupType, float pDistance, int pPitch, int pType, float pSubtype, string pAmmoType, int pIsHeavy, float pCooldown, float pProbability)
 	{
 		DayZInfectedAttackType newType = new DayZInfectedAttackType();
 		
@@ -82,6 +128,7 @@ class DayZInfectedType extends DayZCreatureAIType
 		newType.m_Type = pType;
 		newType.m_Subtype = pSubtype;
 		newType.m_AmmoType = pAmmoType;
+		newType.m_IsHeavy = pIsHeavy;
 		newType.m_Cooldown = pCooldown;
 		newType.m_Probability = pProbability;
 		
@@ -98,7 +145,7 @@ class DayZInfectedType extends DayZCreatureAIType
 		float distDiff = pAttackType.m_Distance - pTargetDistance;
 		if( distDiff < 0 )
 			return 0;
-		float distDiffFrac = distDiff / 10;		
+		float distDiffFrac = distDiff / 10;
 		float utilityDistance = (1 - distDiffFrac) * 100; // distance is most important
 		
 		// probability
@@ -111,7 +158,7 @@ class DayZInfectedType extends DayZCreatureAIType
 		return utilityDistance + utilityProbability;
 	}
 
-	ref array<ref DayZInfectedAttackType> GetAttackGroup(DayZInfectedAttackGroupType pType)
+	protected ref array<ref DayZInfectedAttackType> GetAttackGroup(DayZInfectedAttackGroupType pType)
 	{
 		switch( pType )
 		{
@@ -132,4 +179,8 @@ class DayZInfectedType extends DayZCreatureAIType
 	//! selected & sorted targets by utility function
 	private ref array<ref DayZInfectedAttackType> m_ChaseAttacksGroup;
 	private ref array<ref DayZInfectedAttackType> m_FightAttacksGroup;
+
+	//! Melee hit components (AI targeting)	
+	protected ref array<ref DayZAIHitComponent> m_HitComponentsForAI;
+	protected string m_DefaultHitComponent;
 }

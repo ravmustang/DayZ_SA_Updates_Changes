@@ -11,9 +11,9 @@ class VicinityObjects
 	//! stores VicinityObject to Hashmap - for storing of parent/child relationship
 	void StoreVicinityObject(Object object, Object parent = null)
 	{
-		// Do not store hologram items
+		//! completely remove items that are being placed or are holograms
 		ItemBase ib = ItemBase.Cast(object);
-		if(ib && !ib.IsTakeable()) 
+		if(ib && (ib.IsBeingPlaced() || ib.IsHologram()))
 			return;
 
 		if ( !m_VicinityObjects.Contains(object) )
@@ -43,6 +43,11 @@ class VicinityObjects
 		ref array<Object> vicinityObjects = new array<Object>;
 		for(int i = 0; i < m_VicinityObjects.Count(); i++)
 		{
+			//! filters out non-takeable items (won't be shown in vicinity)
+			ItemBase ib = ItemBase.Cast(GetObject(i));
+			if(ib && !ib.IsTakeable())
+				continue;
+
 			vicinityObjects.Insert(GetObject(i));
 		}
 		
@@ -85,7 +90,7 @@ class ActionTarget
 
 	Object GetObject()
 		{ return m_Object; }
-	
+
 	Object GetParent()
 		{ return m_Parent; }
 
@@ -250,6 +255,7 @@ class ActionTargets
 		if ( object && object.GetType() == string.Empty ) return false; // mainly ground
 		if ( object && (object.IsBuilding() || object.IsTransport() || object.IsStaticTransmitter()) ) return false;
 		if ( object && (object.IsTree() || object.IsBush())) return false;
+		if ( object && (object.IsInherited(BaseBuildingBase) || object.IsInherited(FenceKit) || object.IsInherited(WatchtowerKit)) ) return false; // base building objects
 
 		if ( object )
 		{
@@ -257,7 +263,7 @@ class ActionTargets
 			if (vector.DistanceSq(m_Player.GetPosition(), object.GetPosition()) > c_MaxTargetDistance * c_MaxTargetDistance)
 				return true;
 
-			// use CE_CENTER mem point for obstruction check		
+			// use CE_CENTER mem point for obstruction check
 			if ( object.HasSelection(CE_CENTER) )
 			{
 				vector modelPos = object.GetSelectionPosition(CE_CENTER);
@@ -448,9 +454,13 @@ class ActionTargets
 				{
 					float util = m_Targets.Get(i).GetUtility();
 					int compIdx = m_Targets.Get(i).GetComponentIndex();
-					string compName = obj.GetActionComponentName(compIdx);
+					array<string> compNames = new array<string>;
+					obj.GetActionComponentNameList(compIdx, compNames);
 
-					DbgUI.Text(obj.GetDisplayName() + " :: " + obj + " | util: " + util + " | compIdx: " + compIdx + " | compName: " + compName + "| wPos: " + obj.GetWorldPosition() );
+					for ( int c = 0; c < compNames.Count(); c++ )
+					{
+						DbgUI.Text(obj.GetDisplayName() + " :: " + obj + " | util: " + util + " | compIdx: " + compIdx + " | compName: " + compNames[c] + "| wPos: " + obj.GetWorldPosition() );
+					}
 				}
 				else
 					continue;
@@ -604,7 +614,7 @@ class ActionTargets
 	//--------------------------------------------------------
 	//! searching properties
 	private const float c_RayDistance = 5.0;
-	private const float c_MaxTargetDistance = 2.0;
+	private const float c_MaxTargetDistance = 3.0;
 	private const float c_ConeAngle = 30.0;
 	private const float c_ConeHeightMin = -0.5;
 	private const float c_ConeHeightMax = 2.0;

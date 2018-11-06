@@ -17,6 +17,8 @@ class DayZPlayerCamera1stPerson extends DayZPlayerCameraBase
 		{
 			Print("DayZPlayerCamera1stPerson: main bone not found");
 		}
+		
+		m_OffsetLS = "0.04 0.04 0"; //x - up, y - forward
 	}
 	
 
@@ -49,22 +51,7 @@ class DayZPlayerCamera1stPerson extends DayZPlayerCameraBase
 		rot[2] = 0;
 		
 		Math3D.YawPitchRollMatrix(rot, pOutResult.m_CameraTM);
-
-		/* if (m_iBoneIndex != -1)
-		{
-			vector	camPos = m_pPlayer.GetBonePositionMS(m_iBoneIndex);
-
-			// camPos 	= camPos + pOutResult.m_CameraTM[0] * 0.04;		// xaxis (nahoru)
-			// camPos 	= camPos + pOutResult.m_CameraTM[1] * 0.04;		// yaxis (dopredu)
-
-			//! 
-			pOutResult.m_CameraTM[3]	= camPos;	
-		}
-
-		else
-		{
-			pOutResult.m_CameraTM[3]	= "0 0 0";
-		} */
+		pOutResult.m_CameraTM[3]		= m_OffsetLS;
 
 		pOutResult.m_iDirectBone 		= m_iBoneIndex;
 		pOutResult.m_iDirectBoneMode 	= 1;
@@ -92,7 +79,8 @@ class DayZPlayerCamera1stPerson extends DayZPlayerCameraBase
 		return "DayZPlayerCamera1stPerson";
 	}
 	
-	protected	int 	m_iBoneIndex;		//!< main bone 
+	protected	int 	m_iBoneIndex;		//!< main bone
+	protected	vector	m_OffsetLS;			//!< position offset 
 
 	protected 	float 	m_fUpDownAngle;		//!< up down angle in rad
 	protected 	float 	m_fUpDownAngleAdd;	//!< up down angle in rad

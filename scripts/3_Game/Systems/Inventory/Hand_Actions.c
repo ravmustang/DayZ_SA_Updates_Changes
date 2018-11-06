@@ -233,22 +233,28 @@ class HandActionForceSwap extends HandActionBase
 		HandEventForceSwap es = HandEventForceSwap.Cast(e);
 		if (es)
 		{
-			InventoryLocation src1 = new InventoryLocation;
-			InventoryLocation src2 = new InventoryLocation;
-			InventoryLocation dst1 = new InventoryLocation;
-			if (itemToHands.GetInventory().GetCurrentInventoryLocation(src1) && itemInHands.GetInventory().GetCurrentInventoryLocation(src2))
-			{
-				dst1.Copy(src1);
-				dst1.CopyLocationFrom(src2);
-
-				//hndDebugPrint("[hndfsm] FSwap e.m_dst2=" + es.m_Dst.DumpToString());
-				//hndDebugPrint("[hndfsm] FSwap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString());
-				GameInventory.LocationSwap(src1, src2, dst1, es.m_Dst);
-				player.OnItemInHandsChanged();
-			}
+			hndDebugPrint("[hndfsm] FSwap e.m_dst2=" + es.m_Dst.DumpToString());
+			HandActionForceSwap.ForceSwap(player, itemInHands, itemToHands, es.GetDst());
 		}
 		else
 			Error("[hndfsm] HandActionSwap - this is no HandEventSwap");
+	}
+	
+	static void ForceSwap (notnull Man player, notnull EntityAI itemInHands, notnull EntityAI itemToHands, notnull InventoryLocation itemInHandsDst)
+	{
+		InventoryLocation src1 = new InventoryLocation;
+		InventoryLocation src2 = new InventoryLocation;
+		InventoryLocation dst1 = new InventoryLocation;
+		if (itemToHands.GetInventory().GetCurrentInventoryLocation(src1) && itemInHands.GetInventory().GetCurrentInventoryLocation(src2))
+		{
+			hndDebugPrint("[hndfsm] FSwap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString());
+			dst1.Copy(src1);
+			dst1.CopyLocationFrom(src2);
+
+			GameInventory.LocationSwap(src1, src2, dst1, itemInHandsDst);
+
+			player.OnItemInHandsChanged();
+		}
 	}
 };
 

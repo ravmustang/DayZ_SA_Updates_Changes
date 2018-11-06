@@ -49,7 +49,7 @@ class InventoryActionHandler
 		}
 		mngr.ForceTarget(actionTargetItem);
 		
-		GetGame().GetUIManager().HideScriptedMenu(GetGame().GetUIManager().FindMenu(MENU_INVENTORY));
+		GetGame().GetMission().HideInventory();
 	}
 	
 	int GetActionID()

@@ -13,8 +13,8 @@ class ActionTuneRadioStation: ActionContinuousBase
 	void ActionTuneRadioStation()
 	{
 		m_CallbackClass = ActionTuneRadioStationCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_WALKIETALKIETUNE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_WALKIETALKIETUNE;	
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_TUNE;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_TUNE;	
 		m_MessageStartFail = "I've failed to change the radio station.";
 		m_MessageStart = "I've changed the radio station.";
 		m_MessageFail = "I've failed to change the radio station.";
@@ -40,7 +40,7 @@ class ActionTuneRadioStation: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Tune radio station";
+		return "#tune_radio_station";
 	}
 	
 	override bool HasTarget()
@@ -60,14 +60,10 @@ class ActionTuneRadioStation: ActionContinuousBase
 		return false;
 	}
 
-	override void OnRepeatServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		Radio radio = Radio.Cast( action_data.m_MainItem );
 		radio.TuneNextStation();
-	}
-
-	override void OnCompleteServer( ActionData action_data )
-	{
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }

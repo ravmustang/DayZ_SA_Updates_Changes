@@ -43,8 +43,9 @@ class CAContinuousRepeat : CAContinuousBase
 		{
 			m_SpentUnits.param1 = m_TimeElpased;
 			SetACData(m_SpentUnits);
-			m_TimeElpased = 0;
-			return UA_REPEAT;
+			m_TimeElpased = m_TimeToComplete - m_TimeElpased;
+			OnCompletePogress(action_data);
+			return UA_PROCESSING;
 		}
 	}
 	

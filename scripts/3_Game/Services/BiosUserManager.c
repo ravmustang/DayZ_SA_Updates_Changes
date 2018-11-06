@@ -30,27 +30,6 @@ class BiosUserManager
 	*/
 	proto native EBiosError GetUserList(ref array<ref BiosUser> user_list);
 	
-	//! Handle user selection
-	/*!
-		Xbox: If one user is available, or the title initiator is valid,
-		otherwise displays the user picker.
-	*/
-	EBiosError PickUser()
-	{
-		ref array<ref BiosUser> user_list = new array<ref BiosUser>;
-		GetUserList(user_list);
-		if( user_list.Count() == 1 )
-		{
-			SelectUser( user_list.Get( 0 ) );
-			g_Game.SelectUser();
-			return EBiosError.OK;
-		}
-		else
-		{
-			return PickUserAsync();
-		}
-	}
-	
 	//! Display a system dependant account picket
 	/*!
 		Xbox: The async result is returned in the OnUserPicked callback.
@@ -151,7 +130,7 @@ class BiosUserManager
 			
 			g_Game.SetGameState( DayZGameState.MAIN_MENU );
 			g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
-			g_Game.SelectUser();
+			g_Game.GamepadCheck();
 		}
 	}
 	
@@ -176,7 +155,7 @@ class BiosUserManager
 			
 			g_Game.SetGameState( DayZGameState.JOIN );
 			g_Game.SetLoadState( DayZLoadState.JOIN_START );
-			g_Game.SelectUser();
+			g_Game.GamepadCheck();
 		}
 	}
 	

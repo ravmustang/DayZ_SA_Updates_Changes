@@ -21,7 +21,7 @@ class ActionCloseDoors: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Close door";
+		return "#close_door";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

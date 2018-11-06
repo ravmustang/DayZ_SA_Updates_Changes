@@ -32,12 +32,12 @@ class CargoBase : Managed
 	 * @param[out]	row			returned row of the item at internal index
 	 * @param[out]	col			returned col. 0 on xbox
 	 **/
-	proto void GetItemRowCol (int index, out int row, out int col);
+	proto bool GetItemRowCol (int index, out int row, out int col);
 	/**@fn			GetItemSize
 	 * @param[out]	w			returned width of the item at internal index
 	 * @param[out]	h			returned height of the item at internal index
 	 **/
-	proto void GetItemSize (int index, out int w, out int h);
+	proto bool GetItemSize (int index, out int w, out int h);
 
 	/**@fn			FindEntityInCargo
 	 * @return		find internal index of the entity in cargo or -1 if not found

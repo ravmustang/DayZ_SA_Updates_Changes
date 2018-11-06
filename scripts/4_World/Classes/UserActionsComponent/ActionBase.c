@@ -1,5 +1,15 @@
+class ActionReciveData
+{
+	ref ActionTarget					m_Target;
+}
+
 class ActionData
 {
+	void ActionData()
+	{
+		m_State = UA_NONE;
+	}
+	
 	ActionBase							m_Action;
 	ItemBase							m_MainItem;
 	ActionBaseCB 						m_Callback;
@@ -9,6 +19,7 @@ class ActionData
 	PlayerBase							m_Player;
 	int 								m_PossibleStanceMask;
 	ref array<ref InventoryLocation>	m_ReservedInventoryLocations;
+	int									m_RefreshReservationTimer;
 	bool								m_WasExecuted;
 }
 
@@ -65,7 +76,7 @@ class ActionBase
 		m_Sounds = new TStringArray;
 	}
 	
-	bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extraData = NULL)
+	bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL )
 	{
 		action_data = CreateActionData();
 		action_data.m_Action = this;
@@ -74,7 +85,14 @@ class ActionBase
 		action_data.m_MainItem = item;
 		action_data.m_PossibleStanceMask = GetStanceMask(player);
 		action_data.m_ReservedInventoryLocations = new array<ref InventoryLocation>;
+		action_data.m_RefreshReservationTimer = 150;
 		action_data.m_WasExecuted = false;
+		
+		ActionReciveData action_recive_data = player.GetActionManager().GetReciveData();
+		if ( action_recive_data )
+		{
+			HandleReciveData(action_recive_data,action_data);
+		}
 		
 		if ( (!GetGame().IsMultiplayer() || GetGame().IsClient()) && !IsInstant() )
 		{
@@ -120,6 +138,12 @@ class ActionBase
 	{
 		return false;
 	}
+
+	//! not using plane object - it's using multiple proxies
+	bool IsUsingProxies()
+	{
+		return false;
+	}
 	
 	bool RemoveForceTargetAfterUse()
 	{
@@ -146,10 +170,10 @@ class ActionBase
 		return "default action text";
 	}
 	
-	string GetTargetDescription()
+	/*string GetTargetDescription()
 	{
 		return "default target description";
-	}
+	}*/
 	
 	bool CanBePerformedFromQuickbar()
 	{
@@ -165,7 +189,16 @@ class ActionBase
 	{
 		return !CanBePerformedFromInventory();
 	}
+	
+	bool CanBeUsedInRestrain()
+	{
+		return false;
+	}
 	 
+	bool CanBeUsedInVehicle()
+	{
+		return false;
+	}
 	
 	protected bool ActionConditionContinue( ActionData action_data ) //condition for action
 	{
@@ -183,26 +216,65 @@ class ActionBase
 
 	void WriteToContext(ParamsWriteContext ctx, ActionData action_data)
 	{
-		if( HasTarget() )
+		int componentIndex = -1;
+		int proxyBoneIdx = -1;
+
+		array<string> selectionNames = new array<string>();
+
+		Object targetObject = null;
+		Object targetParent = null;
+		
+		if( HasTarget() && !IsUsingProxies() )
 		{
 			// callback data
-			Object targetObject = action_data.m_Target.GetObject();
+			targetObject = action_data.m_Target.GetObject();
 			ctx.Write(targetObject);
-			Object targetParent = action_data.m_Target.GetParent();
+			targetParent = action_data.m_Target.GetParent();
 			ctx.Write(targetParent);
-			int componentIndex = action_data.m_Target.GetComponentIndex();
+			componentIndex = action_data.m_Target.GetComponentIndex();
+			ctx.Write(componentIndex);
+		}
+		else if( HasTarget() && IsUsingProxies() )
+		{
+			//! get proxy bone idx from parent and selection we are looking at
+			//! ID is used for synchronisation to server where it's translated back to object
+			Entity entParent = Entity.Cast(action_data.m_Target.GetParent());
+			if (entParent)
+			{
+				action_data.m_Target.GetObject().GetActionComponentNameList(action_data.m_Target.GetComponentIndex(), selectionNames);
+				for (int s = 0; s < selectionNames.Count(); s++)
+				{
+					proxyBoneIdx = entParent.GetBoneIndex(selectionNames[s]);
+					if( proxyBoneIdx > -1 )
+					{
+						break;
+					}
+				}
+			}
+
+			ctx.Write(proxyBoneIdx);
+			targetParent = action_data.m_Target.GetParent();
+			ctx.Write(targetParent);
+			componentIndex = action_data.m_Target.GetComponentIndex();
 			ctx.Write(componentIndex);
 		}
 	}
 	
-	bool ReadFromContext(ParamsReadContext ctx, ActionData action_data )
-	{				
-		if( HasTarget() )
+	bool ReadFromContext(ParamsReadContext ctx, out ActionReciveData action_recive_data )
+	{
+		if( !action_recive_data )
 		{
-			Object actionTargetObject = null;
-			Object actionTargetParent = null;
-			int componentIndex = -1;
-			
+			action_recive_data = new ActionReciveData;
+		}
+		Object actionTargetObject = null;
+		Object actionTargetParent = null;
+		int componentIndex = -1;
+		int proxyBoneIdx = -1;
+		
+		ref ActionTarget target;
+
+		if( HasTarget() && !IsUsingProxies() )
+		{			
 			if ( !ctx.Read(actionTargetObject) )
 				return false;
 							
@@ -212,14 +284,50 @@ class ActionBase
 			if ( !ctx.Read(componentIndex) )
 				return false;
 			
-			ref ActionTarget target;
 			target = new ActionTarget(actionTargetObject, actionTargetParent, componentIndex, vector.Zero, 0);
 						
-			action_data.m_Target = target;
+			action_recive_data.m_Target = target;
+		}
+		else if( HasTarget() && IsUsingProxies() )
+		{
+			if ( !ctx.Read(proxyBoneIdx) )
+				return false;
+							
+			if ( !ctx.Read(actionTargetParent))
+				return false;
+
+			if ( !ctx.Read(componentIndex) )
+				return false;
+
+			//! create target object from proxyBoneIdx synced from client
+			if ( proxyBoneIdx > -1 )
+			{
+				Entity entParent = Entity.Cast(actionTargetParent);
+
+				if (entParent)
+				{
+					actionTargetObject = entParent.GetBoneObject(proxyBoneIdx);		
+				}
+			}
+			else
+			{
+				return false;
+			}
+			
+			target = new ActionTarget(actionTargetObject, actionTargetParent, componentIndex, vector.Zero, 0);
+						
+			action_recive_data.m_Target = target;		
 		}
 
-
 		return true;
+	}
+	
+	void HandleReciveData(ActionReciveData action_recive_data, ActionData action_data)
+	{
+		if(HasTarget())
+		{
+			action_data.m_Target = action_recive_data.m_Target;
+		}
 	}
 	
 	//----------------------------------------------------------------------------------------------
@@ -260,7 +368,8 @@ class ActionBase
 	// called from actionmanager.c
 	void Start( ActionData action_data ) //Setup on start of action
 	{
-/*		if( GetGame().IsServer() )
+		action_data.m_State = UA_START;
+		if( GetGame().IsServer() )
 		{
 			OnStartServer(action_data);
 		}
@@ -268,11 +377,19 @@ class ActionBase
 		{
 			OnStartClient(action_data);
 		}	
-		*/	
 		InformPlayers(action_data.m_Player,action_data.m_Target,UA_START);	
 	}
 	
+	void End( ActionData action_data )
+	{
+		if( action_data.m_Player )
+			action_data.m_Player.GetActionManager().OnActionEnd();
+	}
+	
 	void OnContinuousCancel(ActionData action_data)
+	{}
+	
+	void Interrupt(ActionData action_data)
 	{}
 
 	bool Can( PlayerBase player, ActionTarget target, ItemBase item )
@@ -281,6 +398,26 @@ class ActionBase
 		{
 			return false;
 		}
+		
+		if ( player.IsRestrained() && !CanBeUsedInRestrain() )
+			return false;
+		
+		if (player.GetCommand_Vehicle() && !CanBeUsedInVehicle() )
+			return false;
+		
+		if ( HasTarget() )
+		{
+			EntityAI entity = EntityAI.Cast(target.GetObject());
+			if ( entity && !target.GetObject().IsMan() )
+			{
+				Man man = entity.GetHierarchyRootPlayer();
+				if( man && man != player )
+				{
+					return false;
+				}
+			}
+		}
+		
 		if ( m_ConditionItem && m_ConditionItem.Can(player, item) && m_ConditionTarget && m_ConditionTarget.Can(player, target) && ActionCondition(player, target, item) ) 
 		{	
 			return true;
@@ -317,21 +454,28 @@ class ActionBase
 			{
 				targetInventoryLocation = new InventoryLocation;
 				targetItem.GetInventory().GetCurrentInventoryLocation(targetInventoryLocation);
-				if ( !action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, targetInventoryLocation, 10000) )
+				if ( action_data.m_Player.GetInventory().HasInventoryReservation( targetItem, targetInventoryLocation) )
 				{
 					success = false;
-				}				
+				}
+				else
+				{
+					action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, targetInventoryLocation, 10000);
+				}
 			}
 		}	
 		
 		handInventoryLocation = new InventoryLocation;
 		handInventoryLocation.SetHands(action_data.m_Player,action_data.m_Player.GetItemInHands());
 
-		if ( !action_data.m_Player.GetInventory().AddInventoryReservation( action_data.m_Player.GetItemInHands(), handInventoryLocation, 10000) )
+		if ( action_data.m_Player.GetInventory().HasInventoryReservation( action_data.m_Player.GetItemInHands(), handInventoryLocation) )
 		{
 			success = false;
 		}
-		
+		else
+		{
+			action_data.m_Player.GetInventory().AddInventoryReservation( action_data.m_Player.GetItemInHands(), handInventoryLocation, 10000);
+		}
 		
 		if ( success )
 		{
@@ -363,7 +507,21 @@ class ActionBase
 			action_data.m_ReservedInventoryLocations.Clear();
 		}
 	}
-		
+	
+	void RefreshReservations(ActionData action_data)
+	{
+		if(action_data.m_ReservedInventoryLocations)
+		{
+			InventoryLocation il;
+			for ( int i = 0; i < action_data.m_ReservedInventoryLocations.Count(); i++)
+			{
+				il = action_data.m_ReservedInventoryLocations.Get(i);
+				EntityAI entity = il.GetItem();
+				action_data.m_Player.GetInventory().ExtendInventoryReservation( il.GetItem() , il, 10000 );
+			}
+		}
+	}
+
 	// MESSAGES --------------------------------------------------------------------
 	string GetMessageText( int state ) //returns text of action based on given id
 	{
@@ -399,6 +557,7 @@ class ActionBase
 				break;
 				
 			case UA_CANCEL:
+
 				message = GetMessageCancel();
 				break;
 			
@@ -615,7 +774,31 @@ class ActionBase
 	
 	void OnUpdate(ActionData action_data)
 	{
+		if(!GetGame().IsMultiplayer() || GetGame().IsClient())
+		{
+			if(action_data.m_RefreshReservationTimer > 0)
+			{
+				action_data.m_RefreshReservationTimer--;
+			}
+			else
+			{
+				action_data.m_RefreshReservationTimer = 150;
+				RefreshReservations(action_data);
+			}
+		}
 	}
+	
+	void OnStartClient(ActionData action_data)
+	{}
+	
+	void OnStartServer(ActionData action_data)
+	{}
+	
+	void OnEndClient(ActionData action_data)
+	{}
+	
+	void OnEndServer(ActionData action_data)
+	{}
 
 	// SOFT SKILLS ------------------------------------------------
 	float GetSpecialtyWeight()

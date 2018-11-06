@@ -6,6 +6,7 @@ class ModifierBase
 	string 				m_System = "Modifiers";
 	float 				m_ActivatedTime;//overall time this modifier was active
 	bool				m_TrackActivatedTime;//should this modifier track overall time it was active ?
+	bool				m_IsPersistent;//is this modifier saved to the DB ?
 	PlayerBase			m_Player;
 	float				m_TickIntervalInactive = 5;
 	float				m_TickIntervalActive = 3;
@@ -39,7 +40,11 @@ class ModifierBase
 	{
 		return m_Player;
 	}
-
+	
+	bool IsPersistent()
+	{
+		return m_IsPersistent;
+	}
 
 	void MakeParamObjectPersistent(Param object)
 	{

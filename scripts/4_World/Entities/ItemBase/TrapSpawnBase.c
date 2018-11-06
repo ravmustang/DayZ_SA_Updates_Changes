@@ -68,15 +68,19 @@ class TrapSpawnBase extends ItemBase
 		return false;
 	}
 
-	bool IsTakeable()
+	override bool IsTakeable()
 	{
 		if ( g_Game.IsServer() )
 		{
 			CargoBase itemcargo = this.GetInventory().GetCargo();
-			int cargo_count = itemcargo.GetItemCount();
-			if ( cargo_count > 0 )
+			
+			if (itemcargo)
 			{
-				return false;
+				int cargo_count = itemcargo.GetItemCount();
+				if ( cargo_count > 0 )
+				{
+					return false;
+				}
 			}
 		}
 		return true;

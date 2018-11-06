@@ -1,0 +1,3 @@
+class WoodenLog extends ItemBase
+{
+}

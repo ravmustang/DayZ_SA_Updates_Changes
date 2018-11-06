@@ -4,17 +4,14 @@ enum CarSoundCtrl
 {
 	// simulation
 	ENGINE, //!< indicates if engine is ON
-	THRUST, //!< thrust position
 	RPM,    //!< engine's RPM
 	SPEED,  //!< speed of the car in km/h
 
 	// miscellaneous
 	DOORS, //!< indicates if doors are open
-
-	// other
-	CAMERA, //!< indicates if camera inside 3rd of 1st person view
-	PLAYER  //!< indicates if driver is controlled by player
+	PLAYER //!< indicates if driver is controlled by player
 };
+
 
 
 //!	Type of vehicle's fluid. (native, do not change or extend)
@@ -30,6 +27,7 @@ enum CarFluid
 	USER3, //!< reserved for user / modding support
 	USER4  //!< reserved for user / modding support
 };
+
 
 
 //!	Enumerated vehicle's gears. (native, do not change or extend)
@@ -62,6 +60,13 @@ class Car extends Transport
 {
 	//!	Returns the current speed of the vehicle in km/h.
 	proto native float GetSpeedometer();
+	
+	/*!
+		Returns tank capacity for the specified vehicle's fluid.
+
+		\param fluid the specified fluid type
+	*/
+	proto native float GetFluidCapacity( CarFluid fluid );
 
 	/*!
 		Returns fraction value (in range <0, 1>)
@@ -71,10 +76,10 @@ class Car extends Transport
 	*/
 	proto native float GetFluidFraction( CarFluid fluid );
 
-	//! Removes to the specified fluid the specified amount.
+	//! Removes from the specified fluid the specified amount.
 	proto native void Leak( CarFluid fluid, float amount );
 
-	//! Adds from the specified fluid the specified amount.
+	//! Adds to the specified fluid the specified amount.
 	proto native void Fill( CarFluid fluid, float amount );
 
 	//!	Returns the instance of vehicle's controller.
@@ -91,6 +96,9 @@ class Car extends Transport
 
 	//! Stops the engine.
 	proto native void EngineStop();
+
+	//! Returns total number of gears.
+	proto native int GetGearsCount();
 
 	//! Returns true when lights are on, false otherwise.
 	proto native bool IsLightsOn();
@@ -109,9 +117,10 @@ class CarController
 	/*!
 		Sets the steering value.
 
-		\param in should be in range <-1, 1>
+		\param in     should be in range <-1, 1>
+		\param analog indicates if the input value was taken from analog controller
 	*/
-	proto native void SetSteering( float in );
+	proto native void SetSteering( float in, bool analog = false );
 
 	//!	Returns the current thrust turbo modifier value in range <0, 1>.
 	proto native float GetThrustTurbo();

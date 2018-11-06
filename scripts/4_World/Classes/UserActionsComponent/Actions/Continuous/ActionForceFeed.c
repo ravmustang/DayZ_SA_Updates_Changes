@@ -41,6 +41,6 @@ class ActionForceFeed: ActionForceConsume
 		
 	override string GetText()
 	{
-		return "Feed";
+		return "#feed";
 	}
 };

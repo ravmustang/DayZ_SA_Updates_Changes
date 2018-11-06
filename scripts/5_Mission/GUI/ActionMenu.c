@@ -4,7 +4,7 @@ class ActionMenu
 	private const float FADE_OUT_TIME = 0.3;
 	private const float HIDE_MENU_TIME = 5;
 
-	private ref WidgetFadeTimer m_fade_timer;
+	private ref WidgetFadeTimer m_FadeTimer;
 	private ref array<TextWidget> m_actionItems;
 	private TextWidget m_defaultActionWidget;
 	private Widget m_actionsPanelWidget;
@@ -15,7 +15,7 @@ class ActionMenu
 	void ActionMenu()
 	{
 		m_actionItems = new array<TextWidget>;
-		m_fade_timer = new WidgetFadeTimer;
+		m_FadeTimer = new WidgetFadeTimer;
 		m_hide_timer = new Timer(CALL_CATEGORY_GUI);
 		m_visible = false;
 	}
@@ -57,9 +57,9 @@ class ActionMenu
 		// clear state
 		m_defaultActionWidget.Show(false);
 		if( actions.Count() <= 1 )
-			m_fade_timer.FadeOut(m_actionsPanelWidget, FADE_OUT_TIME, true);		
+			m_FadeTimer.FadeOut(m_actionsPanelWidget, FADE_OUT_TIME, true);		
 		else
-			m_fade_timer.FadeIn(m_actionsPanelWidget, FADE_IN_TIME, true);
+			m_FadeTimer.FadeIn(m_actionsPanelWidget, FADE_IN_TIME, true);
 		
 		// update state
 		for (int i = 0; i < m_actionItems.Count(); i++)
@@ -147,7 +147,7 @@ class ActionMenu
 		
 		m_visible = false;
 		m_hide_timer.Stop();
-		m_fade_timer.Stop();
+		m_FadeTimer.Stop();
 		//m_defaultActionWidget.Show(false);
 		m_actionsPanelWidget.Show(false);
 	}
@@ -156,6 +156,6 @@ class ActionMenu
 	{
 		//m_defaultActionWidget.Show(false);
 		if (m_actionsPanelWidget.IsVisible())
-			m_fade_timer.FadeOut(m_actionsPanelWidget, FADE_OUT_TIME, true);
+			m_FadeTimer.FadeOut(m_actionsPanelWidget, FADE_OUT_TIME, true);
 	}	
 }

@@ -28,6 +28,19 @@ class ActionTurnOffWhileInHands: ActionSingleUseBase
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
+		if ( item.IsInherited(Roadflare) )
+		{
+			m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LIGHTFLARE;
+		}
+		else if (item.IsInherited(Chemlight_ColorBase))
+		{
+			m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LITCHEMLIGHT;
+		}
+		else
+		{
+			m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_OFF;
+		}
+		
 		if ( item.HasEnergyManager()  &&  item.GetCompEM().CanSwitchOff() )
 		{
 			return true;
@@ -38,7 +51,7 @@ class ActionTurnOffWhileInHands: ActionSingleUseBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		action_data.m_MainItem.GetCompEM().SwitchOff();
 	}

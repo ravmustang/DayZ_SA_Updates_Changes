@@ -6,6 +6,58 @@ class ActionPourLiquidCB : ActionContinuousBaseCB
 	{
 		m_ActionData.m_ActionComponent = new CAContinuousQuantityLiquidTransfer(UAQuantityConsumed.POUR_LIQUID, TIME_TO_REPEAT);
 	}
+	
+	override void OnAnimationEvent(int pEventID)	
+	{
+		super.OnAnimationEvent( pEventID );
+				
+		Bottle_Base target_vessel = Bottle_Base.Cast( m_ActionData.m_Target.GetObject());
+		
+		switch (pEventID)
+		{
+			case UA_ANIM_EVENT:			
+				if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+				{		
+					//local singleplayer
+					target_vessel.PlayPouringSound();
+				}
+			
+				if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+				{			
+					target_vessel.PlayPouringSound();					
+				}
+			
+				if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+				{			
+					
+				}
+
+			break;
+		}
+	}
+	
+	override void EndActionComponent()
+	{
+		super.EndActionComponent();
+		
+		Bottle_Base target_vessel = Bottle_Base.Cast( m_ActionData.m_Target.GetObject());
+
+		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{
+			//local singleplayer
+			target_vessel.StopPouringSound();
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{			
+			target_vessel.StopPouringSound();					
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{		
+		
+		}
+	}
 };
 
 class ActionPourLiquid: ActionContinuousBase
@@ -13,8 +65,8 @@ class ActionPourLiquid: ActionContinuousBase
 	void ActionPourLiquid()
 	{
 		m_CallbackClass = ActionPourLiquidCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYBOTTLE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_POURBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTY_VESSEL;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		
 		m_MessageStartFail = "It's ruined.";
 		m_MessageStart = "I have started filling the bottle.";
@@ -51,8 +103,7 @@ class ActionPourLiquid: ActionContinuousBase
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		ItemBase item = player.GetItemInHands();
 		
-		//return "fill "+item.GetDisplayName().Substring(0,(item.GetDisplayName().Length() )); //crops the '' bit from the displayname
-		return "Pour liquid";
+		return "#pour_liquid";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -77,5 +128,10 @@ class ActionPourLiquid: ActionContinuousBase
 	override void OnStartServer( ActionData action_data )
 	{
 		action_data.m_Player.SetLiquidTendencyDrain(false);
+	}
+	
+	override void OnEndServer( ActionData action_data )
+	{
+		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

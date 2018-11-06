@@ -31,13 +31,13 @@ class ActionReadPaper: ActionSingleUseBase
 		return "#read";
 	}
 
-	override void OnCompleteClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{
 		//display note
 		//action_data.m_Player.enterNoteMenuRead = true;
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Paper paper_item = Paper.Cast(action_data.m_MainItem);
 		PaperParams params = new PaperParams(paper_item.m_AdvancedText);

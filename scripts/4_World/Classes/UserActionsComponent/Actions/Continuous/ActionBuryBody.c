@@ -11,7 +11,7 @@ class ActionBuryBody: ActionContinuousBase
 	void ActionBuryBody()
 	{
 		m_CallbackClass = ActionBuryBodyCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGSHOVEL;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		m_MessageStartFail = "There's nothing to ignite.";
@@ -37,7 +37,7 @@ class ActionBuryBody: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Bury the body";
+		return "#bury_the_body";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -61,7 +61,7 @@ class ActionBuryBody: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		Object targetObject = action_data.m_Target.GetObject();
 		g_Game.ObjectDelete(targetObject);

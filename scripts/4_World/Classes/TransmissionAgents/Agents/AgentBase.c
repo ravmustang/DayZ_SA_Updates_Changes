@@ -1,3 +1,13 @@
+enum eAgents
+{
+	//agent list
+	CHOLERA 		= 1;
+	INFLUENZA 		= 2;
+	SALMONELLA		= 4;
+	BRAIN 			= 8;
+}
+
+
 class AgentBase extends MessageReceiverBase
 {
 	float			m_Type = 0;
@@ -8,6 +18,7 @@ class AgentBase extends MessageReceiverBase
 	int				m_MaxCount = 1;
 	float 			m_AutoinfectProbability = -1;//probability of autoinfect as percentage per hour (50 means 50% chance autoinfect with this agent will happen 1x times within an hour of gameplay)(also dependent on CanAutoinfectPlayer check)
 	//int				m_ChanceOfInfection = 1;//chance of transmission from enviro sources like ponds etc. [0..1]
+	float 			m_TransferabilityAirOut; // transferibility airborne out
 	
 	void AgentBase()
 	{
@@ -32,6 +43,11 @@ class AgentBase extends MessageReceiverBase
 		
 		float probability = (m_AutoinfectProbability / 3600) * deltaT * 1000;
 		float dice_throw = Math.RandomFloat(0,100 * 1000);
+		/*
+		Print(probability);
+		Print(dice_throw);
+		Print("-----------");
+		*/
 		if( dice_throw < probability )
 		{
 			return CanAutoinfectPlayer(player);
@@ -55,6 +71,11 @@ class AgentBase extends MessageReceiverBase
 	float GetTransferabilityOut()
 	{
 		return m_TransferabilityOut;
+	}	
+	
+	float GetTransferabilityAirOut()
+	{
+		return m_TransferabilityAirOut;
 	}
 
 	int GetMaxCount()

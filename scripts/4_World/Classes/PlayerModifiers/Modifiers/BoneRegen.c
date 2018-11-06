@@ -1,4 +1,4 @@
-class BoneRegen: ModifierBase
+class BoneRegenMdfr: ModifierBase
 {
 	private const 	float	MINIMAL_WATER_TO_REGENRATE = 2500;
 	private const 	float	MINIMAL_ENERGY_TO_REGENRATE = 4000;

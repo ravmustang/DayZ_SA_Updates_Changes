@@ -20,6 +20,8 @@ class DayZCreature extends EntityAI
 
 class DayZCreatureAI extends DayZCreature 
 {
+	proto native AIAgent GetAIAgent();
+
 	proto native void DebugDisableAIControl();
 	proto native void DebugRestoreAIControl();
 	
@@ -68,20 +70,23 @@ class DayZCreatureAI extends DayZCreature
 			ProcessSoundEvent(sound_event);
 		}
 	}
+
+	void OnSoundVoiceEvent(int event_id, string event_user_string)
+	{
+		AnimSoundVoiceEvent voice_event = GetCreatureAIType().GetSoundVoiceEvent(event_id);
+		if(voice_event != NULL)
+		{
+			ProcessSoundVoiceEvent(voice_event);
+		}
+	}
 	
 	void OnStepEvent(int event_id, string event_user_string) 
 	{
-		GetGame().ProfilerStart("OnStepEvent");
-		GetGame().ProfilerStart("FindStepEvent");
 		AnimStepEvent step_event = GetCreatureAIType().GetStepEvent(event_id);
-		GetGame().ProfilerStop("FindStepEvent");
 		if(step_event != NULL)
 		{
-			GetGame().ProfilerStart("ProcessStepEvent");
 			ProcessStepEvent(step_event);
-			GetGame().ProfilerStop("ProcessStepEvent");
 		}
-		GetGame().ProfilerStop("OnStepEvent");
 	}
 	
 	void OnDamageEvent(int event_id, string event_user_string)
@@ -97,17 +102,22 @@ class DayZCreatureAI extends DayZCreature
 	{
 		if(!RegisterAnimationEvent("Sound", "OnSoundEvent"))
 		{
-			Print("Error registering anim. event");
+			Print("Error registering anim. event (Sound)");
+		}
+
+		if(!RegisterAnimationEvent("SoundVoice", "OnSoundVoiceEvent"))
+		{
+			Print("Error registering anim. event (SoundVoice)");
 		}
 		
 		if(!RegisterAnimationEvent("Step", "OnStepEvent"))
 		{
-			Print("Error registering anim. event");
+			Print("Error registering anim. event (Step)");
 		}
 		
 		if(!RegisterAnimationEvent("Damage", "OnDamageEvent"))
 		{
-			Print("Error registering anim. event");
+			Print("Error registering anim. event (Damage)");
 		}
 	}
 	
@@ -116,9 +126,32 @@ class DayZCreatureAI extends DayZCreature
 		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			SoundObjectBuilder objectBuilder = sound_event.GetSoundBuilder();
-			objectBuilder.UpdateEnvSoundControllers(GetPosition());
-			SoundObject soundObject = objectBuilder.BuildSoundObject();
-			PlaySound(soundObject, objectBuilder);
+			if(NULL != objectBuilder)
+			{
+				objectBuilder.UpdateEnvSoundControllers(GetPosition());
+				SoundObject soundObject = objectBuilder.BuildSoundObject();
+				PlaySound(soundObject, objectBuilder);
+			}
+		}
+		
+		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
+		{
+			if(sound_event.m_NoiseParams != NULL)
+				GetGame().GetNoiseSystem().AddNoise(this, sound_event.m_NoiseParams);
+		}
+	}
+
+	private void ProcessSoundVoiceEvent(AnimSoundVoiceEvent sound_event)
+	{
+		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			SoundObjectBuilder objectBuilder = sound_event.GetSoundBuilder();
+			if(NULL != objectBuilder)
+			{
+				objectBuilder.UpdateEnvSoundControllers(GetPosition());
+				SoundObject soundObject = objectBuilder.BuildSoundObject();
+				PlaySound(soundObject, objectBuilder);
+			}
 		}
 		
 		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
@@ -302,16 +335,16 @@ class DayZAnimal extends DayZCreatureAI
 		return false;
 	}
 	
-	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, string component, string ammo, vector modelPos)
+	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
-		super.EEHitBy(damageResult, damageType, source, component, ammo, modelPos);
+		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos);
 		
 		ComponentAnimalBleeding animal_bleeding = ComponentAnimalBleeding.Cast( GetComponent( COMP_TYPE_ANIMAL_BLEEDING ) );
-		animal_bleeding.CreateWound( component, ammo );
+		animal_bleeding.CreateWound( dmgZone, ammo );
 		
 		int type = 0;
 		int direction = 0;
-		if (ComputeDamageHitParams(source, component, type, direction) == true)
+		if (ComputeDamageHitParams(source, dmgZone, type, direction) == true)
 		{
 			QueueDamageHit(type, direction);
 		}
@@ -325,14 +358,14 @@ class DayZAnimal extends DayZCreatureAI
 		m_DamageHitDirection = direction;
 	}
 	
-	bool ComputeDamageHitParams(EntityAI source, string component, out int type, out int direction)
+	bool ComputeDamageHitParams(EntityAI source, string dmgZone, out int type, out int direction)
 	{
 		type = 0; // not used right now
 		
 		float angleDeg = ComputeHitDirectionAngleDeg(source);
 		direction = TranslateHitAngleDegToDirectionIndex(angleDeg);
 		
-		direction += FindComponentDirectionOffset(component);
+		direction += FindComponentDirectionOffset(dmgZone);
 		
 		return true;	
 	}

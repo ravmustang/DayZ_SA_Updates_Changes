@@ -38,9 +38,8 @@ class ActionMineBush: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Cut the bush down";
+		return "#cut_down_bush";
 	}
-
 		
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
@@ -52,7 +51,7 @@ class ActionMineBush: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{		
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}

@@ -1,9 +1,9 @@
-class ToggleSelections
+class ToggleAnimations
 {
 	protected string m_ToggleOff;
 	protected string m_ToggleOn;
 	
-	void ToggleSelections( string toggle_off, string toggle_on )
+	void ToggleAnimations( string toggle_off, string toggle_on )
 	{
 		m_ToggleOff = toggle_off;
 		m_ToggleOn = toggle_on;

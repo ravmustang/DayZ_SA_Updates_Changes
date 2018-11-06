@@ -25,7 +25,11 @@ class OptionSelectorBase extends ScriptedWidgetEventHandler
 	
 	bool IsFocusable( Widget w )
 	{
-		return w == m_Parent;
+		if( w )
+		{
+			return w == m_Parent;
+		}
+		return false;
 	}
 	
 	override bool OnMouseEnter( Widget w, int x, int y )

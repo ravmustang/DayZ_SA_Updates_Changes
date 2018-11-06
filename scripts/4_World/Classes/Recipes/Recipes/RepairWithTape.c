@@ -5,7 +5,7 @@ class RepairWithTape extends RecipeBase
 		m_Name = "#STR_RepairWithTape0";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 1;//animation length in relative time units
-		m_Specialty = 0.04;// value > 0 for roughness, value < 0 for precision
+		m_Specialty = 0.03;// value > 0 for roughness, value < 0 for precision
 		
 		
 		//conditions
@@ -34,6 +34,8 @@ class RepairWithTape extends RecipeBase
 		
 		//ingredient 2
 		InsertIngredient(1,"Inventory_Base");//you can insert multiple ingredients this way
+		InsertIngredient(1,"DefaultWeapon");//you can insert multiple ingredients this way
+		InsertIngredient(1,"DefaultMagazine");//you can insert multiple ingredients this way
 		
 		m_IngredientAddHealth[1] = 0;// 0 = do nothing
 		m_IngredientSetHealth[1] = -1; // -1 = do nothing

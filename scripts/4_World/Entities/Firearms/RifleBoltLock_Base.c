@@ -73,7 +73,7 @@ class RBL_OPN_BU0_MA0 extends WeaponStableState
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
 };
-class RBL_JAM_BU1_MA0 extends WeaponStableState
+class RBL_JAM_BU1_MA0 extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { jammed bullet nomag"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } jammed bullet nomag"); }
@@ -82,7 +82,7 @@ class RBL_JAM_BU1_MA0 extends WeaponStableState
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return true; }
 };
-class RBL_JAM_BU1_MA1 extends WeaponStableState
+class RBL_JAM_BU1_MA1 extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { jammed bullet mag"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } jammed bullet mag"); }
@@ -163,9 +163,9 @@ class RifleBoltLock_Base extends Rifle_Base
 		//WeaponCharging Mech_J11 = new WeaponCharging(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_OPENED);
 		
 		WeaponStateBase Trigger_C00 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY)); // cock without clip
-		WeaponStateBase Trigger_C10 = new WeaponFireLast(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL)); // cock with clip
-		WeaponFireAndChamberNext Trigger_C11 = new WeaponFireAndChamberNext(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL));
-		WeaponStateBase Trigger_C11L = new WeaponFireLast(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_LAST));
+		WeaponStateBase Trigger_C10 = new WeaponFireLast(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL), GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM)); // cock with clip
+		WeaponFireAndChamberNext Trigger_C11 = new WeaponFireAndChamberNext(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL), GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM));
+		WeaponStateBase Trigger_C11L = new WeaponFireLast(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_LAST), GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM));
 		WeaponStateBase Trigger_C01 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY));
 		WeaponStateBase Trigger_L00 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY));
 		WeaponStateBase Trigger_L01 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY));
@@ -173,8 +173,10 @@ class RifleBoltLock_Base extends Rifle_Base
 		WeaponStateBase Trigger_J11 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY));
 	
 		//Fire and jam
-		WeaponStateBase Trigger_C10J = new WeaponFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM)); // cock with clip
-		WeaponStateBase Trigger_C11J = new WeaponFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM));
+//		WeaponStateBase Trigger_C10J = new WeaponFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM)); // cock with clip
+//		WeaponStateBase Trigger_C11J = new WeaponFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM));
+		
+//		WeaponStateBase Trigger_C11J = new WeaponFire(this, NULL, WeaponActions.FIRE, GetWeaponSpecificCommand(WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM));
 
 		WeaponStateBase Unjam_J10 = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, GetWeaponSpecificCommand(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START));
 		WeaponStateBase Unjam_J11 = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, GetWeaponSpecificCommand(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START));
@@ -272,29 +274,38 @@ class RifleBoltLock_Base extends Rifle_Base
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C01, _dto_,    C01));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C01, _abt_,    C01));
 		
-		m_fsm.AddTransition(new WeaponTransition(   C10, __T__,    Trigger_C10J, NULL, new WeaponGuardJammed(this)));
+/*		m_fsm.AddTransition(new WeaponTransition(   C10, __T__,    Trigger_C10J, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10J, _fin_,    J10));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10J, _rto_,    J10));
-		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10J, _abt_,    J10));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10J, _abt_,    J10));*/
 		
 		m_fsm.AddTransition(new WeaponTransition(   C10, __T__,    Trigger_C10));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10, _fin_,    J10, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10, _rto_,    J10, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10, _abt_,    J10, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10, _fin_,    C00));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10, _rto_,    C00));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10, _abt_,    C00));
 		
 
 		
-		m_fsm.AddTransition(new WeaponTransition(   C11, __T__,    Trigger_C11J, NULL, new WeaponGuardJammed(this)));
+/*		m_fsm.AddTransition(new WeaponTransition(   C11, __T__,    Trigger_C11J, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11J, _fin_,    J11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11J, _rto_,    J11));
-		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10J, _abt_,    J11));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C10J, _abt_,    J11));*/
 		
 		m_fsm.AddTransition(new WeaponTransition(   C11, __T__,    Trigger_C11, NULL, new WeaponGuardHasAmmo(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11, _fin_,    J11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11, _rto_,    J11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11, _abt_,    J11, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11, _fin_,    C11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11, _rto_,    C11));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11, _abt_,    C11));
 		
 		m_fsm.AddTransition(new WeaponTransition(   C11, __T__,    Trigger_C11L));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11L, _fin_,    J11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11L, _rto_,    J11, NULL, new WeaponGuardJammed(this)));
+		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11L, _abt_,    J11, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11L, _fin_,    L01));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11L, _rto_,    L01));
 		m_fsm.AddTransition(new WeaponTransition(   Trigger_C11L, _abt_,    L01));
@@ -448,6 +459,23 @@ class RifleBoltLock_Base extends Rifle_Base
 		SelectionMagazineHide();
 
 		m_fsm.Start();
+	}
+	
+	override float GetChanceToJam()
+	{
+		float chanceToJam = super.GetChanceToJam();
+		Magazine mag = GetMagazine(GetCurrentMuzzle());
+		
+		if(mag)
+		{
+			chanceToJam = chanceToJam + ((1.0 - chanceToJam) * mag.GetChanceToJam());
+		}
+		else
+		{
+			chanceToJam = chanceToJam + ((1.0 - chanceToJam) * 0.1);
+		}
+		
+		return chanceToJam;
 	}
 };
 

@@ -42,6 +42,18 @@ class GetServersResultRow
 	string	m_CreatedAt;
 	string	m_UpdatedAt;
 
+	//characters alive
+	string m_CharactersAlive;
+	//steam friends - list of names separated by comma
+	string m_SteamFriends;
+	
+	int m_Ping;	
+  	string m_TimeOfDay;
+  	//! disable3rdPerson servers for mode regular/hardcore
+  	int m_Disable3rdPerson;  //1 for disabled, ie. hardcore
+	//! time multiplier of environment
+	float m_EnvironmentTimeMul;
+
 };
 
 
@@ -235,6 +247,68 @@ class GetServersInput
 		m_HostPort = hostPort;
 		m_UseHostPort = true;
 	}
+	
+	void SetFavorited( bool show )
+	{
+		m_SortBy += "F";
+		AddShow( show );
+		
+	}
+	
+	void SetFriendsPlaying( bool show )
+	{
+		m_SortBy += "P";
+		AddShow( show );
+	}
+	
+	void SetPreviouslyPlayed( bool show )
+	{
+		m_SortBy += "R";
+		AddShow( show );
+	}
+	
+	void SetProperVersionMatch( bool show )
+	{
+		m_SortBy += "V";
+		AddShow( show );
+	}
+	
+	void SetFullServer( bool show )
+	{
+		m_SortBy += "S";
+		AddShow( show );
+	}
+	
+	void SetThirdPerson( bool show )
+	{
+		m_SortBy += "3";
+		AddShow( show );
+	}
+	
+	void SetPublic( bool show )
+	{
+		m_SortBy += "L";
+		AddShow( show );
+	}
+	
+	void SetAcceleratedTime( bool show )
+	{
+		m_SortBy += "A";
+		AddShow( show );
+	}
+	
+	void SetLAN()
+	{
+		m_SortBy += "N";
+	}
+	
+	void AddShow( bool show )
+	{
+		if( show )
+			m_SortBy += "+";
+		else
+			m_SortBy += "-";
+	}
 };
 
 class BiosLobbyService
@@ -264,6 +338,7 @@ class BiosLobbyService
 		@param error error indicating success or fail of the async operation.
 		@param response for debugging - this is the data returned by the server; or an empty string ;)
 	*/
+	
 	void OnDoneAsync(ref GetServersResult result_list, EBiosError error, string response)
 	{
 		OnlineServices.OnLoadServersAsync( result_list, error, response );

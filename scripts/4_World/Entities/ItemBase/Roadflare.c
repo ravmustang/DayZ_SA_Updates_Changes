@@ -54,8 +54,10 @@ class Roadflare : ItemBase
 		RegisterNetSyncVariableFloat("m_EM.m_Energy"); // TO DO: Do not register float energy directly, but use GetEnergy0To100() instead!
 	}
 	
-	void ~Roadflare()
+	override void EEDelete(EntityAI parent)
 	{
+		super.EEDelete(parent);
+		
 		if ( GetGame() )
 		{
 			if ( m_LoopSoundEntity != NULL )
@@ -139,9 +141,23 @@ class Roadflare : ItemBase
 	// When the flare stops burning
 	override void OnWorkStop()
 	{
-		m_BurningState = RoadflareBurningState.SMOKE_ONLY;
-		UpdateActiveParticles();
-		m_FinalSmokeTimer.Run(60, this, "StopSmoking", NULL, false);
+		if ( GetGame().IsMissionMainMenu() )
+		{
+			m_BurningState = RoadflareBurningState.NOT_BURNING;
+			UpdateActiveParticles();
+		}
+		else
+		{
+			m_BurningState = RoadflareBurningState.SMOKE_ONLY;
+			UpdateActiveParticles();
+			m_FinalSmokeTimer.Run(60, this, "StopSmoking", NULL, false);
+			
+			if ( GetGame().IsServer() )
+			{
+				SetHealth("","",0);
+			}
+		}
+		
 		
 		if ( m_LoopSoundEntity != NULL && GetGame() != NULL )
 		{
@@ -149,11 +165,6 @@ class Roadflare : ItemBase
 		}
 		
 		SwitchLight(false);
-		
-		if ( GetGame().IsServer() )
-		{
-			SetHealth("","",0);
-		}
 	}
 	
 	// Updates all (in)active particles
@@ -277,5 +288,10 @@ class Roadflare : ItemBase
 	override void OnActivatedByTripWire()
 	{
 		GetCompEM().SwitchOn();
+	}
+	
+	override bool CanIgniteItem(EntityAI ignite_target = NULL)
+	{
+		return GetCompEM().IsWorking();
 	}
 };

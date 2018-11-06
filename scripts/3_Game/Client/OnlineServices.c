@@ -3,10 +3,17 @@ class OnlineServices
 	static ref ScriptInvoker												m_FriendsAsyncInvoker		= new ScriptInvoker();
 	static ref ScriptInvoker												m_PermissionsAsyncInvoker	= new ScriptInvoker();
 	static ref ScriptInvoker												m_ServersAsyncInvoker		= new ScriptInvoker();
+	static ref ScriptInvoker												m_ServerAsyncInvoker		= new ScriptInvoker();
 	static ref ScriptInvoker												m_MuteUpdateAsyncInvoker	= new ScriptInvoker();
 	
 	static ref BiosClientServices											m_ClientServices;
 	static ref TrialService													m_TrialService				= new TrialService;
+	
+	
+	protected static string													m_CurrentServerIP;
+	protected static int													m_CurrentServerPort;
+	protected static ref GetServersResultRow								m_CurrentServerInfo;
+	
 	
 	protected static ref map<string, ref BiosFriendInfo>					m_FriendsList;
 	protected static ref map<string, bool>									m_MuteList;
@@ -40,19 +47,26 @@ class OnlineServices
 	static void GetClientServices()
 	{
 		BiosUserManager user_manager = GetGame().GetUserManager();
-		BiosUser selected_user = user_manager.GetSelectedUser();
-		if( selected_user )
+		if( user_manager )
 		{
-			m_ClientServices = selected_user.GetClientServices();
-		}
-		#ifdef PLATFORM_WINDOWS
-			array<ref BiosUser> user_list = new array<ref BiosUser>;
-			user_manager.GetUserList( user_list );
-			if( user_list.Count() > 0 )
+			BiosUser selected_user = user_manager.GetSelectedUser();
+			if( selected_user )
 			{
-				m_ClientServices = user_list.Get( 0 ).GetClientServices();
+				m_ClientServices = selected_user.GetClientServices();
 			}
-		#endif
+			#ifdef PLATFORM_WINDOWS
+				array<ref BiosUser> user_list = new array<ref BiosUser>;
+				user_manager.GetUserList( user_list );
+				if( user_list.Count() > 0 )
+				{
+					m_ClientServices = user_list.Get( 0 ).GetClientServices();
+				}
+			#endif
+		}
+		else
+		{
+			Error( "BiosClientServices Error: Usermanager does not exist." );
+		}
 	}
 	
 	static bool ErrorCaught( EBiosError error )
@@ -62,11 +76,10 @@ class OnlineServices
 			case EBiosError.OK:
 			{
 				return false;
-				break;
 			}
 			case EBiosError.CANCEL:
 			{
-				DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Opperation canceled." );
+				DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Operation canceled." );
 				return true;
 			}
 			case EBiosError.BAD_PARAMETER:
@@ -127,16 +140,68 @@ class OnlineServices
 		}
 	}
 	
+	static void GetCurrentServerInfo( string ip, int port )
+	{
+		GetClientServices();
+		
+		m_CurrentServerIP = ip;
+		m_CurrentServerPort = port;
+		
+		GetServersInput inputValues = new GetServersInput;
+		
+		inputValues.SetHostIp( ip );
+		inputValues.SetHostPort( port );
+		inputValues.m_Page = 0;
+		inputValues.m_RowsPerPage = 10;
+		inputValues.m_Platform = 1;
+
+		#ifdef PLATFORM_XBOX
+			inputValues.m_Platform = 2;
+		#endif
+		#ifdef PLATFORM_PS4
+			inputValues.m_Platform = 3;
+		#endif
+		
+		if( m_ClientServices )
+		{
+			m_ClientServices.GetLobbyService().GetServers( inputValues );
+		}
+	}
+	
+	static void ClearCurrentServerInfo()
+	{
+		m_CurrentServerInfo	= null;
+		m_CurrentServerIP	= "";
+		m_CurrentServerPort	= 0;
+	}
+	
 	static void OnLoadServersAsync( ref GetServersResult result_list, EBiosError error, string response )
 	{
 		if( !ErrorCaught( error ) )
 		{
+			if( m_CurrentServerIP != "" && m_CurrentServerPort > 0 )
+			{
+				foreach( GetServersResultRow result : result_list.m_Results )
+				{
+					if( result.m_HostIp == m_CurrentServerIP && result.m_HostPort == m_CurrentServerPort )
+					{
+						m_CurrentServerInfo	= result;
+						m_CurrentServerIP	= "";
+						m_CurrentServerPort	= 0;
+					}
+				}
+			}
 			m_ServersAsyncInvoker.Invoke( result_list, error, response );
 		}
 		else
 		{
 			m_ServersAsyncInvoker.Invoke( null, error, "" );
 		}
+	}
+	
+	static GetServersResultRow GetCurrentServerInfo()
+	{
+		return m_CurrentServerInfo;
 	}
 	
 	static void LoadFriends()
@@ -168,7 +233,6 @@ class OnlineServices
 	static void OnUserProfileAsync(EBiosError error)
 	{
 		ErrorCaught( error );
-		LoadPermissions( ClientData.GetSimplePlayerList() );
 	}
 	
 	static void OnFriendsAsync( ref BiosFriendInfoArray friend_list, EBiosError error )
@@ -289,6 +353,26 @@ class OnlineServices
 		return m_MuteList;
 	}
 	
+	static void ShowInviteScreen()
+	{
+		#ifdef PLATFORM_CONSOLE
+			GetClientServices();
+			if( m_ClientServices )
+			{
+				string addr;
+				int port;
+				if( GetGame().GetHostAddress( addr, port ) )
+				{
+					ErrorCaught( m_ClientServices.GetSessionService().ShowInviteToGameplaySessionAsync( addr, port ) );
+				}
+			}
+			else
+			{
+				DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Service reference does not exist." );
+			}
+		#endif
+	}
+	
 	static void LoadMPPrivilege()
 	{
 		#ifdef PLATFORM_CONSOLE
@@ -334,7 +418,7 @@ class OnlineServices
 			else
 			{
 				g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
-				g_Game.SelectUser();
+				g_Game.GamepadCheck();
 			}
 		}
 	}
@@ -458,6 +542,10 @@ class OnlineServices
 				g_Game.ConnectFromServerBrowser( result.m_HostIp, result.m_HostPort );
 				m_AutoConnectTries = 0;
 				return;
+			}
+			else
+			{
+				GetGame().GetUIManager().ShowDialog( "SERVERS UNAVALIABLE", "#str_xbox_authentification_fail", 232, DBT_OK, DBB_NONE, DMT_INFO, GetGame().GetUIManager().GetMenu() );
 			}
 		}
 		

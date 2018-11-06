@@ -12,8 +12,10 @@ class DayZPlayerCameras
 	static const int 	DAYZCAMERA_IRONSIGHTS				= 10;		//!< ironsights camera
 	static const int 	DAYZCAMERA_OPTICS					= 11;		//!< optics
 	static const int 	DAYZCAMERA_1ST_UNCONSCIOUS			= 12;		//!< unconscious
+	static const int	DAYZCAMERA_3RD_JUMP					= 13;		//!< jump
 	
-	static const int	DAYZCAMERA_3RD_VEHICLE				= 13;		//!< vehicle
+	static const int	DAYZCAMERA_1ST_VEHICLE				= 30;		//!< vehicle 1st person
+	static const int	DAYZCAMERA_3RD_VEHICLE				= 31;		//!< generic vehicle 3rd person
 	
 	static const int 	PERITEMUD_INVALID 			= -1;		//! uninitialized / invalid per item camera user data
 	static const int 	PERITEMUD_EMPTYHANDED 		= 20;		//! for empty hands
@@ -50,6 +52,9 @@ class DayZPlayerCameras
 		pType.RegisterCameraCreator(DAYZCAMERA_OPTICS, DayZPlayerCameraOptics);
 		pType.RegisterCameraCreator(DAYZCAMERA_3RD_ERC_RAISED_MELEE, DayZPlayerCamera3rdPersonErcRaisedMelee);
 		pType.RegisterCameraCreator(DAYZCAMERA_1ST_UNCONSCIOUS, DayZPlayerCamera1stPersonUnconscious);
+		pType.RegisterCameraCreator(DAYZCAMERA_3RD_JUMP, DayZPlayerCamera3rdPersonJump);
+		
+		pType.RegisterCameraCreator(DAYZCAMERA_1ST_VEHICLE, DayZPlayerCamera1stPersonVehicle);
 		pType.RegisterCameraCreator(DAYZCAMERA_3RD_VEHICLE, DayZPlayerCamera3rdPersonVehicle);
 
 		
@@ -67,6 +72,10 @@ class DayZPlayerCameras
 		RegisterTransitionTime(DAYZCAMERA_3RD_ERC_SPR, DAYZCAMERA_3RD_CRO, 0.3, false);
 		RegisterTransitionTime(DAYZCAMERA_3RD_ERC_SPR, DAYZCAMERA_3RD_PRO, 0.5, false);
 		RegisterTransitionTime(DAYZCAMERA_3RD_ERC_SPR, DAYZCAMERA_3RD_ERC_RAISED, 0.3, false);
+		RegisterTransitionTime(DAYZCAMERA_3RD_ERC_SPR, DAYZCAMERA_3RD_JUMP, 0.1, false);
+		RegisterTransitionTime(DAYZCAMERA_3RD_JUMP, DAYZCAMERA_3RD_ERC_SPR, 0.2, false);
+		RegisterTransitionTime(DAYZCAMERA_3RD_ERC, DAYZCAMERA_3RD_JUMP, 0.05, false);
+		RegisterTransitionTime(DAYZCAMERA_3RD_JUMP, DAYZCAMERA_3RD_ERC, 0.3, false);
 
 		//! 3rd person crouch camera transitions
 		RegisterTransitionTime(DAYZCAMERA_3RD_CRO, DAYZCAMERA_3RD_ERC, 0.4, false);

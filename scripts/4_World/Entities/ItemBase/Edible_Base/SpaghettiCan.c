@@ -7,7 +7,7 @@ class SpaghettiCan : Edible_Base
 	
 	override void Open()
 	{
-		m_Opened = true;
+		super.Open();
 		ReplaceEdibleWithNew("SpaghettiCan_Opened");
 	}
 }

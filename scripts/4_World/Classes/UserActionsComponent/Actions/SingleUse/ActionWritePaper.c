@@ -15,6 +15,7 @@ class ActionWritePaper: ActionContinuousBase
 		m_CallbackClass = ActionWritePaperCB;
 		m_MessageSuccess = "I broke chemlight.";
 		m_MessageFail = "It's out of energy";
+		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 		//m_Animation = "break";
 	}
 	
@@ -48,7 +49,7 @@ class ActionWritePaper: ActionContinuousBase
 		return "#write_note";
 	}
 
-	override void OnCompleteClient( ActionData action_data )
+	override void OnFinishProgressClient( ActionData action_data )
 	{
 		//which is pen and which paper
 		if (action_data.m_Target.GetObject().ConfigIsExisting("writingColor"))
@@ -62,5 +63,10 @@ class ActionWritePaper: ActionContinuousBase
 			action_data.m_Player.m_paper = EntityAI.Cast(action_data.m_Target.GetObject());
 		}
 		action_data.m_Player.enterNoteMenuWrite = true;
+	}
+	
+	override void OnFinishProgressServer( ActionData action_data )
+	{
+		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

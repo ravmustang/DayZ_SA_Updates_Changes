@@ -20,8 +20,6 @@ class FoodStage
 	protected int m_TextureIndex;
 	protected int m_MaterialIndex;
 	
-	protected ref array<string> m_Modifiers;
-	
 	protected float m_CookingTime;
 	
 	//constructor
@@ -53,10 +51,6 @@ class FoodStage
 			SetTextureIndex( visual_properties.Get( 1 ) );
 			SetMaterialIndex( visual_properties.Get( 2 ) );
 		}
-		
-		//modifiers
-		m_Modifiers = new array<string>;
-		GetGame().ConfigGetTextArray( config_path + " " + "modifiers", m_Modifiers );
 	}
 	
 	//Food Stage Type
@@ -171,17 +165,6 @@ class FoodStage
 	float GetToxicity()
 	{
 		return GetNutritionPropertyFromIndex( 4 );
-	}
-	
-	//Modifiers
-	array<string> GetModifiers()
-	{
-		if ( !m_Modifiers )
-		{
-			m_Modifiers = new array<string>;
-		}
-		
-		return m_Modifiers;
 	}
 	
 	//Food item

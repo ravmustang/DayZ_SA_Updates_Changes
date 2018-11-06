@@ -15,7 +15,7 @@ class ActionZoomIn: ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "Zoom in";
+		return "#zoom_in";
 	}
 
 	override bool HasTarget()
@@ -33,7 +33,7 @@ class ActionZoomIn: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		ItemOptics optic;
 		if( Class.CastTo(optic, action_data.m_MainItem) )

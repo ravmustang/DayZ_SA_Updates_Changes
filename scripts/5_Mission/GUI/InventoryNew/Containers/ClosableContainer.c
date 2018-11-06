@@ -1,14 +1,12 @@
-class ClosableContainer: Container
+class ClosableContainer extends Container
 {
 	protected bool m_Closed;
 	protected EntityAI m_Entity;
 
-	void ClosableContainer( ContainerBase parent )
+	void ClosableContainer( LayoutHolder parent )
 	{
-		m_Body = new array<ref ContainerBase>;
+		m_Body = new array<ref LayoutHolder>;
 		m_Body.Insert( new ClosableHeader( this, "CloseButtonOnMouseButtonDown" ) );
-		
-		m_MainPanel.GetScript( m_Spacer );
 	}
 
 	void Open()
@@ -17,7 +15,6 @@ class ClosableContainer: Container
 		m_Closed = false;
 		OnShow();
 		m_Parent.m_Parent.Refresh();
-		( Container.Cast( m_Parent.m_Parent ) ).UpdateBodySpacers();
 	}
 	
 	void SetOpenState( bool state )
@@ -32,7 +29,6 @@ class ClosableContainer: Container
 		{
 			OnHide();
 		}
-		(Container.Cast( m_Parent.m_Parent ) ).UpdateBodySpacers();
 	}
 
 	void Close()
@@ -40,7 +36,6 @@ class ClosableContainer: Container
 		ItemManager.GetInstance().SetDefaultOpenState( m_Entity.GetType(), false );
 		m_Closed = true;
 		this.OnHide();
-		( Container.Cast( m_Parent.m_Parent ) ).UpdateBodySpacers();
 	}
 
 	bool IsOpened()
@@ -61,12 +56,12 @@ class ClosableContainer: Container
 		}
 	}
 
-	override void Insert( ContainerBase container )
+	override void Insert( LayoutHolder container )
 	{
 		m_Body.Insert( container );
 	}
 
-	override ContainerBase Get( int x )
+	override LayoutHolder Get( int x )
 	{
 		if( m_Body && x < m_Body.Count() && x >= 0 )
 			return m_Body.Get( x );

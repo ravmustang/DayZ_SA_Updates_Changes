@@ -7,7 +7,7 @@ class BuildingWithFireplace extends Building
 	{
 		m_FireplacePoints = new array<ref FireplacePoint>;
 		m_FireplacePoints.Insert( new FireplacePoint( "fireplace_action1", "fireplace_point1", "fireplace_smoke1", NULL, this ) );
-		m_FireplacePoints.Insert( new FireplacePoint( "fireplace_action1", "fireplace_point2", "fireplace_smoke2", NULL, this ) );
+		m_FireplacePoints.Insert( new FireplacePoint( "fireplace_action2", "fireplace_point2", "fireplace_smoke2", NULL, this ) );
 	}
 	
 	//fireplace indoor

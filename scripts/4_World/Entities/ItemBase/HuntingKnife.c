@@ -1,0 +1,4 @@
+class HuntingKnife extends ToolBase
+{
+	
+}

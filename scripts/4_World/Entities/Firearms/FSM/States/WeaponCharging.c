@@ -13,10 +13,6 @@ class WeaponCharging extends WeaponStateBase
 	ref WeaponCharging_CK m_onCK;
 	ref WeaponChamberFromAttMag_W4T m_chamber;
 
-	void ~WeaponCharging()
-	{
-	}
-
 	void WeaponCharging (Weapon_Base w = NULL, WeaponStateBase parent = NULL, WeaponActions action = WeaponActions.NONE, int actionType = -1)
 	{
 		m_action = action;
@@ -29,7 +25,7 @@ class WeaponCharging extends WeaponStateBase
 		m_hideB = new BulletHide_W4T(m_weapon, this);
 		m_onCK = new WeaponCharging_CK(m_weapon, this);
 		m_chamber = new WeaponChamberFromAttMag_W4T(m_weapon, this);
-		
+
 		// events
 		WeaponEventBase __be_ = new WeaponEventAnimBulletEject;
 		WeaponEventBase __bh_ = new WeaponEventAnimBulletHide;
@@ -109,6 +105,33 @@ class WeaponEjectBullet_Cartridge extends WeaponStateBase
 		m_dstMagazine = NULL;
 		super.OnExit(e);
 	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponEjectBullet_Cartridge.SaveCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponEjectBullet_Cartridge.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
 };
 
 class WeaponEjectBullet_Cartridge_W4T extends WeaponEjectBullet_Cartridge

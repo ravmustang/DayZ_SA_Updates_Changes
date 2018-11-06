@@ -1,0 +1,3 @@
+class CamoNet extends ItemBase
+{
+}

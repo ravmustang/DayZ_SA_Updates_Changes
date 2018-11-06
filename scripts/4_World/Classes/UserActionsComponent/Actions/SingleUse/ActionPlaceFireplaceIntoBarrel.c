@@ -44,7 +44,7 @@ class ActionPlaceFireplaceIntoBarrel: ActionSingleUseBase
 		return false;
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		FireplaceBase fireplace_in_hands = FireplaceBase.Cast( action_data.m_MainItem );
 		

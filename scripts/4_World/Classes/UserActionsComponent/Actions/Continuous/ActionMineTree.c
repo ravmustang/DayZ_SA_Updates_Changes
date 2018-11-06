@@ -5,7 +5,7 @@ class ActionMineTreeCB : ActionContinuousBaseCB
 	override void CreateActionComponent()
 	{
 		m_ActionData.m_ActionComponent = new CAContinuousMineWood(TIME_BETWEEN_MATERIAL_DROPS);
-	}
+	} 
 };
 
 class ActionMineTree: ActionContinuousBase
@@ -20,7 +20,7 @@ class ActionMineTree: ActionContinuousBase
 		m_MessageStart = "I started cutting down the tree.";
 		m_MessageSuccess = "I have cut down the tree.";
 		m_MessageFail = "My tool is ruined.";
-		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_HIGH;
+		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
 	
 	override void CreateConditionComponents()  
@@ -36,30 +36,36 @@ class ActionMineTree: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Cut tree down";
+		return "#cut_down_tree";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
 		Object targetObject = target.GetObject();
+		
 		if ( targetObject.IsTree() )
 		{ 
 			return true;
 		}
+		
 		return false;
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{			
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
-		GetGame().ObjectDelete(action_data.m_Target.GetObject());
+		// TODO switch WoodenPlank item for logs, once those are ready
+		//ItemBase wooden_logs = ItemBase.Cast(GetGame().CreateObject("WoodenPlank",action_data.m_Player.GetPosition(), false));
+		//wooden_logs.SetQuantity(1);
+		
+		// "hiding" of map item
+		//action_data.m_Target.GetObject().SetOrigin("0 0 0");
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
+	override void OnFinishProgressClient( ActionData action_data )
 	{
-		if (action_data && action_data.m_Target)
+		/*if (action_data && action_data.m_Target)
 		{
-			GetGame().ObjectDelete(action_data.m_Target.GetObject());
-		}
+		}*/
 	}
 };

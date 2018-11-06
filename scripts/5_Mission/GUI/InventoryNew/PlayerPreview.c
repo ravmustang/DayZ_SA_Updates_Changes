@@ -1,4 +1,4 @@
-class PlayerPreview: ContainerBase
+class PlayerPreview: LayoutHolder
 {
 	protected PlayerPreviewWidget m_CharacterPanelWidget;
 
@@ -7,16 +7,16 @@ class PlayerPreview: ContainerBase
 	protected int m_CharacterScaleDelta;
 	protected vector m_CharacterOrientation;
 	
-	void PlayerPreview( ContainerBase parent )
+	void PlayerPreview( LayoutHolder parent )
 	{
-		m_CharacterPanelWidget = PlayerPreviewWidget.Cast( m_Parent.GetMainPanel().FindAnyWidget( "CharacterPanelWidget" ) );
+		m_CharacterPanelWidget = PlayerPreviewWidget.Cast( m_Parent.GetMainWidget().FindAnyWidget( "CharacterPanelWidget" ) );
 
-		WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( m_Parent.GetMainPanel().FindAnyWidget( "CharacterPanel" ),  this, "MouseButtonDown" );
-		WidgetEventHandler.GetInstance().RegisterOnMouseWheel( m_Parent.GetMainPanel().FindAnyWidget( "CharacterPanel" ),  this, "MouseWheel" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( m_Parent.GetMainWidget().FindAnyWidget( "CharacterPanel" ),  this, "MouseButtonDown" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseWheel( m_Parent.GetMainWidget().FindAnyWidget( "CharacterPanel" ),  this, "MouseWheel" );
 		
 		m_CharacterScaleDelta = 1;
 		m_CharacterPanelWidget.SetPlayer( GetGame().GetPlayer() );
-		m_CharacterPanelWidget.SetModelPosition( "0 -1 0.605" );
+		m_CharacterPanelWidget.SetModelPosition( "0 0 0.605" );
 		m_CharacterPanelWidget.SetSize( 1.34, 1.34 );  // default scale
 		UpdateScale();
 	}

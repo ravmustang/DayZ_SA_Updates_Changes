@@ -31,7 +31,7 @@ class ActionDrinkWellContinuous: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Drink";
+		return "#drink";
 	}
 	
 	override void CreateConditionComponents()  
@@ -58,15 +58,15 @@ class ActionDrinkWellContinuous: ActionContinuousBase
 		return false;
 	}
 	
-	override void OnRepeatServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
 		float amount = nacdata.param1 * WATER_DRANK_PER_SEC;
 		action_data.m_Player.Consume(NULL,amount, EConsumeType.ENVIRO_WELL);
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
-		OnRepeatServer(action_data);
+		OnFinishProgressServer(action_data);
 	}
 };

@@ -27,28 +27,39 @@ class InventorySlots
 	 * i.e. it does NOT look at name= or displayName= attributes of the entry!
 	 **/
 	static proto native int GetSlotIdFromString (string slot_name);
-	/**@fn		GetStackMaxForSlotId
-	 * @param[in]	slot_id	\p	queried slot
-	 * @return	stackMax attribute from corresponding entry (or default value == 1)
-	 **/
-	static proto native int GetStackMaxForSlotId (int slot_Id);
-	/**@fn		GetSelectionForSlotId
-	 * @param[in]	slot_id	\p	queried slot
-	 * @param[out]	selection	\p	selection filled with attribute from corresponding entry
-	 * @return	true if slot valid
-	 **/
-	static proto bool GetSelectionForSlotId (int slot_Id, out string selection);
 	/**@fn		IsSlotIdValid
 	 * @brief	verifies existence of the slot id
 	 * @return	true if slot valid
 	 **/
 	static proto native bool IsSlotIdValid (int slot_Id);
+	/**@fn		GetStackMaxForSlotId
+	 * @param[in]	slot_id	\p	queried slot
+	 * @return	stackMax attribute from corresponding entry (or default value == 1)
+	 **/
+	static proto native int GetStackMaxForSlotId (int slot_Id);
+	/**@fn		GetShowForSlotId
+	 * @param[in]	slot_id	\p	queried slot
+	 * @return	show attribute from corresponding entry (or default value == true)
+	 **/
+	static proto native bool GetShowForSlotId (int slot_Id);
+	/**@fn		GetAutoAttachForSlotId
+	 * @param[in]	slot_id	\p	queried slot
+	 * @return	auto attach attribute from corresponding entry (or default value == 1)
+	 **/
+	static proto native bool GetAutoAttachForSlotId (int slot_Id);
 	/**@fn		GetBoneNameForSlotId
 	 * @param[in]	slot_id	\p	queried slot
 	 * @param[out]	bone_name	\p	selection filled with attribute from corresponding entry
 	 * @return	true if slot valid
 	 **/	
 	static proto bool GetBoneNameForSlotId (int slot_Id, out string bone_name);
+	/**@fn		GetSelectionForSlotId
+	 * @param[in]	slot_id	\p	queried slot
+	 * @param[out]	selection	\p	selection filled with attribute from corresponding entry
+	 * @return	true if slot valid
+	 **/
+	static proto bool GetSelectionForSlotId (int slot_Id, out string selection);
+
 	/**@fn		GetBoneIndexForSlotId
 	 * @param[in]	slot_id	\p	queried slot
 	 * @return	stackMax attribute from corresponding entry (or default value == 1)

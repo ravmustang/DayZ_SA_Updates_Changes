@@ -50,7 +50,7 @@ class Paper extends ItemBase
 		}
 		if (rpc_type == ERPCs.RPC_READ_NOTE)
 		{
-			Print("reading");
+			//Print("reading");
 			array<ref WritePaperParams> new_AdvancedText = new array<ref WritePaperParams>;
 			PaperParams paramsRead = new PaperParams(null);
 			if (ctx.Read(paramsRead))

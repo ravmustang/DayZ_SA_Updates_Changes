@@ -38,7 +38,8 @@ class CAContinuousRepeatStartEngine : CAContinuousRepeat
 			m_SpentUnits.param1 = m_TimeElpased;
 			SetACData(m_SpentUnits);
 			m_TimeElpased = 0;
-			return UA_REPEAT;
+			OnCompletePogress(action_data);
+			return UA_PROCESSING;
 		}
 	}
 };

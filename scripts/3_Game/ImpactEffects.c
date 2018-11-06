@@ -13,6 +13,9 @@ class ImpactMaterials
 	static int 							m_LastRegisteredMaterial = 0;
 	
 	// Surface effects. Register all materials here!
+	static int PLASTIC	 					= RegisterSurface("Hit_Plastic");
+	static int SAND 						= RegisterSurface("Hit_Sand");
+	static int TEXTILE 						= RegisterSurface("Hit_Textile");
 	static int CONCRETE 					= RegisterSurface("Hit_Concrete");
 	static int GRAVEL 						= RegisterSurface("Hit_Gravel");
 	static int DIRT 						= RegisterSurface("Hit_Dirt");
@@ -69,7 +72,7 @@ class ImpactMaterials
 		if (isWater)
 			surface = "Hit_Water";
 		
-		EffBulletImpactBase eff = GetImpactEffect(surface, ammoType).Spawn();
+		EffBulletImpactBase eff = EffBulletImpactBase.Cast(GetImpactEffect(surface, ammoType).Spawn());
 		
 		if (!eff  &&  surface == "") // handle undefined surface
 		{
@@ -98,7 +101,7 @@ class ImpactMaterials
 					string error2 = "Error! Object '" + object_type + "' with model file: " + directHit.GetModelName() + ".p3d has undefined 'Hit_...' material! Thus cannot play appropriate impact effect.";
 					Print(error2);
 					string undefined_surface = "Hit_ErrorNoMaterial";
-					eff = GetImpactEffect(undefined_surface, ammoType).Spawn();
+					eff = EffBulletImpactBase.Cast(GetImpactEffect(undefined_surface, ammoType).Spawn());
 				}
 			}
 		}
@@ -108,7 +111,7 @@ class ImpactMaterials
 			string error_mat = "ERROR! Unregistered surface impact material <" + surface + ">! Register this material in the Surface Effects list in ImpactEffects.c!";
 			Print(error_mat);
 			surface = "Hit_Undefined";
-			eff = GetImpactEffect(surface, ammoType).Spawn();
+			eff = EffBulletImpactBase.Cast(GetImpactEffect(surface, ammoType).Spawn());
 		}
 		
 		if (eff)

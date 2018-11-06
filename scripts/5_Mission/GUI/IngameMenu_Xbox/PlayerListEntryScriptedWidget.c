@@ -1,16 +1,19 @@
 class PlayerListEntryScriptedWidget extends ScriptedWidgetEventHandler
 {
-	protected string		m_Name;
-	protected string		m_UID;
-	protected bool			m_Mute;
-	protected bool			m_GlobalMute;
+	protected string					m_Name;
+	protected string					m_UID;
+	protected bool						m_Mute;
+	protected bool						m_GlobalMute;
 	
-	protected Widget		m_Root;
-	protected TextWidget	m_PlayerName;
-	protected ImageWidget	m_PlayerAvatar;
-	protected ImageWidget	m_MicrophoneIcon;
-	protected ImageWidget	m_MuteIcon;
-	protected ButtonWidget	m_PlayerButton;
+	protected Widget					m_Root;
+	protected TextWidget				m_PlayerName;
+	protected ImageWidget				m_PlayerAvatar;
+	protected ImageWidget				m_MicrophoneIcon;
+	protected ImageWidget				m_MuteIcon;
+	protected ButtonWidget				m_PlayerButton;
+	
+	protected PlayerListScriptedWidget	m_Tab;
+	protected bool						m_Selected;
 	
 	void PlayerListEntryScriptedWidget( Widget parent, string name, string uid, bool show_permissions )
 	{
@@ -76,5 +79,66 @@ class PlayerListEntryScriptedWidget extends ScriptedWidgetEventHandler
 			m_MuteIcon.Show( m_Mute );
 		else
 			m_MuteIcon.Show( true );
+	}
+	
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		return false;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		return false;
+	}
+	
+	void Focus()
+	{
+		OnFocus( m_Root, 0, 0 );
+	}
+	
+	override bool OnFocus( Widget w, int x, int y )
+	{
+		if( !m_Selected )
+		{
+			#ifdef PLATFORM_CONSOLE
+			if( w == m_Root )
+			{
+				Select();
+			}
+			#endif
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocusLost( Widget w, int x, int y )
+	{
+		#ifdef PLATFORM_CONSOLE
+		if( w == m_Root )
+		{
+			Deselect();
+		}
+		#endif
+		return false;
+	}
+	
+	void Select( bool notify = true )
+	{
+		if( !m_Selected )
+		{
+			if( notify )
+			{
+				m_Tab.SelectPlayer( this );
+			}
+			m_Selected = true;
+		}
+	}
+	
+	void Deselect()
+	{
+		if( m_Selected )
+		{
+			m_Selected = false;
+		}
 	}
 }

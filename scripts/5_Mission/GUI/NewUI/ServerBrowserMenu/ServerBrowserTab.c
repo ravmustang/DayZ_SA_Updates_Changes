@@ -2,7 +2,8 @@ enum TabType
 {
 	OFFICIAL,
 	COMMUNITY,
-	LAN
+	LAN,
+	NONE
 }
 
 enum SelectedPanel
@@ -12,53 +13,15 @@ enum SelectedPanel
 	MENU
 }
 
-class ServerBrowserPage
-{
-	Widget m_Root;
-	
-	void ServerBrowserPage( int index, Widget parent )
-	{
-		m_Root		= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/server_browser_list_page.layout", parent );
-		m_Root.SetName( "page_" + index );
-		m_Root.SetSort( index );
-	}
-	
-	void ~ServerBrowserPage()
-	{
-		delete m_Root;
-	}
-	
-	void Show()
-	{
-		m_Root.Show( true );
-	}
-	
-	void Hide()
-	{
-		if (!m_Root)
-			return;
-		
-		m_Root.Show( false );
-	}
-	
-	float GetYPos()
-	{
-		float x, y;
-		m_Root.GetScreenPos( x, y );
-		return y;
-	}
-}
-
 class ServerBrowserTab extends ScriptedWidgetEventHandler
 {
 	protected Widget										m_Root;
 	protected ScrollWidget									m_ServerListScroller;
 	protected Widget										m_ServerList;
 	
-	 ref map<int, ref GetServersResultRowArray>	m_Entries;
+	protected ref map<int, ref GetServersResultRowArray>	m_Entries;
 	
-	 ref array<ref ServerBrowserPage>				m_Pages;
-	 ref map<string, ref ServerBrowserEntry>				m_EntryWidgets;
+	protected ref map<string, ref ServerBrowserEntry>		m_EntryWidgets;
 
 	protected ref ServerBrowserFilterContainer				m_Filters;
 	
@@ -70,9 +33,9 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	protected ESortOrder									m_SortOrder;
 	
 	protected SelectedPanel									m_SelectedPanel;
-	 bool											m_Initialized;
-	 bool											m_BegunLoading;
-	 bool											m_Loading;
+	protected bool											m_Initialized;
+	protected bool											m_BegunLoading;
+	protected bool											m_Loading;
 	protected int											m_TotalServers;
 	protected int											m_TotalLoadedServers;
 	protected int											m_LastLoadedPage;
@@ -106,12 +69,15 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_ServerListScroller.VScrollToPos01( 0 );
 		
 		m_Entries				= new map<int, ref GetServersResultRowArray>;
-		m_Pages					= new array<ref ServerBrowserPage>;
 		m_EntryWidgets			= new map<string, ref ServerBrowserEntry>;
 		m_Menu					= menu;
 		m_TabType				= type;
 		
+		if( type == TabType.LAN )
+			m_Root.FindAnyWidget( "filters_content" ).Show( false );
+		
 		m_Filters				= new ServerBrowserFilterContainer( m_Root.FindAnyWidget( "filters_content" ), this );
+		
 		m_ApplyFilter			= m_Root.FindAnyWidget( "apply_filter_button" );
 		m_RefreshList			= m_Root.FindAnyWidget( "refresh_list_button" );
 		m_HostSort				= m_Root.FindAnyWidget( "server_list_content_header_host" );
@@ -121,16 +87,50 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_PingSort				= m_Root.FindAnyWidget( "server_list_content_header_ping" );
 		m_LoadingText			= TextWidget.Cast( m_Root.FindAnyWidget( "loading_servers_info" ) );
 		
+		SelectHostSort();
+		
 		m_Root.SetHandler( this );
 	}
 	
 	void ~ServerBrowserTab()
 	{
-		if (m_Filters)
+		if( m_Filters )
 			m_Filters.SaveFilters();
 		
-		if (m_Root)
+		if(m_Root)
 			delete m_Root;
+	}
+	
+	void LoadFakeData( int entries )
+	{
+		ref GetServersResult result = new GetServersResult;
+		
+		result.m_Page = 1;
+		result.m_Pages = 1;
+		result.m_Results = new GetServersResultRowArray;
+		
+		for( int i = 0; i < entries; i++ )
+		{
+			ref GetServersResultRow row = new GetServersResultRow;
+			row.m_Id = "#server_browser_tab_id" + i.ToString();
+			row.m_Name = "#server_browser_tab_server" + i.ToString();
+			row.m_Official = true;
+			row.m_MaxPlayers = 10;
+			row.m_MinPlayers = 0;
+			row.m_CurrentNumberPlayers = 0;
+			
+			result.m_Results.Insert( row );
+		}
+		
+		m_Menu.SetRefreshing( m_TabType );
+		m_Initialized = true;
+		m_BegunLoading = false;
+		
+		m_Entries.Clear();
+		m_EntryWidgets.Clear();
+		
+		m_Loading = true;
+		OnLoadServersAsync( result, EBiosError.OK, "" );
 	}
 	
 	override bool OnClick( Widget w, int x, int y, int button )
@@ -212,7 +212,16 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			float x_s, y_s;
 			float x_l, y_l;
 			
-			Widget root = entry.GetRoot();
+			Widget root			= entry.GetRoot();
+			Widget first_child	= root.GetParent().GetChildren();
+			Widget last_child	= first_child;
+			while( last_child )
+			{
+				if( last_child.GetSibling() )
+					last_child = last_child.GetSibling();
+				else
+					break;
+			}
 			
 			root.GetParent().Update();
 			root.Update();
@@ -225,7 +234,15 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			root.GetScreenPos( x_l, y_l );
 			root.GetScreenSize( x_s, y_s );
 			
-			if( y_l + y_s >= bottom_pos )
+			if( root == first_child )
+			{
+				m_ServerListScroller.VScrollToPos01( 0 );
+			}
+			else if( root == last_child )
+			{
+				m_ServerListScroller.VScrollToPos01( 1 );
+			}
+			else if( y_l + y_s >= bottom_pos )
 			{
 				m_ServerListScroller.VScrollToPos( m_ServerListScroller.GetVScrollPos() + y_s );
 			}
@@ -283,7 +300,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_ApplyFilter || w == m_RefreshList );
+		if( w )
+		{
+			return ( w == m_ApplyFilter || w == m_RefreshList );
+		}
+		return false;
 	}
 	
 	void SetPanelFocus()
@@ -298,13 +319,13 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void PressX()
 	{
-		if( !m_Menu.IsRefreshing() )
+		if( m_Menu.IsRefreshing() == TabType.NONE )
 			RefreshList();
 	}
 	
 	void PressY()
 	{
-		if(m_Menu.IsRefreshing() )
+		if( m_Menu.IsRefreshing() != TabType.NONE )
 			return;
 
 		switch( m_SelectedPanel )
@@ -319,7 +340,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			}
 			case SelectedPanel.FILTERS:
 			{
-				m_Filters.ResetFilters();
+				if( m_Filters )
+					m_Filters.ResetFilters();
 				break;
 			}
 		}
@@ -337,12 +359,10 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void Up()
 	{
-		
 	}
 	
 	void Down()
 	{
-		
 	}
 	
 	void GetNextEntry()
@@ -359,7 +379,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			if( sibling )
 				SetFocus( focused.GetSibling() );
 			else
-				SetFocus( focused.GetParent().GetChildren() );
+				SetFocus( focused.GetParent().GetSibling().GetChildren() );
 		}
 	}
 	
@@ -409,7 +429,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void RefreshList()
 	{
-		m_Menu.SetRefreshing( true );
+		m_Menu.SetRefreshing( m_TabType );
 		m_Initialized = true;
 		m_BegunLoading = false;
 		m_LastLoadedPage = 0;
@@ -418,12 +438,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_TotalLoadedServers = 0;
 		m_CurrentLoadedPage = 0;
 		m_Entries.Clear();
-		m_Pages.Clear();
 		m_EntryWidgets.Clear();
 		
 		m_CurrentFilterInput = m_Filters.GetFilterOptions();
 		m_CurrentFilterInput.m_Page = 0;
-		m_CurrentFilterInput.m_SortBy = GetSortOption();
+		//m_CurrentFilterInput.m_SortBy = GetSortOption();
 		m_CurrentFilterInput.m_SortOrder = m_SortOrder;
 		
 		m_Loading = true;
@@ -443,7 +462,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			}
 			case TabType.LAN:
 			{
-				
+				m_CurrentFilterInput.SetLAN();
+				OnlineServices.LoadServers( m_CurrentFilterInput );
 				break;
 			}
 		}
@@ -461,22 +481,10 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void SelectServer( ServerBrowserEntry server )
 	{
-		/*
 		#ifdef PLATFORM_CONSOLE
-			if( m_SelectedServer && m_EntryWidgets.Contains( m_SelectedServer.GetServerID() ) )
-			{
-				//m_SelectedServer.Lighten( m_SelectedServer.GetRoot(), server.GetRoot(), 0, 0 );
-				//m_SelectedServer.Select( false );
-				//m_SelectedServer.ServerListFocus( true );
-				return;
-			}
-			else
-			{
-				ScrollToEntry( server );
-			}
-		#endif
-		*/
 		ScrollToEntry( server );
+		#endif
+		
 		m_SelectedServer = server;
 		
 		if (!m_Menu)
@@ -485,16 +493,54 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_Menu.SelectServer( server );
 	}
 	
+	void OnLoadServersAsyncPC( ref GetServersResult result_list, EBiosError error, string response )
+	{
+		if( result_list )
+		{
+			if( result_list.m_Results.Count() > 0 )
+			{
+				m_Entries.Insert( result_list.m_Page, result_list.m_Results );
+				foreach( GetServersResultRow result : result_list.m_Results )
+				{
+					if( PassFilter( result ) )
+					{
+						ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, m_TotalLoadedServers, this );
+						entry.FillInfo( result );
+						entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
+						m_EntryWidgets.Insert( result.m_Id, entry );
+						m_TotalLoadedServers++;
+						m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+					}
+					
+					if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
+						return;
+				}
+			}
+			else
+			{
+				m_LoadingText.SetText( "Finished loading " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+				m_Menu.SetRefreshing( TabType.NONE );
+			}
+			m_ServerList.Update();
+
+		}
+		else
+		{
+			m_LoadingText.SetText( "Finished loading " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+			m_Menu.SetRefreshing( TabType.NONE );
+		}
+	}
+	
 	void OnLoadServersAsync( ref GetServersResult result_list, EBiosError error, string response )
 	{
-		if( !result_list || result_list.m_Pages == 0 )
+		if( m_Menu.IsRefreshing() != m_TabType || !result_list )
 		{
-			m_Menu.SetRefreshing( false );
-			string text = "Unable to get servers, ";
+			m_Menu.SetRefreshing( TabType.NONE );
+			string text = "#server_browser_tab_unable_to_get_server";
 			if( !result_list )
 				text += ( "Error code: " + error );
 			else
-				text += "there are no servers available with your current filter settings.";
+				text += "#server_browser_tab_no_servers_with_filter";
 			m_LoadingText.SetText( text );
 			#ifdef PLATFORM_XBOX
 				m_Filters.Focus();
@@ -505,38 +551,65 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		if( result_list.m_Page == 1 )
 		{
 			m_TotalPages = result_list.m_Pages;
+			
+			#ifdef PLATFORM_CONSOLE
 			m_TotalServers = Math.Clamp( ( result_list.m_Pages - 1 ) * SERVER_BROWSER_PAGE_SIZE, 0, 10000000 );
-			for( int i = 1; i <= m_TotalPages; i++ )
-			{
-				m_Pages.Insert( new ServerBrowserPage( i, m_ServerList ) );
-			}
-			m_LoadingText.SetText( "Loaded " + m_TotalLoadedServers + "/" + m_TotalServers + " servers" );
+			#else
+			m_TotalServers = 0;
+			#endif
+			
+			m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_TotalServers + " " +  "#server_browser_servers_desc" );
 		}
 		
+		#ifndef PLATFORM_CONSOLE
+		m_TotalPages = result_list.m_Pages;
+		#endif
+
 		m_LastLoadedPage = result_list.m_Page;
 		m_Entries.Insert( result_list.m_Page, result_list.m_Results );
 		
+
+		#ifdef PLATFORM_CONSOLE
 		if( m_LastLoadedPage == m_TotalPages )
 		{
 			m_TotalServers += result_list.m_Results.Count();
 		}
-		if( m_TotalPages > m_LastLoadedPage )
-			GetNextPage();
+		#else
+		m_TotalServers += result_list.m_Results.Count();
+		#endif
 		
-		if( !m_BegunLoading && m_TotalPages > 0 )
+		#ifdef PLATFORM_CONSOLE
+		if( m_TotalPages > m_LastLoadedPage )
 		{
-			m_BegunLoading = true;
+			GetNextPage();
+		}
+		#endif
+		
+		#ifdef PLATFORM_CONSOLE
+		if( m_TotalPages > 0 )
+		{
 			GetGame().GameScript.Call( this, "LoadEntries", new Param2<int, int>( 1, m_TotalPages ) );
 		}
+		#endif
 	}
 	
+	bool IsPingInRange( int ping, string max_ping )
+	{
+		int max = max_ping.Substring( 1, max_ping.Length() - 1 ).ToInt();
+		
+		if( ping < max )
+			return true;
+		return false;
+	}
+		
 	bool PassFilter( GetServersResultRow result )
 	{	
-		if (!m_Menu || !m_Menu.IsRefreshing())
+		if ( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
 			return false;
 		
-		bool is_fav = m_Menu.IsFavorited( result.m_Id );
-		bool is_vis = g_Game.IsVisited( result.m_HostIp, result.m_HostPort );
+		bool is_fav		= m_Menu.IsFavorited( result.m_Id );
+		bool is_vis		= g_Game.IsVisited( result.m_HostIp, result.m_HostPort );
+		bool is_ping	= IsPingInRange( result.m_Ping, m_Filters.m_PingFilter.GetStringValue() );
 		
 		if( m_Filters.m_FavoritedFilter.IsSet() )
 		{
@@ -546,6 +619,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		if( m_Filters.m_PreviouslyPlayedFilter.IsSet() )
 		{
 			if( is_vis != m_Filters.m_PreviouslyPlayedFilter.IsEnabled() )
+				return false;
+		}
+		if( m_Filters.m_PingFilter.IsSet() )
+		{
+			if( !is_ping )
 				return false;
 		}
 		return true;
@@ -558,7 +636,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		for( int i = start_page; i <= end_page; i )
 		{
-			if( !m_Menu || !m_Menu.IsRefreshing() )
+			if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
 				return;
 			ref GetServersResultRowArray results = m_Entries.Get( i );
 			int index;
@@ -568,16 +646,15 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				{
 					if( PassFilter( result ) )
 					{
-						ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList.FindAnyWidget( "page_" + i ), index, this );
+						ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
 						entry.FillInfo( result );
 						entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
 						m_EntryWidgets.Insert( result.m_Id, entry );
 						index++;
-						m_TotalLoadedServers++;
-						m_LoadingText.SetText( "Loaded " + m_TotalLoadedServers + "/" + m_TotalServers + " servers" );
+						m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_TotalServers + " " + "#server_browser_servers_desc" );
 					}
 					
-					if( !m_Menu || !m_Menu.IsRefreshing() )
+					if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
 						return;
 					
 					if( index % 10 == 0 )
@@ -585,10 +662,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 						Sleep( 0.01 );
 					}
 				}
-				
-				m_ServerList.FindAnyWidget( "page_" + i ).Update();
-				if( i > 2 )
-					m_Pages.Get( i - 1 ).Hide();
+
 				m_ServerList.Update();
 				i++;
 			}
@@ -605,62 +679,34 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			if( m_Entries.Count() > 0 )
 			{
 				GetServersResultRowArray res = m_Entries.GetElement( 0 );
-				if( res && res.Count() > 0 )
+				if( res && res.Count() > 0 && m_EntryWidgets.Get( res.Get( 0 ).m_Id ) )
 					m_EntryWidgets.Get( res.Get( 0 ).m_Id ).Focus();
 			}
 		}
 		else
 		{
-			m_LoadingText.SetText( "Unable to get servers, there are no servers available with your current filter settings." );
+			m_LoadingText.SetText( "#server_browser_unable_with_filter" );
 			m_Filters.Focus();
 		}
 		
 		if (!m_Menu)
 			return;
-		m_Menu.SetRefreshing( false );
+		
+		m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+		m_Menu.SetRefreshing( TabType.NONE );
 	}
 	
 	void Update( float timeslice )
 	{
-		if( m_TotalPages > 0 )
-		{
-			float pos = m_ServerListScroller.GetVScrollPos01();
-			float next_page_pos = ( m_CurrentLoadedPage + 1 ) * ( 1 / m_TotalPages );
-			float prev_page_pos = ( m_CurrentLoadedPage ) * ( 1 / m_TotalPages );
-			
-			if( pos > next_page_pos )
-			{
-				if( m_CurrentLoadedPage < m_TotalPages - 1 )
-				{
-					m_CurrentLoadedPage++;
-					if( m_CurrentLoadedPage < m_TotalPages - 1 )
-						m_Pages.Get( m_CurrentLoadedPage + 1 ).Show();
-					for( int i = m_CurrentLoadedPage - 4; i >= 0; i-- )
-						m_Pages.Get( i ).Hide();
-				}
-				m_ServerList.Update();
-			}
-			
-			if( pos <= prev_page_pos )
-			{
-				if( m_CurrentLoadedPage > 1 )
-				{
-					m_CurrentLoadedPage--;
-					m_Pages.Get( m_CurrentLoadedPage - 1 ).Show();
-					if( m_CurrentLoadedPage < m_TotalPages - 2 )
-						m_Pages.Get( m_CurrentLoadedPage + 2 ).Hide();
-				}
-				m_ServerList.Update();
-			}
-		}
+		m_ServerList.Update();
 	}
 	
 	void Connect( ServerBrowserEntry server )
 	{
-		if (!m_Menu)
+		if( !m_Menu )
 			return;
 		
-		if (m_Menu.IsRefreshing())
+		if( m_Menu.IsRefreshing() != TabType.NONE )
 			return;
 		
 		m_SelectedServer = server;
@@ -804,7 +850,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( w_name ).Show( true );
 		m_Root.FindAnyWidget( w_name + "_dsc" ).Show( !m_SortOrder );
 		m_Root.FindAnyWidget( w_name + "_asc" ).Show( m_SortOrder );
-		
 		#endif
 	}
 	

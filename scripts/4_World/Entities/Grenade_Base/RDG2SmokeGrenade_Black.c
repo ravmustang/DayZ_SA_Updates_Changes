@@ -10,8 +10,10 @@ class RDG2SmokeGrenade_Black : ItemGrenade
 		RegisterNetSyncVariableFloat("m_EM.m_Energy"); // TO DO: Do not register float energy directly, but use GetEnergy0To100() instead!
 	}
 	
-	void ~RDG2SmokeGrenade_Black()
+	override void EEDelete(EntityAI parent)
 	{
+		super.EEDelete(parent);
+		
 		if ( GetGame() )
 		{
 			if ( m_LoopSoundEntity != NULL )

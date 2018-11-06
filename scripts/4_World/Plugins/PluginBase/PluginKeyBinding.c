@@ -53,7 +53,6 @@ class PluginKeyBinding extends PluginBase
 		RegisterKeyBind(	 MENU_MAIN						,KeyCode.KC_LCONTROL	,KeyCode.KC_E		,"PluginDeveloper"		,"ToggleMissionLoader"			,"[LCtrl]+[E]"					,"Show/Hide mission loader");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_RSHIFT		,-1					,"PluginDeveloper"		,"SpawnFromClipboard"			,"[Right Shift]"				,"Spawn item from clipboard");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_INSERT		,-1					,"PluginDeveloper"		,"TeleportAtCursor"				,"[Insert]"		 				,"Teleport player to cursor position");
-		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_NEXT		,-1					,"PluginDeveloper"		,"ToggleGodModeThisPlayer"		,"[Page Down]"					,"Toggle god mode");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_HOME		,-1					,"PluginDeveloper"		,"ToggleFreeCamera"				,"[Home]"						,"Toggle free camera and teleport player to its position");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_DIVIDE		,-1					,"PluginDeveloper"		,"ToggleFreeCameraBackPos"		,"[Divide numeric]"				,"Toggle free camera, no player teleport");
 		

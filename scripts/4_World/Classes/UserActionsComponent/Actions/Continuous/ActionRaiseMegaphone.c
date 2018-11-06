@@ -4,7 +4,7 @@ class ActionRaiseMegaphoneCB : ActionContinuousBaseCB
 	
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousRepeat( REPEAT_AFTER_SEC );
+		m_ActionData.m_ActionComponent = new CAContinuousTime( -1 );
 	}
 }
 
@@ -13,8 +13,8 @@ class ActionRaiseMegaphone: ActionContinuousBase
 	void ActionRaiseMegaphone()
 	{
 		m_CallbackClass = ActionRaiseMegaphoneCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_RAISEMEGAPHONE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_RAISEMEGAPHONE;		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_RAISEITEM;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_RAISEITEM;		
 		m_MessageStartFail = "I have failed to raise the megaphone.";
 		m_MessageStart = "I have raised the megaphone.";
 		m_MessageFail = "I have failed to raise the megaphone.";
@@ -49,7 +49,7 @@ class ActionRaiseMegaphone: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Raise megaphone";
+		return "#raise_megaphone";
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -58,7 +58,7 @@ class ActionRaiseMegaphone: ActionContinuousBase
 		{
 			ItemMegaphone megaphone = ItemMegaphone.Cast( item );
 			
-			if ( megaphone ) 
+			if ( megaphone && megaphone.GetCompEM().IsWorking() ) 
 			{
 				return true;
 			}
@@ -69,16 +69,13 @@ class ActionRaiseMegaphone: ActionContinuousBase
 
 	override void OnStartServer( ActionData action_data )
 	{
-		action_data.m_MainItem.GetCompEM().SwitchOn();
+		ItemMegaphone megaphone = ItemMegaphone.Cast( action_data.m_MainItem );
+		megaphone.SetCanSpeak( true );
 	}
 		
-	override void OnCancelServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
-		action_data.m_MainItem.GetCompEM().SwitchOff();
+		ItemMegaphone megaphone = ItemMegaphone.Cast( action_data.m_MainItem );
+		megaphone.SetCanSpeak( false );
 	}
-	
-	override void OnCompleteServer( ActionData action_data )
-	{
-		action_data.m_MainItem.GetCompEM().SwitchOff();
-	}	
 }

@@ -3,6 +3,10 @@ class ActionInteractLoopBaseCB : ActionInteractBaseCB
 	
 	bool CancelCondition()
 	{
+		if ( !m_ActionData )
+		{
+			return DefaultCancelCondition();
+		}
 		//SetCommand(DayZPlayerConstants.CMD_ACTIONINT_ACTIONLOOP);
 		//Print("cancel condition enabled: " + GetState().ToString() );
 		if ( !m_Interrupted && (GetState() == STATE_LOOP_LOOP || GetState() == STATE_LOOP_LOOP2) )
@@ -35,7 +39,7 @@ class ActionInteractLoopBase : ActionInteractBase
 	void ActionInteractLoopBase() 
 	{
 		m_CallbackClass = ActionInteractLoopBaseCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BERRIES;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_HUDCursorIcon = CursorIcons.Cursor;
 	}
 };

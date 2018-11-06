@@ -35,10 +35,10 @@ class ActionTestBloodTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Test blood of target";
+		return "#test_targets_blood";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PlayerBase ntraget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );

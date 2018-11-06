@@ -20,7 +20,7 @@ class ActionLockedDoors: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Locked door";
+		return "#locked_door";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -40,7 +40,7 @@ class ActionLockedDoors: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 	}
 };

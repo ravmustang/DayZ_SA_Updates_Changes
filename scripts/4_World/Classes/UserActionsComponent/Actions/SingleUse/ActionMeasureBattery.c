@@ -36,7 +36,7 @@ class ActionMeasureBattery: ActionSingleUseBase
 		return "#lick_battery";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		
 		float energy = 0;

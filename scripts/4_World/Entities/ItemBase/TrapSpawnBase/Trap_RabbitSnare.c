@@ -2,12 +2,14 @@ class Trap_RabbitSnare extends TrapSpawnBase
 {
 	void Trap_RabbitSnare()
 	{
-		m_InitWaitTime = 120 + Math.RandomInt( 0, 300 );
-		m_UpdateWaitTime = 15;
+		//m_InitWaitTime = 120 + Math.RandomInt( 0, 300 );
+		m_InitWaitTime = 2;
+		//m_UpdateWaitTime = 15;
+		m_UpdateWaitTime = 1;
 		m_BaitNeeded = false;
 		m_IsFoldable = true;
 		m_IsUsable = true;
-		m_MinimalDistanceFromPlayersToCatch = 100;
+		m_MinimalDistanceFromPlayersToCatch = 1;
 
 		m_AnimationPhaseSet = "inventory";
 		m_AnimationPhaseTriggered = "placing";
@@ -16,29 +18,30 @@ class Trap_RabbitSnare extends TrapSpawnBase
 		m_WaterSurfaceForSetup = false;
 
 		m_SurfaceForSetup = new map<string, float>;
-		m_SurfaceForSetup.Set("cp_concrete", 0.05 );
-		m_SurfaceForSetup.Set("cp_dirt", 0.10 );
-		m_SurfaceForSetup.Set("cp_broadleaf_dense1", 0.50 );
-		m_SurfaceForSetup.Set("cp_broadleaf_dense2", 0.50 );
-		m_SurfaceForSetup.Set("cp_broadleaf_sparse1", 0.50 );
-		m_SurfaceForSetup.Set("cp_broadleaf_sparse2", 0.50 );
-		m_SurfaceForSetup.Set("cp_conifer_common1", 0.50 );
-		m_SurfaceForSetup.Set("cp_conifer_common2", 0.50 );
-		m_SurfaceForSetup.Set("cp_conifer_moss1", 0.50 );
-		m_SurfaceForSetup.Set("cp_conifer_moss2", 0.50 );
-		m_SurfaceForSetup.Set("cp_grass", 0.35 );
-		m_SurfaceForSetup.Set("cp_grass_tall", 0.35 );
-		m_SurfaceForSetup.Set("cp_gravel", 0.10 );
-		m_SurfaceForSetup.Set("cp_rock", 0.10 );
+		m_SurfaceForSetup.Set("cp_concrete", 1 );
+		m_SurfaceForSetup.Set("cp_dirt", 1 );
+		m_SurfaceForSetup.Set("cp_broadleaf_dense1", 1 );
+		m_SurfaceForSetup.Set("cp_broadleaf_dense2", 1 );
+		m_SurfaceForSetup.Set("cp_broadleaf_sparse1", 1 );
+		m_SurfaceForSetup.Set("cp_broadleaf_sparse2", 1 );
+		m_SurfaceForSetup.Set("cp_conifer_common1", 1 );
+		m_SurfaceForSetup.Set("cp_conifer_common2", 1 );
+		m_SurfaceForSetup.Set("cp_conifer_moss1", 1 );
+		m_SurfaceForSetup.Set("cp_conifer_moss2", 1 );
+		m_SurfaceForSetup.Set("cp_grass", 1 );
+		m_SurfaceForSetup.Set("cp_grass_tall", 1 );
+		m_SurfaceForSetup.Set("cp_gravel", 1 );
+		m_SurfaceForSetup.Set("cp_rock", 1 );
 		
 		m_CatchesPond = new multiMap<string, float>;
 		
 		m_CatchesSea = new multiMap<string, float>;
 		
 		m_CatchesGroundAnimal = new multiMap<string, float>;
-		m_CatchesGroundAnimal.Insert("Animal_LepusEuropaeus",1);
-		m_CatchesGroundAnimal.Insert("Animal_LepusEuropaeus",1);
-		m_CatchesGroundAnimal.Insert("Animal_LepusEuropaeus",1);
+		m_CatchesGroundAnimal.Insert("Animal_GallusGallusDomesticusF_Brown",1);
+		//m_CatchesGroundAnimal.Insert("Animal_GallusGallusDomesticusF_Spotted",1);
+		//m_CatchesGroundAnimal.Insert("Animal_GallusGallusDomesticusF_White",1);
+		//m_CatchesGroundAnimal.Insert("Animal_LepusEuropaeus",1); Temporarily removed because rabbits don't sppawn now. Used Gallus Gallus as a placeholder.
 	}
 	
 	override bool IsOneHandedBehaviour()
@@ -50,6 +53,11 @@ class Trap_RabbitSnare extends TrapSpawnBase
 	{
 		return true;
 	}
+	
+	override string GetDeploySoundset()
+	{
+		return "rabbitsnare_deploy_SoundSet";
+	}	
 	
 	override void SetupTrap()
 	{

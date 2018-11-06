@@ -3,8 +3,6 @@
  */
 class CGame
 {
-	// -enOldInventory
-	bool m_ParamOldInventory;
 	// -enNewMenu
 	//bool m_ParamNewMenu;
 	static bool m_ParamDoNoLogs;
@@ -35,7 +33,7 @@ class CGame
 	void OnEvent(EventType eventTypeId, Param params)
 	{
 	}
-	
+
 	//PLM Type: 0 == RESUMED, 1 == SUSPENDED
 	void OnProcessLifetimeChanged(int plmtype)
 	{
@@ -53,7 +51,21 @@ class CGame
 	void OnAfterCreate()
 	{
 	}
-	
+
+	/**
+	\brief Called when recieving focus (windows)
+	*/
+	void OnActivateMessage()
+	{
+	}
+
+	/**
+	\brief Called when loosing focus (windows)
+	*/
+	void OnDeactivateMessage()
+	{
+	}
+
 	/**
 	\brief Called once before game update loop starts, ret value indicates if init was done in scripts, otherwise it is done in the engine
 	*/
@@ -145,7 +157,7 @@ class CGame
 	@param password of the server
 	\return true on success, false is not success(server does not exist)
 	*/
-	proto native int		Connect( UIScriptedMenu parent , string IpAddress, int port, string password, string serverID );	
+	proto native int		Connect( UIScriptedMenu parent , string IpAddress, int port, string password );	
 	/**
   \brief Connects to last success network session
 	\return true on success, false if there is no previous session
@@ -236,6 +248,22 @@ class CGame
 	proto native void		SelectPlayer(PlayerIdentity identity, Object player);
 	
 	/**
+  	\brief returns player's network id from identity id in out parameters
+		@param identity PlayerIdentity.id used in MP (use NULL in singleplayer)
+		@param networkIdLowBits lower bits of 64bit network id
+		@param networkIdHighBits higher bits of 64bit network id
+		\note Usable only on server
+	*/	
+	proto void 				GetPlayerNetworkIDByIdentityID( int playerIdentityID, out int networkIdLowBits, out int networkIdHightBits );
+
+	/**
+  	\brief Returns entity identified by network id
+		@param networkIdLowBits identity used in MP (use NULL in singleplayer)
+		@param networkIdHighBits object which should be controlled by player
+	*/	
+	proto native Object 	GetObjectByNetworkId( int networkIdLowBits, int networkIdHighBits );
+
+	/**
   	\brief Creates spectator object (mostly cameras)
 		@param identity identity used in MP (use NULL in singleplayer)
 		@param spectatorObjType classname for spectator object (like cameras)
@@ -250,10 +278,38 @@ class CGame
 	proto native void		UpdateSpectatorPosition(vector position);
 	
 	/**
+  	\brief Inform client about logout time (creates logout screen on specified client)
+	\note Works only on server
+	@param player object which is logging out
+	@param time length of logout
+	*/
+	proto native void		SendLogoutTime(Object player, int time);
+	
+	/**
   	\brief Destroy player info and disconnect 
 	\note Works only on server
 	*/
 	proto native void		DisconnectPlayer(PlayerIdentity identity, string uid);
+	
+	/**
+  	\brief Add player to reconnect cache to be able to rejoin character still existing in the world
+	\note Works only on server and no database requests are sent
+	@param identity of player
+	*/
+	proto native void		AddToReconnectCache(PlayerIdentity identity);
+	
+	/**
+  	\brief Remove player from reconnect cache
+	\note Works only on server
+	@param uid of the player
+	*/
+	proto native void		RemoveFromReconnectCache(string uid);
+	
+	/**
+  	\brief Remove all player from reconnect cache
+	\note Works only on server
+	*/
+	proto native void		ClearReconnectCache();
 
 	/**
   	\brief Returns current daytime on server
@@ -471,6 +527,8 @@ class CGame
 	*/
 	proto native Object CreateObject( string type, vector pos, bool create_local = false, bool init_ai = false, bool create_physics = true );
 	proto native SoundOnVehicle CreateSoundOnObject(Object source, string sound_name, float distance, bool looped, bool create_local = false);
+	proto native SoundWaveOnVehicle CreateSoundWaveOnObject(Object source, SoundObject soundObject, AbstractWave soundWave);
+	
 	proto native void   ObjectDelete( Object obj );
     proto native void   RemoteObjectDelete( Object obj ); /// RemoteObjectDelete - deletes only remote object (unregisters from network). do not use if not sure what you do
 	proto native void   RemoteObjectTreeDelete( Object obj ); /// RemoteObjectDelete - deletes only remote object tree (unregisters from network). do not use if not sure what you do
@@ -553,6 +611,14 @@ class CGame
 	proto native void		GetObjectsAtPosition3D(vector pos, float radius, out array<Object> objects, out array<CargoBase> proxyCargos);
 	proto native World	GetWorld();
 	proto void					GetWorldName( out string world_name );
+	
+	string GetWorldName()
+	{
+		string world_name;
+		g_Game.GetWorldName(world_name);
+		return world_name;
+	}
+	
 	proto void					FormatString( string format, string params[], out string output);
 	proto void					GetVersion( out string version );
 	proto native UIManager	GetUIManager();
@@ -646,6 +712,14 @@ class CGame
 	*/
 	proto native void		MutePlayer(string sourceVoice, string targetVoice, bool mute);
 	
+	
+	/**
+	 \brief Enable/disable VoN for target player
+	@param player in question
+	@param enable sets if player can use VoN
+	*/
+	proto native void		EnableVoN(Object player, bool enable);
+	
 	//! Returns current chat channel.
 	//proto native ChatChannel ChatGetChannel();
 
@@ -684,11 +758,6 @@ class CGame
 	// Interny build
 	proto native bool		IsDebug();
 	
-	bool IsOldInventory()
-	{
-		return m_ParamOldInventory;
-	}
-	
 	static bool IsDoNoLogs()
 	{
 		return m_ParamDoNoLogs;
@@ -716,6 +785,7 @@ class CGame
 	proto void				SurfaceGetType(float x, float z, out string type);
 	proto void				SurfaceGetType3D(float x, float y, float z, out string type);
 	proto void				SurfaceUnderObject(Object object, out string type, out int liquidType);
+	proto void				SurfaceUnderObjectByBone(Object object, int boneType, out string type, out int liquidType);
 	proto native float		SurfaceGetNoiseMultiplier(float x, float z);
 	proto native vector		SurfaceGetNormal(float x, float z);
 	proto native float		SurfaceGetSeaLevel();
@@ -757,29 +827,98 @@ class CGame
 		return angles;
 	}
 	
-	//! Checks if this surface is softt (it can be dig into with shovel or similar items)
+	//! Checks if this surface is soft
 	bool IsSurfaceSoftGround(string surface)
 	{
-		const int array_elements = 16; // Sadly we don't have full API for dealing with static arrays right now, so we can't write flexible code. When we get Contains(...) method then a lot of this code can be replaced by it.
+		const int array_elements = 30; // Sadly we don't have full API for dealing with static arrays right now, so we can't write flexible code. When we get Contains(...) method then a lot of this code can be replaced by it.
 		string compatible_surfaces[array_elements] = 	
 			{
-				"cp_gravel",
-				"dirt_ext",
-				"cp_dirt",
 				"cp_broadleaf_dense1",
 				"cp_broadleaf_dense2",
 				"cp_broadleaf_sparse1",
 				"cp_broadleaf_sparse2",
-				"cp_grass",
-				"cp_grass_tall",
-				"grass_dry_ext",
 				"cp_conifer_common1",
 				"cp_conifer_common2",
 				"cp_conifer_moss1",
 				"cp_conifer_moss2",
+				"cp_dirt",
+				"dirt_ext",
+				"dirt_int",
+				"cp_grass",
+				"grass_dry_ext",
+				"grass_dry_int",
+				"cp_grass_tall",
+				"cp_gravel",
 				"gravel_small_ext",
-				"sand_ext"}; // Don't forget to update array_elements if you change element count!
+				"gravel_small_int",
+				"gravel_large_ext",
+				"gravel_large_int",
+				"cp_rock",
+				"rubble_large_ext",
+				"rubble_large_int",
+				"rubble_small_ext",
+				"rubble_small_int",
+				"sand_ext",
+				"sand_int",
+				"trash_ext",
+				"trash_ext",
+				"trash_int"}; // Don't forget to update array_elements if you change element count!
 		
+		
+		for ( int i = 0; i < array_elements; i++ )
+		{
+			if ( compatible_surfaces[i] == surface )
+			{
+				return true;
+				break;
+			}
+		}
+		
+		return false;
+	}
+	
+	//! Checks if this surface is hard
+	bool IsSurfaceHardGround(string surface)
+	{
+		const int array_elements = 36; // Sadly we don't have full API for dealing with static arrays right now, so we can't write flexible code. When we get Contains(...) method then a lot of this code can be replaced by it.
+		string compatible_surfaces[array_elements] = 	
+			{
+				"asphalt_ext",
+				"asphalt_destroyed_ext",
+				"asphalt_int",
+				"asphalt_destroyed_int",
+				"asphalt_felt_ext",
+				"asphalt_felt_int",
+				"cp_concrete1",
+				"cp_concrete2",
+				"concrete_ext",
+				"concrete_stairs_ext",
+				"concrete_int",
+				"concrete_stairs_int",
+				"ceramic_tiles_ext",
+				"ceramic_tiles_int",
+				"ceramic_tiles_roof_ext",
+				"ceramic_tiles_roof_int",
+				"lino_ext",
+				"lino_int",
+				"metal_thick_ext",
+				"metal_stairs_ext",
+				"metal_thick_int",
+				"metal_stairs_int",
+				"metal_thin_ext",
+				"metal_thin_int",
+				"metal_thin_mesh_ext",
+				"metal_thin_mesh_int",
+				"stone_ext",
+				"stone_int",
+				"textile_carpet_ext",
+				"textile_carpet_int",
+				"wood_parquet_ext",
+				"wood_parquet_int",
+				"wood_planks_ext",
+				"wood_planks_stairs_ext",
+				"wood_planks_int",
+				"wood_planks_stairs_int"}; // Don't forget to update array_elements if you change element count!
 		
 		for ( int i = 0; i < array_elements; i++ )
 		{
@@ -843,6 +982,15 @@ class CGame
 	proto native void	AddPPMask(float ndcX, float ndcY, float ndcRadius, float ndcBlur);
 
 	proto native void 	ResetPPMask();
+
+	/*!
+	override inventory light
+	\param diffuse		directional light
+	\param ambient 		ambient light
+	\param ground		ground light
+	\param dir		direction of light, Vector(0,0,1) is from camera
+	*/
+	proto native void 	OverrideInventoryLights(vector diffuse, vector ambient, vector ground, vector dir);
 
 
 	proto native void OpenURL(string url);
@@ -1027,4 +1175,14 @@ class CGame
 
 	proto native BiosUserManager GetUserManager();
 	
+	//! Returns true when current mission is Main Menu
+	bool IsMissionMainMenu()
+	{
+		if ( g_Game.GetMissionState() == DayZGame.MISSION_STATE_MAINMENU )
+		{
+			return true;
+		}
+		
+		return false;
+	}
 };

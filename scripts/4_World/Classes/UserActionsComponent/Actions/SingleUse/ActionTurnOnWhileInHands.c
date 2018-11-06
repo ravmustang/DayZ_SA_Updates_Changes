@@ -39,7 +39,7 @@ class ActionTurnOnWhileInHands: ActionSingleUseBase
 		}
 		else
 		{
-			m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
+			m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_ON;
 		}
 		
 		
@@ -53,13 +53,16 @@ class ActionTurnOnWhileInHands: ActionSingleUseBase
 
 	override void OnExecuteServer( ActionData action_data )  //Takhle to nedelat, vyrob si action componentu a tehle check patri do jeji Execute metody. Message o selhani pak napis jako messageStartFail
 	{
-		if ( action_data.m_MainItem.GetCompEM().CanWork() )
+		if ( action_data.m_MainItem.HasEnergyManager() )
 		{
-			action_data.m_MainItem.GetCompEM().SwitchOn();
-		} 
-		else
-		{
-			InformPlayers(action_data.m_Player,action_data.m_Target,UA_FAILED);
+			if ( action_data.m_MainItem.GetCompEM().CanWork() )
+			{
+				action_data.m_MainItem.GetCompEM().SwitchOn();
+			} 
+			else
+			{
+				InformPlayers(action_data.m_Player,action_data.m_Target,UA_FAILED);
+			}
 		}
 	}
 };

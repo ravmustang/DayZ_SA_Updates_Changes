@@ -39,7 +39,7 @@ class ActionAttachPowerSourceToPanel: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
 		EntityAI item_entity = EntityAI.Cast( action_data.m_MainItem );
@@ -49,11 +49,11 @@ class ActionAttachPowerSourceToPanel: ActionSingleUseBase
 		
 		if( target_entity.GetInventory().FindFirstFreeLocationForNewEntity( item_entity.GetType(), FindInventoryLocationType.ATTACHMENT, target_location ) )
 		{
-			action_data.m_Player.ServerTakeEntityToTargetAttachmentEx( target_entity, item_entity, target_location.GetSlot() );
+			target_entity.ServerTakeEntityAsAttachmentEx( item_entity, target_location.GetSlot() );
 		}
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
+	override void OnEndClient( ActionData action_data )
 	{
 		// Probably not needed since attaching is done server side.
 		/*

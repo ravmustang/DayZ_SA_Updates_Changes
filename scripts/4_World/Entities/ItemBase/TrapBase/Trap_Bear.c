@@ -23,6 +23,11 @@ class BearTrap extends TrapBase
 		return true;
 	}
 	
+	override string GetDeploySoundset()
+	{
+		return "beartrap_deploy_SoundSet";
+	}
+	
 	override void OnSteppedOn(EntityAI victim)
 	{
 		vector 	contact_pos;
@@ -118,7 +123,7 @@ class BearTrap extends TrapBase
 			{
 				PlayerBase player_victim = PlayerBase.Cast( victim );
 			
-				player_victim.SpawnBulletHitReaction();
+				player_victim.SpawnDamageDealtEffect();
 			}
 			
 			PlaySoundBiteLeg();
@@ -161,7 +166,8 @@ class BearTrap extends TrapBase
 	{
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
-			PlaySound("bearTrap_open_0", 15);
+			//PlaySound("bearTrap_open_0", 15);
+			SEffectManager.PlaySound("Fishing_puddle_SoundSet", this.GetPosition(), 0, 0, false);
 		}
 	}
 	

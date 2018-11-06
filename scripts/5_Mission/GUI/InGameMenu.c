@@ -1,5 +1,10 @@
 class InGameMenu extends UIScriptedMenu
 {
+	protected ButtonWidget					m_ContinueButton;
+	protected ButtonWidget					m_ExitButton;
+	protected ButtonWidget					m_RestartButton;
+	protected ButtonWidget					m_OptionsButton;
+	
 	void InGameMenu()
 	{
 		//nic
@@ -25,16 +30,26 @@ class InGameMenu extends UIScriptedMenu
 	{
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets("gui/layouts/day_z_ingamemenu.layout");
 				
-		string version;
-		GetGame().GetVersion(version);
+		TextWidget version_widget = TextWidget.Cast( layoutRoot.FindAnyWidget("version") );
 		
-		TextWidget version_widget;
-		Class.CastTo(version_widget, layoutRoot.FindAnyWidget("version"));
-		version_widget.SetText("#main_menu_version " + version);
+		m_ContinueButton	= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "continuebtn" ) );
+		m_ExitButton		= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "exitbtn" ) );
+		m_RestartButton		= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "restartbtn" ) );
+		m_OptionsButton		= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "optionsbtn" ) );
+		
+		string version;
+		GetGame().GetVersion( version );
+		#ifdef PLATFORM_CONSOLE
+			version = "#main_menu_version" + " " + version + " (" + g_Game.GetDatabaseID() + ")";
+		#else
+			version = "#main_menu_version" + " " + version;
+		#endif
+		version_widget.SetText( version );
 
 		#ifdef PREVIEW_BUILD
 			version_widget.SetText("THIS IS PREVIEW");
 		#endif
+		
 		ButtonWidget restart_btn;
 		Class.CastTo(restart_btn, layoutRoot.FindAnyWidgetById(IDC_INT_RETRY));
 		
@@ -98,17 +113,25 @@ class InGameMenu extends UIScriptedMenu
 			return true;
 
 		case IDC_MAIN_QUIT:
-			GetGame().GetUIManager().ShowDialog("EXIT", "Are you sure you want to exit?", IDC_INT_EXIT, DBT_YESNO, DBB_YES, DMT_QUESTION, NULL);
+		{
+			GetGame().LogoutRequestTime();
+			GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(GetGame().GetMission().CreateLogoutMenu, this);
+			
+			//GetGame().GetUIManager().ShowDialog("EXIT", "Are you sure you want to exit?", IDC_INT_EXIT, DBT_YESNO, DBB_YES, DMT_QUESTION, NULL);
+				
+			
 			return true;
-
+		}
 		case IDC_INT_RETRY:
 			if (!GetGame().IsMultiplayer())
 			{
 				GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(GetGame().RestartMission);
+				GetGame().GetMission().PlayerControlEnable();
 			}
 			else
 			{
 				GetGame().GetUIManager().ShowDialog("#main_menu_respawn", "#main_menu_respawn_question", IDC_INT_RETRY, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
+				GetGame().GetMission().PlayerControlEnable();
 			}
 			return true;
 		}
@@ -147,7 +170,7 @@ class InGameMenu extends UIScriptedMenu
 			PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
 			if(player)
 			{
-				GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(player.ShowDeadScreen, DayZPlayerImplement.DEAD_SCREEN_DELAY, false, false);
+				GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(player.ShowDeadScreen, DayZPlayerImplement.DEAD_SCREEN_DELAY, false, false, 0);
 			}
 			
 			MissionGameplay missionGP = MissionGameplay.Cast(GetGame().GetMission());
@@ -158,5 +181,80 @@ class InGameMenu extends UIScriptedMenu
 		}
 	
 		return false;
+	}
+	
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorRed( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorWhite( w, enterW );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocus( Widget w, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorRed( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocusLost( Widget w, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorWhite( w, null );
+			return true;
+		}
+		return false;
+	}
+	
+	bool IsFocusable( Widget w )
+	{
+		if( w )
+		{
+			if( w == m_ContinueButton || w == m_ExitButton || w == m_RestartButton || w == m_OptionsButton );
+				return true;
+		}
+		return false;
+	}
+	
+	//Coloring functions (Until WidgetStyles are useful)
+	void ColorRed( Widget w )
+	{
+		SetFocus( w );
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_ContinueButton )
+		{
+			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+		}
+	}
+	
+	void ColorWhite( Widget w, Widget enterW )
+	{
+		#ifdef PLATFORM_WINDOWS
+		SetFocus( null );
+		#endif
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_ContinueButton )
+		{
+			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+		}
 	}
 }

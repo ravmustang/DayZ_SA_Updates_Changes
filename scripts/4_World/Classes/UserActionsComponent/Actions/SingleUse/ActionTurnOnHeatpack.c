@@ -26,7 +26,7 @@ class ActionTurnOnHeatpack : ActionTurnOnWhileInHands
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		action_data.m_MainItem.GetCompEM().SwitchOn();
 	}

@@ -100,6 +100,32 @@ class WeaponEjectBullet extends WeaponStateBase
 		m_dstMagazine = NULL;
 		super.OnExit(e);
 	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponEjectBullet.LoadCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponEjectBullet.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
 };
 
 

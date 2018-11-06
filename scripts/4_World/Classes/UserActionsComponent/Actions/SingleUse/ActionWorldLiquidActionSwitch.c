@@ -19,7 +19,7 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 	
 	override string GetText()
 	{
-		return "Switch to " + m_switch_to;
+		return "#switch_to" + " " + m_switch_to;
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -31,7 +31,7 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 			{
 				if ( Liquid.CanFillContainer( target_item, item.GetLiquidType() ) )
 				{
-					m_switch_to = "Liquid drain";
+					m_switch_to = "#liquid_drain";
 					return true;
 				}
 				else
@@ -44,7 +44,7 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 			{
 				if ( Liquid.CanFillContainer( item, target_item.GetLiquidType() ) )
 				{
-					m_switch_to = "Liquid pour";
+					m_switch_to = "#liquid_pour";
 					return true;
 				}
 				else
@@ -59,6 +59,7 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 	
 	override void Start( ActionData action_data ) //Setup on start of action
 	{
+		super.Start( action_data );
 		bool state;
 		state = action_data.m_Player.GetLiquidTendencyDrain();
 		action_data.m_Player.SetLiquidTendencyDrain(!state);

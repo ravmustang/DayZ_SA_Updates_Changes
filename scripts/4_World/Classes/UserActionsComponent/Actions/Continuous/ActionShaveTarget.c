@@ -17,6 +17,9 @@ class ActionShaveTarget: ActionContinuousBase
 		m_MessageFail = "I have failed to shave target.";
 		m_MessageCancel = "I stopped shaving target.";
 		//m_Animation = "ignite";
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
+		m_FullBody = true;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -46,10 +49,10 @@ class ActionShaveTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Shave target";
+		return "#shave_target";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PlayerBase man;
 		if ( action_data.m_Target && Class.CastTo(man, action_data.m_Target.GetObject()) )

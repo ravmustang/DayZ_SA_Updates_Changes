@@ -33,7 +33,7 @@ class ActionSortAmmoPile: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Sort ammunition";
+		return "#sort_ammunition";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -41,7 +41,7 @@ class ActionSortAmmoPile: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteLoopServer( ActionData action_data )
+	override void OnEndAnimationLoopServer( ActionData action_data )
 	{	
 		SortAmmo(action_data.m_MainItem);
 	}
@@ -60,7 +60,7 @@ class ActionSortAmmoPile: ActionContinuousBase
 				int count = magazine.GetAmmoCount();
 				if(magazine.ServerAcquireCartridge(health, ammo_type))
 				{
-					int health_label = MiscGameplayFunctions.GetHealthLabelForAmmo(ammo_type,health);
+					int health_label = MiscGameplayFunctions.GetHealthLevelForAmmo(ammo_type,health);
 					if( piles[health_label] == null )
 					{
 						piles[health_label] = Magazine.Cast( GetGame().CreateObject( item.ClassName(), item.GetPosition() ) );		

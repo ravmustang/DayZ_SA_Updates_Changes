@@ -57,7 +57,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	protected float m_screen_x;
 	protected	float m_screen_y;
 
-	protected ref TItemsMap m_items;
+	protected ref TItemsMap m_Items;
 	protected InventoryGridController m_controller;
 
 	protected Widget m_root;
@@ -67,7 +67,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 
 	void InventoryGrid()
 	{
-		m_items = new TItemsMap;	
+		m_Items = new TItemsMap;	
 	}
 
 	protected void OnWidgetScriptInit(Widget w)
@@ -435,7 +435,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	}
 	
 	TItemsMap GetItems() {
-		return m_items;	
+		return m_Items;	
 	}
 	
 	bool IsIcon() 
@@ -495,9 +495,9 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	
 	void SetItemColor(InventoryItem item, int color)
 	{
-		if (m_items.Contains(item))
+		if (m_Items.Contains(item))
 		{
-			vector data = m_items.Get(item);
+			vector data = m_Items.Get(item);
 			int index = Math.Round(data[0]);
 			
 			Widget w = GetItemBackground(index);
@@ -507,9 +507,9 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	//! Set size in pixels
 	void SetItemSize(InventoryItem item, int pixels_w, int pixels_h)
 	{
-		if (m_items.Contains(item))
+		if (m_Items.Contains(item))
 		{
-			vector data = m_items.Get(item);
+			vector data = m_Items.Get(item);
 			int index = Math.Round(data[0]);
 			
 			Widget w = GetItemBackground(index);
@@ -566,10 +566,10 @@ class InventoryGrid: ScriptedWidgetEventHandler
 		Widget item_w;
 		
 		// remove not actual items
-		c = m_items.Count();
+		c = m_Items.Count();
 		for (i = 0; i < c; i++)
 		{
-			item = m_items.GetKey(i);
+			item = m_Items.GetKey(i);
 			if( item != NULL )
 			{
 				bool remove_item = false;
@@ -581,7 +581,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 				else
 				{
 					// check items position actual
-					if ((m_items.Get(item) - items.Get(item)).LengthSq() > 0.01)
+					if ((m_Items.Get(item) - items.Get(item)).LengthSq() > 0.01)
 					{
 						// item has different position or size
 						remove_item = true;
@@ -603,7 +603,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 			item = items.GetKey(i);
 			data = items.Get(item);
 					
-			if (m_items.Contains(item) == false)
+			if (m_Items.Contains(item) == false)
 			{
 				AddItem(item, data, Vector(0,0,0) );
 			}
@@ -635,10 +635,10 @@ class InventoryGrid: ScriptedWidgetEventHandler
 		Widget item_w;
 		
 		// remove not actual items
-		c = m_items.Count();
+		c = m_Items.Count();
 		for (i = 0; i < c; i++)
 		{
-			item = m_items.GetKey(i);
+			item = m_Items.GetKey(i);
 			
 			bool remove_item = false;
 			
@@ -649,7 +649,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 			else
 			{
 				// check items position actual
-				if ((m_items.Get(item) - items.Get(item)).LengthSq() > 0.01)
+				if ((m_Items.Get(item) - items.Get(item)).LengthSq() > 0.01)
 				{
 					// item has different position or size
 					remove_item = true;
@@ -670,7 +670,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 			item = items.GetKey(i);
 			data = items.Get(item);
 					
-			if (m_items.Contains(item) == false)
+			if (m_Items.Contains(item) == false)
 			{
 				AddItem(item, data, Vector(0,0,0) );
 			}
@@ -693,10 +693,10 @@ class InventoryGrid: ScriptedWidgetEventHandler
 		int index;
 		InventoryItem item;
 		vector data;
-		for (i = 0; i < m_items.Count(); i++)
+		for (i = 0; i < m_Items.Count(); i++)
 		{
-			item = m_items.GetKey(i);
-			data = m_items.Get(item); 
+			item = m_Items.GetKey(i);
+			data = m_Items.Get(item); 
 			index = Math.Round(data[0]);
 			RefreshItemVariables( item, data, true, false );
 		}
@@ -709,10 +709,10 @@ class InventoryGrid: ScriptedWidgetEventHandler
 		int index;
 		InventoryItem item;
 		vector data;
-		for (i = 0; i < m_items.Count(); i++)
+		for (i = 0; i < m_Items.Count(); i++)
 		{
-			item = m_items.GetKey(i);
-			data = m_items.Get(item); 
+			item = m_Items.GetKey(i);
+			data = m_Items.Get(item); 
 			index = Math.Round(data[0]);
 			RefreshItemVariables( item, data, false, true );
 		}
@@ -820,7 +820,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	//--------------------------------------------------------------------------
 	void AddItem(InventoryItem item, vector data, vector rotation)
 	{
-		m_items.Set(item, data);			
+		m_Items.Set(item, data);			
 				
 		int index = Math.Round(data[0]);
 		int width = Math.Round(data[1]);
@@ -865,7 +865,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	//--------------------------------------------------------------------------
 	void SetItem(InventoryItem item, vector data, vector rotation)
 	{
-		m_items.Set(item, data);
+		m_Items.Set(item, data);
 				
 		int index = Math.Round(data[0]);
 		int width = Math.Round(data[1]);
@@ -876,7 +876,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 		ShowBackground(row, col, width, height, true);
 				
 		Widget bck = GetItem(index);
-		Widget item_w_bck = bck.FindAnyWidget("GridItemBck"); //GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory/inventoryGridItem.layout", bck);
+		Widget item_w_bck = bck.FindAnyWidget("GridItemBck");
 		if(item_w_bck)
 		{
 		item_w_bck.SetFlags(WidgetFlags.VISIBLE | WidgetFlags.EXACTPOS | WidgetFlags.EXACTSIZE);			
@@ -928,9 +928,9 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	//--------------------------------------------------------------------------
 	void ResetItem(InventoryItem item)
 	{
-		if (m_items.Contains(item))
+		if (m_Items.Contains(item))
 		{
-			vector data = m_items.Get(item);
+			vector data = m_Items.Get(item);
 			int index = Math.Round(data[0]);
 			int width = Math.Round(data[1]);
 			int height = Math.Round(data[2]);
@@ -944,7 +944,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	//--------------------------------------------------------------------------
 	bool HasItem(InventoryItem item)
 	{
-		return m_items.Contains(item);
+		return m_Items.Contains(item);
 	}
 	
 	//--------------------------------------------------------------------------
@@ -952,17 +952,21 @@ class InventoryGrid: ScriptedWidgetEventHandler
 	{
 		Widget bck;
 		Widget itemW;
-		if ( m_items.Contains(item) )
+		if ( item && m_Items.Contains( item ) )
 		{
-			vector data = m_items.Get(item);
+			vector data = m_Items.Get(item);
 			int index = Math.Round(data[0]);
 			int width = Math.Round(data[1]);
 			int height = Math.Round(data[2]);
 			bck = GetItem(index);
-			itemW = bck.FindAnyWidget("GridItemBck");
-			delete itemW;
+			if( bck )
+			{
+				itemW = bck.FindAnyWidget("GridItemBck");
+				if( itemW )
+					delete itemW;
+			}
 		
-			m_items.Remove(item);			
+			m_Items.Remove( item );			
 			int col = index % ItemsHorizontal;
 			int row = index / ItemsHorizontal;
 		

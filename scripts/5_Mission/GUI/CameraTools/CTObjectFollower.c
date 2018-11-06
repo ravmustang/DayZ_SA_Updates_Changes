@@ -33,7 +33,7 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 		}
 	}
 	
-	void Update()
+	void Update( float timeslice )
 	{
 		UpdatePos();
 	}
@@ -49,7 +49,6 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 		if( m_FollowedObject )
 		{
 			m_FollowedObject.SetPosition( position );
-			m_FollowedObject.PlaceOnSurface();
 			m_Position = m_FollowedObject.GetPosition();
 		}
 		UpdatePos();
@@ -61,7 +60,6 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 		PlayerBase player = PlayerBase.Cast( m_FollowedObject );
 		if( player )
 		{
-			vector x;
 			player.SetOrientation( m_Orientation );
 		}
 		UpdatePos();
@@ -80,7 +78,7 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 	{
 		if( m_FollowedObject )
 		{
-			return m_FollowedObject.GetDirection();
+			return m_FollowedObject.GetOrientation();
 		}
 		return "0 0 0";
 	}
@@ -116,6 +114,16 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 		m_FollowerRoot.SetPos( relativePos[0], relativePos[1] );
 	}
 	
+	void Show()
+	{
+		m_FollowerRoot.Show( true );
+	}
+	
+	void Hide()
+	{
+		m_FollowerRoot.Show( false );
+	}
+	
 	void Fade( bool fade )
 	{
 		if( fade )
@@ -144,7 +152,7 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 		{
 			if( m_Menu )
 			{
-				m_Menu.SelectEvent( CTEvent.Cast( this ) );
+				m_Menu.SelectActor( CTActor.Cast( this ) );
 			}
 			return true;
 		}
@@ -157,7 +165,7 @@ class CTObjectFollower extends ScriptedWidgetEventHandler
 		{
 			if( m_Menu )
 			{
-				m_Menu.SelectEvent( null );
+				m_Menu.SelectActor( null );
 			}
 			return true;
 		}

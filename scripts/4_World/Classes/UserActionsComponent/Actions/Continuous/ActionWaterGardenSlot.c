@@ -13,7 +13,8 @@ class ActionWaterGardenSlot: ActionContinuousBase
 	void ActionWaterGardenSlot()
 	{
 		m_CallbackClass = ActionWaterGardenSlotCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
+		m_FullBody = true;
 		m_MessageSuccess = "I've watered slot.";
 		m_MessageStartFail = "There's not enough fertilizer.";
 		m_MessageStart = "I've started fertilizing.";
@@ -35,7 +36,7 @@ class ActionWaterGardenSlot: ActionContinuousBase
 	
 	override string GetText()
 	{
-		return "Water slot";
+		return "#water_slot";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -64,10 +65,5 @@ class ActionWaterGardenSlot: ActionContinuousBase
 		}
 		
 		return false;
-	}
-	
-	override void OnCompleteServer( ActionData action_data )
-	{
-		// The functionality is in the Execute event of this user action's component.
 	}
 };

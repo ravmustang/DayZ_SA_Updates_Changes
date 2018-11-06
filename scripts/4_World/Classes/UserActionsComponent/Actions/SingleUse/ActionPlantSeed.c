@@ -10,6 +10,9 @@ class ActionPlantSeed: ActionSingleUseBase
 		m_MessageCancel = "";
 		//m_Animation = "open";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
+		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_DROPITEM_HANDS;
+		m_FullBody = false;
 	}
 	
 	override void CreateConditionComponents()  
@@ -50,12 +53,12 @@ class ActionPlantSeed: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Process(action_data);
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{
 		Process(action_data);
 	}

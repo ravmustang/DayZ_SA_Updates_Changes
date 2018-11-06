@@ -11,10 +11,10 @@ class ActionTurnOnTransmitter: ActionTurnOnWhileInHands
 	void ActionTurnOnTransmitter()
 	{
 		m_CallbackClass = ActionTurnOnTransmitterCB;
-		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_WALKIETALKIEON;
-		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
+		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_ON;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_ON;
 		m_MessageSuccess = "I have turned it on.";
-		m_MessageStartFail = "Cannot turn on the device without power source.";
+		m_MessageStartFail = "Cannot turn on the device without a power source.";
 		m_MessageFail = "It's broken.";
 	}
 	
@@ -32,7 +32,7 @@ class ActionTurnOnTransmitter: ActionTurnOnWhileInHands
 	{
 		if ( item.IsTransmitter() )
 		{
-			if ( item.HasEnergyManager() && item.GetCompEM().CanSwitchOn() )
+			if ( item.HasEnergyManager() && !item.GetCompEM().IsWorking() )
 			{
 				if ( item.IsInherited( TransmitterBase ) )
 				{
@@ -42,13 +42,13 @@ class ActionTurnOnTransmitter: ActionTurnOnWhileInHands
 				}
 				
 				return true;
-			}				
+			}
 		}
 		
 		return false;
 	}
 		
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		action_data.m_MainItem.GetCompEM().SwitchOn();
 	}

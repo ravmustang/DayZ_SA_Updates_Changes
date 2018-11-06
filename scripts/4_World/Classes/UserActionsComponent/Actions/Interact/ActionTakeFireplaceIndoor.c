@@ -1,5 +1,7 @@
 class ActionTakeFireplaceIndoor: ActionInteractBase
 {
+	string m_NewItemTypeName = "Fireplace";
+
 	void ActionTakeFireplaceIndoor()
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
@@ -14,7 +16,7 @@ class ActionTakeFireplaceIndoor: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Take fireplace";
+		return "#take_fireplace";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -27,20 +29,29 @@ class ActionTakeFireplaceIndoor: ActionInteractBase
 	
 			if ( !fireplace_indoor.HasAshes() && !fireplace_indoor.IsBurning() && fireplace_indoor.IsCargoEmpty() && !fireplace_indoor.GetCookingEquipment() )
 			{
-				return true;
+				InventoryLocation targetIL = new InventoryLocation;
+				bool found = player.GetInventory().FindFirstFreeLocationForNewEntity(m_NewItemTypeName, FindInventoryLocationType.ANY, targetIL);
+				return found;
 			}
 		}
 
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object target_object = action_data.m_Target.GetObject();
 		FireplaceIndoor fireplace_indoor = FireplaceIndoor.Cast( target_object );
 		
-		TakeFireplaceFromIndoorLambda lambda(fireplace_indoor, "Fireplace", action_data.m_Player);
-		action_data.m_Player.ServerReplaceItemWithNew(lambda);
+		TakeFireplaceFromIndoorLambda lambda(fireplace_indoor, m_NewItemTypeName, action_data.m_Player);
+		InventoryLocation targetIL = new InventoryLocation;
+		bool found = action_data.m_Player.GetInventory().FindFirstFreeLocationForNewEntity(m_NewItemTypeName, FindInventoryLocationType.ANY, targetIL);
+		if (found)
+		{
+			// allow action only if there is place in inventory
+			lambda.OverrideNewLocation(targetIL);
+			action_data.m_Player.ServerReplaceItemWithNew(lambda);
+		}
 	}
 }
 
@@ -51,10 +62,6 @@ class TakeFireplaceFromIndoorLambda : ReplaceItemWithNewLambdaBase
 	void TakeFireplaceFromIndoorLambda (EntityAI old_item, string new_item_type, PlayerBase player)
 	{
 		m_Player = player;
-
-		InventoryLocation targetHnd = new InventoryLocation;
-		targetHnd.SetHands(player, null);
-		OverrideNewLocation(targetHnd);
 	}
 
 	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
@@ -77,8 +84,6 @@ class TakeFireplaceFromIndoorLambda : ReplaceItemWithNewLambdaBase
 				child_dst.SetParent(new_item);
 				
 				m_Player.LocalTakeToDst(child_src, child_dst);
-				
-				GetGame().RemoteObjectTreeCreate(child); // this forces server to send CreateVehicle Message to client. This is needed for preserving the appearance of network operations on client (so that DeleteObject(old) arrives before CreateVehicle(new)). @NOTE: this does not delete the object on server, only it's network representation.
 			}
 		}
 	}

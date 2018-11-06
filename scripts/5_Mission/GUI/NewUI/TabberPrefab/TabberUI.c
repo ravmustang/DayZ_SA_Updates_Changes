@@ -1,6 +1,7 @@
 class TabberUI extends ScriptedWidgetEventHandler
 {
-	protected Widget m_Root;
+	protected bool		m_FirstInit = true;
+	protected Widget	m_Root;
 	
 	protected ref map<int, Widget> m_TabControls;
 	protected ref map<int, Widget> m_Tabs;
@@ -28,8 +29,6 @@ class TabberUI extends ScriptedWidgetEventHandler
 				tab_child = tab_child.GetSibling();
 			}
 			
-			AlignTabbers( m_Root.FindAnyWidget( "Tab_Control_Container" ) );
-			
 			for( int i = 0; i < tab_count; i++ )
 			{
 				Widget tab_control	= tab_controls.FindAnyWidget( "Tab_Control_" + i );
@@ -46,6 +45,8 @@ class TabberUI extends ScriptedWidgetEventHandler
 				}
 			}
 			
+			AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
+			
 			#ifdef PLATFORM_CONSOLE
 				Widget xb_controls = m_Root.FindAnyWidget( "XboxControls" );
 				if( xb_controls )
@@ -59,32 +60,82 @@ class TabberUI extends ScriptedWidgetEventHandler
 		float total_size;
 		float x, y;
 		
+		Widget tab_controls_container = tab_controls.FindAnyWidget( "Tab_Control_Container" );
+		
 		tab_controls.Update();
+		tab_controls_container.Update();
 		
-		int tab_count;
-		Widget tab_child = tab_controls.GetChildren();
+		Widget tab_child = tab_controls_container.GetChildren();
 		while( tab_child )
 		{
-			tab_count++;
-			tab_child.GetSize( x, y );
-			total_size += x;
-			tab_child = tab_child.GetSibling();
-		}
-		
-		tab_child = tab_controls.GetChildren();
-		while( tab_child )
-		{
-			Widget tab_bg = tab_child.FindAnyWidget( tab_child.GetName() + "_Background" );
-			tab_child.GetPos( x, y );
-			//tab_bg.SetPos( -x, 0 );
-			//tab_bg.SetSize( total_size, 1 );
+			TextWidget tab_text = TextWidget.Cast( tab_child.FindAnyWidget( tab_child.GetName() + "_Title" ) );
+			int t_x, t_y;
+			tab_text.GetTextSize( t_x, t_y );
+			tab_child.SetSize( t_x + 50, 1 );
+			tab_controls_container.Update();
+			
+			total_size += ( t_x + 50 );
 			
 			tab_child = tab_child.GetSibling();
 		}
 		
+		tab_child = tab_controls_container.GetChildren();
+		
+		float x_f_c, y_f_c;
+		tab_controls_container.GetScreenPos( x_f_c, y_f_c );
+		
+		while( tab_child )
+		{
+			Widget tab_bg = tab_child.FindAnyWidget( tab_child.GetName() + "_Background" );
+			tab_child.GetScreenPos( x, y );
+			tab_bg.SetPos( ( x_f_c - x ), 0 );
+			tab_bg.SetSize( total_size, 1 );
+			
+			tab_child = tab_child.GetSibling();
+		}
+		
+		tab_controls.GetSize( x, y );
+		
+		tab_controls.SetSize( total_size, y );
+		tab_controls_container.Update();
+		tab_controls.Update();
+		
 		#ifdef PLATFORM_CONSOLE
-			m_Root.FindAnyWidget( "XboxControls" ).Show( tab_count > 1 );
+			m_Root.FindAnyWidget( "XboxControls" ).Show( m_Tabs.Count() > 1 );
 		#endif
+	}
+	
+	int AddTab( string name )
+	{
+		int new_index = m_Tabs.Count();
+		Widget tab = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/tabber_prefab/tab.layout", m_Root );
+		Widget control = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/tabber_prefab/tab_control.layout", m_Root.FindAnyWidget( "Tab_Control_Container" ) );
+		TextWidget control_text = TextWidget.Cast( control.FindAnyWidget( "Tab_Control_x_Title" ) );
+		
+		tab.SetName( "Tab_" + new_index );
+		control.SetName( "Tab_Control_" + new_index );
+		control_text.SetName( "Tab_Control_" + new_index + "_Title" );
+		control.FindAnyWidget( "Tab_Control_x_Background" ).SetName( "Tab_Control_" + new_index + "_Background" );
+		
+		control_text.SetText( name );
+		
+		control.SetHandler( this );
+		m_TabControls.Insert( new_index, control );
+		m_Tabs.Insert( new_index, tab );
+		
+		AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
+		
+		return new_index;
+	}
+	
+	void RemoveTab( int index )
+	{
+		
+	}
+	
+	Widget GetTab( int index )
+	{
+		return m_Tabs.Get( index );
 	}
 	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
@@ -101,8 +152,14 @@ class TabberUI extends ScriptedWidgetEventHandler
 				SelectTabPanel( index );
 				
 				m_SelectedIndex = index;
-				AlignTabbers( m_Root.FindAnyWidget( "Tab_Control_Container" ) );
 				m_OnTabSwitch.Invoke( m_SelectedIndex );
+				
+				if( m_FirstInit )
+				{
+					AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
+					m_FirstInit = false;
+				}
+				
 				return true;
 			}
 		}
@@ -114,7 +171,7 @@ class TabberUI extends ScriptedWidgetEventHandler
 	{
 		if( w == m_Root.FindAnyWidget( "Tab_Control_Container" ) )
 		{
-			AlignTabbers( m_Root.FindAnyWidget( "Tab_Control_Container" ) );
+			AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
 			return true;
 		}
 		return false;
@@ -124,7 +181,7 @@ class TabberUI extends ScriptedWidgetEventHandler
 	{
 		if( w == m_Root.FindAnyWidget( "Tab_Control_Container" ) )
 		{
-			AlignTabbers( m_Root.FindAnyWidget( "Tab_Control_Container" ) );
+			AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
 			return true;
 		}
 		return false;

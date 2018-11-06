@@ -1,39 +1,68 @@
 class ActionContinuousBaseCB : ActionBaseCB
 {	
 	bool m_inLoop = false;
+	bool m_callLoopEnd = false;
 	
 	bool CancelCondition()
 	{
+		/*if(m_Interrupted)
+		{
+			return DefaultCancelCondition();
+		}*/
 		//SetCommand(DayZPlayerConstants.CMD_ACTIONINT_ACTIONLOOP);
 		//Print("cancel condition enabled: " + GetState().ToString() );
-		if ( !m_Interrupted && (GetState() == STATE_LOOP_LOOP || GetState() == STATE_LOOP_LOOP2 || m_inLoop) )
-		{	
-			if( m_ActionData.m_State == UA_INITIALIZE )
-				m_ActionData.m_State = UA_PROCESSING;
-			
-			
-			AnimatedActionBase action = AnimatedActionBase.Cast(m_ActionData.m_Action);
-			action.Do(m_ActionData, m_ActionData.m_State);
+		if ( !m_ActionData )
+		{
+			return DefaultCancelCondition();
 		}
-			return DefaultCancelCondition(); 
+		if ( !m_Interrupted && (GetState() == STATE_LOOP_LOOP || GetState() == STATE_LOOP_LOOP2 || m_inLoop) )
+		{
+			ActionContinuousBase actionS = ActionContinuousBase.Cast(m_ActionData.m_Action);	
+			if( m_ActionData.m_State == UA_INITIALIZE )
+			{
+				actionS.OnStartAnimationLoop( m_ActionData );
+				m_ActionData.m_State = UA_PROCESSING;
+				m_callLoopEnd = true;
+			}
+			
+			actionS.Do(m_ActionData, m_ActionData.m_State);
+		}
+		else if (m_callLoopEnd == true)
+		{
+			ActionContinuousBase actionE = ActionContinuousBase.Cast(m_ActionData.m_Action);
+			actionE.OnEndAnimationLoop( m_ActionData );
+			m_callLoopEnd = false;
+		}
+		return DefaultCancelCondition();
 	}
 	
 	
 	override void OnAnimationEvent(int pEventID)	
 	{
-		AnimatedActionBase action = AnimatedActionBase.Cast(m_ActionData.m_Action);
+		if (m_ActionData)
+		{
+			AnimatedActionBase action = AnimatedActionBase.Cast(m_ActionData.m_Action);
 #ifdef DEVELOPER
-		Print("ActionInteractBase.c | OnAnimationEvent | OnAnimationEvent called");
+			Print("ActionInteractBase.c | OnAnimationEvent | OnAnimationEvent called");
 #endif
-		if ( !m_Interrupted && pEventID == UA_IN_START ) 
+			if ( !m_Interrupted && pEventID == UA_IN_START ) 
+			{
+				m_inLoop = true;
+			//ActionContinuousBase.Cast(action).OnStartLoop( m_ActionData );
+			}else if ( !m_Interrupted && pEventID == UA_IN_END ) 
+			{
+			
+				m_inLoop = false;
+				//ActionContinuousBase.Cast(action).OnCompleteLoop( m_ActionData );
+			}else if ( !m_Interrupted && pEventID == UA_ANIM_EVENT ) 
+			{
+				action.OnAnimationEvent( m_ActionData );
+				//action.OnCompleteLoop( m_ActionData );
+			}
+		}
+		else
 		{
-			m_inLoop = true;
-		}else if ( !m_Interrupted && pEventID == UA_IN_END ) 
-		{
-			m_inLoop = false;
-		}else if ( !m_Interrupted && pEventID == UA_ANIM_EVENT ) 
-		{
-			action.OnAnimationEvent( m_ActionData );
+			//Debug.LogError("Call OnAnimationEvent ")
 		}
 	}
 	
@@ -58,7 +87,7 @@ class ActionContinuousBaseCB : ActionBaseCB
 	
 	override void EndActionComponent()
 	{
-		// TODO for second type animation SetCommand(DayZPlayerConstants.CMD_ACTIONINT_END2);
+		// TODO for second type animation SetCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 		if ( m_ActionData.m_State == UA_FINISHED )
 		{
 			SetCommand(DayZPlayerConstants.CMD_ACTIONINT_END);
@@ -112,5 +141,69 @@ class ActionContinuousBase : AnimatedActionBase
 	override int GetActionCategory()
 	{
 		return AC_CONTINUOUS;
+	}
+	
+	void OnStartAnimationLoop( ActionData action_data )
+	{
+		if(GetGame().IsServer())
+		{
+			OnStartAnimationLoopServer(action_data);
+		}
+		else
+		{
+			OnStartAnimationLoopClient(action_data);
+		}
+		action_data.m_WasExecuted = false;
+	}
+	
+	void OnEndAnimationLoop( ActionData action_data )
+	{
+		if(GetGame().IsServer())
+		{
+			OnEndAnimationLoopServer(action_data);
+		}
+		else
+		{
+			OnEndAnimationLoopClient(action_data);
+		}
+		action_data.m_WasExecuted = false;
+	}
+	
+	void OnFinishProgress( ActionData action_data )
+	{
+		if(GetGame().IsServer())
+		{
+			OnFinishProgressServer(action_data);
+		}
+		else
+		{
+			OnFinishProgressClient(action_data);
+		}
+		action_data.m_WasExecuted = false;
+	
+	}
+	
+	
+	protected void OnStartAnimationLoopServer( ActionData action_data ) //method called on start main animation loop (after in animation part )
+	{
+	}
+	
+	protected void OnStartAnimationLoopClient( ActionData action_data ) //method called on start main animation loop (after in animation part )
+	{
+	}
+	
+	protected void OnEndAnimationLoopServer( ActionData action_data ) //method called on finish main animation loop (before out animation part )
+	{
+	}
+	protected void OnEndAnimationLoopClient( ActionData action_data ) //method called on finish main animation loop (before out animation part )
+	{
+	}
+	
+	protected void OnFinishProgressServer( ActionData action_data )
+	{
+	}
+	
+	protected void OnFinishProgressClient( ActionData action_data )
+	{
 	}
 };

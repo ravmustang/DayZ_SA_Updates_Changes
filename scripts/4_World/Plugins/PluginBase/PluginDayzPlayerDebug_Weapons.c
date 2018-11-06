@@ -133,6 +133,8 @@ class PluginDayzPlayerDebug_Weapons
 		PluginDayzPlayerDebug_AbilityConfig("Crossbow Opened", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_CROSSBOW_OPENED),
 		PluginDayzPlayerDebug_AbilityConfig("Crossbow Close", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_CROSSBOW_CLOSED),
 		PluginDayzPlayerDebug_AbilityConfig("Crossbow Full", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_CROSSBOW_FULL),
+		
+		PluginDayzPlayerDebug_AbilityConfig("INTERRUPT", WeaponActions.INTERRUPT, -1),
 
 
 		PluginDayzPlayerDebug_AbilityConfig("Chamb Loader 1 Bullet Opened", WeaponActions.CHAMBERING_LOADER, WeaponActionChamberingLoaderTypes.CHAMBERINGLOADER_OPENED),
@@ -140,6 +142,7 @@ class PluginDayzPlayerDebug_Weapons
 
 		PluginDayzPlayerDebug_AbilityConfig("Unjamming Start", WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START),
 		PluginDayzPlayerDebug_AbilityConfig("Unjamming End", WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_END), 
+		PluginDayzPlayerDebug_AbilityConfig("Unjamming Interrupt", WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_INTERRUPT),
 
 		PluginDayzPlayerDebug_AbilityConfig("Fire Normal", WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL),
 		PluginDayzPlayerDebug_AbilityConfig("Fire Last", WeaponActions.FIRE, WeaponActionFireTypes.FIRE_LAST),

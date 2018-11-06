@@ -56,7 +56,8 @@ class CAContinuousTimeIgnite : CAContinuousBase
 					string reason = GetReasonToCancel( action_data.m_Target, action_data.m_MainItem );
 					if ( reason != "" )
 					{
-						m_IgniteFireplaceAction.SetReasonToCancel( reason );
+						IgniteFireplaceActionData if_action_data = IgniteFireplaceActionData.Cast(action_data);
+						if_action_data.m_ReasonToCancel = reason;
 						
 						return UA_CANCEL;
 					}					
@@ -72,6 +73,7 @@ class CAContinuousTimeIgnite : CAContinuousBase
 				m_SpentUnits.param1 = m_TimeElpased;
 				SetACData( m_SpentUnits );
 			}
+			OnCompletePogress(action_data);
 			return UA_FINISHED;
 		}
 	}
@@ -96,7 +98,7 @@ class CAContinuousTimeIgnite : CAContinuousBase
 
 		//COMMON REASONS
 		//check kindling
-		if ( !m_IgniteFireplaceAction.m_SkipKindlingCheck && !fireplace_target.HasAnyKindling() )
+		if ( !m_IgniteFireplaceAction.SkipKindlingCheck() && !fireplace_target.HasAnyKindling() )
 		{
 			if ( item )
 			{

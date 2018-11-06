@@ -1,4 +1,4 @@
-class BloodRegen: ModifierBase
+class BloodRegenMdfr: ModifierBase
 {
 	private const float	BLOOD_INCREMENT_PER_SEC = 5;
 	
@@ -7,7 +7,7 @@ class BloodRegen: ModifierBase
 		m_TrackActivatedTime = false;
 		m_ID 					= eModifiers.MDF_BLOOD_REGEN;
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
-			m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
+		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
 
 	override bool ActivateCondition(PlayerBase player)

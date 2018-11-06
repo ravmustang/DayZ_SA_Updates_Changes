@@ -1,6 +1,6 @@
 class CollapsibleHeader: Header
 {
-	void CollapsibleHeader( ContainerBase parent, string function_name ) { }
+	void CollapsibleHeader( LayoutHolder parent, string function_name ) { }
 
 	override void SetLayoutName()
 	{

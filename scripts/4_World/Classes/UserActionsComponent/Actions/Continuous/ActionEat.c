@@ -38,6 +38,6 @@ class ActionEat: ActionConsume
 		
 	override string GetText()
 	{
-		return "Eat";
+		return "#eat";
 	}
 };

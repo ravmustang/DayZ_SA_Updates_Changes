@@ -17,27 +17,30 @@ typedef FSMTransition<WeaponStateBase, WeaponEventBase, WeaponActionBase, Weapon
  **/
 class Weapon_Base extends Weapon
 {
+	protected ref array<ref AbilityRecord> m_abilities = new array<ref AbilityRecord>;		/// weapon abilities
 	protected ref WeaponFSM m_fsm;	/// weapon state machine
-	protected ref array<ref AbilityRecord> m_abilities;		/// weapon abilities
-	protected int m_weaponAnimState; /// animation state the weapon is in, -1 == uninitialized
-	protected bool m_receivedSyncFromRemote; /// if remote weapon, this flag waits for first stable state sync
+	protected bool m_isJammed = false;
+	protected bool m_LiftWeapon = false;
 	protected bool m_canEnterIronsights = true; /// if false, weapon goes straight into optics view
-	protected ref array<string> m_ironsightsExcludingOptics; /// optics that go straight into optics view (skip ironsights)
-	ref array<float> 	m_DOFProperties;
+	protected int m_weaponAnimState = -1; /// animation state the weapon is in, -1 == uninitialized
+	protected float m_DmgPerShot;
+	protected ref array<string> m_ironsightsExcludingOptics = new array<string>; /// optics that go straight into optics view (skip ironsights)
+	ref array<float> m_DOFProperties = new array<float>;
+	ref array<float> m_ChanceToJam = new array<float>;
+	protected float m_ChanceToJamSync = 0;
 	protected ref PropertyModifiers m_PropertyModifierObject;
-	protected int m_RecoilSeed;
+	protected PhxInteractionLayers hit_mask = PhxInteractionLayers.CHARACTER | PhxInteractionLayers.BUILDING | PhxInteractionLayers.DOOR | PhxInteractionLayers.VEHICLE | PhxInteractionLayers.ROADWAY | PhxInteractionLayers.TERRAIN | PhxInteractionLayers.ITEM_SMALL | PhxInteractionLayers.ITEM_LARGE | PhxInteractionLayers.FENCE | PhxInteractionLayers.AI;
 
 	void Weapon_Base ()
 	{
-		m_weaponAnimState = -1;
-		m_receivedSyncFromRemote = false;
-		m_abilities = new array<ref AbilityRecord>;
-		m_ironsightsExcludingOptics = new array<string>;
-		m_DOFProperties = new array<float>;
+		m_DmgPerShot = ConfigGetFloat("damagePerShot");
 		
 		InitExcludedScopesArray(m_ironsightsExcludingOptics);
 		InitDOFProperties(m_DOFProperties);
-		
+		if(GetGame().IsServer())
+		{
+			InitReliability(m_ChanceToJam);
+		}
 		InitStateMachine();
 	}
 
@@ -105,6 +108,13 @@ class Weapon_Base extends Weapon
 	bool ProcessWeaponEvent (WeaponEventBase e)
 	{
 		SyncEventToRemote(e);
+		
+		// @NOTE: synchronous events not handled by fsm
+		if (e.GetEventID() == WeaponEventID.SET_NEXT_MUZZLE_MODE)
+		{
+			SetNextMuzzleMode(GetCurrentMuzzle());
+			return true;
+		}
 
 		if (m_fsm.ProcessEvent(e) == ProcessEventResult.FSM_OK)
 			return true;
@@ -140,14 +150,12 @@ class Weapon_Base extends Weapon
 	}
 	int GetWeaponAnimState () { return m_weaponAnimState; }
 
-	override void EEFired (int muzzleType, int mode, string ammoType)
+	void EEFired (int muzzleType, int mode, string ammoType)
 	{
-		super.EEFired(muzzleType, mode, ammoType);
-		
+		ItemBase suppressor = GetAttachedSuppressor();
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
 		{
 			// Muzzle flash & overheating effects
-			ItemBase suppressor = GetAttachedSuppressor();
 			ItemBase.PlayFireParticles(this, ammoType, this, suppressor, "CfgWeapons" );
 			IncreaseOverheating(this, ammoType, this, suppressor, "CfgWeapons");
 			
@@ -158,118 +166,47 @@ class Weapon_Base extends Weapon
 			}
 		}
 		
+		if (GetGame().IsServer())
+		{
+			AddHealth("","Health",-m_DmgPerShot); //damages weapon
+			if (suppressor)
+				suppressor.AddHealth("","Health",-m_DmgPerShot); //damages suppressor; TODO add suppressor damage coeficient/parameter (?) to suppressors/weapons (?)
+		}
+		JamCheck(muzzleType);
+		
 		#ifdef DEVELOPER
 		MiscGameplayFunctions.UnlimitedAmmoDebugCheck(this);
 		#endif
 	}
 	
+	void JamCheck (int muzzleIndex )
+	{
+		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
+		if ( player )
+		{
+			float rnd = player.GetRandomGeneratorSyncManager().GetRandom01(RandomGeneratorSyncUsage.RGSJam);
+			//Print("Random Jam - " + rnd);
+			if (rnd < GetSyncChanceToJam())
+				m_isJammed = true;
+		}
+	}
+	
+	bool IsJammed () { return m_isJammed; }
+	void SetJammed (bool value) { m_isJammed = value; }
+	float GetChanceToJam () { return m_ChanceToJam[GetHealthLevel()]; }
+	float GetSyncChanceToJam () { return m_ChanceToJamSync; }
+	
 	void SyncSelectionState (bool has_bullet, bool has_mag)
-	{					
+	{
 		if (has_bullet)
 			SelectionBulletShow();
 		else
 			SelectionBulletHide();
-	
+
 		if (has_mag)
 			SelectionMagazineShow();
 		else
 			SelectionMagazineHide();
-	}
-
-	void OnStableStateEntry ()
-	{
-		PlayerBase p = PlayerBase.Cast(GetHierarchyParent());
-		if (p && p.GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
-		{
-			int mi = GetCurrentMuzzle();
-
-			float ammoDamage = 0.0;
-			string ammoTypeName;
-			GetCartridgeInfo(mi, ammoDamage, ammoTypeName);
-
-			InventoryLocation loc = new InventoryLocation;
-			Magazine mag = GetMagazine(mi);
-			if (mag)
-				mag.GetInventory().GetCurrentInventoryLocation(loc);
-
-			ScriptRemoteInputUserData ctx = new ScriptRemoteInputUserData;
-
-			ctx.Write(INPUT_UDT_WEAPON_REMOTE_SYNC);
-			ctx.Write(GetCurrentStateID());
-			ctx.Write(ammoDamage);
-			ctx.Write(ammoTypeName);
-			loc.WriteToContext(ctx);
-
-			wpnDebugPrint("[wpnfsm] OnStableStateEntry - sending state to remote");
-			p.StoreInputForRemotes(ctx);
-			
-		}
-		/*if (p)
-		{
-			p.OnWeaponActionEnd();
-		}*/
-		//MWBREAK
-	}
-
-	void OnSyncFromRemote (ParamsReadContext ctx)
-	{
-		if (m_receivedSyncFromRemote)
-		{
-			wpnDebugSpam("[wpnfsm] already initialized, ignoring sync-from-remote packet");
-			return;
-		}
-		else
-		{
-			wpnDebugSpam("[wpnfsm] first sync-from-remote packet");
-			m_receivedSyncFromRemote = true;
-
-			int currStateID = -1;
-			if (!ctx.Read(currStateID))
-			{
-				Error("Weapon::SyncRemote - cannot read currStateID!");
-				return;
-			}
-
-			float ammoDamage = 0.0;
-			if (!ctx.Read(ammoDamage))
-			{
-				Error("Weapon::SyncRemote - cannot read ammoDamage!");
-				return;
-			}
-			string ammoTypeName;
-			if (!ctx.Read(ammoTypeName))
-			{
-				Error("Weapon::SyncRemote - cannot read ammoTypeName!");
-				return;
-			}
-
-			InventoryLocation loc = new InventoryLocation;
-			if (!loc.ReadFromContext(ctx))
-			{
-				Error("Weapon::SyncRemote - cannot read mag!");
-				return;
-			}
-
-			if (currStateID != GetCurrentStateID())
-			{
-				wpnDebugPrint("[wpnfsm] first sync-from-remote packet and state is different, syncing!");
-				NetSyncCurrentStateID(currStateID);
-
-				int mi = GetCurrentMuzzle();
-				LoadChamber(mi, ammoDamage, ammoTypeName);
-
-				if (loc.IsValid())
-				{
-					Magazine mag = Magazine.Cast(loc.GetItem());
-					InventoryLocation src = new InventoryLocation;
-					mag.GetInventory().GetCurrentInventoryLocation(src);
-
-					GameInventory.LocationSyncMoveEntity(src, loc);
-				}
-				else
-					Error("Weapon::SyncRemote - inventory location of mag is not valid!");
-			}
-		}
 	}
 
 	override void OnStoreLoad (ParamsReadContext ctx)
@@ -285,7 +222,43 @@ class Weapon_Base extends Weapon
 			ctx.Read(dummy);
 		}
 	}
-	
+
+	void SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (m_fsm && m_fsm.IsRunning())
+		{
+			if (m_fsm.SaveCurrentFSMState(ctx))
+				wpnDebugPrint("[wpnfsm] Weapon=" + this + " state saved.");
+			else
+				Error("[wpnfsm] Weapon=" + this + " state NOT saved.");
+		}
+		else
+			Error("[wpnfsm] Weapon.SaveCurrentFSMState: trying to save weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
+	}
+
+	void LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (m_fsm)
+		{
+			if (m_fsm.LoadCurrentFSMState(ctx))
+			{
+				WeaponStableState state = WeaponStableState.Cast(GetCurrentState());
+				if (state)
+				{
+					SyncSelectionState(state.HasBullet(), state.HasMagazine());
+					state.SyncAnimState();
+					wpnDebugPrint("[wpnfsm] Weapon=" + this + " stable state loaded and synced.");
+				}
+				else
+					wpnDebugPrint("[wpnfsm] Weapon=" + this + " unstable/error state loaded.");
+			}
+			else
+				Error("[wpnfsm] Weapon=" + this + " did not load.");
+		}
+		else
+			Error("[wpnfsm] Weapon.LoadCurrentFSMState: trying to load weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
+	}
+
 	void AfterStoreLoad ()
 	{
 		if (m_fsm)
@@ -311,12 +284,22 @@ class Weapon_Base extends Weapon
 	}
 
 	/**@fn		GetCurrentStateID
-	 * @brief	tries to return identifier of current stable state
+	 * @brief	tries to return identifier of current state
 	 **/
-	int GetCurrentStateID ()
+	int GetInternalStateID ()
 	{
 		if (m_fsm)
-			return m_fsm.GetCurrentStateID();
+			return m_fsm.GetInternalStateID();
+		return 0;
+	}
+	
+	/**@fn		GetCurrentStableStateID
+	 * @brief	tries to return identifier of current stable state (or nearest stable state if unstable state is currently running)
+	 **/
+	int GetCurrentStableStateID ()
+	{
+		if (m_fsm)
+			return m_fsm.GetCurrentStableStateID();
 		return 0;
 	}
 
@@ -331,27 +314,9 @@ class Weapon_Base extends Weapon
 			Magazine mag = GetMagazine(mi);
 			bool has_mag = mag != null;
 			bool has_bullet = !IsChamberEmpty(mi);
-			bool has_jam = IsChamberJammed(mi);
+			bool has_jam = IsJammed();
 			m_fsm.RandomizeFSMState(has_bullet, has_mag, has_jam);
 			SyncSelectionState(has_bullet, has_mag);
-		}
-	}
-
-	/**@fn		NetSyncCurrentStateID
-	 * @brief	Engine callback - network synchronization of FSM's state. not intended to direct use.
-	 **/
-	void NetSyncCurrentStateID (int id)
-	{
-		if (m_fsm)
-		{
-			m_fsm.NetSyncCurrentStateID(id);
-			
-			WeaponStableState state = WeaponStableState.Cast(GetCurrentState());
-			if (state)
-			{
-				SyncSelectionState(state.HasBullet(), state.HasMagazine());
-				state.SyncAnimState();
-			}
 		}
 	}
 
@@ -397,9 +362,6 @@ class Weapon_Base extends Weapon
 		return false;
 	}
 	
-	void SetRecoilSeed (int seed) { m_RecoilSeed = seed; }
-	int GetRecoilSeed () { return m_RecoilSeed; }
-
 	override void OnInventoryEnter (Man player)
 	{
 		super.OnInventoryEnter(player);
@@ -458,28 +420,6 @@ class Weapon_Base extends Weapon
 		return true;
 	}
 
-	void OnEventFromRemote (ParamsReadContext ctx)
-	{
-		WeaponEventBase e = CreateWeaponEventFromContext(ctx);
-		if (e)
-		{
-			PlayerBase player = PlayerBase.Cast(GetHierarchyParent());
-			player.GetWeaponManager().SetRunning(true);
-
-			fsmDebugSpam("[wpnfsm] recv event from remote: created event=" + e);
-			if(e.GetEventID() == WeaponEventID.HUMANCOMMAND_ACTION_ABORTED)
-			{
-				ProcessEventResult aa;
-				m_fsm.ProcessAbortEvent(e, aa);
-			}
-			else
-			{
-				m_fsm.ProcessEvent(e);
-			}
-			player.GetWeaponManager().SetRunning(false);
-		}
-	}
-
 	void SyncEventToRemote (WeaponEventBase e)
 	{
 		DayZPlayer p = DayZPlayer.Cast(GetHierarchyParent());
@@ -504,12 +444,12 @@ class Weapon_Base extends Weapon
 
 	bool CanFire ()
 	{
-		if (!IsChamberEmpty(GetCurrentMuzzle()) && !IsChamberFiredOut(GetCurrentMuzzle()) && !IsChamberJammed(GetCurrentMuzzle()))
+		if (!IsChamberEmpty(GetCurrentMuzzle()) && !IsChamberFiredOut(GetCurrentMuzzle()) && !IsJammed() && !m_LiftWeapon)
 			return true;
 		return false;
 	}
 	
-	override int GetItemWeight()
+	override int GetItemWeight ()
 	{
 		int AttachmentWeight = 0;
 		float item_wetness = GetWet();
@@ -525,7 +465,7 @@ class Weapon_Base extends Weapon
 	}
 	
 	//! Initializes list of optics, that do not allow ironsights camera for the weapon
-	bool InitExcludedScopesArray(out array<string> temp_array)
+	bool InitExcludedScopesArray (out array<string> temp_array)
 	{
 		if (GetGame().ConfigIsExisting("cfgWeapons " + GetType() + " ironsightsExcludingOptics"))
 		{
@@ -536,7 +476,7 @@ class Weapon_Base extends Weapon
 	}
 	
 	//! Checks if attached optic allows ironsights, sets m_canEnterIronsights accordingly
-	void OpticsAllowsIronsightsCheck(ItemOptics optic)
+	void OpticsAllowsIronsightsCheck (ItemOptics optic)
 	{
 		if (!optic)
 		{
@@ -555,25 +495,132 @@ class Weapon_Base extends Weapon
 		m_canEnterIronsights = true;
 	}
 	
-	bool CanEnterIronsights()
+	bool CanEnterIronsights ()
 	{
 		return m_canEnterIronsights;
 	}
 	
 	//! Initializes DOF properties for weapon's ironsight/optics cameras
-	bool InitDOFProperties(out array<float> temp_array)
+	bool InitDOFProperties (out array<float> temp_array)
 	{
 		if (GetGame().ConfigIsExisting("cfgWeapons " + GetType() + " PPDOFProperties"))
 		{
-			GetGame().ConfigGetFloatArray("cfgWeapons " + GetType() + " PPDOFProperties",temp_array);
+			GetGame().ConfigGetFloatArray("cfgWeapons " + GetType() + " PPDOFProperties", temp_array);
 			return true;
 		}
 		return false;
 	}
 	
-	ref array<float> GetWeaponDOF()
+	bool InitReliability (out array<float> reliability_array)
+	{
+		if (GetGame().ConfigIsExisting("cfgWeapons " + GetType() + " Reliability ChanceToJam"))
+		{
+			GetGame().ConfigGetFloatArray("cfgWeapons " + GetType() + " Reliability ChanceToJam", reliability_array);
+			return true;
+		}
+		return false;
+	}
+	
+	ref array<float> GetWeaponDOF ()
 	{
 		return m_DOFProperties;
+	}
+	
+	// lifting weapon on obstcles
+	bool LiftWeaponCheck (PlayerBase player)
+	{
+		m_LiftWeapon = false;
+		// not a gun, no weap.raise for now
+		if ( HasSelection("Usti hlavne") )
+			return false;
+		
+		if (!player)
+		{
+			Print("Error: No weapon owner, returning");
+			return false;
+		}
+		
+		// weapon not raised
+		if ( player.GetInputController() && !player.GetInputController().IsWeaponRaised() )
+			return false;
+		
+		vector usti_hlavne_position = GetSelectionPosition( "Usti hlavne" ); 	// Usti hlavne
+		//vector weapon_back_position = GetSelectionPosition( "Weapon back" ); 	// back of weapon; barrel length
+		vector trigger_axis_position = GetSelectionPosition("trigger_axis");
+		//usti_hlavne_position = ModelToWorld(usti_hlavne_position);
+		
+		vector hit_pos, hit_normal; //junk
+		float hit_fraction; //junk
+		Object obj;
+		vector start, end;
+		vector direction;
+		
+		// freelook raycast
+		if (player.GetInputController().CameraIsFreeLook())
+		{
+			if (player.m_DirectionToCursor != vector.Zero)
+			{
+				direction = player.m_DirectionToCursor;
+			}
+			// if player raises weapon in freelook
+			else
+			{
+				direction = MiscGameplayFunctions.GetHeadingVector(player);
+			}
+		}
+		else
+		{
+			direction = GetGame().GetCurrentCameraDirection(); // exception for freelook. Much better this way!
+		}
+		
+		// TODO cast from "Head" in prone?
+		int idx = player.GetBoneIndexByName("Neck");
+		if ( idx == -1 )
+			{ start = player.GetPosition()[1] + 1.5; }
+		else
+			{ start = player.GetBonePositionWS(idx); }
+		
+		float distance;
+		// used to get razcast distance from weapon config; may be needed, if universal calculation fails?
+		/*if (m_ItemModelLength != 0)
+			distance = m_ItemModelLength; //TODO
+		else
+			distance = 1;
+		*/
+		distance = vector.Distance(usti_hlavne_position,trigger_axis_position) + 0.1;
+		if (distance < 0.65) // approximate minimal cast distance for short pistols
+			distance = 0.65;
+		ItemBase attachment;
+		// if weapon has battel attachment, does longer cast
+		if (ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonet")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetAK")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetMosin")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetSKS")) || ItemBase.CastTo(attachment,GetAttachedSuppressor()))
+		{
+			distance += attachment.m_ItemModelLength;
+			/*
+			vector mins, maxs;
+			//attachment.GetWorldBounds(mins, maxs);
+			mins = attachment.GetMemoryPointPos(BoundingBox_min)
+			maxs = attachment.GetMemoryPointPos(BoundingBox_max)
+			Print(vector.Distance(mins, maxs));
+			Print("mins " + mins);
+			Print("maxs " + maxs);
+			distance += 0.2; 
+			*/
+		}
+		end = start + (direction * distance);
+		DayZPhysics.RayCastBullet(start, end, hit_mask, player, obj, hit_pos, hit_normal, hit_fraction);
+		
+		// something is hit
+		if (hit_pos != vector.Zero)
+		{
+			m_LiftWeapon = true;
+			return true;
+		}
+		return false;
+	}
+	
+	void SetSyncJammingChance( float jamming_chance )
+	{
+		m_ChanceToJamSync = jamming_chance;
 	}
 };
 

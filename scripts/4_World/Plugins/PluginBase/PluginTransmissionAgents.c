@@ -1,6 +1,8 @@
 enum InjectTypes
 {
-    PLAYER_TO_ITEM, ITEM_TO_PLAYER
+    PLAYER_TO_ITEM, 
+	ITEM_TO_PLAYER,
+	PLAYER_AIR_PLAYER,
 };
 
 class PluginTransmissionAgents extends PluginBase
@@ -12,10 +14,10 @@ class PluginTransmissionAgents extends PluginBase
 	void PluginTransmissionAgents()
 	{
 		//add new agents here
-		m_AgentList.Insert(AGT_INFLUENZA, new InfluenzaAgent);
-		m_AgentList.Insert(AGT_CHOLERA, new CholeraAgent);
-		m_AgentList.Insert(AGT_SALMONELLA, new SalmonellaAgent);
-		m_AgentList.Insert(AGT_BRAIN, new BrainAgent);
+		m_AgentList.Insert(eAgents.INFLUENZA, new InfluenzaAgent);
+		m_AgentList.Insert(eAgents.CHOLERA, new CholeraAgent);
+		m_AgentList.Insert(eAgents.SALMONELLA, new SalmonellaAgent);
+		m_AgentList.Insert(eAgents.BRAIN, new BrainAgent);
 	}
 	
 
@@ -63,16 +65,22 @@ class PluginTransmissionAgents extends PluginBase
 		target.RemoveAgent( agent_id );
 	}
 	
-	private float GetAgentTransferabilityIn( int agent_id )
+	protected float GetAgentTransferabilityIn( int agent_id )
 	{
 		if( !m_AgentList.Get(agent_id) ) return 0;
 		return m_AgentList.Get(agent_id).GetTransferabilityIn();
 	}
-
-	private float GetAgentTransferabilityOut( int agent_id )
+	
+	protected float GetAgentTransferabilityOut( int agent_id )
 	{
 		if(!m_AgentList.Get(agent_id)) return 0;
 		return m_AgentList.Get(agent_id).GetTransferabilityOut();
+	}	
+	
+	protected float GetAgentTransferabilityAirOut( int agent_id )
+	{
+		if(!m_AgentList.Get(agent_id)) return 0;
+		return m_AgentList.Get(agent_id).GetTransferabilityAirOut();
 	}
 	/*
 	float GetAgentChance( int agent_id )
@@ -127,12 +135,21 @@ class PluginTransmissionAgents extends PluginBase
 				break;
 
 			case AGT_WATER_POND:
-					target.InsertAgent(AGT_CHOLERA, dose_size);
+				//target.InsertAgent(eAgents.CHOLERA, dose_size);
+				InjectAgentsWithPlayer( target, eAgents.CHOLERA , 0, dose_size, InjectTypes.ITEM_TO_PLAYER );
 				break;
 				
-			case AGT_UACTION_CONSUME: //user action of a consumption
+			case AGT_UACTION_CONSUME: //user action of a consumption, from item to player and player to item(should not be used in continuous actions)
 				InjectAgentsWithPlayer( target, sourceAgents , 0, dose_size, InjectTypes.ITEM_TO_PLAYER );
 				InjectAgentsWithPlayer( source, targetAgents , 0, dose_size, InjectTypes.PLAYER_TO_ITEM );
+				break;
+			
+			case AGT_UACTION_TO_PLAYER: //user action of a consumption, only from item to player
+				InjectAgentsWithPlayer( target, sourceAgents , 0, dose_size, InjectTypes.ITEM_TO_PLAYER );
+				break;
+
+			case AGT_UACTION_TO_ITEM: //to transfer from the player to the consumed item
+				InjectAgentsWithPlayer( target, sourceAgents , 0, dose_size, InjectTypes.PLAYER_TO_ITEM );
 				break;
 				
 			case AGT_TRANSFER_COPY: //transferring liquid
@@ -140,11 +157,11 @@ class PluginTransmissionAgents extends PluginBase
 				break;
 
 			case AGT_AIRBOURNE:
-				InjectAgentsWithPlayer( target, sourceAgents , GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.MASK, Man.Cast( target )), dose_size, InjectTypes.PLAYER_TO_ITEM );
+				InjectAgentsWithPlayer( target, sourceAgents , GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.MASK, Man.Cast( target )), dose_size, InjectTypes.PLAYER_AIR_PLAYER );
 		}
 	}
 	
-	private void InjectAgentsWithoutPlayer(EntityAI target, int agents)
+	protected void InjectAgentsWithoutPlayer(EntityAI target, int agents)
 	{
 		if( target.IsItemBase() )
 		{
@@ -154,7 +171,7 @@ class PluginTransmissionAgents extends PluginBase
 	}
 	
 	//! will add agents to a given target
-	private void InjectAgentsWithPlayer(EntityAI target, int agents,float protection, int dose_size, int inject_type)//target,array_of_agents,protection_lvl
+	protected void InjectAgentsWithPlayer(EntityAI target, int agents,float protection, int dose_size, int inject_type)//target,array_of_agents,protection_lvl
 	{
 		if(target && (agents != 0) && target.IsEntityAI() )
 		{
@@ -163,18 +180,18 @@ class PluginTransmissionAgents extends PluginBase
 			
 			for(int i = 0; i < agents_aray.Count(); i++)
 			{
-				int count = CalculateAgentsToTransmit(agents_aray.Get(i), protection, dose_size, inject_type);
+				float count = CalculateAgentsToTransmit(agents_aray.Get(i), protection, dose_size, inject_type);
 				target.InsertAgent(agents_aray.Get(i),count);
 			}
 		}
 	}
 
-	static void BuildAgentArray(int agent, array<int> agents_out)
+	static void BuildAgentArray(int agents, array<int> agents_out)
 	{
 		int mask = 1;
 		for(int i = 0; i < 31; i++)
 		{
-			if( mask & agent ) agents_out.Insert(mask);
+			if( mask & agents ) agents_out.Insert(mask);
 			mask = mask * 2;
 		}
 	}
@@ -188,11 +205,10 @@ class PluginTransmissionAgents extends PluginBase
 			mask = type | mask;
 		}
 		return mask;
-		
 	}
 	
 	
-	private float GetProtectionLevel(int type, int slot, Man player)
+	protected float GetProtectionLevel(int type, int slot, Man player)
 	{
 		EntityAI attachment = player.GetInventory().FindAttachment(slot);
 		if(!attachment) return 0;
@@ -214,7 +230,7 @@ class PluginTransmissionAgents extends PluginBase
 	}
 
 	//------------------------------------------------------------------------------------------------------
-	private int CalculateAgentsToTransmit(int agent_id, float protection, int dose_size, int inject_type)
+	protected float CalculateAgentsToTransmit(int agent_id, float protection, int dose_size, int inject_type)
 	{
 
 		Debug.Log("protection: "+protection.ToString());
@@ -226,14 +242,19 @@ class PluginTransmissionAgents extends PluginBase
 		{
 			transf = GetAgentTransferabilityOut(agent_id);
 		}
-		else if( inject_type == InjectTypes.ITEM_TO_PLAYER )
+		if( inject_type == InjectTypes.ITEM_TO_PLAYER )
 		{
 			transf = GetAgentTransferabilityIn(agent_id);
+		}
+		if( inject_type == InjectTypes.PLAYER_AIR_PLAYER )
+		{
+			transf = GetAgentTransferabilityAirOut(agent_id);
 		}
 
 		Debug.Log("transf: "+transf.ToString(), "Agents");
 		//float result =  GetAgentInitialCount(agent_id) * prot * transf * dose_size;//final formula
 		float result =  1 * prot * transf * dose_size;//final formula
+		//result = Math.Ceil(result);
 		Debug.Log("result: "+result.ToString(), "Agents");
 		return result;
 	}

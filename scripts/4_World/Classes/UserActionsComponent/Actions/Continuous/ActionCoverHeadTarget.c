@@ -34,7 +34,7 @@ class ActionCoverHeadTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Put on targets head";
+		return "#put_on_targets_head";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -49,7 +49,7 @@ class ActionCoverHeadTarget: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		//setaperture will be called from here, or from statemachine
 		PlayerBase ntarget;

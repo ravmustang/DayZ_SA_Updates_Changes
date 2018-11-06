@@ -1,60 +1,116 @@
-//WIP
 class SEffectManager
 {
 	protected static ref array<int> m_FreeEffectIDs = new array<int>;
 	protected static ref map<int, ref Effect> m_EffectsMap = new map<int, ref Effect>;
 	protected static int m_HighestFreeEffectID = 1;
 	
+	static ref ScriptInvoker Event_OnFrameUpdate = new ScriptInvoker();
 	
-	static private int EffectRegister(Effect eff)
+	//===============================
+	// EffectRegister
+	//===============================
+	static int EffectRegister(Effect effect)
 	{
-		int key = GetFreeEffectID();
-		m_EffectsMap.Insert(key, eff);
-		eff.SetID(key);
+		int id = GetFreeEffectID();
+		m_EffectsMap.Insert(id, effect);
+		effect.SetID(id);
 		
-		return key;
-	}
-	
-	static int GetFreeEffectID()
-	{
-		int return_id;
-		
-		if (m_FreeEffectIDs.Count() > 0)
+		if ( effect.IsSound() )
 		{
-			return_id = m_FreeEffectIDs.Get(0);
-			m_FreeEffectIDs.Remove(0);
+			EffectSound sound = EffectSound.Cast( effect );
+			sound.Event_OnSoundWaveEnded.Insert( SEffectManager.Event_OnSoundWaveEnded );
 		}
-		else
-		{
-			return_id = m_HighestFreeEffectID;
-			m_HighestFreeEffectID++; //As of 12.4.2018 this trick doesn't work: return_id = m_HighestFreeEffectID++;
-		}
-		
-		return return_id;
-		
-	}
-	
-	static int PlayInWorld(Effect eff, vector pos, vector ori = "0 0 0")
-	{
-		eff.SetPosition( pos );
-		eff.SetOrientation( ori );
-		
-		eff.Play();
-		int id = EffectRegister(eff);
 		
 		return id;
 	}
 	
-	static int PlayOnObject(Effect eff, Object obj, vector local_pos = "0 0 0", vector local_ori = "0 0 0")
-	{
-		eff.Play();
-		eff.AttachTo( obj, local_pos, local_ori);
-		int id = EffectRegister(eff);
+	//===============================
+	// EffectUnregister
+	//===============================
+	static void EffectUnregister(int id)
+    {
+		m_EffectsMap.Remove(id);
 		
-		return id;
+		if ( m_FreeEffectIDs.Find(id) == -1 )
+		{
+			m_FreeEffectIDs.Insert(id);
+		}
+    }
+	
+	//===============================
+	// CreateSound
+	//===============================
+	static EffectSound CreateSound(string sound_set, vector position, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false)
+	{
+		ref EffectSound effect_sound = new EffectSound();
+		effect_sound.SetSoundSet(sound_set);
+		effect_sound.SetPosition(position);
+		effect_sound.SetSoundFadeIn(play_fade_in);
+		effect_sound.SetSoundFadeOut(stop_fade_out);
+		effect_sound.SetSoundLoop(loop);
+		
+		EffectRegister( effect_sound );
+		
+		return effect_sound;
 	}
 	
-	static bool IsExist( int effect_id )
+	//===============================
+	// PlaySound
+	//===============================
+	static EffectSound PlaySound(string sound_set, vector position, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false)
+	{
+		ref EffectSound effect_sound = CreateSound(sound_set, position, play_fade_in, stop_fade_out, loop);
+				
+		effect_sound.SoundPlay();
+		
+		return effect_sound;
+	}
+	
+	//===============================
+	// PlaySoundOnObject
+	//===============================
+	static EffectSound PlaySoundOnObject(string sound_set, Object parent_object, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false)
+	{
+		ref EffectSound effect_sound = CreateSound(sound_set, parent_object.GetPosition(), play_fade_in, stop_fade_out, loop);
+		
+		effect_sound.SetParent( parent_object );
+		effect_sound.SoundPlay();
+		
+		return effect_sound;
+	}
+	
+	//===============================
+	// Event_OnSoundWaveEnded
+	//===============================
+	static void Event_OnSoundWaveEnded(EffectSound effect_sound)
+	{		
+		if ( effect_sound.IsSoundAutodestroy() )
+		{			
+			effect_sound.Event_OnSoundWaveEnded.Remove( SEffectManager.Event_OnSoundWaveEnded );
+			
+			//if ( DestroySound( effect_sound ) )
+			{
+				//Print("Sound Deleted");
+			}
+		}
+	}
+	
+	//===============================
+	// DestroySound
+	//===============================
+	static bool DestroySound(EffectSound sound_effect)
+	{
+		EffectUnregister( sound_effect.GetID() );
+		sound_effect.SoundStop();
+		delete sound_effect;
+		
+		return true;
+	}
+	
+	//===============================
+	// IsEffectExist
+	//===============================
+	static bool IsEffectExist( int effect_id )
 	{
 		if ( m_EffectsMap[effect_id] )
 		{
@@ -64,6 +120,36 @@ class SEffectManager
 		return false;
 	}
 	
+	//===============================
+	// PlayInWorld
+	//===============================
+	static int PlayInWorld(Effect eff, vector pos)
+	{
+		eff.SetPosition( pos );
+		eff.Start();
+		int id = EffectRegister(eff);
+		
+		return id;
+	}
+	
+	//===============================
+	// PlayOnObject
+	//===============================
+	static int PlayOnObject(Effect eff, Object obj, vector local_pos = "0 0 0", vector local_ori = "0 0 0")
+	{
+		eff.SetAttachmentParent(obj);
+		eff.SetAttachedLocalPos(local_pos);
+		eff.SetAttachedLocalOri(local_ori);
+		
+		eff.Start();
+		int id = EffectRegister(eff);
+		
+		return id;
+	}
+	
+	//===============================
+	// Stop
+	//===============================
 	static void Stop(int effect_id)
 	{
 		Effect eff = m_EffectsMap.Get(effect_id);
@@ -79,20 +165,40 @@ class SEffectManager
 		}
 	}
 	
+	//===============================
+	// GetEffectByID
+	//===============================
 	static Effect GetEffectByID(int effect_id)
 	{
 		return m_EffectsMap.Get(effect_id);
 	}
 	
-	static void EffectUnregister(int id)
-    {
-		m_EffectsMap.Set(id, NULL);
-		m_FreeEffectIDs.Insert(id);
-    }
-	
-	
-	/*static array<ref Effect> GetAllEffects()
+	//===============================
+	// Event_OnFrameUpdate
+	//===============================
+	static void Event_OnFrameUpdate(float time_delta)
 	{
-		return m_Effects;
-	}*/
+		Event_OnFrameUpdate.Invoke(time_delta);
+	}
+	
+	//===============================
+	// GetFreeEffectID
+	//===============================
+	protected static int GetFreeEffectID()
+	{
+		int return_id;
+		
+		if (m_FreeEffectIDs.Count() > 0)
+		{
+			return_id = m_FreeEffectIDs.Get(0);
+			m_FreeEffectIDs.Remove(0);
+		}
+		else
+		{
+			return_id = m_HighestFreeEffectID;
+			m_HighestFreeEffectID += 1;
+		}
+		
+		return return_id;		
+	}
 }

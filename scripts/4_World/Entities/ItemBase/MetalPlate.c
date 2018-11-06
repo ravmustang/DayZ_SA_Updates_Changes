@@ -1,0 +1,3 @@
+class MetalPlate extends ItemBase
+{
+}

@@ -1,4 +1,4 @@
-class Blinded: ModifierBase
+class BlindedMdfr: ModifierBase
 {
 	private const float		BLIND_TIME = 7;
 	private float	 		m_Timer;

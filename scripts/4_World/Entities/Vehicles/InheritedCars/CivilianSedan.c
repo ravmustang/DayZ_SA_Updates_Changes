@@ -98,12 +98,12 @@ class CivilianSedan extends CarScript
 				{	
 					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
 					{
-						newValue = newValue + 0.25;
+						newValue = newValue + 0.7;
 					}
 				}
 				else
 				{
-					newValue = newValue + 0.25;
+					newValue = newValue + 0.7;
 				}
 
 				//-----
@@ -113,12 +113,12 @@ class CivilianSedan extends CarScript
 				{	
 					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
 					{
-						newValue = newValue + 0.25;
+						newValue = newValue + 0.7;
 					}
 				}
 				else
 				{
-					newValue = newValue + 0.25;
+					newValue = newValue + 0.7;
 				}
 			
 				//-----
@@ -127,12 +127,12 @@ class CivilianSedan extends CarScript
 				{	
 					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
 					{
-						newValue = newValue + 0.25;
+						newValue = newValue + 0.7;
 					}
 				}
 				else
 				{
-					newValue = newValue + 0.25;
+					newValue = newValue + 0.7;
 				}
 
 				//-----
@@ -141,14 +141,17 @@ class CivilianSedan extends CarScript
 				{	
 					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
 					{
-						newValue = newValue + 0.25;
+						newValue = newValue + 0.7;
 					}
 				}
 				else
 				{
-					newValue = newValue + 0.25;
+					newValue = newValue + 0.7;
 				}
 
+				if ( newValue > 1 )
+					newValue = 1;
+			
 				return newValue;
 			break;
 		}
@@ -156,6 +159,28 @@ class CivilianSedan extends CarScript
 		return oldValue;
 	}
 	
+	override string GetAnimSourceFromSelection( string selection )
+	{
+		switch( selection )
+		{
+		case "doors_driver":
+			return "DoorsDriver";
+		case "doors_codriver":
+			return "DoorsCoDriver";
+		case "doors_cargo1":
+			return "DoorsCargo1";
+		case "doors_cargo2":
+			return "DoorsCargo2";
+		case "doors_hood":
+			return "DoorsHood";
+		case "doors_trunk":
+			return "DoorsTrunk";
+		}
+
+		return "";
+	}
+
+
 	override bool IsVitalTruckBattery()
 	{
 		return false;

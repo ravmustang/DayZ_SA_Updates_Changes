@@ -26,7 +26,7 @@ class ActionGetOutTransport: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Leave vehicle";
+		return "#leave_vehicle";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -41,7 +41,7 @@ class ActionGetOutTransport: ActionInteractBase
 			{
 				m_crewIdx = m_transport.CrewMemberIndex( player );
 				if ( m_crewIdx >= 0 && m_transport.CrewCanGetThrough( m_crewIdx ) )
-				return true;
+					return true;
 			}
 		}
 
@@ -50,6 +50,7 @@ class ActionGetOutTransport: ActionInteractBase
 
 	override void Start( ActionData action_data )
 	{
+		super.Start( action_data );
 		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
 		if( vehCommand )
 		{
@@ -74,7 +75,29 @@ class ActionGetOutTransport: ActionInteractBase
 		}
 	}
 	
-	override bool IsInstant()
+	override void OnUpdate(ActionData action_data)
+	{
+
+		if(action_data.m_State == UA_START)
+		{
+			if( !action_data.m_Player.GetCommand_Vehicle().IsGettingOut() )
+			{
+				End(action_data);
+			}
+			//TODO add some timed check for stuck possibility
+			/*else
+			{
+				End(action_data);
+			}*/
+		}
+	}
+	
+	override bool CanBeUsedInRestrain()
+	{
+		return true;
+	}
+	
+	override bool CanBeUsedInVehicle()
 	{
 		return true;
 	}

@@ -1,5 +1,5 @@
 #ifdef DEVELOPER
-const bool DebugTrigger = true;
+const bool DebugTrigger = false;
 #else
 const bool DebugTrigger = false;
 #endif
@@ -159,8 +159,10 @@ class Trigger extends ScriptedEntity
 		SetExtents(mins, maxs);
 	}
 
-	private void ~Trigger()
+	override void EEDelete(EntityAI parent)
 	{
+		super.EEDelete(parent);
+		
 		Cleanup();
 	}
 			

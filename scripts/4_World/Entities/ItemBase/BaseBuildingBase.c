@@ -1,58 +1,266 @@
 //BASE BUILDING BASE
 class BaseBuildingBase extends ItemBase
 {
-	//==============================================================================
-	// CONSTRUCTION
+	//TODO - remove player messages???
+	static const string MESSAGE_CANNOT_BE_CONSTRUCTED		= "This part cannot be constructed.";
+	static const string MESSAGE_CANNOT_BE_DECONSTRUCTED		= "This part cannot be dismantled because of some other part.";
 	
-	static const string ANIMATION_BARBED_WIRE 				= "BarbWire";
-	static const string ANIMATION_CAMO_NET 					= "Camonet";
-	static const string ANIMATION_LIGHTS 					= "xlights";
+	const string ANIMATION_DEPLOYED			= "Deployed";
+			string CONSTRUCTION_KIT			= "";
 	
-	static const string MESSAGE_NOT_ENOUGH_MATERIALS		= "There are not enough materials to build this part.";
-	static const string MESSAGE_CANNOT_BE_DECONSTRUCTED		= "This part cannot be deconstructed because of some other part.";
+	float 	m_ConstructionKitHealth;			//stored health value for used construction kit
 	
-	ref Construction 	m_Construction;
-	ref array<string> 	m_BaseParts;
-	// construction ^
-	//==============================================================================
+	ref Construction 			m_Construction;
 	
-	//==============================================================================
-	// ELECTRIC FENCES
+	bool 	m_HasBase = false;
+	bool 	m_HasGate = false;
+	//variables for synchronization of base building parts (2x32 is the current limit)
+	int 	m_SyncParts01;									//synchronization for already built parts (32)
+	int 	m_SyncParts02;									//synchronization for already built parts (64)
 	
-	static const string 				BARBEDWIRE_SLOT_LEFT				= "barbedwireleft";
-	static const string 				BARBEDWIRE_SLOT_RIGHT				= "barbedwireright";
-	static const string 				BARBEDWIRE_SLOT_FRONT				= "barbedwirefront";
-	static const string 				BARBEDWIRE_SLOTS[] = {BARBEDWIRE_SLOT_FRONT, BARBEDWIRE_SLOT_LEFT, BARBEDWIRE_SLOT_RIGHT};
-	
-	// Positions of damage triggers are local to the model. "0 0 0" means undefined and it will be ignored, therefore overwrite these in your item's constructor if you want to use them!
-	const int 							DMG_TRIGGERS_COUNT						= 3;
-	vector 								m_DmgTrgLocalPos[DMG_TRIGGERS_COUNT]	= {"0 0 0", "0 0 0", "0 0 0"}; // Order must be same with BARBEDWIRE_SLOTS!
-	int									m_DmgTrgLocalDir[DMG_TRIGGERS_COUNT]	= {0,0,0}; // Direction of each trigger local to the model in degrees
-	
-	ref map<string,BarbedWire>		m_BarbedWires;
-	ref array<BarbedWireTrigger> 		m_DmgTriggers;
-	
-	// electric fences ^
-	//==============================================================================
-
-	//==============================================================================
-	// CONSTRUCTION	
+	ref map<string, ref AreaDamageRegularDeferred> m_DamageTriggers;
 	
 	// Constructor
 	void BaseBuildingBase() 
 	{
+		//TODO - damage triggers
+		/*
 		SetFlags(EntityFlags.TRIGGER, false);
 		
 		m_DmgTriggers = new array<BarbedWireTrigger>;
 		m_BarbedWires = new map<string,BarbedWire>;
+		*/
 		
-		m_Construction = new Construction( this );
+		m_DamageTriggers = new ref map<string, ref AreaDamageRegularDeferred>;
+		
+		//synchronized variables
+		RegisterNetSyncVariableInt( "m_SyncParts01" );
+		RegisterNetSyncVariableInt( "m_SyncParts02" );
+	}
+
+	// --- SYNCHRONIZATION
+	void Synchronize()
+	{
+		if ( GetGame().IsServer() )
+		{
+			SetSynchDirty();
+			
+			if ( GetGame().IsMultiplayer() )
+			{
+				Refresh();
+			}
+		}
 	}
 	
-	// Destructor
-	void ~BaseBuildingBase() 
+	//refresh visual/physics state
+	void Refresh()
 	{
-		//cleanup
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( UpdateVisuals );
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( UpdatePhysics, 100, false );
+	}
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+
+		//update parts
+		SetPartsFromSyncData();
+		
+		//update visuals (client)
+		Refresh();
+	}
+	
+	//parts synchronization
+	void RegisterPartForSync( int part_id )
+	{
+		if ( part_id >= 1 )		//part_id must starts from index = 1
+		{
+			int offset;
+			int mask;
+			
+			m_SyncParts01 = m_SyncParts01 | mask;
+			
+			if ( part_id > 32 )
+			{
+				offset = ( part_id % 32 ) - 1;
+				mask = 1 << offset;
+				
+				m_SyncParts02 = m_SyncParts02 | mask;
+			}
+			else
+			{
+				offset = part_id - 1;
+				mask = 1 << offset;
+				
+				m_SyncParts01 = m_SyncParts01 | mask;
+			}
+			
+			Synchronize();
+		}
+	}
+	
+	void UnregisterPartForSync( int part_id )
+	{
+		if ( part_id >= 1 )		//part_id must starts from index = 1
+		{
+			int offset;
+			int mask;
+			
+			m_SyncParts01 = m_SyncParts01 | mask;
+			
+			if ( part_id > 32 )
+			{
+				offset = ( part_id % 32 ) - 1;
+				mask = 1 << offset;
+				
+				m_SyncParts02 = m_SyncParts02 & ~mask;
+			}
+			else
+			{
+				offset = part_id - 1;
+				mask = 1 << offset;
+				
+				m_SyncParts01 = m_SyncParts01 & ~mask;
+			}
+			
+			Synchronize();
+		}		
+	}	
+	
+	bool IsPartBuildInSyncData( int part_id )
+	{
+		if ( part_id >= 1 )		//part_id must starts from index = 1
+		{
+			int offset;
+			int mask;
+			
+			m_SyncParts01 = m_SyncParts01 | mask;
+			
+			if ( part_id > 32 )
+			{
+				offset = ( part_id % 32 ) - 1;
+				mask = 1 << offset;
+				
+				if ( ( m_SyncParts02 & mask ) > 0 )
+				{
+					return true;
+				}
+			}
+			else
+			{
+				offset = part_id - 1;
+				mask = 1 << offset;
+				
+				if ( ( m_SyncParts01 & mask ) > 0 )
+				{
+					return true;
+				}
+			}
+		}			
+		
+		return false;
+	} 
+	//------
+	
+	//set construction parts based on synchronized data
+	void SetPartsFromSyncData()
+	{
+		Construction construction = GetConstruction();
+		map<string, ref ConstructionPart> construction_parts = construction.GetConstructionParts();
+		
+		for ( int i = 0; i < construction_parts.Count(); ++i )
+		{
+			string key = construction_parts.GetKey( i );
+			ConstructionPart value = construction_parts.Get( key );
+		
+			bool is_part_built_sync = IsPartBuildInSyncData( value.GetId() );
+			if ( is_part_built_sync )
+			{
+				if ( !value.IsBuilt() )
+				{
+					GetConstruction().BuildPart( key, false );
+				}
+			}
+			else
+			{
+				if ( value.IsBuilt() )
+				{
+					GetConstruction().DismantlePart( key, false );
+				}
+			}
+		}
+	}
+	//
+	
+	//Base
+	bool HasBase()
+	{
+		return m_HasBase;
+	}
+	
+	void SetBaseState( bool has_base )
+	{
+		m_HasBase = has_base;
+	}
+	
+	//Gate
+	bool HasGate()
+	{
+		return m_HasGate;
+	}
+	
+	void SetGateState( bool has_gate )
+	{
+		m_HasGate = has_gate;
+	}
+	
+	// --- PLACING
+	override bool IsHeavyBehaviour()
+	{
+		return true;
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	//--- CONSTRUCTION KIT
+	ItemBase CreateConstructionKit()
+	{
+		ItemBase construction_kit = ItemBase.Cast( GetGame().CreateObject( CONSTRUCTION_KIT, GetPosition() ) );
+		construction_kit.SetHealth( m_ConstructionKitHealth );
+		
+		return construction_kit;
+	}
+	
+	void DestroyConstructionKit( ItemBase construction_kit )
+	{
+		m_ConstructionKitHealth = construction_kit.GetHealth();
+		GetGame().ObjectDelete( construction_kit );
+	}
+	
+	// --- EVENTS
+	override void OnStoreSave( ParamsWriteContext ctx )
+	{   
+		super.OnStoreSave( ctx );
+		
+		//sync parts 01
+		ctx.Write( m_SyncParts01 );
+		ctx.Write( m_SyncParts02 );
+	}
+	
+	override void OnStoreLoad( ParamsReadContext ctx )
+	{
+		super.OnStoreLoad( ctx );
+		
+		//Restore synced parts data
+		//sync parts 01
+		ctx.Read( m_SyncParts01 );
+		ctx.Read( m_SyncParts02 );
+		
+		//restore parts from restored sync data
+		SetPartsFromSyncData();
 	}
 	
 	override void EEInit()
@@ -61,245 +269,383 @@ class BaseBuildingBase extends ItemBase
 		
 		//Construction init
 		ConstructionInit();
-	}
-	
-	//add to entity ai
-	override bool CanUseConstruction()
-	{
-		return true;
-	}
-	
-	//on store save/load
-	override void OnStoreSave( ParamsWriteContext ctx )
-	{
-		super.OnStoreSave( ctx );
 		
-		GetConstruction().OnStoreSave( ctx );
+		//update visuals and physics
+		Refresh();
 	}
-	
-	override void OnStoreLoad( ParamsReadContext ctx )
+
+	override void OnItemLocationChanged( EntityAI old_owner, EntityAI new_owner ) 
 	{
-		super.OnStoreLoad( ctx );
+		super.OnItemLocationChanged( old_owner, new_owner );
 		
-		GetConstruction().OnStoreLoad( ctx );
-	}	
-	
-	//construction init
-	void ConstructionInit()
-	{
-		GetConstruction().Init( m_BaseParts );
+		//update visuals after location change
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( UpdatePhysics, 100, false );
 	}
-	Construction GetConstruction()
-	{
-		return m_Construction;
-	}	
 	
-	// --- EVENTS
 	override void EEItemAttached ( EntityAI item, string slot_name )
 	{
 		super.EEItemAttached ( item, slot_name );
 		
-		ItemBase item_IB = ItemBase.Cast( item );
-		string item_type = item_IB.GetType();
-
-		// Attachment control
-		switch (item_type)
-	{
-			case "BarbedWire":
-				BarbedWire attached_BW = BarbedWire.Cast( item_IB );
-				OnBarbedWireAttached(attached_BW, slot_name); // Removed function
-			break;
-			
-			case "CableReel":
-				CableReel attached_cable_reel = CableReel.Cast( item_IB );
-				// OnCableReelAttached(attached_cable_reel, slot_name); // Removed function
-			break;
-		
-			case "CamoNet":
-				this.SetAnimationPhase ( ANIMATION_CAMO_NET, 0 );
-			break;
-				
-			case "XmasLights":
-				this.SetAnimationPhase ( ANIMATION_LIGHTS, 0 );
-				XmasLights fence_light = XmasLights.Cast( item_IB );
-				fence_light.AttachToObject( this );
-			break;
-		}
-		
-		// this.OnItemAttached ( item ); // Removed function
+		//update visuals and physics
+		Refresh();
 	}
-
+	
 	override void EEItemDetached ( EntityAI item, string slot_name )
 	{
 		super.EEItemDetached ( item, slot_name );
 		
-		ItemBase item_IB = ItemBase.Cast( item );
-		string item_type = item_IB.GetType();
-	
-		// Attachment control
-		switch (item_type)
-	{
-			case "BarbedWire":
-				BarbedWire detached_BW = BarbedWire.Cast( item_IB );
-				OnBarbedWireDetached(detached_BW, slot_name); // Removed function
-			break;
-		
-			case "CableReel":
-				CableReel detached_CR = CableReel.Cast( item_IB );
-				// OnCableReelDetached(detached_CR, slot_name); // Removed function
-			break;
-			
-			case "CamoNet":
-				this.SetAnimationPhase ( ANIMATION_CAMO_NET, 1 );
-			break;
-		
-			case "XmasLights":
-				this.SetAnimationPhase ( ANIMATION_LIGHTS, 1 );
-				XmasLights fence_light = XmasLights.Cast( item_IB );
-				fence_light.DetachFromObject( this );
-			break;
-	}
+		//update visuals and physics
+		Refresh();
 	}
 	
-	
-	// construction ^
-	//==============================================================================
-	
-	
-	
-	/*==============================================
-					ELECTRIC FENCES
-	==============================================*/
-	
-	
-	// When a barbed wire is attached to this fence/watchtower
-	void OnBarbedWireAttached(BarbedWire attached_BW, string slot_name)
+	//CONSTRUCTION EVENTS
+	void OnPartBuilt( string part_name )
 	{
-		SetWire(slot_name, attached_BW);
-		UpdateDamageTriggers();
-		ShowSelection(ANIMATION_BARBED_WIRE);
-		AddProxyPhysics( ANIMATION_BARBED_WIRE );
-	}
-	
-	// Creates all damage triggers this structure needs. They are tied to the barbed wire item.
-	void UpdateDamageTriggers()
-	{
-		DestroyDamageTriggers();
+		ConstructionPart constrution_part = GetConstruction().GetConstructionPart( part_name );
 		
-		for ( int i = 0; i < 3; ++i )
+		//check base state
+		if ( constrution_part.IsBase() )
 		{
-			string slot_name = BARBEDWIRE_SLOTS[i];
-			BarbedWire bw = BarbedWire.Cast( FindAttachmentBySlotName( slot_name ) );
+			SetBaseState( true );
 			
-			if (bw)
+			//spawn kit
+			if ( GetGame().IsServer() )
 			{
-				vector local_pos = m_DmgTrgLocalPos[ i ];
-				if ( local_pos != "0 0 0" ) // "0 0 0" is considered as undefined!
-				{
-					vector global_pos	= ModelToWorld (local_pos);
-					BarbedWireTrigger dmg_trg = BarbedWireTrigger.Cast( GetGame().CreateObject( "BarbedWireTrigger", global_pos, false ) );
-					vector mins = "-1.8 -0.4 -0.6";
-					vector maxs = "1.8 0.4 0.6";
-					vector ori = GetOrientation();
-					ori[0] = ori[0] + m_DmgTrgLocalDir[i]; // rotate the trigger
-					dmg_trg.SetOrientation( ori );
-					dmg_trg.SetExtents(mins, maxs);	
-					dmg_trg.SetParentObject( bw );
-					m_DmgTriggers.Insert(dmg_trg);
-				}
+				CreateConstructionKit();
 			}
 		}
-	}
 	
-	// Removes all damage triggers
-	void DestroyDamageTriggers()
-	{
-		int count = m_DmgTriggers.Count();
-		--count;
-		for ( int i = count; i >= 0; --i )
+		//check gate state
+		if ( constrution_part.IsGate() )
 		{
-			BarbedWireTrigger trg = m_DmgTriggers.Get(i);
-			
-			if ( trg  &&  GetGame() ) // It's necesarry to check if the game exists. Otherwise a crash occurs while quitting.
-				GetGame().ObjectDelete( trg );
-			
-			m_DmgTriggers.Remove(i);
+			SetGateState( true );
 		}
+	
+		//register constructed parts for synchronization
+		RegisterPartForSync( constrution_part.GetId() );		
 	}
 	
-	void SetWire(string slot_name, BarbedWire wire)
+	void OnPartDismantled( string part_name )
 	{
-		if (wire)
+		ConstructionPart constrution_part = GetConstruction().GetConstructionPart( part_name );
+		
+		//check base state
+		if ( constrution_part.IsBase() )
 		{
-			m_BarbedWires.Set(slot_name, wire);
+			//Destroy construction
+			GetGame().ObjectDelete( this );
+		}
+		
+		//check gate state
+		if ( constrution_part.IsGate() )
+		{
+			SetGateState( false );
+		}		
+		
+		//register constructed parts for synchronization
+		UnregisterPartForSync( constrution_part.GetId() );
+	}
+	
+	// --- UPDATE
+	void UpdateVisuals()
+	{
+		//update attachments visuals
+		ref array<string> attachment_slots = new ref array<string>;
+		GetAttachmentSlots( this, attachment_slots );
+		for ( int i = 0; i < attachment_slots.Count(); i++ )
+		{
+			string slot_name = attachment_slots.Get( i );
+			EntityAI attachment = FindAttachmentBySlotName( slot_name );
+			string slot_name_mounted = slot_name + "_Mounted";
+		
+			if ( attachment )
+			{
+				if ( attachment.IsInherited( BarbedWire ) )
+				{
+					BarbedWire barbed_wire = BarbedWire.Cast( attachment );
+					if ( barbed_wire.IsMounted() )
+					{
+						SetAnimationPhase( slot_name, 1 );
+						SetAnimationPhase( slot_name_mounted, 0 );
+						
+						//TODO - add damage trigger once triggers are fixed
+						//CreateAreaDamage( slot_name_mounted );			//create damage trigger if barbed wire is mounted
+					}
+					else
+					{
+						SetAnimationPhase( slot_name_mounted, 1 );
+						SetAnimationPhase( slot_name, 0 );
+						
+						DestroyAreaDamage( slot_name_mounted );			//destroy damage trigger if barbed wire is not mounted
+					}
+				}
+				else
+				{
+					if ( IsAttachmentSlotLocked( attachment ) )
+					{
+						SetAnimationPhase( slot_name_mounted, 1 );
+						SetAnimationPhase( slot_name, 1 );
+					}
+					else
+					{
+						SetAnimationPhase( slot_name, 0 );
+					}			
+				}
+			}
+			else
+			{
+				SetAnimationPhase( slot_name_mounted, 1 );
+				SetAnimationPhase( slot_name, 1 );
+				
+				DestroyAreaDamage( slot_name_mounted );			//try to destroy damage trigger if barbed wire is not present
+			}
+		}	
+	
+		//check base
+		if ( !HasBase() )
+		{
+			SetAnimationPhase( ANIMATION_DEPLOYED, 0 );
 		}
 		else
 		{
-			m_BarbedWires.Set(slot_name, NULL);
-		}
-	}
-	
-	
-	// !Returns the some barbed wire attached on this fence
-	BarbedWire GetWire()
-	{
-		BarbedWire return_wire;
-		ref array<BarbedWire> wires = GetWires();
-		
-		if (wires.Count() > 0)
-		{
-			return_wire = wires.Get(0);
+			SetAnimationPhase( ANIMATION_DEPLOYED, 1 );
 		}
 		
-		return return_wire;
+		GetConstruction().UpdateVisuals();
 	}
 	
-	void OnBarbedWireDetached(BarbedWire detached_BW, string slot_name)
+	void UpdatePhysics()
 	{
-		detached_BW.GetCompEM().UnplugAllDevices();
-		SetWire(slot_name, NULL);
-		UpdateDamageTriggers();
-		HideSelection(ANIMATION_BARBED_WIRE);
-		RemoveProxyPhysics( ANIMATION_BARBED_WIRE );
-	}
-	
-	// !Returns array of barbed wires attached to this BBB object
-	array<BarbedWire> GetWires()
-	{
-		array<BarbedWire> return_array = new array<BarbedWire>;
-		
-		for ( int i = 0; i < 3; ++i )
+		//update attachments physics
+		ref array<string> attachment_slots = new ref array<string>;
+		GetAttachmentSlots( this, attachment_slots );
+		for ( int i = 0; i < attachment_slots.Count(); i++ )
 		{
-			BarbedWire bw = m_BarbedWires.Get( BARBEDWIRE_SLOTS[i] );
+			string slot_name = attachment_slots.Get( i );
+			EntityAI attachment = FindAttachmentBySlotName( slot_name );
+			string slot_name_mounted = slot_name + "_Mounted";
 			
-			if (bw)
+			if ( attachment )
 			{
-				return_array.Insert(bw);
+				if ( attachment.IsInherited( BarbedWire ) )
+				{
+					BarbedWire barbed_wire = BarbedWire.Cast( attachment );
+					if ( barbed_wire.IsMounted() )
+					{
+						RemoveProxyPhysics( slot_name );
+						AddProxyPhysics( slot_name_mounted );
+					}
+					else
+					{
+						RemoveProxyPhysics( slot_name_mounted );
+						AddProxyPhysics( slot_name );
+					}
+				}
+				else
+				{
+					if ( IsAttachmentSlotLocked( attachment ) )
+					{
+						RemoveProxyPhysics( slot_name_mounted );
+						RemoveProxyPhysics( slot_name );
+					}
+					else
+					{
+						AddProxyPhysics( slot_name );
+					}
+				}
+			}
+			else
+			{
+				RemoveProxyPhysics( slot_name_mounted );
+				RemoveProxyPhysics( slot_name );
 			}
 		}
 		
-		return return_array;
+		//check base
+		if ( !HasBase() )
+		{
+			AddProxyPhysics( ANIMATION_DEPLOYED );
+		}
+		else
+		{
+			RemoveProxyPhysics( ANIMATION_DEPLOYED );
+		}
+		
+		GetConstruction().UpdatePhysics();
+		
+		//regenerate navmesh
+		SetAffectPathgraph( true, false );
+	}	
+	
+	override bool CanUseConstruction()
+	{
+		return true;
+	}
+
+	protected bool IsAttachmentSlotLocked( EntityAI attachment )
+	{
+		if ( attachment )
+		{
+			InventoryLocation inventory_location = new InventoryLocation;
+			attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
+			
+			return GetInventory().GetSlotLock( inventory_location.GetSlot() );
+		}
+			
+		return false;
 	}
 	
-	//! Returns the number of barbed wires attached to this structure
-	int GetWiresCount()
+	//--- ATTACHMENT SLOTS
+	void GetAttachmentSlots( EntityAI entity, out array<string> attachment_slots )
 	{
-		int total_count = m_BarbedWires.Count();
-		int counter = 0;
-		
-		for ( int i = 0; i < total_count; ++i )
+		string config_path = "CfgVehicles" + " " + entity.GetType() + " " + "attachments";
+		if ( GetGame().ConfigIsExisting( config_path ) )
 		{
-			BarbedWire bw = m_BarbedWires.Get( BARBEDWIRE_SLOTS[i] );
-			
-			if (bw)
+			GetGame().ConfigGetTextArray( config_path, attachment_slots );
+		}
+	}
+	
+	// --- INIT
+	void ConstructionInit()
+	{
+		if ( !m_Construction )
+		{
+			m_Construction = new Construction( this );
+		}
+		
+		GetConstruction().Init();
+	}
+	
+	Construction GetConstruction()
+	{
+		return m_Construction;
+	}
+	
+	//--- INVENTORY/ATTACHMENTS CONDITIONS
+	//attachments
+	override bool CanReceiveAttachment( EntityAI attachment, int slotId )
+	{
+		return true;
+	}
+	
+	bool HasAttachmentsBesidesBase()
+	{
+		if ( GetInventory().AttachmentCount() > 1 )
+		{
+			if ( !HasBase() )
 			{
-				counter++;
+				return true;
 			}
 		}
 		
-		return counter;
+		return false;
 	}
 	
-	// electric fences ^
-	//==============================================================================	
+	//this into/outo parent.Cargo
+	override bool CanPutInCargo( EntityAI parent )
+	{
+		return false;
+	}
+	
+	override bool CanRemoveFromCargo( EntityAI parent )
+	{
+		return false;
+	}
+
+	//hands
+	override bool CanPutIntoHands( EntityAI parent )
+	{
+		return false;
+	}
+	
+	//--- ACTION CONDITIONS
+	//direction
+	bool IsFacingFront( PlayerBase player )
+	{
+		return true;
+	}
+	
+	bool IsFacingBack( PlayerBase player )
+	{
+		return true;
+	}
+	
+	//folding
+	bool CanFoldBaseBuildingObject()
+	{
+		if ( HasBase() || GetInventory().AttachmentCount() > 0 )
+		{
+			return false;
+		}
+		
+		return true;
+	}
+	
+	void FoldBaseBuildingObject()
+	{
+		CreateConstructionKit();
+		GetGame().ObjectDelete( this );
+	}
+	
+	//Damage triggers (barbed wire)
+	void CreateAreaDamage( string slot_name )
+	{
+		if ( GetGame() && GetGame().IsServer() )
+		{
+			//destroy area damage if some already exists
+			DestroyAreaDamage( slot_name );
+			
+			//create new area damage
+			AreaDamageRegularDeferred area_damage = new AreaDamageRegularDeferred( this );
+			
+			vector min_max[2];
+			
+			if ( MemoryPointExists( slot_name + "_min" ) )
+			{
+				min_max[0] = GetMemoryPointPos( slot_name + "_min" );
+			}
+			if ( MemoryPointExists( slot_name + "_max" ) )
+			{
+				min_max[0] = GetMemoryPointPos( slot_name + "_max" );
+			}
+			
+			/*
+			vector egde_length = GetConstruction().GetCollisionBoxSize( min_max );
+			vector min;
+			min[0] = -egde_length[0] / 2;
+			min[1] = -egde_length[1] / 2;
+			min[2] = -egde_length[2] / 2;
+			vector max;
+			max[0] = egde_length[0] / 2;
+			max[1] = egde_length[1] / 2;
+			max[2] = egde_length[2] / 2;
+			area_damage.SetExtents( min_max[0], min_max[1] );
+			*/
+			area_damage.SetExtents( "-2 -1 -2", "2 1 2" );
+			area_damage.SetLoopInterval( 0.5 );
+			area_damage.SetDeferInterval( 0.5 );
+			area_damage.SetHitZones( { "Head","Torso","LeftHand","LeftLeg","LeftFoot","RightHand","RightLeg","RightFoot" } );
+			area_damage.SetAmmoName( "MeleeDamage" );
+			area_damage.Spawn();
+			
+			m_DamageTriggers.Insert( slot_name, area_damage );
+		}
+	}
+	
+	void DestroyAreaDamage( string slot_name )
+	{
+		if ( GetGame() && GetGame().IsServer() )
+		{
+			AreaDamageRegularDeferred area_damage;
+			if ( m_DamageTriggers.Find( slot_name, area_damage ) ) 
+			{
+				if ( area_damage )
+				{
+					area_damage.DestroyDamageTrigger();
+				}
+				
+				m_DamageTriggers.Remove( slot_name );
+			}
+		}
+	}
 }

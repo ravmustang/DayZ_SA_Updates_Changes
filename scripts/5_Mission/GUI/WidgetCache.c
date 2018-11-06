@@ -2,12 +2,14 @@ class WidgetCache
 {
 	private ref static WidgetCache s_instance;
 
-	protected ref map<string, ref array<ref WidgetCacheObject>> m_widgets_cache;
+	protected ref map<string, ref array<ref WidgetCacheObject>> m_WidgetsCache;
 
-	const int INVENTORY_CACHES = 5;
-	const int INVENTORY_ICON_CACHES = 5;
-	const int INVENTORY_ICON_CONTAINER_CACHES = 5;
-	const int COLLAPSIBLE_HEADER_CACHES = 5;
+	const int INVENTORY_CACHES = 1;
+	const int INVENTORY_ICON_CACHES = 50;
+	const int INVENTORY_ICON_CONTAINER_CACHES = 50;
+	const int COLLAPSIBLE_HEADER_CACHES = 50;
+	const int GRID_CONTAINER_CACHES = 50;
+	
 	ref Inventory m_Inventory;
 
 	static WidgetCache GetInstance()
@@ -23,9 +25,9 @@ class WidgetCache
 	void WidgetCache()
 	{
 		s_instance = this;
-		m_widgets_cache = new map<string, ref array<ref WidgetCacheObject>>;
+		m_WidgetsCache = new map<string, ref array<ref WidgetCacheObject>>;
 
-		CreateWidgetsCache();
+		//CreateWidgetsCache();
 		/*m_Inventory = new Inventory( NULL );
 		m_Inventory.Reset();
 		m_Inventory.OnHide();*/
@@ -39,16 +41,15 @@ class WidgetCache
 	void CreateWidgetsCache()
 	{
 		CreateWidgetCache( WidgetLayoutName.Inventory, INVENTORY_CACHES );
-		CreateWidgetCache( WidgetLayoutName.InventoryIcon, INVENTORY_ICON_CACHES );
-		CreateWidgetCache( WidgetLayoutName.InventoryIconContainer, 5 );
+		CreateWidgetCache( WidgetLayoutName.InventorySlotsContainer, 5 );
 		CreateWidgetCache( WidgetLayoutName.CollapsibleHeader, COLLAPSIBLE_HEADER_CACHES );
-		CreateWidgetCache( WidgetLayoutName.LeftArea, COLLAPSIBLE_HEADER_CACHES );
+		CreateWidgetCache( WidgetLayoutName.LeftArea, 1 );
 		CreateWidgetCache( WidgetLayoutName.CollapsibleContainer, COLLAPSIBLE_HEADER_CACHES );
 		CreateWidgetCache( WidgetLayoutName.ClosableHeader, COLLAPSIBLE_HEADER_CACHES );
-		CreateWidgetCache( WidgetLayoutName.HandsHeader, COLLAPSIBLE_HEADER_CACHES );
-		CreateWidgetCache( WidgetLayoutName.HandsArea, COLLAPSIBLE_HEADER_CACHES );
+		CreateWidgetCache( WidgetLayoutName.HandsHeader, 1 );
+		CreateWidgetCache( WidgetLayoutName.HandsArea, 1 );
 		CreateWidgetCache( WidgetLayoutName.ClosableContainer, COLLAPSIBLE_HEADER_CACHES );
-		CreateWidgetCache( WidgetLayoutName.GridContainer, COLLAPSIBLE_HEADER_CACHES );
+		CreateWidgetCache( WidgetLayoutName.GridContainer, GRID_CONTAINER_CACHES );
 	}
 
 	void CreateWidgetCache( string layoutName, int numberOfCaches )
@@ -59,21 +60,20 @@ class WidgetCache
 		{
 			ref Widget w = GetGame().GetWorkspace().CreateWidgets( layoutName, NULL );
 			w.Show( false );
-			if( layoutName == WidgetLayoutName.Inventory )
-			w.SetSort(50);
 			ref WidgetCacheObject w_cache_object = new WidgetCacheObject( w );
 			widgets.Insert( w_cache_object );
 		}
 
-		m_widgets_cache.Insert( layoutName, widgets );
+		m_WidgetsCache.Insert( layoutName, widgets );
 	}
 
 	WidgetCacheObject Get( string layoutName )
 	{
-		array<ref WidgetCacheObject> objects = m_widgets_cache.Get( layoutName );
+		array<ref WidgetCacheObject> objects = m_WidgetsCache.Get( layoutName );
+		ref WidgetCacheObject w;
 		if( objects && objects.Count() > 0 )
 		{
-			WidgetCacheObject w = objects.Get( 0 );
+			w = objects.Get( 0 );
 			objects.Remove(0);
 	
 			w.SaveOriginalValeus();
@@ -83,7 +83,10 @@ class WidgetCache
 
 	void Return( string layoutName, ref WidgetCacheObject w )
 	{
+		Widget w_p = w.GetWidget().GetParent();
+		if( w_p )
+			w_p.RemoveChild( w.GetWidget() );
 		w.RestoreOriginalValeus();
-		m_widgets_cache.Get( layoutName ).Insert( w );
+		m_WidgetsCache.Get( layoutName ).Insert( w );
 	}
 }

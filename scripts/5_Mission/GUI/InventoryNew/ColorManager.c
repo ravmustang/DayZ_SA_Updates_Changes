@@ -37,36 +37,27 @@ class ColorManager
 		}
 	}
 	
-	int GetItemColor( InventoryItem item )
+	int GetItemColor( ItemBase item )
 	{
-		InventoryManager manager = InventoryManager.GetInstance();
 		int color = -1;
-		if( manager )
+		ItemBase dragged_item = ItemBase.Cast( ItemManager.GetInstance().GetDraggedItem() );
+		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		
+		if ( dragged_item )
+			return 0;
+		
+		// if item icon is main icon (view, viewgrid )
+		if ( item.GetHierarchyParent() && item.GetHierarchyParent() != player )
 		{
-			InventoryItem dragged_item = manager.GetItem();
-			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-			
-			if ( dragged_item ) return 0;
-			// int color = InventoryGrid.ITEM_COLOR_NORMAL;
-			
+			color = -1;
+		}
 
-			// if item icon is main icon (view, viewgrid )
-			if ( item.IsInherited( InventoryItem ) && item.GetHierarchyParent() && item.GetHierarchyParent() != player )
+		if( item ) 
+		{
+			float temperature = item.GetTemperature();
+			if ( temperature )
 			{
-				color = -1;
-			}
-
-			if( item.IsInherited( InventoryItem )  ) 
-			{
-				ItemBase item_base = ItemBase.Cast( item );
-				if( item_base )
-				{
-					float temperature = item_base.GetTemperature();
-					if ( temperature )
-					{
-						color = GetTemperatureColor( temperature );
-					}
-				}
+				color = GetTemperatureColor( temperature );
 			}
 		}
 		return color;

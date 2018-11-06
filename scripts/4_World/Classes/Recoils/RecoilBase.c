@@ -3,7 +3,7 @@ class RecoilBase
 	bool m_DebugMode;
 	
 	Weapon_Base m_Weapon;
-	Man m_Player;
+	PlayerBase m_Player;
 	protected bool m_DeleteRequested;
 	protected float m_Time;//how much time has elapsed since first update
 	protected float m_ReloadTime;//reload time config parameter of the weapon
@@ -32,7 +32,7 @@ class RecoilBase
 	{
 		m_Weapon = weapon;
 		m_DebugMode = false;
-		//m_Player = weapon.GetHierarchyRootPlayer();
+		m_Player = PlayerBase.Cast(weapon.GetHierarchyRootPlayer());
 		m_HandsCurvePoints = new array<vector>;
 		Init();
 		PostInit(weapon);
@@ -51,43 +51,10 @@ class RecoilBase
 	void PostInit(Weapon_Base weapon)
 	{
 		int muzzleIndex = weapon.GetCurrentMuzzle();
-		
-		if( weapon.GetRecoilSeed() == 0 )
-		{
-			Magazine magazine = weapon.GetMagazine(muzzleIndex);
-			int weapon_uid_low;
-			int weapon_uid_high;
-			weapon.GetNetworkID(weapon_uid_low, weapon_uid_high);
-			
-			/*
-			int mag_uid_low;
-			int mag_uid_high;
-			magazine.GetNetworkID(mag_uid_low,mag_uid_high);
-			*/
-			
-			//int ammo_count = magazine.GetAmmoCount();
-			int new_seed = Math.AbsInt(weapon_uid_low);
-			
-			weapon.SetRecoilSeed(new_seed);
-			
-			if(m_DebugMode)
-			{
-				Print("---------------------");
-				PrintString("weaponUID_1:"+weapon_uid_low);
-				PrintString("weaponUID_2:"+weapon_uid_high);
-				//PrintString("magUID_1:"+mag_uid_low);
-				//PrintString("magUID_2:"+mag_uid_high);
-				PrintString("ammo_count:"+magazine.GetAmmoCount());
-				PrintString("new_seed:"+new_seed);
-				Print("---------------------");
-			}
-			
-		}
+		Magazine magazine = weapon.GetMagazine(muzzleIndex);
 
-		Math.Randomize( weapon.GetRecoilSeed() );
-		m_Angle = Math.RandomFloatInclusive(m_MouseOffsetRangeMin,m_MouseOffsetRangeMax);
-		weapon.SetRecoilSeed(Math.RandomIntInclusive(1, 1000000));
-		if(m_DebugMode) Print(weapon.GetRecoilSeed());
+		m_Angle = m_Player.GetRandomGeneratorSyncManager().GetRandomInRange(RandomGeneratorSyncUsage.RGSRecoil, m_MouseOffsetRangeMin, m_MouseOffsetRangeMax);
+
 		if(m_DebugMode) Print(m_Angle);
 		
 		m_ReloadTime = weapon.GetReloadTime(muzzleIndex);
@@ -111,6 +78,12 @@ class RecoilBase
 			Destroy();
 		}
 		
+		if( m_DeleteRequested )
+		{
+			delete this;
+		}
+		
+		
 		ApplyMouseOffset(pDt, axis_mouse_x, axis_mouse_y);
 		ApplyHandsOffset(pDt, axis_hands_x, axis_hands_y);
 		
@@ -122,10 +95,7 @@ class RecoilBase
 		axis_hands_x = axis_hands_x * recoil_modifier[0];
 		axis_hands_y = axis_hands_y * recoil_modifier[1];
 		
-		if( m_DeleteRequested )
-		{
-			delete this;
-		}
+		
 		
 
 	}
@@ -196,7 +166,7 @@ class RecoilBase
 	vector GetRecoilModifier(Weapon_Base weapon)
 	{
 		vector recoil_modifier;
-		if( weapon.GetPropertyModifierObject() )
+		if( weapon && weapon.GetPropertyModifierObject() )
 		{
 			recoil_modifier = weapon.GetPropertyModifierObject().GetRecoilModifiers();
 		}

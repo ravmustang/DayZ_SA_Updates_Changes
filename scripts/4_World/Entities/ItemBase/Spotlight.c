@@ -28,6 +28,11 @@ class Spotlight extends ItemBase
 		UpdateAllSelections();
 	}
 	
+	override string GetDeploySoundset()
+	{
+		return "spotlight_deploy_SoundSet";
+	}	
+	
 	override bool IsTwoHandedBehaviour()
 	{
 		return true;

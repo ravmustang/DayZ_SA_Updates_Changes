@@ -27,11 +27,12 @@ enum HandEventID
  **/
 class HandEventBase
 {
-	int m_EventID;
+	int m_EventID = 0;
+	int m_AnimationID = -1;
 	Man m_Player;
 	EntityAI m_Entity;
 
-	void HandEventBase (Man p = null, EntityAI e = NULL) { m_EventID = 0; m_Player = p; m_Entity = e; }
+	void HandEventBase (Man p = null, EntityAI e = NULL) { m_Player = p; m_Entity = e; }
 	HandEventID GetEventID () { return m_EventID; }
 
 	void ReadFromContext (ParamsReadContext ctx) { }
@@ -40,9 +41,11 @@ class HandEventBase
 		ctx.Write(m_EventID);
 		ctx.Write(m_Player);
 		ctx.Write(m_Entity);
+		ctx.Write(m_AnimationID);
 	}
 
 	InventoryLocation GetDst () { return null; }
+	int GetAnimationID () { return m_AnimationID; }
 	bool IsSwapEvent () { return false; }
 	bool CheckRequest () { return true; }
 	bool IsServerSideOnly () { return false; }
@@ -73,15 +76,44 @@ class HandEventBase
 	static HandEventBase CreateHandEventFromContext (ParamsReadContext ctx)
 	{
 		int eventID = -1;
-		ctx.Read(eventID);
+		if (!ctx.Read(eventID))
+		{
+			Error("[hndfsm] CreateHandEventFromContext - cannot read eventID");
+			return null;
+		}
 		Man player;
-		ctx.Read(player);
+		if (!ctx.Read(player))
+		{
+			Error("[hndfsm] CreateHandEventFromContext - cannot read player");
+			return null;
+		}		
 		EntityAI entity;
-		ctx.Read(entity);
-
+		if (!ctx.Read(entity))
+		{
+			Error("[hndfsm] CreateHandEventFromContext - cannot read entity");
+			return null;
+		}
+		int animID = -1;
+		if (!ctx.Read(animID))
+		{
+			Error("[hndfsm] CreateHandEventFromContext - cannot read animID");
+			return null;
+		}
 		HandEventBase b = HandEventFactory(eventID, player, entity);
-		b.ReadFromContext(ctx);
+		if (b)
+		{
+			b.m_AnimationID = animID;
+			b.ReadFromContext(ctx);
+		}
 		return b;
+	}
+	
+	string DumpToString ()
+	{
+		string res = "{ HandEv id=" + typename.EnumToString(HandEventID, GetEventID());
+		res = res + " pl=" + m_Player + " e= " + m_Entity;
+		res = res + " }";
+		return res;
 	}
 };
 
@@ -150,13 +182,37 @@ class HandEventDrop extends HandEventBase
 };
 class HandEventSwap extends HandEventBase
 {
+	int m_Animation2ID = -1;
+
 	void HandEventSwap (Man p = null, EntityAI e = NULL) { m_EventID = HandEventID.SWAP; }
+	
+	override void ReadFromContext (ParamsReadContext ctx)
+	{
+		super.ReadFromContext(ctx);
+		ctx.Read(m_Animation2ID);
+	}
+
+	override void WriteToContext (ParamsWriteContext ctx)
+	{
+		super.WriteToContext(ctx);
+		ctx.Write(m_Animation2ID);
+	}
 
 	override InventoryLocation GetDst ()
 	{
-		InventoryLocation dst = new InventoryLocation;
-		dst.SetHands(m_Player, m_Entity);
-		return dst;
+		EntityAI inHands = m_Player.GetHumanInventory().GetEntityInHands();
+
+		InventoryLocation new_src = new InventoryLocation;
+		InventoryLocation old_src = new InventoryLocation;
+		if (inHands && m_Entity && inHands && m_Entity.GetInventory().GetCurrentInventoryLocation(new_src) && inHands.GetInventory().GetCurrentInventoryLocation(old_src))
+		{
+			InventoryLocation old_dst = new InventoryLocation;
+			old_dst.Copy(old_src);
+			old_dst.CopyLocationFrom(new_src);
+			return old_dst;
+		}
+		Error("[hndfsm] HandEventSwap - cannot create Dst");
+		return null;
 	}
 	
 	override bool IsSwapEvent () { return true; }
@@ -176,6 +232,7 @@ class HandEventSwap extends HandEventBase
 class HandEventForceSwap extends HandEventBase
 {
 	ref InventoryLocation m_Dst; /// destination of item in hands
+	int m_Animation2ID = -1;
 
 	void HandEventForceSwap (Man p = null, EntityAI e = NULL, InventoryLocation dst = NULL) { m_EventID = HandEventID.FORCESWAP; m_Dst = dst; }
 
@@ -184,11 +241,13 @@ class HandEventForceSwap extends HandEventBase
 		m_Dst = new InventoryLocation;
 		super.ReadFromContext(ctx);
 		m_Dst.ReadFromContext(ctx);
+		ctx.Read(m_Animation2ID);
 	}
 	override void WriteToContext (ParamsWriteContext ctx)
 	{
 		super.WriteToContext(ctx);
 		m_Dst.WriteToContext(ctx);
+		ctx.Write(m_Animation2ID);
 	}
 
 	override InventoryLocation GetDst () { return m_Dst; }

@@ -5,7 +5,7 @@ class MainMenu extends UIScriptedMenu
 	protected ref MainMenuVideo		m_Video;
 	
 	protected MissionMainMenu		m_Mission;
-	protected DayZIntroScene 		m_ScenePC;
+	protected DayZIntroScenePC 		m_ScenePC;
 	
 	protected TextWidget			m_PlayerName;
 	protected TextWidget			m_Version;
@@ -15,7 +15,6 @@ class MainMenu extends UIScriptedMenu
 	protected Widget				m_Play;
 	protected ButtonWidget			m_ChooseServer;
 	protected ButtonWidget			m_CustomizeCharacter;
-	protected ButtonWidget			m_Options;
 	protected ButtonWidget			m_PlayVideo;
 	protected ButtonWidget			m_Tutorials;
 	protected Widget				m_StatButton;
@@ -46,7 +45,6 @@ class MainMenu extends UIScriptedMenu
 		m_Play						= layoutRoot.FindAnyWidget( "play" );
 		m_ChooseServer				= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "choose_server" ) );
 		m_CustomizeCharacter		= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "customize_character" ) );
-		m_Options					= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "options" ) );
 		m_PlayVideo					= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "play_video" ) );
 		m_Tutorials					= ButtonWidget.Cast( layoutRoot.FindAnyWidget( "tutorials" ) );
 		m_StatButton				= layoutRoot.FindAnyWidget( "stat_button" );
@@ -79,8 +77,9 @@ class MainMenu extends UIScriptedMenu
 		
 #else
 		m_ScenePC					= m_Mission.GetIntroScenePC();
+		if( m_ScenePC )
+			m_ScenePC.ResetIntroCamera();
 #endif
-		m_Mission.ResetIntroCamera();
 		
 		m_PlayerName				= TextWidget.Cast( layoutRoot.FindAnyWidget("character_name_text") );
 		
@@ -92,10 +91,12 @@ class MainMenu extends UIScriptedMenu
 			layoutRoot.FindAnyWidget( "character" ).Show( false );
 			m_CustomizeCharacter.Show( false );
 			m_Tutorials.Show( true );
-			m_Options.Show( true );
+			m_CustomizeCharacter.Show( false );
+			m_ChooseServer.SetText( "#main_menu_controls" );
 		#endif
 		#ifdef PLATFORM_XBOX
-			m_ChooseServer.SetText( "CONTROLS" );
+			m_CustomizeCharacter.Show( true );
+			m_CustomizeCharacter.SetText( "#main_menu_configure" );
 			m_PlayVideo.Show( true );
 		#endif
 		
@@ -103,10 +104,12 @@ class MainMenu extends UIScriptedMenu
 		
 		string version;
 		GetGame().GetVersion( version );
-		if( version != "" )
-			m_Version.SetText( "#main_menu_version" + " " + version );
-		else
-			m_Version.Show( false );
+		#ifdef PLATFORM_CONSOLE
+			version = "#main_menu_version" + " " + version + " (" + g_Game.GetDatabaseID() + ")";
+		#else
+			version = "#main_menu_version" + " " + version;
+		#endif
+		m_Version.SetText( version );
 		
 		GetGame().GetUIManager().ScreenFadeOut(0);
 
@@ -121,50 +124,19 @@ class MainMenu extends UIScriptedMenu
 		if( !GetGame().GetProfileString( "FirstLaunchDone", launch_done ) || launch_done != "true" )
 		{
 			GetGame().SetProfileString( "FirstLaunchDone", "true" );
-			GetGame().GetUIManager().ShowDialog( "TUTORIALS", "Would you like to see a basic tutorial?", 555, DBT_YESNO, DBB_YES, DMT_QUESTION, this );
+			GetGame().GetUIManager().ShowDialog( "#main_menu_tutorial", "#main_menu_tutorial_desc", 555, DBT_YESNO, DBB_YES, DMT_QUESTION, this );
 			GetGame().SaveProfile();
 		}
 		#endif
 		
 		#ifdef PLATFORM_PS4
-			m_ChooseServer.Show( false );
 			ImageWidget toolbar_a = layoutRoot.FindAnyWidget( "SelectIcon" );
 			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
 			toolbar_a.LoadImageFile( 0, "set:playstation_buttons image:cross" );
 			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:circle" );
 		#endif
 		
-		UpdateNewsFeed();
-		
 		return layoutRoot;
-	}
-	
-	void UpdateNewsFeed()
-	{
-		#ifdef PLATFORM_XBOX
-			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
-		
-			if( OnlineServices.IsGameTrial( false ) )
-		    {
-				layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( true );
-				layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
-		    }
-		    else
-		    {
-				layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
-				layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( true );
-		    }
-		#endif		
-		#ifdef PLATFORM_PS4
-			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
-			layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
-			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
-		#endif
-		#ifdef PLATFORM_WINDOWS
-			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( true );
-			layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
-			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
-		#endif
 	}
 	
 	void ~MainMenu()
@@ -206,12 +178,11 @@ class MainMenu extends UIScriptedMenu
 			}
 			else if ( w == m_CustomizeCharacter )
 			{
-				CustomizeCharacter();
-				return true;
-			}
-			else if ( w == m_Options || w == m_SettingsButton )
-			{
-				OpenSettings();
+				#ifdef PLATFORM_CONSOLE
+					OpenSettings();
+				#else
+					CustomizeCharacter();
+				#endif
 				return true;
 			}
 			else if ( w == m_StatButton )
@@ -222,6 +193,11 @@ class MainMenu extends UIScriptedMenu
 			else if ( w == m_MessageButton )
 			{
 				OpenMessages();
+				return true;
+			}
+			else if ( w == m_SettingsButton )
+			{
+				OpenSettings();
 				return true;
 			}
 			else if ( w == m_Exit )
@@ -282,8 +258,8 @@ class MainMenu extends UIScriptedMenu
 			int port;
 			if( g_Game.GetLastVisitedServer( ip, port ) )
 			{
-				m_LastPlayedTooltipIP.SetText( "Server IP: " + ip );
-				m_LastPlayedTooltipPort.SetText( "Server port: " + port.ToString() );
+				m_LastPlayedTooltipIP.SetText( "#main_menu_IP" + " " + ip );
+				m_LastPlayedTooltipPort.SetText( "#main_menu_port" + " " + port.ToString() );
 				m_LastPlayedTooltipTimer.FadeIn( m_LastPlayedTooltip, 0.3, true );
 			}
 		}
@@ -334,12 +310,15 @@ class MainMenu extends UIScriptedMenu
 	
 	bool IsFocusable( Widget w )
 	{
-		if( w == m_Play || w == m_ChooseServer || w == m_CustomizeCharacter || w == m_StatButton || w == m_MessageButton || w == m_SettingsButton );
-			return true;
-		if( w == m_Exit || w == m_NewsFeedOpen || w == m_NewsFeedClose || w == m_PlayVideo || w == m_Options );
-			return true;
-		if( w == m_CharacterStatsOpen || w == m_CharacterStatsClose || w == m_NewsMain || w == m_NewsSec1 || w == m_NewsSec2 || w == m_PrevCharacter || w == m_NextCharacter );
-			return true;
+		if( w )
+		{
+			if( w == m_Play || w == m_ChooseServer || w == m_CustomizeCharacter || w == m_StatButton || w == m_MessageButton || w == m_SettingsButton );
+				return true;
+			if( w == m_Exit || w == m_NewsFeedOpen || w == m_NewsFeedClose || w == m_PlayVideo );
+				return true;
+			if( w == m_CharacterStatsOpen || w == m_CharacterStatsClose || w == m_NewsMain || w == m_NewsSec1 || w == m_NewsSec2 || w == m_PrevCharacter || w == m_NextCharacter );
+				return true;
+		}
 		return false;
 	}
 	
@@ -379,12 +358,14 @@ class MainMenu extends UIScriptedMenu
 			ColorRed( m_Play );
 		#else
 			SetFocus( layoutRoot );
+			g_Game.SetLoadState( DayZLoadState.MAIN_MENU_CONTROLLER_SELECT );
 		#endif
+		
 		Refresh();
 		
-		if( m_ScenePC && m_ScenePC.GetCamera() )
+		if( m_ScenePC && m_ScenePC.GetIntroCamera() )
 		{
-			m_ScenePC.GetCamera().LookAt( m_ScenePC.GetIntroSceneCharacter().GetPosition() + Vector( 0, 1, 0 ) );
+			m_ScenePC.GetIntroCamera().LookAt( m_ScenePC.GetIntroCharacter().GetPosition() + Vector( 0, 1, 0 ) );
 		}
 	}
 	
@@ -393,33 +374,35 @@ class MainMenu extends UIScriptedMenu
 		//super.OnHide();
 	}
 
-#ifdef PLATFORM_CONSOLE
 	override void Update(float timeslice)
 	{
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) && g_Game.GetLoadState() != DayZGameState.CONNECTING )
 		{
-			g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
-			#ifndef PLATFORM_WINDOWS
-			GetGame().GetInput().ResetActiveGamepad();
+			#ifdef PLATFORM_CONSOLE
+				g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+				#ifndef PLATFORM_WINDOWS
+				GetGame().GetInput().ResetActiveGamepad();
+				#endif
+			#else
+				Exit();
 			#endif
 		}
 	}
-#endif
 	
 	void Play()
 	{
-		if (m_ScenePC && m_ScenePC.GetIntroSceneCharacter())
+		if (m_ScenePC && m_ScenePC.GetIntroCharacter())
 		{
 			//saves demounit for further use
-			if (m_ScenePC.GetIntroSceneCharacter().GetInventory().FindAttachment(InventorySlots.BODY) && m_ScenePC.GetCurrentCharacterID() == -1)
+			if (m_ScenePC.GetIntroCharacter().GetCharacterObj().GetInventory().FindAttachment(InventorySlots.BODY) && m_ScenePC.GetIntroCharacter().GetCharacterID() == -1)
 			{
-				m_ScenePC.SaveCharacterSetup();
+				m_ScenePC.GetIntroCharacter().SaveCharacterSetup();
 			}
 			
-			m_ScenePC.SaveCharName();
+			m_ScenePC.GetIntroCharacter().SaveCharName();
 		}
 
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			if( OnlineServices.IsGameTrial( false ) )
 		    {
 				AutoConnect();
@@ -429,14 +412,10 @@ class MainMenu extends UIScriptedMenu
 				EnterScriptedMenu(MENU_SERVER_BROWSER);
 		    }
 		#else
-			#ifdef PLATFORM_PS4
-				EnterScriptedMenu(MENU_SERVER_BROWSER);
-			#else
-				if( !g_Game.IsNewCharacter() )
-					GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallByName(this, "ConnectLastSession");
-				else
-					GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallByName(this, "ConnectBestServer");
-			#endif
+			if( !g_Game.IsNewCharacter() )
+				GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallByName(this, "ConnectLastSession");
+			else
+				GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallByName(this, "ConnectBestServer");
 		#endif
 	}
 
@@ -447,8 +426,10 @@ class MainMenu extends UIScriptedMenu
 			return;
 		#endif
 		
-		if( m_ScenePC )
-			m_ScenePC.SaveCharName();
+		if( m_ScenePC && m_ScenePC.GetIntroCharacter() )
+		{
+			m_ScenePC.GetIntroCharacter().SaveCharName();
+		}
 		
 		#ifdef NEW_UI
 			EnterScriptedMenu(MENU_SERVER_BROWSER);
@@ -457,9 +438,9 @@ class MainMenu extends UIScriptedMenu
 		#endif
 		
 		//saves demounit for further use
-		if (m_ScenePC && m_ScenePC.GetIntroSceneCharacter() && m_ScenePC.GetIntroSceneCharacter().GetInventory().FindAttachment(InventorySlots.BODY) && m_ScenePC.GetCurrentCharacterID() == -1)
+		if (m_ScenePC && m_ScenePC.GetIntroCharacter() && m_ScenePC.GetIntroCharacter().GetCharacterObj().GetInventory().FindAttachment(InventorySlots.BODY) && m_ScenePC.GetIntroCharacter().GetCharacterID() == -1)
 		{
-			m_ScenePC.SaveCharacterSetup();
+			m_ScenePC.GetIntroCharacter().SaveCharacterSetup();
 		}
 	}
 	
@@ -470,24 +451,24 @@ class MainMenu extends UIScriptedMenu
 	
 	void NextCharacter()
 	{
-		if ( m_ScenePC )
+		if ( m_ScenePC && m_ScenePC.GetIntroCharacter() )
 		{
-			m_ScenePC.SaveCharName();
-			m_ScenePC.ChangeCharacter( m_ScenePC.NextCharacterID() );
+			m_ScenePC.GetIntroCharacter().SaveCharName();
+			m_ScenePC.GetIntroCharacter().CreateNewCharacterById( m_ScenePC.GetIntroCharacter().GetNextCharacterID() );
 			
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_ScenePC.SceneCharacterSetPos, 250 );
+			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_ScenePC.SceneCharacterSetPos, 250 );
 			m_PlayerName.SetText( g_Game.GetPlayerGameName() );
 		}
 	}
 	
 	void PreviousCharacter()
 	{
-		if ( m_ScenePC )
+		if ( m_ScenePC && m_ScenePC.GetIntroCharacter() )
 		{
-			m_ScenePC.SaveCharName();
-			m_ScenePC.ChangeCharacter( m_ScenePC.PrevCharacterID() );
+			m_ScenePC.GetIntroCharacter().SaveCharName();
+			m_ScenePC.GetIntroCharacter().CreateNewCharacterById( m_ScenePC.GetIntroCharacter().GetPrevCharacterID() );
 			
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_ScenePC.SceneCharacterSetPos, 250 );
+			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_ScenePC.SceneCharacterSetPos, 250 );
 			m_PlayerName.SetText( g_Game.GetPlayerGameName() );
 		}
 	}
@@ -543,7 +524,7 @@ class MainMenu extends UIScriptedMenu
 	
 	void Exit()
 	{
-		GetGame().GetUIManager().ShowDialog("EXIT", "Are you sure you want to exit?", IDC_MAIN_QUIT, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
+		GetGame().GetUIManager().ShowDialog("#main_menu_exit", "#main_menu_exit_desc", IDC_MAIN_QUIT, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
 	}
 		
 	bool TryConnectLastSession( out string ip, out int port )
@@ -591,6 +572,9 @@ class MainMenu extends UIScriptedMenu
 	//Coloring functions (Until WidgetStyles are useful)
 	void ColorRed( Widget w )
 	{
+		if( !w )
+			return;
+		
 		SetFocus( w );
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
@@ -621,6 +605,9 @@ class MainMenu extends UIScriptedMenu
 	
 	void ColorWhite( Widget w, Widget enterW )
 	{
+		if( !w )
+			return;
+		
 		#ifdef PLATFORM_WINDOWS
 		SetFocus( null );
 		#endif
@@ -631,8 +618,8 @@ class MainMenu extends UIScriptedMenu
 			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
 		}
 		
-		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
-		TextWidget text2	= TextWidget.Cast(w.FindWidget( w.GetName() + "_text_1" ) );
+		TextWidget text		= TextWidget.Cast( w.FindWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast( w.FindWidget( w.GetName() + "_text_1" ) );
 		ImageWidget image	= ImageWidget.Cast( w.FindWidget( w.GetName() + "_image" ) );
 		
 		if( text )

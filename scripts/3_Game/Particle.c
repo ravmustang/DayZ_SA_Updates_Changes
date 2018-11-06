@@ -1,7 +1,8 @@
 class Particle extends ScriptedEntity
 {
 	protected int		m_ParticleID;
-	protected bool 		m_IsPlaying;	
+	protected int		m_SurvivedFrames = 0;
+	protected bool 		m_IsPlaying;
 	
 	vector 				m_DefaultOri;
 	vector 				m_DefaultPos;
@@ -12,7 +13,6 @@ class Particle extends ScriptedEntity
 	private Object 		m_ParentObject;
 	private Object 		m_ParticleEffect;
 	
-	Effect m_MyEffectHolder;
 	
 	//====================================
 	// Client: Constructor
@@ -37,6 +37,11 @@ class Particle extends ScriptedEntity
 		{
 			CreateParticleEffect();
 		}
+	}
+	
+	Object GetParticleParent()
+	{
+		return m_ParentObject;
 	}
 	
 	//====================================
@@ -115,12 +120,12 @@ class Particle extends ScriptedEntity
 		if (m_ParticleEffect)
 		{
 			int repeat = false;
-			string emitors_array[];
+			string emitors_array[30];
 			
 			int emitors = GetParticleEmitors(m_ParticleEffect, emitors_array, 30);
 			
 			for (int i = 0; i < emitors; i++)
-			{	
+			{
 				GetParticleParm(m_ParticleEffect, i, EmitorParam.REPEAT, repeat);
 				
 				if (repeat)
@@ -143,7 +148,7 @@ class Particle extends ScriptedEntity
 	{
 		if (m_ParticleEffect)
 		{
-			string emitors_array[];
+			string emitors_array[20];
 			
 			int emitors = GetParticleEmitors(m_ParticleEffect, emitors_array, 20);
 			
@@ -161,7 +166,7 @@ class Particle extends ScriptedEntity
 	{
 		if (m_ParticleEffect)
 		{
-			string emitors_array[];
+			string emitors_array[20];
 			
 			int emitors = GetParticleEmitors(m_ParticleEffect, emitors_array, 20);
 			
@@ -178,18 +183,6 @@ class Particle extends ScriptedEntity
 	void SetParticleParam(int parameter_id, float value )
 	{
 		SetParticleParm(m_ParticleEffect, -1, parameter_id, value);
-		
-		// The above sometimes doesn't work as intended. The following is a debug/hack.
-		/*
-		string emitors_array[];
-		
-		int emitors = GetParticleEmitors(m_ParticleEffect, emitors_array, 20);
-		
-		for (int i = 0; i < emitors; i++)
-		{
-			SetParticleParm(m_ParticleEffect, i, parameter_id, value);
-		}
-		*/
 	}
 	
 	
@@ -200,32 +193,33 @@ class Particle extends ScriptedEntity
 	{
 		//int count = GetParticleCount();
 		
-		if (!IsActive()  &&  GetParticleCount() <= 0 )
+		if ( !IsActive()  &&  GetParticleCount() <= 0  &&  m_SurvivedFrames > 5 )
 		{
 			OnToDelete();
-			GetGame().ObjectDelete( this );
 			m_ParticleEffect = NULL;
+			GetGame().ObjectDelete( this );
 		}
 	}
 	
 	override void EOnFrame(IEntity other, float timeslice)
 	{
+		++m_SurvivedFrames;
 		OnCheckAutoDelete();
 	}
 	
 	// Called before deletion
-	void OnToDelete()
+	private void OnToDelete()
 	{
+		/* TODO Call Back To Effect
 		if (m_MyEffectHolder)
 		{
-			m_MyEffectHolder.SetParticle(NULL);
-			m_MyEffectHolder.CheckLifeSpan();
+			if ( m_MyEffectHolder.GetParticle() == this )
+			{
+				m_MyEffectHolder.SetParticle(NULL);
+				m_MyEffectHolder.CheckLifeSpan();
+			}
 		}
-	}
-	
-	void SetEffectHolder(Effect eff)
-	{
-		m_MyEffectHolder = eff;
+		*/
 	}
 	
 	//! Makes the particle change direction by random_angle every random_interval seconds.
@@ -414,5 +408,11 @@ class Particle extends ScriptedEntity
 	void SetSource(int particle_id)
 	{
 		m_ParticleID = particle_id;
+	}
+	
+	//! Returns particle id
+	int GetParticleID()
+	{
+		return m_ParticleID;
 	}
 }

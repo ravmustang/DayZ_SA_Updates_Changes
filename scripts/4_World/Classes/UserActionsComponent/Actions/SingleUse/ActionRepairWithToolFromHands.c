@@ -45,7 +45,7 @@ class ActionRepairWithToolFromHands: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		if ( targetObject  /* &&  targetObject.IsKindOf("ItemBase")*/ )

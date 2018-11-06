@@ -41,7 +41,8 @@ class InventoryItemType
 			GetGame().ConfigGetChildName(cfgPath, i, soundName);			
 			string soundPath = cfgPath + " " + soundName + " ";
 			AnimSoundEvent soundEvent = new AnimSoundEvent(soundPath);
-			m_animSoundEvents.Insert(soundEvent);
+			if(soundEvent.IsValid())
+				m_animSoundEvents.Insert(soundEvent);
 		}
 	}
 

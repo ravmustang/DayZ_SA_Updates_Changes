@@ -16,7 +16,7 @@ class ActionFillObject: ActionContinuousBase
 	void ActionFillObject()
 	{
 		m_CallbackClass = ActionFillObjectCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGSHOVEL;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIG;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		/*
@@ -46,11 +46,11 @@ class ActionFillObject: ActionContinuousBase
 	{
 		if( m_ActionState == FILLED )
 		{
-			return "Empty the object";
+			return "#empty_the_object";
 		}
 		else
 		{
-			return "Fill the object";
+			return "#fill_the_object";
 		}
 	}
 
@@ -77,9 +77,10 @@ class ActionFillObject: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		HescoBox hesco;
+		
 		if ( Class.CastTo(hesco,action_data.m_Target.GetObject()) )
 		{
 			const float ITEM_DAMAGE = 0.05;
@@ -96,5 +97,22 @@ class ActionFillObject: ActionContinuousBase
 		}
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		HescoBox hesco;
+		
+		if ( Class.CastTo(hesco,action_data.m_Target.GetObject()) )
+		{
+			if ( hesco.GetState() == HescoBox.UNFOLDED )
+			{
+				hesco.Fill();
+			}
+			else if ( hesco.GetState() == HescoBox.FILLED )
+			{
+				hesco.Unfold();
+			}
+		}
 	}
 };

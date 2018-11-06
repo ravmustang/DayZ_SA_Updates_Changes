@@ -19,6 +19,7 @@ class ParticleList
 	static const int CAMP_NORMAL_SMOKE				= RegisterParticle("smoke_medium_camp_01");
 	static const int CAMP_FIRE_END					= RegisterParticle("fire_small_camp_01_end");
 	static const int CAMP_STEAM_2END				= RegisterParticle("steam_medium_camp_2end");
+	static const int CAMP_STEAM_EXTINGUISH_START	= RegisterParticle("default_01");
 	// Fireplace indoor
 	static const int HOUSE_FIRE_START				= RegisterParticle("fire_small_house_01_start");
 	static const int HOUSE_SMALL_FIRE 				= RegisterParticle("fire_small_house_01");
@@ -47,7 +48,9 @@ class ParticleList
 	static const int COOKING_BURNING_DONE			= RegisterParticle("cooking_burning_done");
 	
 	// TORCH
-	static const int TORCH							= RegisterParticle("fire_small_torch_01");
+	static const int TORCH_T1						= RegisterParticle("fire_small_torch_02");
+	static const int TORCH_T2						= RegisterParticle("fire_small_torch_03");
+	static const int TORCH_T3						= RegisterParticle("fire_small_torch_01");
 	
 	// ROADFLARE
 	static const int ROADFLARE_BURNING_INIT			= RegisterParticle("fire_small_roadflare_red_04");
@@ -66,11 +69,14 @@ class ParticleList
 	static const int BARBED_WIRE_SPARKS				= RegisterParticle("electro_shortc2");
 
 	// PLAYER
-	static const int BLEEDING_SOURCE				= RegisterParticle("blood_test");
-	static const int BLOOD_SPLAT					= RegisterParticle("blood_medium_01");
+	static const int BLEEDING_SOURCE				= RegisterParticle("blood_bleeding_01");
 	static const int BLOOD_SURFACE_DROPS			= RegisterParticle("blood_surface_drops");
 	static const int BLOOD_SURFACE_CHUNKS			= RegisterParticle("blood_surface_chunks");
 	static const int VOMIT							= RegisterParticle("character_vomit_01");
+	static const int BREATH_VAPOUR_LIGHT			= RegisterParticle("breath_vapour_light");
+	static const int BREATH_VAPOUR_MEDIUM			= RegisterParticle("breath_vapour_medium");
+	static const int BREATH_VAPOUR_HEAVY			= RegisterParticle("breath_vapour_heavy");
+	static const int VOMIT_CHUNKS					= RegisterParticle("character_vomit_puddle");
 	
 	// GUNS
 	static const int GUN_MUZZLE_FLASH_SVD_STAR		= RegisterParticle("weapon_shot_Flame_3D_4star");
@@ -90,20 +96,24 @@ class ParticleList
 	static const int GUN_MP5K_COMPENSATOR			= RegisterParticle("weapon_shot_mp5k_02");
 	static const int GUN_UMP45						= RegisterParticle("weapon_shot_ump45_01");
 	static const int GUN_M4A1						= RegisterParticle("weapon_shot_m4a1_01");
+	static const int GUN_MP133						= RegisterParticle("weapon_shot_mp133_01");
 	
 	static const int GUN_CZ61						= RegisterParticle("weapon_shot_cz61_01");
 	static const int GUN_LONG_WINDED_SMOKE			= RegisterParticle("weapon_shot_winded_smoke");
 	static const int SMOKING_BARREL					= RegisterParticle("smoking_barrel");
 	static const int SMOKING_BARREL_SMALL			= RegisterParticle("smoking_barrel_small");
+	static const int SMOKING_BARREL_STEAM			= RegisterParticle("smoking_barrel_steam");
+	static const int SMOKING_BARREL_HOT				= RegisterParticle("smoking_barrel_heavy");
 	
 	// BULLET & MELEE IMPACTS
 	static const int IMPACT_TEST					= RegisterParticle("impacts/bullet_impact_placeholder");
+	static const int IMPACT_DISTANT_DUST			= RegisterParticle("impacts/distant_dust");
 	static const int IMPACT_TEST_RICOCHET			= RegisterParticle("impacts/bullet_riochet_placeholder");
 	static const int IMPACT_TEST2					= RegisterParticle("_test_orientation_02");
 	static const int IMPACT_TEST_ENTER_DEBUG		= RegisterParticle("impacts/_test_impact_enter_debug");
 	static const int IMPACT_TEST_RICOCHET_DEBUG		= RegisterParticle("impacts/_test_impact_ricochet_debug");
 	static const int IMPACT_TEST_EXIT_DEBUG			= RegisterParticle("impacts/_test_impact_exit_debug");
-	static const int IMPACT_TEST_NO_MATERIAL_ERROR	= RegisterParticle("_test_no_material");
+	static const int IMPACT_TEST_NO_MATERIAL_ERROR	= RegisterParticle("impacts/hit_default_ent_01");
 	static const int IMPACT_WOOD_ENTER				= RegisterParticle("impacts/hit_wood_ent_01");
 	static const int IMPACT_WOOD_RICOCHET			= RegisterParticle("impacts/hit_wood_ric_01");
 	static const int IMPACT_WOOD_EXIT				= RegisterParticle("impacts/hit_wood_ext_01");
@@ -142,6 +152,15 @@ class ParticleList
 	static const int IMPACT_WATER_SMALL_ENTER		= RegisterParticle("impacts/hit_water_ent_01");
 	static const int IMPACT_WATER_MEDIUM_ENTER		= RegisterParticle("impacts/hit_water_ent_02");
 	static const int IMPACT_WATER_LARGE_ENTER		= RegisterParticle("impacts/hit_water_ent_03");
+	static const int IMPACT_TEXTILE_ENTER			= RegisterParticle("impacts/hit_textile_ent_01");
+	static const int IMPACT_TEXTILE_RICOCHET		= RegisterParticle("impacts/hit_textile_ric_01");
+	static const int IMPACT_TEXTILE_EXIT			= RegisterParticle("impacts/hit_textile_ext_01");
+	static const int IMPACT_SAND_ENTER				= RegisterParticle("impacts/hit_sand_ent_01");
+	static const int IMPACT_SAND_RICOCHET			= RegisterParticle("impacts/hit_sand_ric_01");
+	static const int IMPACT_SAND_EXIT				= RegisterParticle("impacts/hit_sand_ext_01");
+	static const int IMPACT_PLASTIC_ENTER			= RegisterParticle("impacts/hit_plastic_ent_01");
+	static const int IMPACT_PLASTIC_RICOCHET		= RegisterParticle("impacts/hit_plastic_ric_01");
+	static const int IMPACT_PLASTIC_EXIT			= RegisterParticle("impacts/hit_plastic_ext_01");
 	
 	// EXPLOSIONS
 	static const int EXPLOSION_LANDMINE				= RegisterParticle("explosion_landmine_01");
@@ -149,8 +168,16 @@ class ParticleList
 	
 	// ENVIRO EFX
 	static const int SMOKING_HELI_WRECK				= RegisterParticle("smoke_heli_wreck_01");
+	static const int SMOKE_GENERIC_WRECK			= RegisterParticle("smoke_generic_wreck");
 	static const int SMOKING_CAR_ENGINE				= RegisterParticle("menu_engine_fire");
 	static const int EVAPORATION					= RegisterParticle("menu_evaporation");
+	
+	// VEHICLES
+	static const int HATCHBACK_COOLANT_OVERHEATING	= RegisterParticle("Hatchback_coolant_overheating");
+	static const int HATCHBACK_COOLANT_OVERHEATED	= RegisterParticle("Hatchback_coolant_overheated");
+	static const int HATCHBACK_ENGINE_OVERHEATING	= RegisterParticle("Hatchback_engine_failing");
+	static const int HATCHBACK_ENGINE_OVERHEATED	= RegisterParticle("Hatchback_engine_failure");
+	static const int HATCHBACK_EXHAUST_SMOKE		= RegisterParticle("Hatchback_exhaust");
 	
 	static int RegisterParticle (string file_name)
 	{
@@ -162,15 +189,15 @@ class ParticleList
 	{
 		if (!m_ParticlePaths)
 			m_ParticlePaths = new map<int, string>;
-		
+	
 		string path = root_path + file_name + ".ptc";
-		
 		bool file_exist = FileExist(path);
 		
 		if ( !file_exist )
-			Error("ERROR! Particle file not found! <" + path + ">  Correct path to this particle in file ParticleList.c!");
+			Error("ERROR! Particle file not found! <" + path + ">  Correct path to this particle in script file ParticleList.c! Then rebuild 'scripts' and 'graphics' PBOs.");
 		
-		m_ParticlePaths.Insert(m_lastID++, root_path + file_name);
+		m_ParticlePaths.Insert(++m_lastID, root_path + file_name);
+		
 		return m_lastID;
 	}
 	

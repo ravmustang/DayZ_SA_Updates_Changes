@@ -6,18 +6,18 @@ class ItemVariableFlags
 	static const int BOOL 					= 0x0004;
 };
 
-class CashedObjectsParams
+class CachedObjectsParams
 {	
-	static ref Param1<int> 		PARAM1_INT;//CashedObjectsParams.PARAM1_INT
-	static ref Param1<bool> 	PARAM1_BOOL;//CashedObjectsParams.PARAM1_BOOL
-	static ref Param1<float> 	PARAM1_FLOAT;//CashedObjectsParams.PARAM1_FLOAT
-	static ref Param1<string> 	PARAM1_STRING;//CashedObjectsParams.PARAM1_STRING
+	static ref Param1<int> 		PARAM1_INT;//CachedObjectsParams.PARAM1_INT
+	static ref Param1<bool> 	PARAM1_BOOL;//CachedObjectsParams.PARAM1_BOOL
+	static ref Param1<float> 	PARAM1_FLOAT;//CachedObjectsParams.PARAM1_FLOAT
+	static ref Param1<string> 	PARAM1_STRING;//CachedObjectsParams.PARAM1_STRING
 	
-	static ref Param2<int,int> 		PARAM2_INT_INT;//CashedObjectsParams.PARAM2_INT_INT
-	static ref Param2<int,float> 	PARAM2_INT_FLOAT;//CashedObjectsParams.PARAM2_INT_FLOAT
-	static ref Param2<int,string> 	PARAM2_INT_STRING;//CashedObjectsParams.PARAM2_INT_STRING
-	static ref Param2<string,float> PARAM2_STRING_FLOAT;//CashedObjectsParams.PARAM2_STRING_FLOAT
-	static ref Param2<string,string> PARAM2_STRING_STRING;//CashedObjectsParams.PARAM2_STRING_STRING
+	static ref Param2<int,int> 		PARAM2_INT_INT;//CachedObjectsParams.PARAM2_INT_INT
+	static ref Param2<int,float> 	PARAM2_INT_FLOAT;//CachedObjectsParams.PARAM2_INT_FLOAT
+	static ref Param2<int,string> 	PARAM2_INT_STRING;//CachedObjectsParams.PARAM2_INT_STRING
+	static ref Param2<string,float> PARAM2_STRING_FLOAT;//CachedObjectsParams.PARAM2_STRING_FLOAT
+	static ref Param2<string,string> PARAM2_STRING_STRING;//CachedObjectsParams.PARAM2_STRING_STRING
 	
 	static void Init()
 	{
@@ -36,7 +36,7 @@ class CashedObjectsParams
 };
 
 
-class CashedObjectsArrays//don't forget to .Clear() your cache object before using it
+class CachedObjectsArrays//don't forget to .Clear() your cache object before using it
 {	
 	static void Init()
 	{
@@ -45,7 +45,7 @@ class CashedObjectsArrays//don't forget to .Clear() your cache object before usi
 		ARRAY_INT 		= new TIntArray;
 	}
 	
-	static ref TStringArray ARRAY_STRING;//CashedObjectsArrays.ARRAY_STRING
-	static ref TFloatArray ARRAY_FLOAT;//CashedObjectsArrays.ARRAY_FLOAT
-	static ref TIntArray ARRAY_INT;//CashedObjectsArrays.ARRAY_INT
+	static ref TStringArray ARRAY_STRING;//CachedObjectsArrays.ARRAY_STRING
+	static ref TFloatArray ARRAY_FLOAT;//CachedObjectsArrays.ARRAY_FLOAT
+	static ref TIntArray ARRAY_INT;//CachedObjectsArrays.ARRAY_INT
 };

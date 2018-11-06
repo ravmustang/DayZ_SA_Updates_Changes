@@ -39,7 +39,7 @@ class ActionExtinguishFireplaceByExtinguisher: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Extinguish";
+		return "#extinguish";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -49,7 +49,7 @@ class ActionExtinguishFireplaceByExtinguisher: ActionContinuousBase
 		{
 			FireplaceBase fireplace_target = FireplaceBase.Cast( target_object );
 			
-			if ( fireplace_target.IsBurning() && !item.IsDamageDestroyed() ) 
+			if ( fireplace_target.CanExtinguishFire() && !item.IsDamageDestroyed() ) 
 			{
 				return true;
 			}		
@@ -57,4 +57,17 @@ class ActionExtinguishFireplaceByExtinguisher: ActionContinuousBase
 		
 		return false;
 	}
+	
+	//TODO Fire extinguisher is not in BETA (no animations, no sounds)
+	//If something will change in the future, extinguishing action needs to be updated to reflect the fire extinguisher usage
+	/*
+	override void OnCancelServer( ActionData action_data )
+	{	
+		Object target_object = action_data.m_Target.GetObject();
+		FireplaceBase fireplace_target = FireplaceBase.Cast( target_object );
+
+		//reset fire state
+		fireplace_target.RefreshFireState();
+	}
+	*/	
 }

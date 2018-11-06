@@ -117,6 +117,13 @@ class BotStateBase
 	 * @param[in]	dst		to state (current)
 	 **/
 	void OnSubMachineChanged (BotStateBase src, BotStateBase dst) { }
+	
+	/**@fn		OnStateChanged
+	 * @brief	called on current state when state machine has changed its state
+	 * @param[in]	src		from state (previous)
+	 * @param[in]	dst		to state (current)
+	 **/
+	void OnStateChanged (BotStateBase src, BotStateBase dst) { }
 };
 
 class BotStateIdle : BotStateBase

@@ -7,11 +7,12 @@ const int INPUT_UDT_WEAPON_ACTION				= 5;
 const int INPUT_UDT_ITEM_MANIPULATION			= 6;
 const int INPUT_UDT_INVENTORY					= 7;
 const int INPUT_UDT_ADVANCED_PLACEMENT			= 8;
-const int INPUT_UDT_WEAPON_REMOTE_SYNC			= 9;
+//const int INPUT_UDT_WEAPON_REMOTE_SYNC			= 9; // obsolette
 const int INPUT_UDT_WEAPON_REMOTE_EVENT			= 10;
 const int INPUT_UDT_USER_MUTE_XBOX				= 11;
 const int INPUT_UDT_USER_SYNC_PERMISSIONS		= 12;
 const int INPUT_UDT_HAND_REMOTE_EVENT			= 13;
+const int INPUT_UDT_WEAPON_LIFT_EVENT 			= 14;
 
 const int AC_UNCATEGORIZED						= 0;
 const int AC_SINGLE_USE							= 1;
@@ -33,16 +34,16 @@ const int AT_DRINK = 106;
 const int AT_FORCE_CONSUME = 107;
 const int AT_WATER = 108;
 const int AT_RESTRAIN_T = 109;
-//const int AT_INJECT_S = 110; <-- free to use (moved to singleuse)
-//const int AT_INJECT_T = 111; <-- free to use (moved to singleuse)
+//const int AT_MINE_TREE_FENCE = 110; <--- free to use (removed)
+//const int AT_MINE_TREE_WATCHTOWER = 111; <--- free to use (removed)
 const int AT_BANDAGE_S = 112;
 const int AT_BANDAGE_T = 113;
 const int AT_DRINK_DISINFECTANT = 114;
 const int AT_FORCE_DRINK_DISINFECTANT = 115;
-//const int AT_INJECT_EPINEPHRINE_S = 116; <-- free to use (moved to singleuse)
-//const int AT_INJECT_EPINEPHRINE_T = 117; <-- free to use (moved to singleuse)
-//const int AT_INJECT_MORPHINE_S = 118;  <-- free to use (moved to singleuse)
-//const int AT_INJECT_MORPHINE_T = 119;  <-- free to use (moved to singleuse)
+const int AT_STRUGGLE = 116;
+const int AT_RESTRAIN_S = 117;
+const int AT_MOUNT_BARBED_WIRE = 118;
+const int AT_UNMOUNT_BARBED_WIRE = 119;
 const int AT_FEED_VITAMIN_BOTTLE = 120;
 const int AT_FEED_TETRACYCLINE_ANTIBIOTICS = 121;
 const int AT_FEED_PURIFICATION_TABLETS = 122;
@@ -93,10 +94,10 @@ const int AT_MINE_ROCK = 168;
 const int AT_FILL_BOTTLE = 169;
 const int AT_TUNE_FREQUENCY = 170;
 const int AT_TUNE_RADIO_STATION = 171;
-const int AT_IGNITE_FIREPLACE_BY_MATCH = 172;
-const int AT_IGNITE_FIREPLACE_BY_LIGHTER = 173;
-const int AT_IGNITE_FIREPLACE_BY_HANDDRILL = 174;
-const int AT_IGNITE_FIREPLACE_BY_ROADFLARE = 175;
+const int AT_DIAL_COMBINATION_LOCK = 172;
+const int AT_DIAL_COMBINATION_LOCK_ON_TARGET = 173;
+const int AT_BUILD_BASE_PART = 174;
+const int AT_DISMANTLE_BASE_PART = 175;
 const int AT_EXTINGUISH_FIREPLACE_BY_LIQUID = 176;
 const int AT_BURN_SEW_S = 177;
 const int AT_BURN_SEW_T = 178;
@@ -114,14 +115,13 @@ const int AT_WATER_GARDEN_SLOT = 189;
 const int AT_WRING_CLOTHES = 190;
 const int AT_LOAD_MAGAZINE = 191;
 const int AT_EMPTY_MAGAZINE = 192;
-const int AT_CONSTRUCT = 193;
-const int AT_DECONSTRUCT = 195;
+const int AT_BUILD_PART = 193;
+const int AT_DISMANTLE_PART = 195;
 const int AT_EAT_SMALL = 194;
 const int AT_CPR_T = 196;
 const int AT_MINE_TREE_BARK = 197;
 const int AT_DIG_WORMS = 198;
 const int AT_SHAVE_T = 199;
-
 const int AT_DRINK_POND = 201;
 const int AT_DRINK_WELL = 202;
 const int AT_ROTATE_HOLOGRAM = 203;
@@ -130,7 +130,7 @@ const int AT_UNCOVER_HEAD_S = 205;
 const int AT_UNCOVER_HEAD_T = 206;
 const int AT_SORT_AMMO = 207;
 const int AT_IGNITE_FIREPLACE_BY_AIR = 208;
-const int AT_IGNITE_FIREPLACE_BY_TORCH = 209;
+const int AT_DESTROY_PART = 209;
 const int AT_LOCK_DOORS = 210;
 const int AT_UNLOCK_DOORS = 211;
 const int AT_UNPACK_BOX = 212;
@@ -160,8 +160,7 @@ const int AT_LOAD_MULTI_BULLET_TO_WEAPON = 235;
 const int AT_VIEW_OPTICS = 236;
 const int AT_VIEW_BINOCULARS = 237;
 const int AT_EMPTY_COOKING_POT = 238;
-
-
+const int AT_FOLD_BASEBUILDING_OBJECT = 239;
 
 //SingleUse Actions
 const int AT_OPEN = 501;
@@ -194,10 +193,10 @@ const int AT_SWITCH_ON_WHILE_ON_GROUND = 528;
 const int AT_SWITCH_OFF_WHILE_ON_GROUND = 529;
 const int AT_PLANT_SEED = 531;
 const int AT_ATTACH_METAL_WIRE = 532;
-//const int AT_FERTILIZE_SLOT_BIT = 533; // unused UA. Feel free to take its place!
+const int AT_BUILD_PART_SWITCH = 533;
 const int AT_DISINFECT_PLANT_BIT = 534;
 const int AT_READ_PAPER = 535;
-const int AT_TURN_ON_TORCH = 536;
+//const int AT_TURN_ON_TORCH = 536; // Free ID.
 const int AT_TURN_ON_ENERGY_BASE = 537;
 const int AT_CLOSE = 538;
 const int AT_TURN_ON_HEATPACK = 539;
@@ -234,8 +233,14 @@ const int AT_HANDCUFF_T = 571;
 const int AT_VEH_ENGINE_STOP = 572;
 const int AT_DETACH = 573;
 const int AT_UNFOLD_MAP = 574;
-
-
+//const int AT_MINE_TREE_ACTION_SWITCH = 575; <--- free to use (removed)
+const int AT_DROP_ITEM = 576;
+const int AT_ATTACH_SELECTION = 577;
+const int AT_ATTACH_ON_PROXY = 578;
+const int AT_TURN_ON_WEAPON_FLASHLIGHT = 579;
+const int AT_TURN_OFF_WEAPON_FLASHLIGHT = 580;
+const int AT_VEH_SWITCH_SEATS = 581;
+const int AT_NEXT_COMBINATION_LOCK_DIAL = 582;
 
 //Interact Actions
 const int AT_PULL_OUT_PLUG = 1001;
@@ -281,8 +286,11 @@ const int AT_OPEN_CAR_DOORS = 1043;
 const int AT_WASH_HANDS_WELL_ONE = 1044;
 const int AT_WASH_HANDS_WATER_ONE = 1045;
 const int AT_GETOUT_TRANSPORT = 1046;
-const int AT_CLOSE_V3S_PLATE = 1047;
-const int AT_OPEN_V3S_PLATE = 1048;
+const int AT_ANIMATE_CAR_SELECTION = 1047;
+const int AT_ANIMATE_SEATS = 1048;
+const int AT_FENCE_OPEN = 1049;
+const int AT_FENCE_CLOSE = 1050;
+const int AT_NEXT_COMBINATION_LOCK_DIAL_ON_TARGET = 1051;
 
 //weapons
 const int AT_WPN_ATTACH_MAGAZINE = 1501;
@@ -293,6 +301,7 @@ const int AT_WPN_UNJAM = 1505;
 const int AT_WPN_EJECT_BULLET = 1506;
 const int AT_WPN_LOAD_MULTI_BULLETS_START = 1507;
 const int AT_WPN_LOAD_MULTI_BULLETS_END   = 1508;
+const int AT_WPN_SET_NEXT_MUZZLE_MODE = 1509;
 
 //vehicle
 const int AT_VEH_SWITCH_LIGHTS = 2001;

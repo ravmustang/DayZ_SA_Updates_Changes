@@ -8,7 +8,7 @@ enum ERecipeSanityCheck
 const float ACCEPTABLE_DISTANCE = 5;
 
 const int SANITY_CHECK_ACCEPTABLE_RESULT = ERecipeSanityCheck.NOT_OWNED_BY_ANOTHER_LIVE_PLAYER + ERecipeSanityCheck.CLOSE_ENOUGH;
-class PluginRecipesManager extends PluginBase
+class PluginRecipesManager extends PluginRecipesManagerBase
 {
 	ref Timer m_TestTimer;
 	const string KEYWORD_NEW_ITEM = "Item:";
@@ -19,6 +19,7 @@ class PluginRecipesManager extends PluginBase
 	
 	const int MAX_INGREDIENTS = 5;
 	
+	int m_RegRecipeIndex;
 	int m_ResolvedRecipes[MAX_CONCURENT_RECIPES];
 	
 	bool m_EnableDebugCrafting = false;
@@ -471,16 +472,16 @@ class PluginRecipesManager extends PluginBase
 		return true;
 	}
 
-	protected void RegisterRecipe(RecipeBase recipe, int id)
+	override protected void RegisterRecipe(RecipeBase recipe)
 	{
-		recipe.SetID(id);
-		m_RecipeList[id] = recipe;
+		if( m_RegRecipeIndex >= MAX_NUMBER_OF_RECIPES )
+		{
+			Error("Exceeded max. number of recipes, max set to: "+MAX_NUMBER_OF_RECIPES.ToString());
+		}
+		recipe.SetID(m_RegRecipeIndex);
+		m_RecipeList[m_RegRecipeIndex] = recipe;
+		m_RegRecipeIndex++;
 	}
-
-	/*void PerformRecipeClientRequest(int id, ItemBase item_a, ItemBase item_b, PlayerBase player, int craft_type = AT_CRAFT)
-	{
-		player.RequestCraftingSetup(id,item_a,item_b, craft_type);			
-	}*/
 
 	protected bool CheckRecipe(int id, ItemBase item1, ItemBase item2, PlayerBase player)//requires ordered items
 	{
@@ -507,52 +508,6 @@ class PluginRecipesManager extends PluginBase
 		}
 	}
 	
-	/*void OnCraftingSetUpClient(CraftingMeta meta, PlayerBase player)
-	{
-		int id = meta.GetRecipeID();
-		ItemBase item_a = meta.GetIngredient1();
-		ItemBase item_b = meta.GetIngredient2();
-		
-		if(!item_a || !item_b) return;
-		bool is_insta_recipe = GetIsInstaRecipe(id);
-		
-		m_Ingredients[0] = item_a;
-		m_Ingredients[1] = item_b;
-
-		SortIngredientsInRecipe(id, 2,m_Ingredients,m_sortedIngredients);
-		
-		RecipeSelected( id, m_sortedIngredients[0], m_sortedIngredients[1], player );
-
-		if( (IsEnableDebugCrafting() && !GetGame().IsMultiplayer()) || (is_insta_recipe && !GetGame().IsMultiplayer()) )
-		{
-			PerformRecipeServer(id, item_a, item_b, player);
-		}
-
-		GetGame().GetUIManager().HideScriptedMenu(GetGame().GetUIManager().FindMenu(MENU_INVENTORY));			
-	}*/
-
-	
-	/*void OnCraftingSetUpServer(CraftingMeta meta, PlayerBase player)
-	{
-		int id = meta.GetRecipeID();
-		ItemBase item_a = meta.GetIngredient1();
-		ItemBase item_b = meta.GetIngredient2();
-		
-		if(!item_a || !item_b) return;
-		bool is_insta_recipe = GetIsInstaRecipe(id);
-		
-		m_Ingredients[0] = item_a;
-		m_Ingredients[1] = item_b;
-
-		SortIngredientsInRecipe(id, 2,m_Ingredients,m_sortedIngredients);
-		
-		if( IsEnableDebugCrafting() || is_insta_recipe )
-		{
-			PerformRecipeServer(id, item_a, item_b, player);
-		}
-	}*/
-	
-		
 	protected void PrintCache()
 	{
 		for(int i = 0; i < m_CacheItemMap.Count(); i++)
@@ -739,7 +694,7 @@ class PluginRecipesManager extends PluginBase
 	
 	protected void CreateAllRecipes()
 	{
-		#include "Scripts\4_World\Classes\Recipes\Recipes\_RecipeList.inc"
+		RegisterRecipies();
 	}
 	
 	protected void ReadTest()

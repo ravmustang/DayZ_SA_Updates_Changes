@@ -38,7 +38,7 @@ class CAContinuousQuantityEdible : CAContinuousQuantityRepeat
 			if ( GetGame().IsServer() ) 
 			{
 				//action_data.m_MainItem.Consume(targetObject, m_SpentQuantity);
-				ntarget.Consume(action_data.m_MainItem, m_SpentQuantity);
+				ntarget.Consume(action_data.m_MainItem, m_SpentQuantity, EConsumeType.ITEM_CONTINUOUS);
 				
 			}
 		}
@@ -47,7 +47,7 @@ class CAContinuousQuantityEdible : CAContinuousQuantityRepeat
 			if ( GetGame().IsServer() ) 
 			{
 				//action_data.m_MainItem.Consume(action_data.m_Player, m_SpentQuantity);
-				action_data.m_Player.Consume(action_data.m_MainItem, m_SpentQuantity);
+				action_data.m_Player.Consume(action_data.m_MainItem, m_SpentQuantity, EConsumeType.ITEM_CONTINUOUS);
 			}
 		}
 	}

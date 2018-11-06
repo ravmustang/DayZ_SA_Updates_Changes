@@ -1,4 +1,4 @@
-class BrokenLegs: ModifierBase
+class BrokenLegsMdfr: ModifierBase
 {
 	private const 	float	HEALTHY_LEG = 80;
 

@@ -109,6 +109,16 @@ class HandStateBase
 	 * @param[in]	dst		to state (current)
 	 **/
 	void OnSubMachineChanged (HandStateBase src, HandStateBase dst) { }
+
+	/**@fn		OnStateChanged
+	 * @brief	called on current state when state machine has changed its state
+	 * @param[in]	src		from state (previous)
+	 * @param[in]	dst		to state (current)
+	 **/
+	void OnStateChanged (HandStateBase src, HandStateBase dst)
+	{
+		m_Player.GetHumanInventory().OnHandsStateChanged(src, dst);
+	}
 };
 
 

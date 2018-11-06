@@ -7,8 +7,7 @@ class TunaCan : Edible_Base
 	
 	override void Open()
 	{
-		m_Opened = true;
-
+		super.Open();
 		ReplaceEdibleWithNew("TunaCan_Opened");
 	}
 }

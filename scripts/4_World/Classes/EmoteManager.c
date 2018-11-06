@@ -1,6 +1,8 @@
 class EmoteCB : HumanCommandActionCallback
 {
+	//const int 		CB_SURRENDER_STATE = 100;
 	bool 			m_IsFullbody;
+	int 			m_callbackID;
 	PlayerBase 		m_player;
 	
 	bool CancelCondition()
@@ -10,7 +12,7 @@ class EmoteCB : HumanCommandActionCallback
 	
 	bool IsEmoteCallback()
 	{
-		return true;
+		return IsGestureCallback();
 	}
 	
 	override void OnAnimationEvent(int pEventID)
@@ -19,6 +21,20 @@ class EmoteCB : HumanCommandActionCallback
 		{
 			m_player.GetEmoteManager().KillPlayer();
 		}
+		else if (GetGame().IsServer() && pEventID == UA_ANIM_EVENT)
+		{
+			if (m_player.GetItemInHands())
+				m_player.GetItemInHands().Delete();
+			/*else if ( m_player.GetCommand_Move() && m_player.GetCommand_Move().IsOnBack() ) //no surrender state on back, bugs out
+				return;*/
+			else
+				m_player.GetHumanInventory().CreateInHands("SurrenderDummyItem");
+		}
+	}
+	
+	override bool IsGestureCallback()
+	{
+		return true;
 	}
 };
 
@@ -43,26 +59,30 @@ class EmoteFromMenu
 }
 
 class EmoteManager
-{		
+{
 	PlayerBase 				m_Player;
 	ItemBase				m_item;
 	EmoteCB					m_Callback;
 	HumanInputController 	m_HIC;
+	ref InventoryLocation 	m_HandInventoryLocation;
 	ref EmoteFromMenu 		m_MenuEmote;
 	bool					m_bEmoteIsPlaying;
+	bool 					m_IsSurrendered;
+	protected bool 			m_ItemToBeCreated;
 	protected bool			m_BelayedEmote;
 	protected bool			m_ItemToHands;
 	protected bool			m_ItemIsOn;
 	protected bool			m_MouseButtonPressed;
 	protected bool 			m_PlayerDies;
 	protected bool 			m_controllsLocked;
+	protected bool 			m_EmoteLockState;
 	protected int  			m_GestureID;
-	protected int			m_BelayedEmoteID;
+	protected int			m_BelayedEmoteSlot;
 	protected int			m_PreviousGestureID;
 	protected int			m_CurrentGestureID;
 	protected int 			m_LastMask;
 	protected int 			m_RPSOutcome;
-	
+	protected const float 	WATER_DEPTH = 0.15;
 	
 	void EmoteManager( PlayerBase player ) 
 	{
@@ -70,6 +90,10 @@ class EmoteManager
 		m_HIC = m_Player.GetInputController();
 		m_ItemIsOn = false;
 		m_RPSOutcome = -1;
+		
+		//leave this here?
+		m_HandInventoryLocation = new InventoryLocation;
+		m_HandInventoryLocation.SetHands(m_Player,null);
 	}
 	
 	void SetGesture(int id)
@@ -82,9 +106,43 @@ class EmoteManager
 		return m_GestureID;
 	}
 	
+	int DetermineGestureIndex()
+	{
+		// while player controls something else (car) - do not use gestures
+		if( m_HIC.IsOtherController() )
+			return 0;
+	
+		int gesture = m_HIC.IsGestureSlot();
+		return gesture;
+	}
+	
 	//Called from players commandhandler each frame, checks input
 	void Update( float deltaT )
 	{
+		/*if (GetGame().GetInput())
+		{
+			//Print("---input is there --- ");
+			//Print("---action count? ---" + GetGame().GetInput().GetActionsCount());
+			for (int i = 1; i < 350; i++)
+			{
+				if (GetGame().GetInput().GetActionDown(i, false))
+					Print("---GetActionDown--- " + i);
+			}
+		}*/
+		// no updates on restrained characters
+		if (m_Player.IsRestrained())
+			return;
+		
+		CheckEmoteLockedState();
+		
+		// dummy item has been created, cancels the "soft reservation" bool
+		if (m_Player.GetItemInHands() && m_Player.GetItemInHands().GetType() == "SurrenderDummyItem" && m_ItemToBeCreated)
+		{
+			m_ItemToBeCreated = false;
+		}
+		
+		int gestureSlot = DetermineGestureIndex();
+
 		if ( m_Callback ) 
 		{
 			bool uiGesture = false;
@@ -92,20 +150,12 @@ class EmoteManager
 			{
 				uiGesture = GetGame().GetUIManager().IsMenuOpen(MENU_GESTURES);
 			}
-			
-			//Movement lock in fullbody anims
-			if (m_Callback.m_IsFullbody && !m_controllsLocked)
-			{
-				m_controllsLocked = true;
-				//m_Player.GetInputController().OverrideAimChangeX(true,0);
-				//m_Player.GetInputController().OverrideMovementSpeed(true,0);
-			}
-			
+					
 			//jtomasik - asi bych nemel checkovat jestli hrac klika v menu nebo ve scene tady, ale mel by to vedet input manager?
 			//HACK - handle differently with new input controller
-			if( (m_HIC.IsGestureSlot() > 0 && m_HIC.IsGestureSlot() != 12 ) /*|| uiGesture*/|| (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
+			if( (gestureSlot > 0 && gestureSlot != 12 ) || (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
 			{
-				//Print("gestureslot pressed: " + m_HIC.IsGestureSlot());
+				//Print("gestureslot pressed: " + gestureSlot);
 				if (m_CurrentGestureID == ID_EMOTE_SUICIDE  && m_HIC.IsSingleUse() /*m_MouseButtonPressed*/)
 				{
 					if (m_Callback.GetState() == m_Callback.STATE_LOOP_LOOP)
@@ -141,18 +191,12 @@ class EmoteManager
 					EndCallback();
 				}
 
-				if ( m_HIC.IsGestureSlot() && m_PreviousGestureID != m_HIC.IsGestureSlot() )
+				if ( gestureSlot && m_PreviousGestureID != gestureSlot )
 				{
 					m_BelayedEmote = true;
-					m_BelayedEmoteID = m_HIC.IsGestureSlot();
+					m_BelayedEmoteSlot = gestureSlot;
 				}
 			}
-			
-			/*if ( m_MenuEmote && m_MenuEmote.m_ID != m_PreviousGestureID )
-			{
-				m_BelayedEmote = true;
-				m_BelayedEmoteID = m_MenuEmote.m_ID;
-			}*/
 			
 			//HOTFIX for stance changing in additive emotes
 			if ( m_LastMask != -1 && m_Player.IsPlayerInStance(DayZPlayerConstants.STANCEMASK_PRONE) )
@@ -165,24 +209,36 @@ class EmoteManager
 				//PlayEmoteFromMenu();
 				EndCallback();
 			}
-		}
-		
+		}	
 		//no m_Callback exists
 		else
 		{
 			if (m_bEmoteIsPlaying)
 			{
 				m_bEmoteIsPlaying = false;
-				//m_LaunchedFromRadial = false;
 				OnEmoteEnd();
+			}
+			else if (!m_Player.GetItemInHands() && m_IsSurrendered && !m_ItemToBeCreated)
+			{
+				PlaySurrenderInOut(false);
+				return;
+			}
+			
+			// fallback in case lock does not end properly
+			else if (m_IsSurrendered && !m_Player.GetItemInHands() || (m_Player.GetItemInHands() && m_Player.GetItemInHands().GetType() != "SurrenderDummyItem" && m_EmoteLockState))
+			{
+				m_IsSurrendered = false;
+				SetEmoteLockState(false);
+				//m_Player.OnSurrenderEnd();
+				return;
 			}
 			else if (!m_bEmoteIsPlaying && m_MenuEmote)
 			{
 				PlayEmoteFromMenu();
 			}
-			else
+			else if (gestureSlot > 0)
 			{
-				PickEmote(m_HIC.IsGestureSlot());
+				PickEmote(gestureSlot);
 			}
 		}
 	}
@@ -201,28 +257,51 @@ class EmoteManager
 			return;
 		}
 		
+		//surrender "state" switch
+		if ( m_CurrentGestureID == ID_EMOTE_SURRENDER )
+		{
+			m_IsSurrendered = !m_IsSurrendered;
+			if ( !m_IsSurrendered )
+			{
+				SetEmoteLockState(false);
+			}
+			else
+			{
+				//TODO, HACK: fix this hack once inventory lock conditions have been sorted out
+				SetEmoteLockState(true);
+				/*if ( m_Player.GetCommand_Move() && m_Player.GetCommand_Move().IsOnBack() )
+				{
+					m_IsSurrendered = !m_IsSurrendered; //invalid position, surrender state cannot proceed
+				}*/
+			}
+		}
+		
+		if ( m_IsSurrendered )
+		{
+			if (m_BelayedEmote)
+			{
+				m_BelayedEmoteSlot = -1;
+				m_BelayedEmote = false;
+			}
+			return;
+		}
+		
+		SetEmoteLockState(false);
+		
 		if ( m_BelayedEmote )
 		{
-			if ( m_PreviousGestureID != m_BelayedEmoteID )
+			if ( /*m_PreviousGestureID != m_BelayedEmoteSlot &&*/ !m_IsSurrendered)
 			{
-				PickEmote(m_BelayedEmoteID);
-				//PlayEmote(m_BelayedEmoteID);
+				PickEmote(m_BelayedEmoteSlot);
+				//PlayEmote(m_BelayedEmoteSlot);
 			}
-			m_BelayedEmoteID = -1;
+			m_BelayedEmoteSlot = -1;
 			m_BelayedEmote = false;
 		}
-		else
+		/*else
 		{
-			if ( m_Player.GetActionManager() ) m_Player.GetActionManager().EnableActions();
-			m_Player.m_InventorySoftLocked = false;
-			
-			if ( m_controllsLocked )
-			{
-				m_controllsLocked = false;
-				m_Player.GetInputController().OverrideAimChangeX(false,0);
-				m_Player.GetInputController().OverrideMovementSpeed(false,0);
-			}
-		}
+			SetEmoteLockState(false);
+		}*/
 
 		//! back to the default - shoot from camera - if not set already
 		if (!m_Player.IsShootingFromCamera()) m_Player.OverrideShootFromCamera(true);
@@ -259,11 +338,11 @@ class EmoteManager
 	//Configure Emote parameters for callback here
 	bool PlayEmote( int id )
 	{
-		if (!CanPlayEmote())
+		if (!CanPlayEmote(id))
 		{
 			return false;
 		}
-		
+		m_PreviousGestureID = m_CurrentGestureID;
 		m_CurrentGestureID = id;
 		if( id > 0)
 		{
@@ -309,8 +388,13 @@ class EmoteManager
 				break;
 			
 				case ID_EMOTE_LYINGDOWN :
-					CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_LYINGDOWN,DayZPlayerConstants.STANCEMASK_CROUCH,true);
-					HideItemInHands();
+					vector water_info = HumanCommandSwim.WaterLevelCheck( m_Player, m_Player.GetPosition() - (m_Player.GetDirection() * 0.9) ); //checks behind player, where the head ends up being
+					//Print("depth: " + water_info[0]);
+					if ( water_info[0] < WATER_DEPTH ) //is player able to lay down without "drowning"?
+					{
+						CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_LYINGDOWN,DayZPlayerConstants.STANCEMASK_CROUCH,true);
+						HideItemInHands();
+					}
 				break;
 			
 				case ID_EMOTE_TAUNTKISS :
@@ -338,6 +422,7 @@ class EmoteManager
 				
 				case ID_EMOTE_TAUNTELBOW :
 					CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREMOD_TAUNTELBOW,DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT,false);
+					HideItemInHands();
 				break;
 				
 				case ID_EMOTE_THUMB :
@@ -375,6 +460,7 @@ class EmoteManager
 			
 				case ID_EMOTE_SUICIDE :
 					int suicideID = DayZPlayerConstants.CMD_SUICIDEFB_UNARMED;
+					int m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 					string suicideStr;
 					ItemBase weapon;
 					weapon = m_Player.GetItemInHands();
@@ -389,6 +475,7 @@ class EmoteManager
 						if (weapon.IsKindOf("Pistol_Base"))
 						{
 							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_PISTOL;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 							//! switch to shoot from weapons instead of camera
 							m_Player.OverrideShootFromCamera(false);
 						}
@@ -396,21 +483,40 @@ class EmoteManager
 						else if (weapon.IsKindOf("Rifle_Base"))
 						{
 							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_RIFLE;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 							//! switch to shoot from weapons instead of camera
 							m_Player.OverrideShootFromCamera(false);
 						}
 						
-						else if (suicideStr == "onehanded") 	suicideID = DayZPlayerConstants.CMD_SUICIDEFB_1HD;
+						else if (suicideStr == "onehanded"){
+							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_1HD;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
+						}
 						
-						else if (suicideStr == "fireaxe") 		suicideID = DayZPlayerConstants.CMD_SUICIDEFB_FIREAXE;
+						else if (suicideStr == "fireaxe"){
+							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_FIREAXE;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
+						}
 						
-						else if (suicideStr == "pitchfork") 	suicideID = DayZPlayerConstants.CMD_SUICIDEFB_PITCHFORK;
+						else if (suicideStr == "pitchfork"){
+							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_PITCHFORK;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
+						}
 						
-						else if (suicideStr == "sword") 		suicideID = DayZPlayerConstants.CMD_SUICIDEFB_SWORD;
+						else if (suicideStr == "sword"){
+							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_SWORD;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
+						}
 						
-						else if (suicideStr == "spear") 		suicideID = DayZPlayerConstants.CMD_SUICIDEFB_SPEAR;
+						else if (suicideStr == "spear"){
+							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_SPEAR;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
+						}
 						
-						else if (suicideStr == "woodaxe") 		suicideID = DayZPlayerConstants.CMD_SUICIDEFB_WOODAXE;
+						else if (suicideStr == "woodaxe"){
+							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_WOODAXE;
+							m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
+						}
 					
 						else //item in hands is not eligible for suicide
 							suicideID = -1;
@@ -418,7 +524,7 @@ class EmoteManager
 			
 					if (suicideID > -1)
 					{
-						CreateEmoteCallback(EmoteCB,suicideID,DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH,true);
+						CreateEmoteCallback(EmoteCB, suicideID, m_StanceMask, true);
 						//m_Callback.RegisterAnimationEvent("Death",1);
 					}
 				break;
@@ -574,6 +680,19 @@ class EmoteManager
 					}
 				break;
 				
+				case ID_EMOTE_SURRENDER :
+					if ( !m_IsSurrendered )
+					{
+						PlaySurrenderInOut(true);
+					}
+					else if ( m_IsSurrendered )
+					{
+						if ( m_Player.GetItemInHands() )
+							//m_Player.GetHumanInventory().LocalDestroyEntity(m_Player.GetItemInHands());		
+							m_Player.GetItemInHands().Delete();
+					}
+				break;
+				
 				case ID_EMOTE_CAMPFIRE :
 					CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_CAMPFIRE,DayZPlayerConstants.STANCEMASK_CROUCH,true);
 				break;
@@ -602,7 +721,6 @@ class EmoteManager
 					CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREMOD_RPS,DayZPlayerConstants.STANCEMASK_ERECT,false);
 				break;
 				
-				//new stuff
 				case ID_EMOTE_NOD :
 					if (!m_Player.IsPlayerInStance(DayZPlayerConstants.STANCEMASK_PRONE))
 					{
@@ -643,11 +761,9 @@ class EmoteManager
 				break;
 			}
 		}
-		if ( m_bEmoteIsPlaying )
+		if ( m_bEmoteIsPlaying && m_Callback.m_IsFullbody )
 		{
-			if ( m_Player.GetActionManager() )	 m_Player.GetActionManager().DisableActions();
-			//m_Player.GetInventory().LockInventory(LOCK_FROM_SCRIPT);
-			m_Player.m_InventorySoftLocked = true;
+			SetEmoteLockState(true);
 		}
 		
 		return true;
@@ -657,9 +773,9 @@ class EmoteManager
 	{
 		if ( m_Player )
 		{
-			m_PreviousGestureID = gestureslot;
+			//m_PreviousGestureID = gestureslot;
 			//HACK - to be removed with new input controller
-			if ( m_PreviousGestureID == 12)
+			if ( gestureslot == 12)
 			{
 				return;
 			}
@@ -738,6 +854,7 @@ class EmoteManager
 			if (m_Callback)
 			{
 				m_bEmoteIsPlaying = true;
+				m_Callback.m_callbackID = id;
 				m_Callback.m_player = m_Player;
 			}
 		}
@@ -745,28 +862,23 @@ class EmoteManager
 	
 	protected void HideItemInHands()
 	{
+		/*if (GetGame().IsMultiplayer() && !GetGame().IsClient())
+			return;*/
 		m_item = m_Player.GetItemInHands();
 		if(m_Callback && m_item)
 		{
-			m_ItemIsOn = m_item.IsPilotLight();
-			if (m_ItemIsOn)
-				m_item.SetPilotLight(false);
-			m_item.SetInvisible(true);
+			m_Player.GetItemAccessor().HideItemInHands(true);
 			m_ItemToHands = true;
 		}
 	}
 	
 	protected void ShowItemInHands()
 	{
+		/*if (GetGame().IsMultiplayer() && !GetGame().IsClient())
+			return;*/
 		if (m_item)
 		{
-			if (m_ItemIsOn)
-			{
-				m_item.SetPilotLight(m_ItemIsOn);
-				m_ItemIsOn = false;
-			}
-			m_item.SetInvisible(false);
-			m_Player.GetItemAccessor().OnItemInHandsChanged();
+			m_Player.GetItemAccessor().HideItemInHands(false);
 		}
 		m_ItemToHands = false;
 	}
@@ -784,7 +896,7 @@ class EmoteManager
 			{
 				m_Player.SetSuicide(true);
 				weapon.ProcessWeaponEvent(weapon_event);
-				m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END2);
+				m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 				if (m_Player.IsAlive()) 	(GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(this.KillPlayer);
 			}
 			else
@@ -798,13 +910,13 @@ class EmoteManager
 		{
 			m_Callback.RegisterAnimationEvent("Death",1);
 			m_Player.SetSuicide(true);
-			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END2);
+			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(this.KillPlayer, 4000, false);
 		}
 		//unarmed "suicide" :)
 		else
 		{
-			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END2);
+			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 		}
 	}
 
@@ -897,13 +1009,18 @@ class EmoteManager
 		return m_controllsLocked;
 	}
 	
-	bool CanPlayEmote()
+	bool CanPlayEmote(int id)
 	{
+		if (m_BelayedEmote && id == m_CurrentGestureID)
+		{
+			return false;
+		}
+		
 		if ( !m_Player || m_Player.GetCommand_Action() || m_Player.GetCommandModifier_Action() )
 		{	
 			return false;
 		}
-		if ( m_Player.GetWeaponManager().IsRunning() || m_Player.GetActionManager().GetRunningAction() )
+		if ( (m_Player.GetWeaponManager() && m_Player.GetWeaponManager().IsRunning()) || (m_Player.GetActionManager() && m_Player.GetActionManager().GetRunningAction()) )
 		{
 			return false;
 		}
@@ -912,13 +1029,162 @@ class EmoteManager
 		{
 			return false;
 		}
-		if (m_Player.GetCommand_Vehicle())
+		if ( m_Player.GetCommand_Vehicle() )
 		{
-			if (m_Player.GetCommand_Vehicle().GetTransport())
+			if ( m_Player.GetCommand_Vehicle().GetTransport() )
 			{
 				return false;
 			}
 		}
+		
+		if ( m_Player.GetCommand_Move() && m_Player.GetCommand_Move().IsOnBack() && id != ID_EMOTE_SURRENDER)
+		{
+			return false;
+		}
+		
+		//"locks" player in surrender state
+		if ( m_IsSurrendered && (id != ID_EMOTE_SURRENDER) )
+		{
+			return false;
+		}
+		
+		if ( m_HandInventoryLocation && m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation) )
+		{
+			if ( m_IsSurrendered && (id == ID_EMOTE_SURRENDER) )
+			{
+				return true;
+			}
+			if ( m_Callback && m_Callback.m_IsFullbody )
+			{
+				return true;
+			}
+			return false;
+		}
 		return true;
 	}
+	
+	void PlaySurrenderInOut(bool state)
+	{
+		m_PreviousGestureID = m_CurrentGestureID;
+		m_CurrentGestureID = ID_EMOTE_SURRENDER;
+		if (state)
+		{
+			m_ItemToBeCreated = true;
+			if ((GetGame().IsMultiplayer() && !GetGame().IsServer()) || !GetGame().IsMultiplayer())
+			{
+				if (m_Player.GetItemInHands() && !m_Player.CanDropEntity(m_Player.GetItemInHands()))
+					return;
+				if (m_Player.GetItemInHands())
+					m_Player.DropItem(m_Player.GetItemInHands());
+			}
+			CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_SURRENDERIN,DayZPlayerConstants.STANCEMASK_ALL,true);
+			if (m_Callback)
+				m_Callback.RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);
+		}
+		else
+		{
+			CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_SURRENDEROUT,DayZPlayerConstants.STANCEMASK_ALL,true);
+			/*if (m_Callback)
+				m_Callback.RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);*/
+		}
+	}
+	
+	//!
+	void SetEmoteLockState(bool state)
+	{
+		//Print("lock state " + state);
+			
+		if (!m_HandInventoryLocation)
+		{
+			m_HandInventoryLocation = new InventoryLocation;
+			m_HandInventoryLocation.SetHands(m_Player,null);
+		}
+		
+		if (!state)
+		{
+			if (m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation))
+			{
+				//Print("Clearing hand reservation... ");
+				m_Player.GetInventory().ClearInventoryReservation( null, m_HandInventoryLocation);
+			}
+			
+			if ( m_Player.GetActionManager() )
+				m_Player.GetActionManager().EnableActions();
+			
+			m_Player.SetInventorySoftLock(false);
+						
+			if ( m_controllsLocked )
+			{
+				m_controllsLocked = false;
+				m_Player.GetInputController().OverrideAimChangeX(false,0);
+				m_Player.GetInputController().OverrideMovementSpeed(false,0);
+			}
+		}
+		else
+		{
+			//m_HandInventoryLocation.SetHands(m_Player,m_Player.GetItemInHands());
+			if (!m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation))
+			{
+				//Print("Adding hand reservation... ");
+				m_Player.GetInventory().AddInventoryReservation( null, m_HandInventoryLocation, 10000);
+			}
+				
+			if ( m_Player.GetActionManager() )
+				m_Player.GetActionManager().DisableActions();
+			//m_Player.GetInventory().LockInventory(LOCK_FROM_SCRIPT);
+			m_Player.SetInventorySoftLock(true);
+			
+			//Movement lock in fullbody anims
+			//TODO check for better solution to prevent turning on back and borking the animation (surrender)
+			if (m_Callback && m_Callback.m_IsFullbody && !m_controllsLocked && m_CurrentGestureID == ID_EMOTE_SURRENDER)
+			{
+				m_controllsLocked = true;
+				//m_Player.GetInputController().OverrideAimChangeX(true,0);
+				//m_Player.GetInputController().OverrideMovementSpeed(true,0);
+			}
+		}
+		m_EmoteLockState = state;
+	}
+	
+	void CheckEmoteLockedState()
+	{
+		if (!m_EmoteLockState && m_Player.GetItemInHands() && m_Player.GetItemInHands().GetType() == "SurrenderDummyItem")
+		{
+			m_IsSurrendered = true;
+			SetEmoteLockState(true);
+			return;
+		}
+		
+		//refreshes reservation in case of unwanted timeout
+		if ( m_EmoteLockState && m_HandInventoryLocation && !m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation) )
+		{
+			m_Player.GetInventory().AddInventoryReservation( null, m_HandInventoryLocation, 10000);
+		}
+	}
+	
+	//! force-ends surrender state from outside of normal flow
+	void EndSurrenderRequest(SurrenderData data)
+	{
+		if (m_IsSurrendered)
+		{
+			SetEmoteLockState(false);
+			if (m_Player.GetItemInHands())
+				m_Player.GetItemInHands().Delete();
+			
+			m_IsSurrendered = false;
+			
+			data.End();
+		}
+	}
+	
+	bool IsEmotePlaying()
+	{
+		return m_bEmoteIsPlaying || m_IsSurrendered;
+	}
 };
+
+class SurrenderData
+{
+	//!called on surrender end request end
+	void End();
+}

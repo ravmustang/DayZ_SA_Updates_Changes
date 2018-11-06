@@ -33,7 +33,7 @@ class ActionForceABite: ActionForceConsumeSingle
 		return "#feed_a_bite";
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{	
 		if ( action_data.m_MainItem.GetQuantity() <= 0 )
 		{

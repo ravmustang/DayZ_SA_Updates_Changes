@@ -1,19 +1,19 @@
-class Header: ContainerBase
+class Header: LayoutHolder
 {
 	protected EntityAI	m_Entity;
-	void Header( ContainerBase parent, string function_name )
+	void Header( LayoutHolder parent, string function_name )
 	{
 		#ifndef PLATFORM_CONSOLE
-		WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( GetMainPanel().FindAnyWidget( "collapse_button" ),  m_Parent, function_name );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel().FindAnyWidget( "collapse_button" ),  m_Parent, "OnDropReceivedFromHeader" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( GetMainWidget().FindAnyWidget( "collapse_button" ),  m_Parent, function_name );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "collapse_button" ),  m_Parent, "OnDropReceivedFromHeader" );
 		#endif
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainPanel(),  m_Parent, "OnDropReceivedFromHeader" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainPanel(),  this, "DraggingOverHeader" );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget(),  m_Parent, "OnDropReceivedFromHeader" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget(),  this, "DraggingOverHeader" );
 	}
 	
 	void SetName( string name )
 	{
-		TextWidget text_widget = TextWidget.Cast( GetMainPanel().FindAnyWidget( "TextWidget0" ) );
+		TextWidget text_widget = TextWidget.Cast( GetMainWidget().FindAnyWidget( "TextWidget0" ) );
 		name.ToUpper();
 		text_widget.SetText( name );
 	}
@@ -21,7 +21,7 @@ class Header: ContainerBase
 	void SetItemPreview( EntityAI entity_ai )
 	{
 		m_Entity = entity_ai;
-		ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( GetMainPanel().FindAnyWidget( "Render" ) );
+		ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( GetMainWidget().FindAnyWidget( "Render" ) );
 		item_preview.SetItem(entity_ai);
 		item_preview.SetView( entity_ai.GetViewIndex() );
 	}

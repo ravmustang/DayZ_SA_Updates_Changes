@@ -28,13 +28,13 @@ class XmasLights extends Inventory_Base
 
 		if( GetCompEM().IsPlugged() )
 		{
-			parent.SetAnimationPhase( "cord_plugged", 0);
-			parent.SetAnimationPhase( "cord_folded", 1);
+			parent.SetAnimationPhase( "Cord_plugged", 0);
+			parent.SetAnimationPhase( "Cord_folded", 1);
 		}
 		else
 		{
-			parent.SetAnimationPhase( "cord_plugged", 1);
-			parent.SetAnimationPhase( "cord_folded", 0);
+			parent.SetAnimationPhase( "Cord_plugged", 1);
+			parent.SetAnimationPhase( "Cord_folded", 0);
 		}
 	}
 
@@ -55,10 +55,10 @@ class XmasLights extends Inventory_Base
 				item.SetObjectMaterial( 1, "dz\\gear\\camping\\data\\christmas_lights_green_on.rvmat" );
 				item.SetObjectMaterial( 2, "dz\\gear\\camping\\data\\christmas_lights_blue_on.rvmat" );
 				item.SetObjectMaterial( 3, "dz\\gear\\camping\\data\\christmas_lights_yellow_on.rvmat" );
-				item.SetObjectTexture( 0, "dz\\gear\\consumables\\data\\chemlight_ca.paa" );
-				item.SetObjectTexture( 1, "dz\\gear\\consumables\\data\\chemlight_ca.paa" );
-				item.SetObjectTexture( 2, "dz\\gear\\consumables\\data\\chemlight_ca.paa" );
-				item.SetObjectTexture( 3, "dz\\gear\\consumables\\data\\chemlight_ca.paa" );
+				item.SetObjectTexture( 0, "dz\\gear\\camping\\data\\christmas_lights_string_ca.paa" );
+				item.SetObjectTexture( 1, "dz\\gear\\camping\\data\\christmas_lights_string_ca.paa" );
+				item.SetObjectTexture( 2, "dz\\gear\\camping\\data\\christmas_lights_string_ca.paa" );
+				item.SetObjectTexture( 3, "dz\\gear\\camping\\data\\christmas_lights_string_ca.paa" );
 				item.SetPilotLight(true);	
 			}
 			else
@@ -95,7 +95,7 @@ class XmasLights extends Inventory_Base
 		item.SetObjectTexture( 2, "" );
 		item.SetObjectTexture( 3, "" );
 		item.SetPilotLight(false);
-		item.SetAnimationPhase( "cord_plugged", 0);
-		item.SetAnimationPhase( "cord_folded", 0);
+		item.SetAnimationPhase( "Cord_plugged", 1);
+		item.SetAnimationPhase( "Cord_folded", 1);
 	}
 }

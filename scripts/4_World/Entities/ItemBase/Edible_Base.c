@@ -45,21 +45,6 @@ class Edible_Base extends ItemBase
 		
 		//Material index
 		ctx.Write( GetFoodStage().GetMaterialIndex() );
-
-		//Modifiers
-		//size
-		int modifiers_size = 0;
-		if ( GetFoodStage().GetModifiers() )	//if not null
-		{
-			modifiers_size = GetFoodStage().GetModifiers().Count();
-		}
-		ctx.Write( modifiers_size );
-
-		//data
-		for ( int j = 0; j < modifiers_size; j++ )
-		{
-			ctx.Write( GetFoodStage().GetModifiers().Get( j ) );
-		}
 	}
 	
 	override void OnStoreLoad( ParamsReadContext ctx )
@@ -85,22 +70,6 @@ class Edible_Base extends ItemBase
 		int material_idx = 0;
 		ctx.Read( material_idx );
 		GetFoodStage().SetMaterialIndex( material_idx );
-		
-		//Modifiers
-		//count
-		int modifiers_size = 0;
-		ctx.Read( modifiers_size );	
-		
-		
-		//clear modifiers when inserting loaded data
-		GetFoodStage().GetModifiers().Clear();
-		//data
-		for ( int j = 0; j < modifiers_size; j++ )
-		{
-			string modifier;
-			ctx.Read( modifier );
-			GetFoodStage().GetModifiers().Insert( modifier );
-		}
 		
 		//refresh visual after load
 		RefreshVisuals();
@@ -276,8 +245,13 @@ class Edible_Base extends ItemBase
 	void ReplaceEdibleWithNew (string typeName)
 	{
 		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
-		ReplaceEdibleWithNewLambda lambda = new ReplaceEdibleWithNewLambda(this, typeName, player);
-		player.ServerReplaceItemInHandsWithNew(lambda);
+		if (player)
+		{
+			ReplaceEdibleWithNewLambda lambda = new ReplaceEdibleWithNewLambda(this, typeName, player);
+			player.ServerReplaceItemInHandsWithNew(lambda);
+		}
+		else
+			Error("ReplaceEdibleWithNew - cannot use edible without player");
 	}
 }
 

@@ -8,37 +8,32 @@ class WidgetCacheObject
 	float m_x, m_y, m_width, m_height, m_screen_x, m_screen_y, m_screen_width, m_screen_height;
 	float m_alpha;
 
-	ref map<string, ref WidgetCacheObject> m_widgets_cache;
+	ref map<string, ref WidgetCacheObject> m_WidgetsCache;
 	ref array<ref WidgetCacheObject> m_registred_children;
 
 	void WidgetCacheObject( Widget w )
 	{
-		m_widgets_cache = new map<string, ref WidgetCacheObject>;
+		m_WidgetsCache = new map<string, ref WidgetCacheObject>;
 		m_registred_children = new array<ref WidgetCacheObject>;
 		m_widget = w;
 	}
-
-	void ~WidgetCacheObject()
-	{
-		//Print("was here");
-	}
-
+	
 	WidgetCacheObject FindAnyWidget( string widget_name )
 	{
-		WidgetCacheObject wco = m_widgets_cache.Get( widget_name );
+		WidgetCacheObject wco = m_WidgetsCache.Get( widget_name );
 
 		if( wco == NULL )
 		{
 			Widget temp = m_widget.FindAnyWidget( widget_name );
 			wco = new WidgetCacheObject( temp );
 			wco.SaveOriginalValeus();
-			m_widgets_cache.Insert( widget_name, wco );
+			m_WidgetsCache.Insert( widget_name, wco );
 		}
 
 		return wco;
 	}
 
-	void RegisterOnMouseButtonDown( ContainerBase w, string function_name )
+	void RegisterOnMouseButtonDown( LayoutHolder w, string function_name )
 	{
 		WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( m_widget, w, function_name );
 	}
@@ -205,9 +200,9 @@ class WidgetCacheObject
 		m_widget.SetAlpha( m_alpha );
 		m_widget.SetRotation( 0, 0, 0 );
 
-		if( m_widgets_cache.Count() > 0 )
+		if( m_WidgetsCache.Count() > 0 )
 		{
-			foreach ( WidgetCacheObject wco: m_widgets_cache )
+			foreach ( WidgetCacheObject wco: m_WidgetsCache )
 			{
 				wco.RestoreOriginalValeus();
 			}

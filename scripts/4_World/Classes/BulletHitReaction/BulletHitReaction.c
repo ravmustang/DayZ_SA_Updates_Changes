@@ -1,4 +1,4 @@
-class BulletHitReaction
+class DamageDealtEffect
 {
 	const float ALPHA_MIN = 0;
 	const float ALPHA_MAX = 0.2;
@@ -6,13 +6,13 @@ class BulletHitReaction
 	float m_BreakPoint;
 	float m_TimeActive;
 	
-	void BulletHitReaction()
+	void DamageDealtEffect()
 	{
 		m_HitDuration = 0.30;
 		m_BreakPoint = 0.05;
 	}
 	
-	void ~BulletHitReaction()
+	void ~DamageDealtEffect()
 	{
 		PPEffects.HitEffect(0);
 	}

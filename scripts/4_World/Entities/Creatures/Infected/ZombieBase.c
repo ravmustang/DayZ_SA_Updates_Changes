@@ -1,18 +1,47 @@
 class ZombieBase extends DayZInfected
 {
 	//! server / singleplayer properties
-	private int m_StanceVariation = 0;
-	private int m_LastMindState = -1;
+	protected int m_StanceVariation = 0;
+	protected int m_LastMindState = -1;
+	protected float m_LastMovementSpeed = -1;
 	
-	private bool m_KnuckleLand = false;
-	private float m_KnuckleOutTimer = 0;
+	protected bool m_KnuckleLand = false;
+	protected float m_KnuckleOutTimer = 0;
+
+	protected int m_MindState = -1;
+	protected float m_MovementSpeed = -1;
+	
+	protected ref AbstractWave				m_LastSoundVoiceAW;
+	protected ref InfectedSoundEventHandler	m_InfectedSoundEventHandler;
 
 	//-------------------------------------------------------------
 	void ZombieBase()
 	{
-		SetEventMask(EntityEvent.INIT);
+		Init();
 	}
 	
+	void Init()
+	{
+		SetEventMask(EntityEvent.INIT);
+		
+		RegisterNetSyncVariableInt("m_MindState", -1, 4);
+		RegisterNetSyncVariableFloat("m_MovementSpeed", -1, 3);
+
+		//! client only
+		if( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{
+			m_LastSoundVoiceAW 			= null;
+			m_InfectedSoundEventHandler = new InfectedSoundEventHandler(this);
+		}
+	}
+	
+	//! synced variable(s) handler
+	override void OnVariablesSynchronized()
+	{
+		DebugSound("[Infected @ " + this + "][OnVariablesSynchronized]");
+		HandleSoundEvents();
+	}
+
 	//-------------------------------------------------------------
 	override void EOnInit(IEntity other, int extra)
 	{
@@ -23,6 +52,11 @@ class ZombieBase extends DayZInfected
 			DayZInfectedCommandMove moveCommand = GetCommand_Move();
 			moveCommand.SetStanceVariation(m_StanceVariation);
 		}
+	}
+	
+	bool IsMale()
+	{
+		return true;
 	}
 	
 	//-------------------------------------------------------------
@@ -40,7 +74,20 @@ class ZombieBase extends DayZInfected
 	{
 		return false;
 	}
-	
+	//-------------------------------------------------------------
+
+	//! returns hit component for attacking AI
+	override string GetHitComponentForAI()
+	{
+		return GetDayZInfectedType().GetHitComponentForAI();
+	}
+
+	//! returns default hit component (fallback)
+	override string GetDefaultHitComponent()
+	{
+		return GetDayZInfectedType().GetDefaultHitComponent();
+	}
+
 	//-------------------------------------------------------------
 	//!
 	//! CommandHandler
@@ -53,6 +100,9 @@ class ZombieBase extends DayZInfected
 		{
 			return;
 		}
+
+		//! movement handler (just for sync now)
+		HandleMove(pCurrentCommandID);
 		
 		//! handle finished commands
 		if (pCurrentCommandFinished)
@@ -62,8 +112,8 @@ class ZombieBase extends DayZInfected
 			moveCommand.SetStanceVariation(m_StanceVariation);
 			
 			return;
-		};
-
+		}
+		
 		//! crawl transition
 		if( HandleCrawlTransition(pCurrentCommandID) )
 		{
@@ -92,14 +142,33 @@ class ZombieBase extends DayZInfected
 			if( FightLogic(pCurrentCommandID, inputController, pDt) )
 			{
 				return;
-			} 
+			}
+		}		
+	}
+
+	//-------------------------------------------------------------
+	//!
+	//! HandleMove
+	//!
+	
+	void HandleMove(int pCurrentCommandID)
+	{
+		DayZInfectedInputController ic = GetInputController();
+		m_MovementSpeed = ic.GetMovementSpeed();
+		if (Math.AbsFloat(m_LastMovementSpeed - m_MovementSpeed) >= 0.9 && m_LastMovementSpeed != m_MovementSpeed)
+		{
+			SetSynchDirty();
 		}
+		m_LastMovementSpeed = m_MovementSpeed;
 	}
 	
 	//-------------------------------------------------------------
 	//!
 	//! HandleDeath
 	//! 
+
+	float m_DamageHitDirection = 0;
+	int   m_DeathType = 0;
 
 	bool HandleDeath(int pCurrentCommandID)
 	{
@@ -110,13 +179,40 @@ class ZombieBase extends DayZInfected
 
 		if( !IsAlive() )
 		{
-			StartCommand_Death();
+			StartCommand_Death(m_DeathType, m_DamageHitDirection);
+			m_MovementSpeed = -1;
+			m_MindState = -1;
+			SetSynchDirty();
 			return true;
 		}
 
 		return false;
 	}	
 	
+	bool EvaluateDeathAnimation(EntityAI pSource, string pComponent, string pAmmoType, out int pAnimType, out float pAnimHitDir)
+	{
+		//! 
+		bool doPhxImpulse = GetGame().ConfigGetInt("cfgAmmo " + pAmmoType + " doPhxImpulse") > 0;
+		
+		//! anim type
+		pAnimType = doPhxImpulse;
+				
+		//! direction
+		pAnimHitDir = ComputeHitDirectionAngle(pSource);
+		
+		//! add some impulse if needed
+		if( doPhxImpulse )
+		{
+			vector impulse = 80 * m_TransportHitVelocity;
+			impulse[1] = 80 * 1.5;
+			Print("Impulse: " + impulse.ToString());
+			
+			dBodyApplyImpulse(this, impulse);
+		}
+				
+		return true;
+	}
+
 	//-------------------------------------------------------------
 	//!
 	//! HandleVault
@@ -179,10 +275,10 @@ class ZombieBase extends DayZInfected
 		if( moveCommand && moveCommand.IsTurning() )
 			return false;
 		
-		int mindState = pInputController.GetMindState();
-		if( m_LastMindState != mindState )
+		m_MindState = pInputController.GetMindState();
+		if( m_LastMindState != m_MindState )
 		{
-			switch( mindState )
+			switch( m_MindState )
 			{
 			case DayZInfectedConstants.MINDSTATE_CALM:
 				if( moveCommand )
@@ -200,10 +296,126 @@ class ZombieBase extends DayZInfected
 				break;
 			}
 			
-			m_LastMindState = mindState;
+			m_LastMindState = m_MindState;
 			m_AttackCooldownTime = 0.0;
+			SetSynchDirty();
 		}
 		return false;
+	}
+
+	//-------------------------------------------------------------
+	//!
+	//! Sound (client only)
+	//!
+	
+	protected void HandleSoundEvents()
+	{
+		//! no sound handler - bail out
+		if( !m_InfectedSoundEventHandler )
+		{
+			return;
+		}
+
+		//! infected is dead
+		if( !IsAlive() )
+		{
+			//! stop all sounds
+			m_InfectedSoundEventHandler.Stop();
+			return;
+		}
+
+		switch( m_MindState )
+		{
+		case DayZInfectedConstants.MINDSTATE_CALM:
+			m_InfectedSoundEventHandler.PlayRequest(EInfectedSoundEventID.MINDSTATE_CALM_MOVE);
+			break;
+		case DayZInfectedConstants.MINDSTATE_ALERTED:
+			m_InfectedSoundEventHandler.PlayRequest(EInfectedSoundEventID.MINDSTATE_ALERTED_MOVE);
+			break;
+		case DayZInfectedConstants.MINDSTATE_DISTURBED:
+			m_InfectedSoundEventHandler.PlayRequest(EInfectedSoundEventID.MINDSTATE_DISTURBED_IDLE);
+			break
+		case DayZInfectedConstants.MINDSTATE_CHASE:
+			m_InfectedSoundEventHandler.PlayRequest(EInfectedSoundEventID.MINDSTATE_CHASE_MOVE);
+			break;
+		default:
+			m_InfectedSoundEventHandler.Stop();
+			break;
+		}
+		
+		DebugSound("[Infected @ " + this + "][MindState]" + typename.EnumToString(DayZInfectedConstants, m_MindState));
+		DebugSound("[Infected @ " + this + "][SoundEventID]" + typename.EnumToString(EInfectedSoundEventID, m_InfectedSoundEventHandler.GetCurrentStateEventID()));
+	}
+
+	AbstractWave ProcessVoiceFX(string pSoundSetName)
+	{
+		ref SoundParams			soundParams;
+		ref SoundObjectBuilder	soundObjectBuilder;
+		ref SoundObject			soundObject;
+		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			soundParams = new SoundParams( pSoundSetName );
+			if ( !soundParams.IsValid() )
+			{
+				//SoundError("Invalid sound set.");
+				return null;
+			}
+			
+			soundObjectBuilder = new SoundObjectBuilder( soundParams );
+			soundObject = soundObjectBuilder.BuildSoundObject();
+			soundObject.SetKind( WaveKind.WAVEEFFECT );
+			
+			return PlaySound(soundObject, soundObjectBuilder);
+		}
+
+		return null;
+	}
+
+	override void OnSoundVoiceEvent(int event_id, string event_user_string)
+	{
+		//super.OnSoundVoiceEvent(event_id, event_user_string);
+		AnimSoundVoiceEvent voice_event = GetCreatureAIType().GetSoundVoiceEvent(event_id);
+		if(voice_event != null)
+		{
+			//! stop state sound when playing anim SoundVoice
+			if (m_InfectedSoundEventHandler) // && m_InfectedSoundEventHandler.IsPlaying())
+			{
+				m_InfectedSoundEventHandler.Stop();
+				DebugSound("[Infected @ " + this + "][SoundEvent] InfectedSoundEventHandler - stop all");
+			}
+
+			//! stop playing of old SoundVoice from anim (if any)
+			if (m_LastSoundVoiceAW != null)
+			{
+				DebugSound("[Infected @ " + this + "][AnimVoiceEvent] Stopping LastAW");
+				m_LastSoundVoiceAW.Stop();
+			}
+			
+			//! play new SoundVoice from anim
+			ProcessSoundVoiceEvent(voice_event, m_LastSoundVoiceAW);
+			
+			HandleSoundEvents();
+		}
+	}
+	
+	protected void ProcessSoundVoiceEvent(AnimSoundVoiceEvent sound_event, out AbstractWave aw)
+	{
+		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			SoundObjectBuilder objectBuilder = sound_event.GetSoundBuilder();
+			if(NULL != objectBuilder)
+			{
+				objectBuilder.UpdateEnvSoundControllers(GetPosition());
+				SoundObject soundObject = objectBuilder.BuildSoundObject();
+				aw = PlaySound(soundObject, objectBuilder);
+			}
+		}
+		
+		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
+		{
+			if(sound_event.m_NoiseParams != NULL)
+				GetGame().GetNoiseSystem().AddNoise(this, sound_event.m_NoiseParams);
+		}
 	}
 	
 	//-------------------------------------------------------------
@@ -237,10 +449,38 @@ class ZombieBase extends DayZInfected
 			{
 				if( m_ActualTarget != NULL )
 				{
+					bool playerInBlockStance = false;
 					vector targetPos = m_ActualTarget.GetPosition();
-					if( vector.DistanceSq(targetPos, this.GetPosition()) < 1.5 * 1.5 )
+
+					PlayerBase playerTarget = PlayerBase.Cast(m_ActualTarget);
+					if( playerTarget )
 					{
-						DamageSystem.CloseCombatDamage(this, m_ActualTarget, -1, m_ActualAttackType.m_AmmoType, targetPos);
+						playerInBlockStance = playerTarget.GetMeleeFightLogic() && playerTarget.GetMeleeFightLogic().IsInBlock();
+					}
+
+					if( vector.DistanceSq(targetPos, this.GetPosition()) <= m_ActualAttackType.m_Distance * m_ActualAttackType.m_Distance )
+					{
+						//! player is in block stance
+						if( playerInBlockStance )
+						{
+							//! infected is playing heavy attack - decrease the dmg to light
+							if( m_ActualAttackType.m_IsHeavy != 0 )
+							{
+								DamageSystem.CloseCombatDamageName(this, m_ActualTarget, m_ActualTarget.GetHitComponentForAI(), "MeleeZombie", targetPos);
+							}
+							else
+							{
+								//! infected is playing light attach - do not send damage, play animation instead
+								if( GetGame().IsServer() && m_ActualTarget )
+								{
+									m_ActualTarget.EEHitBy(null, 0, EntityAI.Cast(this), -1, m_ActualTarget.GetDefaultHitComponent(), "Dummy_Light", vector.Zero);
+								}
+							}
+						}
+						else
+						{
+							DamageSystem.CloseCombatDamageName(this, m_ActualTarget, m_ActualTarget.GetHitComponentForAI(), m_ActualAttackType.m_AmmoType, targetPos);
+						}
 					}
 				}
 			}
@@ -396,14 +636,15 @@ class ZombieBase extends DayZInfected
 	//! 
 	
 	bool m_DamageHitToProcess = false;
-	float m_DamageHitType = 0;
-	int m_DamageHitDirection = 0;
 	
+	bool m_DamageHitHeavy = false;
+	int m_DamageHitType = 0;
+		
 	bool HandleDamageHit(int pCurrentCommandID)
 	{
 		if( m_DamageHitToProcess )
 		{
-			StartCommand_Hit(m_DamageHitType, m_DamageHitDirection);
+			StartCommand_Hit(m_DamageHitHeavy, m_DamageHitType, m_DamageHitDirection);
 			
 			m_DamageHitToProcess = false;
 			return true;
@@ -413,33 +654,25 @@ class ZombieBase extends DayZInfected
 	}
 
 	//! selects animation type and direction based on damage system data
-	bool EvaluateDamageHitAnimation(EntityAI pSource, string pComponent, string pAmmoType, out float pAnimType, out int pAnimHitDir)
+	bool EvaluateDamageHitAnimation(EntityAI pSource, string pComponent, string pAmmoType, out bool pHeavyHit, out int pAnimType, out float pAnimHitDir)
 	{
-		pAnimType = GetGame().ConfigGetInt("cfgAmmo " + pAmmoType + " hitAnimation");
+		//! heavy hit
+		pHeavyHit = GetGame().ConfigGetInt("cfgAmmo " + pAmmoType + " hitAnimation") > 0;
 				
-		//! direction
-		float dirAngle = ComputeHitDirectionAngle(pSource);
-		pAnimHitDir = TranslateHitDirectionToDirectionIndex(dirAngle);
-
-		if( pAnimType == 1 )
-		{
-			pAnimHitDir += 4;
-		}
-		else
+		//! anim type
+		pAnimType = 0; // belly
+		
+		if( !pHeavyHit )
 		{
 			if( pComponent == "Torso" ) // body
-			{
-				pAnimHitDir += 4;
-			}			
+				pAnimType = 1;
 			else if( pComponent == "Head" ) // head		
-			{
-			}
-			else
-			{
-				pAnimHitDir += 8;
-			}			
+				pAnimType = 2;
 		}
 				
+		//! direction
+		pAnimHitDir = ComputeHitDirectionAngle(pSource);
+
 		return true;
 	}
 	
@@ -464,43 +697,91 @@ class ZombieBase extends DayZInfected
 		return dirAngle;
 	}
 	
-	int TranslateHitDirectionToDirectionIndex(float dir)
-	{
-		if( dir >= -45 && dir <= 45 ) // front
-			return 0;
-		if( dir > 45 && dir < 135 ) // right
-			return 2;
-		if( dir > -135 && dir < -45 ) // left
-			return 3;
-		
-		return 1; // back
-	}
-	
 	//-------------------------------------------------------------
 	//!
 	//! Events from damage system
 	//! 
 
-	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, string component, string ammo, vector modelPos)
+	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
-		super.EEHitBy(damageResult, damageType, source, component, ammo, modelPos);
+		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos);
 		
-/*		int crawlTransitionType = -1;
-		if( EvaluateCrawlTransitionAnimation(source, component, ammo, crawlTransitionType) )
-		{
-			m_CrawlTransition = crawlTransitionType;
-			return;
-		}*/
+		m_TransportHitRegistered = false;
 		
-		if( EvaluateDamageHitAnimation(source, component, ammo, m_DamageHitType, m_DamageHitDirection) )
+		if( !IsAlive() )
 		{
-			m_DamageHitToProcess = true;
+			dBodySetInteractionLayer(this, PhxInteractionLayers.AI_NO_COLLISION);
+			EvaluateDeathAnimation(source, dmgZone, ammo, m_DeathType, m_DamageHitDirection);
+		}
+		else
+		{
+			int crawlTransitionType = -1;
+			if( EvaluateCrawlTransitionAnimation(source, dmgZone, ammo, crawlTransitionType) )
+			{
+				m_CrawlTransition = crawlTransitionType;
+				return;
+			}
+			
+			if( EvaluateDamageHitAnimation(source, dmgZone, ammo, m_DamageHitHeavy, m_DamageHitType, m_DamageHitDirection) )
+			{
+				m_DamageHitToProcess = true;
+				return;
+			}
+		}		
+	}
+	
+	override void EEHitByRemote(int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
+	{
+		super.EEHitByRemote(damageType, source, component, dmgZone, ammo, modelPos);
+	}
+
+	//! sound debug messages
+	protected void DebugSound(string s)
+	{
+		//Print(s);
+	}
+	
+	//-------------------------------------------------------------
+	//!
+	//! Phx contact event
+	//! 
+	
+	override private void EOnContact(IEntity other, Contact extra)
+	{
+		if( !IsAlive() )
 			return;
+		
+		Transport transport = Transport.Cast(other);
+		if( transport )
+		{
+			if ( GetGame().IsServer() || !GetGame().IsMultiplayer() )
+			{
+				RegisterTransportHit(transport);
+			}			
 		}
 	}
 	
-	override void EEHitByRemote(int damageType, EntityAI source, string component, string ammo, vector modelPos)
+	bool m_TransportHitRegistered = false;
+	vector m_TransportHitVelocity;
+	
+	void RegisterTransportHit(Transport transport)
 	{
-		super.EEHitByRemote(damageType, source, component, ammo, modelPos);
-	}	
+		if( !m_TransportHitRegistered )
+		{
+			m_TransportHitRegistered = true;
+			
+			// compute impulse & damage 
+			m_TransportHitVelocity = GetVelocity(transport);
+			float damage = 10 * m_TransportHitVelocity.Length();
+			//Print("Transport damage: " + damage.ToString());
+			
+			vector impulse = 40 * m_TransportHitVelocity;
+			impulse[1] = 40 * 1.5;
+			//Print("Impulse: " + impulse.ToString());
+			
+			dBodyApplyImpulse(this, impulse);
+			
+			ProcessDirectDamage( 3, transport, "", "TransportHit", "0 0 0", damage );
+		}
+	}
 }

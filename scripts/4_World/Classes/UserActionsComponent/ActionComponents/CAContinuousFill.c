@@ -64,6 +64,7 @@ class CAContinuousFill : CAContinuousBase
 			else
 			{
 				CalcAndSetQuantity( action_data );
+				OnCompletePogress(action_data);
 				return UA_FINISHED;
 			}
 		}
@@ -78,6 +79,16 @@ class CAContinuousFill : CAContinuousBase
 		
 		CalcAndSetQuantity( action_data );
 		return UA_CANCEL;
+	}
+	
+	override int Interrupt( ActionData action_data )
+	{				
+		if ( GetGame().IsServer() )
+		{
+			action_data.m_Player.GetSoftSkillManager().AddSpecialty( UASoftSkillsWeight.PRECISE_LOW );
+		}
+		
+		return super.Interrupt( action_data );
 	}
 	
 	override float GetProgress()
@@ -97,7 +108,13 @@ class CAContinuousFill : CAContinuousBase
 				SetACData(m_SpentUnits);
 			}
 			
-			Liquid.FillContainerEnviro(action_data.m_MainItem, m_liquid_type, m_SpentQuantity);
+			bool inject_agents = true;
+			
+			if(action_data.m_Target.GetObject() && action_data.m_Target.GetObject().IsWell())
+			{
+				inject_agents = false;
+			}
+			Liquid.FillContainerEnviro(action_data.m_MainItem, m_liquid_type, m_SpentQuantity, inject_agents);
 		}
 		m_SpentQuantity = 0;
 	}

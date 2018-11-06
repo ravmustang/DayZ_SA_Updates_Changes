@@ -1,6 +1,6 @@
 class HandsHeader: Header
 {
-	void HandsHeader( ContainerBase parent, string function_name ) { }
+	void HandsHeader( LayoutHolder parent, string function_name ) { }
 
 	override void SetLayoutName()
 	{
@@ -15,11 +15,11 @@ class HandsHeader: Header
 		EntityAI item = p.GetHumanInventory().GetEntityInHands();
 		if( item )
 		{
-			m_MainPanel.FindAnyWidget( "collapse_button" ).Show( true );
+			m_MainWidget.FindAnyWidget( "collapse_button" ).Show( true );
 		}
 		else
 		{
-			m_MainPanel.FindAnyWidget( "collapse_button" ).Show( false );
+			m_MainWidget.FindAnyWidget( "collapse_button" ).Show( false );
 		}
 	}
 }

@@ -11,8 +11,8 @@ class ActionUnpackBox: ActionContinuousBase
 	void ActionUnpackBox()
 	{
 		m_CallbackClass = ActionUnpackBoxCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYMAG;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EMPTYMAG;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_OPENITEM;
 		
 
 		
@@ -50,10 +50,10 @@ class ActionUnpackBox: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Unbox";
+		return "#unbox";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetHierarchyRootPlayer() == action_data.m_Player )
 		{
@@ -85,6 +85,8 @@ class ActionUnpackBox: ActionContinuousBase
 				
 				//spawns wrapping Paper
 				ItemBase paper = ItemBase.Cast( GetGame().CreateObject("Paper", action_data.m_Player.GetPosition(), false) );
+				
+				action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 			}
 		}
 	}

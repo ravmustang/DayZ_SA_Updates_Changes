@@ -16,11 +16,6 @@ class Fireplace extends FireplaceBase
 	{
 		return true;
 	}
-
-	override bool IsDeployable()
-	{
-		return true;
-	}
 	
 	override bool IsBaseFireplace()
 	{
@@ -28,7 +23,7 @@ class Fireplace extends FireplaceBase
 	}
 	
 	//attachments
-	override bool CanReceiveAttachment( EntityAI attachment )
+	override bool CanReceiveAttachment( EntityAI attachment, int slotId )
 	{
 		ItemBase item = ItemBase.Cast( attachment );
 		
@@ -177,6 +172,9 @@ class Fireplace extends FireplaceBase
 			}
 		}
 		
+		//TODO
+		//add SetViewIndex when attaching various attachments
+		
 		//refresh fireplace visuals
 		RefreshFireplaceVisuals();
 	}
@@ -213,6 +211,9 @@ class Fireplace extends FireplaceBase
 			Bottle_Base cooking_pot = Bottle_Base.Cast( item );
 			cooking_pot.RemoveAudioVisuals();
 		}
+		
+		//TODO
+		//add SetViewIndex when detaching various attachments
 		
 		//refresh fireplace visuals
 		RefreshFireplaceVisuals();
@@ -276,4 +277,90 @@ class Fireplace extends FireplaceBase
 		
 		return true;
 	}
+	
+	//particles
+	override bool CanShowSmoke()
+	{
+		return !IsOven();
+	}
+	
+	// Item-to-item fire distribution
+	override bool HasFlammableMaterial()
+	{
+		return true;
+	}
+	
+	override bool CanBeIgnitedBy( EntityAI igniter = NULL )
+	{
+		if ( HasAnyKindling() && !IsBurning() )
+		{
+			return true;
+		}
+			
+		return false;
+	}
+	
+	override bool CanIgniteItem( EntityAI ignite_target = NULL )
+	{
+		if ( IsBurning() )
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	override bool IsIgnited()
+	{
+		return IsBurning();
+	}
+	
+	override void OnIgnitedTarget( EntityAI ignited_item )
+	{
+	}
+	
+	override void OnIgnitedThis( EntityAI fire_source )
+	{	
+		//remove grass
+		Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , GetPosition() );
+		cc_object.SetOrientation ( GetOrientation() );
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( DestroyClutterCutter, 0.2, false, cc_object );
+		
+		//start fire
+		StartFire(); 
+	}
+	
+	void DestroyClutterCutter( Object clutter_cutter )
+	{
+		GetGame().ObjectDelete( clutter_cutter );
+	}
+	
+	override bool IsThisIgnitionSuccessful( EntityAI item_source = NULL )
+	{
+		//check kindling
+		if ( !HasAnyKindling() )
+		{
+			return false;
+		}
+		
+		//check roof
+		if ( !IsEnoughRoomForFireAbove() )
+		{
+			return false;
+		}
+		
+		//check surface
+		if ( IsWaterSurface() )
+		{
+			return false;
+		}
+
+		//check wetness/rain/wind
+		if ( IsWet() || IsRainingAbove() || IsWindy() )
+		{
+			return false;
+		}
+		
+		return true;	
+	}	
 }

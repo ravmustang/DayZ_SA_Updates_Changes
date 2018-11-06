@@ -157,8 +157,6 @@ class RadialQuickbarMenu extends UIScriptedMenu
 		//delete existing content
 		DeleteItems();
 		
-		InventoryManager inv_manager = InventoryManager.GetInstance();
-		
 		for ( int i = 0; i < m_Items.Count(); ++i )
 		{
 			RadialQuickbarItem quickbar_item = m_Items.Get( i );
@@ -189,7 +187,7 @@ class RadialQuickbarMenu extends UIScriptedMenu
 				//item quantity
 				Widget quantity_stack = quantity_panel.FindAnyWidget( "QuantityStackPanel" );
 				ProgressBarWidget quantity_bar = ProgressBarWidget.Cast( quantity_panel.FindAnyWidget( "QuantityBar" ) );
-				int has_quantity = inv_manager.HasItemQuantity( item );
+				int has_quantity = QuantityConversions.HasItemQuantity( item );
 				//calculate and set quantity
 				if ( has_quantity == QUANTITY_HIDDEN )
 				{
@@ -202,7 +200,7 @@ class RadialQuickbarMenu extends UIScriptedMenu
 					
 					//show stack
 					TextWidget quantity_text = TextWidget.Cast( quantity_stack.FindAnyWidget( "Quantity" ) );
-					quantity_text.SetText( inv_manager.GetItemQuantityText( item ) );
+					quantity_text.SetText( QuantityConversions.GetItemQuantityText( item ) );
 					quantity_stack.Show( true );
 				}
 				else if ( has_quantity == QUANTITY_PROGRESS )
@@ -214,7 +212,7 @@ class RadialQuickbarMenu extends UIScriptedMenu
 					float progress_max = quantity_bar.GetMax();
 					int max = item.ConfigGetInt( "varQuantityMax" );
 					int count = item.ConfigGetInt( "count" );
-					float quantity = inv_manager.GetItemQuantity( ItemBase.Cast( item ) );
+					float quantity = QuantityConversions.GetItemQuantity( ItemBase.Cast( item ) );
 					
 					if ( count > 0 )
 					{
@@ -236,7 +234,7 @@ class RadialQuickbarMenu extends UIScriptedMenu
 			}
 			else
 			{
-				item_title.SetText( "Empty" );
+				item_title.SetText( "#empty" );
 				
 				//display content panels
 				item_details.Show( false );

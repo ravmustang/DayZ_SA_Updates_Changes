@@ -57,7 +57,7 @@ class ActionSkinning: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Skin";
+		return "#skin";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -84,7 +84,7 @@ class ActionSkinning: ActionContinuousBase
 	}
 
 	// Spawns the loot according to the Skinning class in the dead agent's config
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		
@@ -100,18 +100,22 @@ class ActionSkinning: ActionContinuousBase
 		
 		if (body.IsInherited(PlayerBase))
 		{
+			// This section drops all clothes (and attachments) from the dead player before deleting their body
+			PlayerBase body_PB = PlayerBase.Cast(body);
 			
-			PlayerBase body_PB;
-			Class.CastTo(body_PB,  body );
-			body_PB.DropAllItems();
-			GetGame().ObjectDelete(body); // Temporal deletion of the body
+			if (body_PB.IsRestrained())
+				MiscGameplayFunctions.TransformRestrainItem(body_PB.GetHumanInventory().GetEntityInHands(), action_data.m_Player.GetHumanInventory().GetEntityInHands(), action_data.m_Player, body_PB);
+			
+			DropEquipAndDestroyRootLambda lambda(body_PB, "", action_data.m_Player);
+			action_data.m_Player.ServerReplaceItemWithNew(lambda);
 		}
 		else
 		{
 			GetGame().ObjectDelete(body); // Temporal deletion of the body
 		}
 		
-		Object cutter = GetGame().CreateObject( "ClutterCutter2x2", body_pos, false ); // clutter cutter to free space on ground for organs.
+		// clutter cutter removed due to issues with audio it causes when players steps on it.
+		//Object cutter = GetGame().CreateObject( "ClutterCutter2x2", body_pos, false ); // clutter cutter to free space on ground for organs.
 		
 		// Get config path to the animal
 		string cfg_animal_class_path = "cfgVehicles " + body.GetType() + " " + "Skinning ";
@@ -151,7 +155,8 @@ class ActionSkinning: ActionContinuousBase
 	{
 		// Create item from config
 		ItemBase added_item;
-		Class.CastTo(added_item,  GetGame().CreateObject( item_to_spawn, body_pos, false ) );
+		vector pos_rnd = body_pos + Vector(Math.RandomFloat01() - 0.5, 0, Math.RandomFloat01() - 0.5);
+		Class.CastTo(added_item,  GetGame().CreateObject( item_to_spawn, pos_rnd, false ) );
 		
 		// Check if skinning is configured for this body
 		if (!added_item)
@@ -159,8 +164,6 @@ class ActionSkinning: ActionContinuousBase
 		
 		// Set randomized position
 		added_item.PlaceOnSurface();
-		// Now randomly offset the position of item horizontally
-		added_item.SetPosition( added_item.GetPosition() + Vector(Math.RandomFloat01() - 0.5, 0, Math.RandomFloat01() - 0.5) );
 		
 		// Set item's quantity from config, if it's defined there.
 		float item_quantity = 0;
@@ -210,7 +213,7 @@ class ActionSkinning: ActionContinuousBase
 			added_item.DecreaseHealthCoef( organ_dmg_coef );
 		}
 		
-		added_item.InsertAgent(AGT_SALMONELLA, 1);
+		added_item.InsertAgent(eAgents.SALMONELLA, 1);
 		return added_item;
 	}
 };

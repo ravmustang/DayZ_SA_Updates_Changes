@@ -12,18 +12,19 @@ class CAContinuousCraft : CAContinuousTime
 		{	
 			m_SpentUnits.param1 = 0;
 		}
-		int recipeID = action_data.m_Player.GetCraftingRecipeID();		
+		
+		WorldCraftActionData action_data_wc = WorldCraftActionData.Cast(action_data);	
 		
 		PluginRecipesManager module_recipes_manager;
 		Class.CastTo(module_recipes_manager, GetPlugin(PluginRecipesManager));
 		if( module_recipes_manager )
 		{
-			m_AdjustedTimeToComplete = module_recipes_manager.GetRecipeLengthInSecs( recipeID );
-			if( module_recipes_manager.GetIsInstaRecipe(recipeID) || module_recipes_manager.IsEnableDebugCrafting() )
+			m_AdjustedTimeToComplete = module_recipes_manager.GetRecipeLengthInSecs( action_data_wc.m_RecipeID );
+			if( module_recipes_manager.GetIsInstaRecipe( action_data_wc.m_RecipeID) || module_recipes_manager.IsEnableDebugCrafting() )
 			{
 				m_AdjustedTimeToComplete = 0;
 			}
-			float specialty_weight = module_recipes_manager.GetRecipeSpecialty( recipeID );
+			float specialty_weight = module_recipes_manager.GetRecipeSpecialty( action_data_wc.m_RecipeID );
 			m_AdjustedTimeToComplete = action_data.m_Player.GetSoftSkillManager().AdjustCraftingTime( m_AdjustedTimeToComplete, specialty_weight );
 			
 			//PrintString("ttc:" + m_AdjustedTimeToComplete.ToString());
@@ -48,6 +49,7 @@ class CAContinuousCraft : CAContinuousTime
 				m_SpentUnits.param1 = m_TimeElpased;
 				SetACData(m_SpentUnits);
 			}
+			OnCompletePogress(action_data);
 			return UA_FINISHED;
 		}
 		return UA_PROCESSING;

@@ -2,6 +2,7 @@ class Hologram
 {
 	protected EntityAI 			m_Parent; 		
 	protected EntityAI 			m_Projection; 	
+	protected ItemBase 			m_ProjectionIB; 	
 	protected PlayerBase 		m_Player;
 	protected ProjectionTrigger m_ProjectionTrigger;
 
@@ -15,6 +16,8 @@ class Hologram
 	protected vector 			m_DefaultOrientation;
 	protected vector			m_Rotation;
 		
+	protected const string 		ANIMATION_PLACING 				= "Placing";
+	protected const string 		ANIMATION_INVENTORY 			= "Inventory";
 	protected const string 		SELECTION_PLACING 				= "placing";
 	protected const string 		SELECTION_INVENTORY 			= "inventory";
 
@@ -22,7 +25,7 @@ class Hologram
 	protected const float 		SMALL_PROJECTION_GROUND 		= 2;
 	protected const float		DISTANCE_SMALL_PROJECTION		= 1;
 	protected const float		LARGE_PROJECTION_DISTANCE_LIMIT	= 6;
-	protected const float 		SLOPE_LIMIT 					= 0.05;
+	protected const float 		SLOPE_LIMIT 					= 0.25;
 	protected const float 		PROJECTION_TRANSITION			= 0.25;
 	protected const float 		LOOKING_TO_SKY					= 0.75;
 	
@@ -34,12 +37,13 @@ class Hologram
 	Shape m_DebugPlugArrowLeftFar;
 	Shape m_DebugPlugArrowRightFar;
 	*/
-	
-	void Hologram( PlayerBase player )
+		
+	void Hologram( PlayerBase player, vector pos)
 	{	
 		m_Player = player;
 		m_Parent = m_Player.GetHumanInventory().GetEntityInHands();
 		m_Projection = NULL;
+		m_ProjectionIB = NULL;
 		m_ProjectionTrigger = NULL;
 		m_UpdatePosition = true;
 		m_Rotation = "0 0 0";
@@ -48,17 +52,21 @@ class Hologram
 		
 		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
 		{	
-			projection_entity = EntityAI.Cast( GetGame().CreateObject( ProjectionBasedOnParent(), "0 0 0" ) );
+			projection_entity = EntityAI.Cast( GetGame().CreateObject( ProjectionBasedOnParent(), pos ) );
 			SetProjectionEntity( projection_entity );
-			SetSelections();
+			SetProjectionIB( projection_entity );
+			SetAnimations();
 		}
 		else
 		{
-			projection_entity = EntityAI.Cast( GetGame().CreateObject( ProjectionBasedOnParent(), "0 0 0", true, false, false ) );
+			projection_entity = EntityAI.Cast( GetGame().CreateObject( ProjectionBasedOnParent(), pos, true, false, false ) );
 			SetProjectionEntity( projection_entity );	
-			SetSelections();
+			SetProjectionIB( projection_entity );	
+			SetAnimations();
 			CreateTrigger();
 		}
+		
+		GetProjectionIB().SetIsHologram( true );
 	}
 	
 	void ~Hologram()
@@ -77,16 +85,16 @@ class Hologram
 		}
 	}
 	
-	void SetSelections()
+	void SetAnimations()
 	{
-		if ( m_Projection.HasAnimation( SELECTION_PLACING ) )
+		if ( m_Projection.HasAnimation( ANIMATION_PLACING ) )
 		{
-			m_Projection.SetAnimationPhase( SELECTION_PLACING, 0 );
+			m_Projection.SetAnimationPhase( ANIMATION_PLACING, 0 );
 			SetSelectionToRefresh( SELECTION_PLACING );
 
-			if ( m_Projection.HasAnimation( SELECTION_INVENTORY ) )
+			if ( m_Projection.HasAnimation( ANIMATION_INVENTORY ) )
 			{
-				m_Projection.SetAnimationPhase( SELECTION_INVENTORY, 1 );
+				m_Projection.SetAnimationPhase( ANIMATION_INVENTORY, 1 );
 			}
 		}
 		else
@@ -124,14 +132,19 @@ class Hologram
 
 		for( int i = 0; i <= GARDEN_TOOLS_COUNT; i++ )
 		{
-			if( entity_in_hands.IsKindOf( garden_plot_tools[i] ) )
+			if ( entity_in_hands.IsKindOf( garden_plot_tools[i] ) )
 			{
 				return "GardenPlot";
 			}
 		}
 		
+		//Camping & Base building
+		if ( entity_in_hands.IsInherited( TentBase ) || entity_in_hands.IsInherited( FenceKit ) || entity_in_hands.IsInherited( WatchtowerKit ) )
+		{
+			return entity_in_hands.GetType() + "Placing";
+		}
+		
 		return entity_in_hands.GetType();
-
 	}
 		
 	// update loop for visuals and collisions of the hologram
@@ -758,6 +771,16 @@ class Hologram
 	EntityAI GetProjectionEntity()
 	{
 		return m_Projection;
+	}
+	
+	void SetProjectionIB( EntityAI projection )
+	{
+		m_ProjectionIB = ItemBase.Cast( projection );
+	}
+
+	ItemBase GetProjectionIB()
+	{
+		return m_ProjectionIB;
 	}
 	
 	void SetIsFloating( bool is_floating )

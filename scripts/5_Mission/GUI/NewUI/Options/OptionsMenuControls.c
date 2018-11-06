@@ -9,7 +9,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	protected ButtonWidget					m_Keybindings;
 	
 	protected GameOptions					m_Options;
-	protected OptionsMenuNew				m_Menu;
+	protected OptionsMenu					m_Menu;
 	
 	protected ref NumericOptionsAccess		m_VSensitivityOption;
 	protected ref NumericOptionsAccess		m_HSensitivityOption;
@@ -27,7 +27,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	protected ref map<int, ref Param2<string, string>> m_TextMap;
 	
-	void OptionsMenuControls( Widget parent, Widget details_root, GameOptions options, OptionsMenuNew menu )
+	void OptionsMenuControls( Widget parent, Widget details_root, GameOptions options, OptionsMenu menu )
 	{
 		#ifdef PLATFORM_CONSOLE
 			m_Root									= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/xbox/controls_tab.layout", parent );
@@ -45,17 +45,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_Options 									= options;
 		m_Menu										= menu;
 		
-		#ifdef PLATFORM_WINDOWS
-		#ifndef PLATFORM_CONSOLE
-		m_VSensitivityOption						= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_YAXIS ) );
-		m_HSensitivityOption						= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_XAXIS ) );
-		m_InvertOption								= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_YREVERSED ) );
-		#endif
-		#endif
-		
-		m_ControllerVSensitivityOption				= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_CONTROLLER_YAXIS ) );
-		m_ControllerHSensitivityOption				= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_CONTROLLER_XAXIS ) );
-		m_ControllerInvertOption					= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_CONTROLLER_REVERSED_LOOK ) );
+		SetOptions( options );
 		
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
@@ -71,7 +61,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "controller_hsensitivity_setting_option" ).SetUserID( AT_CONFIG_CONTROLLER_XAXIS );
 		m_Root.FindAnyWidget( "controller_invert_setting_option" ).SetUserID( AT_CONFIG_CONTROLLER_REVERSED_LOOK );
 
-		ref array<string> opt						= { "Disabled", "Enabled" };
+		ref array<string> opt						= { "#options_controls_disabled", "#options_controls_enabled" };
 	
 		m_ControllerVSensitivitySelector			= new OptionSelectorSlider( m_Root.FindAnyWidget( "controller_vsensitivity_setting_option" ), m_ControllerVSensitivityOption.ReadValue(), this, false, m_ControllerVSensitivityOption.GetMin(), m_ControllerVSensitivityOption.GetMax() );
 		m_ControllerHSensitivitySelector			= new OptionSelectorSlider( m_Root.FindAnyWidget( "controller_hsensitivity_setting_option" ), m_ControllerHSensitivityOption.ReadValue(), this, false, m_ControllerHSensitivityOption.GetMin(), m_ControllerHSensitivityOption.GetMax() );
@@ -94,6 +84,12 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_ControllerInvertSelector.m_OptionChanged.Insert( UpdateControllerInvertView );
 		
 		FillTextMap();
+		
+		float x, y, y2;
+		m_Root.FindAnyWidget( "controls_settings_scroll" ).GetScreenSize( x, y );
+		m_Root.FindAnyWidget( "controls_settings_root" ).GetScreenSize( x, y2 );
+		int f = ( y2 > y );
+		m_Root.FindAnyWidget( "controls_settings_scroll" ).SetAlpha( f );
 	}
 	
 	void EnterKeybindingMenu()
@@ -127,7 +123,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	override bool OnFocus( Widget w, int x, int y )
 	{
-		OptionsMenuNew menu = OptionsMenuNew.Cast( GetGame().GetUIManager().GetMenu() );
+		OptionsMenu menu = OptionsMenu.Cast( GetGame().GetUIManager().GetMenu() );
 		if( menu )
 			menu.OnFocus( w, x, y );
 		if( w )
@@ -138,9 +134,9 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 				m_DetailsRoot.Show( true );
 				m_DetailsLabel.SetText( p.param1 );
 				m_DetailsText.SetText( p.param2 );
-				int sx, sy;
-				float lines = m_DetailsText.GetContentHeight();
-				m_DetailsText.SetSize( 1, lines );
+				
+				//float lines = m_DetailsText.GetContentHeight();
+				//m_DetailsText.SetSize( 1, lines );
 				
 				m_DetailsText.Update();
 				m_DetailsLabel.Update();
@@ -190,7 +186,11 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_Keybindings );
+		if( w )
+		{
+			return ( w == m_Keybindings );
+		}
+		return false;
 	}
 	
 	bool IsChanged()
@@ -205,15 +205,21 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	void Revert()
 	{
-		m_ControllerVSensitivitySelector.SetValue( m_ControllerVSensitivityOption.ReadValue(), false );
-		m_ControllerHSensitivitySelector.SetValue( m_ControllerHSensitivityOption.ReadValue(), false );
-		m_ControllerInvertSelector.SetValue( m_ControllerInvertOption.GetIndex(), false );
+		if( m_ControllerVSensitivitySelector )
+			m_ControllerVSensitivitySelector.SetValue( m_ControllerVSensitivityOption.ReadValue(), false );
+		if( m_ControllerHSensitivitySelector )
+			m_ControllerHSensitivitySelector.SetValue( m_ControllerHSensitivityOption.ReadValue(), false );
+		if( m_ControllerInvertSelector )
+			m_ControllerInvertSelector.SetValue( m_ControllerInvertOption.GetIndex(), false );
 		
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
-		m_VSensitivitySelector.SetValue( m_VSensitivityOption.ReadValue(), false );
-		m_HSensitivitySelector.SetValue( m_HSensitivityOption.ReadValue(), false );
-		m_InvertSelector.SetValue( m_InvertOption.GetIndex(), false );
+		if( m_VSensitivitySelector )
+			m_VSensitivitySelector.SetValue( m_VSensitivityOption.ReadValue(), false );
+		if( m_HSensitivitySelector )
+			m_HSensitivitySelector.SetValue( m_HSensitivityOption.ReadValue(), false );
+		if( m_InvertSelector )
+			m_InvertSelector.SetValue( m_InvertOption.GetIndex(), false );
 		#endif
 		#endif
 	}
@@ -266,17 +272,32 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	void SetOptions( GameOptions options )
 	{
 		m_Options = options;
+		
+		#ifdef PLATFORM_WINDOWS
+		#ifndef PLATFORM_CONSOLE
+		m_VSensitivityOption						= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_YAXIS ) );
+		m_HSensitivityOption						= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_XAXIS ) );
+		m_InvertOption								= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_YREVERSED ) );
+		
+		#endif
+		#endif
+		
+		m_ControllerVSensitivityOption				= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_CONTROLLER_YAXIS ) );
+		m_ControllerHSensitivityOption				= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_CONTROLLER_XAXIS ) );
+		m_ControllerInvertOption					= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_CONFIG_CONTROLLER_REVERSED_LOOK ) );
+		
+		Revert();
 	}
 	
 	void FillTextMap()
 	{
 		m_TextMap = new map<int, ref Param2<string, string>>;
-		m_TextMap.Insert( AT_CONFIG_YAXIS, new Param2<string, string>( "Vertical Sensitivity", "#options_controls_vertical_sensitivity_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_XAXIS, new Param2<string, string>( "Horizontal Sensitivity", "#options_controls_horizontal_sensitivity_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_YREVERSED, new Param2<string, string>( "Invert Vertical View", "#options_controls_invert_vertical_view_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "Vertical Sensitivity", "#options_controls_vertical_sens_contr_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "Horizontal Sensitivity", "#options_controls_horizontal_sens_contr_desc" ) );
-		m_TextMap.Insert( AT_CONFIG_CONTROLLER_REVERSED_LOOK, new Param2<string, string>( "Invert Vertical View", "#options_controls_invert_vert_view_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_YAXIS, new Param2<string, string>( "#options_controls_vertical_sens", "#options_controls_vertical_sensitivity_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_XAXIS, new Param2<string, string>( "#options_controls_horizontal_sens", "#options_controls_horizontal_sensitivity_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_YREVERSED, new Param2<string, string>( "#options_controls_invert_vertical_view", "#options_controls_invert_vertical_view_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "#options_controls_vertical_sens_contr", "#options_controls_vertical_sens_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "#options_controls_horizontal_sens_contr", "#options_controls_horizontal_sens_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_REVERSED_LOOK, new Param2<string, string>( "#options_controls_invert_vert_view_contr", "#options_controls_invert_vert_view_contr_desc" ) );
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)

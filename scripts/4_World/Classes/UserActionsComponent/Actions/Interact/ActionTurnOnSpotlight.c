@@ -13,7 +13,7 @@ class ActionTurnOnSpotlight: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Switch on spotlight";
+		return "#switch_on_spotlight";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -30,7 +30,7 @@ class ActionTurnOnSpotlight: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		if (targetObject)

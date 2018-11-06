@@ -56,10 +56,10 @@ class SoundObject
 	void SoundObject(SoundParams soundParams);
 	
 	proto native void SetPosition(vector position);
+	proto native void SetOcclusionObstruction(float occlusion, float obstruction);
 	proto native void SetKind(WaveKind kind);
 	proto native void Initialize(SoundParams soundParams);
 }
-
 
 //soundsys.hpp
 class SoundParams
@@ -70,36 +70,74 @@ class SoundParams
 	proto native bool IsValid();
 }
 
+class AbstractWaveEvents
+{
+	ref ScriptInvoker Event_OnSoundWaveStarted = new ScriptInvoker();
+	ref ScriptInvoker Event_OnSoundWaveStopped = new ScriptInvoker();
+	ref ScriptInvoker Event_OnSoundWaveLoaded = new ScriptInvoker();
+	ref ScriptInvoker Event_OnSoundWaveEnded = new ScriptInvoker();
+}
+
 class AbstractWave
 {
+	void AbstractWave()
+	{
+		AbstractWaveEvents events = new AbstractWaveEvents();
+		SetUserData(events);
+	}
+	
+	proto native void SetUserData(Managed inst);
+	proto native Managed GetUserData();
+	
 	proto native void Play();
-	void PlayWithOffset(float offset) { Play(); SetStartOffset(offset); }
+	
+	void PlayWithOffset(float offset)
+	{
+		Play();
+		SetStartOffset(offset);
+	}
 	//proto native void Mute();
 	proto native void Stop();
 	proto native void Restart();
 	proto native void SetStartOffset(float offset);
 	proto native float GetLength();
-	proto native void Repeat(int count);
+	proto native void Loop(bool setLoop);
 	proto native void SetVolume(float value);
-	//proto native float GetCurrPosition();
+	proto native void SetVolumeRelative(float value);
+	proto native void SetPosition(vector position);
+	proto native void SetFadeInFactor(float volume);
+	proto native void SetFadeOutFactor(float volume);
+	proto native void Skip(float timeSec);
 	
 	void OnPlay()
 	{
-		//Print("[lukasikjak] AbstractWave::OnPlay");
+		Managed data = GetUserData();
+		AbstractWaveEvents events;
+		Class.CastTo(events, data);
+		events.Event_OnSoundWaveStarted.Invoke(this);
 	}
 	
 	void OnStop()
 	{
-		//Print("[lukasikjak] AbstractWave::OnStop");
+		Managed data = GetUserData();
+		AbstractWaveEvents events;
+		Class.CastTo(events, data);
+		events.Event_OnSoundWaveStopped.Invoke(this);
 	}
-	
+		
 	void OnLoad()
 	{
-		//Print("[lukasikjak] AbstractWave::OnLoad");
+		Managed data = GetUserData();
+		AbstractWaveEvents events;
+		Class.CastTo(events, data);
+		events.Event_OnSoundWaveLoaded.Invoke(this);
 	}
 	
 	void OnEnd()
 	{
-		//Print("[lukasikjak] AbstractWave::OnEnd");
+		Managed data = GetUserData();
+		AbstractWaveEvents events;
+		Class.CastTo(events, data);
+		events.Event_OnSoundWaveEnded.Invoke(this);
 	}
 }

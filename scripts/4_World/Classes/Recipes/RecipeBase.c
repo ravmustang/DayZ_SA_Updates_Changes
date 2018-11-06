@@ -433,16 +433,16 @@ class RecipeBase
 					return false;
 				}
 			}
-			int dmg3 = ingredient.GetHealthLabel();
-			if( m_MinDamageIngredient[i] >= 0 && ingredient.GetHealthLabel() < m_MinDamageIngredient[i] )
+			int dmg3 = ingredient.GetHealthLevel();
+			if( m_MinDamageIngredient[i] >= 0 && ingredient.GetHealthLevel() < m_MinDamageIngredient[i] )
 			{
-				int dmg = ingredient.GetHealthLabel();
+				int dmg = ingredient.GetHealthLevel();
 				//Debug.Log("Recipe condition check failing1: m_MinDamageIngredient[0]","recipes");
 				return false;
 			}
-			if( m_MaxDamageIngredient[i] >= 0 && ingredient.GetHealthLabel() > m_MaxDamageIngredient[i] )
+			if( m_MaxDamageIngredient[i] >= 0 && ingredient.GetHealthLevel() > m_MaxDamageIngredient[i] )
 			{
-				int dmg2 = ingredient.GetHealthLabel();
+				int dmg2 = ingredient.GetHealthLevel();
 				//Debug.Log("Recipe condition check failing1: m_MaxDamageIngredient[0]","recipes");
 				return false;
 			}

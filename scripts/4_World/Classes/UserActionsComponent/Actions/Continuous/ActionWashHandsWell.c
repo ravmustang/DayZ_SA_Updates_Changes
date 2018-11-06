@@ -25,7 +25,7 @@ class ActionWashHandsWell: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Wash hands";
+		return "#wash_hands";
 	}
 	
 	override void CreateConditionComponents()  
@@ -47,14 +47,14 @@ class ActionWashHandsWell: ActionContinuousBase
 		return false;
 	}
 
-	override void OnRepeatServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
 		module_lifespan.UpdateBloodyHandsVisibility( action_data.m_Player, false );
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	/*override void OnCompleteServer( ActionData action_data )
 	{
-		OnRepeatServer(action_data);
-	}
+		OnFinishProgressServer(action_data);
+	}*/
 };

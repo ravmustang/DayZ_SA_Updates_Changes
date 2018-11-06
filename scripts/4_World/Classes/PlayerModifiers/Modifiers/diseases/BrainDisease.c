@@ -1,4 +1,4 @@
-class BrainDisease: ModifierBase
+class BrainDiseaseMdfr: ModifierBase
 {
 	static const int BRAIN_AGENT_THRESHOLD_ACTIVATE = 2000;
 	static const int BRAIN_AGENT_THRESHOLD_DEACTIVATE = 0;
@@ -10,9 +10,9 @@ class BrainDisease: ModifierBase
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
 	
-	override private bool ActivateCondition(PlayerBase player)
+	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(AGT_BRAIN) > BRAIN_AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.BRAIN) > BRAIN_AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -22,17 +22,19 @@ class BrainDisease: ModifierBase
 		}
 	}
 
-	override private void OnActivate(PlayerBase player)
+	override protected void OnActivate(PlayerBase player)
 	{
+		player.IncreaseDiseaseCount();
 	}
 
-	override private void OnDeactivate(PlayerBase player)
+	override protected void OnDeactivate(PlayerBase player)
 	{
+		player.DecreaseDiseaseCount();
 	}
 
-	override private bool DeactivateCondition(PlayerBase player)
+	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(AGT_BRAIN) < BRAIN_AGENT_THRESHOLD_DEACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.BRAIN) < BRAIN_AGENT_THRESHOLD_DEACTIVATE) 
 		{
 			return true;
 		}
@@ -42,13 +44,13 @@ class BrainDisease: ModifierBase
 		}
 	}
 
-	override private void OnTick(PlayerBase player, float deltaT)
+	override protected void OnTick(PlayerBase player, float deltaT)
 	{
-		float chance_of_laughter = player.GetSingleAgentCountNormalized(AGT_BRAIN) / Math.RandomInt(1,10);
+		float chance_of_laughter = player.GetSingleAgentCountNormalized(eAgents.BRAIN) / Math.RandomInt(1,10);
 		
 		if( Math.RandomFloat01() < chance_of_laughter )
 		{
-			StateBase state = player.GetStateManager().QueueUpPrimaryState(StateIDs.STATE_LAUGHTER);
+			player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_LAUGHTER);
 		}
 	}
 };

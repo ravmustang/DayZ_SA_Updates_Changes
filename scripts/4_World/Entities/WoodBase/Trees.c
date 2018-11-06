@@ -9,7 +9,7 @@ class TreeHard_t_BetulaPendula_1f: TreeHard
 		else if ( item && item.KindOf("Axe") )
 		{
 			output_map.Insert("FireWood",1);
-			output_map.Insert("WoodenStick",1);
+			//output_map.Insert("WoodenStick",1);
 		}
 	}
 };

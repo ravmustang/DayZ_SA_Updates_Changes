@@ -1,12 +1,12 @@
 class ProjectedCrosshair extends ScriptedWidgetEventHandler
 {
-	private Widget		m_Root;
-	private vector		m_Position;
-	private bool 			m_Visible;
-	private bool			m_Debug;
+	protected Widget		m_Root;
+	protected vector		m_Position;
+	protected bool 			m_Visible;
+	protected bool			m_Debug;
 	
-	private PlayerBase	m_Player;
-	private Weapon		m_Weapon;		
+	protected PlayerBase	m_Player;
+	protected Weapon_Base	m_Weapon;		
 
 	void ProjectedCrosshair()
 	{
@@ -31,7 +31,7 @@ class ProjectedCrosshair extends ScriptedWidgetEventHandler
 	}
 	
 	//! Update
-	private void Update()
+	protected void Update()
 	{
 #ifdef DEVELOPER
 		m_Debug = DiagMenu.GetBool( DiagMenuIDs.DM_WEAPON_DEBUG_ENABLE );
@@ -61,12 +61,12 @@ class ProjectedCrosshair extends ScriptedWidgetEventHandler
 	}
 
 	// getters
-  	private void GetPlayer()
+  	protected void GetPlayer()
 	{
 		Class.CastTo(m_Player, GetGame().GetPlayer());
 	}
 
-	private void GetCrosshairPosition()
+	protected void GetCrosshairPosition()
 	{
 		m_Visible = false;
 		ItemBase itemInHands;
@@ -75,7 +75,7 @@ class ProjectedCrosshair extends ScriptedWidgetEventHandler
 		{
 			if( Class.CastTo(m_Weapon, itemInHands) )
 			{
-				//m_Visible = m_Weapon.GetProjectedCursorPos3d(m_Position);
+				//m_Visible = MiscGameplayFunctions.GetProjectedCursorPos3d(m_Position, m_Weapon);
 			}
 		}
 	}

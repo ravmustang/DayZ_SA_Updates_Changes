@@ -7,28 +7,24 @@ class TreeHard_t_acer2s: TreeHard
 };
 @endcode
 */
-
 class TreeHard extends PlantSuper
 {
+	override void OnTreeCutDown( EntityAI cutting_tool )
+	{
+		ToolBase cut_tree_tool = ToolBase.Cast( cutting_tool );
+		cut_tree_tool.HardTreeCut();
+	}
+	
 	override bool IsTree()
 	{
 		return true;
-	}
-		
-	override void PlayFallingPlantSound()
-	{
-		SoundParams soundParams = new SoundParams("hardTreeFall_SoundSet");
-		SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-		SoundObject soundObject = soundBuilder.BuildSoundObject();
-		soundObject.SetPosition(GetPosition());
-		GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
 	}
 	
 	override int GetAmountOfDrops(ItemBase item)
 	{
 		if ( item && item.KindOf("Knife") )
 		{
-			return 10;
+			return 1000; //HOTFIX "infinite" bark
 		}
 		else if ( item && item.KindOf("Axe") )
 		{
@@ -49,7 +45,7 @@ class TreeHard extends PlantSuper
 		else if ( item && item.KindOf("Axe") )
 		{
 			output_map.Insert("FireWood",1);
-			output_map.Insert("WoodenStick",1);
+			//output_map.Insert("WoodenStick",1);
 		}
 	}
 	
@@ -74,25 +70,22 @@ class TreeHard extends PlantSuper
 //! For specific tree declaration see description of \ref TreeHard
 class TreeSoft extends PlantSuper
 {
+	override void OnTreeCutDown( EntityAI cutting_tool )
+	{
+		ToolBase cut_tree_tool = ToolBase.Cast( cutting_tool );
+		cut_tree_tool.SoftTreeCut();
+	}
+	
 	override bool IsTree()
 	{
 		return true;
-	}
-	
-	override void PlayFallingPlantSound()
-	{
-		SoundParams soundParams = new SoundParams("softTreeFall_SoundSet");
-		SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-		SoundObject soundObject = soundBuilder.BuildSoundObject();
-		soundObject.SetPosition(GetPosition());
-		GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
 	}
 	
 	override int GetAmountOfDrops(ItemBase item)
 	{
 		if ( item && item.KindOf("Knife") )
 		{
-			return 10;
+			return 1000; //HOTFIX "infinite" bark
 		}
 		else if ( item && item.KindOf("Axe") )
 		{
@@ -113,7 +106,7 @@ class TreeSoft extends PlantSuper
 		else if ( item && item.KindOf("Axe") )
 		{
 			output_map.Insert("FireWood",1);
-			output_map.Insert("WoodenStick",1);
+			//output_map.Insert("WoodenStick",1);
 		}
 	}
 	
@@ -139,18 +132,15 @@ class TreeSoft extends PlantSuper
 //! default values for hard bushes
 class BushHard extends PlantSuper
 {
+	override void OnTreeCutDown( EntityAI cutting_tool )
+	{
+		ToolBase cut_tree_tool = ToolBase.Cast( cutting_tool );
+		cut_tree_tool.HardBushCut();
+	}
+	
 	override bool IsBush()
 	{
 		return true;
-	}
-	
-	override void PlayFallingPlantSound()
-	{
-		SoundParams soundParams = new SoundParams("hardBushFall_SoundSet");
-		SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-		SoundObject soundObject = soundBuilder.BuildSoundObject();
-		soundObject.SetPosition(GetPosition());
-		GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
 	}
 	
 	override int GetAmountOfDrops(ItemBase item)
@@ -178,7 +168,7 @@ class BushHard extends PlantSuper
 		else if ( item && item.KindOf("Axe") )
 		{
 			output_map.Insert("LongWoodenStick",1);
-			output_map.Insert("WoodenStick",1);
+			//output_map.Insert("WoodenStick",1);
 		}
 	}
 	
@@ -203,18 +193,15 @@ class BushHard extends PlantSuper
 //! For specific tree declaration see description of \ref TreeHard
 class BushSoft extends PlantSuper
 {
+	override void OnTreeCutDown( EntityAI cutting_tool )
+	{
+		ToolBase cut_tree_tool = ToolBase.Cast( cutting_tool );
+		cut_tree_tool.SoftBushCut();
+	}
+	
 	override bool IsBush()
 	{
 		return true;
-	}
-	
-	override void PlayFallingPlantSound()
-	{
-		SoundParams soundParams = new SoundParams("softBushFall_SoundSet");
-		SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-		SoundObject soundObject = soundBuilder.BuildSoundObject();
-		soundObject.SetPosition(GetPosition());
-		GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
 	}
 	
 	override int GetAmountOfDrops(ItemBase item)

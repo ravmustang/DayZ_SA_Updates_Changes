@@ -25,7 +25,7 @@ class ActionHandcuffTarget: ActionSingleUseBase
 		return "#handcuff";
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		PlayerBase ntarget = PlayerBase.Cast(action_data.m_Target.GetObject());
 		//ntarget.SetCaptive();

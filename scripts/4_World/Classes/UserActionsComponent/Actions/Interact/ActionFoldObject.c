@@ -19,7 +19,7 @@ class ActionFoldObject: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Fold the object";
+		return "#fold_the_object";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -37,7 +37,7 @@ class ActionFoldObject: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		HescoBox hesco = HescoBox.Cast( targetObject );

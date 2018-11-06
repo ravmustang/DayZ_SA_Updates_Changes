@@ -50,7 +50,7 @@ class InspectMenuNew extends UIScriptedMenu
 	{
 		if (item)
 		{
-			UpdateItemInfo(layoutRoot, item);
+			InspectMenuNew.UpdateItemInfo(layoutRoot, item);
 	
 			if (!m_item_widget)
 			{
@@ -65,6 +65,7 @@ class InspectMenuNew extends UIScriptedMenu
 			}
 			
 			m_item_widget.SetItem(item);
+			m_item_widget.SetView( item.GetViewIndex() );
 			m_item_widget.SetModelPosition(Vector(0,0,1));
 			
 			float x, y;		
@@ -142,337 +143,309 @@ class InspectMenuNew extends UIScriptedMenu
 			m_item_widget.SetPos( new_x, new_y );
 		}
 	}
-};
-
-const int COLOR_RUINED			= 0xFF0000;
-const int COLOR_BADLY_DAMAGED	= 0xFFBF00;
-const int COLOR_DAMAGED			= 0xFFFF00;
-const int COLOR_WORN			= 0xBFFF00;
-const int COLOR_PRISTINE		= 0x40FF00;
-
-const int COLOR_DRENCHED		= 0xFF0000FF;
-const int COLOR_SOAKING_WET 	= 0xFF3030FF;
-const int COLOR_WET 			= 0xFF6060FF;
-const int COLOR_DAMP 			= 0xFF9090FF;;
-
-const int COLOR_LIQUID 			= 0x00EEFF;
-
-const int STATE_RUINED 		 	= 4;
-const int STATE_BADLY_DAMAGED 	= 3;
-const int STATE_DAMAGED 	  	= 2;
-const int STATE_WORN 		  	= 1;
-const int STATE_PRISTINE 	  	= 0;
-
-const float STATE_DRENCHED		= 0.8;
-const float	STATE_SOAKING_WET	= 0.5;
-const float	STATE_WET			= 0.25;
-const float	STATE_DAMP			= 0.05;
-
-const int COLOR_RAW				= 0xFFBF4242;
-const int COLOR_BAKED			= 0xFFA56D28;
-const int COLOR_BOILED			= 0xFFAF9442;
-const int COLOR_DRIED			= 0xBFFFEB48;
-const int COLOR_BURNED			= 0xFF888888;
-const int COLOR_ROTTEN			= 0xFF75BB2F;
-
-//--------------------------------------------------------------------------
-void UpdateItemInfo(Widget root_widget, EntityAI item)
-{
-	if (!root_widget || !item) return;
-
-	Widget panelInfo = root_widget.FindAnyWidget("InventoryInfoPanelWidget");
-	if ( panelInfo )
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfo(Widget root_widget, EntityAI item)
 	{
-		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) )
+		if (!root_widget || !item) return;
+	
+		Widget panelInfo = root_widget.FindAnyWidget("InventoryInfoPanelWidget");
+		if ( panelInfo )
 		{
-			panelInfo.Show( false );
+			if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) )
+			{
+				panelInfo.Show( false );
+			}
+			else
+			{
+				panelInfo.Show( true );
+			}
 		}
-		else
+	
+		if ( !item.IsInherited( ZombieBase ) && !item.IsInherited( Car ) )
 		{
-			panelInfo.Show( true );
+			InventoryItem iItem = InventoryItem.Cast( item );
+			WidgetTrySetText(root_widget, "ItemDescWidget", iItem.GetTooltip());
 		}
+	
+		WidgetTrySetText(root_widget, "ItemNameWidget", item.GetDisplayName());
+		InspectMenuNew.UpdateItemInfoDamage(root_widget, item);
+		InspectMenuNew.UpdateItemInfoLiquidType(root_widget, item);
+		InspectMenuNew.UpdateItemInfoTemperature(root_widget, item);
+		InspectMenuNew.UpdateItemInfoWetness(root_widget, item);
+		InspectMenuNew.UpdateItemInfoQuantity(root_widget, item);
+		InspectMenuNew.UpdateItemInfoWeight(root_widget, item);
+		InspectMenuNew.UpdateItemInfoFoodStage(root_widget, item);
 	}
 
-	if ( !item.IsInherited( ZombieBase ) && !item.IsInherited( Car ) )
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoDamage(Widget root_widget, EntityAI item)
 	{
-		InventoryItem iItem = InventoryItem.Cast( item );
-		WidgetTrySetText(root_widget, "ItemDescWidget", iItem.GetTooltip());
-	}
-
-	WidgetTrySetText(root_widget, "ItemNameWidget", item.GetDisplayName());
-	UpdateItemInfoDamage(root_widget, item);
-	UpdateItemInfoLiquidType(root_widget, item);
-	UpdateItemInfoTemperature(root_widget, item);
-	UpdateItemInfoWetness(root_widget, item);
-	UpdateItemInfoQuantity(root_widget, item);
-	UpdateItemInfoWeight(root_widget, item);
-	UpdateItemInfoFoodStage(root_widget, item);
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoDamage(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
-	
-	int damageLevel = item.GetHealthLabel();
-	
-	switch(damageLevel)
-	{
-		case STATE_RUINED:
-		{
-			WidgetTrySetText(root_widget, "ItemDamageWidget", "RUINED", COLOR_RUINED);
-			break;
-		}
-		case STATE_BADLY_DAMAGED:
-		{
-			WidgetTrySetText(root_widget, "ItemDamageWidget", "BADLY DAMAGED", COLOR_BADLY_DAMAGED);
-			break;
-		}
+		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
 		
-		case STATE_DAMAGED:
-		{
-			WidgetTrySetText(root_widget, "ItemDamageWidget", "DAMAGED", COLOR_DAMAGED);
-			break;
-		}
+		int damageLevel = item.GetHealthLevel();
 		
-		case STATE_WORN:
+		switch(damageLevel)
 		{
-			WidgetTrySetText(root_widget, "ItemDamageWidget", "WORN", COLOR_WORN);
-			break;
-		}
-		
-		case STATE_PRISTINE:
-		{
-			WidgetTrySetText(root_widget, "ItemDamageWidget", "PRISTINE", COLOR_PRISTINE);
-			break;
-		}
-				
-		default:
-		{
-			WidgetTrySetText(root_widget, "ItemDamageWidget", "ERROR", COLOR_PRISTINE);
-			break;
-		}
-	}
-
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoLiquidType(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
-	
-	ItemBase item_base = ItemBase.Cast( item );
-	
-	if( item_base && item_base.GetQuantity() > 0 && item_base.IsBloodContainer() )
-	{
-		BloodContainerBase blood_container = BloodContainerBase.Cast( item_base );
-		
-		if( blood_container.GetBloodTypeVisible() )
-		{
-			string blood_type_name = BloodTypes.GetBloodTypeName(blood_container.GetLiquidType());
-			WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "BLOOD: " + blood_type_name, COLOR_LIQUID);
-		}
-		else
-		{
-			WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "BLOOD", COLOR_LIQUID);
-		}
-	}
-	else if( item_base && item_base.GetQuantity() > 0 && item_base.IsLiquidContainer() )
-	{
-		int liquid_type = item_base.GetLiquidType();
-		
-		switch(liquid_type)
-		{
-			case LIQUID_WATER:
+			case STATE_RUINED:
 			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "WATER", COLOR_LIQUID);
+				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_ruined", Colors.COLOR_RUINED);
 				break;
 			}
-				
-			case LIQUID_RIVERWATER:
+			case STATE_BADLY_DAMAGED:
 			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "RIVER WATER", COLOR_LIQUID);
-				break;
-			}
-				
-			case LIQUID_VODKA:
-			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "VODKA", COLOR_LIQUID);
+				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_badly", Colors.COLOR_BADLY_DAMAGED);
 				break;
 			}
 			
-			case LIQUID_BEER:
+			case STATE_DAMAGED:
 			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "BEER", COLOR_LIQUID);
+				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_damaged", Colors.COLOR_DAMAGED);
 				break;
 			}
 			
-			case LIQUID_GASOLINE:
+			case STATE_WORN:
 			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "GASOLINE", COLOR_LIQUID);
+				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_worn", Colors.COLOR_WORN);
 				break;
 			}
 			
-			case LIQUID_DIESEL:
+			case STATE_PRISTINE:
 			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "DIESEL", COLOR_LIQUID);
+				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_pristine", Colors.COLOR_PRISTINE);
 				break;
 			}
-			
-			case LIQUID_DISINFECTANT:
-			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "DISINFECTANT", COLOR_LIQUID);
-				break;
-			}
-
-			case LIQUID_SALINE:
-			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "SALINE", COLOR_LIQUID);
-				break;
-			}
-			
+					
 			default:
 			{
-				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "ERROR", COLOR_LIQUID);
+				WidgetTrySetText(root_widget, "ItemDamageWidget", "ERROR", Colors.COLOR_PRISTINE);
 				break;
 			}
 		}
-	}
-	else
-	{
-		WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "");
-	}
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoTemperature(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
-	float temperature;
-	ItemBase item_base = ItemBase.Cast( item );
-	if( item_base )
-	{
-		temperature = item_base.GetTemperature();
+	
 	}
 	
-	if( temperature != 0)
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoLiquidType(Widget root_widget, EntityAI item)
 	{
-		WidgetTrySetText(root_widget, "ItemTemperatureWidget",  "~ " + temperature.ToString() +  " CELSIUS", GetTemperatureColor( temperature ) );
-	}	
-	else
-	{
-		WidgetTrySetText(root_widget, "ItemTemperatureWidget", "");
-	}
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoWetness(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
-	/*		
-	_bagwet = 1;
-	if(!isNull (itemParent _item) && (itemParent _item) isKindOf "ClothingBase")then{
-	_bagwet = getNumber(configFile >> "cfgVehicles" >> typeOf (itemParent _item) >> "absorbency");
-	};
-
-	//wetness setting
-	if(!isNull (itemParent _item) && _bagwet > 0 && _pwetness > 0)then{
-	_wetness=getNumber(_config >> "absorbency") min _pwetness;
-	};
-	*/
-	float wetness = 0;
-	
-	if ( item.IsInherited(ItemBase) )
-	{
-		ItemBase item_IB = ItemBase.Cast( item );
-		wetness = item_IB.GetWet();
-	}
-	
-	float bagwet = 1;
-
-	EntityAI parent = item.GetHierarchyParent();
-	if (parent && parent.IsClothing())
-	{
-		bagwet = parent.ConfigGetFloat("absorbency");
-	}
-	
-	if( wetness < STATE_DAMP )
-	{
-		WidgetTrySetText(root_widget, "ItemWetnessWidget", "");
-	}
-	else if( wetness >= STATE_DAMP && wetness < STATE_WET )
-	{
-		WidgetTrySetText(root_widget, "ItemWetnessWidget", "DAMP", COLOR_DAMP);
-	}
-	else if( wetness >= STATE_WET && wetness < STATE_SOAKING_WET )
-	{
-		WidgetTrySetText( root_widget, "ItemWetnessWidget", "WET", COLOR_WET );
-	}
-	else if( wetness >= STATE_SOAKING_WET && wetness < STATE_DRENCHED )
-	{
-		WidgetTrySetText( root_widget, "ItemWetnessWidget", "SOAKING WET", COLOR_SOAKING_WET );
-	}
-	else
-	{
-		WidgetTrySetText( root_widget, "ItemWetnessWidget", "DRENCHED", COLOR_DRENCHED );
-	}
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoQuantity(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
-	
-	ItemBase item_base = ItemBase.Cast( item );
-	if( item_base )
-	{
-		float item_quantity = item_base.GetQuantity();
-		int max_quantity = item.ConfigGetInt("varQuantityMax");
-		float quantity_ratio;
+		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
 		
-		if( max_quantity > 0 ) // Some items, like books, have max_quantity set to 0 => division by ZERO error in quantity_ratio
+		ItemBase item_base = ItemBase.Cast( item );
+		
+		if( item_base && item_base.GetQuantity() > 0 && item_base.IsBloodContainer() )
 		{
-			if( item.ConfigGetString("stackedUnit") == "pc." )
+			BloodContainerBase blood_container = BloodContainerBase.Cast( item_base );
+			
+			if( blood_container.GetBloodTypeVisible() )
 			{
-				if( item_quantity == 1 )
+				string blood_type_name = BloodTypes.GetBloodTypeName(blood_container.GetLiquidType());
+				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_blood: " + blood_type_name, Colors.COLOR_LIQUID);
+			}
+			else
+			{
+				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_blood", Colors.COLOR_LIQUID);
+			}
+		}
+		else if( item_base && item_base.GetQuantity() > 0 && item_base.IsLiquidContainer() )
+		{
+			int liquid_type = item_base.GetLiquidType();
+			
+			switch(liquid_type)
+			{
+				case LIQUID_WATER:
 				{
-					WidgetTrySetText( root_widget, "ItemQuantityWidget", item_quantity.ToString() + " PIECE" );
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_water", Colors.COLOR_LIQUID);
+					break;
+				}
+					
+				case LIQUID_RIVERWATER:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_river_water", Colors.COLOR_LIQUID);
+					break;
+				}
+					
+				case LIQUID_VODKA:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_vodka", Colors.COLOR_LIQUID);
+					break;
+				}
+				
+				case LIQUID_BEER:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_beer", Colors.COLOR_LIQUID);
+					break;
+				}
+				
+				case LIQUID_GASOLINE:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_gasoline", Colors.COLOR_LIQUID);
+					break;
+				}
+				
+				case LIQUID_DIESEL:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_diesel", Colors.COLOR_LIQUID);
+					break;
+				}
+				
+				case LIQUID_DISINFECTANT:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_disinfectant", Colors.COLOR_LIQUID);
+					break;
+				}
+	
+				case LIQUID_SALINE:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_saline", Colors.COLOR_LIQUID);
+					break;
+				}
+				
+				default:
+				{
+					WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "ERROR", Colors.COLOR_LIQUID);
+					break;
+				}
+			}
+		}
+		else
+		{
+			WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "");
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoTemperature(Widget root_widget, EntityAI item)
+	{
+		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
+		float temperature;
+		ItemBase item_base = ItemBase.Cast( item );
+		if( item_base )
+		{
+			temperature = item_base.GetTemperature();
+		}
+		
+		if( temperature != 0)
+		{
+			WidgetTrySetText(root_widget, "ItemTemperatureWidget",  "~ " + temperature.ToString() +  " " + "#inv_inspect_celsius", GetTemperatureColor( temperature ) );
+		}	
+		else
+		{
+			WidgetTrySetText(root_widget, "ItemTemperatureWidget", "");
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoWetness(Widget root_widget, EntityAI item)
+	{
+		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
+		/*		
+		_bagwet = 1;
+		if(!isNull (itemParent _item) && (itemParent _item) isKindOf "ClothingBase")then{
+		_bagwet = getNumber(configFile >> "cfgVehicles" >> typeOf (itemParent _item) >> "absorbency");
+		};
+	
+		//wetness setting
+		if(!isNull (itemParent _item) && _bagwet > 0 && _pwetness > 0)then{
+		_wetness=getNumber(_config >> "absorbency") min _pwetness;
+		};
+		*/
+		float wetness = 0;
+		
+		if ( item.IsInherited(ItemBase) )
+		{
+			ItemBase item_IB = ItemBase.Cast( item );
+			wetness = item_IB.GetWet();
+		}
+		
+		float bagwet = 1;
+	
+		EntityAI parent = item.GetHierarchyParent();
+		if (parent && parent.IsClothing())
+		{
+			bagwet = parent.ConfigGetFloat("absorbency");
+		}
+		
+		if( wetness < STATE_DAMP )
+		{
+			WidgetTrySetText(root_widget, "ItemWetnessWidget", "");
+		}
+		else if( wetness >= STATE_DAMP && wetness < STATE_WET )
+		{
+			WidgetTrySetText(root_widget, "ItemWetnessWidget", "#inv_inspcet_damp", Colors.COLOR_DAMP);
+		}
+		else if( wetness >= STATE_WET && wetness < STATE_SOAKING_WET )
+		{
+			WidgetTrySetText( root_widget, "ItemWetnessWidget", "#inv_inspect_wet", Colors.COLOR_WET );
+		}
+		else if( wetness >= STATE_SOAKING_WET && wetness < STATE_DRENCHED )
+		{
+			WidgetTrySetText( root_widget, "ItemWetnessWidget", "#inv_inspect_soaking_wet", Colors.COLOR_SOAKING_WET );
+		}
+		else
+		{
+			WidgetTrySetText( root_widget, "ItemWetnessWidget", "#inv_inspect_drenched", Colors.COLOR_DRENCHED );
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoQuantity(Widget root_widget, EntityAI item)
+	{
+		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
+		
+		ItemBase item_base = ItemBase.Cast( item );
+		if( item_base )
+		{
+			float item_quantity = item_base.GetQuantity();
+			int max_quantity = item.ConfigGetInt("varQuantityMax");
+			float quantity_ratio;
+			
+			if( max_quantity > 0 ) // Some items, like books, have max_quantity set to 0 => division by ZERO error in quantity_ratio
+			{
+				if( item.ConfigGetString("stackedUnit") == "pc." )
+				{
+					if( item_quantity == 1 )
+					{
+						WidgetTrySetText( root_widget, "ItemQuantityWidget", item_quantity.ToString() + " " + "#inv_inspect_piece", Colors.COLOR_DEFAULT );
+					}
+					else
+					{
+						WidgetTrySetText( root_widget, "ItemQuantityWidget", item_quantity.ToString() + " " + "#inv_inspect_piece", Colors.COLOR_DEFAULT );
+					}		
+				}
+				else if( item.ConfigGetString("stackedUnit") == "percentage" )
+				{
+					quantity_ratio = Math.Round( ( item_quantity / max_quantity ) * 100 );
+					
+					WidgetTrySetText( root_widget, "ItemQuantityWidget", quantity_ratio.ToString() + "#inv_inspect_remaining", Colors.COLOR_DEFAULT );			
+				}
+				else if( item.ConfigGetString("stackedUnit") == "g" )
+				{
+					quantity_ratio = Math.Round( ( item_quantity / max_quantity ) * 100 );
+					
+					WidgetTrySetText( root_widget, "ItemQuantityWidget", quantity_ratio.ToString() + "#inv_inspect_remaining", Colors.COLOR_DEFAULT );			
+				}
+				else if( item.ConfigGetString("stackedUnit") == "ml" )
+				{
+					quantity_ratio = Math.Round( ( item_quantity / max_quantity ) * 100 );
+					
+					WidgetTrySetText( root_widget, "ItemQuantityWidget", quantity_ratio.ToString() + "#inv_inspect_remaining", Colors.COLOR_DEFAULT );
+				}
+				else if( item.IsInherited( Magazine ) )
+				{
+					Magazine magazine_item;
+					Class.CastTo(magazine_item, item);
+					
+					if( magazine_item.GetAmmoCount() == 1 )
+					{
+						WidgetTrySetText( root_widget, "ItemQuantityWidget",  magazine_item.GetAmmoCount().ToString() + " " + "#inv_inspect_piece", Colors.COLOR_DEFAULT );
+					}
+					else
+					{
+						WidgetTrySetText( root_widget, "ItemQuantityWidget",  magazine_item.GetAmmoCount().ToString() + " " + "#inv_inspect_pieces", Colors.COLOR_DEFAULT );
+					}
 				}
 				else
 				{
-					WidgetTrySetText( root_widget, "ItemQuantityWidget", item_quantity.ToString() + " PIECES" );
-				}		
-			}
-			else if( item.ConfigGetString("stackedUnit") == "percentage" )
-			{
-				quantity_ratio = Math.Round( ( item_quantity / max_quantity ) * 100 );
-				
-				WidgetTrySetText( root_widget, "ItemQuantityWidget", quantity_ratio.ToString() + "% REMAINING" );			
-			}
-			else if( item.ConfigGetString("stackedUnit") == "g" )
-			{
-				quantity_ratio = Math.Round( ( item_quantity / max_quantity ) * 100 );
-				
-				WidgetTrySetText( root_widget, "ItemQuantityWidget", quantity_ratio.ToString() + "% REMAINING" );			
-			}
-			else if( item.ConfigGetString("stackedUnit") == "ml" )
-			{
-				quantity_ratio = Math.Round( ( item_quantity / max_quantity ) * 100 );
-				
-				WidgetTrySetText( root_widget, "ItemQuantityWidget", quantity_ratio.ToString() + "% REMAINING" );
-			}
-			else if( item.IsInherited( Magazine ) )
-			{
-				Magazine magazine_item;
-				Class.CastTo(magazine_item, item);
-				
-				if( magazine_item.GetAmmoCount() == 1 )
-				{
-					WidgetTrySetText( root_widget, "ItemQuantityWidget",  magazine_item.GetAmmoCount().ToString() + " PIECE" );
-				}
-				else
-				{
-					WidgetTrySetText( root_widget, "ItemQuantityWidget",  magazine_item.GetAmmoCount().ToString() + " PIECES" );
+					WidgetTrySetText( root_widget, "ItemQuantityWidget", "" );
 				}
 			}
 			else
@@ -480,144 +453,138 @@ void UpdateItemInfoQuantity(Widget root_widget, EntityAI item)
 				WidgetTrySetText( root_widget, "ItemQuantityWidget", "" );
 			}
 		}
-		else
-		{
-			WidgetTrySetText( root_widget, "ItemQuantityWidget", "" );
-		}
 	}
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoWeight(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
 	
-	ItemBase item_IB = ItemBase.Cast( item );
-	if( item_IB )
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoWeight(Widget root_widget, EntityAI item)
 	{
-		// old calculation
-		/*
-		float quantity = 0;
-		float wetness = 0;
-		int confweight = item.ConfigGetInt("weight");
-		quantity = item_IB.GetQuantity();
-		wetness = item_IB.GetWet();
+		if ( item.IsInherited( ZombieBase ) || item.IsInherited( Car ) ) return;
 		
-		float weight = 0;
-	
-		if (quantity > 0 && confweight != 0)
+		ItemBase item_IB = ItemBase.Cast( item );
+		if( item_IB )
 		{
-			weight = Math.Round( (wetness + 1) * confweight * quantity );
-		}
-		else if (quantity > 0)
-		{
-			weight = Math.Round( (wetness + 1) * quantity );
-		}
-		else
-		{
-			weight=Math.Round( (wetness + 1) * confweight );
-		}
-		*/
-		int weight = item_IB.GetItemWeight();
+			// old calculation
+			/*
+			float quantity = 0;
+			float wetness = 0;
+			int confweight = item.ConfigGetInt("weight");
+			quantity = item_IB.GetQuantity();
+			wetness = item_IB.GetWet();
+			
+			float weight = 0;
 		
-		if (root_widget.GetName() != "BackPanelWidget")
-		{
-			weight = item_IB.GetSingleInventoryItemWeight();
-		}
-		
-		if (weight >= 1000)
-		{
-			int kilos = Math.Round(weight / 1000.0);
-			WidgetTrySetText(root_widget, "ItemWeightWidget", "ABOUT " + kilos.ToString() + " KG");
-		}
-		else if (weight >= 500)
-		{
-			WidgetTrySetText(root_widget, "ItemWeightWidget", "UNDER 1 KG");
-		} 
-		else if (weight >= 250)
-		{
-			WidgetTrySetText(root_widget, "ItemWeightWidget", "UNDER 0.5 KG");
-		}
-		else 
-		{
-			WidgetTrySetText(root_widget, "ItemWeightWidget", "UNDER 0.25 KG");
-		}
-	}
-}
-
-//--------------------------------------------------------------------------
-void UpdateItemInfoFoodStage(Widget root_widget, EntityAI item)
-{
-	if ( item.IsInherited( Edible_Base ) && !item.IsInherited( Bottle_Base ) )
-	{
-		Edible_Base food_item = Edible_Base.Cast( item );
-		
-		ref FoodStage food_stage = food_item.GetFoodStage();
-		FoodStageType food_stage_type = food_stage.GetFoodStageType();
-		
-		string food_stage_name = food_stage.GetFoodStageName( food_stage_type );
-		food_stage_name.ToUpper();
-		
-		switch( food_stage_type )
-		{
-			case FoodStageType.RAW:
+			if (quantity > 0 && confweight != 0)
 			{
-				WidgetTrySetText( root_widget, "ItemFoodStageWidget", food_stage_name, COLOR_RAW );
-				break;
+				weight = Math.Round( (wetness + 1) * confweight * quantity );
 			}
-			case FoodStageType.BAKED:
+			else if (quantity > 0)
 			{
-				WidgetTrySetText( root_widget, "ItemFoodStageWidget", food_stage_name, COLOR_BAKED );
-				break;
-			}
-			case FoodStageType.BOILED:
-			{
-				WidgetTrySetText( root_widget, "ItemFoodStageWidget", food_stage_name, COLOR_BOILED );
-				break;
-			}
-			case FoodStageType.DRIED:
-			{
-				WidgetTrySetText( root_widget, "ItemFoodStageWidget", food_stage_name, COLOR_DRIED );
-				break;
-			}
-			case FoodStageType.BURNED:
-			{
-				WidgetTrySetText( root_widget, "ItemFoodStageWidget", food_stage_name, COLOR_BURNED );
-				break;
-			}
-			case FoodStageType.ROTTEN:
-			{
-				WidgetTrySetText( root_widget, "ItemFoodStageWidget", food_stage_name, COLOR_ROTTEN );
-				break;
-			}
-		}
-	}
-	else
-	{
-		WidgetTrySetText( root_widget, "ItemFoodStageWidget", "" );
-	}
-}
-
-//--------------------------------------------------------------------------
-void WidgetTrySetText(Widget root_widget, string widget_name, string text, int color = 0)
-{
-	TextWidget widget = TextWidget.Cast( root_widget.FindAnyWidget(widget_name) );
-	if (widget)
-	{
-		widget.SetText(text);
-
-		Widget widget_background = root_widget.FindAnyWidget(widget_name+"Background");
-		if (widget_background)
-		{
-			if (color != 0)
-			{
-				widget_background.Show( true );
-				widget_background.SetColor(color | 0x7F000000);
+				weight = Math.Round( (wetness + 1) * quantity );
 			}
 			else
 			{
-				widget_background.Show( false );
+				weight=Math.Round( (wetness + 1) * confweight );
+			}
+			*/
+			int weight = item_IB.GetItemWeight();
+			
+			if (root_widget.GetName() != "BackPanelWidget")
+			{
+				weight = item_IB.GetSingleInventoryItemWeight();
+			}
+			
+			if (weight >= 1000)
+			{
+				int kilos = Math.Round(weight / 1000.0);
+				WidgetTrySetText(root_widget, "ItemWeightWidget", "#inv_inspect_about" + " " + kilos.ToString() + " " + "#inv_inspect_kg", Colors.COLOR_DEFAULT);
+			}
+			else if (weight >= 500)
+			{
+				WidgetTrySetText(root_widget, "ItemWeightWidget", "#inv_inspect_under_1", Colors.COLOR_DEFAULT);
+			} 
+			else if (weight >= 250)
+			{
+				WidgetTrySetText(root_widget, "ItemWeightWidget", "#inv_inspect_under_05", Colors.COLOR_DEFAULT);
+			}
+			else 
+			{
+				WidgetTrySetText(root_widget, "ItemWeightWidget", "#inv_inspect_under_025", Colors.COLOR_DEFAULT);
 			}
 		}
 	}
-}
+	
+	//--------------------------------------------------------------------------
+	static void UpdateItemInfoFoodStage(Widget root_widget, EntityAI item)
+	{
+		if ( item.IsInherited( Edible_Base ) && !item.IsInherited( Bottle_Base ) )
+		{
+			Edible_Base food_item = Edible_Base.Cast( item );
+			
+			ref FoodStage food_stage = food_item.GetFoodStage();
+			FoodStageType food_stage_type = food_stage.GetFoodStageType();
+					
+			switch( food_stage_type )
+			{				
+				case FoodStageType.RAW:
+				{
+					WidgetTrySetText( root_widget, "ItemFoodStageWidget", "#inv_inspect_raw", Colors.COLOR_RAW );
+					break;
+				}
+				case FoodStageType.BAKED:
+				{
+					WidgetTrySetText( root_widget, "ItemFoodStageWidget", "#inv_inspect_baked", Colors.COLOR_BAKED );
+					break;
+				}
+				case FoodStageType.BOILED:
+				{
+					WidgetTrySetText( root_widget, "ItemFoodStageWidget", "#inv_inspect_boiled", Colors.COLOR_BOILED );
+					break;
+				}
+				case FoodStageType.DRIED:
+				{
+					WidgetTrySetText( root_widget, "ItemFoodStageWidget", "#inv_inspect_dried", Colors.COLOR_DRIED );
+					break;
+				}
+				case FoodStageType.BURNED:
+				{
+					WidgetTrySetText( root_widget, "ItemFoodStageWidget", "#inv_inspect_burned", Colors.COLOR_BURNED );
+					break;
+				}
+				case FoodStageType.ROTTEN:
+				{
+					WidgetTrySetText( root_widget, "ItemFoodStageWidget", "#inv_inspect_rotten", Colors.COLOR_ROTTEN );
+					break;
+				}
+			}
+		}
+		else
+		{
+			WidgetTrySetText( root_widget, "ItemFoodStageWidget", "" );
+		}
+	}
+	
+	//--------------------------------------------------------------------------
+	static void WidgetTrySetText(Widget root_widget, string widget_name, string text, int color = 0)
+	{
+		TextWidget widget = TextWidget.Cast( root_widget.FindAnyWidget(widget_name) );
+		if (widget)
+		{
+			widget.SetText(text);
+	
+			Widget widget_background = root_widget.FindAnyWidget(widget_name+"Background");
+			if (widget_background)
+			{
+				if (color != 0)
+				{
+					widget_background.Show( true );
+					widget_background.SetColor(color | 0x7F000000);
+				}
+				else
+				{
+					widget_background.Show( false );
+				}
+			}
+		}
+	}
+
+};

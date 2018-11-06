@@ -1,7 +1,6 @@
 class PluginDeveloper extends PluginBase
 {
 	protected bool									m_IsWinHolding;	
-	protected bool 									m_GodModeEnabled;
 	protected int									m_FeaturesMask;
 	
 	static PluginDeveloper GetInstance()
@@ -48,8 +47,6 @@ class PluginDeveloper extends PluginBase
 	{
 		super.OnInit();
 		
-		m_GodModeEnabled = false;
-		
 		DeveloperFreeCamera.OnInit();
 	}
 	
@@ -82,10 +79,6 @@ class PluginDeveloper extends PluginBase
 			{
 				OnRPCServerLogRecieved( ctx ); break;
 			}
-			case ERPCs.DEV_RPC_TOGGLE_GOD_MODE:
-			{
-				OnRPCToggleGodMode( player ); break;
-			}
 			case ERPCs.RPC_SYNC_SCENE_OBJECT:
 			{
 				OnRPCSyncSceneObject( ctx ); break;
@@ -117,12 +110,13 @@ class PluginDeveloper extends PluginBase
 		{
 			ref array<Man> players = new array<Man>;
 			GetGame().GetPlayers( players );
-				
+			
 			for ( int i = 0; i < players.Count(); ++i )
 			{
 				ref Param1<string> param = new Param1<string>( msg );
 				Man player = players.Get(i);
-				if( player )
+				
+				if ( player  &&  player.HasNetworkID() )
 				{
 					player.RPCSingleParam(ERPCs.DEV_RPC_SEND_SERVER_LOG, param, true, player.GetIdentity());
 				}
@@ -165,11 +159,6 @@ class PluginDeveloper extends PluginBase
 		}
 	}
 	
-	void OnRPCToggleGodMode( PlayerBase player )
-	{
-		ToggleGodMode( player );
-	}
-	
 	void OnRPCClearInventory(PlayerBase player)
 	{
 		ClearInventory(player);
@@ -205,48 +194,6 @@ class PluginDeveloper extends PluginBase
 	void OnSetFreeCameraEvent( PlayerBase player, FreeDebugCamera camera )
 	{
 		DeveloperFreeCamera.OnSetFreeCameraEvent( player, camera );
-	}
-	
-	// God mode
-	bool IsGodMode()
-	{
-		return m_GodModeEnabled;
-	}
-
-	void ToggleGodModeThisPlayer()
-	{
-		ToggleGodMode( PlayerBase.Cast( GetGame().GetPlayer() ) );
-	}
-
-	void ToggleGodMode( PlayerBase player )
-	{
-		if ( GetGame().IsServer() )
-		{
-			if ( !m_GodModeEnabled )
-			{
-				player.SetAllowDamage( false );
-				player.MessageStatus( "God mode ENABLED" );
-				m_GodModeEnabled = true;
-			}
-			else
-			{
-				player.SetAllowDamage( true );
-				player.MessageStatus( "God mode DISABLED" );
-				m_GodModeEnabled = false;
-			}
-		}
-		else
-		{
-			if ( !m_GodModeEnabled )
-			{
-				m_GodModeEnabled = true;
-			}
-			else
-			{
-				m_GodModeEnabled = false;
-			}
-			player.RPCSingleParam( ERPCs.DEV_RPC_TOGGLE_GOD_MODE, NULL, true );
-		}
 	}
 	
 	void OnSpawnErrorReport (string name)
@@ -487,10 +434,12 @@ class PluginDeveloper extends PluginBase
 			if ( g_Game.GetUIManager().GetMenu() == NULL )
 			{
 				g_Game.GetUIManager().EnterScriptedMenu(MENU_SCRIPTCONSOLE, NULL);
+				GetGame().GetMission().PlayerControlDisable();
 			}
 			else if ( g_Game.GetUIManager().IsMenuOpen(MENU_SCRIPTCONSOLE) )
 			{
 				g_Game.GetUIManager().Back();
+				GetGame().GetMission().PlayerControlEnable();
 			}
 		}
 	}

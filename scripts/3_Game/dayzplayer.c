@@ -24,7 +24,7 @@ class DayZPlayerCameraResult
 	float 		m_fInsideCamera;		//!< 0..1 (0 normal lod, 1 inside lod), >0.7 -> inside
 	bool		m_bUpdateWhenBlendOut;	//!< true - camera is updated when blending to new camera (Ironsights == false)
 	float 		m_fShootFromCamera;		//!< 1(default) - uses shoot from camera (+aiming sway), 0 pure weapon shoot (ironsights == 0)
-
+	float		m_fIgnoreParentRoll;	//!< 1 - resets base transforms roll
 
 	//! cannot be instanced from script (always created from C++)
 	private void DayZPlayerCameraResult()
@@ -78,6 +78,11 @@ class DayZPlayerCamera
 	string GetCameraName()
 	{
 		return "DayZPlayerCamera";
+	}
+	
+	float GetCurrentPitch()
+	{
+		return -1;
 	}
 	
 	//! data 
@@ -266,6 +271,16 @@ class DayZPlayerType
 		return m_pNoiseStepProne;
 	}
 	
+	NoiseParams GetNoiseParamsLandLight()
+	{
+		return m_pNoiseLandLight;	
+	}
+	
+	NoiseParams GetNoiseParamsLandHeavy()
+	{
+		return m_pNoiseLandHeavy;
+	}
+	
 	void LoadSoundWeaponEvent()
 	{
 		string cfgPath = "CfgVehicles SurvivorBase AnimEvents SoundWeapon ";
@@ -279,7 +294,8 @@ class DayZPlayerType
 			GetGame().ConfigGetChildName(cfgPath, i, soundName);
 			string soundPath = cfgPath + soundName + " ";
 			AnimSoundEvent soundEvent = new AnimSoundEvent(soundPath);
-			m_animSoundEventsAttack.Insert(soundEvent);
+			if(soundEvent.IsValid())
+				m_animSoundEventsAttack.Insert(soundEvent);
 		}
 	}
 	
@@ -297,6 +313,40 @@ class DayZPlayerType
 		return NULL;
 	}
 	
+	//! register hit components for AI melee (used by attacking AI)
+	void RegisterHitComponentsForAI()
+	{
+		m_HitComponentsForAI = new array<ref DayZAIHitComponent>;
+
+		//! registers default hit compoent for the entity
+		m_DefaultHitComponent = "dmgZone_torso";
+
+		//! register hit components that are selected by probability
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_head", 5);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_leftArm", 50);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_torso", 65);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_rightArm", 50);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_leftLeg", 40);
+		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_rightLeg", 40);
+	}
+	
+	string GetHitComponentForAI()
+	{
+		string hitComp;
+		
+		if (DayZAIHitComponentHelpers.SelectMostProbableHitComponent(m_HitComponentsForAI, hitComp))
+		{
+			return hitComp;
+		}
+		
+		return GetDefaultHitComponent();
+	}
+	
+	string GetDefaultHitComponent()
+	{
+		return m_DefaultHitComponent;
+	}
+	
 	private void DayZPlayerType()
 	{
 		string cfgPath = "CfgVehicles SurvivorBase ";
@@ -310,6 +360,11 @@ class DayZPlayerType
 		m_pNoiseStepProne = new NoiseParams();
 		m_pNoiseStepProne.LoadFromPath(cfgPath + "NoiseStepProne");
 		
+		m_pNoiseLandLight = new NoiseParams();
+		m_pNoiseLandLight.LoadFromPath(cfgPath + "NoiseLandLight");
+		
+		m_pNoiseLandHeavy = new NoiseParams();
+		m_pNoiseLandHeavy.LoadFromPath(cfgPath + "NoiseLandHeavy");
 		
 		LoadSoundWeaponEvent();
 	}
@@ -345,6 +400,12 @@ class DayZPlayerType
 	ref NoiseParams m_pNoiseStepStand;
 	ref NoiseParams m_pNoiseStepCrouch;
 	ref NoiseParams m_pNoiseStepProne;
+	ref NoiseParams m_pNoiseLandLight;
+	ref NoiseParams m_pNoiseLandHeavy;
+
+	//! Melee hit components (AI targeting)	
+	protected ref array<ref DayZAIHitComponent> m_HitComponentsForAI;
+	protected string m_DefaultHitComponent;
 	
 	ref array<ref AnimSoundEvent> m_animSoundEventsAttack;
 }
@@ -365,6 +426,7 @@ enum DayZPlayerConstants
 	DEBUG_SHOWINJURY,		//!< menu for showing injuries
 	DEBUG_SHOWEXHAUSTION,	//!< menu for showing exhaustion
 	DEBUG_ENABLEJUMP,		//!< menu for showing exhaustion
+	DEBUG_ENABLETALKING,	//!< option for showing talk command
 	
 
     //! ---------------------------------------------------------
@@ -397,6 +459,11 @@ enum DayZPlayerConstants
 	MOVEMENT_RUN,				//! 0x4
 	MOVEMENT_SPRINT,			//! 0x8 
 
+	//! rotation modes
+	
+	ROTATION_DISABLE,			//!
+	ROTATION_ENABLE,			//!
+	
 	//! movement idx
 	MOVEMENTIDX_IDLE	= 0,
 	MOVEMENTIDX_WALK	= 1,
@@ -418,15 +485,15 @@ enum DayZPlayerConstants
     //! ---------------------------------------------------------
 	
 	//! command ids - main movement commands 
-	COMMANDID_NONE,    	// type is int - no command - invalid state 
-	COMMANDID_MOVE,     // type is int (overridden from C++) - normal movement (idle, walk, run, sprint, ... )
-	COMMANDID_ACTION,	// type is int (overridden from C++) - full body action
-	COMMANDID_MELEE,	// type is int (overridden from C++) - melee attacks
-	COMMANDID_MELEE2,	// type is int (overridden from C++) - melee attacks
-	COMMANDID_FALL,		// type is int (overridden from C++) - falling
-	COMMANDID_DEATH,	// type is int (overridden from C++) - dead 
-	COMMANDID_DAMAGE,	// type is int (overridden from C++) - fullbody damage
-	COMMANDID_LADDER,	// type is int (overridden from C++) - ladder
+	COMMANDID_NONE,    		// type is int - no command - invalid state 
+	COMMANDID_MOVE,			// type is int (overridden from C++) - normal movement (idle, walk, run, sprint, ... )
+	COMMANDID_ACTION,		// type is int (overridden from C++) - full body action
+	COMMANDID_MELEE,		// type is int (overridden from C++) - melee attacks
+	COMMANDID_MELEE2,		// type is int (overridden from C++) - melee attacks
+	COMMANDID_FALL,			// type is int (overridden from C++) - falling
+	COMMANDID_DEATH,		// type is int (overridden from C++) - dead 
+	COMMANDID_DAMAGE,		// type is int (overridden from C++) - fullbody damage
+	COMMANDID_LADDER,		// type is int (overridden from C++) - ladder
 	COMMANDID_UNCONSCIOUS,	// type is int (overridden from C++) - unconscious
 	COMMANDID_SWIM,			// type is int (overridden from C++) - swimming
 	COMMANDID_VEHICLE,		// type is int (overridden from C++) - vehicle
@@ -446,9 +513,9 @@ enum DayZPlayerConstants
     //! ---------------------------------------------------------
 
 	//! internal action commands used in HumanCommandActionCallback.InternalCommand()
-	CMD_ACTIONINT_INTERRUPT				= -2,		//!< secondary ending
-	CMD_ACTIONINT_END2					= -1,		//!< secondary ending
-	CMD_ACTIONINT_END					= 0,		//!< end action
+	CMD_ACTIONINT_INTERRUPT				= -2,		//!< totally interrupt action (no animation, just blend)
+	CMD_ACTIONINT_FINISH				= -1,		//!< secondary ending (finishing action, eg running out of water while drinking, not all actions have this)
+	CMD_ACTIONINT_END					= 0,		//!< end action (stopping action, without finish, all actions have this)
 	CMD_ACTIONINT_ACTION				= 1,		//!< one time secondary action within an action
 	CMD_ACTIONINT_ACTIONLOOP			= 2,		//!< loop secondary action within an action
 
@@ -464,28 +531,24 @@ enum DayZPlayerConstants
     //! modifier (differential animation)
     CMD_ACTIONMOD_DRINK					= 0,		// erc,cro    		[end, end2]
 	CMD_ACTIONMOD_EAT					= 1,		// erc,cro    		[end, end2]
-	CMD_ACTIONMOD_EMPTYCANISTER			= 2,		// erc,cro          [end]
+	CMD_ACTIONMOD_EMPTY_VESSEL			= 2,		// erc,cro          [end]
 	CMD_ACTIONMOD_CATCHRAIN				= 3,		// erc,cro			[end]
-	CMD_ACTIONMOD_EATPILLS				= 4,		// erc,cro			[end]
-	CMD_ACTIONMOD_EATTABLETS			= 5,		// erc,cro   	    [end]
-	CMD_ACTIONMOD_EMPTYBOTTLE			= 6,		// erc,cro          [end]
 	CMD_ACTIONMOD_VIEWCOMPASS			= 7,		// erc,cro          [end]
-	CMD_ACTIONMOD_DRINKCAN				= 8,		// erc,cro			[end]
-	CMD_ACTIONMOD_WALKIETALKIETUNE		= 9,		// erc,cro			[end]
+	CMD_ACTIONMOD_ITEM_TUNE				= 9,		// erc,cro			[end]
 	CMD_ACTIONMOD_GIVEL					= 10,		// erc,cro			[end]
 	CMD_ACTIONMOD_GIVER					= 11,		// erc,cro			[end]
 	CMD_ACTIONMOD_SHAVE					= 12,		// erc,cro			[end]
 	CMD_ACTIONMOD_FILLMAG				= 13,		// erc,cro			[end]
 	CMD_ACTIONMOD_EMPTYMAG				= 14,		// erc,cro			[end]
-	CMD_ACTIONMOD_DRINKPOT				= 15,		// erc,cro			[end]
-	CMD_ACTIONMOD_EMPTYPOT				= 16,		// erc,cro			[end]
-	CMD_ACTIONMOD_EATFRUIT				= 17,		// erc,cro			[end]
+	CMD_ACTIONMOD_OPENITEM				= 15,		// erc,cro			[end]
 	CMD_ACTIONMOD_TAKETEMPSELF			= 18,		// erc,cro			[end]
 	CMD_ACTIONMOD_VIEWMAP				= 19,		// erc,cro			[end]
-	CMD_ACTIONMOD_RAISEMEGAPHONE		= 20,		// erc,cro			[end]
+	CMD_ACTIONMOD_RAISEITEM				= 20,		// erc,cro			[end]
 	CMD_ACTIONMOD_SEARCHINVENTORY		= 21,		// erc,cro			[end]
 	CMD_ACTIONMOD_CRAFTING				= 22,		// erc,cro			[end]
-	CMD_ACTIONMOD_LOOKOPTICS			= 23,		// erc,cro			[end]
+	CMD_ACTIONMOD_RESTRAINEDSTRUGGLE	= 23,		// erc,cro 			[end, end2]
+	CMD_ACTIONMOD_COVERHEAD_SELF		= 24,		// erc,cro 			[end, end2]
+	CMD_ACTIONMOD_COVERHEAD_TARGET		= 25,		// erc,cro 			[end, end2]
 	
 	// onetime 
 	CMD_ACTIONMOD_PICKUP_HANDS			= 500,		// erc,cro
@@ -497,27 +560,32 @@ enum DayZPlayerConstants
 	CMD_ACTIONMOD_OPENDOORFW			= 506,		// erc,cro
 	CMD_ACTIONMOD_OPENLID				= 507,		// erc,cro 
 	CMD_ACTIONMOD_CLOSELID				= 508,		// erc,cro 	
-	CMD_ACTIONMOD_WALKIETALKIEON		= 509,		// erc,cro
-	CMD_ACTIONMOD_WALKIETALKIEOFF		= 510,		// erc,cro
+	CMD_ACTIONMOD_ITEM_ON				= 509,		// erc,cro
+	CMD_ACTIONMOD_ITEM_OFF				= 510,		// erc,cro
 	CMD_ACTIONMOD_BATONEXTEND			= 511,		// erc,cro
 	CMD_ACTIONMOD_BATONRETRACT			= 512,		// erc,cro
 	CMD_ACTIONMOD_UNLOCKHANDCUFFTARGET	= 513,		// erc,cro
 	CMD_ACTIONMOD_FISHINGRODEXTEND		= 514,		// erc,cro
 	CMD_ACTIONMOD_FISHINGRODRETRACT		= 515,		// erc,cro
 	CMD_ACTIONMOD_CLEANHANDSBOTTLE		= 516,		// erc,cro
-	CMD_ACTIONMOD_OPENFOOD				= 517,		// erc,cro
+	CMD_ACTIONMOD_OPENITEM_ONCE			= 517,		// erc,cro
 	CMD_ACTIONMOD_ATTACHSCOPE			= 518,		// erc,cro
 	CMD_ACTIONMOD_ATTACHBARREL			= 519,		// erc,cro
+	CMD_ACTIONMOD_EMPTYSEEDSPACK		= 520,		// erc,cro
+	CMD_ACTIONMOD_INTERACTONCE			= 521,		// erc,cro
+	CMD_ACTIONMOD_ATTACHITEM			= 522,		// erc,cro
+	
+	CMD_ACTIONMOD_DROPITEM_HANDS		= 900,		// erc, cro
+	CMD_ACTIONMOD_DROPITEM_INVENTORY	= 901,		// erc, cro
+	
+	
 
     //! --------------------------
     //! fb (full body)
     CMD_ACTIONFB_DRINK					= 0,		// pne				[end, end2]
 	CMD_ACTIONFB_EAT					= 1,		// pne				[end, end2]
 	CMD_ACTIONFB_CATCHRAIN				= 3,		// pne				[end]
-	CMD_ACTIONFB_EATPILLS				= 4,		// pne				[end]
-	CMD_ACTIONFB_EATTABLETS				= 5,		// pne				[end]
-	CMD_ACTIONFB_DRINKCAN				= 8,		// pne				[end]
-	CMD_ACTIONFB_WALKIETALKIETUNE		= 9,		// pne				[end]
+	CMD_ACTIONFB_ITEM_TUNE				= 9,		// pne				[end]
 	CMD_ACTIONFB_GIVEL					= 10,		// pne				[end]
 	CMD_ACTIONFB_GIVER					= 11,		// pne				[end]
 	CMD_ACTIONFB_FILLMAG				= 13,		// pne				[end]
@@ -527,60 +595,55 @@ enum DayZPlayerConstants
 	CMD_ACTIONFB_FILLBOTTLEWELL			= 52,		// cro	            [end]
 	CMD_ACTIONFB_FIREESTINGUISHER		= 53,		// erc              [end]
 	CMD_ACTIONFB_WRING					= 54,		// cro 		        [end]
-	CMD_ACTIONFB_BERRIES				= 55,		// erc,cro		    [end]
-	CMD_ACTIONFB_DIGSHOVEL				= 57,		// erc		        [end]
-	CMD_ACTIONFB_DIGHOE					= 58,		// erc			    [end]
-	CMD_ACTIONFB_FISHING				= 59,		// cro			    [action (check fish), end(catch fish), end2(not catching anything ]
-	CMD_ACTIONFB_CPR					= 60,		// cro     		    [end]
-	CMD_ACTIONFB_BANDAGE				= 61,		// cro		        [end]
-	CMD_ACTIONFB_CRAFTING				= 62,		// cro		        [end]
-	CMD_ACTIONFB_INTERACT				= 63,		// erc,cro			[end]
-	CMD_ACTIONFB_DRINKCANISTER			= 64,		// erc,cro          [end]
-	CMD_ACTIONFB_FORCEFEED				= 65,		// erc,cro          [end]
-	CMD_ACTIONFB_BANDAGETARGET			= 66,		// erc,cro          [end]
-	CMD_ACTIONFB_DISINFECTTARGET		= 67,		// cro     		    [end]
-	CMD_ACTIONFB_DEPLOY					= 68,		// cro			    [end]
-	CMD_ACTIONFB_STARTFIREMATCH			= 69,		// cro			    [end]
-	CMD_ACTIONFB_ANIMALSKINNING			= 70,		// cro				[end]
-	CMD_ACTIONFB_WASHHANDSWELL			= 71,		// cro				[end]
-	CMD_ACTIONFB_WASHHANDSPOND			= 72,		// cro				[end]
-	CMD_ACTIONFB_SALINEBLOODBAGTARGET	= 73,		// erc,cro			[end]
-	CMD_ACTIONFB_SALINEBLOODBAG			= 74,		// erc,cro			[end]
-	CMD_ACTIONFB_STITCHUPSELF			= 75,		// erc,cro			[end]
-	CMD_ACTIONFB_VOMIT					= 76,		// cro				[end]
-	CMD_ACTIONFB_CUTTIESTARGET			= 77,		// erc,cro			[end (finish cutting), end2 (cancel cutting)]
-	CMD_ACTIONFB_TIEUPTARGET			= 78,		// erc,cro			[end (finish tying up), end2 (cancel tying up)]
-	CMD_ACTIONFB_STARTFIRETORCH			= 79,		// erc,cro			[end]
-	CMD_ACTIONFB_CHECKPULSE				= 80,		// cro				[end]
-	CMD_ACTIONFB_EMPTYSEEDSPACK			= 81,		// erc, cro			[end]
-	CMD_ACTIONFB_CLEANWOUNDSTARGET		= 82,		// erc, cro			[end]
-	CMD_ACTIONFB_STARTFIREDRILL			= 83,		// erc, cro			[end]
-	CMD_ACTIONFB_STARTFIRELIGHTER		= 84,		// erc, cro			[end]
-	CMD_ACTIONFB_COLLECTBLOODSELF		= 85,		// erc, cro			[end]
-	CMD_ACTIONFB_POURBOTTLE				= 86,		// erc, cro			[end]
-	CMD_ACTIONFB_POURCAN				= 88,		// erc, cro			[end]
-	CMD_ACTIONFB_EATFRUIT				= 89,		// pne				[end]
-	CMD_ACTIONFB_HACKBUSH				= 90,		// erc				[end, end2]
-	CMD_ACTIONFB_HACKTREE				= 91,		// erc				[end, end2]
-	CMD_ACTIONFB_TAKETEMPSELF			= 92,		// pne				[end]
-	CMD_ACTIONFB_DIGHOLE				= 93,		// erc				[end, end2]
-	CMD_ACTIONFB_DIGUPCACHE				= 94,		// erc				[end, end2]
+	CMD_ACTIONFB_FISHING				= 56,		// cro			    [action (check fish), end(catch fish), end2(not catching anything ]
+	CMD_ACTIONFB_CPR					= 57,		// cro     		    [end]
+	CMD_ACTIONFB_BANDAGE				= 58,		// cro		        [end]
+	CMD_ACTIONFB_CRAFTING				= 59,		// cro		        [end]
+	CMD_ACTIONFB_INTERACT				= 60,		// erc,cro			[end]
+	CMD_ACTIONFB_FORCEFEED				= 62,		// erc,cro          [end]
+	CMD_ACTIONFB_BANDAGETARGET			= 63,		// erc,cro          [end]
+	CMD_ACTIONFB_SPRAYPLANT				= 64,		// cro     		    [end]
+	CMD_ACTIONFB_STARTFIRE				= 65,		// cro			    [end]
+	CMD_ACTIONFB_ANIMALSKINNING			= 66,		// cro				[end]
+	CMD_ACTIONFB_WASHHANDSWELL			= 67,		// cro				[end]
+	CMD_ACTIONFB_WASHHANDSPOND			= 68,		// cro				[end]
+	CMD_ACTIONFB_SALINEBLOODBAGTARGET	= 69,		// erc,cro			[end]
+	CMD_ACTIONFB_SALINEBLOODBAG			= 70,		// erc,cro			[end]
+	CMD_ACTIONFB_STITCHUPSELF			= 71,		// erc,cro			[end]
+	CMD_ACTIONFB_VOMIT					= 72,		// cro				[end]
+	CMD_ACTIONFB_UNRESTRAINTARGET		= 73,		// erc,cro			[end (finish cutting), end2 (cancel cutting)]
+	CMD_ACTIONFB_RESTRAINTARGET			= 74,		// erc,cro			[end (finish tying up), end2 (cancel tying up)]
+	CMD_ACTIONFB_CHECKPULSE				= 76,		// cro				[end]
+	CMD_ACTIONFB_CLEANWOUNDSTARGET		= 78,		// erc, cro			[end]
+	CMD_ACTIONFB_COLLECTBLOODSELF		= 81,		// erc, cro			[end]
+	CMD_ACTIONFB_EMPTY_VESSEL			= 82,		// erc, cro			[end]
+	CMD_ACTIONFB_OPENITEM				= 83,		// pne				[end]
+	CMD_ACTIONFB_HACKBUSH				= 85,		// erc				[end, end2]
+	CMD_ACTIONFB_HACKTREE				= 86,		// erc				[end, end2]
+	CMD_ACTIONFB_TAKETEMPSELF			= 87,		// pne				[end]
+	CMD_ACTIONFB_DIG					= 88,		// erc				[end, end2]
+	CMD_ACTIONFB_DIGUPCACHE				= 89,		// erc				[end, end2]
+	CMD_ACTIONFB_DIGMANIPULATE			= 90,		// erc				[end, end2]
 	CMD_ACTIONFB_DEPLOY_HEAVY			= 95,		// erc				[end, end2]
-	CMD_ACTIONFB_DEPLOY_1HD				= 96,		// cro				[end, end2]
-	CMD_ACTIONFB_DEPLOY_2HD				= 97,		// cro				[end, end2]
+	CMD_ACTIONFB_DEPLOY_2HD				= 96,		// cro				[end, end2]
+	CMD_ACTIONFB_DEPLOY_1HD				= 97,		// cro				[end, end2]
 	CMD_ACTIONFB_BLOWFIREPLACE			= 98,		// cro				[end]
 	CMD_ACTIONFB_VIEWMAP				= 99,		// pne				[end]
 	CMD_ACTIONFB_VIEWCOMPASS			= 100,		// pne				[end]
 	CMD_ACTIONFB_FILLBOTTLEPOND			= 101,		// erc, cro			[end]
 	CMD_ACTIONFB_PLACING_HEAVY			= 102,		// erc				[end, end2]
-	CMD_ACTIONFB_PLACING_1HD			= 103,		// cro				[end, end2]
-	CMD_ACTIONFB_PLACING_2HD			= 104,		// cro				[end, end2]
+	CMD_ACTIONFB_PLACING_2HD			= 103,		// cro				[end, end2]
+	CMD_ACTIONFB_PLACING_1HD			= 104,		// cro				[end, end2]
 	CMD_ACTIONFB_CUTBARK				= 105,		// erc,cro			[end, end2]
 	CMD_ACTIONFB_VIEWNOTE				= 106,		// erc,cro,pne		[end]
 	CMD_ACTIONFB_SEARCHINVENTORY		= 107,		// pne				[end]
-	CMD_ACTIONFB_LOOKOPTICS				= 108,		// pne				[end]
+	CMD_GESTUREFB_LOOKOPTICS			= 108,		// erc,cro,pne		[end]
 	CMD_ACTIONFB_MINEROCK				= 109,		// erc				[end, end2]
-	CMD_ACTIONFB_RAISEMEGAPHONE			= 110,		// pne				[end]
+	CMD_ACTIONFB_RAISEITEM				= 110,		// pne 				[end]
+	CMD_ACTIONFB_RESTRAINEDSTRUGGLE		= 111,		// ,pne 			[end, end2]
+	CMD_ACTIONFB_RESTRAINSELF			= 112,		// erc,cro 			[end]
+	CMD_ACTIONFB_ASSEMBLE				= 113,		// erc,cro			[end, end2]
+	CMD_ACTIONFB_DISASSEMBLE			= 114,		// erc,cro			[end, end2]
 	
 	// onetime 
 	CMD_ACTIONFB_PICKUP_HANDS			= 500,		// pne
@@ -589,18 +652,20 @@ enum DayZPlayerConstants
 	CMD_ACTIONFB_LIGHTFLARE				= 503,		// pne
 	CMD_ACTIONFB_LITCHEMLIGHT			= 504,		// pne
 	CMD_ACTIONFB_UNPINGRENAGE			= 505,		// pne
-	CMD_ACTIONFB_WALKIETALKIEON			= 506,		// pne
-	CMD_ACTIONFB_WALKIETALKIEOFF		= 507,		// pne
+	CMD_ACTIONFB_ITEM_ON				= 506,		// pne
+	CMD_ACTIONFB_ITEM_OFF				= 507,		// pne
 	CMD_ACTIONFB_HANDCUFFTARGET			= 508,		// erc,cro
 	CMD_ACTIONFB_MORPHINE				= 509,		// cro
 	CMD_ACTIONFB_INJECTION				= 510,		// cro
 	CMD_ACTIONFB_INJECTIONTARGET		= 511,		// erc,cro
 	CMD_ACTIONFB_DRINKSIP				= 512,		// cro
 	CMD_ACTIONFB_CLEANHANDSBOTTLE		= 513,		// pne
-	CMD_ACTIONFB_OPENFOOD				= 514,		// pne
+	CMD_ACTIONFB_OPENITEM_ONCE			= 514,		// pne
 	CMD_ACTIONFB_POKE					= 515,		// cro
 	CMD_ACTIONFB_ATTACHSCOPE			= 516,		// pne
 	CMD_ACTIONFB_ATTACHBARREL			= 517,		// pne
+	CMD_ACTIONFB_RESTRAIN				= 518,		// erc,cro,pne
+	CMD_ACTIONFB_PICKUP_HEAVY			= 519,		// erc
 	
     
     //! ---------------------------------------------------------
@@ -609,6 +674,7 @@ enum DayZPlayerConstants
 	
 	// looping actions
 	CMD_ACTIONMOD_STARTENGINE			= 300,    		// [end]
+	CMD_ACTIONMOD_TOOTHORN				= 301,    		// [end]
 	
 	// onetime actions
 	CMD_ACTIONMOD_DRIVER_DOOR_OPEN		= 400,
@@ -616,6 +682,8 @@ enum DayZPlayerConstants
 	CMD_ACTIONMOD_CODRIVER_DOOROPEN		= 402,
 	CMD_ACTIONMOD_CODRIVER_DOORCLOSE	= 403,
 	CMD_ACTIONMOD_STOPENGINE			= 404,
+	CMD_ACTIONMOD_SHIFTGEAR				= 405,
+	CMD_ACTIONMOD_HEADLIGHT				= 406,
 	
 	
 	
@@ -660,6 +728,9 @@ enum DayZPlayerConstants
     CMD_GESTUREMOD_NODHEAD				= 1109,			// erc,cro
     CMD_GESTUREMOD_SHAKEHEAD			= 1110,			// erc,cro
     CMD_GESTUREMOD_SHRUG				= 1111,			// erc,cro
+    CMD_GESTUREMOD_SURRENDER			= 1112,			// erc
+    CMD_GESTUREMOD_SURRENDERIN			= 1112,			// erc
+    CMD_GESTUREMOD_SURRENDEROUT			= 1113,			// erc
 	
     //! --------------------------
     //! fb (full body)
@@ -685,6 +756,7 @@ enum DayZPlayerConstants
     CMD_GESTUREFB_SITA					= 1054,			// cro              [end]
     CMD_GESTUREFB_SITB					= 1055,			// cro              [end]
     CMD_GESTUREFB_DABBING				= 1056,			// erc, cro         [end]
+    CMD_GESTUREFB_KNEEL					= 1057,			// cro   			[end]
 
     // onetime 
     CMD_GESTUREFB_THROAT				= 1100,			// pne
@@ -697,6 +769,9 @@ enum DayZPlayerConstants
 	CMD_GESTUREFB_NODHEAD				= 1110,			// pne
 	CMD_GESTUREFB_SHAKEHEAD				= 1111,			// pne
     CMD_GESTUREFB_SHRUG					= 1112,			// pne
+    CMD_GESTUREFB_SURRENDER				= 1113,			// cro,pne
+    CMD_GESTUREFB_SURRENDERIN			= 1113,			// cro,pne
+    CMD_GESTUREFB_SURRENDEROUT			= 1114,			// cro,pne
 	
 
     //! ---------------------------------------------------------
@@ -707,6 +782,7 @@ enum DayZPlayerConstants
 	CMD_TRAILER_WALKIE_TALKIE 			= 3002,
 	CMD_TRAILER_WOUNDED 				= 3003,
 	CMD_TRAILER_WALK_AWAY 				= 3004,
+	CMD_TRAILER_DEAD 	 				= 3005,
 	
     
     //! ---------------------------------------------------------
@@ -837,6 +913,28 @@ class DayZPlayer extends Human
 	
 	proto native	bool					IsCameraBlending();
 	
+	
+	//! ---------------- deterministic random numbers ------------------------
+
+	/**
+	\brief Random number in range of <0,0xffffffff> - !!! use this only during deterministic simulation (CommandHandler)
+	\return int value in range of <0,0xffffffff>
+	*/
+	proto native	int						Random();
+	
+	/**
+	\brief Random number in range of <0,pRange-1> - !!! use this only during deterministic simulation (CommandHandler)
+	@param pRange upper bounds of random number
+	\return int value in range of <0,pRange-1>
+	*/
+	proto native	float					RandomRange(int pRange);
+
+	/**
+	\brief Random number in range of <0,1> - !!! use this only during deterministic simulation (CommandHandler)
+	\return float value in range of <0,1>
+	*/
+	proto native	float					Random01();
+	
 	//! returns true if player is using EyeZoom, otherwise false
 	bool									IsEyeZoom();
 	//! return true if shots are fired from camere, otherwise false
@@ -849,8 +947,13 @@ class DayZPlayer extends Human
 	//! processes melee hit
 	proto native	MeleeCombatData			GetMeleeCombatData();
 
-	//! processes melee hit
+	//! processes melee hit (uses component index)
 	proto native	void					ProcessMeleeHit(InventoryItem pMeleeWeapon, int pMeleeModeIndex, Object pTarget, int pComponentIndex, vector pHitWorldPos);
+	//! processes melee hit (uses component name)
+	proto native	void					ProcessMeleeHitName(InventoryItem pMeleeWeapon, int pMeleeModeIndex, Object pTarget, string pComponentName, vector pHitWorldPos);
+	
+	//! ---------------- release controls -------------------------
+	proto native	void					ReleaseNetworkControls();
 	
 	//! ---------------- sync stuff -------------------------
 	

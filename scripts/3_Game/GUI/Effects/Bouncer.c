@@ -18,6 +18,8 @@ class Bouncer
 	// -----------------------------------------------------------
 	protected void Update()
 	{
+Print("Update");
+		
 		if (m_root)
 		{
 			float p = amount * m_anim.GetValue();

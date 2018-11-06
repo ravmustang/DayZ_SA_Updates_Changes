@@ -152,7 +152,7 @@ class FishingRod_Base : ItemBase
 	void Pulling()
 	{	
 		float agent_speed_distance = vector.Distance("0 0 0",m_Player.GetModelSpeed());
-		if (m_Player.GetItemInHands() != this || !m_Player.IsWaterContact() || agent_speed_distance > 1 )
+		if (m_Player.GetItemInHands() != this || !m_Player.IsInWater() || agent_speed_distance > 1 )
 		{
 			End(INTERUPTED);
 		}

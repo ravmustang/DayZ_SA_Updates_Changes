@@ -51,7 +51,7 @@ class AITargetCallbacksPlayer : AITargetCallbacks
 		float playerVisCoef = 1.0;
 		
 		//! player speed mofifications
-		switch(state.m_iMovement)
+		switch(AITargetCallbacksPlayer.StanceToMovementIdxTranslation(state))
 		{
 			case DayZPlayerConstants.MOVEMENT_RUN:
 				speedCoef = 0.66;
@@ -62,7 +62,7 @@ class AITargetCallbacksPlayer : AITargetCallbacks
 				break;
 				
 			case DayZPlayerConstants.MOVEMENT_IDLE:
-				speedCoef = 0.11;
+				speedCoef = 0.0;
 				break;
 		}
 
@@ -71,12 +71,12 @@ class AITargetCallbacksPlayer : AITargetCallbacks
 		{
 			case DayZPlayerConstants.STANCEIDX_CROUCH:
 			case DayZPlayerConstants.STANCEIDX_RAISEDCROUCH:
-				stanceCoef = 0.66;
+				stanceCoef = 0.33;
 				break;
 				
 			case DayZPlayerConstants.STANCEIDX_PRONE:
 			case DayZPlayerConstants.STANCEIDX_RAISEDPRONE:
-				stanceCoef = 0.33;
+				stanceCoef = 0.11;
 				break;
 		}
 		
@@ -88,7 +88,48 @@ class AITargetCallbacksPlayer : AITargetCallbacks
 		
 		return mod;
 	}
+	
+	//! Translates players speed (idx) and corrects it by current stance
+	//! used mainly for visibility/audibility of player to AI
+	static int StanceToMovementIdxTranslation(HumanMovementState pState)
+	{
+		int movementSpeed = 0;
 
+		switch(pState.m_iStanceIdx)
+		{
+		case DayZPlayerConstants.STANCEIDX_CROUCH:
+			switch(pState.m_iMovement)
+			{
+			case DayZPlayerConstants.MOVEMENTIDX_IDLE:
+				movementSpeed = DayZPlayerConstants.MOVEMENTIDX_IDLE;
+				break;
+			case DayZPlayerConstants.MOVEMENTIDX_WALK:
+			case DayZPlayerConstants.MOVEMENTIDX_RUN:
+				movementSpeed = DayZPlayerConstants.MOVEMENTIDX_WALK;
+				break;
+			case DayZPlayerConstants.MOVEMENTIDX_SPRINT:
+				movementSpeed = DayZPlayerConstants.MOVEMENTIDX_RUN;
+				break;
+			}
+			break;
+		case DayZPlayerConstants.STANCEIDX_PRONE:
+			switch(pState.m_iMovement)
+			{
+			case DayZPlayerConstants.MOVEMENTIDX_IDLE:
+				movementSpeed = DayZPlayerConstants.MOVEMENTIDX_IDLE;
+				break;
+			default:
+				movementSpeed = DayZPlayerConstants.MOVEMENTIDX_WALK;
+				break;
+			}
+			break;
+		default:
+			movementSpeed = pState.m_iMovement;
+		}
+		
+		return movementSpeed;
+	}
+	
 	private PlayerBase m_Player;
 	private int m_iHeadBoneIndex;
 	private int m_iChestBoneIndex;

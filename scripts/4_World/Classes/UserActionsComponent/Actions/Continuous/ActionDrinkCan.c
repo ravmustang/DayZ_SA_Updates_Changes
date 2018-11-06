@@ -2,8 +2,8 @@ class ActionDrinkCan: ActionDrink
 {
 	void ActionDrinkCan()
 	{
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_DRINKCAN;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_DRINKCAN;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_DRINK;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_DRINK;
 	}
 	
 	override int GetType()
@@ -13,6 +13,6 @@ class ActionDrinkCan: ActionDrink
 	
 	override string GetText()
 	{
-		return "Drink can";
+		return "#drink_the_can";
 	}
 };

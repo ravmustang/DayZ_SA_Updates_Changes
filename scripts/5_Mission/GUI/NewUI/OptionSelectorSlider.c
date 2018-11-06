@@ -19,7 +19,7 @@ class OptionSelectorSlider extends OptionSelectorBase
 		m_ParentClass				= parent_menu;
 		m_Slider					= SliderWidget.Cast( m_Root.FindAnyWidget( "option_value" ) );
 		m_Slider.SetCurrent( value );
-		//m_Parent.SetFlags( WidgetFlags.NOFOCUS );
+		
 		m_DisablePanel				= m_Parent.GetParent().FindAnyWidget( m_Parent.GetName() + "_disable" );
 		
 		m_MinValue					= min;
@@ -80,7 +80,11 @@ class OptionSelectorSlider extends OptionSelectorBase
 	
 	override bool IsFocusable( Widget w )
 	{
-		return ( w == m_Parent || w == m_Slider );
+		if( w )
+		{
+			return ( w == m_Parent || w == m_Slider );
+		}
+		return false;
 	}
 	
 	float NormalizeInput( float value )

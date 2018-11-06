@@ -20,7 +20,7 @@ class ActionExitLadder: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Exit ladder";
+		return "#exit_ladder";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -38,6 +38,7 @@ class ActionExitLadder: ActionInteractBase
 	//! 
 	override void Start( ActionData action_data )
 	{
+		super.Start( action_data );
 	    HumanCommandLadder cl = action_data.m_Player.GetCommand_Ladder();
 		if (cl)
 		{

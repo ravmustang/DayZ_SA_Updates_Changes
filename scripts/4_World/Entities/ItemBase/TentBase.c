@@ -1,24 +1,144 @@
 class TentBase extends ItemBase
 {
-	static const int PACKED 	= 0;
-	static const int PITCHED 	= 1;
+	protected const bool PACKED 	= false;
+	protected const bool PITCHED 	= true;
 	
-	private int m_State;
+	protected bool m_State;
+	protected bool m_IsEntrance;
+	protected bool m_IsWindow;
+	protected bool m_IsToggle;
 	
-	protected ref map< ref ToggleSelections, bool> m_ToggleSelections;
-	protected ref array<string> m_ShowSelectionsWhenPitched;
-	protected ref array<string> m_HideSelectionsWhenPacked;
+	protected ref map< ref ToggleAnimations, bool> m_ToggleAnimations;
+	protected ref array<string> m_ShowAnimationsWhenPitched;
+	protected ref array<string> m_ShowAnimationsWhenPacked;
+	protected Object m_ClutterCutter;
 	
 	void TentBase()
 	{
-		m_ToggleSelections = new map<ref ToggleSelections, bool>;
-		m_ShowSelectionsWhenPitched = new array<string>;
-		m_HideSelectionsWhenPacked = new array<string>;
+		m_ToggleAnimations = new map<ref ToggleAnimations, bool>;
+		m_ShowAnimationsWhenPitched = new array<string>;
+		m_ShowAnimationsWhenPacked = new array<string>;
+		RegisterNetSyncVariableBool("m_State");
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
+		RegisterNetSyncVariableBool("m_IsEntrance");
+		RegisterNetSyncVariableBool("m_IsWindow");
+		RegisterNetSyncVariableBool("m_IsToggle");
 	}
 	
-	void Init()
+	void ~TentBase()
 	{
-		Pack( false );
+		if ( GetGame() )
+		{
+			DestroyClutterCutter();
+		}
+	}
+	
+	override void OnStoreSave( ParamsWriteContext ctx )
+	{   
+		super.OnStoreSave( ctx );
+		
+		ctx.Write( m_State );
+	}
+	
+	override void OnStoreLoad( ParamsReadContext ctx )
+	{
+		super.OnStoreLoad( ctx );
+		
+		ctx.Read( m_State );
+		
+		if ( GetState() == PITCHED )
+		{
+			Pitch();
+		}
+		else
+		{
+			Pack();
+		}
+	}
+	
+	override void EEInit()
+	{
+		super.EEInit();
+		
+		if ( GetState() == PITCHED )
+		{
+			Pitch();
+		}
+		else
+		{
+			Pack();
+		}
+	}
+	
+	override void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner)
+	{		
+		super.OnItemLocationChanged(old_owner, new_owner);
+		
+		if ( new_owner || old_owner )
+		{
+			Pack();
+		}
+	}
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+			
+		if ( GetState() == PITCHED )
+		{	
+			if ( IsManipulatedEntrance() && IsSoundSynchRemote() )
+			{						
+				if ( m_IsToggle )
+				{
+					SoundTentOpenPlay();
+				}
+				else
+				{
+					SoundTentClosePlay();
+				}	
+			}
+			else if ( IsManipulatedWindow() && IsSoundSynchRemote() )
+			{						
+				if ( m_IsToggle )
+				{
+					SoundTentOpenWindowPlay();
+				}
+				else
+				{
+					SoundTentCloseWindowPlay();
+				}
+			}
+			else
+			{
+				Pitch();
+			}
+		}
+		else
+		{
+			Pack();
+		}			
+	}
+
+	void HideAllAnimationsAndProxyPhysics()
+	{		
+		string cfg_path = "cfgVehicles " + GetType() + " AnimationSources";
+		
+		if ( GetGame().ConfigIsExisting( cfg_path ) )
+		{
+			int	selections = GetGame().ConfigGetChildrenCount( cfg_path );
+			string proxy_selection_name;
+			
+			for ( int i = 0; i < selections; i++ )
+			{
+				string selection_name;
+				GetGame().ConfigGetChildName( cfg_path, i, selection_name );
+				SetAnimationPhase( selection_name, 1 );
+				
+				proxy_selection_name = selection_name;
+				proxy_selection_name.ToLower();	
+				RemoveProxyPhysics( proxy_selection_name );
+			}
+		}
 	}
 	
 	override bool IsDeployable()
@@ -60,54 +180,59 @@ class TentBase extends ItemBase
 	{
 		super.EEItemAttached(item, slot_name);
 		
-		if ( !g_Game.IsServer() ) return;
-
-		if ( item.IsInherited(XmasLights) ) 
+		if ( item.IsKindOf ( "CamoNet" ) ) 
 		{
-			XmasLights fence_light = XmasLights.Cast( item );
-			fence_light.AttachToObject(this);
-			SetAnimationPhase( "xlights", 0 );
-		}
-		else if ( item.IsKindOf ( "CamoNet" ) ) 
-		{
-			SetAnimationPhase( "camonet", 0 );
+			SetAnimationPhase( "Camonet", 0 );
 			
-			RegenerateNavmesh();
+			if ( !IsKindOf ( "MediumTent" ) )
+			{
+				AddProxyPhysics( "camonet" );
+			}		
+		}
+		
+		if ( item.IsKindOf ( "XmasLights" ) ) 
+		{
+			SetAnimationPhase( "Xlights", 0 );
+			SetAnimationPhase( "Xlights_glass_r", 0 );
+			SetAnimationPhase( "Xlights_glass_g", 0 );
+			SetAnimationPhase( "Xlights_glass_b", 0 );
+			SetAnimationPhase( "Xlights_glass_y", 0 );
+			
+			XmasLights xlights = XmasLights.Cast( item );
+			xlights.AttachToObject( this );
 		}
 	}
 
 	override void EEItemDetached(EntityAI item, string slot_name)
 	{
 		super.EEItemDetached(item, slot_name);
-		
-		if ( !g_Game.IsServer() ) return;
-		
-		if ( item.IsInherited(XmasLights) ) 
+				
+		if ( item.IsKindOf ( "CamoNet" ) ) 
 		{
-			XmasLights fence_light = XmasLights.Cast( item );
-			fence_light.DetachFromObject(this);
-			SetAnimationPhase( "xlights", 1 );
-			SetAnimationPhase( "placing", 0 );
-		}
-		else if ( item.IsKindOf ( "CamoNet" ) ) 
-		{
-			SetAnimationPhase( "camonet", 1 );
-			SetAnimationPhase( "placing", 0 );
+			SetAnimationPhase( "Camonet", 1 );
 			
-			RegenerateNavmesh();
+			if ( !IsKindOf ( "MediumTent" ) )
+			{
+				RemoveProxyPhysics( "camonet" );
+			}
 		}
-	}
-	
-	override void OnPlacementStarted( Man player )
-	{
-		super.OnPlacementStarted( player );
 		
-		Pitch( false );
+		if ( item.IsKindOf ( "XmasLights" ) ) 
+		{
+			SetAnimationPhase( "Xlights", 1 );
+			SetAnimationPhase( "Xlights_glass_r", 1 );
+			SetAnimationPhase( "Xlights_glass_g", 1 );
+			SetAnimationPhase( "Xlights_glass_b", 1 );
+			SetAnimationPhase( "Xlights_glass_y", 1 );
+			
+			XmasLights xlights = XmasLights.Cast( item );
+			xlights.DetachFromObject( this );
+		}
 	}
 	
 	override void OnPlacementComplete( Man player )
 	{
-		Pitch();
+		Pitch( true );
 	}
 	
 	int GetState()
@@ -140,57 +265,136 @@ class TentBase extends ItemBase
 		}
 	}
 	
-	void Pack( bool update_navmesh = true )
+	bool CanAttach( ItemBase item )
 	{
-		//Print("PACKING");
-		m_State = PACKED;
-		if (GetInventory())
-			DestroyInventory();
-		
-		SetAnimationPhase( "placing", 1 );
-		SetAnimationPhase( "inventory", 0 );
-		
-		for ( int i = 0; i < m_HideSelectionsWhenPacked.Count(); i++ )
+		if ( item.IsKindOf ( "CamoNet" ) && GetState() == PITCHED ) 
 		{
-			SetAnimationPhase( m_HideSelectionsWhenPacked.Get(i), 1 );
+			return true;
 		}
+		
+		return false;
+	}
+	
+	void Pack( bool update_navmesh = true )
+	{	
+		HideAllAnimationsAndProxyPhysics();
+		
+		m_State = PACKED;
+		m_IsEntrance = PACKED;
+		m_IsWindow = PACKED;
+		m_IsToggle = PACKED;
+		
+		Refresh();
+				
+		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
 		
 		if ( update_navmesh ) 
 		{
-			//Print("Pack->RegenerateNavmesh");
 			RegenerateNavmesh();	
 		}
+						
+		DestroyClutterCutter();
+		
+		SetViewIndex( PACKED );
+		
+		SetSynchDirty();
 	}
 
 	void Pitch( bool update_navmesh = true )
-	{
-		//Print("PITCHING");
+	{		
+		HideAllAnimationsAndProxyPhysics();
+		
 		m_State = PITCHED;
-		if (!GetInventory())
-			CreateAndInitInventory();
+		m_IsEntrance = PITCHED;
+		m_IsWindow = PITCHED;
+		m_IsToggle = PITCHED;
 		
-		SetAnimationPhase( "placing", 0 );
-		SetAnimationPhase( "inventory", 1 );
+		Refresh();
 		
-		for ( int i = 0; i < m_ShowSelectionsWhenPitched.Count(); i++ )
-		{
-			SetAnimationPhase( m_ShowSelectionsWhenPitched.Get(i), 0 );
-		}
+		GetInventory().UnlockInventory(HIDE_INV_FROM_SCRIPT);
 		
 		if ( update_navmesh ) 
 		{
-			//Print("Pitch->RegenerateNavmesh");
-			RegenerateNavmesh();	
+			RegenerateNavmesh();
 		}
+		
+		SetViewIndex( PITCHED );
+
+		SetSynchDirty();
 	}
 	
-	bool CanToggleSelection( string selection )
+	void UpdateVisuals()
 	{
-		for ( int i = 0; i < m_ToggleSelections.Count(); i++ )
+		string proxy_selection_name;
+		string animation_name;
+		
+		if ( GetState() == PITCHED )
+		{	
+			for ( int i = 0; i < m_ShowAnimationsWhenPitched.Count(); i++ )
+			{
+				animation_name = m_ShowAnimationsWhenPitched.Get(i);
+				
+				SetAnimationPhase( animation_name, 0 );
+			}
+		}
+		else
+		{	
+			for ( int j = 0; j < m_ShowAnimationsWhenPacked.Count(); j++ )
+			{
+				animation_name = m_ShowAnimationsWhenPacked.Get(j);
+				
+				SetAnimationPhase( animation_name, 0 );
+			}
+		}		
+	}
+	
+	void UpdatePhysics()
+	{
+		string proxy_selection_name;
+		string animation_name;
+		
+		if ( GetState() == PITCHED )
+		{	
+			for ( int i = 0; i < m_ShowAnimationsWhenPitched.Count(); i++ )
+			{
+				animation_name = m_ShowAnimationsWhenPitched.Get(i);
+				
+				proxy_selection_name = animation_name;
+				proxy_selection_name.ToLower();
+				AddProxyPhysics( proxy_selection_name );
+			}
+		}
+		else
+		{	
+			for ( int j = 0; j < m_ShowAnimationsWhenPacked.Count(); j++ )
+			{
+				animation_name = m_ShowAnimationsWhenPacked.Get(j);
+				
+				proxy_selection_name = animation_name;
+				proxy_selection_name.ToLower();
+				AddProxyPhysics( proxy_selection_name );
+			}
+		}	
+	}
+	
+	//refresh visual/physics state
+	void Refresh()
+	{
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( UpdateVisuals );
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( UpdatePhysics, 100, false );
+	}
+	
+	bool CanToggleAnimations( string selection )
+	{		
+		for ( int i = 0; i < m_ToggleAnimations.Count(); i++ )
 		{
-			ToggleSelections toggle = m_ToggleSelections.GetKey(i);
+			ToggleAnimations toggle = m_ToggleAnimations.GetKey(i);
+			string toggle_off = toggle.GetToggleOff();
+			toggle_off.ToLower();
+			string toggle_on = toggle.GetToggleOn();
+			toggle_on.ToLower();
 			
-			if ( toggle.GetToggleOff() == selection || toggle.GetToggleOn() == selection )
+			if ( toggle_off == selection || toggle_on == selection )
 			{
 				return true;
 			}
@@ -199,29 +403,134 @@ class TentBase extends ItemBase
 		return false;
 	}
 
-	void ToggleSelection( string selection )
+	void ResetToggle()
 	{
-		//Print("TOGGLE SELLECTIONS");
-		for ( int i = 0; i < m_ToggleSelections.Count(); i++ )
+		m_IsEntrance = false;
+		m_IsWindow = false;
+		m_IsToggle = false;
+	}
+	
+	void ManipulateEntrance()
+	{
+		m_IsEntrance = true;
+	}
+	
+	void ManipulateWindow()
+	{
+		m_IsWindow = true;
+	}
+	
+	bool IsManipulatedEntrance()
+	{
+		return m_IsEntrance;
+	}
+	
+	bool IsManipulatedWindow()
+	{
+		return m_IsWindow;
+	}
+	
+	void ToggleAnimation( string selection )
+	{	
+		ResetToggle();
+		
+		for ( int i = 0; i < m_ToggleAnimations.Count(); i++ )
 		{
-			ToggleSelections toggle = m_ToggleSelections.GetKey(i);
+			ToggleAnimations toggle = m_ToggleAnimations.GetKey(i);
 			
-			if ( toggle.GetToggleOff() == selection || toggle.GetToggleOn() == selection )
-			{
-				if ( m_ToggleSelections.GetElement(i) )
+			string toggle_off = toggle.GetToggleOff();
+			toggle_off.ToLower();
+			string toggle_on = toggle.GetToggleOn();
+			toggle_on.ToLower();
+						
+			if ( toggle_off == selection || toggle_on == selection )
+			{				
+				if ( m_ToggleAnimations.GetElement(i) )
 				{
 					SetAnimationPhase( toggle.GetToggleOff(), 0 );
+					AddProxyPhysics( toggle.GetToggleOff() );
 					SetAnimationPhase( toggle.GetToggleOn(), 1 );
-					m_ToggleSelections.Set( toggle, false );
+					RemoveProxyPhysics( toggle.GetToggleOn() );
+					m_ToggleAnimations.Set( toggle, false );
+					m_IsToggle = true;
+										
+					if ( selection.IndexOfFrom( 0, "entrance" ) )
+					{
+						ManipulateWindow();
+					}
+					
+					if ( selection.IndexOfFrom( 0, "window" ) )
+					{
+						ManipulateEntrance();
+					}
 				}
 				else
-				{
+				{				
 					SetAnimationPhase( toggle.GetToggleOff(), 1 );
+					RemoveProxyPhysics( toggle.GetToggleOff() );
 					SetAnimationPhase( toggle.GetToggleOn(), 0 );
-					m_ToggleSelections.Set( toggle, true );
+					AddProxyPhysics( toggle.GetToggleOn() );
+					m_ToggleAnimations.Set( toggle, true );
+					m_IsToggle = false;
+					
+					if ( selection.IndexOfFrom( 0, "entrance" ) )
+					{
+						ManipulateWindow();
+					}
+					
+					if ( selection.IndexOfFrom( 0, "window" ) )
+					{
+						ManipulateEntrance();
+					}
 				}
 			}
 		}
+		
+		SoundSynchRemote();
+	}
+	
+	string GetSoundOpen()
+	{
+		return "";
+	}
+	
+	string GetSoundClose()
+	{
+		return "";
+	}
+	
+	string GetSoundOpenWindow()
+	{
+		return "";
+	}
+	
+	string GetSoundCloseWindow()
+	{
+		return "";
+	}
+	
+	void SoundTentOpenPlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( GetSoundOpen(), GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
+	
+	void SoundTentClosePlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( GetSoundClose(), GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
+	
+	void SoundTentOpenWindowPlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( GetSoundOpenWindow(), GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
+	
+	void SoundTentCloseWindowPlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( GetSoundCloseWindow(), GetPosition() );
+		sound.SetSoundAutodestroy( true );
 	}
 	
 	void RegenerateNavmesh()
@@ -229,5 +538,16 @@ class TentBase extends ItemBase
 		SetAffectPathgraph( true, false );
 		
 		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().UpdatePathgraphRegionByObject, 100, false, this);
+	}
+	
+	void DestroyClutterCutter()
+	{
+		if ( GetGame().IsMultiplayer() || GetGame().IsServer() )
+		{
+			if ( m_ClutterCutter )
+			{
+				GetGame().ObjectDelete( m_ClutterCutter );
+			}
+		}
 	}
 };

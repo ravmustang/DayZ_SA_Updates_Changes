@@ -4,19 +4,30 @@ class HescoBox extends Inventory_Base
 	static const int UNFOLDED 		= 1;
 	static const int FILLED 		= 2;
 	
-	ref array<string> m_SurfaceForSetup;
+	static ref array<string> 		m_SurfaceForSetup;
+	ref Timer 						m_Timer;
 
 	protected int m_State;
 	
 	void HescoBox()
 	{
 		m_State = FOLDED;
-		m_SurfaceForSetup = new array<string>;
+		
+		if (!m_SurfaceForSetup)
+		{
+			m_SurfaceForSetup = new array<string>;
+			InsertMaterialForSetup();
+		}
 		
 		//synchronized variables
 		RegisterNetSyncVariableInt( "m_State", FOLDED, FILLED );
 	}
 
+	override string GetDeploySoundset()
+	{
+		return "hescobox_deploy_SoundSet";
+	}
+	
 	override bool IsHeavyBehaviour()
 	{
 		return true;
@@ -56,11 +67,7 @@ class HescoBox extends Inventory_Base
 	
 	void RefreshVisuals()
 	{
-		if( GetState() == FOLDED )
-		{
-			m_SurfaceForSetup.Clear();		
-		}
-		else if( GetState() == UNFOLDED )
+		if( GetState() == UNFOLDED )
 		{
 			InsertMaterialForSetup();
 		}
@@ -107,13 +114,15 @@ class HescoBox extends Inventory_Base
 		this.HideSelection( "placing" );
 		this.HideSelection( "filled" );
 		
-		m_SurfaceForSetup.Clear();
-
 		SetState( FOLDED );
+		RefreshPhysics();
 		
-		Synchronize();
-		
-		DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+		if ( GetGame().IsServer() )
+		{
+			SetAllowDamage(true);
+			Synchronize();
+			DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+		}
 	}
 
 	void Unfold()
@@ -121,16 +130,63 @@ class HescoBox extends Inventory_Base
 		this.HideSelection( "inventory" );
 		this.ShowSelection( "placing" );
 		this.HideSelection( "filled" );
-	
+		
 		InsertMaterialForSetup();
-
 		SetState( UNFOLDED );
+		RefreshPhysics();
 		
-		Synchronize();
-		
-		DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+		if ( GetGame().IsServer() )
+		{
+			SetAllowDamage(true);
+			Synchronize();
+			DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+		}
 	}
 
+	override void EEItemLocationChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
+	{
+		super.EEItemLocationChanged (oldLoc, newLoc);
+		
+		RefreshPhysics();
+	}
+	
+	void RefreshPhysicsDelayed()
+	{
+		if ( this  &&  !ToDelete() )
+		{
+			RemoveProxyPhysics( "inventory" );
+			RemoveProxyPhysics( "placing" );
+			RemoveProxyPhysics( "filled" );
+			
+			int state = GetState();
+			
+			switch (state)
+			{
+				case UNFOLDED:
+					//ShowSelection( "placing" );
+					AddProxyPhysics( "placing" ); 
+					
+				return;
+				
+				case FOLDED:
+					AddProxyPhysics( "inventory" ); 
+				return;
+				
+				case FILLED:
+					AddProxyPhysics( "filled" ); 
+				return;
+			}
+		}
+	}
+	
+	void RefreshPhysics()
+	{
+		if (!m_Timer)
+			m_Timer = new Timer( CALL_CATEGORY_GAMEPLAY );
+		
+		m_Timer.Run(0.1, this, "RefreshPhysicsDelayed");
+	}
+	
 	void InsertMaterialForSetup()
 	{	
 		m_SurfaceForSetup.Insert("cp_dirt");
@@ -154,9 +210,49 @@ class HescoBox extends Inventory_Base
 		this.ShowSelection( "filled" );
 		
 		SetState( FILLED );
-
-		Synchronize();
+		RefreshPhysics();
 		
-		DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+		if ( GetGame().IsServer() )
+		{
+			Synchronize();
+			DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+			SetAllowDamage(false);
+		}
+	}
+	
+	override void OnStoreSave(ParamsWriteContext ctx)
+	{   
+		super.OnStoreSave(ctx);
+		
+		// Save state
+		ctx.Write( m_State );
+	}
+
+	override void OnStoreLoad(ParamsReadContext ctx)
+	{   
+		super.OnStoreLoad(ctx);
+		
+		// Load folded/unfolded state
+		int state = FOLDED;
+		ctx.Read(state);
+		
+		switch (state)
+		{
+			case FOLDED:
+			{
+				Fold();
+				break;
+			}
+			case UNFOLDED:
+			{
+				Unfold();
+				break;
+			}
+			case FILLED:
+			{
+				Fill();
+				break;
+			}
+		}
 	}
 }

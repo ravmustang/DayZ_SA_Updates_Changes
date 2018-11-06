@@ -45,7 +45,7 @@ class UIPropertyAttachment
 			{				
 				PluginDeveloper 	module_dev = PluginDeveloper.Cast( GetPlugin(PluginDeveloper) );
 					
-				EntityAI e = module_dev.SpawnEntityAsAttachment(PluginSceneManager.PLAYER, m_Obj, m_ComboItems.Get(curr_index), 0, -1);
+				EntityAI e = module_dev.SpawnEntityAsAttachment(PluginSceneManager.PLAYER, m_Obj, m_ComboItems.Get(curr_index), 1, -1);
 			}
 				
 			m_PrevIndex = curr_index;

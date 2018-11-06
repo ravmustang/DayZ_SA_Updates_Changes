@@ -21,7 +21,7 @@ class ActionStopEngine: ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "Stop engine";
+		return "#stop_engine";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -36,7 +36,8 @@ class ActionStopEngine: ActionSingleUseBase
 			{
 				if ( Class.CastTo(car, trans) &&  car.IsEngineOn() )
 				{
-					return true;
+					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
+						return true;
 				}
 			}
 		}
@@ -55,7 +56,6 @@ class ActionStopEngine: ActionSingleUseBase
 			{
 				if ( Class.CastTo(car, trans) )
 				{
-					car.Leak( CarFluid.FUEL, 21);
 					car.EngineStop();
 				}
 			}
@@ -78,5 +78,10 @@ class ActionStopEngine: ActionSingleUseBase
 				}
 			}
 		}
+	}
+	
+	override bool CanBeUsedInVehicle()
+	{
+		return true;
 	}
 };

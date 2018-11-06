@@ -178,13 +178,27 @@ class SoftSkillsManager
 		
 		GetPreciseRoughLevels();
 
-		if ( specialty_weight < 0 )
-		{			
-			adjusted_value = base_value + ( ( base_value * m_PreciseLevel ) / limit_efficiency );
+		if ( limit_efficiency != 0 )
+		{
+			if ( specialty_weight < 0 )
+			{			
+				adjusted_value = base_value + ( ( base_value * m_PreciseLevel ) / limit_efficiency );
+			}
+			else
+			{
+				adjusted_value = base_value + ( ( base_value * m_RoughLevel ) / limit_efficiency );
+			}
 		}
 		else
 		{
-			adjusted_value = base_value + ( ( base_value * m_RoughLevel ) / limit_efficiency );
+			if ( specialty_weight < 0 )
+			{			
+				adjusted_value = base_value + ( ( base_value * m_PreciseLevel ) );
+			}
+			else
+			{
+				adjusted_value = base_value + ( ( base_value * m_RoughLevel ) );
+			}
 		}
 
 		SetBonusAfter( is_cacomponent, adjusted_value );
@@ -208,13 +222,27 @@ class SoftSkillsManager
 		
 		GetPreciseRoughLevels();
 
-		if ( specialty_weight < 0 )
+		if ( limit_efficiency != 0 )
 		{
-			adjusted_value = base_value - ( ( base_value * m_PreciseLevel  ) / limit_efficiency );
+			if ( specialty_weight < 0 )
+			{
+				adjusted_value = base_value - ( ( base_value * m_PreciseLevel  ) / limit_efficiency );
+			}
+			else
+			{
+				adjusted_value = base_value - ( ( base_value * m_RoughLevel ) / limit_efficiency );
+			}
 		}
 		else
 		{
-			adjusted_value = base_value - ( ( base_value * m_RoughLevel ) / limit_efficiency );
+			if ( specialty_weight < 0 )
+			{
+				adjusted_value = base_value - ( ( base_value * m_PreciseLevel  ) );
+			}
+			else
+			{
+				adjusted_value = base_value - ( ( base_value * m_RoughLevel ) );
+			}
 		}
 
 		SetBonusAfter( is_cacomponent, adjusted_value );
@@ -590,7 +618,12 @@ class SoftSkillManagerDebug
 	{
 		if ( GetActiveSoftSkillManager().GetSoftSkillsPlayer().IsAlive() )
 		{
-			SpecialtyTotal.SetText( "Specialty level: " + GetActiveSoftSkillManager().GetSpecialtyLevel() );
+			float speciality = GetActiveSoftSkillManager().GetSpecialtyLevel();
+			speciality = speciality * 100;
+			speciality = Math.Round( speciality );
+			speciality = speciality * 0.01;
+			
+			SpecialtyTotal.SetText( "Specialty level: " + speciality.ToString() );
 			SpecialtyChange.SetText( "Specialty change: " + GetActiveSoftSkillManager().GetLastUAValue() );
 			ComponentBonusBefore.SetText( "Component/craft default: " + GetActiveSoftSkillManager().GetComponentBonusBefore() );
 			ComponentBonusAfter.SetText( "Component/craft with bonus: " + GetActiveSoftSkillManager().GetComponentBonusAfter() );

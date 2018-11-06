@@ -19,6 +19,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	protected TextWidget				m_ServerMode;
 	protected TextWidget				m_ServerBattleye;
 	protected TextWidget				m_ServerIP;
+	protected TextWidget				m_ServerAcceleration;
 	
 	protected bool						m_IsExpanded;
 	protected bool						m_IsFavorited;
@@ -54,9 +55,15 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerMode			= TextWidget.Cast( m_Root.FindAnyWidget( "mode_text" ) );
 		m_ServerBattleye		= TextWidget.Cast( m_Root.FindAnyWidget( "battlleye_text" ) );
 		m_ServerIP				= TextWidget.Cast( m_Root.FindAnyWidget( "ip_text" ) );
+		m_ServerAcceleration	= TextWidget.Cast( m_Root.FindAnyWidget( "server_acceleration_text" ) );
 		
 		m_Index					= index;
 		m_Tab					= tab;
+		
+		m_ServerTime.LoadImageFile( 0, "set:dayz_gui image:icon_sun" );
+		m_ServerTime.LoadImageFile( 1, "set:dayz_gui image:icon_sun_accel" );
+		m_ServerTime.LoadImageFile( 2, "set:dayz_gui image:icon_moon" );
+		m_ServerTime.LoadImageFile( 3, "set:dayz_gui image:icon_moon_accel" );
 		
 		float alpha = 0.1;
 		if( m_Index % 2 )
@@ -197,7 +204,11 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_Root || w == m_Favorite || w == m_Expand );
+		if( w )
+		{
+			return ( w == m_Root || w == m_Favorite || w == m_Expand );
+		}
+		return false;
 	}
 	
 	void FillInfo( GetServersResultRow server_info )
@@ -208,16 +219,17 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		SetPasswordLocked( server_info.m_IsPasswordProtected );
 		SetPopulation( server_info.m_CurrentNumberPlayers, server_info.m_MaxPlayers );
 		SetSlots( server_info.m_MaxPlayers );
-		SetPing( -1 );
-		SetTime( -1 );
+		SetPing( server_info.m_Ping );
+		SetTime( server_info.m_TimeOfDay, server_info.m_EnvironmentTimeMul );
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 			SetShard( server_info.m_Official );
-			SetCharacterAlive( "Missing data" );
-			SetFriends( {"Missing data"} );
-			SetMode( server_info.m_ModeId );
+			SetCharacterAlive( server_info.m_CharactersAlive );
+			SetFriends( server_info.m_SteamFriends );
+			SetMode( server_info.m_Disable3rdPerson );
 			SetBattleye( server_info.m_AntiCheat );
-			SetIP( server_info.m_HostIp + ":" + server_info.m_HostPort.ToString() );
+			SetIP( server_info.m_Id );
+			SetAcceleration( server_info.m_EnvironmentTimeMul );
 		#endif
 		#endif
 	}
@@ -238,15 +250,15 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		string pop_text;
 		float pop_percentage = population / slots;
 		if( population == 0 )
-			pop_text	= "Empty";
+			pop_text	= "#server_browser_entry_empty";
 		else if( pop_percentage < 0.33 )
-			pop_text	= "Low (" + population.ToString() + ")" ;
+			pop_text	= "#server_browser_entry_low" + population.ToString() + ")" ;
 		else if( pop_percentage < 0.66 )
-			pop_text	= "Medium (" + population.ToString() + ")" ;
+			pop_text	= "#server_browser_entry_medium" + population.ToString() + ")" ;
 		else if( pop_percentage != 1 )
-			pop_text	= "High (" + population.ToString() + ")" ;
+			pop_text	= "#server_browser_entry_high" + population.ToString() + ")" ;
 		else
-			pop_text	= "Full";
+			pop_text	= "#server_browser_entry_full";
 		*/
 		m_ServerPopulation.SetText( population.ToString() );
 	}
@@ -272,9 +284,35 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerPing.SetText( ping.ToString() );
 	}
 	
-	void SetTime( int time )
+	void SetTime( string time, float multiplier )
 	{
-		//m_ServerTime.SetText( time.ToString() );
+		if( time != "" )
+		{
+			TStringArray arr	= new TStringArray;
+			
+			time.Split( ":", arr );
+			
+			if( arr.Count() == 2 )
+			{
+				int hour		= arr.Get( 0 ).ToInt();
+				int minute		= arr.Get( 1 ).ToInt();
+				
+				if( hour >= 19 || hour <= 5 )	//Night
+				{
+					if( multiplier > 1 )
+						m_ServerTime.SetImage( 3 );
+					else
+						m_ServerTime.SetImage( 2 );
+				}
+				else							//Day
+				{
+					if( multiplier > 1 )
+						m_ServerTime.SetImage( 1 );
+					else
+						m_ServerTime.SetImage( 0 );
+				}
+			}
+		}
 	}
 	
 	void SetShard( int shard )
@@ -284,12 +322,12 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		{
 			case 0:
 			{
-				text = "Private";
+				text = "#server_browser_entry_private";
 				break;
 			}
 			case 1:
 			{
-				text = "Official";
+				text = "#server_browser_entry_official";
 				break;
 			}
 		}
@@ -301,17 +339,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerCharacterAlive.SetText( char_alive );
 	}
 	
-	void SetFriends( array<string> friends )
+	void SetFriends( string friends_text )
 	{
-		string friends_text;
-		if( friends && friends.Count() > 0 )
-		{
-			friends_text = friends.Get( 0 );
-			for( int i = 1; i < friends.Count(); i++ )
-			{
-				friends_text += ", " + friends.Get( i );
-			}
-		}
 		m_ServerFriends.SetText( friends_text );
 	}
 	
@@ -322,12 +351,12 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		{
 			case 0:
 			{
-				text = "1st/3rd Person";
+				text = "#server_browser_entry_person_both";
 				break;
 			}
 			case 1:
 			{
-				text = "1st Person Only";
+				text = "#server_browser_entry_person_first";
 				break;
 			}
 		}
@@ -338,12 +367,12 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	{
 		if( battleye )
 		{
-			m_ServerBattleye.SetText( "Enabled" );
+			m_ServerBattleye.SetText( "#server_browser_entry_enabled" );
 			m_ServerBattleye.SetColor( ARGBF( 1, 0, 1, 0 ) );
 		}
 		else
 		{
-			m_ServerBattleye.SetText( "Disabled" );
+			m_ServerBattleye.SetText( "#server_browser_entry_disabled" );
 			m_ServerBattleye.SetColor( ARGBF( 1, 1, 0, 0 ) );
 		}
 	}
@@ -374,6 +403,19 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "unfavorite_image" ).Show( m_IsFavorited );
 	}
 	
+	void SetAcceleration( float mult )
+	{
+		if( mult > 1 )
+		{
+			m_ServerAcceleration.Show( true );
+			m_ServerAcceleration.SetText( mult.ToString() + "x" );
+		}
+		else
+		{
+			m_ServerAcceleration.Show( false );
+		}
+	}
+	
 	bool ToggleFavorite()
 	{
 		m_IsFavorited = !m_IsFavorited;
@@ -394,7 +436,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	void Select( bool notify = true )
 	{
-		//if( !m_Selected )
+		if( !m_Selected )
 		{
 			if( notify )
 			{

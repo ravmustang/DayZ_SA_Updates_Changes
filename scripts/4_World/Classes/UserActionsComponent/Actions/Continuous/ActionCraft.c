@@ -43,7 +43,7 @@ class ActionCraft: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Craft";
+		return "#craft";
 	}	
 		
 	//override void OnStart( ActionData action_data )
@@ -76,20 +76,13 @@ class ActionCraft: ActionContinuousBase
 		}*/
 	}
 
-	override void OnCompleteServer( ActionData action_data )
-	{	
-		//action_data.m_Player.PerformRecipe();
-		//m_HasStarted = false;
-	}
+
 	
 	override void ApplyModifiers( ActionData action_data )
 	{
 	}
 
-	override void OnCancelServer( ActionData action_data  )
-	{
-		//m_HasStarted = false;
-	}
+
 
 	void CancelCraft(PlayerBase player)
 	{

@@ -439,115 +439,34 @@ enum ControlID
 
 class ScriptedWidgetEventHandler: Managed
 {
-	bool OnClick(Widget w, int x, int y, int button)
-	{
-		return false;
-	}
-	bool OnModalResult(Widget w, int x, int y, int code, int result)
-	{
-		return false;
-	}
-	bool OnDoubleClick(Widget w, int x, int y, int button)
-	{
-		return false;
-	}
-	bool OnSelect(Widget w, int x, int y)
-	{
-		return false;
-	}
-	bool OnItemSelected(Widget w, int x, int y, int row, int column, int oldRow, int oldColumn)
-	{
-		return false;
-	}
-	bool OnFocus(Widget w, int x, int y)
-	{
-		return false;
-	}
-	bool OnFocusLost(Widget w, int x, int y)
-	{
-		return false;
-	}
-	bool OnMouseEnter(Widget w, int x, int y)
-	{
-		return false;
-	}
-	bool OnMouseLeave(Widget w, Widget enterW, int x, int y)
-	{
-		return false;
-	}
-	bool OnMouseWheel(Widget w, int x, int y, int wheel)
-	{
-		return false;
-	}
-	bool OnMouseButtonDown(Widget w, int x, int y, int button)
-	{
-		return false;
-	}
-	bool OnMouseButtonUp(Widget w, int x, int y, int button)
-	{
-		return false;
-	}
+	bool OnClick(Widget w, int x, int y, int button);
+	bool OnModalResult(Widget w, int x, int y, int code, int result);
+	bool OnDoubleClick(Widget w, int x, int y, int button);
+	bool OnSelect(Widget w, int x, int y);
+	bool OnItemSelected(Widget w, int x, int y, int row, int column, int oldRow, int oldColumn);
+	bool OnFocus(Widget w, int x, int y);
+	bool OnFocusLost(Widget w, int x, int y);
+	bool OnMouseEnter(Widget w, int x, int y);
+	bool OnMouseLeave(Widget w, Widget enterW, int x, int y);
+	bool OnMouseWheel(Widget w, int x, int y, int wheel);
+	bool OnMouseButtonDown(Widget w, int x, int y, int button);
+	bool OnMouseButtonUp(Widget w, int x, int y, int button);
 	//! control is one of ControlID 
-	bool OnController(Widget w, int control, int value)
-	{
-		return false;
-	}
-	bool OnKeyDown(Widget w, int x, int y, int key)
-	{
-		return false;
-	}
-	bool OnKeyUp(Widget w, int x, int y, int key)
-	{
-		return false;
-	}
-	bool OnKeyPress(Widget w, int x, int y, int key)
-	{
-		return false;
-	}
-	bool OnChange(Widget w, int x, int y, bool finished)
-	{
-		return false;
-	}
-	bool OnDrag(Widget w, int x, int y)
-	{
-		return false;
-	}
-	bool OnDragging(Widget w, int x, int y, Widget reciever)
-	{
-		return false;
-	}
-	bool OnDraggingOver(Widget w, int x, int y, Widget reciever)
-	{
-		return false;
-	}
-	bool OnDrop(Widget w, int x, int y, Widget reciever)
-	{
-		return false;
-	}
-	bool OnDropReceived(Widget w, int x, int y, Widget reciever)
-	{
-		return false;
-	}
-	bool OnResize(Widget w, int x, int y)
-	{
-		return false;
-	}
-	bool OnChildAdd(Widget w, Widget child)
-	{
-		return false;
-	}
-	bool OnChildRemove(Widget w, Widget child)
-	{
-		return false;
-	}
-	bool OnUpdate(Widget w)
-	{
-		return false;
-	}
-	bool OnEvent(EventType eventType, Widget target, int parameter0, int parameter1)
-	{
-		return false;
-	}
+	bool OnController(Widget w, int control, int value);
+	bool OnKeyDown(Widget w, int x, int y, int key);
+	bool OnKeyUp(Widget w, int x, int y, int key);
+	bool OnKeyPress(Widget w, int x, int y, int key);
+	bool OnChange(Widget w, int x, int y, bool finished);
+	bool OnDrag(Widget w, int x, int y);
+	bool OnDragging(Widget w, int x, int y, Widget reciever);
+	bool OnDraggingOver(Widget w, int x, int y, Widget reciever);
+	bool OnDrop(Widget w, int x, int y, Widget reciever);
+	bool OnDropReceived(Widget w, int x, int y, Widget reciever);
+	bool OnResize(Widget w, int x, int y);
+	bool OnChildAdd(Widget w, Widget child);
+	bool OnChildRemove(Widget w, Widget child);
+	bool OnUpdate(Widget w);
+	bool OnEvent(EventType eventType, Widget target, int parameter0, int parameter1);
 };
 
 //Common Widget API

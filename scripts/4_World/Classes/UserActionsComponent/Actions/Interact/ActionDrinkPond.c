@@ -14,12 +14,7 @@ class ActionDrinkPond: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Take a sip";
-	}
-
-	override string GetTargetDescription()
-	{
-		return "Pond";
+		return "#take_a_sip";
 	}
 	
 	override void CreateConditionComponents()  
@@ -52,7 +47,7 @@ class ActionDrinkPond: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		action_data.m_Player.Consume(NULL, UAQuantityConsumed.DRINK, EConsumeType.ENVIRO_POND);
 	}

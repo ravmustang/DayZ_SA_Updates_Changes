@@ -42,6 +42,11 @@ class Trap_FishNet extends TrapSpawnBase
 		return true;
 	}
 	
+	override string GetDeploySoundset()
+	{
+		return "fishnet_deploy_SoundSet";
+	}
+	
 	// ITEM CANNOT BE TAKEN WHEN CONTAINS CARGO
 	/*override*/ bool CanPutInInventory ( EntityAI  player ) 
 	{

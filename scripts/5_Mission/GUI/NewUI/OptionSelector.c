@@ -8,7 +8,7 @@ class OptionSelector extends OptionSelectorBase
 	
 	void OptionSelector( Widget parent, int current_index, ScriptedWidgetEventHandler parent_c, bool disabled )
 	{
-		m_Options				= { "Disabled", "Show", "Hide" };
+		m_Options				= { "#server_browser_disabled", "#server_browser_show", "#server_browser_hide" };
 		m_ParentClass			= parent_c;
 		m_SelectorType			= 2;
 		if( current_index < 0 || current_index >= m_Options.Count() )
@@ -178,7 +178,11 @@ class OptionSelector extends OptionSelectorBase
 	
 	override bool IsFocusable( Widget w )
 	{
-		return ( w == m_Parent || w == m_NextOption || w == m_PreviousOption );
+		if( w )
+		{
+			return ( w == m_Parent || w == m_NextOption || w == m_PreviousOption );
+		}
+		return false;
 	}
 	
 	override void Enable()

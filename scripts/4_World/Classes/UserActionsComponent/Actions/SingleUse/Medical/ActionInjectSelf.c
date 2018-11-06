@@ -37,7 +37,10 @@ class ActionInjectSelf: ActionSingleUseBase
 
 	override void OnExecuteServer( ActionData action_data )
 	{	
-		action_data.m_MainItem.Delete();
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		if (action_data.m_MainItem)
+		{
+			action_data.m_MainItem.Delete();
+			action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		}
 	}
 };

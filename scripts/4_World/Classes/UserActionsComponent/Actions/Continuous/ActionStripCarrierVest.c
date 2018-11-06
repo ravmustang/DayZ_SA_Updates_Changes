@@ -53,10 +53,10 @@ class ActionStripCarrierVest: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Strip vest";
+		return "#strip_vest";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetHierarchyRootPlayer() == action_data.m_Player )
 		{

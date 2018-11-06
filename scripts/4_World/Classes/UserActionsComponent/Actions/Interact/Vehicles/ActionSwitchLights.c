@@ -3,7 +3,7 @@ class ActionSwitchLights: ActionInteractBase
 	void ActionSwitchLights()
 	{
 		m_MessageSuccess    = "";
-		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
+		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_HEADLIGHT;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_HUDCursorIcon     = CursorIcons.LootCorpse;
 	}
@@ -21,21 +21,65 @@ class ActionSwitchLights: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Switch lights";
+		return "#switch_lights";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
-		return true;
+		HumanCommandVehicle vehCommand = player.GetCommand_Vehicle();
+
+		if ( vehCommand )
+		{
+			Transport trans = vehCommand.GetTransport();
+			if ( trans )
+			{
+				CarScript car;
+				if ( Class.CastTo(car, trans) )
+				{
+					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
+					{
+						if ( !car.IsLightsOn() )
+						{
+							EntityAI neededItem = null;
+
+							if ( car.IsVitalCarBattery() ) neededItem = car.FindAttachmentBySlotName("CarBattery");
+							if ( car.IsVitalTruckBattery() ) neededItem = car.FindAttachmentBySlotName("TruckBattery");
+
+							if ( !neededItem || (neededItem && neededItem.IsRuined()) )
+								return false;
+
+							return true;
+						}
+						else
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
-		Print(action_data.m_Target);
-		Car car;
-		if ( Class.CastTo(car, action_data.m_Target.GetObject()) )
+		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
+		if ( vehCommand )
 		{
-			car.SwitchLights();
+			Transport trans = vehCommand.GetTransport();
+			if ( trans )
+			{
+				CarScript car;
+				if ( Class.CastTo(car, trans) )
+				{
+					car.SwitchLights();
+				}
+			}
 		}
+	}
+
+	override bool CanBeUsedInVehicle()
+	{
+		return true;
 	}
 };

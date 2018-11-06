@@ -39,7 +39,7 @@ class ActionDefibrilateSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Defibrilate yourself";
+		return "#defibrilate_myself";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -57,7 +57,7 @@ class ActionDefibrilateSelf: ActionContinuousBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		Defibrillator defib;
 		Class.CastTo(defib, action_data.m_MainItem);

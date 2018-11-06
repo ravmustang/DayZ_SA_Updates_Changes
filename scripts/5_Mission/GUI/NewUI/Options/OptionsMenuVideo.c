@@ -8,7 +8,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	protected RichTextWidget				m_DetailsText;
 	
 	protected GameOptions					m_Options;
-	protected OptionsMenuNew				m_Menu;
+	protected OptionsMenu					m_Menu;
 	
 	//Overall
 	protected ref OptionSelectorMultistate	m_OverallQualitySelector;
@@ -64,7 +64,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	
 	protected ref map<int, ref Param2<string, string>> m_TextMap;
 	
-	void OptionsMenuVideo( Widget parent, Widget details_root, GameOptions options, OptionsMenuNew menu )
+	void OptionsMenuVideo( Widget parent, Widget details_root, GameOptions options, OptionsMenu menu )
 	{
 		m_Root							= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/pc/video_tab.layout", parent );
 		m_DetailsRoot					= details_root;
@@ -75,7 +75,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		m_Menu							= menu;
 		
 		m_Root.FindAnyWidget( "overall_quality_setting_option" ).SetUserID( AT_QUALITY_PREFERENCE );
-		m_Root.FindAnyWidget( "display_mode_setting_option" ).SetUserID( AT_QUALITY_PREFERENCE );
+		m_Root.FindAnyWidget( "display_mode_setting_option" ).SetUserID( AT_OPTIONS_DISPLAY_MODE );
 		m_Root.FindAnyWidget( "resolution_setting_option" ).SetUserID( AT_OPTIONS_RESOLUTION );
 		m_Root.FindAnyWidget( "brightness_setting_option" ).SetUserID( AT_OPTIONS_BRIGHT_SLIDER );
 		m_Root.FindAnyWidget( "vsync_setting_option" ).SetUserID( AT_VSYNC_VALUE );
@@ -90,7 +90,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		
 		//Rendering
 		m_Root.FindAnyWidget( "texture_filtering_setting_option" ).SetUserID( AT_ANISO_DETAIL );
-		m_Root.FindAnyWidget( "terrain_surface_detail_setting_option" ).SetUserID( AT_ANISO_DETAIL );
+		m_Root.FindAnyWidget( "terrain_surface_detail_setting_option" ).SetUserID( AT_OPTIONS_TERRAIN_SHADER );
 		m_Root.FindAnyWidget( "ppaa_setting_option" ).SetUserID( AT_OPTIONS_FXAA_VALUE );
 		m_Root.FindAnyWidget( "hwaa_setting_option" ).SetUserID( AT_FSAA_DETAIL );
 		m_Root.FindAnyWidget( "atoc_setting_option" ).SetUserID( AT_ATOC_DETAIL );
@@ -99,13 +99,14 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		
 		FillTextMap();
 		
-		ref array<string> opt1			= { "Disabled", "Enabled" };
-		ref array<string> opt2			= { "Fullscreen", "Windowed" };
-		ref array<string> opt3			= { "Low", "Medium", "High" };
-		ref array<string> opt4			= { "Poor", "Low", "Medium", "High", "Extreme" };
-		ref array<string> opt5			= { "Poor", "Low", "Medium", "High", "Extreme", "Custom" };
-		ref array<string> opt6			= { "Disabled", "Low", "Medium", "High", "Extreme" };
-		ref array<string> opt7			= { "Disabled", "Low", "Medium", "High" };
+		ref array<string> opt1			= { "#options_controls_disabled", "#options_controls_enabled" };
+		ref array<string> opt2			= { "#options_video_fullscreen", "#options_video_windowed" };
+		ref array<string> opt3			= { "#options_video_low", "#options_video_medium", "#options_video_high" };
+		ref array<string> opt4			= { "#options_video_poor", "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme" };
+		ref array<string> opt41			= { "#options_video_poor", "#options_video_low", "#options_video_medium", "#options_video_high" };
+		ref array<string> opt5			= { "#options_video_poor", "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme", "#options_video_custom" };
+		ref array<string> opt6			= { "#options_controls_disabled", "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme" };
+		ref array<string> opt7			= { "#options_controls_disabled", "#options_video_low", "#options_video_medium", "#options_video_high" };
 		ref array<string> opt8			= new array<string>;
 		
 		for( int i = 0; i < m_ResolutionOption.GetItemsCount(); i++ )
@@ -119,7 +120,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		m_OverallQualitySelector		= new OptionSelectorMultistate( m_Root.FindAnyWidget( "overall_quality_setting_option" ), m_OverallQualityOption.GetIndex(), this, false, opt5 );
 		
 		//Screen
-		m_DisplayModeSelector			= new OptionSelectorMultistate( m_Root.FindAnyWidget( "display_mode_setting_option" ), 0, this, false, opt2 );
+		m_DisplayModeSelector			= new OptionSelectorMultistate( m_Root.FindAnyWidget( "display_mode_setting_option" ), m_DisplayModeOption.GetIndex(), this, false, opt2 );
 		m_ResolutionSelector			= new OptionSelectorMultistate( m_Root.FindAnyWidget( "resolution_setting_option" ), m_ResolutionOption.GetIndex(), this, false, opt8 );
 		m_BrightnessSelector			= new OptionSelectorSlider( m_Root.FindAnyWidget( "brightness_setting_option" ), m_BrightnessOption.ReadValue(), this, false, m_BrightnessOption.GetMin(), m_BrightnessOption.GetMax() );
 		m_VSyncSelector					= new OptionSelectorMultistate( m_Root.FindAnyWidget( "vsync_setting_option" ), m_VSyncOption.GetIndex(), this, false, opt1 );
@@ -134,7 +135,8 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		
 		//Rendering
 		m_TextureFilteringSelector		= new OptionSelectorMultistate( m_Root.FindAnyWidget( "texture_filtering_setting_option" ), m_TextureFilteringOption.GetIndex(), this, false, opt3 );
-		m_TerrainSurfaceDetailSelector	= new OptionSelectorMultistate( m_Root.FindAnyWidget( "terrain_surface_detail_setting_option" ), 0, this, false, opt4 );
+		m_TerrainSurfaceDetailSelector	= new OptionSelectorMultistate( m_Root.FindAnyWidget( "terrain_surface_detail_setting_option" ), m_TerrainSurfaceDetailOption.GetIndex(), this, false, opt41 );
+		
 		m_PPAASelector					= new OptionSelectorMultistate( m_Root.FindAnyWidget( "ppaa_setting_option" ), m_PPAAOption.GetIndex(), this, false, opt6 );
 		m_HWAASelector					= new OptionSelectorMultistate( m_Root.FindAnyWidget( "hwaa_setting_option" ), m_HWAAOption.GetIndex(), this, false, opt7 );
 		m_ATOCSelector					= new OptionSelectorMultistate( m_Root.FindAnyWidget( "atoc_setting_option" ), m_ATOCOption.GetIndex(), this, false, opt1 );
@@ -167,11 +169,14 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		m_AOSelector.m_OptionChanged.Insert( OnAOChanged );
 		m_PPQualitySelector.m_OptionChanged.Insert( OnPPQualityChanged );
 		
-		m_DisplayModeSelector.Disable();
-		m_TerrainSurfaceDetailSelector.Disable();
-
 		RefreshCustom();
 		GetGame().BeginOptionsVideo();
+		
+		float x, y, y2;
+		m_Root.FindAnyWidget( "video_settings_scroll" ).GetScreenSize( x, y );
+		m_Root.FindAnyWidget( "video_settings_root" ).GetScreenSize( x, y2 );
+		int f = ( y2 > y );
+		m_Root.FindAnyWidget( "video_settings_scroll" ).SetAlpha( f );
 	}
 	
 	void ~OptionsMenuVideo()
@@ -203,7 +208,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	
 	void Revert()
 	{
-		//m_DisplayModeSelector.SetValue( m_DisplayModeOption.GetIndex(), false );
+		m_DisplayModeSelector.SetValue( m_DisplayModeOption.GetIndex(), false );
 		m_ResolutionSelector.SetValue( m_ResolutionOption.GetIndex(), false );
 		m_BrightnessSelector.SetValue( m_BrightnessOption.ReadValue(), false );
 		m_VSyncSelector.SetValue( m_VSyncOption.GetIndex(), false );
@@ -220,7 +225,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		m_OverallQualityOption			= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_QUALITY_PREFERENCE ) );
 		
 		//Screen
-		//m_DisplayModeOption			= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_FIELD_OF_VIEW ) );
+		m_DisplayModeOption				= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_DISPLAY_MODE ) );
 		m_ResolutionOption				= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_RESOLUTION ) );
 		m_BrightnessOption				= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_BRIGHT_SLIDER ) );
 		m_VSyncOption					= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_VSYNC_VALUE ) );
@@ -235,7 +240,8 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		
 		//Rendering
 		m_TextureFilteringOption		= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_ANISO_DETAIL ) );
-		//m_TerrainSurfaceDetailOption	= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_FXAA_VALUE ) );
+		m_TerrainSurfaceDetailOption	= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_TERRAIN_SHADER ) );
+
 		m_PPAAOption					= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_FXAA_VALUE ) );
 		m_HWAAOption					= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_FSAA_DETAIL ) );
 		m_ATOCOption					= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_ATOC_DETAIL ) );
@@ -254,7 +260,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		
 		//Rendering
 		m_TextureFilteringSelector.SetValue( m_TextureFilteringOption.GetIndex(), false );
-		m_TerrainSurfaceDetailSelector.SetValue( 0, false );
+		m_TerrainSurfaceDetailSelector.SetValue( m_TerrainSurfaceDetailOption.GetIndex(), false );
 		m_PPAASelector.SetValue( m_PPAAOption.GetIndex(), false );
 		m_HWAASelector.SetValue( m_HWAAOption.GetIndex(), false );
 		if( m_HWAAOption.GetIndex() == 0 )
@@ -280,13 +286,12 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	
 	void OnOverallQualityChanged( int value )
 	{
-		m_Options.Apply();
 		m_OverallQualityOption.SetIndex( value );
 		m_Options.Apply();
-		
 		ReloadOptions();
 		m_OverallQualityOption.SetIndex( value );
 		RefreshCustom();
+		m_Menu.OnChanged();
 	}
 	
 	void OnDisplayModeChanged( int value )
@@ -363,7 +368,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	
 	void OnTerrainSurfaceDetailChanged( int value )
 	{
-		//m_TerrainSurfaceDetailOption.SetIndex( value );
+		m_TerrainSurfaceDetailOption.SetIndex( value );
 		OnOptionChanged();
 		m_Menu.OnChanged();
 	}
@@ -413,7 +418,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	
 	override bool OnFocus( Widget w, int x, int y )
 	{
-		OptionsMenuNew menu = OptionsMenuNew.Cast( GetGame().GetUIManager().GetMenu() );
+		OptionsMenu menu = OptionsMenu.Cast( GetGame().GetUIManager().GetMenu() );
 		if( menu )
 			menu.OnFocus( w, x, y );
 		if( w )
@@ -424,9 +429,9 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 				m_DetailsRoot.Show( true );
 				m_DetailsLabel.SetText( p.param1 );
 				m_DetailsText.SetText( p.param2 );
-				int sx, sy;
-				float lines = m_DetailsText.GetContentHeight();
-				m_DetailsText.SetSize( 1, lines );
+				
+				//float lines = m_DetailsText.GetContentHeight();
+				//m_DetailsText.SetSize( 1, lines );
 				
 				m_DetailsText.Update();
 				m_DetailsLabel.Update();
@@ -441,23 +446,23 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	void FillTextMap()
 	{
 		m_TextMap = new map<int, ref Param2<string, string>>;
-		m_TextMap.Insert( AT_QUALITY_PREFERENCE, new Param2<string, string>( "Quality", "#options_video_quality_desc" ) );
-		//m_TextMap.Insert( , new Param2<string, string>( "Display Mode", "#options_video_display_mode_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_RESOLUTION, new Param2<string, string>( "Resolution", "#options_video_resolution_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_BRIGHT_SLIDER, new Param2<string, string>( "Brightness", "#options_video_brightness_desc" ) );
-		m_TextMap.Insert( AT_VSYNC_VALUE, new Param2<string, string>( "V-Sync", "#options_video_V-sync_desc" ) );
-		m_TextMap.Insert( AT_HDR_DETAIL, new Param2<string, string>( "Color Depth", "#options_video_color_depth_desc" ) );
-		m_TextMap.Insert( AT_OBJECTS_DETAIL, new Param2<string, string>( "Object Detail", "#options_video_object_detail_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_TERRAIN, new Param2<string, string>( "Terrain Detail", "#options_video_terrain_detail_desc" ) );
-		m_TextMap.Insert( AT_TEXTURE_DETAIL, new Param2<string, string>( "Texture Detail", "#options_video_texture_detail_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_SW_VALUE, new Param2<string, string>( "Clouds Detail", "#options_video_clouds_detail_desc" ) );
-		m_TextMap.Insert( AT_SHADOW_DETAIL, new Param2<string, string>( "Shadow Detail", "#options_video_shadow_detail_desc" ) );
-		m_TextMap.Insert( AT_ANISO_DETAIL, new Param2<string, string>( "Textures Filtering", "#options_video_texture_filtering_desc" ) );
-		//m_TextMap.Insert( , new Param2<string, string>( "Terrain Surface Detail", "#options_video_terrain_surface_detail_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_FXAA_VALUE, new Param2<string, string>( "Anti-aliasing Post Process", "#options_video_anti-aliasing_desc" ) );
-		m_TextMap.Insert( AT_FSAA_DETAIL, new Param2<string, string>( "Anti-aliasing Hardware", "#options_video_anti-aliasing_hardware_desc" ) );
-		m_TextMap.Insert( AT_ATOC_DETAIL, new Param2<string, string>( "Foliage Smoothing", "#options_video_foliage_smoothing_desc" ) );
-		m_TextMap.Insert( AT_AMBIENT_OCCLUSION, new Param2<string, string>( "Ambient Occlusion", "#options_video_ambient_occlusion_desc" ) );
-		m_TextMap.Insert( AT_POSTPROCESS_EFFECTS, new Param2<string, string>( "Post Process Quality", "#options_video_post_process_desc" ) );
+		m_TextMap.Insert( AT_QUALITY_PREFERENCE, new Param2<string, string>( "#options_video_quality", "#options_video_quality_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_DISPLAY_MODE, new Param2<string, string>( "#options_video_display_mode", "#options_video_display_mode_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_RESOLUTION, new Param2<string, string>( "#options_video_resolution", "#options_video_resolution_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_BRIGHT_SLIDER, new Param2<string, string>( "#options_video_brightness", "#options_video_brightness_desc" ) );
+		m_TextMap.Insert( AT_VSYNC_VALUE, new Param2<string, string>( "#options_video_V-sync", "#options_video_V-sync_desc" ) );
+		m_TextMap.Insert( AT_HDR_DETAIL, new Param2<string, string>( "#options_video_color_depth", "#options_video_color_depth_desc" ) );
+		m_TextMap.Insert( AT_OBJECTS_DETAIL, new Param2<string, string>( "#options_video_object_detail", "#options_video_object_detail_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_TERRAIN, new Param2<string, string>( "#options_video_terrain_detail", "#options_video_terrain_detail_desc" ) );
+		m_TextMap.Insert( AT_TEXTURE_DETAIL, new Param2<string, string>( "#options_video_texture_detail", "#options_video_texture_detail_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_SW_VALUE, new Param2<string, string>( "#options_video_clouds_detail", "#options_video_clouds_detail_desc" ) );
+		m_TextMap.Insert( AT_SHADOW_DETAIL, new Param2<string, string>( "#options_video_shadow_detail", "#options_video_shadow_detail_desc" ) );
+		m_TextMap.Insert( AT_ANISO_DETAIL, new Param2<string, string>( "#options_video_texture_filtering", "#options_video_texture_filtering_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_TERRAIN_SHADER, new Param2<string, string>( "#options_video_terrain_surface_detail", "#options_video_terrain_surface_detail_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_FXAA_VALUE, new Param2<string, string>( "#options_video_anti-aliasing", "#options_video_anti-aliasing_desc" ) );
+		m_TextMap.Insert( AT_FSAA_DETAIL, new Param2<string, string>( "#options_video_anti-aliasing_hardware", "#options_video_anti-aliasing_hardware_desc" ) );
+		m_TextMap.Insert( AT_ATOC_DETAIL, new Param2<string, string>( "#options_video_foliage_smoothing", "#options_video_foliage_smoothing_desc" ) );
+		m_TextMap.Insert( AT_AMBIENT_OCCLUSION, new Param2<string, string>( "#options_video_ambient_occlusion", "#options_video_ambient_occlusion_desc" ) );
+		m_TextMap.Insert( AT_POSTPROCESS_EFFECTS, new Param2<string, string>( "#options_video_post_process", "#options_video_post_process_desc" ) );
 	}
 }

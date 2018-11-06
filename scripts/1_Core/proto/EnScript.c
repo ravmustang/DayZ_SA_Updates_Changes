@@ -471,6 +471,62 @@ class array<Class T>
 		Set(item1_index, Get(item2_index));
 		Set(item2_index, item1);
 	}
+	
+	void InsertArray(array<T> other)
+	{
+		for (int i = 0; i < other.Count(); i++)
+		{
+			T item = other.Get(i);
+			Insert(item);
+		}
+	}
+	
+	/**
+	\brief Returns a index in array moved by specific number
+		\return \p int Moved index in this array
+		@code
+			Print( "Count: "+ my_array.Count() );
+			Print( "Moved 1:"+ my_array.MoveIndex(2, 1) );
+			Print( "Moved 3:"+ my_array.MoveIndex(2, 2) );
+
+			>> "Count: 4"
+			>> "Moved index 2 by 1: 3";
+			>> "Moved index 2 by 2: 0";
+		@endcode
+	*/
+	int MoveIndex(int curr_index, int move_number)
+	{
+		int count = Count();
+		int new_index = curr_index;
+		
+		if ( move_number > 0 )
+		{
+			new_index = curr_index + move_number;
+		}
+		
+		if ( move_number < 0 )
+		{
+			new_index = curr_index - move_number;
+			
+			if ( new_index < 0 )
+			{
+				if ( new_index <= -count )
+				{
+					new_index = (new_index % count);
+				}
+				
+				new_index = new_index + count;
+			}
+		}
+		
+		if ( new_index >= count )
+		{
+			new_index = (new_index % count);
+		}
+		
+		// move_number is 0
+		return new_index;
+	}
 };
 
 //force these to compile so we can link C++ methods to them

@@ -13,8 +13,16 @@ enum DayZInfectedConstants
 	MINDSTATE_DISTURBED,
 	MINDSTATE_ALERTED,
 	MINDSTATE_CHASE,
-	MINDSTATE_FIGHT
+	MINDSTATE_FIGHT,
 };
+
+enum DayZInfectedConstantsMovement
+{
+	MOVEMENTSTATE_IDLE = 0,
+	MOVEMENTSTATE_WALK,
+	MOVEMENTSTATE_RUN,
+	MOVEMENTSTATE_SPRINT
+}
 
 class DayZInfectedCommandMove
 {
@@ -39,8 +47,8 @@ class DayZInfected extends DayZCreatureAI
 	proto native DayZInfectedInputController GetInputController();	
 	proto native DayZInfectedCommandMove StartCommand_Move();	
 	proto native DayZInfectedCommandVault StartCommand_Vault(int pType);	
-	proto native void StartCommand_Death();
-	proto native void StartCommand_Hit(float pType, int pDirection);
+	proto native void StartCommand_Death(int pType, float pDirection);
+	proto native void StartCommand_Hit(bool pHeavy, int pType, float pDirection);
 	proto native DayZInfectedCommandAttack StartCommand_Attack(EntityAI pTarget, int pType, float pSubtype);
 	proto native void StartCommand_Crawl(int pType);
 	

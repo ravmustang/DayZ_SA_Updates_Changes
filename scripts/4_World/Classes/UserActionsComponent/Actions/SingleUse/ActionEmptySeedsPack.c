@@ -8,6 +8,9 @@ class ActionEmptySeedsPack: ActionSingleUseBase
 	void ActionEmptySeedsPack()
 	{
 		m_MessageSuccess = "I've emptied the pack.";
+		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYSEEDSPACK;
+		m_FullBody = false;
 	}
 	
 	override void CreateConditionComponents()  
@@ -36,7 +39,7 @@ class ActionEmptySeedsPack: ActionSingleUseBase
 		return true;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		SeedPackBase item_SPB = SeedPackBase.Cast( action_data.m_MainItem );
 		item_SPB.EmptySeedPack( action_data.m_Player );

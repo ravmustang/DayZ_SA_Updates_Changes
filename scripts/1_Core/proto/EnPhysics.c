@@ -348,11 +348,14 @@ class Contact
 	dMaterial	Material2;
 	int			MaterialIndex1;
 	int			MaterialIndex2;
+	int			Index1;
+	int			Index2;
+
 	float		Impulse;
 	float		RelativeNormalVelocityBefore;
 	float		RelativeNormalVelocityAfter;
-	vector		Normal
-	vector		Position
+	vector		Normal;
+	vector		Position;
 	vector		RelativeVelocityBefore;
 	vector		RelativeVelocityAfter;
 

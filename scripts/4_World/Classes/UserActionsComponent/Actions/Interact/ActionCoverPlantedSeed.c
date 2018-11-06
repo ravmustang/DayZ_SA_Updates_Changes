@@ -13,7 +13,7 @@ class ActionCoverPlantedSeed: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Cover planted slot";
+		return "#cover_planted_slot";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -29,12 +29,11 @@ class ActionCoverPlantedSeed: ActionInteractBase
 			
 			if (slot)
 			{
-				int slot_state = slot.m_State;
-				bool is_slot_correct = slot.IsPlanted();
+				bool is_slot_planted = slot.IsPlanted();
 				bool is_slot_free = (slot.GetPlant() == NULL);
 				bool is_slot_seeded = (slot.HasSeed());
 				
-				if ( is_slot_correct  &&  is_slot_free  &&  is_slot_seeded )
+				if ( is_slot_planted  &&  is_slot_free  &&  is_slot_seeded )
 				{
 					return true;
 				}
@@ -44,7 +43,7 @@ class ActionCoverPlantedSeed: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		bool can_complete = ActionConditionContinue(action_data);

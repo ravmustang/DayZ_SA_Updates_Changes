@@ -1,0 +1,3 @@
+class KitchenKnife extends ToolBase
+{
+}

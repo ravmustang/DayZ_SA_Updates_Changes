@@ -13,8 +13,8 @@ class ActionDrainLiquid: ActionContinuousBase
 	void ActionDrainLiquid()
 	{
 		m_CallbackClass = ActionDrainLiquidCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYBOTTLE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_POURBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTY_VESSEL;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		
 		m_MessageStartFail = "It's ruined.";
 		m_MessageStart = "I have started filling the bottle.";
@@ -51,8 +51,7 @@ class ActionDrainLiquid: ActionContinuousBase
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		ItemBase item = player.GetItemInHands();
 		
-		//return "fill "+item.GetDisplayName().Substring(0,(item.GetDisplayName().Length() )); //crops the '' bit from the displayname
-		return "Drain Liquid";
+		return "#drain_liquid";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -71,6 +70,11 @@ class ActionDrainLiquid: ActionContinuousBase
 	override void OnStartServer( ActionData action_data )
 	{
 		action_data.m_Player.SetLiquidTendencyDrain(true);
+	}
+	
+	override void OnFinishProgressServer( ActionData action_data )
+	{
+		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 };

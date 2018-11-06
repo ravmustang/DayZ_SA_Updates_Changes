@@ -9,4 +9,15 @@ class TLRLight extends Switchable_Base
 		}
 		return false;
 	}
+	
+	//copied from Flashlight
+	override void OnWorkStart()
+	{
+		SetPilotLight(true);
+	}
+
+	override void OnWorkStop()
+	{
+		SetPilotLight(false);
+	}
 }

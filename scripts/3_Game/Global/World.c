@@ -3,6 +3,8 @@ class World: Managed
 	//proto private void ~World();
 	//proto private void World();
 
+	proto void CheckSoundObstruction(EntityAI source,  bool inSource, out float obstruction, out float occlusion);
+
 	proto native void	GetPlayerList(out array<Man> players);
 	
 	/**

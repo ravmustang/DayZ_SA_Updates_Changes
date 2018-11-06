@@ -97,7 +97,7 @@ class HudDebug extends Hud
 	//============================================
 	// Update
 	//============================================
-	override void Update(float time_delta)
+	override void Update( float timeslice )
 	{
 		for ( int i = 0; i < m_Panels.Count(); ++i )
 		{

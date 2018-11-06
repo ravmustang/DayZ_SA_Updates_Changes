@@ -49,7 +49,7 @@ class ActionWashHandsItem: ActionSingleUseBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
 		module_lifespan.UpdateBloodyHandsVisibility( action_data.m_Player, false );

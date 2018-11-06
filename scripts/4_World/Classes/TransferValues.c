@@ -109,6 +109,7 @@ class TransferValues extends Managed
 		float blood_current = m_Player.GetHealth("","Blood");
 		//float blood_normalized = blood_current / m_BloodMaxValue;
 		float blood_normalized = Math.InverseLerp(PlayerConstants.BLOOD_THRESHOLD_FATAL, m_BloodMaxValue, blood_current);
+		blood_normalized = Math.Clamp(blood_normalized,0,1);
 		float difference_normalized = blood_normalized - m_LastBloodUpdate;
 		float diff_abs = Math.AbsFloat(difference_normalized);
 		
@@ -123,10 +124,10 @@ class TransferValues extends Managed
 	
 	void SendValue(int value_type, float value)
 	{
-		CashedObjectsParams.PARAM2_INT_FLOAT.param1 = value_type;
-		CashedObjectsParams.PARAM2_INT_FLOAT.param2 = value;
+		CachedObjectsParams.PARAM2_INT_FLOAT.param1 = value_type;
+		CachedObjectsParams.PARAM2_INT_FLOAT.param2 = value;
 		
-		GetGame().RPCSingleParam(m_Player, ERPCs.RPC_DAMAGE_VALUE_SYNC, CashedObjectsParams.PARAM2_INT_FLOAT, true, m_Player.GetIdentity());
+		GetGame().RPCSingleParam(m_Player, ERPCs.RPC_DAMAGE_VALUE_SYNC, CachedObjectsParams.PARAM2_INT_FLOAT, true, m_Player.GetIdentity());
 	}
 
 	void ReceiveValue(int value_type, float value)
@@ -143,10 +144,10 @@ class TransferValues extends Managed
 
 	void OnRPC(ParamsReadContext ctx)
 	{
-		ctx.Read(CashedObjectsParams.PARAM2_INT_FLOAT);
+		ctx.Read(CachedObjectsParams.PARAM2_INT_FLOAT);
 		
-		int value_type 	= CashedObjectsParams.PARAM2_INT_FLOAT.param1;
-		float value 	= CashedObjectsParams.PARAM2_INT_FLOAT.param2;
+		int value_type 	= CachedObjectsParams.PARAM2_INT_FLOAT.param1;
+		float value 	= CachedObjectsParams.PARAM2_INT_FLOAT.param2;
 		
 		ReceiveValue(value_type, value);
 	}

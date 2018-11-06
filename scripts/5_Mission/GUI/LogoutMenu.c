@@ -1,7 +1,8 @@
 
 class LogoutMenu extends UIScriptedMenu
 {	
-	private TextWidget m_logoutTimetext;
+	private TextWidget m_LogoutTimetext;
+	private TextWidget m_Info;
 	private ButtonWidget m_bLogoutNow;
 	private ButtonWidget m_bCancel;
 	private int m_iTime;
@@ -21,10 +22,20 @@ class LogoutMenu extends UIScriptedMenu
 	{
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets("gui/layouts/day_z_logout_dialog.layout");
 		
-		m_logoutTimetext = TextWidget.Cast( layoutRoot.FindAnyWidget("logoutTimeText") );
+		m_LogoutTimetext = TextWidget.Cast( layoutRoot.FindAnyWidget("logoutTimeText") );
+		m_Info = TextWidget.Cast( layoutRoot.FindAnyWidget("txtInfo") );
 		m_bLogoutNow = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bLogoutNow") );
 		m_bCancel = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bCancel") );
-
+		
+		UpdateInfo();
+		
+		// player should sit down if possible
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		if (player.GetEmoteManager() && !player.IsRestrained() && !player.IsUnconscious()) 
+		{
+			player.GetEmoteManager().CreateEmoteCBFromMenu(ID_EMOTE_SITA);
+		}
+		
 		return layoutRoot;
 	}
 
@@ -81,27 +92,43 @@ class LogoutMenu extends UIScriptedMenu
 		return true;
 	}
 	
-	void SetTimeLoading()
+	void SetLogoutTime()
 	{
-		m_logoutTimetext.SetText(" ");
+		m_LogoutTimetext.SetText(" ");
 	}
 	
 	void SetTime(int time)
 	{
 		m_iTime = time;
-		m_logoutTimetext.SetText(m_iTime.ToString());
+		m_LogoutTimetext.SetText(m_iTime.ToString());
 	}
 	
 	void UpdateTime()
 	{
+		
 		if (m_iTime > 0)
 		{
 			m_iTime -= 1;
-			m_logoutTimetext.SetText(m_iTime.ToString());	
+			m_LogoutTimetext.SetText(m_iTime.ToString());	
 		}
 		else
 		{
 			Exit();
+		}
+	}
+	
+	void UpdateInfo()
+	{
+		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		if (player.IsRestrained() || player.IsUnconscious())
+		{
+			// display killInfo
+			m_Info.SetText("#layout_logout_dialog_note_killed");
+		}
+		else
+		{
+			// hide killInfo
+			m_Info.SetText("#layout_logout_dialog_note");
 		}
 	}
 

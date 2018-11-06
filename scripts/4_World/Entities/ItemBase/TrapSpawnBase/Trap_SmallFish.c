@@ -25,6 +25,11 @@ class Trap_SmallFish extends TrapSpawnBase
 		return true;
 	}
 	
+	override string GetDeploySoundset()
+	{
+		return "fishtrap_deploy_SoundSet";
+	}
+	
 	// ITEM CANNOT BE TAKEN WHEN CONTAINS CARGO
 	/*override*/ bool CanPutInInventory ( EntityAI  player ) 
 	{

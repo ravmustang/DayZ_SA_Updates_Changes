@@ -69,8 +69,10 @@ class FireplaceIndoor extends FireplaceBase
 		for ( int i = 0; i < nearest_objects.Count(); ++i )
 		{
 			Object object = nearest_objects.Get( i );
+			/*
 			Print(object.GetType() + " idx = " + i.ToString());
 			Print(object.ClassName() + " idx = " + i.ToString());
+			*/
 			
 			if ( object.IsInherited( BuildingWithFireplace ) )
 			{
@@ -160,7 +162,7 @@ class FireplaceIndoor extends FireplaceBase
 	//================================================================
 	// ATTACHMENTS
 	//================================================================	
-	override bool CanReceiveAttachment( EntityAI attachment )
+	override bool CanReceiveAttachment( EntityAI attachment, int slotId )
 	{
 		ItemBase item = ItemBase.Cast( attachment );
 		
@@ -374,5 +376,67 @@ class FireplaceIndoor extends FireplaceBase
 	override bool CanRemoveFromHands ( EntityAI player ) 
 	{
 		return false;
-	}	
+	}
+
+	// Item-to-item fire distribution
+	override bool HasFlammableMaterial()
+	{
+		return true;
+	}
+	
+	override bool CanBeIgnitedBy( EntityAI igniter = NULL )
+	{
+		if ( HasAnyKindling() )
+		{
+			return true;
+		}
+			
+		return false;
+	}
+	
+	override bool CanIgniteItem( EntityAI ignite_target = NULL )
+	{
+		if ( IsBurning() )
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	override bool IsIgnited()
+	{
+		return IsBurning();
+	}
+	
+	override void OnIgnitedTarget( EntityAI ignited_item )
+	{
+	}
+	
+	override void OnIgnitedThis( EntityAI fire_source )
+	{	
+		//remove grass
+		Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , GetPosition() );
+		cc_object.SetOrientation ( GetOrientation() );
+		
+		//start fire
+		StartFire(); 
+	}
+	
+	override bool IsThisIgnitionSuccessful( EntityAI item_source = NULL )
+	{
+		//check kindling
+		if ( !HasAnyKindling() )
+		{
+			return false;
+		}
+		
+		//check wetness
+		if ( IsWet() )
+		{
+			return false;
+		}
+		
+		return true;	
+	}
 }

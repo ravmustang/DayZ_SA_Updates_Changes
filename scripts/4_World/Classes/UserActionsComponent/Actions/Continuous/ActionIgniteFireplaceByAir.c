@@ -11,8 +11,6 @@ class ActionIgniteFireplaceByAir: ActionIgniteFireplace
 		m_MessageFail = "I have failed to start fire by blowing air into fireplace.";
 		m_MessageCancel = "I have stopped blowing air into fireplace.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;	
-		
-		m_SkipKindlingCheck = true;
 	}
 
 	override void CreateConditionComponents()  
@@ -28,7 +26,7 @@ class ActionIgniteFireplaceByAir: ActionIgniteFireplace
 
 	override string GetText()
 	{
-		return "Blow air into fireplace";
+		return "#blow_air_into_fireplace";
 	}
 		
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -50,11 +48,18 @@ class ActionIgniteFireplaceByAir: ActionIgniteFireplace
 		return false;
 	}
 		
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		FireplaceBase fireplace_target = FireplaceBase.Cast( action_data.m_Target.GetObject() );
 
 		//start fire
 		fireplace_target.StartFire();
+		
+		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+	}
+	
+	override bool SkipKindlingCheck()
+	{
+		return false;
 	}
 }

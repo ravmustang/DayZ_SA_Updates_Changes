@@ -8,6 +8,8 @@ class PowerGenerator extends ItemBase
 	static const string			START_SOUND = "powerGeneratorTurnOn";
 	static const string			LOOP_SOUND = "powerGeneratorLoop";
 	static const string			STOP_SOUND = "powerGeneratorTurnOff";
+	static const string 		SPARKPLUG_ATTACH_SOUND = "sparkplug_attach_SoundSet";
+	static const string 		SPARKPLUG_DETACH_SOUND = "sparkplug_detach_SoundSet";
 	
 	SoundOnVehicle 				m_SoundLoopEntity;
 	ref Timer 					m_SoundLoopStartTimer;
@@ -18,19 +20,24 @@ class PowerGenerator extends ItemBase
 	// Constructor
 	void PowerGenerator()
 	{
-		/*if ( !GetGame().IsMultiplayer() ) // Temporal sparkplug spawn for testing
-		{
-			ItemBase sparkplug = GetGame().CreateObject("Sparkplug", GetPosition());
-			
-			if (sparkplug)
-			{
-				TakeEntityAsAttachment(sparkplug);
-			}
-		}*/
+		SetEventMask(EntityEvent.INIT); // Enable EOnInit event
+		
 		m_FuelPercentage = 100;
 		RegisterNetSyncVariableInt("m_FuelPercentage");
 	}
 
+	override void EOnInit( IEntity other, int extra)
+	{
+		if ( GetGame().IsServer() )
+		{
+			m_FuelPercentage = GetCompEM().GetEnergy0To100();
+			SetSynchDirty();
+		}
+		
+		
+		UpdateFuelMeter();
+	}
+	
 	override bool IsHeavyBehaviour()
 	{
 		return true;
@@ -159,6 +166,11 @@ class PowerGenerator extends ItemBase
 		{
 			ShowSelection("sparkplug_installed");
 			m_SparkPlug = item_IB;
+			
+			if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
+			{
+				SEffectManager.PlaySound(SPARKPLUG_ATTACH_SOUND, GetPosition() );
+			}
 		}
 	}
 	
@@ -173,6 +185,11 @@ class PowerGenerator extends ItemBase
 			HideSelection("sparkplug_installed");
 			m_SparkPlug = NULL;
 			GetCompEM().SwitchOff();
+			
+			if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
+			{
+				SEffectManager.PlaySound(SPARKPLUG_DETACH_SOUND, GetPosition() );
+			}
 		}
 	}
 	
@@ -195,6 +212,8 @@ class PowerGenerator extends ItemBase
 		{
 			m_FuelToEnergyRatio = GetCompEM().GetEnergyMax() / m_FuelTankCapacity;
 			GetCompEM().SetEnergy(fuel_amount * m_FuelToEnergyRatio);
+			m_FuelPercentage = GetCompEM().GetEnergy0To100();
+			SetSynchDirty();
 			UpdateFuelMeter();
 		}
 		else
@@ -269,5 +288,12 @@ class PowerGenerator extends ItemBase
 		}
 		
 		return false;
+	}
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+		
+		UpdateFuelMeter();
 	}
 }

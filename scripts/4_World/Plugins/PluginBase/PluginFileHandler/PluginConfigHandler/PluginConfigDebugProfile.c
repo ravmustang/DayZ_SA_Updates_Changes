@@ -214,8 +214,11 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 	protected CfgParamString SetString( string key, string value )
 	{
 		CfgParamString param = CfgParamString.Cast( GetParamByName( key, CFG_TYPE_STRING ) );
-		param.SetValue( value );
-		SaveConfigToFile();
+		if(param)
+		{
+			param.SetValue( value );
+			SaveConfigToFile();
+		}
 		return param;
 	}
 
@@ -223,7 +226,7 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 	{
 		CfgParamString param = CfgParamString.Cast( GetParamByName( key, CFG_TYPE_STRING ) );
 		
-		if ( param.GetValue() != STRING_EMPTY )
+		if ( param && param.GetValue() != STRING_EMPTY )
 		{
 			return param.GetValue();
 		}
@@ -232,13 +235,16 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 			if ( m_DefaultValues.Contains(key) )
 			{
 				CfgParamString default_param = CfgParamString.Cast( m_DefaultValues.Get( key ) );
-				return SetString( key, default_param.GetValue() ).GetValue();
+				CfgParamString param_string = SetString( key, default_param.GetValue() );
+				if(param_string)
+					return param_string.GetValue();
 			}
 			else
 			{
 				return SetString( key, "" ).GetValue();
 			}
 		}
+		return "";
 	}
 	
 	protected void GetSubParametersInStringArray( string setting_name, string sub_param_name, out TStringArray arr )

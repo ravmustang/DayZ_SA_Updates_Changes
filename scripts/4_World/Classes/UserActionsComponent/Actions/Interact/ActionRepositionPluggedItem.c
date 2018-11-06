@@ -16,7 +16,7 @@ class ActionRepositionPluggedItem: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Reposition";
+		return "#reposition";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -73,7 +73,7 @@ class ActionRepositionPluggedItem: ActionInteractBase
 		}
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		Object targetObject = action_data.m_Target.GetObject();	
 		ItemBase target_IB = ItemBase.Cast( targetObject );
@@ -98,7 +98,7 @@ class ActionRepositionPluggedItem: ActionInteractBase
 		m_SourceForReplug = NULL;
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{	
 		if ( !action_data.m_Player.IsPlacingLocal() )
 		{

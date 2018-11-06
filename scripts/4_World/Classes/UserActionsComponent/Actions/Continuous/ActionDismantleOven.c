@@ -35,7 +35,7 @@ class ActionDismantleOven: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Dismantle oven";
+		return "#dismantle_oven";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -55,7 +55,7 @@ class ActionDismantleOven: ActionContinuousBase
 		return false;
 	}
 		
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		Object target_object = action_data.m_Target.GetObject();
 		FireplaceBase fireplace_target = FireplaceBase.Cast( target_object );
@@ -63,8 +63,10 @@ class ActionDismantleOven: ActionContinuousBase
 		if ( fireplace_target.CanDismantleOven() )
 		{
 			ItemBase attached_item = ItemBase.Cast( fireplace_target.GetAttachmentByType( fireplace_target.ATTACHMENT_STONES ) );
-			int slot_id = attached_item.GetInventory().GetSlotId(0);
-			fireplace_target.GetInventory().SetSlotLock( slot_id, false );
+			
+			InventoryLocation inventory_location = new InventoryLocation;
+			attached_item.GetInventory().GetCurrentInventoryLocation( inventory_location );			
+			fireplace_target.GetInventory().SetSlotLock( inventory_location.GetSlot(), false );
 
 			//set oven state
 			fireplace_target.SetOvenState( false );

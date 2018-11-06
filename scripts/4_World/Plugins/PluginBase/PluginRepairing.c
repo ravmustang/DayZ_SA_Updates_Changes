@@ -1,6 +1,6 @@
 class PluginRepairing extends PluginBase
 {	
-	static protected const int HEALTH_UP_ONE_LVL = 25;
+	static protected int HEALTH_UP_ONE_LVL = 25;
 	static protected const int PRISTINE_STATE = 0;
 	static protected const int WORN_STATE = 1;
 	static protected const int DAMAGED_STATE = 2;
@@ -9,7 +9,7 @@ class PluginRepairing extends PluginBase
 
 	bool Repair(PlayerBase player, ItemBase repair_kit, ItemBase item, float specialty_weight)
 	{	
-		switch ( item.GetHealthLabel() ) 
+		switch ( item.GetHealthLevel() ) 
 		{
 			case PRISTINE_STATE:
 				break;
@@ -39,35 +39,35 @@ class PluginRepairing extends PluginBase
 	void CalculateHealth( PlayerBase player, ItemBase kit, ItemBase item, float specialty_weight )
 	{
 		float cur_kit_quantity = kit.GetQuantity();
-		float cur_item_health = item.GetHealth("","");
 		float kit_repair_cost = GetKitRepairCost( kit, item );
+		float kit_repair_cost_adjusted;
 		float new_quantity;
-		float new_quantity_adjusted;
+		float item_max_health = item.GetMaxHealth( "", "" );
+		
+		if ( item_max_health > 100 )
+		{
+			HEALTH_UP_ONE_LVL = item_max_health / 4;
+		}
 		
 		if ( cur_kit_quantity > HEALTH_UP_ONE_LVL )
 		{
-			new_quantity = kit.GetQuantity() - kit_repair_cost;
-			//new_quantity_adjusted = player.GetSoftSkillManager().AddSpecialtyBonus( new_quantity, specialty_weight );
-			//new_quantity_adjusted = Math.Clamp( new_quantity_adjusted, 0, 100 );
-			kit.SetHealth( "", "", new_quantity );
-			kit.SetQuantity( new_quantity, false );
+			kit_repair_cost_adjusted = player.GetSoftSkillManager().SubtractSpecialtyBonus( kit_repair_cost, specialty_weight );
+			kit_repair_cost_adjusted = Math.Clamp( kit_repair_cost_adjusted, 0, 100 );
+			new_quantity = kit.GetQuantity() - kit_repair_cost_adjusted;
+			kit.SetQuantity( new_quantity );
 			
 			item.AddHealth( "", "", HEALTH_UP_ONE_LVL );
 		}
 		else
 		{
-			new_quantity = kit.GetQuantity() - kit_repair_cost;
-			//new_quantity_adjusted = player.GetSoftSkillManager().AddSpecialtyBonus( new_quantity, specialty_weight );
-			//new_quantity_adjusted = Math.Clamp( new_quantity_adjusted, 0, 100 );
-			kit.SetHealth( "", "", new_quantity );
-			kit.SetQuantity( new_quantity, false );
+			new_quantity = kit.GetQuantity() - cur_kit_quantity;
+			kit.SetQuantity( new_quantity );
 			
 			item.AddHealth( "", "", cur_kit_quantity );
 		}
 				
 		if ( !CanRepairToPristine( player ) )
 		{
-			float item_max_health = item.GetMaxHealth( "", "" );
 			float item_health = item.GetHealth( "", "" );
 			float clamp_health = Math.Clamp( item_health, 0, ( item_max_health * 0.7 ) );
 			item.SetHealth( "", "", clamp_health );
@@ -76,7 +76,7 @@ class PluginRepairing extends PluginBase
 
 	bool CanRepair( ItemBase repair_kit, ItemBase item )
 	{
-		if ( item.GetHealthLabel() <= WORN_STATE)
+		if ( item.GetHealthLevel() <= WORN_STATE)
 		{
 			return false;
 		}

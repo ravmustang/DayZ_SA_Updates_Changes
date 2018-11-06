@@ -19,7 +19,7 @@ class ActionDisinfectPlant: ActionContinuousBase
 		m_MessageCancel = "";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 		
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DISINFECTTARGET;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SPRAYPLANT;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_FullBody = true;
 	}
@@ -37,7 +37,7 @@ class ActionDisinfectPlant: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Disinfect plant";
+		return "#disinfect_plant";
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -57,7 +57,7 @@ class ActionDisinfectPlant: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		PlantBase plant;
 		if ( Class.CastTo(plant, action_data.m_Target.GetObject()) )

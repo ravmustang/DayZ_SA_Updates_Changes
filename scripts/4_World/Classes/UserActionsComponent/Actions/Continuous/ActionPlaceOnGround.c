@@ -32,7 +32,7 @@ class ActionPlaceOnGround: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Place on ground";
+		return "#place_on_ground";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -47,7 +47,7 @@ class ActionPlaceOnGround: ActionContinuousBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		action_data.m_Player.DropItem(action_data.m_MainItem);
 	}

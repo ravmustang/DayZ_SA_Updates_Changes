@@ -94,7 +94,7 @@ class TutorialsMenu extends UIScriptedMenu
 			{
 				continue;
 			}
-			if( !button_marker_groups_unflitred.Contains( button_name) )
+			if( !button_marker_groups_unflitred.Contains( button_name ) )
 			{
 				button_marker_groups_unflitred.Insert( button_name, new ref array<int> );
 				button_marker_groups_unflitred.Get( button_name ).Insert( text_widget_id );
@@ -119,11 +119,13 @@ class TutorialsMenu extends UIScriptedMenu
 		Widget xbox_controls_image = layoutRoot.FindAnyWidget( "Markers_" + index );
 		Widget child = xbox_controls_image.GetChildren();
 		child.Show(false);
+		
 		while( child.GetSibling() )
 		{
 			child = child.GetSibling();
 			child.Show(false);
 		}
+		
 		Widget panel_widget;
 		Widget button_marker_widget;
 		
@@ -132,13 +134,13 @@ class TutorialsMenu extends UIScriptedMenu
 			panel_widget = layoutRoot.FindAnyWidget( "PanelWidget" + l );
 			if( tab_array[index][l] != NULL )
 			{
-				RichTextWidget text_widget = RichTextWidget.Cast( panel_widget.FindAnyWidget( "TextWidget" + l ) );
+				TextWidget text_widget = TextWidget.Cast( panel_widget.FindAnyWidget( "TextWidget" + l ) );
 				button_marker_widget = layoutRoot.FindAnyWidget( "button_marker_" + tab_array[index][l].m_ButtonName );
 				text_widget.SetText( tab_array[index][l].m_InfoText );
 				panel_widget.Show( true );
 				button_marker_widget.Show( true );
-				text_widget.Update();
 				panel_widget.Update();
+				
 				if( !button_marker_groups.Contains(tab_array[index][l].m_ButtonName ))
 				{
 					panel_widget.GetScreenPos( text_widget_pos_x, text_widget_pos_y );
@@ -148,6 +150,7 @@ class TutorialsMenu extends UIScriptedMenu
 					button_marker_widget.GetScreenSize( dot_width, dot_height );
 					
 					draw_pos_y = text_widget_pos_y + text_widget_height / 2;
+					
 					if( l < 10 )
 					{
 						draw_pos_x = text_widget_pos_x + text_widget_width - 1;
@@ -156,10 +159,10 @@ class TutorialsMenu extends UIScriptedMenu
 					{
 						draw_pos_x = text_widget_pos_x;
 					}
+					
 					canvas_widget.DrawLine( draw_pos_x, draw_pos_y, dot_pos_x+dot_width/2, draw_pos_y, 2, ARGBF( 0.6, 1, 1, 1 ) );
 					canvas_widget.DrawLine( dot_pos_x+dot_width/2, draw_pos_y, dot_pos_x+dot_width/2, dot_pos_y+dot_height/2, 2, ARGBF( 0.6, 1, 1, 1 ) );	
 				}
-				
 			}
 			else
 			{
@@ -202,8 +205,10 @@ class TutorialsMenu extends UIScriptedMenu
 					first_y = text_widget_pos_y + text_widget_height/2;
 					
 				}
+				
 				group_point_x += text_widget_pos_x;
 				group_point_y += text_widget_pos_y;
+				
 				if( element[0] < 10 )
 				{
 					canvas_widget.DrawLine( text_widget_pos_x + text_widget_width - 1, text_widget_pos_y + text_widget_height/2, text_widget_pos_x + text_widget_width +50, text_widget_pos_y + text_widget_height/2, 2, ARGBF( 0.6, 1, 1, 1 ) );
@@ -213,6 +218,7 @@ class TutorialsMenu extends UIScriptedMenu
 					canvas_widget.DrawLine( text_widget_pos_x, text_widget_pos_y + text_widget_height/2, text_widget_pos_x - 50, text_widget_pos_y + text_widget_height/2, 2, ARGBF( 0.6, 1, 1, 1 ) );
 				}
 			}
+			
 			if( element[0] < 10 )
 			{
 				group_point_x = group_point_x/element.Count() + text_widget_width + 50;
@@ -221,6 +227,7 @@ class TutorialsMenu extends UIScriptedMenu
 			{
 				group_point_x = group_point_x/element.Count() - 50;
 			}
+			
 			group_point_y = group_point_y/element.Count() + text_widget_height/2;
 			
 			button_marker_widget.GetScreenPos( dot_pos_x, dot_pos_y );

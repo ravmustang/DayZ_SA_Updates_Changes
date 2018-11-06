@@ -5,6 +5,7 @@ class ActionClapBearTrapWithThisItem: ActionSingleUseBase
 		m_MessageSuccess = "I've poked the bear trap";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_POKE;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
+		m_FullBody = true;
 	}
 	
 	override void CreateConditionComponents()
@@ -40,7 +41,7 @@ class ActionClapBearTrapWithThisItem: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		TrapBase target_TB;
 		Class.CastTo(target_TB,  action_data.m_Target.GetObject() );

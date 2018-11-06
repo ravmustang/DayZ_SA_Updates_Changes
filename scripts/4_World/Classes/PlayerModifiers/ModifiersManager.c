@@ -26,40 +26,40 @@ class ModifiersManager
 
 	void Init()
 	{
-		//AddModifier(new Testing);
-		AddModifier(new BloodRegen);
+		#ifdef DEVELOPER
+		AddModifier(new TestDiseaseMdfr);
+		#endif
+		AddModifier(new BloodRegenMdfr);
 		//AddModifier(new BoneRegen);
 		//AddModifier(new Health);
-		AddModifier(new Saline);
-		AddModifier(new HealthRegen);
-		AddModifier(new Hunger);
-		AddModifier(new Shock);
-		AddModifier(new ImmuneSystem);
-		AddModifier(new Stomach);
-		AddModifier(new Temperature);
-		AddModifier(new Thirst);
-		AddModifier(new BleedingCheck);
+		AddModifier(new SalineMdfr);
+		AddModifier(new HealthRegenMdfr);
+		AddModifier(new HungerMdfr);
+		//AddModifier(new Shock);
+		AddModifier(new ImmuneSystemMdfr);
+		AddModifier(new StomachMdfr);
+		AddModifier(new HeatComfortMdfr);
+		AddModifier(new ThirstMdfr);
+		AddModifier(new BleedingCheckMdfr);
 		//AddModifier(new Blinded);
-		AddModifier(new BrokenArms);
-		AddModifier(new BrokenLegs);
-		AddModifier(new VomitModifier);
-		AddModifier(new Burning);
-		AddModifier(new Fever);
-		AddModifier(new HeartAttack);
-		AddModifier(new HemolyticReaction);
-		//AddModifier(new Hyperthermia);
-		//AddModifier(new Hypothermia);
-		AddModifier(new Poisoning);
-		AddModifier(new StuffedStomach);
-		AddModifier(new Tremor);
-		AddModifier(new Unconsciousness);
-		AddModifier(new ShockDamage);
-		AddModifier(new CommonCold);
-		AddModifier(new Cholera);
-		AddModifier(new Influenza);
-		AddModifier(new Salmonella);
-		AddModifier(new BrainDisease);
-		AddModifier(new Wet);
+		//AddModifier(new BrokenArms);
+		//AddModifier(new BrokenLegs);
+		AddModifier(new VomitStuffedMdfr);
+		AddModifier(new BurningMdfr);
+		AddModifier(new FeverMdfr);
+		AddModifier(new HeartAttackMdfr);
+		AddModifier(new HemolyticReactionMdfr);
+		AddModifier(new PoisoningMdfr);
+		AddModifier(new StuffedStomachMdfr);
+		//AddModifier(new Tremor);
+		AddModifier(new UnconsciousnessMdfr);
+		AddModifier(new ShockDamageMdfr);
+		AddModifier(new CommonColdMdfr);
+		AddModifier(new CholeraMdfr);
+		AddModifier(new InfluenzaMdfr);
+		AddModifier(new SalmonellaMdfr);
+		AddModifier(new BrainDiseaseMdfr);
+		AddModifier(new WetMdfr);
 	}
 
 	void SetModifiers(bool enable)
@@ -122,34 +122,34 @@ class ModifiersManager
 	
 	void OnStoreSave( ParamsWriteContext ctx )
 	{
-		CashedObjectsArrays.ARRAY_INT.Clear();
+		CachedObjectsArrays.ARRAY_INT.Clear();
 		
 		int modifier_count;
 		for(int x = 0; x < m_ModifierList.Count(); x++)
 		{
 			ModifierBase mdfr = m_ModifierList.GetElement(x);
-			if( mdfr.IsActive() ) 
+			if( mdfr.IsActive() && mdfr.IsPersistent() ) 
 			{
 				modifier_count++;
 				//save the modifier id
-				CashedObjectsArrays.ARRAY_INT.Insert( mdfr.GetModifierID() );
+				CachedObjectsArrays.ARRAY_INT.Insert( mdfr.GetModifierID() );
 				if( mdfr.IsTrackAttachedTime() )
 				{
 					//save the overall attached time
-					CashedObjectsArrays.ARRAY_INT.Insert( mdfr.GetAttachedTime() );
+					CachedObjectsArrays.ARRAY_INT.Insert( mdfr.GetAttachedTime() );
 				}
 			}
 		}
 
 		//write the count
-		//CashedObjectsParams.PARAM1_INT.param1 = modifier_count;
+		//CachedObjectsParams.PARAM1_INT.param1 = modifier_count;
 		//PrintString("Saving modifiers count: "+ modifier_count);
 		ctx.Write(modifier_count);
 
 		//write the individual modifiers and respective attached times
-		for(int i = 0; i < CashedObjectsArrays.ARRAY_INT.Count(); i++)
+		for(int i = 0; i < CachedObjectsArrays.ARRAY_INT.Count(); i++)
 		{
-			int item = CashedObjectsArrays.ARRAY_INT.Get(i);
+			int item = CachedObjectsArrays.ARRAY_INT.Get(i);
 			//PrintString( "saving item: "+item );
 			ctx.Write(item);
 		}
@@ -171,17 +171,23 @@ class ModifiersManager
 			int modifier_id;
 			ctx.Read(modifier_id);
 			//PrintString( "loading item: "+modifier_id );
-			//int modifier_id = CashedObjectsParams.PARAM1_INT.param1;
+			//int modifier_id = CachedObjectsParams.PARAM1_INT.param1;
 			ModifierBase modifier = GetModifier(modifier_id);
-			
-			if( modifier.IsTrackAttachedTime() )
+			if( modifier )
 			{
-				int time;
-				ctx.Read(time);//get the attached time
-				modifier.SetAttachedTime( time );
+				if( modifier.IsTrackAttachedTime() )
+				{
+					int time;
+					ctx.Read(time);//get the attached time
+					modifier.SetAttachedTime( time );
+				}
+				
+				ActivateModifier(modifier_id, EActivationType.TRIGGER_EVENT_ON_CONNECT);
 			}
-			
-			ActivateModifier(modifier_id, EActivationType.TRIGGER_EVENT_ON_CONNECT);
+			else
+			{
+				Debug.LogError("DB loading: non-existent modifier with id:"+modifier_id.ToString());
+			}
 		}
 		
 		for (int x = 0; x < m_ParamList.Count(); x++)

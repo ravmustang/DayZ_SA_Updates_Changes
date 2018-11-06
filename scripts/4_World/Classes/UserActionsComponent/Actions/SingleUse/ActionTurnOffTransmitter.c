@@ -11,7 +11,7 @@ class ActionTurnOffTransmitter: ActionTurnOffWhileInHands
 	void ActionTurnOffTransmitter()
 	{
 		m_CallbackClass = ActionTurnOffTransmitterCB;
-		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_WALKIETALKIEOFF;
+		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_OFF;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;		
 		m_MessageSuccess = "I have turned it off.";
 		m_MessageFail = "I have failed to turn it off.";
@@ -31,7 +31,7 @@ class ActionTurnOffTransmitter: ActionTurnOffWhileInHands
 	{
 		if ( item.IsTransmitter() )
 		{
-			if ( item.HasEnergyManager()  &&  item.GetCompEM().CanSwitchOff() )
+			if ( item.HasEnergyManager() && item.GetCompEM().IsWorking() )
 			{
 				return true;
 			}
@@ -40,8 +40,8 @@ class ActionTurnOffTransmitter: ActionTurnOffWhileInHands
 		return false;
 	}
 		
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		action_data.m_MainItem.GetCompEM().SwitchOff();
-	}	
+	}
 }

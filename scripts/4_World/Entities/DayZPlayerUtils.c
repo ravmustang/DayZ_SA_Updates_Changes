@@ -330,6 +330,8 @@ class DayZPlayerUtils
 	 **/
 	static proto native void ClearComponentCollisions ();
 
+	static proto native vector GetMemoryPointPositionBoneRelative(DayZPlayer pPlayer, int pBoneIndex, int pPointIndex);
+	
 	static void InitPlayerComponentCollisions (Human player)
 	{
 		if (IsComponentCollisionInitialized())

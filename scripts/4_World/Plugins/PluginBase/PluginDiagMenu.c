@@ -2,7 +2,7 @@ enum DiagMenuIDs
 {
 	DM_SCRIPTS_MENU,
 	DM_PLAYER_STATES_MENU,
-	DM_PLAYER_STATES_SHOW,
+	DM_PLAYER_SYMPTOMS_SHOW,
 	DM_TRANSFER_VALUES_MENU,
 	DM_TRANSFER_VALUES_SHOW,
 	DM_PLAYER_CRAFTING_MENU,
@@ -34,6 +34,7 @@ enum DiagMenuIDs
 	DM_PERMANENT_CROSSHAIR,
 	DM_TOGGLE_HUD,
 	DM_MISC_MENU,
+	DM_MISC_SIMULATE,
 	DM_MELEE_MENU,
 	DM_MELEE_DEBUG_ENABLE,
 	DM_MELEE_SHOW_TARGETS,
@@ -52,6 +53,18 @@ enum DiagMenuIDs
 	DM_XBOX_CURSOR,
 	DM_GO_UNCONSCIOUS,
 	DM_GO_UNCONSCIOUS_DELAYED,
+	DM_SIMULATE_INFINITE_LOOP,
+	DM_SIMULATE_NULL_POINTER,
+	DM_SIMULATE_DIVISION_BY_ZERO,
+	DM_SIMULATE_ERROR_FUNCTION,
+	DM_SHOW_BLEEDING_SOURCES,
+	DM_DISABLE_BLOOD_LOSS,
+	DM_BLEEDING_MENU,
+	DM_ACTIVATE_SOURCE,
+	DM_ACTIVATE_ALL_BS,
+	DM_BS_RELOAD,
+	DM_QUICK_RESTRAIN,
+	
 };
 
 enum DebugActionType
@@ -67,7 +80,8 @@ class PluginDiagMenu extends PluginBase
 #ifdef DEVELOPER
 	ref Timer m_Timer;
 	bool m_EnableModifiers 			= true;
-	bool m_EnableUnlimitedAmmo		= false;
+	bool m_EnableUnlimitedAmmo;
+	bool m_DisableBloodLoss			= false;
 	bool m_IsInvincible 			= false;
 	bool m_ShowCraftingDebugActions = false;
 	bool m_LogPlayerStats 			= false;
@@ -82,14 +96,17 @@ class PluginDiagMenu extends PluginBase
 	bool m_AimNoiseEnabled			= true;
 	int m_DisplayPlayerInfo			= false;
 	bool m_ProceduralRecoilEnabled 	= true;
+	bool m_EnableQuickRestrain 		= false;
 	bool m_StaminaDisabled			= false;
 	bool m_EnvironmentStats			= false;
 	bool m_DrawCheckerboard			= false;
 	bool m_PresenceNotifierDebug	= false;
-	bool m_XboxCursor	= false;
+	bool m_ShowBleedingSources		= false;
+	bool m_XboxCursor				= false;
 	float m_SpecialtyLevel			= 0;
 	float m_LifespanLevel			= 0;
 	int  m_DayzPlayerDebugMenu		= -1;
+	int m_BleedingSourceRequested;
 	
 	override void OnInit()
 	{
@@ -103,8 +120,19 @@ class PluginDiagMenu extends PluginBase
 		// LEVEL 0
 		//---------------------------------------------------------------
  		DiagMenu.RegisterMenu(DiagMenuIDs.DM_SCRIPTS_MENU,"Script", "");
-		
-		
+			//---------------------------------------------------------------
+			// LEVEL 1
+			//---------------------------------------------------------------
+			DiagMenu.RegisterMenu(DiagMenuIDs.DM_BLEEDING_MENU,"Bleeding", "Script");
+				//---------------------------------------------------------------
+				// LEVEL 2
+				//---------------------------------------------------------------
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_SHOW_BLEEDING_SOURCES, "", "Show Bleeding Sources", "Bleeding");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_DISABLE_BLOOD_LOSS, "", "Disable Blood Loss", "Bleeding");
+				DiagMenu.RegisterRange(DiagMenuIDs.DM_ACTIVATE_SOURCE, "", "Activate Source #", "Bleeding", "1, 32, 0, 1");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_ACTIVATE_ALL_BS, "", "Activate All Sources", "Bleeding");
+				
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_BS_RELOAD, "", "Client Reload", "Bleeding");
 			//---------------------------------------------------------------
 			// LEVEL 1
 			//---------------------------------------------------------------
@@ -137,7 +165,7 @@ class PluginDiagMenu extends PluginBase
 				//---------------------------------------------------------------
 				// LEVEL 2
 				//---------------------------------------------------------------
-				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_STATES_SHOW, "lalt+6", "Show States", "Player States");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_SYMPTOMS_SHOW, "lalt+6", "Show States", "Player States");
 
 			//---------------------------------------------------------------
 			// LEVEL 1
@@ -178,12 +206,23 @@ class PluginDiagMenu extends PluginBase
 			//---------------------------------------------------------------
 			// LEVEL 1
 			//---------------------------------------------------------------
+			DiagMenu.RegisterMenu(DiagMenuIDs.DM_MISC_SIMULATE, "Simulate script", "Script");
+				//---------------------------------------------------------------
+				// LEVEL 2
+				//---------------------------------------------------------------
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_SIMULATE_INFINITE_LOOP, "", "Simulate infinite loop", "Simulate script");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_SIMULATE_NULL_POINTER, "", "Simulate null pointer", "Simulate script");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_SIMULATE_DIVISION_BY_ZERO, "", "Simulate division by 0", "Simulate script");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_SIMULATE_ERROR_FUNCTION, "", "Simulate Error() function", "Simulate script");	
+			//---------------------------------------------------------------
+			// LEVEL 1
+			//---------------------------------------------------------------
 			DiagMenu.RegisterMenu(DiagMenuIDs.DM_MISC_MENU, "Misc", "Script");
 				//---------------------------------------------------------------
 				// LEVEL 2
 				//---------------------------------------------------------------
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_ITEM_DEBUG_ACTIONS_SHOW, "lalt+4", "Item Debug Actions", "Misc");
-				DiagMenu.RegisterBool(DiagMenuIDs.DM_BULLET_IMPACT, "ralt+0", "BulletImpact", "Misc");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_BULLET_IMPACT, "", "BulletImpact", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_STATS_LOG_ENABLE, "", "Log Player Stats", "Misc");
 				DiagMenu.RegisterMenu(DiagMenuIDs.DM_ACTION_TARGETS_MENU, "Action Targets", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_XBOX_CURSOR, "", "XboxCursor", "Misc");
@@ -195,6 +234,7 @@ class PluginDiagMenu extends PluginBase
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_PRESENCE_NOTIFIER_DBG, "", "Show Presence to AI dbg", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_GO_UNCONSCIOUS, "", "Go Unconscious", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_GO_UNCONSCIOUS_DELAYED, "", "Uncons. in 10sec", "Misc");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_QUICK_RESTRAIN, "ralt+0", "Quick Restrain", "Misc");
 					//---------------------------------------------------------------
 					// LEVEL 3
 					//---------------------------------------------------------------
@@ -226,7 +266,7 @@ class PluginDiagMenu extends PluginBase
 				DiagMenu.SetValue(DiagMenuIDs.DM_WEAPON_AIM_NOISE, true);
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_WEAPON_ALLOW_RECOIL, "", "Procedural Recoil", "Weapon");
 				DiagMenu.SetValue(DiagMenuIDs.DM_WEAPON_ALLOW_RECOIL, true);
-				DiagMenu.RegisterBool(DiagMenuIDs.DM_WEAPON_UNLIMITED, "lalt+9", "Unlitimited Ammo", "Weapon");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_WEAPON_UNLIMITED, "lalt+9", "Unlimited Ammo", "Weapon");
 	}
 	
 	void Update(float deltaT)
@@ -269,6 +309,17 @@ class PluginDiagMenu extends PluginBase
 		CheckPresenceNotifierDebug();
 		CheckGoUnconscious();
 		CheckGoUnconsciousDelayed();
+		CheckSimulateNULLPointer();
+		CheckSimulateDivisionByZero();
+		CheckSimulateInfiniteLoop();
+		CheckSimulateErrorFunction();
+		CheckShowBleedingSources();
+		CheckDisableBloodLoss();
+		CheckActivateAllBS();
+		CheckReloadBS();
+		CheckActivateBleedingSource();
+		CheckQuickRestrain();
+
 	}
 	//---------------------------------------------
 	void CheckModifiers()
@@ -299,6 +350,7 @@ class PluginDiagMenu extends PluginBase
 			{
 				SendUnlimitedRPC(true);
 				m_EnableUnlimitedAmmo = true;
+				ItemBase.SetDebugActionsMask( ItemBase.GetDebugActionsMask() | DebugActionType.UNLIMITED_AMMO );
 			}
 		}
 		else
@@ -307,7 +359,50 @@ class PluginDiagMenu extends PluginBase
 			{
 				SendUnlimitedRPC(false);
 				m_EnableUnlimitedAmmo = false;
+				ItemBase.SetDebugActionsMask( ItemBase.GetDebugActionsMask() & (~DebugActionType.UNLIMITED_AMMO) );
 			}
+		}
+	}	
+	//---------------------------------------------
+	void CheckDisableBloodLoss()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_DISABLE_BLOOD_LOSS) )
+		{
+			if(!m_DisableBloodLoss)
+			{
+				SendDisableBloodLossRPC(true);
+				m_DisableBloodLoss = true;
+			}
+		}
+		else
+		{
+			if(m_DisableBloodLoss)
+			{
+				SendDisableBloodLossRPC(false);
+				m_DisableBloodLoss = false;
+			}
+		}
+	}
+	//---------------------------------------------
+	void CheckActivateAllBS()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_ACTIVATE_ALL_BS) )
+		{
+			SendActivateAllBSRPC();
+			DiagMenu.SetValue(DiagMenuIDs.DM_ACTIVATE_ALL_BS, false);//to prevent constant RPC calls, switch back to false
+		}
+	}	
+	//---------------------------------------------
+	void CheckReloadBS()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_BS_RELOAD) )
+		{
+			PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+			if(player && player.GetBleedingManagerRemote())
+			{
+				player.GetBleedingManagerRemote().Reload();
+			}
+			DiagMenu.SetValue(DiagMenuIDs.DM_BS_RELOAD, false);//to prevent constant RPC calls, switch back to false
 		}
 	}
 	//---------------------------------------------
@@ -319,6 +414,29 @@ class PluginDiagMenu extends PluginBase
 			Class.CastTo(plugin_recipes_manager, GetPlugin(PluginRecipesManager));
 			plugin_recipes_manager.CallbackGenerateCache();
 			DiagMenu.SetValue(DiagMenuIDs.DM_PLAYER_CRAFTING_GENERATE, false);
+		}
+	}
+	//---------------------------------------------
+	void CheckShowBleedingSources()
+	{
+		PlayerBase player;
+		if ( DiagMenu.GetBool(DiagMenuIDs.DM_SHOW_BLEEDING_SOURCES) )
+		{
+			if( !m_ShowBleedingSources )
+			{
+				player = PlayerBase.Cast(GetGame().GetPlayer());
+				player.GetBleedingManagerRemote().SetDiag(true);
+				m_ShowBleedingSources = true;
+			}
+		}
+		else
+		{
+			if( m_ShowBleedingSources )
+			{
+				player = PlayerBase.Cast(GetGame().GetPlayer());
+				player.GetBleedingManagerRemote().SetDiag(false);
+				m_ShowBleedingSources = false;
+			}
 		}
 	}
 	//---------------------------------------------
@@ -378,7 +496,7 @@ class PluginDiagMenu extends PluginBase
 		if( DiagMenu.GetBool(DiagMenuIDs.DM_BULLET_IMPACT) )
 		{
 			PlayerBase pl_player = PlayerBase.Cast(GetGame().GetPlayer() );
-			pl_player.SpawnBulletHitReaction();
+			pl_player.SpawnDamageDealtEffect();
 			DiagMenu.SetValue(DiagMenuIDs.DM_BULLET_IMPACT, false);
 		}
 		else
@@ -638,6 +756,19 @@ class PluginDiagMenu extends PluginBase
 			m_SpecialtyLevel = specialty_value;
 		}
 	}
+	
+	//---------------------------------------------
+	void CheckActivateBleedingSource()
+	{
+		int bleeding_source = DiagMenu.GetRangeValue( DiagMenuIDs.DM_ACTIVATE_SOURCE );
+		
+		if( bleeding_source != m_BleedingSourceRequested )
+		{
+			SendActivateBleedingSource(bleeding_source);
+			m_BleedingSourceRequested = bleeding_source;
+		}
+		
+	}
 
 	//---------------------------------------------
 	void CheckBloodyHands()
@@ -770,6 +901,26 @@ class PluginDiagMenu extends PluginBase
 		}
 	}
 	//---------------------------------------------	
+	void CheckQuickRestrain()
+	{
+		if( DiagMenu.GetBool( DiagMenuIDs.DM_QUICK_RESTRAIN ) )
+		{
+			if(!m_EnableQuickRestrain)
+			{
+				SendEnableQuickRestrainRPC(true);
+				m_EnableQuickRestrain = true;
+			}
+		}
+		else
+		{
+			if(m_EnableQuickRestrain)	
+			{
+				SendEnableQuickRestrainRPC(false);
+				m_EnableQuickRestrain = false;
+			}
+		}
+	}
+	//---------------------------------------------	
 	void CheckAimNoise()
 	{
 		DayZPlayerImplement player;
@@ -883,11 +1034,62 @@ class PluginDiagMenu extends PluginBase
 	}
 	
 	//---------------------------------------------
+	void CheckSimulateNULLPointer()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_SIMULATE_NULL_POINTER) )
+		{
+			SendSimulateNULLPointer();
+			DiagMenu.SetValue(DiagMenuIDs.DM_SIMULATE_NULL_POINTER, false);//to prevent constant RPC calls, switch back to false
+		}
+	}
+	//---------------------------------------------
+	void CheckSimulateDivisionByZero()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_SIMULATE_DIVISION_BY_ZERO) )
+		{
+			SendSimulateDivisionByZero();
+			DiagMenu.SetValue(DiagMenuIDs.DM_SIMULATE_DIVISION_BY_ZERO, false);//to prevent constant RPC calls, switch back to false
+		}
+	}
+	//---------------------------------------------
+	void CheckSimulateInfiniteLoop()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_SIMULATE_INFINITE_LOOP) )
+		{
+			SendSimulateInfiniteLoop();
+			DiagMenu.SetValue(DiagMenuIDs.DM_SIMULATE_INFINITE_LOOP, false);//to prevent constant RPC calls, switch back to false
+		}
+	}
+	//---------------------------------------------
+	void CheckSimulateErrorFunction()
+	{
+		if( DiagMenu.GetBool(DiagMenuIDs.DM_SIMULATE_ERROR_FUNCTION) )
+		{
+			SendSimulateErrorFunction();
+			DiagMenu.SetValue(DiagMenuIDs.DM_SIMULATE_ERROR_FUNCTION, false);//to prevent constant RPC calls, switch back to false
+		}
+	}
+	
+	//---------------------------------------------
 	void SendDebugActionsRPC()
 	{
-		CashedObjectsParams.PARAM1_INT.param1 = ItemBase.GetDebugActionsMask();
-		int mask = CashedObjectsParams.PARAM1_INT.param1;
-		if( GetGame() && GetGame().GetPlayer() ) GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ITEM_DEBUG_ACTIONS, CashedObjectsParams.PARAM1_INT, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_INT.param1 = ItemBase.GetDebugActionsMask();
+		if( GetGame() && GetGame().GetPlayer() ) GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ITEM_DEBUG_ACTIONS, CachedObjectsParams.PARAM1_INT, true, GetGame().GetPlayer().GetIdentity() );
+ 	}
+	
+	//---------------------------------------------
+	void SendEnableQuickRestrainRPC(bool enable)
+	{
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		if(player) player.SetQuickRestrain(enable);
+		if( GetGame() && GetGame().GetPlayer() ) GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_QUICK_RESTRAIN, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+ 	}
+	
+	//---------------------------------------------
+	void SendActivateAllBSRPC()
+	{
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_ACTIVATE_ALL_BS, NULL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendKillPlayerRPC()
@@ -897,86 +1099,92 @@ class PluginDiagMenu extends PluginBase
 	//---------------------------------------------
 	void SendInvincibilityRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_INVINCIBILITY, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_INVINCIBILITY, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendLogPlayerStatsRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LOG_PLAYER_STATS, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LOG_PLAYER_STATS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendModifiersRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_DISABLE_MODIFIERS, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_DISABLE_MODIFIERS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendUnlimitedRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_UNLIMITED_AMMO, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_UNLIMITED_AMMO, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+ 	}
+	//---------------------------------------------
+	void SendDisableBloodLossRPC(bool enable)
+	{
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_DISABLE_BLOODLOOS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendDebugCraftingRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_CRAFTING_DEBUG, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_CRAFTING_DEBUG, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsShowDebugRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_DEBUG_WINDOW, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_DEBUG_WINDOW, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsToggleStateRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_STATE, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_STATE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void GunParticlesToggleStateRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_GUN_PARTICLES_TOGGLE, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_GUN_PARTICLES_TOGGLE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsToggleModelRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_MODEL, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_MODEL, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsSetSpecialtyRPC( float specialty_value )
 	{
-		CashedObjectsParams.PARAM1_FLOAT.param1 = specialty_value;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_SET_SPECIALTY, CashedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_FLOAT.param1 = specialty_value;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_SET_SPECIALTY, CachedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void LifespanBloodyHandsRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_BLOODY_HANDS, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_BLOODY_HANDS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void LifespanPlaytimeUpdateRPC( float playtime )
 	{
-		CashedObjectsParams.PARAM1_FLOAT.param1 = playtime;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_PLAYTIME_UPDATE, CashedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_FLOAT.param1 = playtime;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_PLAYTIME_UPDATE, CachedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendMeleeBlockStanceRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_BLOCK_STANCE, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_BLOCK_STANCE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	//---------------------------------------------
 	void SendMeleeFightRPC(bool enable)
 	{
-		CashedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_FIGHT, CashedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_FIGHT, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	//---------------------------------------------
 	void SendGoUnconsciousRPC(bool is_delayed)
@@ -985,13 +1193,72 @@ class PluginDiagMenu extends PluginBase
 		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_GO_UNCONSCIOUS, p1, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
+	void SendSimulateNULLPointer()
+	{
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_NULL_POINTER, NULL, true, GetGame().GetPlayer().GetIdentity() );
+	}
+	//---------------------------------------------
+	void SendSimulateDivisionByZero()
+	{
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_DIVISION_BY_ZERO, NULL, true, GetGame().GetPlayer().GetIdentity() );
+	}
+	//---------------------------------------------
+	void SendSimulateInfiniteLoop()
+	{
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_INFINITE_LOOP, NULL, true, GetGame().GetPlayer().GetIdentity() );
+	}
+	//---------------------------------------------
+	void SendSimulateErrorFunction()
+	{
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_ERROR_FUNCTION, NULL, true, GetGame().GetPlayer().GetIdentity() );
+	}
+	
+	void SendActivateBleedingSource(int bleeding_source)
+	{
+		Param1<int> p1 = new Param1<int>(bleeding_source);
+		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_ACTIVATE_BS, p1, true, GetGame().GetPlayer().GetIdentity() );
+	}
+	
+	//---------------------------------------------
 	void OnRPC(PlayerBase player, int rpc_type, ParamsReadContext ctx)
 	{
+		if( GetGame().IsMultiplayer()  &&  GetGame().IsServer() )
+		{
+			switch(rpc_type)
+			{
+				case ERPCs.DEV_SIMULATE_NULL_POINTER:
+					PlayerBase NULL_player = NULL;
+					NULL_player.SetHealth("","", -1);		
+				break;
+				
+				case ERPCs.DEV_SIMULATE_DIVISION_BY_ZERO:
+					int zero = 0;
+					int division_by_zero = 1/zero;
+				break;
+				
+				case ERPCs.DEV_SIMULATE_INFINITE_LOOP:
+					while( true )
+					{
+						Print("simulated infinite loop");
+					}
+				break;
+				
+				case ERPCs.DEV_SIMULATE_ERROR_FUNCTION:
+					Error("Simulated error");
+				break;
+			}
+		}
+		
 		switch(rpc_type)
 		{
+			case ERPCs.DEV_ACTIVATE_BS:
+					ctx.Read(CachedObjectsParams.PARAM1_INT);
+					player.GetBleedingManagerServer().DebugActivateBleedingSource(CachedObjectsParams.PARAM1_INT.param1);
+			break;
+			
 			case ERPCs.DEV_RPC_UNLIMITED_AMMO:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				bool enabled = CashedObjectsParams.PARAM1_BOOL.param1;
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				bool enabled = CachedObjectsParams.PARAM1_BOOL.param1;
 				if(enabled)
 				{			
 					ItemBase.SetDebugActionsMask( ItemBase.GetDebugActionsMask() | DebugActionType.UNLIMITED_AMMO );
@@ -1003,40 +1270,55 @@ class PluginDiagMenu extends PluginBase
 			break;
 			
 			case ERPCs.RPC_DISABLE_MODIFIERS:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				bool enable = CashedObjectsParams.PARAM1_BOOL.param1;
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				bool enable = CachedObjectsParams.PARAM1_BOOL.param1;
 				player.SetModifiers( enable );
+			break;
+			
+			case ERPCs.DEV_RPC_DISABLE_BLOODLOOS:
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				player.GetBleedingManagerServer().SetBloodLoss( CachedObjectsParams.PARAM1_BOOL.param1 );
 			break;
 			
 			case ERPCs.RPC_KILL_PLAYER:
 				player.SetHealth("","", -1);
+			break;	
+			
+			case ERPCs.DEV_ACTIVATE_ALL_BS:
+				player.GetBleedingManagerServer().ActivateAllBS();
 			break;
 
 			case ERPCs.RPC_ENABLE_INVINCIBILITY:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				bool value = CashedObjectsParams.PARAM1_BOOL.param1;
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				bool value = CachedObjectsParams.PARAM1_BOOL.param1;
 				player.SetAllowDamage(!value);
 			break;
 
 			case ERPCs.RPC_ITEM_DEBUG_ACTIONS:
-				ctx.Read(CashedObjectsParams.PARAM1_INT);
-				int mask = CashedObjectsParams.PARAM1_INT.param1;
+				ctx.Read(CachedObjectsParams.PARAM1_INT);
+				int mask = CachedObjectsParams.PARAM1_INT.param1;
 				ItemBase.SetDebugActionsMask(mask);
+			break;
+			
+			case ERPCs.RPC_ENABLE_QUICK_RESTRAIN:
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				bool allow = CachedObjectsParams.PARAM1_BOOL.param1;
+				player.SetQuickRestrain(allow);
 			break;
 
 			case ERPCs.RPC_LOG_PLAYER_STATS:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				player.GetPlayerStats().SetAllowLogs(CashedObjectsParams.PARAM1_BOOL.param1);
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				player.GetPlayerStats().SetAllowLogs(CachedObjectsParams.PARAM1_BOOL.param1);
 			break;
 
 			case ERPCs.RPC_SOFT_SKILLS_TOGGLE_STATE:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				player.GetSoftSkillManager().SetSoftSkillsState(CashedObjectsParams.PARAM1_BOOL.param1);
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				player.GetSoftSkillManager().SetSoftSkillsState(CachedObjectsParams.PARAM1_BOOL.param1);
 			break;
 
 			case ERPCs.RPC_SOFT_SKILLS_DEBUG_WINDOW:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				bool show = CashedObjectsParams.PARAM1_BOOL.param1;
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				bool show = CachedObjectsParams.PARAM1_BOOL.param1;
 				
 				if( show )
 				{
@@ -1051,25 +1333,25 @@ class PluginDiagMenu extends PluginBase
 			break;
 		
 			case ERPCs.RPC_GUN_PARTICLES_TOGGLE:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				PrtTest.m_GunParticlesState = CashedObjectsParams.PARAM1_BOOL.param1;
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				PrtTest.m_GunParticlesState = CachedObjectsParams.PARAM1_BOOL.param1;
 			break;
 
 			case ERPCs.RPC_CRAFTING_DEBUG:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
 				PluginRecipesManager plugin_recipes_manager;
 				Class.CastTo(plugin_recipes_manager, GetPlugin(PluginRecipesManager));
-				plugin_recipes_manager.SetEnableDebugCrafting(CashedObjectsParams.PARAM1_BOOL.param1);
+				plugin_recipes_manager.SetEnableDebugCrafting(CachedObjectsParams.PARAM1_BOOL.param1);
 			break;
 
 			case ERPCs.RPC_SOFT_SKILLS_TOGGLE_MODEL:
-				ctx.Read(CashedObjectsParams.PARAM1_BOOL);
-				player.GetSoftSkillManager().SetLinearState(CashedObjectsParams.PARAM1_BOOL.param1) ;
+				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
+				player.GetSoftSkillManager().SetLinearState(CachedObjectsParams.PARAM1_BOOL.param1) ;
 			break;
 
 			case ERPCs.RPC_SOFT_SKILLS_SET_SPECIALTY:
-				ctx.Read( CashedObjectsParams.PARAM1_FLOAT );
-				float specialty = CashedObjectsParams.PARAM1_FLOAT.param1;
+				ctx.Read( CachedObjectsParams.PARAM1_FLOAT );
+				float specialty = CachedObjectsParams.PARAM1_FLOAT.param1;
 				SoftSkillsManager soft_skill_manager = player.GetSoftSkillManager();
 				soft_skill_manager.SetSpecialtyLevel( specialty );
 				soft_skill_manager.SynchSpecialtyLevel();
@@ -1077,31 +1359,33 @@ class PluginDiagMenu extends PluginBase
 			break;
 
 			case ERPCs.RPC_LIFESPAN_BLOODY_HANDS:
-				ctx.Read( CashedObjectsParams.PARAM1_BOOL );
-				bool bloody_hands = CashedObjectsParams.PARAM1_BOOL.param1;
+				ctx.Read( CachedObjectsParams.PARAM1_BOOL );
+				bool bloody_hands = CachedObjectsParams.PARAM1_BOOL.param1;
 				PluginLifespan lifespan_bloody_hands;
 				Class.CastTo(lifespan_bloody_hands, GetPlugin( PluginLifespan ));
 				lifespan_bloody_hands.UpdateBloodyHandsVisibility( player, bloody_hands );
 			break;
 
 			case ERPCs.RPC_LIFESPAN_PLAYTIME_UPDATE:
-				ctx.Read( CashedObjectsParams.PARAM1_FLOAT );
+				ctx.Read( CachedObjectsParams.PARAM1_FLOAT );
 				//reset players playtime
 				float playtime = player.StatGet("playtime");
 				float opposite_playtime = playtime * ( -1 );
 				player.StatUpdate("playtime", opposite_playtime );
 				//set new playtime
-				float playtime_update = CashedObjectsParams.PARAM1_FLOAT.param1;
+				float playtime_update = CachedObjectsParams.PARAM1_FLOAT.param1;
 				player.StatUpdate("playtime", playtime_update );
 				player.SetLastShavedSeconds( 0 );
 				//update lifespan
 				PluginLifespan module_lifespan_update;
 				Class.CastTo(module_lifespan_update, GetPlugin( PluginLifespan ));
 				module_lifespan_update.UpdateLifespan( player, true );
+				module_lifespan_update.ChangeFakePlaytime( player, playtime_update );
+				
 			break;
 			case ERPCs.DEV_GO_UNCONSCIOUS:
-				ctx.Read( CashedObjectsParams.PARAM1_BOOL );
-				if(!CashedObjectsParams.PARAM1_BOOL.param1)
+				ctx.Read( CachedObjectsParams.PARAM1_BOOL );
+				if(!CachedObjectsParams.PARAM1_BOOL.param1)
 				{
 					if(player.IsUnconscious())
 					{

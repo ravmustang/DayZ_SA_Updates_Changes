@@ -26,7 +26,7 @@ class ActionGetInTransport: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Get in vehicle";
+		return "#get_in_vehicle";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -64,6 +64,7 @@ class ActionGetInTransport: ActionInteractBase
 
 	override void Start( ActionData action_data )
 	{
+		super.Start( action_data );
 		int seat = m_transport.GetSeatAnimationType(m_crewIdx);
 		HumanCommandVehicle vehCommand = action_data.m_Player.StartCommand_Vehicle(m_transport, m_crewIdx, seat);
 		if( vehCommand )
@@ -72,8 +73,25 @@ class ActionGetInTransport: ActionInteractBase
 		}
 	}
 
-	override bool IsInstant()
+	override bool CanBeUsedInRestrain()
 	{
 		return true;
+	}
+	
+	override void OnUpdate(ActionData action_data)
+	{
+
+		if(action_data.m_State == UA_START)
+		{
+			if( !action_data.m_Player.GetCommand_Vehicle().IsGettingIn() )
+			{
+				End(action_data);
+			}
+			//TODO add some timed check for stuck possibility
+			/*else
+			{
+				End(action_data);
+			}*/
+		}
 	}
 };

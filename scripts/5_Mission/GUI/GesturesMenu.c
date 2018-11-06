@@ -188,13 +188,14 @@ class GesturesMenu extends UIScriptedMenu
 		else if ( category == GestureCategories.CATEGORY_3 )
 		{
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_DANCE, 		"Dance", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LYINGDOWN, 	"Lay down", 	GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LYINGDOWN, 	"Lie down", 	GestureCategories.CATEGORY_3 ) );
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SOS, 		"Wave", 		GestureCategories.CATEGORY_3 ) );
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS, 		"RPS", 			GestureCategories.CATEGORY_3 ) );
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SITA, 		"SIT_A", 		GestureCategories.CATEGORY_3 ) );
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SITB, 		"SIT_B", 		GestureCategories.CATEGORY_3 ) );
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SUICIDE, 	"Suicide", 		GestureCategories.CATEGORY_3 ) );
 			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_CAMPFIRE, 	"Camp?", 		GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SURRENDER, 	"Surrender", 	GestureCategories.CATEGORY_3 ) );
 			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_R, 	"RPS-Rock", 	GestureCategories.CATEGORY_3 ) );
 			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_P, 	"RPS-Paper", 	GestureCategories.CATEGORY_3 ) );
 			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_S, 	"RPS-Scisors", 	GestureCategories.CATEGORY_3 ) );

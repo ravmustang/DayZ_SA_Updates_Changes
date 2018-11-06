@@ -1,9 +1,9 @@
 class JsonObject
 {	
-	ref map<string, string> 	m_Strings;
-	ref map<string, int>		m_Ints;
-	ref map<string, float>		m_Floats;
-	ref map<string, bool>		m_Bools;
+	ref map<string, string> 		m_Strings;
+	ref map<string, int>			m_Ints;
+	ref map<string, float>			m_Floats;
+	ref map<string, bool>			m_Bools;
 	ref map<string, ref Vector2>	m_Vectors2;
 		
 	void JsonObject()

@@ -65,6 +65,31 @@ class RifleChambering extends WeaponStateBase
 		m_srcMagazine = NULL;
 		super.OnExit(e);
 	}
-};
 
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+};
 

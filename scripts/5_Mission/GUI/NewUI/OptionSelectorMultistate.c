@@ -6,7 +6,7 @@ class OptionSelectorMultistate extends OptionSelector
 		m_Options					= options;
 		if( options.Count() == 0 )
 		{
-			Error( "Invalid ServerBrowserEntry options" );
+			Error( "Invalid OptionSelectorMultistate options" );
 		}
 		
 		if( current_index < 0 || current_index >= m_Options.Count() )

@@ -57,7 +57,7 @@ class ComponentsBank
 			clas_name = Component.GetNameByType(comp_type);
 		}
 		
-		Component comp = clas_name.ToType().Spawn();
+		Component comp = Component.Cast(clas_name.ToType().Spawn());
 		
 		comp.SetParentEntityAI(m_EntityParent);
 		comp.Event_OnAwake();

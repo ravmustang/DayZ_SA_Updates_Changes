@@ -1,4 +1,4 @@
-class BleedingCheck: ModifierBase
+class BleedingCheckMdfr: ModifierBase
 {
 	protected const float		BLOOD_DECREMENT_PER_SEC = -10;
 		

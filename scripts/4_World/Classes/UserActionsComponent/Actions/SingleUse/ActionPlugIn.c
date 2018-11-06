@@ -8,7 +8,7 @@ class ActionPlugIn: ActionSingleUseBase
 		m_MessageSuccess = "m_MessageSuccess";
 		m_MessageFail = "m_MessageFail";
 		m_MessageCancel = "m_MessageCancel";
-		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		//m_TimeToCompleteAction = 4;
 		////m_MaximalActionDistance = 1;
 		//m_Animation = "eat";
@@ -53,7 +53,7 @@ class ActionPlugIn: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		ItemBase target_IB = ItemBase.Cast( targetObject );
@@ -84,7 +84,7 @@ class ActionPlugIn: ActionSingleUseBase
 		target_IB.GetInventory().TakeEntityAsAttachment( InventoryMode.LOCAL, action_data.m_MainItem );
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{	
 		if ( !action_data.m_Player.IsPlacingLocal() )
 		{

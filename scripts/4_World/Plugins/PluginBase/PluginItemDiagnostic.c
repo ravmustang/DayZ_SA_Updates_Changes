@@ -144,11 +144,11 @@ class PluginItemDiagnostic extends PluginBase
 	void OnRPC(ItemBase item, ParamsReadContext ctx)
 	{
 
-		ctx.Read(CashedObjectsParams.PARAM1_INT);
-		int agents_count 	= CashedObjectsParams.PARAM1_INT.param1;
+		ctx.Read(CachedObjectsParams.PARAM1_INT);
+		int agents_count 	= CachedObjectsParams.PARAM1_INT.param1;
 
-		ctx.Read(CashedObjectsParams.PARAM1_INT);
-		int individual_items_count 	= CashedObjectsParams.PARAM1_INT.param1;
+		ctx.Read(CachedObjectsParams.PARAM1_INT);
+		int individual_items_count 	= CachedObjectsParams.PARAM1_INT.param1;
 		
 		FillAgentArray(ctx, agents_count);
 		
@@ -172,8 +172,8 @@ class PluginItemDiagnostic extends PluginBase
 			
 			ctx.Read(p2);
 			/*
-			string name = CashedObjectsParams.PARAM2_STRING_FLOAT.param1;
-			float value = CashedObjectsParams.PARAM2_STRING_FLOAT.param2;
+			string name = CachedObjectsParams.PARAM2_STRING_FLOAT.param1;
+			float value = CachedObjectsParams.PARAM2_STRING_FLOAT.param2;
 			PrintString(name+","+value.ToString());
 			*/
 			params.Insert(p2);
@@ -207,8 +207,8 @@ class PluginItemDiagnostic extends PluginBase
 		m_Agents.Clear();
 		for(int i = 0; i < agents_count; i++)
 		{
-			ctx.Read(CashedObjectsParams.PARAM1_STRING);
-			string agent = CashedObjectsParams.PARAM1_STRING.param1;
+			ctx.Read(CachedObjectsParams.PARAM1_STRING);
+			string agent = CachedObjectsParams.PARAM1_STRING.param1;
 			m_Agents.Insert(agent);
 		}
 	}

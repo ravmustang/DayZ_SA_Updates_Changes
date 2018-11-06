@@ -1,15 +1,6 @@
-class BotEventEntityAttached : BotEventBase
-{
-	EntityAI m_Entity;
-	void BotEventEntityAttached (PlayerBase p = NULL, EntityAI att = NULL) { m_Entity = att; }
-};
+class BotEventEntityAttached : BotEventBase { };
 
-class BotEventEntityDetached : BotEventBase
-{
-	EntityAI m_Entity;
-	void BotEventEntityDetached (PlayerBase p = NULL, EntityAI att = NULL) { m_Entity = att; }
-};
-
+class BotEventEntityDetached : BotEventBase { };
 
 class BotTestAttachAndDropCycle extends BotStateBase
 {
@@ -78,7 +69,7 @@ class BotTestAttachAndDropCycle_Detaching extends BotStateBase
 	{
 		if (m_Entity)
 		{
-			botDebugPrint("[bot] drop item=" + m_Entity + " bot=" + m_Owner);
+			botDebugPrint("[bot] + " + m_Owner + " drop item=" + m_Entity + " bot=" + m_Owner);
 			
 			m_Owner.PredictiveDropEntity(m_Entity);
 
@@ -114,7 +105,7 @@ class BotTestAttachAndDropCycle_Attaching extends BotStateBase
 	{
 		if (m_Entity)
 		{
-			botDebugPrint("[bot] att item=" + m_Entity + " bot=" + m_Owner);
+			botDebugPrint("[bot] + " + m_Owner + " att item=" + m_Entity + " bot=" + m_Owner);
 			
 			if (m_Owner.GetInventory().CanAddAttachment(m_Entity))
 			{

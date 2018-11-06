@@ -35,7 +35,12 @@ class StanceIndicator
 	{	
 		if ( m_Player )
 		{
-			m_Player.GetDisplayStatus().SetValue(eDisplayElements.DELM_STANCE, stance);
+			DisplayElementBase stance_element = m_Player.GetVirtualHud().GetElement(eDisplayElements.DELM_STANCE);
+			if(stance_element)
+			{
+				stance_element.SetValue(stance);
+			}
+			//m_Player.GetVirtualHud().SetValue(eDisplayElements.DELM_STANCE, stance);
 		}
 	}
 };

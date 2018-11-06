@@ -1,47 +1,70 @@
 class PileOfWoodenPlanks extends ItemBase
 {	
+	void PileOfWoodenPlanks()
+	{
+		if ( GetGame().IsServer() )
+		{
+			SetAllowDamage(false);
+		}
+	}
+	
 	// Shows/Hides selections. Call this in init or after every quantity change.
 	void UpdateSelections()
 	{
+		RemoveProxyPhysics( "stage_1" );
+		RemoveProxyPhysics( "stage_2" );
+		RemoveProxyPhysics( "stage_3" );
+		
 		// Show/Hide selections according to the current quantity
 		if ( this )
 		{
 			float quantity = GetQuantity();
 			float quantity_max = GetQuantityMax();
-			Print(quantity);
-			Print(quantity_max);
+			
 			if ( quantity > GetQuantityMax() *0.66 )
 			{
 				// Show 3/3 amount of planks
-				SetAnimationPhase ( "stage_3", 0 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_2", 1 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_1", 1 ); // 1 = hide, 0 = unhide!
+				ShowSelection ( "stage_3" );
+				HideSelection ( "stage_2" );
+				HideSelection ( "stage_1" );
+				
+				AddProxyPhysics( "stage_3" );
 			}
 			
 			if ( quantity > quantity_max *0.33  &&  quantity <= quantity_max *0.66 )
 			{
 				// Show 2/3 amount of planks
-				SetAnimationPhase ( "stage_3", 1 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_2", 0 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_1", 1 ); // 1 = hide, 0 = unhide!
+				HideSelection ( "stage_3" );
+				ShowSelection ( "stage_2" );
+				HideSelection ( "stage_1" );
+				
+				AddProxyPhysics( "stage_2" );
 			}
 			
 			if ( quantity > 0  &&  quantity <= quantity_max *0.33 )
 			{
 				// Show 1/3 amount of planks
-				SetAnimationPhase ( "stage_3", 1 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_2", 1 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_1", 0 ); // 1 = hide, 0 = unhide!
+				HideSelection ( "stage_3" );
+				HideSelection ( "stage_2" );
+				ShowSelection ( "stage_1" );
+				
+				AddProxyPhysics( "stage_1" );
 			}
 			
 			if ( quantity == 0 )
 			{
 				// Show 0 planks. Object should be deleted now.
-				SetAnimationPhase ( "stage_3", 1 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_2", 1 ); // 1 = hide, 0 = unhide!
-				SetAnimationPhase ( "stage_1", 1 ); // 1 = hide, 0 = unhide!
+				HideSelection ( "stage_3" );
+				HideSelection ( "stage_2" );
+				HideSelection ( "stage_1" );
 			}
 		}
+	}
+	
+	override void EEItemLocationChanged(notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
+	{
+		super.EEItemLocationChanged(oldLoc, newLoc);
+		UpdateSelections();
 	}
 	
 	// Removes a number of long planks. Note that one (4m) long plank has the length of 3x normal planks!
@@ -63,5 +86,28 @@ class PileOfWoodenPlanks extends ItemBase
 		
 		// Return the number of removed long planks
 		return available_planks;
+	}
+	
+	override bool CanPutIntoHands( EntityAI parent )
+	{
+		if( !super.CanPutIntoHands( parent ) )
+		{
+			return false;
+		}
+		
+		return false;
+	}
+	
+	override bool CanPutInCargo (EntityAI parent)
+	{
+		// Uncomment this if you want to make it possible to put the pile into V3S Cargo
+		/*
+		if ( parent.IsKindOf("V3S_Cargo") )
+			return true;
+		else
+			return false;
+		*/
+		
+		return false;
 	}
 }

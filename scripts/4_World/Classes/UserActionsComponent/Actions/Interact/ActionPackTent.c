@@ -14,7 +14,7 @@ class ActionPackTent: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Pack tent";
+		return "#pack_tent";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -51,7 +51,17 @@ class ActionPackTent: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
+	{
+		Object targetObject = action_data.m_Target.GetObject();
+		if ( targetObject != NULL && targetObject.IsInherited(TentBase) ) 
+		{
+			TentBase tent = TentBase.Cast( targetObject );
+			tent.Pack();
+		}
+	}
+	
+	override void OnExecuteClient( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		if ( targetObject != NULL && targetObject.IsInherited(TentBase) ) 

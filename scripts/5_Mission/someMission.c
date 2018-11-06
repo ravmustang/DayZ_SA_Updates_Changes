@@ -28,6 +28,10 @@ Mission CreateMission(string path)
 	}
 	else
 	{
+		if( path == "" )
+		{
+			return new MissionDummy;
+		}
 #ifndef NO_GUI_INGAME
 		return new MissionGameplay;
 #else

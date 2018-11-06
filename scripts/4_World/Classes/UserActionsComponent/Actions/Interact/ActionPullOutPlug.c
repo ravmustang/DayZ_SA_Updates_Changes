@@ -4,6 +4,7 @@ class ActionPullOutPlug: ActionInteractBase
 	{
 		m_MessageSuccess = "I've unplugged the device.";
 		m_MessageStart = "";
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 	}
 
 	override int GetType()
@@ -29,7 +30,7 @@ class ActionPullOutPlug: ActionInteractBase
 		return return_string;
 		*/
 		
-		return "Pull out plug";
+		return "#pull_out_plug";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -51,7 +52,7 @@ class ActionPullOutPlug: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{	
 		Object targetObject = action_data.m_Target.GetObject();
 		if ( targetObject )

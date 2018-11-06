@@ -79,7 +79,7 @@ class PluginConfigEmotesProfile extends PluginConfigHandler
 		m_DefaultValues.Insert( EMOTE_2,  GetNewCfgParamInt(ID_EMOTE_SOS) );
 		m_DefaultValues.Insert( EMOTE_3,  GetNewCfgParamInt(ID_EMOTE_HEART) );
 		m_DefaultValues.Insert( EMOTE_4,  GetNewCfgParamInt(ID_EMOTE_TAUNT) );
-		m_DefaultValues.Insert( EMOTE_5,  GetNewCfgParamInt(ID_EMOTE_LYINGDOWN) );
+		m_DefaultValues.Insert( EMOTE_5,  GetNewCfgParamInt(ID_EMOTE_SURRENDER) );
 		m_DefaultValues.Insert( EMOTE_6,  GetNewCfgParamInt(ID_EMOTE_TAUNTKISS) );
 		m_DefaultValues.Insert( EMOTE_7,  GetNewCfgParamInt(ID_EMOTE_POINT) );
 		m_DefaultValues.Insert( EMOTE_8,  GetNewCfgParamInt(ID_EMOTE_TAUNTELBOW) );

@@ -1,4 +1,4 @@
-class Tremor: ModifierBase
+class TremorMdfr: ModifierBase
 {
 	private const float	 	TREMOR_DECREMENT_PER_SEC = 0.008;
 

@@ -1,7 +1,5 @@
-class Wet: ModifierBase
+class WetMdfr: ModifierBase
 {
-	const float WET_THRESHOLD 	= 0.2;
-
 	override void Init()
 	{
 		m_TrackActivatedTime 	= false;
@@ -11,7 +9,15 @@ class Wet: ModifierBase
 	}
 	override bool ActivateCondition(PlayerBase player)
 	{
-		if (player.GetStatWet().Get() > WET_THRESHOLD)
+		if (player.GetStatWet().Get() == player.GetStatWet().GetMax())
+			return true;
+		
+		return false;
+	}
+	
+	override bool DeactivateCondition(PlayerBase player)
+	{
+		if (player.GetStatWet().Get() == player.GetStatWet().GetMin())
 			return true;
 		
 		return false;
@@ -19,8 +25,7 @@ class Wet: ModifierBase
 
 	override void OnActivate(PlayerBase player)
 	{
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(NTF_WETNESS);
-		
+		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(eNotifiers.NTF_WETNESS);
 	}
 
 	override void OnReconnect(PlayerBase player)
@@ -31,15 +36,6 @@ class Wet: ModifierBase
 
 	override void OnDeactivate(PlayerBase player)
 	{
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(NTF_WETNESS);
-	}
-
-
-	override bool DeactivateCondition(PlayerBase player)
-	{
-		if (player.GetStatWet().Get() <= WET_THRESHOLD)
-			return true;
-		
-		return false;
+		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(eNotifiers.NTF_WETNESS);
 	}
 };

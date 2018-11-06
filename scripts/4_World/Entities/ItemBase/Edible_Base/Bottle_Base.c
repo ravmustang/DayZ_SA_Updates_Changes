@@ -5,7 +5,6 @@ class Bottle_Base extends Edible_Base
 	protected int 		m_ParticlePlaying 	= ParticleList.INVALID;
 	//Boiling
 	//waiting for proper particle effects
-	/*
 	protected int PARTICLE_BOILING_EMPTY 	= ParticleList.COOKING_BOILING_EMPTY;
 	protected int PARTICLE_BOILING_START 	= ParticleList.COOKING_BOILING_START;
 	protected int PARTICLE_BOILING_DONE 	= ParticleList.COOKING_BOILING_DONE;
@@ -17,22 +16,16 @@ class Bottle_Base extends Edible_Base
 	protected int PARTICLE_DRYING_DONE 		= ParticleList.COOKING_DRYING_DONE;
 	//Burning
 	protected int PARTICLE_BURNING_DONE		= ParticleList.COOKING_BURNING_DONE;
-	*/
-	protected int PARTICLE_BOILING_EMPTY 	= ParticleList.INVALID;
-	protected int PARTICLE_BOILING_START 	= ParticleList.INVALID;
-	protected int PARTICLE_BOILING_DONE 	= ParticleList.INVALID;
-	//Baking
-	protected int PARTICLE_BAKING_START 	= ParticleList.INVALID;
-	protected int PARTICLE_BAKING_DONE 		= ParticleList.INVALID;
-	//Drying
-	protected int PARTICLE_DRYING_START 	= ParticleList.INVALID;
-	protected int PARTICLE_DRYING_DONE 		= ParticleList.INVALID;
-	//Burning
-	protected int PARTICLE_BURNING_DONE		= ParticleList.INVALID;
 	
 	//Sounds
 	protected SoundOnVehicle	m_SoundCooking;
 	protected string			m_SoundPlaying = "";
+	ref protected EffectSound 	m_PouringSound;
+	ref protected EffectSound 	m_EmptyingLoopSound;
+	ref protected EffectSound 	m_EmptyingEndSound;
+	protected bool 				m_IsPouring;
+	protected bool 				m_IsEmptying;
+	
 	//Boiling
 	const string SOUND_BOILING_EMPTY 		= "boilingWater";
 	const string SOUND_BOILING_START 		= "boilingWater";
@@ -44,8 +37,27 @@ class Bottle_Base extends Edible_Base
 	const string SOUND_DRYING_START 		= "dry";
 	const string SOUND_DRYING_DONE 			= "dryDone";	
 	//Burning
-	const string SOUND_BURNING_DONE 		= "bakeDone";
-
+	const string SOUND_BURNING_DONE 		= "burned";
+		
+	void Bottle_Base()
+	{
+		m_PouringSound  	= new EffectSound;
+		m_EmptyingLoopSound = new EffectSound;
+		m_EmptyingEndSound  = new EffectSound;
+		m_IsPouring 		= false;
+		m_IsEmptying 		= false;
+		
+		RegisterNetSyncVariableBool("m_IsPouring");
+		RegisterNetSyncVariableBool("m_IsEmptying");
+	}
+	
+	void ~Bottle_Base()
+	{
+		SEffectManager.DestroySound( m_PouringSound );
+		SEffectManager.DestroySound( m_EmptyingLoopSound );
+		SEffectManager.DestroySound( m_EmptyingEndSound );
+	}
+	
 	override void EEDelete( EntityAI parent )
 	{
 		super.EEDelete( parent );
@@ -53,7 +65,7 @@ class Bottle_Base extends Edible_Base
 		//remove audio visuals
 		RemoveAudioVisuals();
 	}	
-		
+	
 	//================================================================
 	// PARTICLES & SOUNDS
 	//================================================================
@@ -61,6 +73,32 @@ class Bottle_Base extends Edible_Base
 	//is_done - is the food baked, boiled, dried?
 	//is_empty - is cooking quipment (cargo) empty?
 	//is_burned - is any of the food items in the cargo in burned food stage?
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+				
+		if ( GetIsPouring() && !m_PouringSound.IsSoundPlaying() )
+		{
+			PlayPouringSound();
+		}
+		
+		if ( !GetIsPouring() && m_PouringSound.IsSoundPlaying() )
+		{
+			StopPouringSound();
+		}
+		
+		if ( GetIsEmptying() && !m_EmptyingLoopSound.IsSoundPlaying() )
+		{
+			PlayEmptyingLoopSound();
+		}
+		
+		if ( !GetIsEmptying() && m_EmptyingLoopSound.IsSoundPlaying() )
+		{
+			StopEmptyingSound();
+		}
+	}
+	
 	void RefreshAudioVisuals( CookingMethodType cooking_method, bool is_done, bool is_empty, bool is_burned )
 	{
 		string sound_name;
@@ -178,26 +216,34 @@ class Bottle_Base extends Edible_Base
 		*/
 		
 		EntityAI parent = GetHierarchyParent();
-		vector fireplace_pos = parent.GetPosition();
-		
-		FireplaceBase fireplace = FireplaceBase.Cast( parent );
+		vector particle_pos = parent.GetPosition();
 		float steam_offset = 0;
-		if ( fireplace.IsBaseFireplace() )
-		{
-			steam_offset = 0.8;
-		}
-		else if ( fireplace.IsBarrelWithHoles() )
-		{
-			steam_offset = 1.1;
-		}
-		else if ( fireplace.IsFireplaceIndoor() )
-		{
-			steam_offset = 0.45;
-		}		
 		
-		fireplace_pos[1] = fireplace_pos[1] + steam_offset;
+		if ( parent.IsInherited( PortableGasStove ) )
+		{
+			steam_offset = 0.2;
+		}
+		else if ( parent.IsInherited( FireplaceBase ) )
+		{
+			FireplaceBase fireplace = FireplaceBase.Cast( parent );
+			
+			if ( fireplace.IsBaseFireplace() )
+			{
+				steam_offset = 0.8;
+			}
+			else if ( fireplace.IsBarrelWithHoles() )
+			{
+				steam_offset = 1.1;
+			}
+			else if ( fireplace.IsFireplaceIndoor() )
+			{
+				steam_offset = 0.45;
+			}		
+		}
 		
-		return fireplace_pos;
+		particle_pos[1] = particle_pos[1] + steam_offset;
+		
+		return particle_pos;
 	}
 
 	//sounds
@@ -226,4 +272,199 @@ class Bottle_Base extends Edible_Base
 			m_SoundPlaying = "";
 		}
 	}	
+		
+	void PlayPouringSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{
+			m_PouringSound = SEffectManager.PlaySound( GetPouringSoundset(), GetPosition(), 0, 0, true );
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{
+			SetIsPouring( true );
+		}
+		
+		//local singleplayer
+		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{		
+			if ( !GetIsPouring() )
+			{
+				SetIsPouring( true );
+				m_PouringSound = SEffectManager.PlaySound( GetPouringSoundset(), GetPosition(), 0, 0, true );
+			}
+		}
+	}
+	
+	void StopPouringSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{
+			m_PouringSound.SoundStop();
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{
+			SetIsPouring( false );
+		}
+		
+		//local singleplayer
+		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{	
+			if ( GetIsPouring() )
+			{
+				SetIsPouring( false );
+				m_PouringSound.SoundStop();
+			}
+		}
+	}
+	
+	void SetIsPouring( bool is_pouring )
+	{
+		m_IsPouring = is_pouring;
+		SetSynchDirty();
+	}
+	
+	bool GetIsPouring()
+	{
+		return m_IsPouring;
+	}
+	
+	string GetPouringSoundset()
+	{
+		
+	}
+	
+	void PlayEmptyingLoopSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{
+			m_EmptyingLoopSound = SEffectManager.PlaySound( GetEmptyingLoopSoundset(), GetPosition(), 0, 0, true );
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{
+			SetIsEmptying( true );
+		}
+		
+		//local singleplayer
+		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{		
+			if ( !GetIsEmptying() )
+			{
+				SetIsEmptying( true );
+				m_EmptyingLoopSound = SEffectManager.PlaySound( GetEmptyingLoopSoundset(), GetPosition(), 0, 0, true );
+			}
+		}
+	}
+	
+	void StopEmptyingSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{
+			m_EmptyingLoopSound.SoundStop();
+			m_EmptyingEndSound = SEffectManager.PlaySound( GetEmptyingEndSoundset(), GetPosition() );
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{
+			SetIsEmptying( false );
+		}
+		
+		//local singleplayer
+		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{	
+			if ( GetIsEmptying() )
+			{
+				SetIsEmptying( false );
+				m_EmptyingLoopSound.SoundStop();
+				m_EmptyingEndSound = SEffectManager.PlaySound( GetEmptyingEndSoundset(), GetPosition() );
+			}
+		}
+	}
+	
+	void SetIsEmptying( bool is_emptying )
+	{
+		m_IsEmptying = is_emptying;
+		SetSynchDirty();
+	}
+	
+	bool GetIsEmptying()
+	{
+		return m_IsEmptying;
+	}
+	
+	string GetEmptyingLoopSoundset()
+	{		
+		vector pos = GetPosition();
+		string surface_type = GetGame().GetPlayer().GetSurfaceType();
+		string sound_set = "";
+		
+		if ( GetGame().IsSurfaceHardGround( surface_type ) )
+		{
+			sound_set = GetEmptyingLoopSoundsetHard();
+		}
+		else if ( GetGame().IsSurfaceSoftGround( surface_type ) )
+		{
+			sound_set = GetEmptyingLoopSoundsetSoft();
+		}
+		else if ( GetGame().SurfaceIsPond( pos[0], pos[2] ) || GetGame().SurfaceIsSea( pos[0], pos[2] ) )
+		{
+			sound_set = GetEmptyingLoopSoundsetWater();
+		}
+		
+		return sound_set;
+	}
+	
+	string GetEmptyingEndSoundset()
+	{		
+		vector pos = GetPosition();
+		string surface_type = GetGame().GetPlayer().GetSurfaceType();
+		string sound_set = "";
+		
+		if ( GetGame().IsSurfaceHardGround( surface_type ) )
+		{
+			sound_set = GetEmptyingEndSoundsetHard();
+		}
+		else if ( GetGame().IsSurfaceSoftGround( surface_type ) )
+		{
+			sound_set = GetEmptyingEndSoundsetSoft();
+		}
+		else if ( GetGame().SurfaceIsPond( pos[0], pos[2] ) || GetGame().SurfaceIsSea( pos[0], pos[2] ) )
+		{
+			sound_set = GetEmptyingEndSoundsetWater();
+		}
+		
+		return sound_set;
+	}
+	
+	string GetEmptyingLoopSoundsetHard()
+	{
+		
+	}
+	
+	string GetEmptyingLoopSoundsetSoft()
+	{
+		
+	}
+	
+	string GetEmptyingLoopSoundsetWater()
+	{
+		
+	}
+	
+	string GetEmptyingEndSoundsetHard()
+	{
+		
+	}
+	
+	string GetEmptyingEndSoundsetSoft()
+	{
+		
+	}
+	
+	string GetEmptyingEndSoundsetWater()
+	{
+		
+	}
 }

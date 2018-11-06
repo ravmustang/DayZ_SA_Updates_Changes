@@ -1,3 +1,11 @@
+enum SurfaceAnimationBone
+{
+	LeftFrontLimb = 0,
+	RightFrontLimb,
+	LeftBackLimb,
+	RightBackLimb
+}
+
 class EntityAI extends Entity
 {
 	void EntityAI ()
@@ -25,7 +33,7 @@ class EntityAI extends Entity
 	}
 
 	private ref ComponentsBank m_ComponentsBank;
-	ComponentEnergyManager m_EM;
+	ComponentEnergyManager m_EM; // This reference is necesarry due to synchronization, since it's impossible to synchronize values from a component :(
 
 	//! CreateComponent
 	Component CreateComponent(int comp_type, string extended_class_name="")
@@ -75,8 +83,6 @@ class EntityAI extends Entity
 		Debug.LogError(msg, "Object", "n/a", fnc_name, this.GetType());
 	}
 
-	private EntityEventHandler m_event_handler;
-
 	///@{ Skinning
 	bool IsSkinned()
 	{
@@ -98,6 +104,71 @@ class EntityAI extends Entity
 	}
 	///@} Skinning
 
+	// ITEM TO ITEM FIRE DISTRIBUTION
+	//! Override this method to return TRUE when this item has or can provide fire. Evaluated on server and client.
+	bool HasFlammableMaterial()
+	{
+		return false;
+	}
+	
+	//! Override this method so it checks whenever this item can be ignited right now or not. Evaluated on Server and Client.
+	bool CanBeIgnitedBy(EntityAI igniter = NULL)
+	{
+		return false;
+	}
+	
+	//! Override this method and check if the given item can be ignited right now by this one. Evaluated on Server and Client.
+	bool CanIgniteItem(EntityAI ignite_target = NULL)
+	{
+		return false;
+	}
+	
+	//! Override this method and make it so it returns whenever this item is on fire right now or not. Evaluated on Server and Client.
+	bool IsIgnited()
+	{
+		if ( HasEnergyManager() )
+			return GetCompEM().IsWorking(); // This code is optional, it's just what's most likely to be used in your items.
+		
+		return false;
+	}
+	
+	//! Executed on Server when this item ignites some target item
+	void OnIgnitedTarget( EntityAI target_item)
+	{
+		
+	}
+	
+	//! Executed on Server when some item ignited this one
+	void OnIgnitedThis( EntityAI fire_source)
+	{
+		
+	}
+	
+	//! Executed on Server when this item failed to ignite target item
+	void OnIgnitedTargetFailed( EntityAI target_item)
+	{
+		
+	}
+	
+	//! Executed on Server when some item failed to ignite this one
+	void OnIgnitedThisFailed( EntityAI fire_source)
+	{
+		
+	}
+	
+	//! Final evaluation just before the target item is actually ignited. Evaluated on Server.
+	bool IsTargetIgnitionSuccessful(EntityAI item_target)
+	{
+		return true;
+	}
+	
+	//! Final evaluation just before this item is actually ignited from fire source. Evaluated on Server.
+	bool IsThisIgnitionSuccessful(EntityAI item_source = NULL)
+	{
+		return true;
+	}
+	// End of fire distribution ^
+	
 	// ADVANCED PLACEMENT EVENTS
 	void OnPlacementStarted( Man player ) { }
 		
@@ -146,18 +217,11 @@ class EntityAI extends Entity
 		}
 	}
 
-	EntityEventHandler GetEventHandler() { return m_event_handler; }
-
-	void SetEventHandler(EntityEventHandler event_handler)
-	{
-		m_event_handler = event_handler;
-	}
-	
 	int GetAgents() { return 0; }
 	void RemoveAgent(int agent_id);
 	void RemoveAllAgents();
 	void RemoveAllAgentsExcept(int agent_to_keep);
-	void InsertAgent(int agent, int count);
+	void InsertAgent(int agent, float count);
 
 	override bool IsEntityAI() { return true; }
 
@@ -193,7 +257,7 @@ class EntityAI extends Entity
 			GetInventory().EEInit();
 	}
 	
-	//! Called upon object deleting
+	//! Called right before object deleting
 	void EEDelete(EntityAI parent)
 	{
 		GetInventory().EEDelete(parent);
@@ -201,18 +265,7 @@ class EntityAI extends Entity
 		if ( HasEnergyManager() )
 			GetCompEM().OnDeviceDestroyed();
 	}
-
-	void EEAnimHook(int userType, string param) { }
-
-	void EEAnimDone(string moveName)
-	{
-		if (m_event_handler) 
-		{
-			Param param = new Param1<string>(moveName);
-			m_event_handler.OnEvent(this, EEAnimDone, param);
-		}
-	}
-
+	
 	void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner) { }
 	
 	void EEItemLocationChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
@@ -238,10 +291,6 @@ class EntityAI extends Entity
 		}
 	}
 
-	void EEAnimStateChanged(string moveName) { }
-
-	void EEFired(int muzzleType, int mode, string ammoType) { }
-
 	void EEAmmoChanged()
 	{
 		Mission mission;
@@ -254,18 +303,16 @@ class EntityAI extends Entity
 		}
 	}
 
-	void EELocal(bool isLocal) { }
-
-	void EEDammaged(string hitpointName, float hit) { }
+	void EEHealthLevelChanged(int oldLevel, int newLevel, string zone)
+	{
+	}
 
 	void EEKilled(Object killer) { }
 	
-	void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, string component, string ammo, vector modelPos) { }
+	void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos) { }
 	
-	void EEHitByRemote(int damageType, EntityAI source, string component, string ammo, vector modelPos)
-	{
-		
-	}
+	// called only on the client who caused the hit
+	void EEHitByRemote(int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos) { }
 	
 	// !Called on PARENT when a child is attached to it.
 	void EEItemAttached(EntityAI item, string slot_name)
@@ -283,13 +330,10 @@ class EntityAI extends Entity
 		}
 		
 		// Energy Manager
-		if ( GetGame().IsServer() )
+		if ( this.HasEnergyManager()  &&  item.HasEnergyManager() )
 		{
-			if ( this.HasEnergyManager()  &&  item.HasEnergyManager() )
-			{
-				GetCompEM().OnAttachmentAdded(item);
-			}
-		}				
+			GetCompEM().OnAttachmentAdded(item); // Inner code is meant to be executed client and server side to avoid unnecesarry network synchronization
+		}
 		
 		//SwitchItemSelectionTexture(item, slot_name);
 	}
@@ -314,12 +358,9 @@ class EntityAI extends Entity
 		}
 		
 		// Energy Manager
-		if ( GetGame().IsServer() )
+		if ( this.HasEnergyManager()  &&  item.HasEnergyManager() )
 		{
-			if ( this.HasEnergyManager()  &&  item.HasEnergyManager() )
-			{
-				GetCompEM().OnAttachmentRemoved(item);
-			}
+			GetCompEM().OnAttachmentRemoved(item);
 		}
 		
 		//SwitchItemSelectionTexture(item, slot_name);
@@ -335,33 +376,41 @@ class EntityAI extends Entity
 			hud = mission.GetHud();
 			if(hud) hud.RefreshItemPosition( item );
 		}
+		
+		item.OnMovedInsideCargo(this);
 	}
 
 	void EECargoOut(EntityAI item)
 	{
+		item.OnRemovedFromCargo(this);
 	}
 
 	void EECargoMove(EntityAI item)
 	{
+		item.OnMovedWithinCargo(this);
 	}
 	
-	void EEOnWaterEnter()
+	//! Called when this item enters cargo of some container
+	void OnMovedInsideCargo(EntityAI container)
 	{
+		if ( HasEnergyManager() )
+		{
+			GetCompEM().HandleMoveInsideCargo(container);
+		}
 	}
 	
-	void EEOnWaterExit()
+	//! Called when this item exits cargo of some container
+	void OnRemovedFromCargo(EntityAI container)
 	{
+	
 	}
-
-	void EEUsed(Man owner)
+	
+	//! Called when this item moves within cargo of some container
+	void OnMovedWithinCargo(EntityAI container)
 	{
+	
 	}
-
-	//! Called on client (in multiplayer) when sqf synchronize variable is synchronized
-	void EEVariableSynchronized(string variable_name)
-	{
-	}
-
+	
 	//! Called when entity is part of "connected system" and being restored after load
 	void EEOnAfterLoad()
 	{
@@ -447,19 +496,13 @@ class EntityAI extends Entity
 		}
 	}
 	
-	/**
-	\brief This event is called when player is marked captive.
-		\param captive \p bool true when player is marked captive, false when it is unmarked captive.
-	*/
-	void EEOnSetCaptive(bool captive) { }
-
 	/**@fn		CanReceiveAttachment
 	 * @brief calls this->CanReceiveAttachment(attachment)
 	 * @return	true if action allowed
 	 *
 	 * @note: return scriptConditionExecute(this, attachment, "CanReceiveAttachment");
 	 **/
-	bool CanReceiveAttachment (EntityAI attachment)
+	bool CanReceiveAttachment (EntityAI attachment, int slotId)
 	{
 		return true;
 	}
@@ -906,16 +949,9 @@ class EntityAI extends Entity
 	proto native bool	IsPilotLight();
 	proto native void SetPilotLight(bool isOn);
 	
-	proto native bool IsWaterContact();
-	
 	//! Returns the vehicle in which the given unit is mounted. If there is none, NULL is returned.
 	proto native Transport GetTransport();
 	
-	bool IsRestrained()
-	{
-		return false;		
-	}
-
 	/**
 	\brief Engine calls this function to collect data from entity to store to game database (on server side).
 	@code
@@ -1063,12 +1099,15 @@ class EntityAI extends Entity
 		{
 			bool is_on = GetCompEM().IsSwitchedOn();
 			
-			
-			if (is_on)
-				GetCompEM().SwitchOn();
-			else
-				GetCompEM().SwitchOff();
-			
+			if (is_on != GetCompEM().GetPreviousSwitchState())
+			{
+				if (is_on)
+					GetCompEM().SwitchOn();
+				else
+					GetCompEM().SwitchOff();
+				;
+			}
+				
 			GetCompEM().DeviceUpdate();
 			GetCompEM().StartUpdates();
 		}
@@ -1240,6 +1279,13 @@ class EntityAI extends Entity
 					}
 					break;
 				}
+				
+				case ERPCs.RPC_EXPLODE_EVENT:
+				{
+					OnExplodeClient();
+					
+					break;
+				}
 			}
 		}
 	}
@@ -1271,4 +1317,24 @@ class EntityAI extends Entity
 		return m_ViewIndex;
 	}
 	///@} view index
+	
+	//! Returns hit component for the Entity (overriden for each Type - PlayerBase, DayZInfected, DayZAnimal, etc.)
+	string GetHitComponentForAI()
+	{
+		//! returns Global so it is obvious you need to configure that properly on entity
+		return "";
+	}
+
+	//! returns default hit component for the Entity (overriden for each Type - PlayerBase, DayZInfected, DayZAnimal, etc.)
+	string GetDefaultHitComponent()
+	{
+		//! returns Global so it is obvious you need to configure that properly on entity
+		return "";
+	}
+	
+	//! returns sound type of attachment (used for clothing and weapons on DayZPlayerImplement, paired with Anim*Type enum from DayZAnimEvents)
+	string GetAttachmentSoundType()
+	{
+		return "None";
+	}
 };

@@ -11,8 +11,7 @@ class ActionUseRangefinder : ActionContinuousBase
 	void ActionUseRangefinder()
 	{
 		m_CallbackClass = ActionUseRangefinderCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LOOKOPTICS;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_LOOKOPTICS;
+		m_CommandUID = DayZPlayerConstants.CMD_GESTUREFB_LOOKOPTICS;
 		m_MessageStartFail = "ActionUseRangefinder - m_MessageStartFail";
 		m_MessageStart = "ActionUseRangefinder - m_MessageStart";
 		m_MessageSuccess = "ActionUseRangefinder - m_MessageSuccess";
@@ -33,20 +32,20 @@ class ActionUseRangefinder : ActionContinuousBase
 	{
 		return AT_USE_RANGE_FINDER;
 	}
+	
+	override bool IsFullBody(PlayerBase player)
+	{
+		return true;
+	}
 		
 	override string GetText()
 	{
-		return "Use range finder";
+		return "#use_range_finder";
 	}
 
 	override bool HasTarget()
 	{
 		return false;
-	}
-
-	override bool HasProneException()
-	{
-		return true;
 	}
 	
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -54,7 +53,7 @@ class ActionUseRangefinder : ActionContinuousBase
 		return item.GetCompEM().CanWork() && Rangefinder.Cast( item ).IsInOptics();
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		/*if (action_data.m_Player)
 		{

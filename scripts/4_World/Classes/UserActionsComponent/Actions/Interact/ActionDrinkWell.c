@@ -14,12 +14,7 @@ class ActionDrinkWell extends ActionInteractBase
 
 	override string GetText()
 	{
-		return "Take a sip";
-	}
-
-	override string GetTargetDescription()
-	{
-		return "Well";
+		return "#take_a_sip";
 	}
 	
 	override void CreateConditionComponents()  
@@ -44,12 +39,12 @@ class ActionDrinkWell extends ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		action_data.m_Player.Consume(NULL, UAQuantityConsumed.DRINK, EConsumeType.ENVIRO_WELL);
 		if(action_data.m_Player.HasBloodyHands())
 		{
-			action_data.m_Player.InsertAgent(AGT_CHOLERA, UAQuantityConsumed.DRINK);
+			action_data.m_Player.InsertAgent(eAgents.CHOLERA, UAQuantityConsumed.DRINK);
 		}
 	}
 }

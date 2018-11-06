@@ -15,607 +15,7 @@
 				<default name="clusterMatrix" de="TrajectoryStumps" width="12" height="12"/>
 -->
 		</defaults>
-		<clusters>
-			<export name="PathD10" shape="dz\structures\Roads\Parts\path_dirt_10.p3d" />
-			<export name="PathD30" shape="dz\structures\Roads\Parts\path_dirt_30.p3d" />
-			<export name="PathDCurve" shape="dz\structures\Roads\Parts\path_dirt_curve.p3d" />
-			<export name="PathRCurve" shape="dz\structures\Roads\Parts\path_rock_curve.p3d" />
-			<export name="PathR10" shape="dz\structures\Roads\Parts\path_rock_10.p3d" />
-			<export name="PathR30" shape="dz\structures\Roads\Parts\path_rock_30.p3d" />
-			<export name="Stones" shape="dz\rocks\stones_erosion.p3d" />
-			
-			<export name="Rail1" shape="dz\structures\rail\tracks\rail_track_25.p3d" />
-			<export name="Rail2" shape="dz\structures\rail\tracks\rail_tracke_25.p3d" />
-			<export name="Rail3" shape="dz\structures\rail\tracks\rail_tracke_40.p3d" />
-			<export name="Rail4" shape="dz\structures\rail\tracks\rail_tracke_l25_5.p3d" />
-			<export name="Rail5" shape="dz\structures\rail\tracks\rail_tracke_r25_5.p3d" />
-			<export name="Rail6" shape="dz\structures\rail\tracks\rail_tracke_l30_20.p3d" />
-			<export name="Rail7" shape="dz\structures\rail\tracks\rail_tracke_r30_20.p3d" />
-			<export name="Rail8" shape="dz\structures\rail\tracks\rail_tracke_l25_10.p3d" />
-			<export name="Rail9" shape="dz\structures\rail\tracks\rail_tracke_r25_10.p3d" />
-<!--
-			<export name="Stone1" shape="dz\rocks\stone1.p3d" />
-			<export name="Stone2" shape="dz\rocks\stone2.p3d" />
-			<export name="Stone3" shape="dz\rocks\stone3.p3d" />
-			<export name="Stone4" shape="dz\rocks\stone4.p3d" />
-			<export name="Stone5" shape="dz\rocks\stone5.p3d" />
 
-			<export name="QuercusRobur_3d" shape="dz\plants\tree\t_quercusRobur_3d.p3d" />
--->
-			<export name="AppleTree1" shape="dz\plants2\tree\t_malus1s.p3d" />
-			<export name="AppleTree2" shape="dz\plants\tree\t_malusDomestica_2s.p3d" />
-			<export name="AppleTree3" shape="dz\plants\tree\t_malusDomestica_3s.p3d" />			
-			<export name="PearTree1" shape="dz\plants2\tree\t_pyrus2s.p3d" />
-			<export name="PearTree2" shape="dz\plants\tree\t_pyrusCommunis_2s.p3d" />
-			<export name="PearTree3" shape="dz\plants\tree\t_pyrusCommunis_3s.p3d" />
-			<export name="PlumTree1" shape="dz\plants\tree\t_prunusDomestica_2s.p3d" />
-<!-- 		<export name="ChickenCoop" shape="dz\structures\Residential\Misc\misc_chickenCoop.p3d" /> --><!--Feathers Eggs Will be moved to normal groups-->
-<!-- -->
-			<export name="PiceaAbies_2d" shape="dz\plants\tree\t_piceaabies_2d.p3d" />
-			<export name="PiceaAbies_3d" shape="dz\plants\tree\t_piceaabies_3d.p3d" />
-			<export name="PiceaAbies_fallen" shape="dz\plants\tree\d_piceaabies_fallen.p3d" />
-			<export name="PiceaAbies_fallenB" shape="dz\plants\tree\d_piceaabies_fallenb.p3d" />
-			<export name="PiceaAbies_fallenC" shape="dz\plants\tree\d_piceaabies_fallenc.p3d" />
-			<export name="PiceaAbies_stump" shape="dz\plants\tree\d_piceaabies_stump.p3d" />
-			<export name="PiceaAbies_stumpB" shape="dz\plants\tree\d_piceaabies_stumpb.p3d" />
-<!-- -->
-			<export name="PinusSylvestris_3d" shape="dz\plants\tree\t_PinusSylvestris_3d.p3d" />			
-			<export name="PinusSylvestris_stump" shape="dz\plants\tree\d_PinusSylvestris_stump.p3d" />
-			<export name="PinusSylvestris_stumpB" shape="dz\plants\tree\d_PinusSylvestris_stumpb.p3d" />
-			<export name="PinusSylvestris_fallen" shape="dz\plants\tree\d_PinusSylvestris_fallen.p3d" />
-			<export name="PinusSylvestris_fallenB" shape="dz\plants\tree\d_PinusSylvestris_fallenb.p3d" />
-			<export name="PinusSylvestris_fallenc" shape="dz\plants\tree\d_PinusSylvestris_fallenc.p3d" />
-<!-- -->
-			<export name="FagusSylvatica_2d" shape="dz\plants\tree\t_FagusSylvatica_2d.p3d" />
-			<export name="FagusSylvatica_3d" shape="dz\plants\tree\t_FagusSylvatica_3d.p3d" />
-			<export name="FagusSylvatica_stump" shape="dz\plants\tree\d_FagusSylvatica_stump.p3d" />
-			<export name="FagusSylvatica_stumpB" shape="dz\plants\tree\d_FagusSylvatica_stumpB.p3d" />
-			<export name="FagusSylvatica_stumpC" shape="dz\plants\tree\d_FagusSylvatica_stumpc.p3d" />
-			<export name="FagusSylvatica_fallen" shape="dz\plants\tree\d_FagusSylvatica_fallen.p3d" />
-			<export name="FagusSylvatica_fallenB" shape="dz\plants\tree\d_FagusSylvatica_fallenB.p3d" />
-			<export name="FagusSylvatica_fallenC" shape="dz\plants\tree\d_FagusSylvatica_fallenC.p3d" />
-<!-- -->
-			<export name="QuercusRobur_2d" shape="dz\plants\tree\t_quercusRobur_2d.p3d" />
-			<export name="QuercusRobur_fallenB" shape="dz\plants\tree\d_quercusRobur_fallenb.p3d" />
-			<export name="QuercusRobur_fallenC" shape="dz\plants\tree\d_quercusRobur_fallenc.p3d" />
-			<export name="QuercusRobur_stumpB" shape="dz\plants\tree\d_quercusRobur_stumpb.p3d" />
-			<export name="QuercusRobur_stump" shape="dz\plants\tree\d_quercusRobur_stump.p3d" />
-<!-- -->
-			<export name="Haybale" shape="dz\structures\industrial\misc\misc_haybale.p3d" />
-			<export name="Strawstack" shape="dz\structures\industrial\farms\farm_strawstack.p3d" />
-		</clusters>
-
-<!--Groups -->
-<!--Apple -->
-		<cluster name="AppleTree1" lootmax="2" maxinstances="150">
-			<de name="TrajectoryApple" />
-			<container name="branch" lootmax="1">
-			<point pos="-1.86 -2.40 0.12" range="0.55" height="1.63" flags="32" />
-			<point pos="0.51 -2.40 0.85" range="0.55" height="1.63" flags="32" />
-			<point pos="0.15 -2.40 -0.57" range="0.55" height="1.63" flags="32" />
-			<point pos="-1.09 -2.40 1.47" range="0.55" height="1.63" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="AppleTree2" lootmax="2" maxinstances="150">
-			<de name="TrajectoryApple" />
-			<container name="branch" lootmax="1">
-			<point pos="0.25 -3.88 -1.00" range="0.70" height="2.00" flags="32" />
-			<point pos="1.15 -3.88 0.59" range="0.92" height="2.00" flags="32" />
-			<point pos="-0.50 -3.88 1.20" range="0.63" height="2.00" flags="32" />
-			<point pos="-1.28 -3.88 -0.18" range="0.75" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="AppleTree3" lootmax="2" maxinstances="150">
-			<de name="TrajectoryApple" />
-			<container name="branch" lootmax="1">
-			<point pos="0.13 -5.73 1.23" range="1.00" height="2.00" flags="32" />
-			<point pos="1.40 -5.73 -1.21" range="1.00" height="2.00" flags="32" />
-			<point pos="-1.36 -5.73 -0.95" range="1.00" height="2.00" flags="32" />
-			<point pos="1.94 -5.73 0.62" range="0.71" height="2.00" flags="32" />
-			</container>
-		</cluster>
-<!--Pear -->
-		<cluster name="PearTree1" lootmax="2" maxinstances="150">
-			<de name="TrajectoryPear" />
-			<container name="branch" lootmax="2">
-			<point pos="-0.82 -5.20 -0.37" range="0.55" height="1.63" flags="32" />
-			<point pos="0.88 -5.20 -0.37" range="0.55" height="1.63" flags="32" />
-			<point pos="0.86 -5.20 1.11" range="0.55" height="1.63" flags="32" />
-			<point pos="-0.59 -5.20 1.42" range="0.55" height="1.63" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PearTree2" lootmax="2" maxinstances="150">
-			<de name="TrajectoryPear" />
-			<container name="branch" lootmax="2">
-			<point pos="-0.34 -3.10 1.20" range="1.08" height="1.90" flags="32" />
-			<point pos="-1.00 -3.10 -0.90" range="0.92" height="2.00" flags="32" />
-			<point pos="1.42 -3.10 0.24" range="0.72" height="2.00" flags="32" />
-			<point pos="0.81 -3.10 -1.55" range="0.80" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PearTree3" lootmax="2" maxinstances="150">
-			<de name="TrajectoryPear" />
-			<container name="branch" lootmax="2">
-			<point pos="-1.52 -5.77 -0.18" range="0.84" height="2.00" flags="32" />
-			<point pos="1.32 -5.77 0.16" range="1.00" height="2.00" flags="32" />
-			<point pos="-0.16 -5.77 1.70" range="0.93" height="2.00" flags="32" />
-			<point pos="-0.03 -5.77 -1.72" range="1.07" height="2.00" flags="32" />
-			</container>
-		</cluster>
- <!--Plum -->
-		<cluster name="PlumTree1" lootmax="2" maxinstances="150">
-			<de name="TrajectoryPlum" />
-			<container name="branch" lootmax="2">
-			<point pos="-1.37 -4.75 0.040" range="0.89" height="2.00" flags="32" />
-			<point pos="0.80 -4.75 0.80" range="0.45" height="1.63" flags="32" />
-			<point pos="0.48 -4.75 -1.40" range="0.45" height="1.63" flags="32" />
-			<point pos="1.20 -4.75 -0.42" range="0.45" height="1.63" flags="32" />
-			</container>
-		</cluster>
- <!--Mushrooms - Coniferous -->
-		<cluster name="PiceaAbies_2d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.50 -6.50 0.12" range="0.30" height="1.20" flags="32" />
-			<point pos="-0.04 -6.50 -1.21" range="0.30" height="1.20" flags="32" />
-			<point pos="0.75 -6.50 0.54" range="0.70" height="2.00" flags="32" />
-			<point pos="-1.20 -6.50 -0.79" range="0.70" height="2.00" flags="32" />
-			<point pos="-0.78 -6.50 1.10" range="0.70" height="2.00" flags="32" />
-			<point pos="0.80 -6.50 -1.43" range="1.00" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PiceaAbies_3d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.97 -09.90 0.09" range="1.01" height="2.00" flags="32" />
-			<point pos="-0.28 -09.90 -1.79" range="0.90" height="2.00" flags="32" />
-			<point pos="-1.86 -09.90 -0.21" range="1.00" height="2.00" flags="32" />
-			<point pos="-0.05 -09.90 2.08" range="1.05" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PiceaAbies_fallen" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.90 0.15 -4.38" range="0.83" height="2.00" flags="32" />
-			<point pos="1.23 0.15 -1.40" range="0.91" height="2.00" flags="32" />
-			<point pos="-1.31 0.15 -2.70" range="0.83" height="2.00" flags="32" />
-			<point pos="-1.20 0.15 1.46" range="0.77" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PiceaAbies_fallenB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.44 0.12 0.59" range="1.09" height="2.00" flags="32" />
-			<point pos="-1.12 0.12 0.38" range="0.94" height="2.00" flags="32" />
-			<point pos="-1.16 0.12 -1.52" range="0.75" height="2.00" flags="32" />
-			<point pos="1.16 0.12 -1.45" range="0.75" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PiceaAbies_fallenC" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.55 -0.32 -0.21" range="0.75" height="2.00" flags="32" />
-			<point pos="-1.39 -0.32 0.06" range="0.85" height="2.00" flags="32" />
-			<point pos="-0.18 -0.32 2.21" range="1.00" height="2.00" flags="32" />
-			<point pos="-0.43 -0.32 -2.23" range="1.00" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PiceaAbies_stump" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.91 0.20 0.44" range="0.65" height="2.00" flags="32" />
-			<point pos="0.34 0.20 -1.05" range="0.70" height="2.00" flags="32" />
-			<point pos="-0.53 0.20 0.95" range="0.60" height="2.00" flags="32" />
-			<point pos="-1.13 0.20 -0.28" range="0.39" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PiceaAbies_stumpB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="-0.15 -0.45 1.15" range="0.77" height="2.00" flags="32" />
-			<point pos="-1.04 -0.45 -0.56" range="0.76" height="2.00" flags="32" />
-			<point pos="0.79 -0.45 -0.12" range="0.40" height="1.55" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PinusSylvestris_3d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.30 -7.95 -0.35" range="1.06" height="2.00" flags="32" />
-			<point pos="-0.43 -7.95 1.68" range="1.09" height="2.00" flags="32" />
-			<point pos="-0.64 -7.95 -1.77" range="1.09" height="2.00" flags="32" />
-			<point pos="-2.50 -7.95 0.09" range="1.09" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PinusSylvestris_stump" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.05 -0.82 -1.35" range="1.00" height="2.00" flags="32" />
-			<point pos="-1.20 -0.82 -0.80" range="0.90" height="2.00" flags="32" />
-			<point pos="-0.74 -0.82 1.01" range="0.57" height="2.00" flags="32" />
-			<point pos="1.05 -0.82 1.18" range="0.83" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PinusSylvestris_stumpB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.01 -0.01 -1.38" range="0.84" height="2.00" flags="32" />
-			<point pos="1.32 -0.01 0.74" range="0.90" height="2.00" flags="32" />
-			<point pos="-1.60 -0.01 1.00" range="0.90" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PinusSylvestris_fallen" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.93 -0.28 1.047" range="0.90" height="2.00" flags="32" />
-			<point pos="-1.20 -0.28 -0.75" range="0.90" height="2.00" flags="32" />
-			<point pos="-1.70 -0.28 1.60" range="0.90" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PinusSylvestris_fallenB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.50 -0.10 2.07" range="0.43" height="1.57" flags="32" />
-			<point pos="-1.33 -0.10 -2.08" range="1.0" height="2.00" flags="32" />
-			<point pos="0.67 -0.10 0.05" range="0.70" height="2.00" flags="32" />
-			<point pos="-1.04 -0.10 0.95" range="0.60" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PinusSylvestris_fallenc" lootmax="2" maxinstances="150">
-			<de name="TrajectoryConiferous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.82 -0.17 -1.35" range="0.77" height="2.00" flags="32" />
-			<point pos="1.15 -0.17 0.20" range="0.61" height="2.00" flags="32" />
-			<point pos="-1.16 -0.17 -1.24" range="1.01" height="2.00" flags="32" />
-			<point pos="-1.43 -0.17 0.72" range="0.77" height="2.00" flags="32" />
-			</container>
-		</cluster>
-<!--Mushrooms - DECIDUOUS -->
-		<cluster name="FagusSylvatica_2d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.50 -8.50 0.12" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.82 -8.50 -0.07" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.04 -8.50 -1.20" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_3d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.70 -9.40 1.85" range="1.08" height="2.00" flags="32" />
-			<point pos="2.05 -9.40 -0.40" range="1.20" height="2.00" flags="32" />
-			<point pos="-1.40 -9.40 0.10" range="1.11" height="2.00" flags="32" />
-			<point pos="-0.04 -9.40 2.21" range="1.16" height="2.00" flags="32" />
-			<point pos="-2.08 -9.40 -1.91" range="0.98" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_stump" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="-1.17 -0.73 1.36" range="1.00" height="2.00" flags="32" />
-			<point pos="-1.08 -0.73 -0.89" range="0.91" height="2.00" flags="32" />
-			<point pos="1.10 -0.73 -0.79" range="0.88" height="2.00" flags="32" />
-			<point pos="1.11 -0.73 1.13" range="0.63" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_stumpB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="-2.2 -0.66 0.15" range="1.00" height="2.00" flags="32" />
-			<point pos="-0.10 -0.66 1.82" range="0.67" height="2.00" flags="32" />
-			<point pos="0.45 -0.66 2.43" range="0.50" height="2.00" flags="32" />
-			<point pos="1.67 -0.66 1.29" range="0.78" height="2.00" flags="32" />
-			<point pos="1.35 -0.66 -0.87" range="1.00" height="2.00" flags="32" />
-			<point pos="-1.53 -0.66 -2.02" range="0.80" height="2.00" flags="32" />
-			<point pos="0.42 -0.66 -2.97" range="0.80" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_stumpC" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="-1.11 -0.05 0.07" range="0.61" height="1.78" flags="32" />
-			<point pos="0.13 -0.05 -0.90" range="0.56" height="1.66" flags="32" />
-			<point pos="1.25 -0.05 0.91" range="1.10" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_fallen" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="-1.30 -0.33 -1.25" range="1.00" height="2.00" flags="32" />
-			<point pos="-1.54 -0.33 1.58" range="1.00" height="2.00" flags="32" />
-			<point pos="-2.54 -0.33 3.77" range="1.00" height="2.00" flags="32" />
-			<point pos="-2.07 -0.33 -4.62" range="1.00" height="2.00" flags="32" />
-			<point pos="-2.20 -0.33 -8.08" range="1.00" height="2.00" flags="32" />
-			<point pos="1.91 -0.33 -7.99" range="1.00" height="2.00" flags="32" />
-			<point pos="1.94 -0.33 -4.35" range="1.00" height="2.00" flags="32" />
-			<point pos="1.35 -0.33 -1.46" range="1.00" height="2.00" flags="32" />
-			<point pos="2.54 -0.33 2.62" range="1.00" height="2.00" flags="32" />
-			<point pos="1.35 -0.33 8.39" range="1.00" height="2.00" flags="32" />
-			<point pos="3.54 -0.33 6.16" range="1.00" height="2.00" flags="32" />
-			<point pos="-2.12 -0.33 8.97" range="1.00" height="2.00" flags="32" />
-			<point pos="-3.17 -0.33 6.47" range="1.00" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_fallenB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.96 -0.35 -2.03" range="1.10" height="2.00" flags="32" />
-			<point pos="-1.29 -0.35 0.30" range="1.00" height="2.00" flags="32" />
-			<point pos="1.16 -0.35 0.68" range="0.90" height="1.28" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="FagusSylvatica_fallenC" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.52 -0.30 -1.04" range="0.85" height="2.00" flags="32" />
-			<point pos="-1.77 -0.30 0.18" range="1.10" height="2.00" flags="32" />
-			<point pos="0.89 -0.30 1.27" range="0.90" height="2.00" flags="32" />
-			<point pos="-0.70 -0.30 2.16" range="0.80" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="QuercusRobur_2d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="-0.02 -10.50 2.44" range="0.90" height="2.00" flags="32" />
-			<point pos="-2.67 -10.50 4.55" range="1.10" height="2.00" flags="32" />
-			<point pos="-2.62 -10.50 1.15" range="1.10" height="2.00" flags="32" />
-			<point pos="-0.39 -10.50 4.37" range="0.88" height="2.00" flags="32" />
-			</container>
-		</cluster>
-<!--
-		<cluster name="QuercusRobur_3d" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.495153 -0.501526 0.119188" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.820516 -0.879303 -0.069031" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.040581 -0.670837 -1.206359" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
--->
-		<cluster name="QuercusRobur_fallenB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="0.23 -0.15 1.69" range="1.00" height="2.00" flags="32" />
-			<point pos="-3.03 -0.15 -1.13" range="0.79" height="2.00" flags="32" />
-			<point pos="-0.60 -0.15 -0.29" range="0.75" height="0.18" flags="32" />
-			<point pos="-3.10 -0.15 1.90" range="1.00" height="2.00" flags="32" />
-			<point pos="1.17 -0.15 -0.53" range="0.70" height="0.21" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="QuercusRobur_fallenC" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.03 0.10 -0.85" range="0.47" height="1.68" flags="32" />
-			<point pos="-1.23 0.10 0.75" range="0.40" height="1.30" flags="32" />
-			<point pos="-1.13 0.10 -1.05" range="0.78" height="2.00" flags="32" />
-			<point pos="0.55 0.10 1.12" range="0.70" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="QuercusRobur_stump" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.43 -0.18 -0.34" range="0.92" height="2.00" flags="32" />
-			<point pos="-0.42 -0.18 -1.17" range="0.64" height="2.00" flags="32" />
-			<point pos="-1.04 -0.18 0.71" range="0.52" height="2.00" flags="32" />
-			<point pos="0.56 -0.18 1.45" range="0.68" height="2.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="QuercusRobur_stumpB" lootmax="2" maxinstances="150">
-			<de name="TrajectoryDeciduous" />
-			<container name="branch" lootmax="1">
-			<point pos="1.12 0.38 -0.64" range="0.66" height="2.00" flags="32" />
-			<point pos="0.09 0.38 1.33" range="0.79" height="2.00" flags="32" />
-			<point pos="-0.13 0.38 -1.46" range="0.15" height="0.75" flags="32" />
-			<point pos="-1.48 0.38 -0.63" range="0.99" height="2.00" flags="32" />
-			</container>
-		</cluster>
-<!--Mushrooms - HUMUS -->
-		<cluster name="Haybale" lootmax="2" maxinstances="150">
-			<de name="TrajectoryHumus" />
-			<container name="branch" lootmax="1">
-			<point pos="-0.01 -0.57 -1.40" range="0.90" height="2.000000" flags="32" />
-			<point pos="-0.00 -0.57 1.32" range="0.83" height="2.000000" flags="32" />
-			<point pos="-1.77 -0.57 0.12" range="0.96" height="2.000000" flags="32" />
-			<point pos="1.70 -0.57 0.14" range="0.90" height="2.000000" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Strawstack" lootmax="2" maxinstances="150">
-			<de name="TrajectoryHumus" />
-			<container name="branch" lootmax="1">
-			<point pos="4.83 0.44 -2.29" range="1.09" height="2.00" flags="32" />
-			<point pos="5.23 0.44 1.17" range="1.09" height="2.00" flags="32" />
-			<point pos="-5.17 0.44 -2.63" range="1.09" height="2.00" flags="32" />
-			<point pos="-5.47 0.44 1.67" range="1.09" height="2.00" flags="32" />
-			</container>
-		</cluster>
-<!--STONES -->
-		<cluster name="PathD10" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="2.19 0.20 -0.46" range="0.75" height="1.00" flags="32" />
-			<point pos="-3.41 0.20 -0.11" range="0.75" height="1.00" flags="32" />
-			<point pos="-0.53 0.20 -0.09" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PathD30" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-2.40 0.20 0.12" range="0.75" height="1.00" flags="32" />
-			<point pos="-5.04 0.20 -0.10" range="0.75" height="1.00" flags="32" />
-			<point pos="1.59 0.20 0.30" range="0.75" height="1.00" flags="32" />
-			<point pos="6.23 0.20 -0.02" range="0.75" height="1.00" flags="32" />
-			<point pos="-10.04 0.20 -0.29" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PathR10" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="1.89 0.20 -0.34" range="0.75" height="1.00" flags="32" />
-			<point pos="-1.13 0.20 -0.11" range="0.75" height="1.00" flags="32" />
-			<point pos="-3.74 0.20 -0.03" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PathR30" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-9.11 0.20 -0.50" range="0.75" height="1.00" flags="32" />
-			<point pos="-4.72 0.20 -0.35" range="0.75" height="1.00" flags="32" />
-			<point pos="-0.48 0.20 0.16" range="0.75" height="1.00" flags="32" />
-			<point pos="7.44 0.20 -0.33" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PathDCurve" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-3.68 0.20 0.85" range="0.75" height="1.00" flags="32" />
-			<point pos="-0.71 0.20 0.97" range="0.75" height="1.00" flags="32" />
-			<point pos="3.10 0.20 0.18" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="PathRCurve" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="4.02 0.20 -0.41" range="0.75" height="1.00" flags="32" />
-			<point pos="0.40 0.20 0.73" range="0.75" height="1.00" flags="32" />
-			<point pos="-3.34 0.20 0.90" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Stones" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-2.07 0.20 -0.41" range="0.75" height="1.00" flags="32" />
-			<point pos="0.32 0.20 0.84" range="0.75" height="1.00" flags="32" />
-			<point pos="-1.92 0.20 -2.90" range="0.75" height="1.00" flags="32" />
-			<point pos="0.89 0.20 -2.82" range="0.75" height="1.00" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Rail1" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-2.92 0.75 0.04" range="0.50" height="1.50" />
-			<point pos="0.40 0.75 0.06" range="0.50" height="1.50" />
-			<point pos="5.46 0.75 0.15" range="0.50" height="1.50" />
-			<point pos="8.44 0.75 0.20" range="0.50" height="1.50" />
-			<point pos="-7.38 0.75 -0.17" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail2" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-1.09 0.95 0.12" range="0.50" height="1.50" />
-			<point pos="2.17 0.95 0.20" range="0.50" height="1.50" />
-			<point pos="6.22 0.95 0.32" range="0.50" height="1.50" />
-			<point pos="-5.83 0.95 0.01" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail3" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-9.82 0.95 -0.05" range="0.50" height="1.50" />
-			<point pos="-6.27 0.95 -0.15" range="0.50" height="1.50" />
-			<point pos="-3.02 0.95 -0.01" range="0.50" height="1.50" />
-			<point pos="-0.31 0.95 0.04" range="0.50" height="1.50" />
-			<point pos="2.94 0.95 0.15" range="0.50" height="1.50" />
-			<point pos="5.54 0.95 0.27" range="0.50" height="1.50" />
-			<point pos="9.00 0.95 0.33" range="0.50" height="1.50" />
-			<point pos="12.59 0.95 0.34" range="0.50" height="1.50" />
-			<point pos="-12.35 0.95 -0.20" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail4" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="2.34 0.95 -0.03" range="0.50" height="1.50" />
-			<point pos="-2.26 0.95 -0.13" range="0.50" height="1.50" />
-			<point pos="-5.98 0.95 -0.19" range="0.50" height="1.50" />
-			<point pos="6.61 0.95 0.10" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail5" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-6.27 0.95 -0.150061" range="0.50" height="1.50" />
-			<point pos="-1.77 0.95 -0.058546" range="0.50" height="1.50" />
-			<point pos="1.76 0.95 0.019553" range="0.50" height="1.50" />
-			<point pos="5.25 0.95 0.021179" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail6" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="5.46 0.95 0.15" range="0.50" height="1.50" />
-			<point pos="1.05 0.95 -0.11" range="0.50" height="1.50" />
-			<point pos="-4.30 0.95 -0.21" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail7" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="2.64 0.95 0.23" range="0.50" height="1.50" />
-			<point pos="-1.27 0.95 0.07" range="0.50" height="1.50" />
-			<point pos="-4.46 0.95 0.11" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail8" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-2.82 0.95 -0.23" range="0.50" height="1.50" />
-			<point pos="0.60 0.95 -0.20" range="0.50" height="1.50" />
-			<point pos="4.60 0.95 -0.02" range="0.50" height="1.50" />
-			<point pos="8.46 0.95 0.11" range="0.50" height="1.50" />
-			<point pos="-7.62 0.95 -0.22" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-		<cluster name="Rail9" lootmax="2" maxinstances="5">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="-5.83 0.95 0.01" range="0.50" height="1.50" />
-			<point pos="-0.87 0.95 0.28" range="0.50" height="1.50" />
-			<point pos="1.63 0.95 0.33" range="0.50" height="1.50" />
-			<point pos="6.21 0.95 0.31" range="0.50" height="1.50" />
-			</container>
-		</cluster>
-<!--
-		<cluster name="Stone1" lootmax="2">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="1.495153 -0.501526 0.119188" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.820516 -0.879303 -0.069031" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.040581 -0.670837 -1.206359" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Stone2" lootmax="2">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="1.495153 -0.501526 0.119188" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.820516 -0.879303 -0.069031" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.040581 -0.670837 -1.206359" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Stone3" lootmax="2">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="1.495153 -0.501526 0.119188" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.820516 -0.879303 -0.069031" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.040581 -0.670837 -1.206359" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Stone4" lootmax="2">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="1.495153 -0.501526 0.119188" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.820516 -0.879303 -0.069031" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.040581 -0.670837 -1.206359" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
-		<cluster name="Stone5" lootmax="2">
-			<de name="TrajectoryStones" />
-			<container name="road" lootmax="1">
-			<point pos="1.495153 -0.501526 0.119188" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-1.820516 -0.879303 -0.069031" range="0.478125" height="1.195313" flags="32" />
-			<point pos="-0.040581 -0.670837 -1.206359" range="0.478125" height="1.195313" flags="32" />
-			</container>
-		</cluster>
--->
 		<group name="Land_Shed_M1" lootmax="2">
 				<usage name="Village" />
 				<container name="lootFloor" lootmax="2">
@@ -5485,14 +4885,13 @@
 						<category name="containers" />
 						<category name="clothes" />
 						<tag name="floor" />
-						<point pos="0.910631 -1.552610 1.898501" range="0.100000" height="0.250000" />
-						<point pos="-2.785302 -1.552609 3.766158" range="1.199951" height="2.000001" />
-						<point pos="-0.863013 -1.552609 -1.661788" range="1.199951" height="2.000001" />
-						<point pos="1.224410 -1.552609 -5.821139" range="1.199951" height="2.000001" />
-						<point pos="-1.255842 -1.552609 -4.558404" range="1.199951" height="2.000001" />
-						<point pos="1.158688 -1.552609 -3.205556" range="1.199951" height="2.000001" />
-						<point pos="1.252533 -1.552609 -0.169447" range="1.199951" height="2.000001" />
-						<point pos="2.587484 -1.552609 3.294472" range="1.199951" height="2.000001" />
+						<point pos="2.587403 -1.552612 3.294433" range="1.199951" height="2.000001" />
+						<point pos="-2.785400 -1.552612 3.766114" range="1.199951" height="2.000001" />
+						<point pos="-0.863037 -1.552612 -1.661865" range="1.199951" height="2.000001" />
+						<point pos="1.224365 -1.552612 -5.821045" range="1.199951" height="2.000001" />
+						<point pos="-1.255859 -1.552612 -4.558349" range="1.199951" height="2.000001" />
+						<point pos="1.158691 -1.552612 -3.205566" range="1.199951" height="2.000001" />
+						<point pos="1.252441 -1.552612 -0.169434" range="1.199951" height="2.000001" />
 				</container>
 				<container name="lootshelves">
 						<category name="tools" />
@@ -5500,26 +4899,26 @@
 						<category name="clothes" />
 						<category name="books" />
 						<tag name="shelves" />
-						<point pos="0.610682 -0.698923 -7.824422" range="0.100000" height="0.250000" />
-						<point pos="-0.402172 -0.318923 -7.823465" range="0.100000" height="0.250000" />
-						<point pos="-1.252807 -1.078923 -7.765029" range="0.100000" height="0.250000" />
-						<point pos="2.360787 -0.698923 -7.742255" range="0.100000" height="0.250000" />
-						<point pos="1.178989 -1.453923 -7.781049" range="0.100000" height="0.250000" />
-						<point pos="-2.068578 -0.698923 -7.771155" range="0.100000" height="0.250000" />
-						<point pos="-2.432436 -0.848726 1.285439" range="0.100000" height="0.250000" />
-						<point pos="0.174431 -1.078923 -7.860698" range="0.134375" height="0.265000" />
-						<point pos="-2.671299 -0.698923 -0.075822" range="0.134375" height="0.265000" />
-						<point pos="-1.923756 -1.453923 -7.791921" range="0.134375" height="0.260000" />
-						<point pos="2.315250 -0.689373 1.300462" range="0.340625" height="0.851563" />
+						<point pos="0.610596 -0.698921 -7.824463" range="0.100000" height="0.250000" />
+						<point pos="-0.402100 -0.318924 -7.823486" range="0.100000" height="0.250000" />
+						<point pos="-1.252685 -1.078926 -7.765137" range="0.100000" height="0.250000" />
+						<point pos="2.360839 -0.698921 -7.742188" range="0.100000" height="0.250000" />
+						<point pos="1.178955 -1.453926 -7.781006" range="0.100000" height="0.250000" />
+						<point pos="-2.068604 -0.698921 -7.771240" range="0.100000" height="0.250000" />
+						<point pos="-2.432373 -0.848724 1.285400" range="0.100000" height="0.250000" />
+						<point pos="0.174316 -1.078926 -7.860595" range="0.134375" height="0.265000" />
+						<point pos="-2.671387 -0.698921 -0.075928" range="0.134375" height="0.265000" />
+						<point pos="-1.923828 -1.453926 -7.791992" range="0.134375" height="0.260000" />
+						<point pos="2.315185 -0.689369 1.300537" range="0.340625" height="0.851563" />
 				</container>
 				<container name="lootweapons">
 						<category name="weapons" />
 						<category name="explosives" />
-						<point pos="1.174570 -0.698923 -7.725707" range="0.100000" height="0.250000" />
-						<point pos="-1.661923 -0.800955 0.720525" range="0.134375" height="0.335938" />
-						<point pos="-2.498624 -1.018713 -1.179313" range="0.203125" height="0.507813" />
-						<point pos="-2.553624 -1.424757 -6.849211" range="0.225830" height="0.564575" />
-						<point pos="-1.718463 -1.424757 1.504701" range="0.229492" height="0.573730" />
+						<point pos="1.174560 -0.698921 -7.725585" range="0.100000" height="0.250000" />
+						<point pos="-1.661865 -0.800957 0.720459" range="0.134375" height="0.335938" />
+						<point pos="-2.498535 -1.018715 -1.179199" range="0.203125" height="0.507813" />
+						<point pos="-2.553711 -1.424759 -6.849122" range="0.225830" height="0.564575" />
+						<point pos="-1.718506 -1.424759 1.504639" range="0.229492" height="0.573730" />
 				</container>
 		</group>
 		<group name="Land_Rail_Station_Big" lootmax="4">
@@ -5607,11 +5006,10 @@
 						<category name="weapons" />
 						<category name="books" />
 						<category name="explosives" />
-						<point pos="4.673844 -1.780052 0.484403" range="0.570557" height="0.911445" flags="32" />
-						<point pos="3.204495 -1.780052 -0.266930" range="0.774170" height="0.876548" flags="32" />
-						<point pos="1.538594 -1.780052 0.226184" range="0.787500" height="0.143393" flags="32" />
-						<point pos="-1.878602 -1.780052 0.144534" range="0.909668" height="0.200380" flags="32" />
-						<point pos="-4.091706 -1.780052 -0.036802" range="1.004883" height="0.105550" flags="32" />
+						<point pos="1.819336 -0.538246 -0.031006" range="1.010986" height="2.000000" />
+						<point pos="4.255126 -0.538216 0.003174" range="1.029785" height="2.000000" />
+						<point pos="-4.144531 -0.538322 -0.010254" range="1.031738" height="2.000000" />
+						<point pos="-2.085937 -0.538292 0.058838" range="0.974121" height="2.000000" />
 				</container>
 		</group>
 		<group name="Land_Lighthouse" lootmax="4">
@@ -5928,44 +5326,64 @@
 						<point pos="-10.285642 -6.538376 13.222811" range="0.671667" height="1.679108" />
 				</container>
 		</group>
-		<group name="Land_Construction_House1" lootmax="10">
+		<group name="Land_Construction_House1" lootmax="6">
 				<usage name="Industrial" />
-				<container name="lootFloor" lootmax="10">
-						<category name="tools" />
-						<category name="containers" />
-						<category name="clothes" />
-						<tag name="floor" />
-				</container>
-				<container name="lootshelves" lootmax="10">
+				<container name="lootFloor" lootmax="6">
 						<category name="tools" />
 						<category name="containers" />
 						<category name="clothes" />
 						<category name="books" />
+						<tag name="floor" />
 						<tag name="shelves" />
+						<point pos="3.237304 1.166466 0.461914" range="1.199951" height="2.000000" />
+						<point pos="-0.288818 1.166466 1.918945" range="0.699951" height="1.749878" />
+						<point pos="-0.096192 1.166466 -3.974121" range="0.666016" height="1.665039" />
+						<point pos="-1.855224 1.166466 -3.177979" range="0.616699" height="1.541748" />
+						<point pos="4.564941 4.453781 -1.069092" range="1.199951" height="2.000000" />
+						<point pos="2.578369 4.453781 0.341797" range="1.199951" height="2.000000" />
 				</container>
-				<container name="lootweapons" lootmax="6">
+				<container name="lootweapons" lootmax="4">
 						<category name="weapons" />
 						<category name="explosives" />
+						<point pos="5.127685 1.166466 -1.681640" range="0.661377" height="1.653442" />
+						<point pos="4.495605 2.070610 -2.453858" range="0.100000" height="0.250000" />
+						<point pos="-2.092529 1.166466 -5.014160" range="0.890625" height="2.000000" />
+						<point pos="-3.542969 1.166466 -3.542969" range="0.237500" height="0.593750" />
+						<point pos="4.642578 4.453781 2.395019" range="1.199951" height="2.000000" />
 				</container>
 		</group>
-		<group name="Land_Construction_House2" lootmax="10">
+		<group name="Land_Construction_House2" lootmax="8">
 				<usage name="Industrial" />
-				<container name="lootFloor" lootmax="10">
-						<category name="tools" />
-						<category name="containers" />
-						<category name="clothes" />
-						<tag name="floor" />
-				</container>
-				<container name="lootshelves" lootmax="10">
+				<container name="lootFloor" lootmax="6">
 						<category name="tools" />
 						<category name="containers" />
 						<category name="clothes" />
 						<category name="books" />
+						<tag name="floor" />
 						<tag name="shelves" />
+						<point pos="1.951904 0.918060 -2.858154" range="1.199951" height="2.000000" />
+						<point pos="-2.347900 0.981789 -3.259277" range="0.443750" height="1.109375" />
+						<point pos="0.688964 0.893936 -5.130859" range="1.046143" height="2.000000" />
+						<point pos="-5.645020 0.774376 0.010743" range="0.616211" height="1.540527" />
+						<point pos="-1.604248 0.904266 2.191894" range="1.199951" height="2.000000" />
+						<point pos="2.328125 0.916458 0.074463" range="1.199951" height="2.000000" />
+						<point pos="1.217530 0.906921 6.662598" range="1.199951" height="2.000000" />
+						<point pos="1.777101 1.761909 4.553955" range="0.134375" height="0.335938" />
+						<point pos="3.911377 1.978004 -2.496582" range="0.512500" height="1.281250" />
+						<point pos="0.913574 -2.569633 -3.739258" range="0.885254" height="2.000000" />
+						<point pos="-2.507568 -2.585320 3.139160" range="0.819336" height="2.000000" />
+						<point pos="2.342530 -2.537178 7.020507" range="1.132324" height="2.000000" />
+						<point pos="-3.013184 -1.959282 4.283447" range="0.134375" height="0.335938" />
+						<point pos="-1.312989 -2.614281 0.747314" range="0.648753" height="2.000000" />
+						<point pos="3.733399 -2.518196 -2.566162" range="1.199951" height="2.000000" />
 				</container>
-				<container name="lootweapons" lootmax="6">
+				<container name="lootweapons" lootmax="4">
 						<category name="weapons" />
 						<category name="explosives" />
+						<point pos="-0.602295 0.785027 -7.666748" range="0.858887" height="2.000000" />
+						<point pos="-5.198975 0.749435 2.146240" range="1.062500" height="2.000000" />
+						<point pos="-4.901367 1.953072 -1.563234" range="0.100000" height="0.250000" />
+						<point pos="4.750735 0.906868 6.758787" range="1.199951" height="2.000000" />
 				</container>
 		</group>
 		<group name="Land_Mil_Barracks1" lootmax="10">
@@ -9044,29 +8462,47 @@
 						<category name="containers" />
 						<category name="clothes" />
 						<tag name="floor" />
-						<point pos="-3.353607 1.376566 2.209546" range="0.451660" height="0.189995" />
-						<point pos="-3.364234 -4.349106 2.248383" range="0.546875" height="0.850606" />
-						<point pos="-6.358847 0.255990 2.553636" range="0.685323" height="1.713305" />
-						<point pos="-6.479086 -4.349106 1.191039" range="0.738769" height="1.846923" />
-						<point pos="-6.459722 0.255990 3.994715" range="0.759277" height="1.898192" />
-						<point pos="-3.948467 4.711159 1.509987" range="0.861535" height="1.999962" />
-						<point pos="-6.149202 4.711159 3.695382" range="0.903210" height="1.999962" />
-						<point pos="-5.037525 -4.349106 2.455007" range="1.137471" height="2.000008" />
-						<point pos="-2.316598 -9.170874 -17.431507" range="1.199951" height="2.000006" />
-						<point pos="-1.144095 -0.208128 3.317027" range="1.199951" height="1.999990" />
-						<point pos="6.915729 -0.208128 1.952482" range="1.199951" height="1.999990" />
-						<point pos="7.901748 -0.208128 6.129598" range="1.199951" height="1.999990" />
-						<point pos="7.313069 -0.208128 11.059425" range="1.199951" height="1.999990" />
-						<point pos="5.008510 -0.208128 14.782825" range="1.199951" height="1.999990" />
-						<point pos="-0.758405 -0.208128 16.048162" range="1.199951" height="1.999990" />
-						<point pos="-5.491149 -0.208128 6.357295" range="1.199951" height="1.999990" />
-						<point pos="2.529910 -0.208128 -3.032126" range="1.199951" height="1.999990" />
-						<point pos="2.802376 -9.170874 -18.201799" range="1.199951" height="2.000006" />
-						<point pos="-0.184261 -9.170874 -12.150771" range="1.199951" height="2.000006" />
-						<point pos="2.767156 -9.170874 -9.335751" range="1.199951" height="2.000006" />
-						<point pos="3.520429 -9.170874 -5.850703" range="1.199951" height="2.000006" />
-						<point pos="-2.070045 -9.170874 -7.739405" range="1.199951" height="2.000006" />
-						<point pos="-3.604970 -9.170874 -13.140294" range="1.199951" height="2.000006" />
+						<point pos="0.701172 -3.884857 -2.649414" range="0.993750" height="2.000000" />
+						<point pos="-6.866211 -3.884857 -3.908935" range="1.199951" height="2.000000" />
+						<point pos="-7.146971 -3.884857 -10.960207" range="1.127441" height="2.000000" />
+						<point pos="-6.843262 -3.884857 -16.530272" range="1.199951" height="2.000000" />
+						<point pos="-1.844238 -3.884857 -14.750976" range="1.199951" height="2.000000" />
+						<point pos="1.878417 -3.884857 -7.635254" range="1.199951" height="2.000000" />
+						<point pos="-1.513183 0.115143 -1.174072" range="1.199951" height="2.000000" />
+						<point pos="1.992680 0.115143 10.767333" range="1.199951" height="2.000000" />
+						<point pos="2.730961 0.115143 15.036131" range="1.199951" height="2.000000" />
+						<point pos="5.029300 0.115143 18.086914" range="1.199951" height="2.000000" />
+						<point pos="-6.025885 0.115143 18.056639" range="1.199951" height="2.000000" />
+						<point pos="-7.739262 0.115143 12.317623" range="1.199951" height="2.000000" />
+						<point pos="-2.409182 0.115143 9.476318" range="1.199951" height="2.000000" />
+						<point pos="-0.921876 0.115143 17.582520" range="1.199951" height="2.000000" />
+						<point pos="8.473635 0.115143 10.360107" range="1.199951" height="2.000000" />
+						<point pos="-5.699707 4.517418 5.691406" range="0.709228" height="1.773071" />
+						<point pos="-5.609376 1.547318 2.576902" range="0.576172" height="1.440430" />
+						<point pos="-8.593263 -1.422684 5.795897" range="0.604736" height="1.511841" />
+						<point pos="-7.245607 -8.847534 4.277830" range="0.937918" height="1.997139" />
+						<point pos="-8.627441 -8.847534 5.672119" range="0.728516" height="1.193687" />
+						<point pos="-4.101074 -8.847534 2.465576" range="0.448730" height="1.121826" />
+						<point pos="4.353516 -8.847534 5.132813" range="1.199951" height="2.000000" />
+						<point pos="1.479492 -8.847534 5.677734" range="0.733154" height="1.832886" />
+						<point pos="2.313965 -8.847626 -2.219971" range="1.199951" height="2.000000" />
+						<point pos="2.305665 -8.847626 -6.389648" range="1.199951" height="2.000000" />
+						<point pos="-2.794433 -8.847626 0.274170" range="1.026367" height="2.000000" />
+						<point pos="-2.891602 -8.847626 -16.547119" range="1.199951" height="2.000000" />
+						<point pos="0.829588 -8.847626 -16.364500" range="1.199951" height="2.000000" />
+						<point pos="-4.684569 -7.881798 -17.183594" range="0.375000" height="0.937500" />
+						<point pos="1.608888 -8.847626 -11.157960" range="1.199951" height="2.000000" />
+						<point pos="-3.416503 -8.847626 -6.696289" range="1.199951" height="2.000000" />
+						<point pos="-1.081057 -7.887344 12.287842" range="0.762207" height="1.905517" />
+						<point pos="-2.630380 -3.176239 13.865966" range="0.718750" height="1.796875" />
+						<point pos="-3.556641 -3.176239 8.485351" range="1.162109" height="2.000000" />
+						<point pos="8.723145 -3.180305 4.289307" range="0.510742" height="1.276855" />
+						<point pos="7.004396 -3.180305 3.850340" range="0.540456" height="0.218102" />
+						<point pos="4.832520 -3.180305 6.613037" range="0.914551" height="0.152214" />
+						<point pos="8.354006 -3.180305 9.765622" range="0.879883" height="2.000000" />
+						<point pos="-0.352051 -3.176239 7.062989" range="0.615967" height="1.539917" />
+						<point pos="-0.428223 -3.176239 10.471191" range="0.651001" height="1.627502" />
+						<point pos="1.794435 -3.180305 8.781249" range="1.199951" height="2.000000" />
 				</container>
 				<container name="lootshelves" lootmax="8">
 						<category name="tools" />
@@ -9074,62 +8510,104 @@
 						<category name="clothes" />
 						<category name="books" />
 						<tag name="shelves" />
-						<point pos="-7.015603 -8.326525 0.776331" range="0.100000" height="0.250000" />
-						<point pos="-7.048160 -9.081522 1.105311" range="0.100000" height="0.250000" />
-						<point pos="-7.019475 -8.706523 1.632269" range="0.100000" height="0.250000" />
-						<point pos="-6.991547 -8.326525 2.788383" range="0.100000" height="0.250000" />
-						<point pos="-7.047661 -9.081522 2.647058" range="0.100000" height="0.250000" />
-						<point pos="-7.052516 -8.706523 4.254135" range="0.100000" height="0.250000" />
-						<point pos="-7.048692 -9.081522 3.904524" range="0.100000" height="0.250000" />
-						<point pos="-7.013970 -8.706523 3.196996" range="0.100000" height="0.250000" />
-						<point pos="-7.044707 -8.326525 3.885478" range="0.100000" height="0.250000" />
-						<point pos="-5.732106 -8.326525 4.625499" range="0.100000" height="0.250000" />
-						<point pos="-5.341588 -8.706523 4.624310" range="0.100000" height="0.250000" />
-						<point pos="2.739833 -8.326525 -0.533596" range="0.100000" height="0.250000" />
-						<point pos="-7.018397 -7.946526 3.324456" range="0.100000" height="0.250000" />
-						<point pos="3.749098 -7.946526 -0.481630" range="0.100000" height="0.250000" />
-						<point pos="4.708903 -8.326525 -0.554926" range="0.100000" height="0.250000" />
-						<point pos="3.952396 -8.706523 -0.544361" range="0.100000" height="0.250000" />
-						<point pos="5.560880 -8.326525 -0.460297" range="0.100000" height="0.250000" />
-						<point pos="5.201616 -8.706523 -0.544605" range="0.100000" height="0.250000" />
-						<point pos="5.611935 -7.946526 -9.075474" range="0.100000" height="0.250000" />
-						<point pos="5.638778 -9.081522 -9.304602" range="0.100000" height="0.250000" />
-						<point pos="5.553249 -7.946526 -15.020037" range="0.100000" height="0.250000" />
-						<point pos="5.555817 -9.081522 -15.803887" range="0.100000" height="0.250000" />
-						<point pos="4.441074 -9.081522 -0.504940" range="0.134375" height="0.259999" />
-						<point pos="-6.994440 -7.946526 1.900637" range="0.134375" height="0.259999" />
-						<point pos="5.624116 -8.326525 -9.408064" range="0.134375" height="0.264999" />
-						<point pos="3.028851 -9.081522 -0.533584" range="0.134375" height="0.259999" />
-						<point pos="5.564496 -8.706523 -14.782939" range="0.134375" height="0.264999" />
-						<point pos="5.598081 -8.326525 -15.566167" range="0.134375" height="0.264999" />
-						<point pos="-5.716259 -9.081522 4.605279" range="0.134375" height="0.259999" />
-						<point pos="-7.034344 0.358489 1.054822" range="0.134375" height="0.259998" />
-						<point pos="5.555135 -9.131949 -9.996881" range="0.135254" height="0.338135" />
-						<point pos="-3.251495 -2.758555 4.108636" range="0.140137" height="0.164351" />
-						<point pos="-3.241392 -4.309148 4.098632" range="0.148437" height="0.371092" />
-						<point pos="5.506369 -7.581357 -9.973880" range="0.157715" height="0.164352" />
-						<point pos="-6.344648 0.379897 0.726642" range="0.203857" height="0.509642" />
-						<point pos="-3.973563 -8.403316 -19.059647" range="0.237500" height="0.593750" />
-						<point pos="-4.720103 -9.052727 -19.128613" range="0.253418" height="0.633545" />
-						<point pos="-5.506137 -9.052727 -19.149214" range="0.260254" height="0.650635" />
+						<point pos="0.932129 -2.800476 0.955078" range="0.237500" height="0.370003" />
+						<point pos="1.531738 -3.300476 0.922851" range="0.237500" height="0.370003" />
+						<point pos="0.163086 -3.007133 0.830078" range="0.237500" height="0.593750" />
+						<point pos="0.461426 -3.286613 0.159180" range="0.203125" height="0.507813" />
+						<point pos="1.026856 -3.286682 -4.720215" range="0.271875" height="0.370003" />
+						<point pos="0.508301 -2.786682 -4.674805" range="0.237500" height="0.370003" />
+						<point pos="-0.585937 -2.786682 -4.682617" range="0.237500" height="0.370003" />
+						<point pos="-0.503907 -3.786682 -4.634521" range="0.203125" height="0.370003" />
+						<point pos="-2.909179 -3.756844 -2.631592" range="0.249512" height="0.623779" />
+						<point pos="-3.106445 -3.801949 -1.111817" range="0.138672" height="0.259995" />
+						<point pos="-3.092773 -3.426949 -0.171631" range="0.152344" height="0.264999" />
+						<point pos="-3.111816 -3.801949 0.583984" range="0.133301" height="0.259995" />
+						<point pos="-3.082031 -3.046951 -0.800782" range="0.163086" height="0.264999" />
+						<point pos="-2.226075 -8.049149 2.910888" range="0.133301" height="0.333252" />
+						<point pos="3.318848 -8.071991 2.630858" range="0.375000" height="0.937500" />
+						<point pos="2.274415 -8.071991 2.568847" range="0.340625" height="0.851563" />
+						<point pos="5.010253 -8.071991 2.673338" range="0.306250" height="0.765625" />
+						<point pos="6.514650 -7.953560 5.297849" range="0.237500" height="0.593750" />
+						<point pos="8.666992 -8.266983 3.315184" range="0.271875" height="0.370003" />
+						<point pos="8.650880 -7.766983 2.911376" range="0.237500" height="0.370003" />
+						<point pos="1.105470 -7.572388 3.188476" range="0.203125" height="0.507813" />
+						<point pos="-0.469726 -7.961685 -5.232910" range="0.237500" height="0.593750" />
+						<point pos="0.581543 -8.383270 1.121582" range="0.100000" height="0.250000" />
+						<point pos="1.761231 -8.383270 1.095459" range="0.134375" height="0.264999" />
+						<point pos="1.032227 -8.003273 1.063965" range="0.100000" height="0.250000" />
+						<point pos="3.308594 -8.758270 1.123535" range="0.134375" height="0.259995" />
+						<point pos="2.245117 -8.003273 1.076416" range="0.100000" height="0.250000" />
+						<point pos="2.153809 -8.758270 1.138672" range="0.100000" height="0.250000" />
+						<point pos="-1.538574 -8.286385 -5.283447" range="0.271875" height="0.370003" />
+						<point pos="-2.906739 -8.021385 -5.194091" range="0.306250" height="0.765625" />
+						<point pos="-3.774415 -8.021385 -5.172363" range="0.340625" height="0.851563" />
+						<point pos="-4.751954 -7.786385 -5.260743" range="0.237500" height="0.370003" />
+						<point pos="-5.233886 -8.786385 -5.262696" range="0.237500" height="0.370003" />
+						<point pos="-4.901855 -8.286385 -5.259766" range="0.237500" height="0.370003" />
+						<point pos="-2.124023 -7.786385 -5.309326" range="0.237500" height="0.370003" />
+						<point pos="3.363769 -8.808708 -8.363280" range="0.153564" height="0.383911" />
+						<point pos="-0.653319 -8.383270 -11.758302" range="0.100000" height="0.250000" />
+						<point pos="-1.080565 -8.758270 -11.675780" range="0.134375" height="0.259995" />
+						<point pos="-0.283203 -8.847626 -11.512937" range="0.258260" height="0.645649" />
+						<point pos="-2.201659 -8.021385 -11.332519" range="0.340625" height="0.851563" />
+						<point pos="-3.125488 -8.021385 -11.235595" range="0.271875" height="0.679688" />
+						<point pos="-4.836424 -8.021385 -11.360107" range="0.306250" height="0.765625" />
+						<point pos="-5.765623 -8.021385 -11.327150" range="0.340625" height="0.851563" />
+						<point pos="-6.209471 -8.078827 -17.469238" range="0.237500" height="0.593750" />
+						<point pos="-6.882324 -8.729477 -17.640869" range="0.224609" height="0.561523" />
+						<point pos="3.409180 -8.383270 -13.077148" range="0.134375" height="0.264999" />
+						<point pos="3.373046 -8.383270 -14.230468" range="0.100000" height="0.250000" />
+						<point pos="-0.149417 -7.277306 12.833739" range="0.203125" height="0.507813" />
+						<point pos="-0.039066 -6.997826 11.827147" range="0.203125" height="0.507813" />
+						<point pos="-5.566409 -2.726517 12.756592" range="0.168750" height="0.421875" />
+						<point pos="-5.547369 -2.725731 13.422606" range="0.168750" height="0.421875" />
+						<point pos="-5.942873 -2.698181 11.054932" range="0.203125" height="0.507813" />
+						<point pos="-2.731448 -2.726578 10.901609" range="0.203125" height="0.507813" />
+						<point pos="-2.721195 -2.727005 10.179442" range="0.168750" height="0.421875" />
+						<point pos="-5.404787 -2.726982 7.476805" range="0.203125" height="0.507813" />
+						<point pos="-6.086429 -2.726799 7.481199" range="0.203125" height="0.507813" />
+						<point pos="7.320313 -2.698181 2.586913" range="0.294434" height="0.736084" />
+						<point pos="7.812012 -2.767487 3.723387" range="0.237500" height="0.593750" />
+						<point pos="6.061524 -2.766975 3.694824" range="0.300382" height="0.750954" />
+						<point pos="6.707031 -2.400772 6.305908" range="0.443750" height="1.109375" />
+						<point pos="8.688966 -2.407578 7.715576" range="0.443750" height="1.109375" />
+						<point pos="8.845705 -2.331253 6.416990" range="0.203125" height="0.507813" />
+						<point pos="6.701172 -2.400772 7.519042" range="0.271875" height="0.679688" />
+						<point pos="6.600099 -2.400772 8.186278" range="0.340625" height="0.851563" />
+						<point pos="5.614748 -3.151390 10.994383" range="0.135742" height="0.339355" />
+						<point pos="0.430667 -2.674660 9.938720" range="0.203125" height="0.507813" />
+						<point pos="0.399903 -2.674660 9.177002" range="0.203125" height="0.507813" />
+						<point pos="0.447756 -2.674660 7.936279" range="0.203125" height="0.507813" />
+						<point pos="2.231448 -3.151390 10.918700" range="0.136230" height="0.340576" />
+						<point pos="2.654298 -3.151390 6.649169" range="0.155762" height="0.389404" />
 				</container>
-				<container name="lootweapons">
+				<container name="lootweapons" lootmax="6">
 						<category name="weapons" />
 						<category name="explosives" />
-						<point pos="-4.116150 0.690519 14.508136" range="0.134375" height="0.335938" />
-						<point pos="1.877167 0.692791 14.047804" range="0.134375" height="0.335938" />
-						<point pos="7.894699 0.690659 14.441275" range="0.134375" height="0.335938" />
-						<point pos="7.891038 0.693267 9.202034" range="0.134375" height="0.335938" />
-						<point pos="8.258099 0.691194 3.612161" range="0.134375" height="0.335938" />
-						<point pos="-7.030273 1.113487 0.979812" range="0.134375" height="0.264997" />
-						<point pos="2.192118 0.696014 3.253072" range="0.168750" height="0.421875" />
-						<point pos="5.116595 -0.208128 -1.569254" range="0.877930" height="1.999990" />
-						<point pos="-0.115929 -0.208128 -6.297128" range="0.959961" height="1.999990" />
-						<point pos="0.033112 -0.208128 -1.739066" range="1.109863" height="1.999990" />
-						<point pos="-6.035544 4.711159 1.647591" range="1.147285" height="1.999962" />
-						<point pos="7.776714 -0.208128 16.442947" range="1.199951" height="1.999990" />
-						<point pos="4.614916 -0.208128 -5.960324" range="1.199951" height="1.999990" />
-						<point pos="2.772778 -0.208128 16.490362" range="1.199951" height="1.999990" />
+						<point pos="1.574219 -2.800476 0.951171" range="0.203125" height="0.370003" />
+						<point pos="-0.029297 -3.286682 -4.703613" range="0.271875" height="0.370003" />
+						<point pos="-3.078125 -3.046951 0.589599" range="0.100000" height="0.250000" />
+						<point pos="2.756346 -3.884857 -17.330322" range="1.199951" height="2.000000" />
+						<point pos="2.714355 -3.884857 -12.228759" range="1.199951" height="2.000000" />
+						<point pos="2.098145 0.115143 -4.425538" range="1.199951" height="2.000000" />
+						<point pos="-1.707031 0.115143 -4.573486" range="1.199951" height="2.000000" />
+						<point pos="7.865235 0.115143 3.425049" range="1.199951" height="2.000000" />
+						<point pos="-8.013187 0.115143 15.733640" range="0.993750" height="2.000000" />
+						<point pos="-1.399411 0.115143 13.541505" range="1.199951" height="2.000000" />
+						<point pos="-8.290526 9.115143 3.163818" range="1.089844" height="2.000000" />
+						<point pos="-9.529786 9.687042 4.761716" range="0.134375" height="0.335938" />
+						<point pos="-7.647461 9.604370 6.567382" range="0.134375" height="0.335938" />
+						<point pos="-5.907226 9.526428 1.778564" range="0.134375" height="0.335938" />
+						<point pos="-5.452150 9.115143 4.708739" range="1.199951" height="2.000000" />
+						<point pos="-5.593750 4.517418 2.673828" range="0.606934" height="1.517334" />
+						<point pos="4.408692 -8.071991 2.774657" range="0.227051" height="0.567627" />
+						<point pos="2.591309 -8.383270 1.097656" range="0.134375" height="0.264999" />
+						<point pos="3.384276 -8.003273 -13.510742" range="0.100000" height="0.250000" />
+						<point pos="-6.759770 -2.698181 10.984372" range="0.306250" height="0.765625" />
+						<point pos="-7.010252 -3.176239 9.340576" range="1.199951" height="2.000000" />
+						<point pos="6.812012 -2.163734 2.569824" range="0.168750" height="0.421875" />
+						<point pos="8.918946 -2.407578 7.080077" range="0.203125" height="0.507813" />
+						<point pos="6.945314 -2.400772 7.008055" range="0.168750" height="0.421875" />
 				</container>
 		</group>
 		<group name="Land_Misc_Scaffolding" lootmax="4">
@@ -9620,18 +9098,18 @@
 						<category name="weapons" />
 						<category name="books" />
 						<category name="explosives" />
-						<point pos="1.269089 0.954126 10.218151" range="0.815186" height="2.000000" />
-						<point pos="0.597106 0.938551 -15.373725" range="0.946045" height="2.000000" />
-						<point pos="1.484391 0.951565 6.307896" range="0.960937" height="2.000000" />
-						<point pos="0.622655 0.947542 -0.933124" range="0.996094" height="2.000000" />
-						<point pos="-3.729965 0.944672 -9.523890" range="1.033203" height="2.000000" />
-						<point pos="-4.398837 0.940859 -16.248814" range="1.104736" height="0.099995" />
-						<point pos="-3.053941 0.942411 -12.528265" range="1.174316" height="2.000000" />
-						<point pos="-2.111375 0.947201 -3.984075" range="1.199951" height="2.000000" />
-						<point pos="-1.328856 0.950827 2.545975" range="1.199951" height="2.000000" />
-						<point pos="2.712608 0.944626 -3.694338" range="1.199951" height="2.000000" />
-						<point pos="-1.691404 0.939323 -16.232426" range="1.199951" height="2.000000" />
-						<point pos="4.372273 0.955011 14.481467" range="1.199951" height="0.100002" />
+						<point pos="1.269047 0.954124 10.218261" range="0.815186" height="2.000000" />
+						<point pos="0.597167 0.938553 -15.373780" range="0.946045" height="2.000000" />
+						<point pos="1.484375 0.951569 6.307861" range="0.960937" height="2.000000" />
+						<point pos="0.622559 0.947540 -0.933105" range="0.996094" height="2.000000" />
+						<point pos="-3.729980 0.944672 -9.523927" range="1.033203" height="2.000000" />
+						<point pos="4.372316 0.955009 14.481444" range="1.199951" height="0.100002" />
+						<point pos="-3.053954 0.942413 -12.528320" range="1.174316" height="2.000000" />
+						<point pos="-2.111328 0.947205 -3.984131" range="1.199951" height="2.000000" />
+						<point pos="-1.328857 0.950829 2.545898" range="1.199951" height="2.000000" />
+						<point pos="2.712646 0.944626 -3.694336" range="1.199951" height="2.000000" />
+						<point pos="-1.691406 0.939323 -16.232422" range="1.199951" height="2.000000" />
+						<point pos="-4.182860 0.948479 -14.849121" range="1.199951" height="2.000000" />
 				</container>
 		</group>
 		<group name="Land_City_School" lootmax="30">
@@ -10166,6 +9644,42 @@
 						<point pos="-3.132325 -7.350418 1.095214" range="0.883730" height="2.000473" />
 				</container>
 		</group>
+		<group name="Land_Misc_TrailRoof_Big" lootmax="2">
+				<usage name="Hunting" />
+				<container name="lootFloor">
+						<category name="tools" />
+						<category name="containers" />
+						<category name="clothes" />
+						<category name="food" />
+						<category name="weapons" />
+						<point pos="0.197510 -1.344200 0.828613" range="0.134375" height="0.335938" />
+						<point pos="0.320557 -1.337990 -0.832764" range="0.134375" height="0.335938" />
+						<point pos="-1.375977 -1.791367 -0.255615" range="1.199951" height="2.000000" flags="32" />
+						<point pos="0.782715 -0.884750 0.013428" range="0.478125" height="1.195313" />
+						<point pos="1.380127 -1.344200 0.805420" range="0.168750" height="0.421875" />
+						<point pos="1.946045 -0.884750 0.092041" range="0.409375" height="1.023438" />
+						<point pos="1.093994 -1.791367 1.055176" range="0.417942" height="2.000000" flags="32" />
+						<point pos="-0.244630 -1.791367 1.192138" range="0.591982" height="2.000000" flags="32" />
+				</container>
+		</group>
+		<group name="Land_Misc_TrailRoof_Small" lootmax="2">
+				<usage name="Hunting" />
+				<container name="lootFloor">
+						<category name="tools" />
+						<category name="containers" />
+						<category name="clothes" />
+						<category name="food" />
+						<category name="weapons" />
+						<point pos="0.961670 -0.788895 0.821045" range="0.168750" height="0.421875" />
+						<point pos="-0.989502 -0.788895 0.832031" range="0.134375" height="0.335938" />
+						<point pos="0.422607 -0.329445 0.087891" range="0.409375" height="1.023438" />
+						<point pos="-0.654541 -0.329445 0.083252" range="0.409375" height="1.023438" />
+						<point pos="0.741455 -0.782684 -0.790283" range="0.168750" height="0.421875" />
+						<point pos="-0.452881 -0.782684 -0.812500" range="0.168750" height="0.421875" />
+						<point pos="-0.069581 -1.228294 0.914551" range="0.888434" height="0.245163" flags="32" />
+						<point pos="0.170166 -1.228294 -0.950195" range="0.573214" height="0.260818" flags="32" />
+				</container>
+		</group>		
 		<group name="Land_Misc_DeerStand1" lootmax="2">
 				<usage name="Hunting" />
 				<container name="lootFloor">

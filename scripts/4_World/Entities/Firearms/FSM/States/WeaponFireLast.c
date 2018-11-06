@@ -8,13 +8,13 @@ class WeaponFireLast extends WeaponStateBase
 	ref WeaponFire m_fire;
 	ref WeaponEjectCasing_W4T m_eject;
 
-	void WeaponFireLast (Weapon_Base w = NULL, WeaponStateBase parent = NULL, WeaponActions action = WeaponActions.NONE, int actionType = -1)
+	void WeaponFireLast (Weapon_Base w = NULL, WeaponStateBase parent = NULL, WeaponActions action = WeaponActions.NONE, int actionType = -1, int alternativeType = -1)
 	{
 		m_action = action;
 		m_actionType = actionType;
 
 		// setup nested state machine
-		m_fire = new WeaponFire(m_weapon, this, m_action, m_actionType);
+		m_fire = new WeaponFire(m_weapon, this, m_action, m_actionType,alternativeType);
 		m_eject = new WeaponEjectCasing_W4T(m_weapon, this);
 
 		// events
@@ -25,9 +25,11 @@ class WeaponFireLast extends WeaponStateBase
 		m_fsm = new WeaponFSM(this); // @NOTE: set owner of the submachine fsm
 
 		// transitions
-		m_fsm.AddTransition(new WeaponTransition( m_fire, __be_, m_eject));
+		m_fsm.AddTransition(new WeaponTransition( m_fire, __be_, m_eject, NULL, new GuardNot(WeaponGuardJammed(m_weapon))));
 		m_fsm.AddTransition(new WeaponTransition(m_eject, _fin_, NULL));
 		m_fsm.AddTransition(new WeaponTransition(m_eject, __to_, NULL));
+		m_fsm.AddTransition(new WeaponTransition(m_fire, _fin_, NULL));
+		m_fsm.AddTransition(new WeaponTransition(m_fire, __to_, NULL));
 
 		m_fsm.SetInitialState(m_fire);
 	}

@@ -48,17 +48,18 @@ class ActionMeasureTemperatureSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Measure temperature";
+		return "#measure_temperature";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		if (action_data.m_Player.GetStatTemperature())
+		Thermometer thermometer = Thermometer.Cast(action_data.m_MainItem);
+		
+		if(thermometer)
 		{
-			float temperature = Math.Floor(action_data.m_Player.GetStatTemperature().Get()*10)/10;
-			string message = "Thermometer displays "+temperature.ToString()+" ?C";
-			SendMessageToClient(action_data.m_Player, message);
+			SendMessageToClient(action_data.m_Player, thermometer.GetTemperatureMessage(action_data.m_Player));
 		}
+		
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

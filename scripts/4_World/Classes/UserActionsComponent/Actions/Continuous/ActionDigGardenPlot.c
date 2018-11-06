@@ -11,7 +11,7 @@ class ActionDigGardenPlot: ActionPlaceObject
 	void ActionDigGardenPlot()
 	{
 		m_CallbackClass	= ActionDigGardenPlotCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGSHOVEL;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIG;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
@@ -24,31 +24,26 @@ class ActionDigGardenPlot: ActionPlaceObject
 		
 	override string GetText()
 	{
-		return "Make garden plot";
+		return "#make_garden_plot";
 	}
 	
 	override bool Can ( PlayerBase player, ActionTarget target, ItemBase item )
 	{
+		return false; // TO DO: Boris V 02.VII.2018: Remove this when horticulture is enabled
+		
 		//Client
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
 			if ( player.IsPlacingLocal() )
 			{
 				Hologram hologram = player.GetHologramLocal();
-				GardenPlot_TO_BE_RELEASED item_GP;
+				GardenPlot item_GP;
 				Class.CastTo(item_GP,  hologram.GetProjectionEntity() );	
 				CheckSurfaceBelowGardenPlot(player, item_GP, hologram);
 	
 				if ( !hologram.IsColliding() )
 				{
-					if ( item.IsInherited(Shovel) )
-					{
-						m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGSHOVEL;
-					}	
-					else
-					{
-						m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGHOE;
-					}
+					m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 					return true;
 				}
 			}
@@ -58,9 +53,9 @@ class ActionDigGardenPlot: ActionPlaceObject
 		return true;
 	}
 
-	void CheckSurfaceBelowGardenPlot(PlayerBase player, GardenPlot_TO_BE_RELEASED item_GP, Hologram hologram)
+	void CheckSurfaceBelowGardenPlot(PlayerBase player, GardenPlot item_GP, Hologram hologram)
 	{
-		if (item_GP) // TO DO: When GardenPlot_TO_BE_RELEASED is renamed back to GardenPlot then remove this check.
+		if (item_GP) // TO DO: When GardenPlot is renamed back to GardenPlot then remove this check.
 		{
 			if ( item_GP.CanBePlaced(player, item_GP.GetPosition() )  )
 			{

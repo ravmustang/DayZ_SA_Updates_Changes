@@ -1,15 +1,28 @@
 class Land_Radio_PanelBig extends StaticTransmitter
 {
+	// --- SYSTEM EVENTS
+	override void OnStoreSave( ParamsWriteContext ctx )
+	{   
+		super.OnStoreSave( ctx );
+		
+		//store tuned frequency
+		ctx.Write( GetTunedFrequencyIndex() );
+	}
+	
+	override void OnStoreLoad( ParamsReadContext ctx )
+	{
+		super.OnStoreLoad( ctx );
+		
+		//load and set tuned frequency
+		int tuned_frequency_idx;
+		ctx.Read( tuned_frequency_idx );
+		SetFrequencyByIndex( tuned_frequency_idx );
+	}	
+	
 	//--- BASE
 	override bool IsStaticTransmitter()
 	{
 		return true;
-	}
-	
-	//--- ACTIONS
-	bool CanOperate()
-	{
-		return GetCompEM().IsSwitchedOn();
 	}
 	
 	void SetNextFrequency( PlayerBase player = NULL )
@@ -23,29 +36,30 @@ class Land_Radio_PanelBig extends StaticTransmitter
 	}
 
 	//--- POWER EVENTS
-	override void OnWorkStop()
-	{
-		//turn off device
-		GetCompEM().SwitchOff();
-	}
-
 	override void OnSwitchOn()
 	{
-		//turn device on
-		SwitchOn( true );
-		
+		if ( !GetCompEM().CanWork() )
+		{
+			GetCompEM().SwitchOff();
+		}
+	}	
+	
+	override void OnWorkStart()
+	{
 		//turn on broadcasting/receiving
-		EnableBroadcast( true );
-		EnableReceive( false );
+		EnableBroadcast ( true );
+		EnableReceive ( true );
+		SwitchOn ( true );
 	}
 
-	override void OnSwitchOff()
+	override void OnWorkStop()
 	{
-		//turn device off
-		SwitchOn ( false );
+		//auto switch off (EM)
+		GetCompEM().SwitchOff();
 		
 		//turn off broadcasting/receiving
-		EnableBroadcast( false );
-		EnableReceive( false );
+		EnableBroadcast ( false );
+		EnableReceive ( false );	
+		SwitchOn ( false );		
 	}
 }

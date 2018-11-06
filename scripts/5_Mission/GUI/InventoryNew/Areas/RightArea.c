@@ -1,16 +1,25 @@
 class RightArea: Container
 {
 	ref PlayerContainer m_PlayerContainer;
-	void RightArea( ContainerBase parent )
+	void RightArea( LayoutHolder parent )
 	{
-		m_MainPanel.Show( true );
-		m_MainPanel = m_MainPanel.FindAnyWidget( "Content" );
+		m_MainWidget.Show( true );
+		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
 		
 		m_PlayerContainer = new PlayerContainer( this );
 		m_PlayerContainer.SetPlayer( PlayerBase.Cast( GetGame().GetPlayer() ) );
 		m_Body.Insert( m_PlayerContainer );
-
-		m_MainPanel.GetScript( m_Spacer );
+		m_ActiveIndex = 0;
+	}
+	
+	override Container GetFocusedContainer()
+	{
+		return m_FocusedContainer;
+	}
+	
+	override void SetFocusedContainer( Container cont )
+	{
+		m_FocusedContainer = cont;
 	}
 	
 	EntityAI GetFocusedItem()
@@ -90,40 +99,15 @@ class RightArea: Container
 		{
 			m_PlayerContainer.SetFirstActive();
 		}
-		ScrollBarContainer scroll_bar_container;
-		GetMainPanel().GetParent().GetScript( scroll_bar_container );
-		scroll_bar_container.ScrollToTop();
 	}
 	
 	override void SetNextActive()
 	{
-		ScrollBarContainer scroll_bar_container;
-		GetMainPanel().GetParent().GetScript( scroll_bar_container );
-		if( m_PlayerContainer.IsLastContainerFocused() )
-		{
-			scroll_bar_container.ScrollToTop();
-		}
 		m_PlayerContainer.SetNextActive();
-		float amount = m_PlayerContainer.GetFocusedContainerHeight() + m_PlayerContainer.GetFocusedContainerYPos();
-		if( amount > scroll_bar_container.GetRootHeight() )
-		{
-			scroll_bar_container.ScrollFixedAmount( true, m_PlayerContainer.GetFocusedContainerHeight() );
-		}
 	}
 	
 	override void SetPreviousActive()
 	{
-		ScrollBarContainer scroll_bar_container;
-		float amount = m_PlayerContainer.GetFocusedContainerHeight() + m_PlayerContainer.GetFocusedContainerYPos();
-		GetMainPanel().GetParent().GetScript( scroll_bar_container );
-		if( amount > scroll_bar_container.GetRootHeight() )
-		{
-			scroll_bar_container.ScrollFixedAmount( false, m_PlayerContainer.GetFocusedContainerHeight() );
-		}
-		if( m_PlayerContainer.IsFirstContainerFocused() )
-		{
-			scroll_bar_container.ScrollToBottom();
-		}
 		m_PlayerContainer.SetPreviousActive();
 	}
 	
@@ -144,7 +128,7 @@ class RightArea: Container
 
 	override void SetParentWidget()
 	{
-		m_ParentWidget = m_Parent.GetMainPanel().FindAnyWidget( "RightPanel" );
+		m_ParentWidget = m_Parent.GetMainWidget().FindAnyWidget( "RightPanel" );
 	}
 
 	override void OnShow()

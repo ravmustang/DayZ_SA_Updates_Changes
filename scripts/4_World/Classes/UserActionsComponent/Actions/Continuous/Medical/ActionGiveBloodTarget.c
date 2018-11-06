@@ -37,22 +37,29 @@ class ActionGiveBloodTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Give blood";
+		return "#give_blood";
 	}
 
-	override void OnCompleteLoopServer( ActionData action_data )
+	override void OnEndAnimationLoopServer( ActionData action_data )
 	{
-		OnRepeatServer(action_data);
+		OnFinishProgressServer(action_data);
 
 		if ( action_data.m_MainItem.IsKindOf("BloodSyringe") )
 		{
 			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, new SyringeLambda(action_data.m_MainItem, "Syringe", action_data.m_Player));
 		}
-
+		else
+		{
+			if ( action_data.m_MainItem.GetQuantity() <= 0 )
+			{
+				GetGame().ObjectDelete( action_data.m_MainItem );
+			}	
+		}
+		
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
-	override void OnRepeatServer(ActionData action_data)
+	override void OnFinishProgressServer(ActionData action_data)
 	{
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		action_data.m_MainItem.TransferModifiers(ntarget);
@@ -61,7 +68,7 @@ class ActionGiveBloodTarget: ActionContinuousBase
 		
 		ntarget.AddHealth("","Blood",delta);
 		
-		int itembloodtype = 0; //item.GetVar(BloodType);
+		int itembloodtype = action_data.m_MainItem.GetLiquidType();
 		int bloodtypetarget = ntarget.GetStatBloodType().Get();
 		bool bloodmatch = BloodTypes.MatchBloodCompatibility(itembloodtype, bloodtypetarget);
 
@@ -72,12 +79,12 @@ class ActionGiveBloodTarget: ActionContinuousBase
 		
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0.01 )
 		{
-			action_data.m_MainItem.SetQuantity(0);
+			action_data.m_MainItem.SetQuantity(0, false, false);
 		}
 	}
 	
-	override void OnCancelServer(ActionData action_data)
+	override void OnEndServer(ActionData action_data)
 	{
-		OnRepeatServer(action_data);
+		OnFinishProgressServer(action_data);
 	}
 };

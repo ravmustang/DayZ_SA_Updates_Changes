@@ -1,6 +1,5 @@
-class OptionsMenuNew extends UIScriptedMenu
+class OptionsMenu extends UIScriptedMenu
 {
-	const int SLIDER_WIDGET = 42;
 	protected TabberUI					m_Tabber;
 	protected ref OptionsMenuGame		m_GameTab;
 	protected ref OptionsMenuSounds		m_SoundsTab;
@@ -16,7 +15,7 @@ class OptionsMenuNew extends UIScriptedMenu
 	protected Widget					m_Details;
 	protected TextWidget				m_Version;
 	
-	void OptionsMenuNew()
+	void OptionsMenu()
 	{
 		
 	}
@@ -56,10 +55,13 @@ class OptionsMenuNew extends UIScriptedMenu
 		
 		string version;
 		GetGame().GetVersion( version );
-		if( version != "" )
-			m_Version.SetText( "#main_menu_version" + " " + version );
-		else
-			m_Version.Show( false );
+		#ifdef PLATFORM_CONSOLE
+			version = "#main_menu_version" + " " + version + " (" + g_Game.GetDatabaseID() + ")";
+		#else
+			version = "#main_menu_version" + " " + version;
+		#endif
+		m_Version.SetText( version );
+		
 		#ifdef PLATFORM_WINDOWS
 			SetFocus( layoutRoot );
 		#else
@@ -82,7 +84,7 @@ class OptionsMenuNew extends UIScriptedMenu
 		return layoutRoot;
 	}
 	
-	void ~OptionsMenuNew()
+	void ~OptionsMenu()
 	{
 		Reset();
 	}
@@ -158,6 +160,12 @@ class OptionsMenuNew extends UIScriptedMenu
 			m_GameTab.Apply();
 		}
 		
+		#ifdef WIP_INPUTS
+			// save input configuration
+			GetUApi().Export();
+		#endif		
+		
+		
 		#ifdef PLATFORM_CONSOLE
 			layoutRoot.FindAnyWidget( "Reset" ).Show( false );
 			layoutRoot.FindAnyWidget( "Apply" ).Show( false );
@@ -203,7 +211,7 @@ class OptionsMenuNew extends UIScriptedMenu
 		#endif
 		
 		if( changed )
-			g_Game.GetUIManager().ShowDialog("#main_menu_configure", "You have unsaved changes in the configuration. Would you like to discard them?", 1337, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
+			g_Game.GetUIManager().ShowDialog("#main_menu_configure", "#main_menu_configure_desc", 1337, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
 		else
 		{
 			m_Options.Revert();
@@ -258,13 +266,15 @@ class OptionsMenuNew extends UIScriptedMenu
 			m_GameTab.Revert();
 		//if( m_SoundsTab.IsChanged() )
 			m_SoundsTab.Revert();
-			m_ControlsTab.Revert();
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		//if( m_VideoTab.IsChanged() )
 			m_VideoTab.Revert();
 		#endif
 		#endif
+		
+		if( m_Options.IsChanged() )
+			m_Options.Revert();
 		
 		#ifdef PLATFORM_CONSOLE
 			layoutRoot.FindAnyWidget( "Apply" ).Show( false );
@@ -358,18 +368,9 @@ class OptionsMenuNew extends UIScriptedMenu
 			ColorRed( w );
 			return true;
 		}
-		if( w )
+		if( x == -1 && y == 1 )
 		{
-			if( w.IsInherited( SliderWidget ) || w.GetUserID() == SLIDER_WIDGET )
-			{
-				SliderFocus();
-				return true;
-			}
-			else
-			{
-				ToggleFocus();
-				return true;
-			}
+			SliderFocus();
 		}
 		return false;
 	}
@@ -390,7 +391,11 @@ class OptionsMenuNew extends UIScriptedMenu
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_Apply || w == m_Back || w == m_Reset );
+		if( w )
+		{
+			return ( w == m_Apply || w == m_Back || w == m_Reset );
+		}
+		return false;
 	}
 	
 	override void Refresh()
@@ -442,7 +447,7 @@ class OptionsMenuNew extends UIScriptedMenu
 		
 		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
 		{
-			Reset();
+			Back();
 		}
 	}
 	
@@ -450,6 +455,12 @@ class OptionsMenuNew extends UIScriptedMenu
 	void ColorRed( Widget w )
 	{
 		SetFocus( w );
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_Apply )
+		{
+			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+		}
 	}
 	
 	void ColorWhite( Widget w, Widget enterW )
@@ -457,5 +468,11 @@ class OptionsMenuNew extends UIScriptedMenu
 		#ifdef PLATFORM_WINDOWS
 		SetFocus( null );
 		#endif
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_Apply )
+		{
+			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+		}
 	}
 }

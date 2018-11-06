@@ -21,11 +21,15 @@ class ItemTransmitter extends InventoryItemSuper
 	proto native void EnableReceive(bool state);
 	proto native bool IsBroadcasting();
 	proto native bool IsReceiving();
+	proto native int GetTunedFrequencyIndex();
+	proto native void SetFrequencyByIndex(int index);
 };
 
 //-----------------------------------------------------------------------------
 class ItemMegaphone extends InventoryItemSuper
 {
+	proto native bool CanSpeak();
+	proto native void SetCanSpeak(bool onOff); 
 }
 
 //-----------------------------------------------------------------------------
@@ -63,14 +67,132 @@ class CarWheel extends InventoryItemSuper
 
 	//! Returns wheel width.
 	proto native float GetWidth();
+
+/*	Invoke car phys, when wheel was attached
+	not working properly, postponed for now
+	override void OnWasAttached( EntityAI parent, int slot_name )
+	{
+		IEntity iePrnt = IEntity.Cast( parent );
+		dBodyActive( iePrnt, ActiveState.ACTIVE);
+		dBodyApplyImpulse( iePrnt, "0 1 0");
+	}
+*/
+
+	override void EEKilled(Object killer)
+	{
+		string newWheel = "";
+		switch( GetType() )
+		{
+			case "HatchbackWheel":
+				newWheel = "HatchbackWheel_Ruined";
+			break;
+			
+			case "V3SWheel":
+				newWheel = "V3SWheel_Ruined";
+			break;
+			
+			case "V3SWheelDouble":
+				newWheel = "V3SWheelDouble_Ruined";
+			break;
+
+			case "CivSedanWheel":
+				newWheel = "CivSedanWheel_Ruined";
+			break;	
+		}
+		
+		if ( newWheel != "" )
+		{
+			ReplaceWheelLambda lambda = new ReplaceWheelLambda ( this, newWheel, NULL);
+			lambda.SetTransferParams(true, true, true);
+			GetInventory().ReplaceItemWithNew(InventoryMode.SERVER, lambda);
+		}
+	}
+
 };
+
+class ReplaceWheelLambda : TurnItemIntoItemLambda
+{
+	vector m_oldOri;
+	void ReplaceWheelLambda (EntityAI old_item, string new_item_type, PlayerBase player) {}
+
+	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
+	{
+		super.CopyOldPropertiesToNew(old_item, new_item);
+		m_oldOri = old_item.GetOrientation();
+	}
+	
+	override protected void OnNewEntityCreated (EntityAI new_item)
+	{
+		super.OnNewEntityCreated( new_item );
+		if (new_item)
+			new_item.SetOrientation( m_oldOri );
+	}
+}
+
+class HatchbackWheel extends CarWheel {};
 
 class CarDoor extends InventoryItemSuper
 {
+/*
+	override bool CanDetachAttachment(EntityAI attachment)
+	{
+		if ( GetCarDoorsState( "Driver" ) == CarDoorState.DOORS_OPEN )
+			return true;
+		
+		return false;
+	}
+*/
+
+/*
+	override void OnWasAttached( EntityAI parent, int slot_name )
+	{
+		
+		SoundParams soundParams = new SoundParams("offroad_door_close_SoundSet");
+		SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
+		SoundObject soundObject = soundBuilder.BuildSoundObject();
+		soundObject.SetPosition(GetPosition());
+		GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
+	}
+*/
+/*
+	void CloseDoors()
+	{
+		SetAnimationPhase();
+		
+	}
+*/
 };
 
 class CarRadiator extends InventoryItemSuper
 {
+
+	override void OnWasDetached ( EntityAI parent, int slot_id )
+	{
+		if ( parent )
+		{
+			Car car;
+		 	Class.CastTo( car, parent );
+
+			if ( car )
+			{
+				car.Leak( CarFluid.COOLANT, car.GetFluidFraction(CarFluid.COOLANT)*car.GetFluidCapacity(CarFluid.COOLANT) );
+			}
+		}
+	}
+	
+	override void EEKilled(Object killer)
+	{
+		Car car;
+		EntityAI parent = GetHierarchyParent();
+		
+		Class.CastTo( car, parent );
+
+		if ( car )
+		{
+			car.Leak( CarFluid.COOLANT, car.GetFluidFraction(CarFluid.COOLANT)*car.GetFluidCapacity(CarFluid.COOLANT) );
+		}
+	}
+
 };
 
 
@@ -111,27 +233,9 @@ typedef Clothing ClothingBase;
 //-----------------------------------------------------------------------------
 class ItemBook extends InventoryItemSuper
 {
-	override void EEUsed(Man owner)
-	{
-		if ( GetGame().IsServer() )
-		{
-			 RPCSingleParam(ERPCs.RPC_READ_A_BOOK, NULL, true, owner.GetIdentity());
-		}
-	}
-
 	override event bool OnUseFromInventory(Man owner)
 	{
 		return false;
-	}
-	
-	override void OnRPC( PlayerIdentity sender, int rpc_type, ParamsReadContext  ctx)
-	{
-		super.OnRPC(sender, rpc_type, ctx);
-		
-		if (rpc_type == ERPCs.RPC_READ_A_BOOK)
-		{
-			super.EEUsed(NULL);
-		}
 	}
 };
 

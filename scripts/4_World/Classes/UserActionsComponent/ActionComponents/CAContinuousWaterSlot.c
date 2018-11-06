@@ -82,6 +82,7 @@ class CAContinuousWaterSlot : CAContinuousQuantity
 			else
 			{
 				//CalcAndSetQuantity( action_data );
+				OnCompletePogress(action_data);
 				return UA_FINISHED;
 			}
 		}

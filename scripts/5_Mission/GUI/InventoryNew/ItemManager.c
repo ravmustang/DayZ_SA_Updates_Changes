@@ -150,7 +150,7 @@ class ItemManager
 
 	void DeserializeDefaultHeaderOpenStates()
 	{
-		ItemManager.GetInstance().ClearDefaultHeaderOpenStates();
+		ClearDefaultHeaderOpenStates();
 
 		TStringArray serialized_types = new TStringArray;
 		GetGame().GetProfileStringList( "defaultHeaderOpenStates", serialized_types );
@@ -183,7 +183,7 @@ class ItemManager
 
 	void DeserializeDefaultOpenStates()
 	{
-		ItemManager.GetInstance().ClearDefaultOpenStates();
+		ClearDefaultOpenStates();
 
 		TStringArray serialized_types = new TStringArray;
 		GetGame().GetProfileStringList( "defaultOpenStates", serialized_types );
@@ -228,9 +228,9 @@ class ItemManager
 
 	void HideDropzones()
 	{
-		GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).Show( false );
-		GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).Show( false );
-		GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).Show( false );
+		GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 0 );
+		GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 0 );
+		GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 0 );
 	}
 
 	void ShowSourceDropzone( EntityAI item )
@@ -248,15 +248,15 @@ class ItemManager
 			HideDropzones();
 			if( loc_type == InventoryLocationType.GROUND )
 			{
-				GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+				GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 			}
 			else if( loc_type == InventoryLocationType.HANDS )
 			{
-				GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+				GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 			}
 			else
 			{
-				GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).Show( true );
+				GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 			}
 		}
 	}
@@ -301,6 +301,30 @@ class ItemManager
 		m_TooltipWidget.Show( false );
 		delete m_ItemPreviewWidget;
 		delete m_ToolTipTimer;
+	}
+	
+	static int GetItemHealthColor( EntityAI item )
+	{
+		if( item )
+		{
+			switch ( item.GetHealthLevel() )
+			{
+				case -1 :
+					break;
+				case STATE_PRISTINE:
+					return Colors.COLOR_PRISTINE;
+				case STATE_WORN:
+					return Colors.COLOR_WORN;
+				case STATE_DAMAGED:
+					return Colors.COLOR_DAMAGED;
+				case STATE_BADLY_DAMAGED:
+					return Colors.COLOR_BADLY_DAMAGED;
+				case STATE_RUINED:
+					return Colors.COLOR_RUINED;	
+			}
+		}
+			
+		return 0x00FFFFFF;
 	}
 
 	void SetTemperature( EntityAI item, Widget item_w )
@@ -370,7 +394,7 @@ class ItemManager
 
 		if ( item.IsInherited( InventoryItem) )
 		{
-			UpdateItemInfo( m_TooltipWidget, item );
+			InspectMenuNew.UpdateItemInfo( m_TooltipWidget, item );
 			int screen_w, screen_h;
 			float w, h;
 
@@ -415,6 +439,7 @@ class ItemManager
 				preview_frame.GetSize(ww, hh);
 				m_ItemPreviewWidget = ItemPreviewWidget.Cast( GetGame().GetWorkspace().CreateWidget(ItemPreviewWidgetTypeID, 0, 0, 1, 1, WidgetFlags.VISIBLE, ARGB(255, 255, 255, 255), 210, preview_frame) );
 				m_ItemPreviewWidget.SetItem(item);
+				m_ItemPreviewWidget.SetView( item.GetViewIndex() );
 			}
 		}
 	}

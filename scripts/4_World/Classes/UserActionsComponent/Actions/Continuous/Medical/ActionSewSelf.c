@@ -41,10 +41,10 @@ class ActionSewSelf: ActionContinuousBase
 			
 	override string GetText()
 	{
-		return "Sew cuts";
+		return "#sew_cuts";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{	
 		const float ITEM_DAMAGE = 10;
 		float delta = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() );

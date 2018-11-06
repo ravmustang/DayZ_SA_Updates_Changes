@@ -15,7 +15,7 @@ class ActionTurnOffTransmitterOnGround: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Turn off";
+		return "#turn_off";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -24,9 +24,9 @@ class ActionTurnOffTransmitterOnGround: ActionInteractBase
 		if ( player && target_object && target_object.IsStaticTransmitter() )
 		{
 			EntityAI target_entity = EntityAI.Cast( target_object );
-			string selection = target_object.GetActionComponentName(target.GetComponentIndex());
+			string selection = target_object.GetActionComponentName( target.GetComponentIndex() );
 			
-			if ( target_entity.HasEnergyManager()  &&  target_entity.GetCompEM().CanSwitchOff() && selection == "power_panel" )
+			if ( target_entity.HasEnergyManager() && target_entity.GetCompEM().CanSwitchOff() && selection == "power_panel" )
 			{
 				AdvancedCommunication transmitter = AdvancedCommunication.Cast( target_object );
 				transmitter.DisplayRadioInfo( "ON", player );
@@ -37,21 +37,10 @@ class ActionTurnOffTransmitterOnGround: ActionInteractBase
 		
 		return false;
 	}
-				
-	override void OnCompleteServer( ActionData action_data )
+	
+	override void OnExecuteServer( ActionData action_data )
 	{
-		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
-		
-		if ( target_entity.GetCompEM().CanSwitchOff() )
-		{
-			target_entity.GetCompEM().SwitchOff();
-			
-			InformPlayers(action_data.m_Player,action_data.m_Target,UA_FINISHED);	//Success
-		}
-		else
-		{
-			
-			InformPlayers(action_data.m_Player,action_data.m_Target,UA_FAILED);		//Already turned off
-		}	
+		AdvancedCommunication transmitter = AdvancedCommunication.Cast( action_data.m_Target.GetObject() );
+		transmitter.TurnOffTransmitter();
 	}
 }

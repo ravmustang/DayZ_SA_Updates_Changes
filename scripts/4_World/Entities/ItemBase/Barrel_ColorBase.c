@@ -7,7 +7,8 @@ class Barrel_ColorBase : Container_Base
 	void Barrel_ColorBase()
 	{
 		m_Opened = false;
-		m_BarrelOpener = new Timer();	
+		m_BarrelOpener = new Timer();
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
 	override bool IsHeavyBehaviour()
@@ -30,6 +31,27 @@ class Barrel_ColorBase : Container_Base
 		return false;
 	}
 	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+		
+		if ( IsOpen() && IsSoundSynchRemote() )
+		{
+			SoundBarrelOpenPlay();
+		}
+		
+		if ( !IsOpen() && IsSoundSynchRemote() )
+		{
+			SoundBarrelClosePlay();
+		}
+	}
+	
+	void SoundBarrelOpenPlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( "barrel_open_SoundSet", GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
+	
 	override void Open()
 	{
 		super.Open();
@@ -38,6 +60,8 @@ class Barrel_ColorBase : Container_Base
 		
 		m_RainProcurement = new RainProcurementManager( this );
 		m_RainProcurement.InitRainProcurement();
+		
+		SoundSynchRemote();
 	}
 	
 	void Lock(float actiontime)
@@ -52,6 +76,12 @@ class Barrel_ColorBase : Container_Base
 		Open();
 	}
 	
+	void SoundBarrelClosePlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( "barrel_close_SoundSet", GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
+	
 	override void Close()
 	{
 		super.Close();
@@ -59,8 +89,24 @@ class Barrel_ColorBase : Container_Base
 		SetAnimationPhase("Lid2",1);
 		
 		m_RainProcurement.StopRainProcurement();
+		
+		SoundSynchRemote();
 	}
 
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{
+			SoundParams soundParams = new SoundParams("placeBarrel_SoundSet");
+			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
+			SoundObject soundObject = soundBuilder.BuildSoundObject();
+			soundObject.SetPosition(GetPosition());
+			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
+		}	
+	}
+	
 	void DetermineAction ( PlayerBase player )
 	{
 		int slot_id;

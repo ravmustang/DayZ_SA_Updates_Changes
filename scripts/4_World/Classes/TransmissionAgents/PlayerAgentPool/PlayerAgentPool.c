@@ -69,17 +69,18 @@ class PlayerAgentPool
 	
 	}
 		
-	void AddAgent(int agent_id, int count)
+	void AddAgent(int agent_id, float count)
 	{
 		int max_count = m_PluginTransmissionAgents.GetAgentMaxCount(agent_id);
-
+		
 		if(	!m_VirusPool.Contains(agent_id) )//if it contains, maybe add count only ?
 		{
 			m_VirusPool.Insert( agent_id, Math.Clamp(count,0,max_count) );
 		}
 		else
 		{
-			int new_value = m_VirusPool.Get(agent_id) + count;
+			float new_value = m_VirusPool.Get(agent_id) + count;
+			//Print(new_value);
 			m_VirusPool.Set(agent_id,Math.Clamp(new_value,0,max_count) );
 		}
 	}

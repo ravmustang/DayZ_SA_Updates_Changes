@@ -55,6 +55,7 @@ class WeaponRechamber extends WeaponStateBase
 		e.m_magazine = m_dstMagazine; // @NOTE: override event mag - @TODO
 		super.OnEntry(e); // @NOTE: super after submachine init (prevent override from submachine start)
 	}
+
 	override void OnExit (WeaponEventBase e)
 	{
 		m_dstMagazine = NULL;
@@ -62,6 +63,41 @@ class WeaponRechamber extends WeaponStateBase
 		m_loa.m_srcMagazine = NULL;
 		super.OnExit(e);
 	}
-};
 
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Write(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Read(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+};
 

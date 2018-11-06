@@ -1,7 +1,5 @@
 // Particle test for Maxman
 
-//TO DO: FIX! Particles are now defined by integer, not string!
-
 class ParticleTest extends ItemBase
 {
 	protected const int	PARTICLE_PATH = ParticleList.SMOKING_CAR_ENGINE;
@@ -14,8 +12,10 @@ class ParticleTest extends ItemBase
 	}
 
 	// Destructor
-	void ~ParticleTest()
+	override void EEDelete(EntityAI parent)
 	{
+		super.EEDelete(parent);
+		
 		if (m_Particle  &&  GetGame()) // GetGame() is null when the game is being shut down
 		{
 			m_Particle.Stop();

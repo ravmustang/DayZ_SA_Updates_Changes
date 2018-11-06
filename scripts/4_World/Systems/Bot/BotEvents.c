@@ -4,17 +4,19 @@
 class BotEventBase
 {
 	PlayerBase m_Player;
+	EntityAI m_Entity;
 
-	void BotEventBase (PlayerBase p = NULL) { m_Player = p; }
+	void BotEventBase (PlayerBase p = NULL, EntityAI e = NULL) { m_Entity = e; }
 };
 
 //class BotEventXXX : BotEventBase { void BotEventXXX (PlayerBase p = NULL) { } };
 
 
-class BotEventTestStart : BotEventBase { };
-class BotEventTestStop : BotEventBase { };
+class BotEventStart : BotEventBase { };
+class BotEventStop : BotEventBase { };
 
-class BotEventTestEndOK : BotEventBase { };
-class BotEventTestEndFail : BotEventBase { };
-class BotEventTestEndTimeout : BotEventBase { };
+class BotEventEndOK : BotEventBase { };
+class BotEventEndFail : BotEventBase { };
+class BotEventEndTimeout : BotEventBase { };
+class BotEventOnItemInHandsChanged : BotEventBase { };
 

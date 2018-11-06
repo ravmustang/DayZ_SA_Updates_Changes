@@ -1,5 +1,8 @@
 class Entity extends ObjectTyped
 {
+	//! returns simulation timestamp
+	proto native int GetSimulationTimeStamp();
+
 	//! Return animation phase of animation on object.
 	proto native float GetAnimationPhase(string animation);
 	
@@ -10,7 +13,7 @@ class Entity extends ObjectTyped
 	proto native int GetBoneIndex( string proxySelectionName );
 
 	//! Returns proxy object that corresponds given bone inside skeleton.
-	proto native Entity GetBoneObject( int boneIndex );
+	proto native Object GetBoneObject( int boneIndex );
 	
 	//! Turns on/off invisibility
 	proto native void SetInvisible(bool invisible);

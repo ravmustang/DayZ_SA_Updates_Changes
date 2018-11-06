@@ -7,7 +7,7 @@ class VehicleBattery : ItemBase
 		if ( parent.IsInherited(BatteryCharger) )
 		{
 			BatteryCharger charger = BatteryCharger.Cast( parent );
-			return charger.CanReceiveAttachment(this);
+			return charger.CanReceiveAttachment(this, InventorySlots.INVALID);
 		}
 		
 		return true;

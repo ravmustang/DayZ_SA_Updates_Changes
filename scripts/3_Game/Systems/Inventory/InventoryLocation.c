@@ -1,3 +1,4 @@
+//@NOTE: DO NOT EDIT! enum values are overwritten from c++
 /// types of Inventory Location
 enum InventoryLocationType
 {
@@ -9,6 +10,7 @@ enum InventoryLocationType
 	PROXYCARGO, ///< cargo of a large object (building,...)
 };
 
+//@NOTE: DO NOT EDIT! enum values are overwritten from c++
 /// flags for searching locations in inventory
 enum FindInventoryLocationType
 {
@@ -18,6 +20,7 @@ enum FindInventoryLocationType
 	PROXYCARGO, 	///< 	PXY
 	ANY_CARGO, 		///< 	CGO | PXY
 	ANY, 			///< 	ATT | CGO | PXY | HND
+	NO_SLOT_AUTO_ASSIGN ///<	skips auto-assign test
 };
 
 //! InventoryLocation
@@ -155,10 +158,14 @@ class InventoryLocation
 	 **/
 	proto native void SetParent (notnull EntityAI parent);
 
+	// direct set methods
+	proto native void SetSlot (int slotId);
+	proto native void SetIndex (int idx);
+	proto native void SetRow (int row);
+	proto native void SetCol (int col);
+
 	/**
 	 * @fn		Reset
-	 * @brief	resets inventory location to UNKNOWN
-	 * @NOTE	IsValid returns false afterwards
 	 **/
 	proto native void Reset ();
 	
@@ -492,3 +499,45 @@ class InventoryLocation
 	}
 };
 
+bool OptionalLocationWriteToContext (InventoryLocation loc, notnull ParamsWriteContext ctx)
+{
+	if (loc)
+	{
+		if (!ctx.Write(true))
+		{
+			Error("OptionalLocationWriteToContext - cannot write 1 to context!");
+			return false;
+		}
+		return loc.WriteToContext(ctx);
+	}
+	else
+	{
+		if (!ctx.Write(false))
+		{
+			Error("OptionalLocationWriteToContext - cannot write 0 to context!");
+			return false;
+		}
+	}
+	return true;
+}
+
+bool OptionalLocationReadFromContext (ref out InventoryLocation loc, notnull ParamsReadContext ctx)
+{
+	bool present = false;
+	if (!ctx.Read(present))
+	{
+		Error("OptionalLocationReadFromContext - cannot read bool from context!");
+		return false;
+	}
+	
+	if (!present)
+		return true;
+
+	loc = new InventoryLocation;
+	if (!loc.ReadFromContext(ctx))
+	{
+		Error("OptionalLocationReadFromContext - cannot read (present) inventorylocation from context!");
+		return false;
+	}
+	return true;
+}

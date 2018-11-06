@@ -18,13 +18,12 @@ class GardenBase extends Building
 	
 	// slot names
 	private static const string SLOT_SELECTION_DIGGED_PREFIX 	= "slotDigged_";
-	private static const string SLOT_SELECTION_COVERED_PREFIX 	= "slotCovered_";
-	private static const string SLOT_COMPONENT_PREFIX 			= "Component";
+	static const string SLOT_SELECTION_COVERED_PREFIX 	= "slotCovered_";
+	private static const string SLOT_COMPONENT_PREFIX 			= "slot_";
 	private static const string SLOT_MEMORY_POINT_PREFIX 		= "slot_";
 	
 	
 	private static const int 	CHECK_RAIN_INTERVAL 			= 30;
-	int 						FIRST_SLOT_COMPONENT_INDEX; // Number of 'component##' selection in the p3d file which represents the first slot (View Geometry LOD). Needed for user actions to work on targeted slots.
 	
 	protected ref array<ref Slot> m_Slots;
 	protected float m_BaseFertility;
@@ -34,9 +33,7 @@ class GardenBase extends Building
 	private static ref map<string,string> m_map_slots; // For the 'attachment slot -> plant slot' conversion. It is possible that this will be removed later.
 	
 	void GardenBase()
-	{
-		FIRST_SLOT_COMPONENT_INDEX = 2;
-		
+	{		
 		m_map_slots = new map<string,string>;
 		m_DeleteWithDelayTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
 		
@@ -56,10 +53,10 @@ class GardenBase extends Building
 			m_map_slots.Set(input, output);
 		}
 		
-		// m_CheckRainTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
 		if (GetGame().IsServer())
 		{
-			//m_CheckRainTimer.Run( CHECK_RAIN_INTERVAL, this, "CheckRainTick", NULL, true ); // Temporarily removed. It might have been causing server-side stuttering. Good solution could b provided by upcoming (?) staging system.
+			m_CheckRainTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+			m_CheckRainTimer.Run( CHECK_RAIN_INTERVAL, this, "CheckRainTick", NULL, false ); // Temporarily removed by disabling the loop parameter. It might have been causing server-side stuttering. Good solution could be provided by upcoming (?) staging system.
 		}
 	}
 
@@ -307,9 +304,7 @@ class GardenBase extends Building
 			string converted_slot_name;
 			Print(slot_name); // TO DO: (BLOKER) Until new system for attachment slots is implemented, slot_name is incorrect!
 			vector pos = GetPosition();
-			//int index = GetNearestSlotIDByState( pos , Slot.STATE_DIGGED ) + FIRST_SLOT_COMPONENT_INDEX; // +2 because selections are named differently than 'garden slot' IDs and 'attachment slots' IDs.
 			int index = GetSlotIndexByAttachmentSlot( slot_name );
-			index = index + FIRST_SLOT_COMPONENT_INDEX - 1; // Offset index because of COMPONENT## in p3d
 			
 			if (index < 10)
 			{
@@ -378,7 +373,7 @@ class GardenBase extends Building
 		int slot_index = GetSlotIndexBySelection( selection_component );
 		string message = "ERROR! PLANTING OF THE SEED FAILED!";
 		
-		if ( slot_index >= 0 )
+		if ( slot_index != -1 )
 		{
 			PluginHorticulture module_horticulture = PluginHorticulture.Cast( GetPlugin( PluginHorticulture ) );
 			string plant_type = module_horticulture.GetPlantType( item );
@@ -405,27 +400,53 @@ class GardenBase extends Building
 			{
 				message += " However the soil is too dry for the plant to grow.";
 			}
+			
+			if ( !slot.NeedsWater() )
+			{
+				SproutPlant(player, slot);
+			}
 		}
 		
 		return message;
 	}
 	
+	void SproutPlant (PlayerBase player, Slot slot)
+	{
+		ItemBase seed = slot.GetSeed();
+		
+		SproutLambda lambda = new SproutLambda(seed, slot.m_PlantType, player, this, slot);
+		lambda.SetTransferParams(true, true, true);
+		player.ServerReplaceItemWithNew(lambda);
+	}
+	
 	// Creates a plant
 	void CreatePlant(Slot slot )
 	{
-		int slot_index = GetSlotBySelection(slot.GetSlotComponent()).GetSlotIndex();
-		vector pos = GetSlotPosition(slot_index);
-		PlantBase plant = PlantBase.Cast( GetGame().CreateObject( slot.m_PlantType, pos ) );
-		plant.SetPosition(pos); // Hackfix for plants having random offset. It doesn't work very well though since it causes problems elsewhere. For now there is no better solution.
-		slot.SetPlant(plant);
-		slot.m_State = Slot.STATE_COVERED;
-		plant.Init( this, slot.m_Fertility, slot.m_HarvestingEfficiency, slot.GetWater() );
-		ShowSelection(SLOT_SELECTION_COVERED_PREFIX + (slot_index + 1).ToStringLen(2));
+		// WIP!
 		
 		ItemBase seed = slot.GetSeed();
-		GetGame().ObjectDelete(seed);
-		//this.TakeEntityAsAttachment(plant); // TO DO: Uncomment this when plant proxies are fixed
+		SproutLambda lambda = new SproutLambda(seed, slot.m_PlantType, NULL, this, slot);
+		lambda.SetTransferParams(true, true, true);
+		GetInventory().ReplaceItemWithNew(InventoryMode.SERVER, lambda);
+
+		//int slot_index = GetSlotBySelection(slot.GetSlotComponent()).GetSlotIndex();
+		int slot_index = slot.GetSlotIndex();
+		vector pos = GetSlotPosition(slot_index);
+		//PlantBase plant = PlantBase.Cast( GetGame().CreateObject( slot.m_PlantType, pos ) );
+		//plant.SetPosition(pos);
+		//slot.SetPlant(plant);
+		slot.m_State = Slot.STATE_COVERED;
+		//plant.Init( this, slot.m_Fertility, slot.m_HarvestingEfficiency, slot.GetWater() );
+		ShowSelection(SLOT_SELECTION_COVERED_PREFIX + (slot_index + 1).ToStringLen(2));
 		
+		GetGame().ObjectDelete(seed);
+		
+		/*if ( GetGame().IsServer() )
+     		GetInventory().TakeEntityAsAttachmentEx( InventoryMode.SERVER, plant, slot.GetSlotId() );
+			//ServerTakeEntityAsAttachmentEx( plant,  slot.GetSlotId() );
+		else
+     		GetInventory().TakeEntityAsAttachmentEx( InventoryMode.JUNCTURE, plant, slot.GetSlotId() );
+		*/
 		Param1<ItemBase> param_seed = new Param1<ItemBase>(seed);
 		m_DeleteWithDelayTimer.Run(0.1, this, "DeleteWithDelay", param_seed, false);
 	}
@@ -471,12 +492,15 @@ class GardenBase extends Building
 					selection.Replace( SLOT_COMPONENT_PREFIX, SLOT_SELECTION_DIGGED_PREFIX );
 					int slot_index = GetSlotIndexBySelection(selection);
 					
-					UpdateSlotTexture( slot_index );
+					if (slot_index > 0)
+					{
+						UpdateSlotTexture( slot_index );
 					
 					//TODO Boris: Add soft skill 2.0
 					//PluginExperience module_exp = GetPlugin(PluginExperience);
 					//slot.m_HarvestingEfficiency = module_exp.GetExpParamNumber(player, PluginExperience.EXP_FARMER_FERTILIZATION, "efficiency");
-						
+					}
+					
 					return "I've fertilized the ground. Now it have enough of fertilizer.";
 				}
 				else
@@ -531,9 +555,7 @@ class GardenBase extends Building
 
 	void UpdateSlotTexture( int slot_index )
 	{
-		// 23.3.2018: Temporarily commented out as a quick fix for DAYZ-30633. This will be fixed properly when new hierarchy is implemented.
-		
-		/*
+		// TO DO: Fix DAYZ-30633 here!
 		Slot slot = m_Slots.Get( slot_index );
 		
 		// Show / Hide selections according to DIGGED or COVERED states.
@@ -559,30 +581,27 @@ class GardenBase extends Building
 				SetSlotTextureDigged( slot_index );
 			}
 		}
-		*/
 	}
 
 	void SetSlotTextureDigged( int slot_index )
 	{
-		
 		TStringArray textures = GetHiddenSelectionsTextures();
 		ShowSelection( SLOT_SELECTION_DIGGED_PREFIX + (slot_index + 1).ToStringLen(2) );
 		string texture = textures.Get(0);
-		//SetObjectTexture( slot_index, texture );
+		SetObjectTexture( slot_index, texture );
 		
 		Slot slot = m_Slots.Get( slot_index );
 		
 		if ( slot.NeedsWater() )
 		{
 			// Set dry material
-			//this.SetObjectMaterial ( slot_index, SLOT_MATERIAL_DRY );
+			this.SetObjectMaterial ( slot_index, SLOT_MATERIAL_DRY );
 		}
 		else
 		{
 			// Set wet material
-			//this.SetObjectMaterial ( slot_index, SLOT_MATERIAL_WET );
+			this.SetObjectMaterial ( slot_index, SLOT_MATERIAL_WET );
 		}
-		
 	}
 
 	void SetSlotTextureFertilized( int slot_index, string item_type )
@@ -591,7 +610,7 @@ class GardenBase extends Building
 		
 		int tex_id = GetGame().ConfigGetInt( "cfgVehicles " + item_type + " Horticulture TexId" );
 		ShowSelection( SLOT_SELECTION_DIGGED_PREFIX + (slot_index + 1).ToStringLen(2) );
-		//SetObjectTexture( slot_index, textures.Get(tex_id) );
+		SetObjectTexture( slot_index, textures.Get(tex_id) );
 		
 		Slot slot = m_Slots.Get( slot_index );
 		
@@ -608,11 +627,11 @@ class GardenBase extends Building
 			// Set dry material for garden lime
 			if ( slot.m_FertilizerType == "GardenLime" )
 			{
-				//this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_LIMED_DRY ); // TO DO: Save into constant
+				this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_LIMED_DRY ); // TO DO: Save into constant
 			}
 			else if ( slot.m_FertilizerType == "PlantMaterial" )
 			{
-				//this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_COMPOST_DRY ); // TO DO: Save into constant
+				this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_COMPOST_DRY ); // TO DO: Save into constant
 			}
 		}
 		else
@@ -620,11 +639,11 @@ class GardenBase extends Building
 			// Set dry material for compost
 			if ( slot.m_FertilizerType == "GardenLime" )
 			{
-				//this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_LIMED_WET ); // TO DO: Save into constant
+				this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_LIMED_WET ); // TO DO: Save into constant
 			}
 			else if ( slot.m_FertilizerType == "PlantMaterial" )
 			{
-				//this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_COMPOST_WET ); // TO DO: Save into constant
+				this.SetObjectMaterial ( slot_index + slot_index_offset, SLOT_MATERIAL_COMPOST_WET ); // TO DO: Save into constant
 			}
 		}
 	}
@@ -641,10 +660,9 @@ class GardenBase extends Building
 			}
 			
 			slot.Init( m_BaseFertility );
-			slot.GiveWater( NULL, -9999 );
+			//slot.GiveWater( NULL, -9999 );
 			
 			HideSelection( SLOT_SELECTION_COVERED_PREFIX + (index + 1).ToStringLen(2) );
-			//this.HideSelection( SLOT_SELECTION_DIGGED_PREFIX + (slot_index + 1).ToStringLen(2), 1 );
 		}
 	}
 
@@ -660,9 +678,10 @@ class GardenBase extends Building
 	Slot GetSlotBySelection( string selection_component )
 	{
 		int slot_index = GetSlotIndexBySelection( selection_component );
-		if ( slot_index >= 0 )
+		
+		if ( slot_index > -1 )
 		{
-			return m_Slots.Get( slot_index ); // If script crashes here, it's probably because member variable FIRST_SLOT_COMPONENT_INDEX is not set to correct value.
+			return m_Slots.Get( slot_index );
 		}
 		else
 		{
@@ -670,6 +689,7 @@ class GardenBase extends Building
 		}
 	}
 
+	// Returns slot array index by selection, starting from 0 as the first one.
 	int GetSlotIndexBySelection( string selection_component )
 	{
 		int slot_index = -1;
@@ -695,17 +715,10 @@ class GardenBase extends Building
 					int length_from_end = 2 + length_add;
 					string num_str = selection_component.Substring( start, length_from_end );
 					slot_index = num_str.ToInt();
+					
+					slot_index = slot_index - 1;
 				}
 			}
-		}
-		
-		if ( slot_index >= FIRST_SLOT_COMPONENT_INDEX )
-		{
-			slot_index -= FIRST_SLOT_COMPONENT_INDEX;
-		}
-		else
-		{
-			slot_index = -1;
 		}
 		
 		return slot_index;
@@ -742,7 +755,7 @@ class GardenBase extends Building
 
 	
 	// TO DO: Remove! Player shouldn't dig slots anymore!
-	int GetFreeSlotIndex( PlayerBase player )
+	/*int GetFreeSlotIndex( PlayerBase player )
 	{
 		vector from = GetGame().GetCurrentCameraPosition();
 		vector to = from + (GetGame().GetCurrentCameraDirection() * 5);
@@ -753,14 +766,14 @@ class GardenBase extends Building
 		{
 			int slot_index = GetNearestSlotIDByState( contact_pos , Slot.STATE_NOT_DIGGED );
 			
-			if ( slot_index > -1 )
+			if ( slot_index != -1 )
 			{
 				return slot_index;
 			}
 		}
 		
 		return -1;
-	}
+	}*/
 	
 	int GetNearestSlotIDByState( vector position, int slot_state)
 	{
@@ -821,7 +834,7 @@ class GardenBase extends Building
 						
 						if (slot)
 						{
-							slot.GiveWater( NULL, slot.GetWaterUsage() );
+							//slot.GiveWater( NULL, slot.GetWaterUsage() );
 						}
 					}
 				}
@@ -829,3 +842,32 @@ class GardenBase extends Building
 		}
 	}
 }
+
+class SproutLambda : TurnItemIntoItemLambda
+{
+	GardenBase m_GB;
+	Slot m_Slot;
+
+	void SproutLambda (EntityAI old_item, string new_item_type, PlayerBase player, GardenBase gb = NULL, Slot slot = NULL) { m_GB = gb; m_Slot = slot; }
+
+	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
+	{
+		super.CopyOldPropertiesToNew(old_item, new_item);
+
+		if (new_item) 
+		{							
+			PlantBase plant = PlantBase.Cast(new_item);
+			
+			int slot_index = m_Slot.GetSlotIndex();
+			
+			m_Slot.SetPlant(plant);
+			m_Slot.m_State = Slot.STATE_COVERED;
+			plant.Init( m_GB, m_Slot.m_Fertility, m_Slot.m_HarvestingEfficiency, m_Slot.GetWater() );
+			m_GB.ShowSelection(GardenBase.SLOT_SELECTION_COVERED_PREFIX + (slot_index + 1).ToStringLen(2));
+		}
+		else
+		{
+			Debug.LogError("SproutLambda: failed to create new item", "static");
+		}
+	}
+};

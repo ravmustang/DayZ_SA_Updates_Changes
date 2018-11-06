@@ -44,17 +44,17 @@ class ActionAttachToCharger: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		ItemBase target_IB;
 		Class.CastTo(target_IB,  action_data.m_Target.GetObject() ); // cast to ItemBase
-		target_IB.LocalTakeEntityAsAttachment(action_data.m_MainItem);
+		target_IB.PredictiveTakeEntityAsAttachment(action_data.m_MainItem);
 	}
 
-	override void OnCompleteClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{
 		ItemBase target_IB;
 		Class.CastTo(target_IB,  action_data.m_Target.GetObject() ); // cast to ItemBase
-		target_IB.LocalTakeEntityAsAttachment(action_data.m_MainItem);
+		target_IB.PredictiveTakeEntityAsAttachment(action_data.m_MainItem);
 	}
 };

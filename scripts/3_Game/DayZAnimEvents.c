@@ -114,6 +114,15 @@ enum AnimUpperBodyType
 	Ghillie				= 602194810
 }
 
+enum AnimBackType
+{
+	None 				= -1,
+	Small 				= 161213437,
+	Military 			= 1935514591,
+	Outdoor				= 574855932,
+	Ghillie				= 602194810
+}
+
 enum AnimRangedWeaponType
 {
 	None 		= 5727960,
@@ -130,6 +139,7 @@ class AnimSoundEvent
 	ref SoundObjectBuilder m_SoundObjectBuilder;
 	ref SoundParams m_SoundParams;
 	autoptr NoiseParams m_NoiseParams;
+	bool m_IsValid = false;
 
 	void AnimSoundEvent(string soundPath)
 	{
@@ -140,7 +150,11 @@ class AnimSoundEvent
 			string soundSetName;
 			GetGame().ConfigGetText(soundPath + "soundSet", soundSetName);
 			m_SoundParams = new SoundParams(soundSetName);
-			m_SoundObjectBuilder = new SoundObjectBuilder(m_SoundParams);
+			if(m_SoundParams.IsValid())
+			{
+				m_SoundObjectBuilder = new SoundObjectBuilder(m_SoundParams);
+				m_IsValid = true;
+			}
 		}
 		
 		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
@@ -150,12 +164,75 @@ class AnimSoundEvent
 			{
 				m_NoiseParams = new NoiseParams();
 				m_NoiseParams.Load(noiseName);
+				m_IsValid = true;
 			}
 			else
 			{
 				//Print("AnimSoundEvent: \"" + soundPath + "\" doesn't have defined \"noise\"");
 			}
 		}
+	}
+	
+	bool IsValid()
+	{
+		return m_IsValid;
+	}
+	
+	SoundObjectBuilder GetSoundBuilder()
+	{
+		return m_SoundObjectBuilder;
+	}
+
+	SoundObject GetSoundObject(vector position)
+	{
+		m_SoundObjectBuilder.UpdateEnvSoundControllers(position);
+		return m_SoundObjectBuilder.BuildSoundObject();
+	}
+}
+
+class AnimSoundVoiceEvent
+{
+	int m_iID;
+	ref SoundObjectBuilder m_SoundObjectBuilder;
+	ref SoundParams m_SoundParams;
+	autoptr NoiseParams m_NoiseParams;
+	bool m_IsValid = false;
+
+	void AnimSoundVoiceEvent(string soundPath)
+	{
+		m_iID = GetGame().ConfigGetInt(soundPath + "id");
+
+		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			string soundSetName;
+			GetGame().ConfigGetText(soundPath + "soundSet", soundSetName);
+			m_SoundParams = new SoundParams(soundSetName);
+			if(m_SoundParams.IsValid())
+			{
+				m_SoundObjectBuilder = new SoundObjectBuilder(m_SoundParams);
+				m_IsValid = true;
+			}
+		}
+		
+		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
+		{
+			string noiseName;
+			if(GetGame().ConfigGetText(soundPath + "noise", noiseName))
+			{
+				m_NoiseParams = new NoiseParams();
+				m_NoiseParams.Load(noiseName);
+				m_IsValid = true;
+			}
+			else
+			{
+				//Print("AnimSoundVoiceEvent: \"" + soundPath + "\" doesn't have defined \"noise\"");
+			}
+		}
+	}
+	
+	bool IsValid()
+	{
+		return m_IsValid;
 	}
 	
 	SoundObjectBuilder GetSoundBuilder()
@@ -185,7 +262,7 @@ class AnimStepEvent
 		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			GetGame().ConfigGetText(stepPath + "soundLookupTable", m_sSoundLookupTableName);
-			m_soundLookupTable = AnimSoundLookupTableBank.GetInstance().GetStepTable(m_sSoundLookupTableName);
+			m_soundLookupTable = StepSoundLookupTable.Cast( AnimSoundLookupTableBank.GetInstance().GetStepTable(m_sSoundLookupTableName) );
 		}
 		
 		if(GetGame().IsServer() || !GetGame().IsMultiplayer())

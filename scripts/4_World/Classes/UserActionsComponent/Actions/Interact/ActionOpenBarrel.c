@@ -4,7 +4,7 @@ class ActionOpenBarrel: ActionInteractBase
 	{
 		m_MessageSuccess = "I have opened it.";
 		//m_Animation = "open";	
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_HUDCursorIcon = CursorIcons.OpenHood;
 	}
@@ -16,7 +16,7 @@ class ActionOpenBarrel: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Open";
+		return "#open";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -36,13 +36,23 @@ class ActionOpenBarrel: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object target_object = action_data.m_Target.GetObject();
 		Barrel_ColorBase ntarget = Barrel_ColorBase.Cast( target_object );
 		if( ntarget )
 		{
 			ntarget.Open();
+		}
+	}
+	
+	override void OnEndServer( ActionData action_data )
+	{
+		Object target_object = action_data.m_Target.GetObject();
+		Barrel_ColorBase ntarget = Barrel_ColorBase.Cast( target_object );
+		if( ntarget )
+		{
+			ntarget.SoundSynchRemoteReset();
 		}
 	}
 }

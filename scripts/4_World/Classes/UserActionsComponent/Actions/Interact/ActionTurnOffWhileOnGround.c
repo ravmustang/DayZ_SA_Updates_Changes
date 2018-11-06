@@ -2,7 +2,7 @@ class ActionTurnOffWhileOnGround: ActionInteractBase
 {	
 	void ActionTurnOffWhileOnGround()
 	{
-		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
+		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_MessageSuccess 	= "I've switched it off.";
 		m_MessageFail 		= "It's already turned off.";
@@ -15,7 +15,7 @@ class ActionTurnOffWhileOnGround: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Switch off";
+		return "#switch_off";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -32,7 +32,7 @@ class ActionTurnOffWhileOnGround: ActionInteractBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
 		

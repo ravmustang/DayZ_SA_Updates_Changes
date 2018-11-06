@@ -85,7 +85,7 @@ class CAContinuousTimeCooking : CAContinuousBase
 				m_SpentUnits.param1 = m_TimeElapsed;
 				SetACData(m_SpentUnits);
 			}
-			
+			OnCompletePogress(action_data);
 			return UA_FINISHED;
 		}
 	}

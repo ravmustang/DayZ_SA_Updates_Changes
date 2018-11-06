@@ -1,10 +1,10 @@
 void fsmDebugPrint (string s)
 {
-	Print("" + s); // comment/uncomment to hide/see debug logs
+	//Print("" + s); // comment/uncomment to hide/see debug logs
 }
 void fsmDebugSpam (string s)
 {
-	Print("" + s); // comment/uncomment to hide/see debug spam
+	//Print("" + s); // comment/uncomment to hide/see debug spam
 }
 
 
@@ -21,14 +21,12 @@ class HFSMBase<Class FSMStateBase, Class FSMEventBase, Class FSMActionBase, Clas
 	protected ref FSMStateBase m_State; /// current fsm state
 	protected FSMStateBase m_OwnerState; /// state that owns this fsm (or null if root)
 	protected ref FSMStateBase m_InitialState; /// configurable initial state of the machine
-	protected ref array<ref FSMTransition<FSMStateBase, FSMEventBase, FSMActionBase, FSMGuardBase>> m_Transitions; /// fsm transition table
-	protected bool m_HasCompletions;
+	protected ref array<ref FSMTransition<FSMStateBase, FSMEventBase, FSMActionBase, FSMGuardBase>> m_Transitions = new array<ref FSMTransition<FSMStateBase, FSMEventBase, FSMActionBase, FSMGuardBase>>; /// fsm transition table
+	protected bool m_HasCompletions = false;
 
 	void HFSMBase (FSMStateBase ownerState = NULL)
 	{
 		m_OwnerState = ownerState;
-		m_Transitions = new array<ref FSMTransition<FSMStateBase, FSMEventBase, FSMActionBase, FSMGuardBase>>;
-		m_HasCompletions = false;
 	}
 
 	/**@fn		GetCurrentState
@@ -69,14 +67,6 @@ class HFSMBase<Class FSMStateBase, Class FSMEventBase, Class FSMActionBase, Clas
 	void SetInitialState (FSMStateBase initial_state)
 	{
 		m_InitialState = initial_state;
-	}
-	/**@fn		SetTransitions
-	 * @brief	sets the transition table at once (in case it's prepared ahead)
-	 * @note	alternative is to use AddTransition one by one
-	 **/
-	void SetTransitions (array<ref FSMTransition<FSMStateBase, FSMEventBase, FSMActionBase, FSMGuardBase>> arr)
-	{
-		m_Transitions = arr;
 	}
 	/**@fn		AddTransition
 	 * @brief	adds transition into transition table
@@ -401,10 +391,7 @@ class HFSMBase<Class FSMStateBase, Class FSMEventBase, Class FSMActionBase, Clas
 					return i;
 				}
 			}
-			/*else
-			{
-				fsmDebugSpam("[hfsm][" + i + "/" + count + "] ... matching  t=" + t + " state=" + t.m_srcState + "-------- event=" + t.m_event + "[G=" + t.m_guard +"]/A=" + t.m_action + " --------|> dst=" + t.m_dstState);
-			}*/
+			//else fsmDebugSpam("[hfsm][" + i + "/" + count + "] ... matching  t=" + t + " state=" + t.m_srcState + "-------- event=" + t.m_event + "[G=" + t.m_guard +"]/A=" + t.m_action + " --------|> dst=" + t.m_dstState);
 		}
 		return -1;
 	}
@@ -456,8 +443,11 @@ class HFSMBase<Class FSMStateBase, Class FSMEventBase, Class FSMActionBase, Clas
 		{
 			m_State.OnEntry(e);		// 4a) call onEntry on new state
 
-			if (GetOwnerState())
-				GetOwnerState().OnSubMachineChanged(t.m_srcState, t.m_dstState);	// 5) notify owner state about change in submachine
+				if (GetOwnerState())
+				GetOwnerState().OnSubMachineChanged(t.m_srcState, t.m_dstState);	// 5a) notify owner state about change in submachine
+			
+			if (m_State)
+				m_State.OnStateChanged(t.m_srcState, t.m_dstState); // 5b) notify current state about change in machine
 
 			return ProcessEventResult.FSM_OK;
 		}

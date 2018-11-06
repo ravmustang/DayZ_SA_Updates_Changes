@@ -6,6 +6,9 @@ enum MeleeCombatHit
 	HEAVY,
 	SPRINT,
 	KICK,
+
+	WPN_HIT,
+	WPN_STAB,
 }
 
 class DayZPlayerImplementMeleeCombat
@@ -138,17 +141,12 @@ class DayZPlayerImplementMeleeCombat
 			vector modelPos = m_TargetObject.WorldToModel(m_HitPositionWS);
 			PlayerBase targetedPlayer = NULL;
 			
+			EntityAI m_TargetEntity = EntityAI.Cast(m_TargetObject);
+			
 			//! sound
 			if( GetGame().IsMultiplayer() && GetGame().IsServer() ) // HOTFIX for old melee hit sounds in MP - has to be redone
 			{
 				hitPosWS = m_TargetObject.GetPosition();
-			}
-
-			//! close miss, use light attack and set fallback component in that case
-			if(m_HitZoneIdx == -1)
-			{
-				//! TODO: dirty-hack, will be reworked ASAP (ComponentID name to ID and back translation needed)
-				m_HitZoneIdx = 25;  //! do not use Global, use default for the entity
 			}
 
 			//! Melee Hit/Impact modifiers
@@ -168,7 +166,7 @@ class DayZPlayerImplementMeleeCombat
 			}
 
 			//! in case of kick (on back or push from erc) change the ammo type to dummy 
-			if((m_HitMask & MeleeCombatHit.KICK) == MeleeCombatHit.KICK)
+			if((m_HitMask & (MeleeCombatHit.KICK|MeleeCombatHit.WPN_HIT)) == (MeleeCombatHit.KICK|MeleeCombatHit.WPN_HIT))
 			{
 				ammo = DUMMY_HEAVY_AMMO;
 				noDamage = true;
@@ -177,14 +175,21 @@ class DayZPlayerImplementMeleeCombat
 			if(!noDamage)
 			{
 				//! normal hit with applied damage
-				m_DZPlayer.ProcessMeleeHit(m_Weapon, m_WeaponMode, m_TargetObject, m_HitZoneIdx, hitPosWS);
+				if (m_HitZoneIdx > -1)
+				{
+					m_DZPlayer.ProcessMeleeHit(m_Weapon, m_WeaponMode, m_TargetObject, m_HitZoneIdx, hitPosWS);
+				}
+				else
+				{
+					m_DZPlayer.ProcessMeleeHitName(m_Weapon, m_WeaponMode, m_TargetObject, m_TargetEntity.GetDefaultHitComponent(), hitPosWS);
+				}
 			}
 			else
 			{
 				//! play hit animation for dummy hits
 				if( GetGame().IsServer() && targetedPlayer )
 				{
-					targetedPlayer.EEHitBy(null, 0, EntityAI.Cast(m_DZPlayer), m_HitZoneName, ammo, modelPos);
+					targetedPlayer.EEHitBy(null, 0, EntityAI.Cast(m_DZPlayer), m_HitZoneIdx, m_HitZoneName, ammo, modelPos);
 				}
 			}
 		}
@@ -198,17 +203,32 @@ class DayZPlayerImplementMeleeCombat
 	{
 		if( weapon )
 		{
-			switch(m_HitMask)
+			if (weapon.IsInherited(Weapon))
 			{
-				case MeleeCombatHit.LIGHT :
-					return weapon.GetMeleeMode();
-				break;
-				case MeleeCombatHit.HEAVY :
-					return weapon.GetMeleeHeavyMode();
-				break;
-				case MeleeCombatHit.SPRINT :
-					return weapon.GetMeleeSprintMode();
-				break;
+				switch(m_HitMask)
+				{
+					case MeleeCombatHit.WPN_STAB :
+						return weapon.GetMeleeMode();
+					break;
+					case MeleeCombatHit.WPN_HIT :
+						return weapon.GetMeleeHeavyMode();
+					break;
+				}
+			}
+			else
+			{
+				switch(m_HitMask)
+				{
+					case MeleeCombatHit.LIGHT :
+						return weapon.GetMeleeMode();
+					break;
+					case MeleeCombatHit.HEAVY :
+						return weapon.GetMeleeHeavyMode();
+					break;
+					case MeleeCombatHit.SPRINT :
+						return weapon.GetMeleeSprintMode();
+					break;
+				}
 			}
 		}
 
@@ -302,7 +322,7 @@ class DayZPlayerImplementMeleeCombat
 			MiscGameplayFunctions.GetHeadBonePos(player, start);
 			end = start + MiscGameplayFunctions.GetHeadingVector(player) * vector.Distance(player.GetPosition(), object.GetPosition());
 
-			return DayZPhysics.RayCastBullet( start, end, collisionLayerMask, hitObject, hitPosObstructed, hitNormal, hitFraction);
+			return DayZPhysics.RayCastBullet( start, end, collisionLayerMask, null, hitObject, hitPosObstructed, hitNormal, hitFraction);
 		}
 
 		return false;

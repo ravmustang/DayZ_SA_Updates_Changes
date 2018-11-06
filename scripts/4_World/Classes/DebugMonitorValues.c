@@ -133,20 +133,20 @@ class DebugMonitorValues
 			{	
 				ref Param1<float> value_float = Param1<float>.Cast( param );
 
-				CashedObjectsParams.PARAM2_INT_FLOAT.param1 = value_type;
-				CashedObjectsParams.PARAM2_INT_FLOAT.param2 = value_float.param1;
+				CachedObjectsParams.PARAM2_INT_FLOAT.param1 = value_type;
+				CachedObjectsParams.PARAM2_INT_FLOAT.param2 = value_float.param1;
 				//Print("SendingValue type " + value_type.ToString() + " value "  + value_float.ToString());
-				GetGame().RPCSingleParam(m_Player, ERPCs.RPC_DEBUG_MONITOR_FLT, CashedObjectsParams.PARAM2_INT_FLOAT, true, m_Player.GetIdentity());
+				GetGame().RPCSingleParam(m_Player, ERPCs.RPC_DEBUG_MONITOR_FLT, CachedObjectsParams.PARAM2_INT_FLOAT, true, m_Player.GetIdentity());
 			}
 			break;
 		case DebugMonitorValues.TYPE_LAST_DAMAGE:
 			{
 				ref Param1<string> value_string = Param1<string>.Cast( param );
 
-				CashedObjectsParams.PARAM2_INT_STRING.param1 = value_type;
-				CashedObjectsParams.PARAM2_INT_STRING.param2 = value_string.param1;
+				CachedObjectsParams.PARAM2_INT_STRING.param1 = value_type;
+				CachedObjectsParams.PARAM2_INT_STRING.param2 = value_string.param1;
 				//Print("SendingValue type " + value_type.ToString() + " value "  + value_string);
-				GetGame().RPCSingleParam(m_Player, ERPCs.RPC_DEBUG_MONITOR_STR, CashedObjectsParams.PARAM2_INT_STRING, true, m_Player.GetIdentity());
+				GetGame().RPCSingleParam(m_Player, ERPCs.RPC_DEBUG_MONITOR_STR, CachedObjectsParams.PARAM2_INT_STRING, true, m_Player.GetIdentity());
 			}
 			break;
 		}
@@ -186,9 +186,9 @@ class DebugMonitorValues
 	{
 		ref Param1<float> value = new Param1<float>(0);
 		
-		ctx.Read(CashedObjectsParams.PARAM2_INT_FLOAT);
-		int value_type 	= CashedObjectsParams.PARAM2_INT_FLOAT.param1;
-		value.param1 	= CashedObjectsParams.PARAM2_INT_FLOAT.param2;
+		ctx.Read(CachedObjectsParams.PARAM2_INT_FLOAT);
+		int value_type 	= CachedObjectsParams.PARAM2_INT_FLOAT.param1;
+		value.param1 	= CachedObjectsParams.PARAM2_INT_FLOAT.param2;
 		
 		ReceiveValue(value_type, value);
 	}
@@ -197,9 +197,9 @@ class DebugMonitorValues
 	{
 		ref Param1<string> value = new Param1<string>("");
 
-		ctx.Read(CashedObjectsParams.PARAM2_INT_STRING);
-		int value_type 	= CashedObjectsParams.PARAM2_INT_STRING.param1;
-		value.param1 	= CashedObjectsParams.PARAM2_INT_STRING.param2;
+		ctx.Read(CachedObjectsParams.PARAM2_INT_STRING);
+		int value_type 	= CachedObjectsParams.PARAM2_INT_STRING.param1;
+		value.param1 	= CachedObjectsParams.PARAM2_INT_STRING.param2;
 		
 		ReceiveValue(value_type, value);
 	}

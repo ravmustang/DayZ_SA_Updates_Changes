@@ -5,8 +5,13 @@
 
 class ActionManagerServer: ActionManagerBase
 {		
+	protected ActionBase 				m_PendingAction;
+	ref ActionReciveData				m_PendingActionReciveData;
+	
 	void ActionManagerServer(PlayerBase player)
 	{
+		m_PendingAction = NULL;
+		m_PendingActionReciveData = NULL;
 		//ActionManagerBase(player);
 	}
 	
@@ -32,6 +37,22 @@ class ActionManagerServer: ActionManagerBase
 		else
 		{
 			m_CurrentActionData.m_Action.OnContinuousCancel(m_CurrentActionData);
+		}
+	}
+	
+	override void OnJumpStart()
+	{
+		if(m_CurrentActionData)
+		{
+			if( m_CurrentActionData.m_State == UA_AM_PENDING || m_CurrentActionData.m_State == UA_AM_REJECTED || m_CurrentActionData.m_State == UA_AM_ACCEPTED)
+			{
+				OnActionEnd();
+				m_PendingActionAcknowledgmentID = -1;
+			}
+			else
+			{
+				m_CurrentActionData.m_Action.Interrupt(m_CurrentActionData);
+			}
 		}
 	}
 	
@@ -72,33 +93,12 @@ class ActionManagerServer: ActionManagerBase
 				if (!recvAction)
 					return false;
 				
-				switch (actionID)
+				if (!recvAction.ReadFromContext(ctx, m_PendingActionReciveData))
 				{
-					/*case AT_DEBUG:
-					{
-						ItemBase targetItem = null;
-						if ( !ctx.Read(targetItem) ) //jtomasik - proc ho nenacte?
-							return false;
-
-						int debugActionID = 0;
-						if ( !ctx.Read(debugActionID) ) //jtomasik - proc ho nenacte?
-							return false;
-						
-						targetItem.OnAction(debugActionID, m_Player, NULL);
-						break;
-					}*/
-					
-					default:
-						ref ActionTarget target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0);
-						if (!recvAction.SetupAction(m_Player,target,m_Player.GetItemInHands(),m_CurrentActionData))
-						{
-							success = false;
-						}
-						if (!recvAction.ReadFromContext(ctx, m_CurrentActionData))
-						{
-							success = false;
-						}
+					success = false;
 				}
+				
+				m_PendingAction = recvAction;
 					
 				if (recvAction.UseAcknowledgment())
 				{
@@ -109,7 +109,6 @@ class ActionManagerServer: ActionManagerBase
 					m_PendingActionAcknowledgmentID = AckID;
 				}
 					
-				m_CurrentActionData.m_State = UA_AM_PENDING;
 				break;
 			}
 			default:
@@ -124,12 +123,12 @@ class ActionManagerServer: ActionManagerBase
 			}
 			else
 			{
-				Interrupt();
+				DayZPlayerSyncJunctures.SendActionInterrupt(m_Player);
 			}
-			m_CurrentActionData = NULL;
+			//m_CurrentActionData = NULL;
 			return false;
 		}
-		StartDeliveredAction();
+		//StartDeliveredAction();
 		return true;
 		
 	}
@@ -192,11 +191,7 @@ class ActionManagerServer: ActionManagerBase
 			}
 			else
 			{
-				picked_action.Start(m_CurrentActionData);
-				if( picked_action.IsInstant() )
-				{
-					OnActionEnd();
-				}
+				m_CurrentActionData.m_State = UA_AM_ACCEPTED;
 			}
 		}
 		else
@@ -207,9 +202,8 @@ class ActionManagerServer: ActionManagerBase
 			}
 			else
 			{
-				Interrupt();
+				DayZPlayerSyncJunctures.SendActionInterrupt(m_Player);
 			}
-			m_CurrentActionData = NULL;
 		}
 	}
 	
@@ -233,40 +227,113 @@ class ActionManagerServer: ActionManagerBase
 	}
 	
 	
+	override void Update(int pCurrentCommandID)
+	{
+		super.Update(pCurrentCommandID);
+		
+		if (m_PendingAction)
+		{
+			if ( m_CurrentActionData )
+			{
+				DayZPlayerSyncJunctures.SendActionAcknowledgment(m_Player, m_PendingActionAcknowledgmentID, false);
+			}
+			else
+			{
+				ref ActionTarget target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0); 
+				bool success = true;
+						
+				Debug.Log("[Action DEBUG] Start time stamp ++: " + m_Player.GetSimulationTimeStamp());
+				if (!m_PendingAction.SetupAction(m_Player,target,m_Player.GetItemInHands(),m_CurrentActionData))
+				{
+					success = false;
+				}
+				Debug.Log("[AM] Action data synced (" + m_Player + ")");
+			
+				if (success)
+				{
+					StartDeliveredAction();
+				}	
+				else
+				{
+					if (m_PendingAction.UseAcknowledgment())
+					{
+						DayZPlayerSyncJunctures.SendActionAcknowledgment(m_Player, m_PendingActionAcknowledgmentID, false);
+					}
+					else
+					{
+						DayZPlayerSyncJunctures.SendActionInterrupt(m_Player);
+					}
+				}
+			}
+			m_PendingAction = NULL;
+			m_PendingActionReciveData = NULL;
+		}
+	
+		if (m_CurrentActionData)
+		{
+			switch (m_CurrentActionData.m_State)
+			{
+				case UA_AM_PENDING:
+					break;
+			
+				case UA_AM_ACCEPTED:
+					// check pCurrentCommandID before start or reject 
+					if( ActionPossibilityCheck(pCurrentCommandID) && pCurrentCommandID != DayZPlayerConstants.COMMANDID_SWIM && pCurrentCommandID != DayZPlayerConstants.COMMANDID_LADDER )
+					{
+						if(!m_Player.IsRestrained() || m_CurrentActionData.m_Action.CanBeUsedInRestrain() )
+						{
+							m_CurrentActionData.m_State = UA_START;
+							m_CurrentActionData.m_Action.Start(m_CurrentActionData);
+							if( m_CurrentActionData.m_Action && m_CurrentActionData.m_Action.IsInstant() )
+								OnActionEnd();
+						}
+						else
+						{
+							OnActionEnd();
+						}
+					}
+					else
+					{
+						OnActionEnd();
+					}
+					m_PendingActionAcknowledgmentID = -1;
+					break;
+				
+				case UA_AM_REJECTED:
+					OnActionEnd();
+					m_PendingActionAcknowledgmentID = -1;
+			
+					//m_Player.GetDayZPlayerInventory().UnlockHands();
+					break;
+			
+				default:
+					break;
+			}
+		}
+	}
+	
+	
 	override void OnSyncJuncture(int pJunctureID, ParamsReadContext pCtx)
 	{
 		int AcknowledgmentID;
 		pCtx.Read(AcknowledgmentID);
-		if( AcknowledgmentID == m_PendingActionAcknowledgmentID)
+		
+		if ( m_CurrentActionData && AcknowledgmentID == m_PendingActionAcknowledgmentID)
 		{
-			
-			if(pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_ACCEPT)
-			{
-				ref HumanMovementState		state 	= new HumanMovementState();
-		
-		
-				m_Player.GetMovementState(state);
-				int movementStateID = state.m_CommandTypeId;
-
-				if( ActionPossibilityCheck(movementStateID) && movementStateID != DayZPlayerConstants.COMMANDID_SWIM && movementStateID != DayZPlayerConstants.COMMANDID_LADDER )
-				{
-					m_CurrentActionData.m_Action.Start(m_CurrentActionData);
-					if( m_CurrentActionData.m_Action.IsInstant() )
-						OnActionEnd();
-				}
-				m_PendingActionAcknowledgmentID = -1;
-			}
-				
-			if(pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_REJECT)
-			{
-				m_PendingActionAcknowledgmentID = -1;
-			}
+			if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_ACCEPT)
+				m_CurrentActionData.m_State = UA_AM_ACCEPTED;
+			else if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_REJECT)
+				m_CurrentActionData.m_State = UA_AM_REJECTED;
 		}
-	
 	}
 	
-	private void Interrupt()
+	/*private void Interrupt()
 	{
 		DayZPlayerSyncJunctures.SendActionInterrupt(m_Player);
+	}*/
+	
+	override ActionReciveData GetReciveData()
+	{
+		return m_PendingActionReciveData;
 	}
 };

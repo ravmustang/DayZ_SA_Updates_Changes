@@ -20,7 +20,7 @@ class ActionMineRock: ActionContinuousBase
 		m_MessageStart = "I started mining the rock.";
 		m_MessageSuccess = "I have mined the rock.";
 		m_MessageFail = "My tool is ruined.";
-		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_HIGH;
+		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
 	
 	override void CreateConditionComponents()  
@@ -46,11 +46,10 @@ class ActionMineRock: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Mine";
+		return "#mine";
 	}
-
-
-	override void OnCompleteServer( ActionData action_data )
+	
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}

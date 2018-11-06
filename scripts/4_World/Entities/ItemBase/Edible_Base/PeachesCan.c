@@ -7,7 +7,7 @@ class PeachesCan : Edible_Base
 	
 	override void Open()
 	{
-		m_Opened = true;
+		super.Open();
 		ReplaceEdibleWithNew("PeachesCan_Opened");
 	}
 }

@@ -1,6 +1,6 @@
 class ActionFillGeneratorTankCB : ActionContinuousBaseCB
 {
-	private const float QUANTITY_FILLED_PER_SEC = 50;
+	private const float QUANTITY_FILLED_PER_SEC = 400;
 	
 	override void CreateActionComponent()
 	{
@@ -34,7 +34,7 @@ class ActionFillGeneratorTank: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Fill the tank";
+		return "#fill_the_tank";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -51,16 +51,5 @@ class ActionFillGeneratorTank: ActionContinuousBase
 		}
 		
 		return false;
-	}
-	
-	override void OnCompleteServer( ActionData action_data )
-	{
-		Object targetObject = action_data.m_Target.GetObject();
-		PowerGenerator generator = PowerGenerator.Cast(targetObject);
-		Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
-		int consumed_fuel = generator.AddFuel( nacdata.param1 );
-		action_data.m_MainItem.AddQuantity( -consumed_fuel );
-
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

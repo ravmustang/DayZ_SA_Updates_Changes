@@ -81,11 +81,27 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		}
 		*/
 		m_CameraPPDelay = 0;
+
+		m_CommandWeapons = pPlayer.GetCommandModifier_Weapons();
 	};
 
 
 	float UpdateUDAngle(out float pAngle, out float pAngleAdd, float pMin, float pMax, float pDt)
 	{
+		if (Math.AbsFloat(pAngleAdd) > 0.001)
+		{
+			float aimingUDAngle = m_CommandWeapons.GetBaseAimingAngleUD();
+
+			//!	pAngle + pAngleAdd == aimingUDAngle + aimingUDAdd
+			//! now we set pAngleAdd to be the differenc from aimingAngle and we change camera angle to be the aiming angle
+
+			// override actual angle
+			pAngleAdd 	= pAngle + pAngleAdd - aimingUDAngle;
+			pAngle 		= aimingUDAngle;
+
+			// Print("Angle: " + pAngle.ToString() + " Aim: " + actualUDAngle.ToString() );
+		}
+
 		//! lr angle
 		if (m_pInput.CameraIsFreeLook())	
 		{
@@ -102,7 +118,12 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 
 			pAngleAdd	= Math.SmoothCD(pAngleAdd, 0, m_fUDAngleVel, 0.14, 1000, pDt);
 		}
+		
+		/*{
+			float change = m_pInput.GetAimChange()[1] * Math.RAD2DEG;
 
+			Print ("Script: Camera ud angle: " +  pAngle.ToString() + " change: " + change.ToString() );
+		}*/		
 
 		return Limit(pAngle + pAngleAdd, pMin, pMax);
 	}
@@ -113,6 +134,7 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		//! lr angle
 		if (m_pInput.CameraIsFreeLook() || m_bForceFreeLook)	
 		{
+			//!
 			pAngle	+= m_pInput.GetAimChange()[0] * Math.RAD2DEG;
 			pAngle	= Limit(pAngle, pMin, pMax);
 
@@ -129,10 +151,10 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		return pAngle;
 	}
 
-	override void OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
-	{
-		super.OnUpdate(pDt, pOutResult);
+	
 
+	void 	StdFovUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
+	{
 		//! change abs FOV for naked eye zoom
 		if (m_pPlayer.IsEyeZoom())
 		{
@@ -150,6 +172,14 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		{
 			pOutResult.m_fShootFromCamera = 0.0;
 		}
+	}
+
+
+	override void OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
+	{
+		super.OnUpdate(pDt, pOutResult);
+
+		StdFovUpdate(pDt, pOutResult);
 	}
 
 	override void OnActivate(DayZPlayerCamera pPrevCamera, DayZPlayerCameraResult pPrevCameraResult)
@@ -179,21 +209,22 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 	{
 		PPEffects.ResetPPMask();
 		PPEffects.SetLensEffect(0, 0, 0, 0);
-		PPEffects.OverrideDOF(false, 0, 0, 0, 0, 0);
+		PPEffects.OverrideDOF(false, 0, 0, 0, 0, 1);
 		PPEffects.SetBlurOptics(0);
 	}
 	
-	float GetCurrentPitch()
+	override float GetCurrentPitch()
 	{
 		return m_CurrentCameraPitch;
 	}
 	
-	protected float 	m_fLRAngleVel[1];
-	protected float 	m_fUDAngleVel[1];
-	protected float		m_fFovAbsVel[1];
-	protected float		m_fFovAbsolute;
-	protected bool		m_bForceFreeLook;
-	protected float		m_WeaponSwayModifier;
-	protected float 	m_CameraPPDelay;
-	protected float 	m_CurrentCameraPitch;
+	protected float 				m_fLRAngleVel[1];
+	protected float 				m_fUDAngleVel[1];
+	protected float					m_fFovAbsVel[1];
+	protected float					m_fFovAbsolute;
+	protected bool					m_bForceFreeLook;
+	protected float					m_WeaponSwayModifier;
+	protected float 				m_CameraPPDelay;
+	protected float 				m_CurrentCameraPitch;
+	protected HumanCommandWeapons	m_CommandWeapons;
 }

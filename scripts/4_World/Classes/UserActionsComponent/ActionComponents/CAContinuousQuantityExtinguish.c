@@ -24,14 +24,24 @@ class CAContinuousQuantityExtinguish : CAContinuousQuantityRepeat
 			{
 				FireplaceBase fireplace_target = FireplaceBase.Cast( targetObject );
 				
-				//add wetness to fireplace targets
-				float wetness = fireplace_target.GetWet() + ( m_SpentQuantity / 1000 * m_WetnessGainMultiplier );
-				wetness = Math.Clamp( wetness , 0, 1 );
-				fireplace_target.SetWet( wetness );
+				//add wetness to fireplace targets, set fire state to extinguishing
+				float wetness_inc = ( m_SpentQuantity / 1000 ) * m_WetnessGainMultiplier;
+				fireplace_target.AddWetnessToFireplace( wetness_inc );
+				fireplace_target.SetExtinguishingState();
 				
 				//subtract quantity from water source
 				action_data.m_MainItem.AddQuantity( -m_SpentQuantity );
 			}
 		}
+	}
+	
+	override int Interrupt( ActionData action_data )
+	{				
+		if ( GetGame().IsServer() )
+		{
+			action_data.m_Player.GetSoftSkillManager().AddSpecialty( UASoftSkillsWeight.ROUGH_MEDIUM );
+		}
+		
+		return super.Interrupt( action_data );
 	}
 }

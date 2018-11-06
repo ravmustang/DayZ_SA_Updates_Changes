@@ -68,7 +68,7 @@ class CleanRags extends RecipeBase
 		ItemBase container;
 		Class.CastTo(container, ingredients[1]);
 		
-		if ( container.GetLiquidType() == LIQUID_WATER && container.GetQuantity() > 0 && rags.GetHealthLabel() > 1)
+		if ( container.GetLiquidType() == LIQUID_WATER && container.GetQuantity() > 0 && rags.GetHealthLevel() > 1)
 		{
 			return true;
 		}

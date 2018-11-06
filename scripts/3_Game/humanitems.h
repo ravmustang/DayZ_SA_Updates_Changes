@@ -14,6 +14,7 @@ class HumanItemBehaviorCfg
 
 	int		m_iStanceMask;					//!< combinations of STANCEMASK_
 	int		m_StanceMovements[6];			//! 6 stances -> all has movement mask, STANCEIDX_ ... is index
+	int		m_StanceRotation[6];			//! 
 	int 	m_IKSettings[24];				//! [stance][movement] mask for ik 
 	int 	m_iPerItemCameraUserData;		//! per item camera user data - can be obtained in runtime by DayZPlayer.GetPerItemCameraUD()
 
@@ -29,6 +30,8 @@ class HumanItemBehaviorCfg
 	//! per weapon lean forward 
 	bool	m_bAttackLean;					//! default false
 
+	//! per weapon lean forward 
+	bool	m_bJumpAllowed;					//! default true
 	
 
 	void 	SetIK(int pStance, int pMovement, bool pAim, bool pRArm, bool pLArm)
@@ -87,6 +90,12 @@ class HumanItemAccessor
 	//! signalization from script to engine that item in hands changed
 	proto native void 	OnItemInHandsChanged();
 
+	//! hides item in hands visually
+	proto native void	HideItemInHands(bool pState);
+
+	//! returns if item in hands is hidden visually
+	proto native bool	IsItemInHandsHidden();
+
 	//! returns true if item in hands is a weapon
 	proto native bool	IsItemInHandsWeapon();
 
@@ -102,6 +111,8 @@ class HumanItemAccessor
 	//! return current aiming point from aiming model (additive swaying applied - no recoil points)
 	proto native bool 	WeaponGetAimingModelDirTm(out vector pTm[4]);
 
+	//! 
+	proto native HumanItemBehaviorCfg GetItemInHandsBehaviourCfg();
 
 	private void HumanItemAccessor() 
 	{

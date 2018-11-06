@@ -1,0 +1,3 @@
+class StoneKnife extends ToolBase
+{
+}

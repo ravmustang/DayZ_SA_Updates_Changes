@@ -3,8 +3,8 @@ class ActionViewOptics : ActionContinuousBase
 	void ActionViewOptics()
 	{
 		m_CallbackClass = ActionRaiseAndViewCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LOOKOPTICS;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_LOOKOPTICS;
+		m_CommandUID = DayZPlayerConstants.CMD_GESTUREFB_LOOKOPTICS;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_GESTUREFB_LOOKOPTICS;
 	}
 	
 	override void CreateConditionComponents()  
@@ -17,10 +17,15 @@ class ActionViewOptics : ActionContinuousBase
 	{
 		return AT_VIEW_OPTICS;
 	}
-		
+	
+	override bool IsFullBody(PlayerBase player)
+	{
+		return true;
+	}
+	
 	override string GetText()
 	{
-		return "Use optics";
+		return "#use_optics";
 	}
 	
 	override bool HasProgress()
@@ -33,10 +38,10 @@ class ActionViewOptics : ActionContinuousBase
 		return false;
 	}
 
-	override bool HasProneException()
+	/*override bool HasProneException()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
@@ -58,10 +63,12 @@ class ActionViewOptics : ActionContinuousBase
 		{
 			return false;
 		}*/
+		//if (action_data.m_Callback && action_data.m_Callback.GetState() == HumanCommandActionCallback.STATE_LOOP_END)
+			//return false;
 		return true;
 	}
 	
-	override void OnExecuteClient( ActionData action_data )
+	/*override void OnExecuteClient( ActionData action_data )
 	{
 		ItemOptics optic;
 		if( Class.CastTo(optic, action_data.m_MainItem) )
@@ -72,7 +79,7 @@ class ActionViewOptics : ActionContinuousBase
 			}
 			else
 			{
-				ExitOptics(optic, action_data.m_Player);
+				//ExitOptics(optic, action_data.m_Player);
 			}
 		}
 	}
@@ -88,12 +95,36 @@ class ActionViewOptics : ActionContinuousBase
 			}
 			else
 			{
-				ExitOptics(optic, action_data.m_Player);
+				//ExitOptics(optic, action_data.m_Player);
+			}
+		}
+	}*/
+	
+	override void OnStartAnimationLoopServer( ActionData action_data )
+	{
+		ItemOptics optic;
+		if( Class.CastTo(optic, action_data.m_MainItem) )
+		{
+			if (!optic.IsInOptics())
+			{
+				EnterOptics(optic, action_data.m_Player);
 			}
 		}
 	}
 	
-	override void OnCancelClient( ActionData action_data )
+	override void OnStartAnimationLoopClient( ActionData action_data )
+	{
+		ItemOptics optic;
+		if( Class.CastTo(optic, action_data.m_MainItem) )
+		{
+			if (!optic.IsInOptics())
+			{
+				EnterOptics(optic, action_data.m_Player);
+			}
+		}
+	}
+	
+	override void OnEndClient( ActionData action_data )
 	{
 		ItemOptics optic;
 		if( Class.CastTo(optic, action_data.m_MainItem) )
@@ -102,7 +133,7 @@ class ActionViewOptics : ActionContinuousBase
 		}
 	}
 	
-	override void OnCancelServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
 		ItemOptics optic;
 		if( Class.CastTo(optic, action_data.m_MainItem) )
@@ -111,8 +142,9 @@ class ActionViewOptics : ActionContinuousBase
 		}
 	}
 	
-	override void OnCompleteClient( ActionData action_data )
+	override void OnEndAnimationLoopClient( ActionData action_data )
 	{
+		//Print("OnCompleteLoopClient");
 		ItemOptics optic;
 		if( Class.CastTo(optic, action_data.m_MainItem) )
 		{
@@ -120,8 +152,9 @@ class ActionViewOptics : ActionContinuousBase
 		}
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndAnimationLoopServer( ActionData action_data )
 	{
+		//Print("OnCompleteLoopServer");
 		ItemOptics optic;
 		if( Class.CastTo(optic, action_data.m_MainItem) )
 		{

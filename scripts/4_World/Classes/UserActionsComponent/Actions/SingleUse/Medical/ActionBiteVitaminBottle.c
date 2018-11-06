@@ -2,7 +2,7 @@ class ActionBiteVitaminBottle: ActionConsumeSingle
 {
 	void ActionBiteVitaminBottle()
 	{
-		//m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EATPILLS;
+		//m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
 	}
 
 	override int GetType()

@@ -53,6 +53,7 @@ class ActionWorldCraftSwitch: ActionSingleUseBase
 	
 	override void Start( ActionData action_data ) //Setup on start of action
 	{
+		super.Start( action_data );
 		action_data.m_Player.GetCraftingManager().SetNextRecipe();
 	}
 	

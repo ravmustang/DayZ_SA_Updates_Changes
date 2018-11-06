@@ -56,8 +56,13 @@ class Cooking
 				//update food
 				cooking_state_update = UpdateCookingState( item_to_cook, cooking_method, cooking_equipment, cooking_time_coef );
 				
-				//check for done state
-				if ( item_to_cook.IsFoodBaked() || item_to_cook.IsFoodBoiled() || item_to_cook.IsFoodDried() )
+				//check for done state for boiling and drying
+				if ( item_to_cook.IsFoodBoiled() || item_to_cook.IsFoodDried() )
+				{
+					is_done = true;
+				}
+				//check for done state fro baking (exclude Lard from baked items)
+				else if ( item_to_cook.IsFoodBaked() && item_to_cook.Type() != Lard )		
 				{
 					is_done = true;
 				}
@@ -183,7 +188,7 @@ class Cooking
 				item_to_cook.ChangeFoodStage( new_stage_type );
 				//Temp
 				//Remove all modifiers
-				item_to_cook.RemoveAllAgentsExcept(AGT_BRAIN);
+				item_to_cook.RemoveAllAgentsExcept(eAgents.BRAIN);
 				
 				//remove lard when baking with cooking equipment
 				if ( cooking_equipment && cooking_method == CookingMethodType.BAKING )
@@ -265,7 +270,7 @@ class Cooking
 				item_to_cook.ChangeFoodStage( new_stage_type );
 				//Temp
 				//Remove all modifiers
-				item_to_cook.RemoveAllAgentsExcept(AGT_BRAIN);
+				item_to_cook.RemoveAllAgentsExcept(eAgents.BRAIN);
 
 				//reset cooking time
 				item_to_cook.SetCookingTime( 0 );

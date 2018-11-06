@@ -7,7 +7,7 @@ class SardinesCan : Edible_Base
 	
 	override void Open()
 	{
-		m_Opened = true;
+		super.Open();
 		ReplaceEdibleWithNew("SardinesCan_Opened");
 	}
 }

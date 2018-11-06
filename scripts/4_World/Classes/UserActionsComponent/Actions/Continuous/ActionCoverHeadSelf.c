@@ -38,7 +38,7 @@ class ActionCoverHeadSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Put on head";
+		return "#put_on_head";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -49,7 +49,7 @@ class ActionCoverHeadSelf: ActionContinuousBase
 		return true;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		//setaperture will be called from here, or from statemachine
 		//GetGame().GetWorld().SetAperture(10000);

@@ -1,4 +1,4 @@
-class Health: ModifierBase
+class HealthMdfr: ModifierBase
 {
 	private float	m_LastHealthLevel;
 	private float	m_LastBloodLevel;
@@ -31,12 +31,12 @@ class Health: ModifierBase
 
 		float healthdelta  = Math.AbsInt(health - m_LastHealthLevel);
 		if (health <  m_LastHealthLevel) healthdelta = -healthdelta;
-		//if( player.m_NotifiersManager ) player.m_NotifiersManager.FindNotifier(NTF_LIVES).DisplayTendency(healthdelta);
+		//if( player.m_NotifiersManager ) player.m_NotifiersManager.FindNotifier(eNotifiers.NTF_LIVES).DisplayTendency(healthdelta);
 		m_LastHealthLevel = health;
 		
 		float blooddelta  = Math.AbsInt(blood - m_LastBloodLevel);
 		if (blood <  m_LastBloodLevel) blooddelta = -blooddelta;
-		//if( player.m_NotifiersManager ) player.m_NotifiersManager.FindNotifier(NTF_BLOOD).DisplayTendency(blooddelta);
+		//if( player.m_NotifiersManager ) player.m_NotifiersManager.FindNotifier(eNotifiers.NTF_BLOOD).DisplayTendency(blooddelta);
 		m_LastBloodLevel = blood;
 		
 	}

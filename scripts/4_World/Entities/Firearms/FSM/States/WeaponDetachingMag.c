@@ -70,6 +70,43 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 		m_dst = NULL;
 		super.OnExit(e);
 	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_magazine))
+		{
+			Error("[wpnfsm] WeaponDetachingMag_Store.SaveCurrentFSMState: cannot write m_magazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationWriteToContext(m_dst, ctx))
+		{
+			Error("[wpnfsm] WeaponDetachingMag_Store.SaveCurrentFSMState: cannot write m_st for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_magazine))
+		{
+			Error("[wpnfsm] WeaponDetachingMag_Store.LoadCurrentFSMState: cannot read m_magazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_dst, ctx))
+		{
+			Error("[wpnfsm] WeaponDetachingMag_Store.LoadCurrentFSMState: cannot read m_dst for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
 };
 
 /*class WeaponDetachingMag_Store_W4T extends WeaponDetachingMag_Store
@@ -128,11 +165,49 @@ class WeaponDetachingMag extends WeaponStateBase
 		wpnDebugPrint("WeaponDetachingMag type=" + typename.EnumToString(InventoryLocationType, m_store.m_dst.GetType()));
 		super.OnEntry(e); // @NOTE: super at the end (prevent override from submachine start)
 	}
+
 	override void OnExit (WeaponEventBase e)
 	{
 		m_dst = NULL;
 		m_magazine = NULL;
 		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_magazine))
+		{
+			Error("[wpnfsm] WeaponDetachingMag.SaveCurrentFSMState: cannot write m_magazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationWriteToContext(m_dst, ctx))
+		{
+			Error("[wpnfsm] WeaponDetachingMag.SaveCurrentFSMState: cannot write m_st for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_magazine))
+		{
+			Error("[wpnfsm] WeaponDetachingMag.LoadCurrentFSMState: cannot read m_magazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_dst, ctx))
+		{
+			Error("[wpnfsm] WeaponDetachingMag.LoadCurrentFSMState: cannot read m_dst for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 

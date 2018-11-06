@@ -5,6 +5,7 @@ class NutritionalProfile
 	float m_NutritionalIndex;
 	float m_FullnessIndex;
 	float m_Toxicity;
+	bool m_IsLiquid;
 	
 	void NutritionalProfile(float energy, float water_content, float nutritional_index, float fullness_index, float toxicity)
 	{
@@ -13,6 +14,16 @@ class NutritionalProfile
 		m_NutritionalIndex = nutritional_index;
 		m_FullnessIndex = fullness_index;
 		m_Toxicity = toxicity;
+	}
+	
+	void MarkAsLiquid()
+	{
+		m_IsLiquid = true;
+	}
+	
+	bool IsLiquid()
+	{
+		return m_IsLiquid;
 	}
 	
 	float GetEnergy()

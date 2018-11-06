@@ -38,7 +38,7 @@ class ActionBurnSewSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Close wounds";
+		return "#close_wounds";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -53,7 +53,7 @@ class ActionBurnSewSelf: ActionContinuousBase
 		}
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		const float ITEM_DAMAGE = 0.05;
 		const float SHOCK_AMOUNT = 1000;

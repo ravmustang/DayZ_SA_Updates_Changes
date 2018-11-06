@@ -45,8 +45,7 @@ class WeaponChambering_Cartridge extends WeaponStateBase
 
 			m_weapon.SelectionBulletHide(); // force hide on abort
 		}
-
-		m_srcMagazine = NULL;
+		m_type = string.Empty;
 		super.OnAbort(e);
 	}
 
@@ -61,8 +60,53 @@ class WeaponChambering_Cartridge extends WeaponStateBase
 			wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, error - cannot load chamber chamber!");
 
 		m_type = string.Empty;
-
 		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_damage))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot write m_damage for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Write(m_type))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot write m_type for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Write(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot write m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_damage))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_damage for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Read(m_type))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_type for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Read(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -127,14 +171,41 @@ class WeaponChambering extends WeaponStateBase
 	override void OnAbort (WeaponEventBase e)
 	{
 		m_srcMagazine = NULL;
+		m_chamber.m_srcMagazine = NULL;
 		super.OnAbort(e);
 	}
 
 	override void OnExit (WeaponEventBase e)
 	{
 		m_srcMagazine = NULL;
+		m_chamber.m_srcMagazine = NULL;
 		super.OnExit(e);
 	}
-};
 
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_srcMagazine))
+		{
+			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+};
 

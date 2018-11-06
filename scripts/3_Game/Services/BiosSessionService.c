@@ -89,6 +89,19 @@ class BiosSessionService
 	*/
 	proto native EBiosError	ClearActivityAsync();
 	
+	//! Show system UI to invite friends to current gameplay session
+	/*! 
+		The async result is returned in the OnShowInviteToGameplaySession callback. 
+		On Xbox, if session with session_address and session_port does not exist, then xbox show 
+		message "We could not send the invite".
+		
+		@param session_address server IP address.
+		@param session_port server port.
+		
+		@return EBiosError indicating if the async operation is pending.
+	*/
+	proto native EBiosError ShowInviteToGameplaySessionAsync(string session_address, int session_port);
+	
 	//! Callback function
 	/*!
 		@param error error indicating success or fail of the async operation.
@@ -164,4 +177,14 @@ class BiosSessionService
 			ClearActivityAsync();
 		}
 	}
+	
+	//! Callback function
+	/*!
+		@param error indicating success or fail of the async operation.
+	*/
+	void OnShowInviteToGameplaySession(EBiosError error)
+	{
+		OnlineServices.ErrorCaught( error );
+	}
+	
 };

@@ -1,4 +1,4 @@
-class Shock: ModifierBase
+class ShockMdfr: ModifierBase
 {
 	private const float	 	UNCONSCIOUS_LIMIT = 0;
 	private const float 	SHOCK_INCREMENT_PER_SEC = 1;

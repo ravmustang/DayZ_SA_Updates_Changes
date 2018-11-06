@@ -13,7 +13,8 @@ class ActionWaterPlant: ActionContinuousBase
 	void ActionWaterPlant()
 	{
 		m_CallbackClass = ActionWaterPlantCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
+		m_FullBody = true;
 		m_MessageSuccess = "I've watered plant.";
 		m_MessageStartFail = "";
 		m_MessageStart = "";
@@ -36,7 +37,7 @@ class ActionWaterPlant: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Water plant";
+		return "#water_plant";
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -56,7 +57,7 @@ class ActionWaterPlant: ActionContinuousBase
 		return false;
 	}
 	
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		

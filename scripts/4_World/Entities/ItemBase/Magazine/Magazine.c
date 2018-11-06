@@ -1,6 +1,17 @@
 class Magazine : InventoryItemSuper
 {
-	void Magazine () { }
+	ref array<string>	m_CompatiableAmmo;
+	ref array<float> 	m_ChanceToJam;
+	protected float 	m_ManipulationDamage;
+	
+	void Magazine () 
+	{
+		m_ChanceToJam = new array<float>;
+		InitReliability(m_ChanceToJam);
+		m_ManipulationDamage = ConfigGetFloat("manipulationDamage");
+		m_CompatiableAmmo = new array<string>;
+		ConfigGetTextArray ("ammoItems", m_CompatiableAmmo);
+	}
 
 	//! Gets magazine ammo count
 	proto native int GetAmmoCount();
@@ -48,7 +59,15 @@ class Magazine : InventoryItemSuper
 		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " ContinuousActions", m_ContinuousActions);
 		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " SingleUseActions", m_SingleUseActions);	
 		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " InteractActions", m_InteractActions);	
-	}	
+	}
+	
+	bool IsCompatiableAmmo( ItemBase ammo )
+	{
+		if( m_CompatiableAmmo && ammo )
+			return ( m_CompatiableAmmo.Find( ammo.GetType() ) > -1 );
+		else
+			return false;
+	}
 	
 	bool CanAddCartridges (int count)
 	{
@@ -100,6 +119,21 @@ class Magazine : InventoryItemSuper
 			}
 		}
 		else return false;
+	}
+	
+	bool InitReliability(out array<float> reliability_array)
+	{
+		if (GetGame().ConfigIsExisting("cfgMagazines " + GetType() + " Reliability ChanceToJam"))
+		{
+			GetGame().ConfigGetFloatArray("cfgMagazines " + GetType() + " Reliability ChanceToJam",reliability_array);
+			return true;
+		}
+		return false;
+	}
+	
+	float GetChanceToJam()
+	{
+		return m_ChanceToJam[GetHealthLevel()];
 	}
 	/*
 	override void SplitItem()
@@ -155,6 +189,11 @@ class Magazine : InventoryItemSuper
 			ServerAcquireCartridge(damage, cartrige_name);
 			new_pile.ServerStoreCartridge(damage, cartrige_name);
 		}
+	}
+	
+	void ApplyManipulationDamage()
+	{
+		AddHealth("","Health",-m_ManipulationDamage);
 	}
 
 	override bool IsFullQuantity()

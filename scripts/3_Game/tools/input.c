@@ -119,13 +119,31 @@ class Input
 	proto native bool	GetActionDown(int action, bool check_focus = true);
 	
 	/**  
-	\brief Returns true just in frame, when action was released (button was releases)
+	\brief Returns true just in frame, when release action happened (button was released)
 	@param action id of action, defined in \ref 4_World/Classes/UserActionsComponent/_constants.c
 	@param check_focus if true and game is unfocused, returns 0; otherwise returns actual value
 	@return true if action was released in that frame, false otherwise
 	@see GetActionDown()
 	*/
 	proto native bool	GetActionUp(int action, bool check_focus = true);
+
+	/**  
+	\brief Returns true just in frame, when hold action invoked (button is hold)
+	@param action id of action, defined in \ref 4_World/Classes/UserActionsComponent/_constants.c
+	@param check_focus if true and game is unfocused, returns 0; otherwise returns actual value
+	@return true if action was released in that frame, false otherwise
+	@see GetActionHold()
+	*/
+	proto native bool	GetActionHold(int action, bool check_focus = true);
+
+	/**  
+	\brief Returns true just in frame, when double click action invoked (button double clicked)
+	@param action id of action, defined in \ref 4_World/Classes/UserActionsComponent/_constants.c
+	@param check_focus if true and game is unfocused, returns 0; otherwise returns actual value
+	@return true if action was released in that frame, false otherwise
+	@see GetActionDbl()
+	*/
+	proto native bool	GetActionDbl(int action, bool check_focus = true);
 
 	proto native void	BlockInput(int key);
 	
@@ -195,9 +213,9 @@ class Input
 			{
 				g_Game.CreateGamepadDisconnectMenu();
 			}
-			IdentifyGamepad( GamepadButton.A );
+				IdentifyGamepad( GamepadButton.A );
+			}
 		}
-	}
 	//! callback that is fired when identification was requested
 	void OnGamepadIdentification(int gamepad)
 	{
@@ -205,7 +223,7 @@ class Input
 		{
 			g_Game.DeleteGamepadDisconnectMenu();
 			SelectActiveGamepad( gamepad );
-			g_Game.SelectGamepad();
+			g_Game.SelectUser( gamepad );
 		}
 	}
 };

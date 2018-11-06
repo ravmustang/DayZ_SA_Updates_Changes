@@ -10,20 +10,15 @@ class NotifierBase
 	const int 			TENDENCY_BUFFER_SIZE = 30;//this needs to be bigger or same size as buffer size of any invidual buffer size
 	bool				m_ShowTendency;
 	bool				m_Active;
-	private float		m_SecsSinceLastMessage; //internal counter
-	private float		m_SecsToMessage; //internal counter
-	protected float		m_MinPauseBetweenMessages; //minimal amount of seconds that needs to pass till message is displayed
-	protected float		m_MaxPauseBetweenMessages; //maximal amount of seconds that can pass till message is displayed
-	private float		m_SecsSinceLastSound; //internal counter
-	private float		m_SecsToSound; //internal counter
-	protected float		m_MinPauseBetweenSounds; //minimal amount of seconds that needs to pass till sound is played
-	protected float		m_MaxPauseBetweenSounds; //maximal amount of seconds that can pass till sound is played
-	private float		m_SecsSinceLastAnimation; //internal counter
-	private float		m_SecsToAnimation; //internal counter
-	protected float		m_MinPauseBetweenAnimations; //minimal amount of seconds that needs to pass till animation played
-	protected float		m_MaxPauseBetweenAnimations; //maximal amount of seconds that can pass till animation is splayed
-	float				m_TickInterval;
-	float				m_TickIntervalLastTick;
+	//private float		m_SecsToSound; //internal counter
+	//protected float		m_MinPauseBetweenSounds; //minimal amount of seconds that needs to pass till sound is played
+	//protected float		m_MaxPauseBetweenSounds; //maximal amount of seconds that can pass till sound is played
+	//private float		m_SecsSinceLastAnimation; //internal counter
+	//private float		m_SecsToAnimation; //internal counter
+	//protected float		m_MinPauseBetweenAnimations; //minimal amount of seconds that needs to pass till animation played
+	//protected float		m_MaxPauseBetweenAnimations; //maximal amount of seconds that can pass till animation is splayed
+	int					m_TickInterval;
+	int					m_TickIntervalLastTick;
 	float				m_TendencyBuffer[TENDENCY_BUFFER_SIZE];
 	int					m_TendencyBufferWriteIterator;
 	float 				m_LastTendency;
@@ -41,14 +36,10 @@ class NotifierBase
 		m_Active = true; 
 		m_Manager = manager;
 		m_Player = manager.GetPlayer();
-		
-		m_MinPauseBetweenMessages = -1;
-		m_MinPauseBetweenSounds = m_MinPauseBetweenMessages;
-		m_MinPauseBetweenAnimations = m_MinPauseBetweenMessages;
 		m_TickInterval = 1000;
 	}
 
-	bool IsTimeToTick(float current_time)
+	bool IsTimeToTick(int current_time)
 	{
 		if( current_time > m_TickIntervalLastTick + m_TickInterval )
 		{
@@ -61,9 +52,9 @@ class NotifierBase
 	}
 	
 	
-	DisplayStatus GetDisplayStatus()
+	VirtualHud GetVirtualHud()
 	{
-		return m_Player.GetDisplayStatus();
+		return m_Player.GetVirtualHud();
 	}
 
 	int GetNotifierType()
@@ -149,9 +140,10 @@ class NotifierBase
 		
 		float tnd = sma - m_LastMA;
 		m_LastMA = sma;
-		
-		//PrintString("tendency:" + tnd.ToString() );
-		//PrintString("----------------------------");
+		/*
+		PrintString(GetName()+" tendency:" + tnd.ToString() );
+		PrintString("----------------------------");
+		*/
 		return tnd;
 		
 		//--------------------------------------------------------------------------
@@ -209,45 +201,6 @@ class NotifierBase
 		//------------
 		m_TickIntervalLastTick = current_time;
 		DisplayBadge();
-		if ( m_MinPauseBetweenMessages != -1 )
-		{
-			if ( m_SecsSinceLastMessage >= m_SecsToMessage )
-			{
-				DisplayMessage();
-				m_SecsToMessage = Math.RandomInt(m_MinPauseBetweenMessages,m_MaxPauseBetweenMessages);
-				m_SecsSinceLastMessage = 0;
-			}
-			else
-			{
-				m_SecsSinceLastMessage+=m_DeltaT;
-			}
-		}
-		if ( m_MinPauseBetweenSounds != -1 )
-		{
-			if ( m_SecsSinceLastSound >= m_SecsToSound )
-			{
-				PlaySound();
-				m_SecsToSound = Math.RandomInt(m_MinPauseBetweenSounds,m_MaxPauseBetweenSounds);
-				m_SecsSinceLastSound = 0;
-			}
-			else
-			{
-				m_SecsSinceLastSound+=m_DeltaT;
-			}
-		}
-		if ( m_MinPauseBetweenAnimations != -1 )
-		{
-			if ( m_SecsSinceLastAnimation >= m_SecsToAnimation )
-			{
-				PlayAnimation();
-				m_SecsToAnimation = Math.RandomInt(m_MinPauseBetweenAnimations,m_MaxPauseBetweenAnimations);
-				m_SecsSinceLastAnimation = 0;
-			}
-			else
-			{
-				m_SecsSinceLastAnimation+=m_DeltaT;
-			}
-		}
 		AddToCyclicBuffer( GetObservedValue() );
 		if (m_ShowTendency) DisplayTendency( GetDeltaAvaraged() );
 
@@ -255,14 +208,14 @@ class NotifierBase
 	
 	protected int CalculateTendency(float delta, float inctresholdlow, float inctresholdmed, float inctresholdhigh, float dectresholdlow, float dectresholdmed, float dectresholdhigh)
 	{                                        	
-		int ndelta = TENDENCY_STABLE;
-		if ( delta > inctresholdlow ) 	ndelta = TENDENCY_INC_LOW;
-		if ( delta > inctresholdmed )  	ndelta = TENDENCY_INC_MED;
-		if ( delta > inctresholdhigh ) 	ndelta = TENDENCY_INC_HIGH;	
-		if ( delta < dectresholdlow )  	ndelta = TENDENCY_DEC_LOW;
-		if ( delta < dectresholdmed )  	ndelta = TENDENCY_DEC_MED;
-		if ( delta < dectresholdhigh ) 	ndelta = TENDENCY_DEC_HIGH;
-		return ndelta;
+		int tendency = TENDENCY_STABLE;
+		if ( delta > inctresholdlow ) 	tendency = TENDENCY_INC_LOW;
+		if ( delta > inctresholdmed )  	tendency = TENDENCY_INC_MED;
+		if ( delta > inctresholdhigh ) 	tendency = TENDENCY_INC_HIGH;	
+		if ( delta < dectresholdlow )  	tendency = TENDENCY_DEC_LOW;
+		if ( delta < dectresholdmed )  	tendency = TENDENCY_DEC_MED;
+		if ( delta < dectresholdhigh ) 	tendency = TENDENCY_DEC_HIGH;
+		return tendency;
 	}
 	
 	protected DSLevels DetermineLevel(float value, float warning_treshold, float critical_treshold, float empty_treshold )
@@ -283,18 +236,6 @@ class NotifierBase
 	{
 	}
 
-	protected void DisplayMessage()
-	{
-	}
-
-	protected void PlaySound()
-	{
-	}
-	
-	protected void PlayAnimation()
-	{
-	}
-	
 	protected float GetObservedValue()
 	{
 		return 0;

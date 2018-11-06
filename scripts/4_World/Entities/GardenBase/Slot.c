@@ -138,6 +138,15 @@ class Slot
 			{
 				GetPlant().CheckWater(item );
 			}
+			else
+			{
+				if ( GetSeed() )
+				{
+					GetGarden().CreatePlant(this);
+				}
+				
+				// if there is no seed then do not create plant. Plant will be created when the seed is inserted into watered slot.
+			}
 		}
 		
 		GetGarden().UpdateSlotTexture( GetSlotIndex() );

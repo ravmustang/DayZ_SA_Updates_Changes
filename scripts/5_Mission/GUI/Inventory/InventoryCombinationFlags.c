@@ -15,7 +15,7 @@ class InventoryCombinationFlags
 	static const int ATTACH_MAGAZINE		= 65536;
 	static const int LOAD_CHAMBER			= 4096;
 	static const int DETACH_MAGAZINE		= 8192;
-	static const int SWAP_MAGAZINE			= 16384;
+	//static const int SWAP_MAGAZINE			= 16384;
 	static const int SET_ACTION				= 32768;
 	static const int PERFORM_ACTION			= 2048;
 }

@@ -31,11 +31,14 @@ class ActionActivateTrap: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Activate the trap";
+		return "#activate_the_trap";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
+		ItemBase tgt_item = ItemBase.Cast( target.GetObject() );
+		if ( tgt_item && tgt_item.IsBeingPlaced() ) return false;
+		
 		Object targetObject = target.GetObject();
 		if ( targetObject != NULL && targetObject.IsInherited(TrapBase) ) 
 		{
@@ -50,7 +53,7 @@ class ActionActivateTrap: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		if ( targetObject != NULL && targetObject.IsInherited(TrapBase) ) 

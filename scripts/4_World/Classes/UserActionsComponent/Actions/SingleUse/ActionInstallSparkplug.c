@@ -39,12 +39,12 @@ class ActionInsertSparkplug: ActionSingleUseBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		EntityAI target_EAI = EntityAI.Cast( action_data.m_Target.GetObject() ); // cast to ItemBase
 		target_EAI.LocalTakeEntityAsAttachment (action_data.m_MainItem);
 	}
-	override void OnCompleteClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{
 		EntityAI target_EAI = EntityAI.Cast( action_data.m_Target.GetObject() ); // cast to ItemBase
 		target_EAI.LocalTakeEntityAsAttachment (action_data.m_MainItem);

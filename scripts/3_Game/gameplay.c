@@ -53,8 +53,8 @@ class JsonSerializer: Serializer
 	
 	/**
 	\brief Script variable serialization to json string
-	@param script variable to be serialized to string
-	@param if the string should be formated for human readability
+	@param variable_out script variable to be serialized to string
+	@param nice if the string should be formated for human readability
 	@param result from the serialization, output or error depending on the return value 
 	\return if the serialization was successful
 	@code
@@ -69,8 +69,8 @@ class JsonSerializer: Serializer
 	
 	/**
 	\brief Json string deserialization to script variable
-	@param script variable to be deserialized from string
-	@param the input string
+	@param variable_in script variable to be deserialized from string
+	@param jsonString the input string
 	@param error from the deserialization. Is used only if the return value of the function is false
 	\return if the deserialization was successful
 	@code
@@ -98,7 +98,7 @@ class JsonSerializer: Serializer
 	@endcode	
 	*/
 	proto bool ReadFromString(void variable_in, string jsonString, out string error);
-}
+};
 
 
 class ScriptRPC: ParamsWriteContext
@@ -240,55 +240,10 @@ class ProxySubpart extends Entity
 {
 };
 
-class EventParams: Managed
-{
-};
-
-class EventParams1 extends EventParams
-{
-	Object obj;
-	void EventParams1(Object o)
-	{
-		obj = o;
-	}
-};
-
-class EntityEventHandler: Managed
-{
-	void OnEvent(EntityAI entity, int entity_event_type /* EE* */, Param params)
-	{
-	}
-};
-
-class EntityAnimEndEventHandler extends EntityEventHandler
-{
-	private string m_anim_name;
-	private ref CallQueueContext m_call;
-
-	void EntityAnimEndEventHandler(string anim_name, Class target, string fn, Param params = NULL)
-	{
-		m_anim_name = anim_name;
-		m_call = new CallQueueContext(target, fn, params);
-	}
-
-	override void OnEvent(EntityAI entity, int entity_event_type /* EE* */, Param params)
-	{
-		if (entity_event_type != EEAnimDone) return;
-		if (!m_call) return;
-
-		Param1<string> param = Param1<string>.Cast( params );
-		if (m_anim_name == "" || param.param1 == m_anim_name)
-		{
-			m_call.Call();
-		}
-	}
-};
-
 //-----------------------------------------------------------------------------
-
 // custom widgets
 //-----------------------------------------------------------------------------
-class ItemPreviewWidget extends UIWidget
+class ItemPreviewWidget: Widget
 {
 	proto native void SetItem(EntityAI object);
 	proto native EntityAI GetItem();
@@ -309,7 +264,7 @@ class ItemPreviewWidget extends UIWidget
 };
 
 //-----------------------------------------------------------------------------
-class PlayerPreviewWidget extends UIWidget
+class PlayerPreviewWidget: Widget
 {
 	proto native void		SetItemInHands(InventoryItem object);
 	proto native InventoryItem		GetItemInHands();
@@ -326,6 +281,15 @@ class PlayerPreviewWidget extends UIWidget
 class HtmlWidget extends RichTextWidget
 {
 	proto native void LoadFile(string path);
+};
+
+//-----------------------------------------------------------------------------
+class MapWidget: Widget
+{
+	proto native void ClearUserMarks();
+	proto native void AddUserMark(vector pos, string text, int color /*ARGB*/, string texturePath);
+	proto native vector MapToScreen(vector worldPos);
+	proto native vector ScreenToMap(vector screenPos);
 };
 
 //-----------------------------------------------------------------------------
@@ -411,30 +375,7 @@ typedef Param1<int>MPConnectionLostEventParams;
 #ifdef DOXYGEN
 // just because of doc
 
-enum ChatChannel
-{
-	CCNone,
-	CCGlobal,
-	CCVehicle,
-	CCItemTransmitter,
-	CCPublicAddressSystem,
-	CCItemMegaphone,
-	CCDirect,
-	CCCustom1,
-	CCCustom2,
-	CCCustom3,
-	CCCustom4,
-	CCCustom5,
-	CCCustom6,
-	CCCustom7,
-	CCCustom8,
-	CCCustom9,
-	CCCustom10,
-	CCCustomLast = CCCustom10,
-	CCStatus,
-	CCSystem,
-	CCN
-};
+
 
 enum EventType
 {
@@ -584,9 +525,11 @@ class Hud: Managed
 	void RefreshQuantity( EntityAI item_to_refresh ) {}
 	void UpdateBloodName() {}
 	void RefreshItemPosition( EntityAI item_to_refresh ) {}
-	void Update(float time_delta){}
+	void Update( float timeslice ){}
 	void InitInventory();
 	bool IsXboxDebugCursorEnabled();
+	void ShowVehicleInfo();
+	void HideVehicleInfo();
 
 	void SetPermanentCrossHair( bool show ) {}
 
@@ -666,6 +609,16 @@ class Mission
 	{
 		return false;
 	}
+	
+	void PlayerControlEnable() {}
+	void PlayerControlDisable() {}
+
+	void ShowInventory() {}
+	void HideInventory() {}
+	
+	void ShowChat() {}
+	void HideChat() {}
+
 };
 
 // -------------------------------------------------------------------------
@@ -752,6 +705,8 @@ const int AT_OPTIONS_VIDEO_DEFAULT = 57,
 const int AT_CONFIG_CONTROLLER_XAXIS = 58,
 const int AT_CONFIG_CONTROLLER_YAXIS = 59,
 const int AT_CONFIG_CONTROLLER_REVERSED_LOOK = 60,
+const int AT_OPTIONS_DISPLAY_MODE = 61,
+const int AT_OPTIONS_TERRAIN_SHADER = 62,
 
 // Option Access Control Type
 const int OA_CT_NUMERIC = 0;
@@ -901,6 +856,7 @@ class Hive
 {
 	proto native void InitOnline( string host = "" );
 	proto native void InitOffline();
+	proto native void InitSandbox();
 
 	proto native void SetShardID( string shard );
 	proto native void SetEnviroment( string env );
@@ -908,11 +864,60 @@ class Hive
 	proto native void CharacterSave( Man player );
 	proto native void CharacterKill( Man player );
 	proto native void CharacterExit( Man player );
+
+	proto native void CallUpdater( string content );
+	
 };
 
 proto native Hive CreateHive();
 proto native void DestroyHive();
 proto native Hive GetHive();
+
+// -------------------------------------------------------------------------
+class UAInput
+{
+	proto native int Hash();
+
+	proto native void BindButton( string sButtonName );
+	proto native void UnBindButton( string sButtonName );
+
+	proto native float LocalValue();
+
+	proto native bool LocalPress();
+	proto native bool LocalRelease();
+	proto native bool LocalHold();
+	proto native bool LocalDoubleClick();
+
+};
+
+// -------------------------------------------------------------------------
+class UAInputAPI
+{
+	proto native void ListCurrentProfile();
+	proto native void ListCurrentPreset();
+	proto native void ListAvailableButtons();
+	proto native void ListActiveGroup();
+
+	proto native UAInput GetInputByID( int iID );
+	proto native UAInput GetInputByName( string sInputName );
+	
+	proto bool GetButtonNameByDik( int iDikCode, out string sName );
+	proto native int GetButtonIDByDik( int iDikCode );
+
+	proto native UAInput RegisterInput( string sInputName, string sLoc, string sGroupName );
+	proto native void DeRegisterInput( string sInputName );
+
+	proto native void RegisterGroup( string sGroupName, string sLoc );
+	proto native void DeRegisterGroup( string sGroupName );
+
+	proto native void ActivateGroup( string sGroupName );
+	proto native void ActivateExclude( string sExcludeName );
+	proto native void ActivateModificator( string sModName );
+
+	proto native void Export();
+};
+
+proto native UAInputAPI GetUApi();
 
 // -------------------------------------------------------------------------
 class CETesting

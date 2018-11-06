@@ -56,8 +56,8 @@ class QuickBarBase
 				m_aQuickbarEnts[i].m_enabled = false;
 		}
 		m_slotsCount = newSize;
-		if(_player.m_HUD)
-			_player.m_HUD.RefreshQuickbar(true);
+		if(_player.m_Hud)
+			_player.m_Hud.RefreshQuickbar(true);
 	}
 //-------------------------------------------------------------		
 	int GetNonEmptyCount()
@@ -112,16 +112,16 @@ class QuickBarBase
 			m_aQuickbarEnts[index].m_enabled = true;
 		else
 			m_aQuickbarEnts[index].m_enabled = false;
-		if(_player.m_HUD)
-			_player.m_HUD.RefreshQuickbar(true);
+		if(_player.m_Hud)
+			_player.m_Hud.RefreshQuickbar(true);
 	}
 //-------------------------------------------------------------
 	void SetShotcutEnable(int index, bool value)
 	{
 		m_aQuickbarEnts[index].m_enabled = value;
 		Print("enable - "+ value);
-		if(_player.m_HUD)
-			_player.m_HUD.RefreshQuickbar(true);
+		if(_player.m_Hud)
+			_player.m_Hud.RefreshQuickbar(true);
 	}
 //-------------------------------------------------------------
 	bool CanAddAsShortcut(EntityAI entity)
@@ -241,8 +241,8 @@ class QuickBarBase
 		{
 			m_aQuickbarEnts[index].m_entity = NULL;
 			m_aQuickbarEnts[index].m_enabled = false;
-			if(_player.m_HUD)
-				_player.m_HUD.RefreshQuickbar(true);
+			if(_player.m_Hud)
+				_player.m_Hud.RefreshQuickbar(true);
 		}
 	}
 //-------------------------------------------------------------		
@@ -258,8 +258,8 @@ class QuickBarBase
 			else
 				m_aQuickbarEnts[index].m_enabled = false;
 			
-			if(_player.m_HUD)
-				_player.m_HUD.RefreshQuickbar(true);
+			if(_player.m_Hud)
+				_player.m_Hud.RefreshQuickbar(true);
 		}
 		
 		

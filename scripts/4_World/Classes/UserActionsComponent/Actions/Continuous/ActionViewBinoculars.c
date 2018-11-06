@@ -1,12 +1,5 @@
 class ActionViewBinoculars : ActionViewOptics
 {
-	void ActionViewBinoculars()
-	{
-		m_CallbackClass = ActionRaiseAndViewCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LOOKOPTICS;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_LOOKOPTICS;
-	}
-	
 	override int GetType()
 	{
 		return AT_VIEW_BINOCULARS;
@@ -14,7 +7,7 @@ class ActionViewBinoculars : ActionViewOptics
 		
 	override string GetText()
 	{
-		return "Use binoculars";
+		return "#use_binoculars";
 	}
 	
 	override void EnterOptics(ItemOptics optic, PlayerBase player)
@@ -27,6 +20,7 @@ class ActionViewBinoculars : ActionViewOptics
 			{
 				Rangefinder rf = Rangefinder.Cast(optic);				
 				rf.GetCompEM().SwitchOn();
+				rf.SetPlayer( player );
 			}
 			else
 			{
@@ -46,6 +40,7 @@ class ActionViewBinoculars : ActionViewOptics
 			{
 				Rangefinder rf = Rangefinder.Cast(optic);
 				rf.GetCompEM().SwitchOff();
+				rf.SetPlayer( null );
 			}
 			else
 			{

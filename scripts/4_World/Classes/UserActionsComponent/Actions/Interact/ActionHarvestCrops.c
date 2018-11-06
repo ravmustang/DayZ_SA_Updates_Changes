@@ -10,6 +10,9 @@ class ActionHarvestCrops: ActionInteractBase
 		m_MessageCancel = "";
 
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
+		
+		//m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
+		//m_FullBody = true;
 	}
 
 	override int GetType()
@@ -19,7 +22,7 @@ class ActionHarvestCrops: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Harvest crops";
+		return "#harvest_crops";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -38,7 +41,7 @@ class ActionHarvestCrops: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object targetObject = action_data.m_Target.GetObject();
 		PlantBase plant = PlantBase.Cast( targetObject );

@@ -11,16 +11,26 @@ class HumanInventoryWithFSM : HumanInventory
 	void HumanInventoryWithFSM ()
 	{
 		m_FSM = new HandFSM();
-
-		m_Empty = new HandStateEmpty(GetManOwner());
-		m_Equipped = new HandStateEquipped(GetManOwner());
+	}
+	
+	void CreateStableStates ()
+	{
+		// stable states are created only if they do not exist already (for example created by derived class like DayZPlayerInventory)
+		// @NOTE: this cannot be done in constructor, as there is NO owner set yet. GetManOwner() will therefore return NULL.
+		if (!m_Empty)
+			m_Empty = new HandStateEmpty(GetManOwner());
+		if (!m_Equipped)
+			m_Equipped = new HandStateEquipped(GetManOwner());
 	}
 
 	override void Init ()
 	{
 		// setup state machine
 		hndDebugPrint("[hndfsm] Initializing Human Inventory FSM");
-
+		
+		// basic states
+		CreateStableStates();
+		
 		// events
 		HandEventBase __T__ = new HandEventTake;
 		HandEventBase __D__ = new HandEventDrop;

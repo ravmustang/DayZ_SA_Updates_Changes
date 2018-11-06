@@ -105,6 +105,13 @@ class DayZPlayerImplementHeading
 		return false;
 
 	}
+	
+	static bool NoHeading(float pDt, SDayZPlayerHeadingModel pModel, out float pLastHeadingDiff)
+	{
+		pLastHeadingDiff = 0;
+		pModel.m_fHeadingAngle = pModel.m_fOrientationAngle;
+		return true;
+	}
 
 
 

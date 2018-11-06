@@ -6,13 +6,69 @@ class ActionEmptyBottleBaseCB : ActionContinuousBaseCB
 	{
 		m_ActionData.m_ActionComponent = new CAContinuousEmpty(QUANTITY_EMPTIED_PER_SEC);
 	}
+	
+	override void OnAnimationEvent(int pEventID)	
+	{
+		super.OnAnimationEvent( pEventID );
+				
+		Bottle_Base vessel_in_hands = Bottle_Base.Cast( m_ActionData.m_MainItem );
+		
+		switch (pEventID)
+		{
+			case UA_ANIM_EVENT:			
+				if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+				{		
+					//local singleplayer
+					Print("OnAnimationEvent IsServer single");
+					vessel_in_hands.PlayEmptyingLoopSound();
+				}
+			
+				if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+				{			
+					Print("OnAnimationEvent IsServer ");
+					vessel_in_hands.PlayEmptyingLoopSound();				
+				}
+			
+				if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+				{			
+					
+				}
+
+			break;
+		}
+	}
+	
+	override void EndActionComponent()
+	{
+		super.EndActionComponent();
+		
+		Bottle_Base vessel_in_hands = Bottle_Base.Cast( m_ActionData.m_MainItem );
+
+		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{
+			//local singleplayer
+			Print("EndActionComponent IsServer single");
+			vessel_in_hands.StopEmptyingSound();
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		{			
+			Print("EndActionComponent IsServer ");
+			vessel_in_hands.StopEmptyingSound();				
+		}
+		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{		
+		
+		}
+	}
 };
 
 class ActionEmptyBottleBase: ActionContinuousBase
 {
 	void ActionEmptyBottleBase()
 	{
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYBOTTLE;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTY_VESSEL;
 		m_MessageStartFail = "It's ruined.";
 		m_MessageStart = "I have started filling the bottle.";
 		m_MessageSuccess = "I have finished filling the bottle..";
@@ -43,7 +99,7 @@ class ActionEmptyBottleBase: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Empty";
+		return "#empty";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

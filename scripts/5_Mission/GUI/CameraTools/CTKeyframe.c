@@ -13,9 +13,10 @@ class CTKeyframe extends ScriptedWidgetEventHandler
 	protected EditBoxWidget		m_InterpTimeWidget;
 	protected EditBoxWidget		m_FOVWidget;
 	protected EditBoxWidget		m_DOFWidget;
+	protected EditBoxWidget		m_PinWidget;
 	protected TextWidget		m_TotalTimeWidget;
 	
-	void CTKeyframe( int index, vector pos, vector orient, float int_value, float fov, float dof, float time_before, Widget root, CameraToolsMenu parent )
+	void CTKeyframe( int index, vector pos, vector orient, float int_value, float fov, float dof, int pin, float time_before, Widget root, CameraToolsMenu parent )
 	{
 		m_Menu				= parent;
 		
@@ -25,6 +26,7 @@ class CTKeyframe extends ScriptedWidgetEventHandler
 		m_InterpTimeWidget	= EditBoxWidget.Cast( m_Root.FindAnyWidget( "keyframe_time_edit" ) );
 		m_FOVWidget			= EditBoxWidget.Cast( m_Root.FindAnyWidget( "keyframe_fov_edit" ) );
 		m_DOFWidget			= EditBoxWidget.Cast( m_Root.FindAnyWidget( "keyframe_dof_edit" ) );
+		m_PinWidget			= EditBoxWidget.Cast( m_Root.FindAnyWidget( "keyframe_pin_edit" ) );
 		m_TotalTimeWidget	= TextWidget.Cast( m_Root.FindAnyWidget( "keyframe_time" ) );
 		
 		m_Index				= index;
@@ -35,6 +37,7 @@ class CTKeyframe extends ScriptedWidgetEventHandler
 		SetInterpTime( int_value );
 		SetFOV( fov );
 		SetDOF( dof );
+		SetPin( pin );
 		m_IndexWidget.SetText( m_Index.ToString() );
 		m_Root.SetHandler( this );
 	}
@@ -49,6 +52,16 @@ class CTKeyframe extends ScriptedWidgetEventHandler
 		string time_text = m_InterpTimeWidget.GetText();
 		m_InterpTime = time_text.ToFloat();
 		return m_InterpTime;
+	}
+	
+	void SetPin( int pin )
+	{
+		m_PinWidget.SetText( pin.ToString() );
+	}
+	
+	int GetPin()
+	{
+		return m_PinWidget.GetText().ToInt();
 	}
 	
 	void SetFOV( float fov )
@@ -142,6 +155,10 @@ class CTKeyframe extends ScriptedWidgetEventHandler
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_InterpTimeWidget || w == m_TotalTimeWidget || w == m_FOVWidget || w == m_DOFWidget );
+		if( w )
+		{
+			return ( w == m_InterpTimeWidget || w == m_TotalTimeWidget || w == m_FOVWidget || w == m_DOFWidget );
+		}
+		return false;
 	}
 }

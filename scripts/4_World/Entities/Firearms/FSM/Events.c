@@ -22,6 +22,7 @@ enum WeaponEventID
 	HUMANCOMMAND_ACTION_ABORTED,
 	RELOAD_TIMEOUT,
 	DRY_FIRE_TIMEOUT,
+	SET_NEXT_MUZZLE_MODE,
 	ANIMATION_EVENT,
 };
 
@@ -175,6 +176,12 @@ class WeaponEventDryFireTimeout extends WeaponEventBase
 	void WeaponEventDryFireTimeout (DayZPlayer p = NULL, Magazine m = NULL) { m_eventID = WeaponEventID.DRY_FIRE_TIMEOUT; }
 };
 
+/**@brief		triggered when dry fire timer expires
+ **/
+class WeaponEventSetNextMuzzleMode extends WeaponEventBase
+{
+	void WeaponEventSetNextMuzzleMode (DayZPlayer p = NULL, Magazine m = NULL) { m_eventID = WeaponEventID.SET_NEXT_MUZZLE_MODE; }
+};
 
 class WeaponEventAnimation extends WeaponEventBase
 {
@@ -204,6 +211,7 @@ WeaponEventBase WeaponEventFactory (WeaponEventID id, int aetype, DayZPlayer p =
 		case WeaponEventID.HUMANCOMMAND_ACTION_ABORTED: return new WeaponEventHumanCommandActionAborted(p, m);
 		case WeaponEventID.RELOAD_TIMEOUT: return new WeaponEventReloadTimeout(p, m);
 		case WeaponEventID.DRY_FIRE_TIMEOUT: return new WeaponEventDryFireTimeout(p, m);
+		case WeaponEventID.SET_NEXT_MUZZLE_MODE: return new WeaponEventSetNextMuzzleMode(p, m);
 		case WeaponEventID.ANIMATION_EVENT: return WeaponAnimEventFactory(aetype, p, m);
 	}
 	return NULL;

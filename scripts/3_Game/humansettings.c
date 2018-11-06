@@ -24,6 +24,8 @@ class SHumanCommandMoveSettings
 	float		m_fHeadingChangeLimiterIdle;
 	float		m_fHeadingChangeLimiterWalk;
 	float		m_fHeadingChangeLimiterRun;
+	
+	float		m_fLeaningSpeed;
 }
 
 class SHumanCommandSwimSettings 

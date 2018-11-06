@@ -42,7 +42,7 @@ class MosinLoadedDischarged extends WeaponStableState
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
 };
-class MosinLoadedJammed extends WeaponStableState
+class MosinLoadedJammed extends WeaponStateJammed
 {
 	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { LoadedJammed J1"); super.OnEntry(e); }
 	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } LoadedJammed J1"); }
@@ -202,6 +202,7 @@ class Mosin9130_Base extends Weapon_Base
 		m_fsm.AddTransition(new WeaponTransition(Trigger_C0,	_abt_, C0));
 		
 		m_fsm.AddTransition(new WeaponTransition(C1,			__T__, Trigger_C1)); // fire.cocked
+		m_fsm.AddTransition(new WeaponTransition(Trigger_C1,	_fin_, J1, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_C1,	_fin_, D1));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_C1,	_rto_, J1, NULL, new WeaponGuardJammed(this)));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_C1,	_rto_, D1, NULL, new WeaponGuardChamberFiredOut(this)));

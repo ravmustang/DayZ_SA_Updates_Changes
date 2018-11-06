@@ -1,6 +1,6 @@
 class CharacterCreationMenu extends UIScriptedMenu
 {
-	DayZIntroScene							m_Scene;
+	DayZIntroScenePC							m_Scene;
 	
 	protected Widget						m_CharacterRotationFrame;
 	protected Widget						m_Apply;
@@ -20,15 +20,8 @@ class CharacterCreationMenu extends UIScriptedMenu
 	{
 		MissionMainMenu mission = MissionMainMenu.Cast( GetGame().GetMission() );
 		
-		#ifdef PLATFORM_CONSOLE
-			//m_SceneXbox = mission.GetIntroSceneXbox();
-			//m_SceneXbox.ResetIntroCamera();
-		#else
-		#ifdef PLATFORM_WINDOWS
-			m_Scene = mission.GetIntroScenePC();
-			m_Scene.ResetIntroCamera();
-		#endif
-		#endif
+		m_Scene = mission.GetIntroScenePC();
+		m_Scene.ResetIntroCamera();
 	}
 	
 	override Widget Init()
@@ -47,30 +40,32 @@ class CharacterCreationMenu extends UIScriptedMenu
 		
 		string version;
 		GetGame().GetVersion( version );
-		if( version != "" )
-			m_Version.SetText( "#main_menu_version" + " " + version );
-		else
-			m_Version.Show( false );
+		#ifdef PLATFORM_CONSOLE
+			version = "#main_menu_version" + " " + version + " (" + g_Game.GetDatabaseID() + ")";
+		#else
+			version = "#main_menu_version" + " " + version;
+		#endif
+		m_Version.SetText( version );
 		
-		m_GenderSelector					= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_gender_setting_option" ), 0, null, false, m_Scene.m_CharGenderList );
-		if ( m_Scene.IsCharacterFemale() )
+		m_GenderSelector = new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_gender_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharGenderList() );
+		if ( m_Scene.GetIntroCharacter().IsCharacterFemale() )
 		{
 			m_GenderSelector.SetValue( "Female" );
-			m_SkinSelector	= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.m_CharPersonalityFemaleList );
+			m_SkinSelector = new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Female ) );
 		}
 		else
 		{
 			m_GenderSelector.SetValue( "Male" );
-			m_SkinSelector	= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.m_CharPersonalityMaleList );
+			m_SkinSelector = new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Male ) );
 		}
 		
-		m_TopSelector						= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_top_setting_option" ), 0, null, false, m_Scene.m_CharShirtList );
-		m_BottomSelector					= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_bottom_setting_option" ), 0, null, false, m_Scene.m_CharPantsList );
-		m_ShoesSelector						= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_shoes_setting_option" ), 0, null, false, m_Scene.m_CharShoesList );
+		m_TopSelector		= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_top_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShirtsList() );
+		m_BottomSelector	= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_bottom_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharPantsList() );
+		m_ShoesSelector		= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_shoes_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShoesList() );
 		
-		if( m_Scene && m_Scene.GetIntroSceneCharacter() )
+		if( m_Scene && m_Scene.GetIntroCharacter() )
 		{
-			PlayerBase scene_char = m_Scene.GetIntroSceneCharacter();
+			PlayerBase scene_char = m_Scene.GetIntroCharacter().GetCharacterObj();
 			
 			Object obj = scene_char.GetInventory().FindAttachment(InventorySlots.BODY);
 			if( obj )
@@ -120,39 +115,45 @@ class CharacterCreationMenu extends UIScriptedMenu
 	void Apply()
 	{
 		g_Game.SetPlayerGameName( m_PlayerName.GetText() );
-		m_Scene.SaveCharacterSetup();
-		m_Scene.SaveCharName();
-		m_Scene.SaveDefaultCharacter();
+		m_Scene.GetIntroCharacter().SaveCharacterSetup();
+		m_Scene.GetIntroCharacter().SaveCharName();
+		m_Scene.GetIntroCharacter().SaveDefaultCharacter();
 		SetCharacter();
+		GetGame().GetUIManager().Back();
+	}
+	
+	void Back()
+	{
 		GetGame().GetUIManager().Back();
 	}
 	
 	void SetCharacter()
 	{
-		if (m_Scene.GetIntroSceneCharacter())
+		if (m_Scene.GetIntroCharacter())
 		{
 			m_PlayerName.SetText( g_Game.GetPlayerGameName() );
 			
-			m_Scene.SetAttachment( m_TopSelector.GetStringValue(), InventorySlots.BODY );
-			m_Scene.SetAttachment( m_BottomSelector.GetStringValue(), InventorySlots.LEGS );
-			m_Scene.SetAttachment( m_ShoesSelector.GetStringValue(), InventorySlots.FEET );
+			m_Scene.GetIntroCharacter().SetAttachment( m_TopSelector.GetStringValue(), InventorySlots.BODY );
+			m_Scene.GetIntroCharacter().SetAttachment( m_BottomSelector.GetStringValue(), InventorySlots.LEGS );
+			m_Scene.GetIntroCharacter().SetAttachment( m_ShoesSelector.GetStringValue(), InventorySlots.FEET );
 			
 			if (g_Game.IsNewCharacter())
 			{
-				m_Scene.SetAttachment("", InventorySlots.SHOULDER);
-				m_Scene.SetAttachment("", InventorySlots.BOW);
-				m_Scene.SetAttachment("", InventorySlots.MELEE);
-				m_Scene.SetAttachment("", InventorySlots.VEST);
-				m_Scene.SetAttachment("", InventorySlots.HIPS);
-				m_Scene.SetAttachment("", InventorySlots.BACK);
-				m_Scene.SetAttachment("", InventorySlots.HEADGEAR);
-				m_Scene.SetAttachment("", InventorySlots.MASK);
-				m_Scene.SetAttachment("", InventorySlots.EYEWEAR);
-				m_Scene.SetAttachment("", InventorySlots.GLOVES);
-				m_Scene.SetAttachment("", InventorySlots.ARMBAND);
-				m_Scene.SetAttachment("", InventorySlots.HANDS);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.SHOULDER);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.BOW);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.MELEE);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.VEST);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.HIPS);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.BACK);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.HEADGEAR);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.MASK);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.EYEWEAR);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.GLOVES);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.ARMBAND);
+				m_Scene.GetIntroCharacter().SetAttachment("", InventorySlots.HANDS);
 			}
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_Scene.SceneCharacterSetPos, 250 );
+			
+			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_Scene.SceneCharacterSetPos, 250 );
 		}
 	}
 	
@@ -160,21 +161,21 @@ class CharacterCreationMenu extends UIScriptedMenu
 	{
 		g_Game.SetNewCharacter(true);
 		
-		m_Scene.SetCurrentCharacterID( -1 );
+		m_Scene.GetIntroCharacter().SetCharacterID( -1 );
 		
 		// make random selection
-		m_Scene.RandomSelectGender();
+		m_Scene.GetIntroCharacter().SetCharacterGender( Math.RandomInt(0, 2) );
 		
-		if ( m_Scene.IsCharacterFemale() )
+		if ( m_Scene.GetIntroCharacter().IsCharacterFemale() )
 		{
 			m_GenderSelector.SetValue( "Female" );
-			m_SkinSelector.LoadNewValues( m_Scene.m_CharPersonalityFemaleList, 0 );
+			m_SkinSelector.LoadNewValues( m_Scene.GetIntroCharacter().GetCharList( ECharGender.Female ), 0 );
 			m_SkinSelector.SetRandomValue();
 		}
 		else
 		{
 			m_GenderSelector.SetValue( "Male" );
-			m_SkinSelector.LoadNewValues( m_Scene.m_CharPersonalityMaleList, 0 );
+			m_SkinSelector.LoadNewValues( m_Scene.GetIntroCharacter().GetCharList( ECharGender.Male ), 0 );
 			m_SkinSelector.SetRandomValue();
 		}
 		
@@ -190,46 +191,39 @@ class CharacterCreationMenu extends UIScriptedMenu
 	//Selector Events
 	void GenderChanged()
 	{
-		m_Scene.SetCharacterFemale( ( m_GenderSelector.GetStringValue() == "Female" ) );
+		ECharGender gender = ECharGender.Male;
 		
-		if ( m_Scene.IsCharacterFemale() )
+		if ( m_GenderSelector.GetStringValue() == "Female" )
 		{
-			m_SkinSelector.LoadNewValues( m_Scene.m_CharPersonalityFemaleList, 0 );
-			m_SkinSelector.SetRandomValue();
+			gender = ECharGender.Female;
 		}
-		else
-		{
-			m_SkinSelector.LoadNewValues( m_Scene.m_CharPersonalityMaleList, 0 );
-			m_SkinSelector.SetRandomValue();
-		}
+		
+		m_Scene.GetIntroCharacter().SetCharacterGender( gender );
+		
+		m_SkinSelector.LoadNewValues( m_Scene.GetIntroCharacter().GetCharList( gender ) , 0 );
+		m_SkinSelector.SetRandomValue();
 	}
 	
 	void SkinChanged()
 	{
-		m_Scene.CreateNewCharacter( m_SkinSelector.GetStringValue() );
+		m_Scene.GetIntroCharacter().CreateNewCharacterByName( m_SkinSelector.GetStringValue() );
 		
 		layoutRoot.FindAnyWidget( "character_root" ).Show( g_Game.IsNewCharacter() );
-		
-		TopChanged();
-		BottomChanged();
-		ShoesChanged();
-		
-		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_Scene.SceneCharacterSetPos, 100 );
 	}
 	
 	void TopChanged()
 	{
-		m_Scene.SetAttachment( m_TopSelector.GetStringValue(), InventorySlots.BODY );
+		m_Scene.GetIntroCharacter().SetAttachment( m_TopSelector.GetStringValue(), InventorySlots.BODY );
 	}
 	
 	void BottomChanged()
 	{
-		m_Scene.SetAttachment( m_BottomSelector.GetStringValue(), InventorySlots.LEGS );
+		m_Scene.GetIntroCharacter().SetAttachment( m_BottomSelector.GetStringValue(), InventorySlots.LEGS );
 	}
 	
 	void ShoesChanged()
 	{
-		m_Scene.SetAttachment( m_ShoesSelector.GetStringValue(), InventorySlots.FEET );
+		m_Scene.GetIntroCharacter().SetAttachment( m_ShoesSelector.GetStringValue(), InventorySlots.FEET );
 	}
 	
 	override bool OnKeyPress( Widget w, int x, int y, int key )
@@ -252,7 +246,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 		}
 		else if ( w == m_BackButton )
 		{
-			GetGame().GetUIManager().Back();
+			Back();
 			return true;
 		}
 		return false;
@@ -318,7 +312,11 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_Apply || w == m_RandomizeCharacter || w == m_BackButton );
+		if( w )
+		{
+			return ( w == m_Apply || w == m_RandomizeCharacter || w == m_BackButton );
+		}
+		return false;
 	}
 	
 	void CheckNewOptions()
@@ -332,15 +330,14 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	override void OnShow()
 	{
-		#ifdef PLATFORM_CONSOLE
+#ifdef PLATFORM_CONSOLE
 		SetFocus( m_Apply );
-		#endif
-		
+#endif
 		CheckNewOptions();
 		
-		if( m_Scene && m_Scene.GetCamera() )
+		if( m_Scene && m_Scene.GetIntroCamera() )
 		{
-			m_Scene.GetCamera().LookAt( m_Scene.GetIntroSceneCharacter().GetPosition() + Vector( 0, 1, 0 ) );
+			m_Scene.GetIntroCamera().LookAt( m_Scene.GetIntroCharacter().GetPosition() + Vector( 0, 1, 0 ) );
 		}
 	}
 	
@@ -373,6 +370,14 @@ class CharacterCreationMenu extends UIScriptedMenu
 		m_Version.SetText( version );
 	}
 	
+	override void Update(float timeslice)
+	{
+		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+		{
+			Back();
+		}
+	}
+	
 	override void OnHide()
 	{
 		//super.OnHide();
@@ -383,6 +388,12 @@ class CharacterCreationMenu extends UIScriptedMenu
 	{
 		SetFocus( w );
 
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_Apply )
+		{
+			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+		}
+		
 		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
 		TextWidget text2	= TextWidget.Cast(w.FindWidget( w.GetName() + "_text_1" ) );
 		ImageWidget image	= ImageWidget.Cast( w.FindWidget( w.GetName() + "_image" ) );
@@ -408,6 +419,12 @@ class CharacterCreationMenu extends UIScriptedMenu
 		#ifdef PLATFORM_WINDOWS
 		SetFocus( null );
 		#endif
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_Apply )
+		{
+			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+		}
 		
 		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
 		TextWidget text2	= TextWidget.Cast(w.FindWidget( w.GetName() + "_text_1" ) );

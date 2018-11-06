@@ -7,7 +7,7 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 	protected ref map<string, ref PlayerListEntryScriptedWidget>	m_Entries;
 	
 	protected int													m_TotalEntries;
-	protected int													m_SelectedEntry;
+	protected PlayerListEntryScriptedWidget							m_SelectedEntry;
 	
 	void PlayerListScriptedWidget( Widget parent, string header_text )
 	{
@@ -19,12 +19,13 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 		m_Entries			= new map<string, ref PlayerListEntryScriptedWidget>;
 		
 		m_Header.SetText( header_text );
-		
+		OnlineServices.m_ServersAsyncInvoker.Insert( OnLoadServersAsync );
 		m_ScrollContainer.VScrollToPos01( 0 );
 	}
 	
 	void ~PlayerListScriptedWidget()
 	{
+		OnlineServices.m_ServersAsyncInvoker.Remove( OnLoadServersAsync );
 		delete m_Root;
 	}
 	
@@ -72,6 +73,17 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 	bool IsEmpty()
 	{
 		return ( m_Entries.Count() == 0 );
+	}
+	
+	void OnLoadServersAsync( ref GetServersResult result_list, EBiosError error, string response )
+	{
+		string header_text = "Server";
+		GetServersResultRow info = OnlineServices.GetCurrentServerInfo();
+		if( info )
+		{
+			header_text = info.m_Name + " - " + info.m_HostIp + ":" + info.m_HostPort;
+		}
+		m_Header.SetText( header_text );
 	}
 	
 	void Reload( BiosFriendInfoArray player_list )
@@ -184,8 +196,22 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 	{
 		if( m_Entries )
 		{
+			PlayerListEntryScriptedWidget next_entry;
+			
+			if( m_Entries.Get( UID ) == m_SelectedEntry )
+			{
+				for( int i = 0; i < m_Entries.Count() - 1; i++ )
+				{
+					if( m_Entries.GetElement( i ) == m_Entries.Get( UID ) )
+					{
+						next_entry = m_Entries.GetElement( i + 1 );
+					}
+				}
+			}
+			
 			m_Entries.Remove( UID );
 			m_TotalEntries--;
+			SelectPlayer( next_entry );
 			m_Content.Update();
 		}
 	}
@@ -207,6 +233,12 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 		}
 	}
 	
+	void SelectPlayer( PlayerListEntryScriptedWidget entry )
+	{
+		m_SelectedEntry = entry;
+		ScrollToEntry( entry );
+	}
+	
 	void ScrollToEntry( PlayerListEntryScriptedWidget entry )
 	{
 		if( entry )
@@ -215,15 +247,37 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 			float x_s, y_s;
 			float x_l, y_l;
 			
+			Widget root			= entry.GetButtonWidget();
+			Widget first_child	= root.GetParent().GetChildren();
+			Widget last_child	= first_child;
+			while( last_child )
+			{
+				if( last_child.GetSibling() )
+					last_child = last_child.GetSibling();
+				else
+					break;
+			}
+			
+			root.GetParent().Update();
+			root.Update();
+			
 			m_ScrollContainer.GetScreenPos( x, y );
 			m_ScrollContainer.GetScreenSize( x_s, y_s );
 			
 			float bottom_pos = y + y_s;
 			
-			entry.GetButtonWidget().GetScreenPos( x_l, y_l );
-			entry.GetButtonWidget().GetScreenSize( x_s, y_s );
+			root.GetScreenPos( x_l, y_l );
+			root.GetScreenSize( x_s, y_s );
 			
-			if( y_l + y_s >= bottom_pos )
+			if( root == first_child )
+			{
+				m_ScrollContainer.VScrollToPos01( 0 );
+			}
+			else if( root == last_child )
+			{
+				m_ScrollContainer.VScrollToPos01( 1 );
+			}
+			else if( y_l + y_s >= bottom_pos )
 			{
 				m_ScrollContainer.VScrollToPos( m_ScrollContainer.GetVScrollPos() + y_s );
 			}

@@ -238,7 +238,7 @@ class BatteryCharger extends ItemBase
 		ShowSelection(SEL_CLIPS_DETACHED);
 	}
 
-	override bool CanReceiveAttachment( EntityAI attachment ) 
+	override bool CanReceiveAttachment( EntityAI attachment, int slotId ) 
 	{
 		ItemBase ibase;
 		Class.CastTo(ibase, attachment);

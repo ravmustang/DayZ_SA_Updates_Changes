@@ -41,10 +41,10 @@ class ActionTestBloodSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Test blood";
+		return "#test_blood";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
 		int blood_type = action_data.m_Player.GetStatBloodType().Get();

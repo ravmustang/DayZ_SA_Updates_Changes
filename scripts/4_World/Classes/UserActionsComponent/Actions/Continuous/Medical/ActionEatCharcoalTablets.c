@@ -2,8 +2,8 @@ class ActionEatCharcoalTablets: ActionConsume
 {
 	void ActionEatCharcoalTablets()
 	{
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EATTABLETS;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EATTABLETS;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EAT;
 	}
 	
 	override int GetType()

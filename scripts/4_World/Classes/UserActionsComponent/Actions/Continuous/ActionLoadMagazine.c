@@ -36,7 +36,7 @@ class ActionLoadMagazine: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Load magazine";
+		return "#load_magazine";
 	}
 	
 	override void CreateConditionComponents()  
@@ -51,24 +51,15 @@ class ActionLoadMagazine: ActionContinuousBase
 		Magazine itm;
 		if ( Class.CastTo(trg, target.GetObject()) && Class.CastTo(itm, item) && itm.GetAmmoCount() < itm.GetAmmoMax() && trg.GetAmmoCount() != 0 )
 		{
-			array<string> ammo_array = new array<string>;
-		
-			itm.ConfigGetTextArray ("ammoItems", ammo_array);
-			for( int i = 0; i < ammo_array.Count(); i++ )
-			{
-				string AmmoType = ammo_array.Get(i);
-
-				if(AmmoType == trg.GetType())
-					return true;	
-			}
+			return itm.IsCompatiableAmmo( trg );
 		}
 		return false;
 	}
 	
-	override void OnRepeatServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
-		Param1<float> timeSpendParam;
-		if( !Class.CastTo(timeSpendParam, action_data.m_ActionComponent.GetACData()) ) return;
+		//Param1<float> timeSpendParam;
+		//if( !Class.CastTo(timeSpendParam, action_data.m_ActionComponent.GetACData()) ) return;
 		
 		Magazine trg;
 		Magazine itm;
@@ -79,18 +70,20 @@ class ActionLoadMagazine: ActionContinuousBase
 			
 			if( trg.ServerAcquireCartridge(dmg,ammoType) )
 			{
-				if( !itm.ServerStoreCartridge(dmg,ammoType) )			
+				if( !itm.ServerStoreCartridge(dmg,ammoType) )		
+				{	
 					trg.ServerStoreCartridge(dmg,ammoType);
+				}
+				else
+				{
+					itm.ApplyManipulationDamage(); //damages magazine
+				}
 			}
 		}
+		//manipulationDamage
 		//if(trg.GetAmmoCount() > 0 )
 			//trg.SetSynchDirty();
 		//itm.SetSynchDirty();
-	}
-
-	override void OnCompleteServer( ActionData action_data )
-	{
-		//OnRepeat(action_data);
 	}
 	
 	override bool CanBePerformedFromQuickbar()

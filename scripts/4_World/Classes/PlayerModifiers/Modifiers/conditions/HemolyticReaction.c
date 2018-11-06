@@ -1,4 +1,4 @@
-class HemolyticReaction: ModifierBase
+class HemolyticReactionMdfr: ModifierBase
 {
 	private float		m_RunningTime;
 	
@@ -8,6 +8,7 @@ class HemolyticReaction: ModifierBase
 		m_ID 					= eModifiers.MDF_HEMOLYTIC_REACTION;
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
+		m_IsPersistent = true;
 		m_RunningTime = CalculateRunTime();
 	}
 	override bool ActivateCondition(PlayerBase player)
@@ -17,12 +18,12 @@ class HemolyticReaction: ModifierBase
 
 	override void OnActivate(PlayerBase player)
 	{
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(NTF_SICK);
+		player.IncreaseDiseaseCount();
 	}
 
 	override void OnDeactivate(PlayerBase player)
 	{
-		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(NTF_SICK);
+		player.DecreaseDiseaseCount();
 	}
 
 	override void OnReconnect(PlayerBase player)

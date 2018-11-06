@@ -1,30 +1,19 @@
-enum StartingPhase
-{
-	BATTERY_CHECK,
-	SPARK_CHECK,
-	BELT_CHECK,
-	FUEL_CHECK,
-	FAIL
-}
-
-
-class ActionDataStartVehicle: ActionData
-{
-	int m_VehicleStart;
-}
-
-
 class ActionStartCarCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousRepeatStartEngine( UATimeSpent.DEFAULT );
+		m_ActionData.m_ActionComponent = new CAContinuousTime(UATimeSpent.DEFAULT);
 	}
-}
+};
 
 class ActionStartEngine: ActionContinuousBase
 {
 	private const float ROUGH_SPECIALTY_WEIGHT = 0.5;
+
+	bool m_BatteryCon = false;
+	bool m_SparkCon = false;
+	bool m_BeltCon = false;
+	bool m_FuelCon = false;
 	
 	void ActionStartEngine()
 	{
@@ -34,25 +23,7 @@ class ActionStartEngine: ActionContinuousBase
 		m_SpecialtyWeight = ROUGH_SPECIALTY_WEIGHT;
 		m_LockTargetOnUse = false;
 	}
-	
-	override ActionData CreateActionData()
-	{
-		ActionDataStartVehicle ad = new ActionDataStartVehicle;
-		return ad; 
-	}
 
-	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extraData = NULL)
-	{
-		if ( super.SetupAction(player, target, item, action_data, extraData) )
-		{
-			ActionDataStartVehicle ad = ActionDataStartVehicle.Cast(action_data);
-			ad.m_VehicleStart = StartingPhase.BATTERY_CHECK;
-			return true;
-		}
-
-		return false;
-	}
-	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionTarget = new CCTNone;
@@ -66,12 +37,7 @@ class ActionStartEngine: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Start Car";
-	}
-	
-	override bool HasTarget()
-	{
-		return false;
+		return "#start_the_car";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -80,35 +46,89 @@ class ActionStartEngine: ActionContinuousBase
 		if( vehCommand )
 		{
 			Transport trans = vehCommand.GetTransport();
-			
+
 			if ( trans )
 			{
 				Car car;
 				if ( Class.CastTo(car, trans) && !car.IsEngineOn() )
 				{
-					return true;
+					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
+						return true;
 				}
 			}
 		}
 
 		return false;
 	}
-	
-	override bool ActionConditionContinue( ActionData action_data )
-	{	
-		ActionDataStartVehicle ad = ActionDataStartVehicle.Cast(action_data);
-		//if ( ad.m_VehicleStart != StartingPhase.FAIL )
-		//{
-			return true;
-		//}
-		
-		return false;
-	}
 
-	override void OnExecuteServer( ActionData action_data )
+	override void OnStartServer( ActionData action_data )
 	{
-		
-		ActionDataStartVehicle ad = ActionDataStartVehicle.Cast(action_data);
+		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
+
+		if( vehCommand )
+		{
+			Transport trans = vehCommand.GetTransport();
+			if ( trans )
+			{
+				CarScript car;
+				if ( Class.CastTo(car, trans) )
+				{
+					m_BatteryCon = false;
+					m_SparkCon = false;
+					m_BeltCon = false;
+					m_FuelCon = false;
+
+					EntityAI item = null;					
+					if ( car.IsVitalCarBattery() || car.IsVitalTruckBattery() )
+					{
+						
+						if ( car.IsVitalCarBattery() ) item = car.FindAttachmentBySlotName("CarBattery");
+						if ( car.IsVitalTruckBattery() ) item = car.FindAttachmentBySlotName("TruckBattery");
+						if ( item && !item.IsRuined() )
+							m_BatteryCon = true;
+					}
+					else
+					{
+						m_BatteryCon = true;
+					}
+
+					item = null;
+					if ( car.IsVitalSparkPlug() || car.IsVitalGlowPlug() )
+					{
+						
+						if ( car.IsVitalSparkPlug() ) item = car.FindAttachmentBySlotName("SparkPlug");
+						if ( car.IsVitalGlowPlug() ) item = car.FindAttachmentBySlotName("GlowPlug");
+						if ( item && !item.IsRuined() )
+							m_SparkCon = true;
+					}
+					else
+					{
+						m_SparkCon = true;
+					}
+
+					//TODO:: make it proper when the belt will be ready
+					item = null;
+					m_BeltCon = true;
+					if ( car.IsVitalEngineBelt()  )
+					{
+						if ( car.IsVitalGlowPlug() ) item = car.FindAttachmentBySlotName("EngineBelt");
+						if ( item && !item.IsRuined() )
+							m_BeltCon = true;
+					}
+					else
+					{
+						m_BeltCon = true;
+					}
+
+					float fuel = car.GetFluidFraction( CarFluid.FUEL );	
+					if (  fuel > 0 )
+						m_FuelCon = true;
+				}
+			}
+		}
+	}
+	override void OnFinishProgressServer( ActionData action_data )
+	{
 		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
 		if( vehCommand )
 		{
@@ -118,108 +138,32 @@ class ActionStartEngine: ActionContinuousBase
 				CarScript car;
 				if ( Class.CastTo(car, trans) )
 				{
-					switch( ad.m_VehicleStart )
+					//TODO:: Sounds are not played - waiting for 
+					if ( m_FuelCon && m_BeltCon && m_SparkCon && m_BatteryCon )
 					{
-						case StartingPhase.BATTERY_CHECK:
-						
-							EntityAI battery;
-							if ( car.IsVitalCarBattery() ) battery = car.FindAttachmentBySlotName("CarBattery");
-
-							if ( car.IsVitalTruckBattery() ) battery = car.FindAttachmentBySlotName("TruckBattery");
-
-							if ( ( battery && !battery.IsRuined() ) || ( !car.IsVitalCarBattery() && !car.IsVitalTruckBattery() ) )
-							{
-								ad.m_VehicleStart = StartingPhase.SPARK_CHECK;
-							}
-							else
-							{
-								ad.m_VehicleStart = StartingPhase.FAIL;
-							}
-						break;
-
-						case StartingPhase.SPARK_CHECK:
-							EntityAI plug;
-							if ( car.IsVitalSparkPlug() ) plug = car.FindAttachmentBySlotName("SparkPlug");
-
-							if ( car.IsVitalGlowPlug() ) plug = car.FindAttachmentBySlotName("GlowPlug");
-
-							if ( ( plug && !plug.IsRuined() ) || ( !car.IsVitalSparkPlug() && !car.IsVitalGlowPlug() ) )
-							{
-								ad.m_VehicleStart = StartingPhase.BELT_CHECK;
-							}
-							else
-							{
-								ad.m_VehicleStart = StartingPhase.FAIL;
-							}
-						break;
-
-						case StartingPhase.BELT_CHECK:
-							EntityAI belt;
-							if ( car.IsVitalSparkPlug() ) belt = car.FindAttachmentBySlotName("EngineBelt");
+						car.PlaySound("offroad_engine_start_SoundSet", 5, false);
+						car.EngineStart();
+					}
+					else
+					{
+						if ( !m_FuelCon )
+							car.PlaySound("offroad_engine_failed_start_fuel_SoundSet", 5, false);
 							
-							if ( ( belt && !belt.IsRuined() ) || !car.IsVitalSparkPlug() )
-							{
-								ad.m_VehicleStart = StartingPhase.FUEL_CHECK;
-							}
-							else
-							{
-								ad.m_VehicleStart = StartingPhase.FAIL;
-							}
-						break;
-
-						case StartingPhase.FUEL_CHECK:
-							car.Fill( CarFluid.FUEL, 150 );
-							float fuel = car.GetFluidFraction( CarFluid.FUEL );	
-							if (  fuel > 0 )
-							{
-								car.EngineStart();
-								ad.m_VehicleStart = StartingPhase.FAIL;
-							}
-							else
-							{
-								ad.m_VehicleStart = StartingPhase.FAIL;
-							}
-						break;
+							// offroad_engine_failed_start_fuel_SoundSet	
+							// offroad_engine_failed_start_battery_SoundSet
+							// offroad_engine_failed_start_sparkplugs_SoundSet
+							
+							// offroad_engine_stop_SoundSet
+							// offroad_engine_stop_fuel_SoundSet
+						
 					}
 				}
 			}
 		}
 	}
-/*
-	override void OnCompleteLoopServer( ActionData action_data )
-	{	
-		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
-		if( vehCommand )
-		{
-			Transport trans = vehCommand.GetTransport();
-			
-			if ( trans )
-			{
-				Car car;
-				if ( Class.CastTo(car, trans) )
-				{
-					car.EngineStart();
-				}
-			}
-		}
+	
+	override bool CanBeUsedInVehicle()
+	{
+		return true;
 	}
-
-	override void OnCompleteLoopClient( ActionData action_data )
-	{	
-		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
-		if( vehCommand )
-		{
-			Transport trans = vehCommand.GetTransport();
-			
-			if ( trans )
-			{
-				Car car;
-				if ( Class.CastTo(car, trans) )
-				{
-					car.EngineStart();
-				}
-			}
-		}
-	}
-*/
 };

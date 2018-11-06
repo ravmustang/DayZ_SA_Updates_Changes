@@ -28,9 +28,9 @@ class ActionEmptyMagazine: ActionContinuousBase
 
 	}
 	
-	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extraData = NULL)
+	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL)
 	{
-		if( super.SetupAction( player, target, item, action_data, extraData))
+		if( super.SetupAction( player, target, item, action_data, extra_data))
 		{
 			EmptyMagazineActionData emActionData = EmptyMagazineActionData.Cast(action_data);
 			emActionData.m_magazinePile = NULL;
@@ -81,10 +81,10 @@ class ActionEmptyMagazine: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Empty magazine";
+		return "#empty_magazine";
 	}
 	
-	override void OnRepeatServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		EmptyMagazineActionData emActionData = EmptyMagazineActionData.Cast(action_data);
 		
@@ -136,6 +136,8 @@ class ActionEmptyMagazine: ActionContinuousBase
 		{
 			return;
 		}	
+		
+		mag.ApplyManipulationDamage();
 		
 		string magazineTypeName;
 	 	GetGame().ConfigGetText( "CfgAmmo " + ammoType + " spawnPileType" , magazineTypeName);

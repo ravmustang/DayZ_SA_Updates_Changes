@@ -4,6 +4,7 @@ class CAContinuousMineWood : CAContinuousBase
 	protected float 				m_AdjustedTimeBetweenMaterialDrops;
 	protected float 				m_TimeBetweenMaterialDrops;
 	protected float					m_DamageToMiningItemEachDrop;
+	protected float					m_AdjustedDamageToMiningItemEachDrop;
 	protected int 					m_AmountOfDrops;
 	//protected string				m_Material;
 	//protected float 				m_AmountOfMaterialPerDrop;
@@ -66,8 +67,8 @@ class CAContinuousMineWood : CAContinuousBase
 					CreateItems(action_data);
 					
 					float damage = (1 / m_AmountOfDrops) * 100;
-					targetObject.DecreaseHealth("","",damage);					
-					action_data.m_MainItem.DecreaseHealth ( "", "", m_DamageToMiningItemEachDrop );
+					targetObject.DecreaseHealth("","",damage,true);					
+					action_data.m_MainItem.DecreaseHealth ( "", "", m_AdjustedDamageToMiningItemEachDrop );
 				}
 				if ( targetObject.IsDamageDestroyed() )
 				{
@@ -76,10 +77,15 @@ class CAContinuousMineWood : CAContinuousBase
 						m_SpentUnits.param1 = m_TimeElpased;
 						SetACData(m_SpentUnits);	
 					}
-					targetObject.PlayFallingPlantSound();
+					if ( targetObject.IsTree() )
+						ItemBase wooden_logs = ItemBase.Cast(GetGame().CreateObject("WoodenLog",action_data.m_Player.GetPosition(), false));
+					
+					targetObject.OnTreeCutDown( action_data.m_MainItem );
+					OnCompletePogress(action_data);
 					return UA_FINISHED;
 				}
-				m_TimeElpased = 0;
+				m_TimeElpased = m_TimeElpased - m_AdjustedTimeBetweenMaterialDrops;
+				OnCompletePogress(action_data);
 			}
 			return UA_PROCESSING;
 		}
@@ -89,6 +95,21 @@ class CAContinuousMineWood : CAContinuousBase
 	{	
 		//float progress = m_TimeElpased/m_AdjustedTimeBetweenMaterialDrops;
 		return m_TimeElpased/m_AdjustedTimeBetweenMaterialDrops;
+	}
+		
+	override int Cancel( ActionData action_data )
+	{	
+		ToolBase cut_tree_tool = ToolBase.Cast( action_data.m_MainItem );
+		
+		if (!cut_tree_tool)
+			return super.Cancel( action_data );
+		
+		if ( cut_tree_tool.GetHaveCutHardTree() || cut_tree_tool.GetHaveCutSoftTree() || cut_tree_tool.GetHaveCutHardBush() || cut_tree_tool.GetHaveCutSoftBush() )
+		{
+			cut_tree_tool.SoundSynchRemoteReset();
+		}
+		
+		return super.Cancel( action_data );
 	}
 	
 	//---------------------------------------------------------------------------
@@ -103,6 +124,7 @@ class CAContinuousMineWood : CAContinuousBase
 			//m_AmountOfMaterialPerDrop = Math.Max(1,ntarget.GetAmountOfMaterialPerDrop(action_data.m_MainItem));
 			ntarget.GetMaterialAndQuantityMap(action_data.m_MainItem,m_MaterialAndQuantityMap);
 			m_DamageToMiningItemEachDrop = ntarget.GetDamageToMiningItemEachDrop(action_data.m_MainItem);
+			m_AdjustedDamageToMiningItemEachDrop = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_DamageToMiningItemEachDrop, m_Action.GetSpecialtyWeight(), true );
 			return true;
 		}
 		return false;
@@ -112,29 +134,34 @@ class CAContinuousMineWood : CAContinuousBase
 	{
 		string material;
 		int increment;
+		float adjusted_increment;
 		for(int i = 0; i < m_MaterialAndQuantityMap.Count(); i++)
 		{
 			material = m_MaterialAndQuantityMap.GetKey(i);
 			if (material != "")
 			{
 				increment = m_MaterialAndQuantityMap.GetElement(i);
+				adjusted_increment = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( increment, m_Action.GetSpecialtyWeight(), true, 0 );
+				adjusted_increment = Math.Round( adjusted_increment );
 				if ( !m_MinedItem[i] )
 				{
 					m_MinedItem[i] = ItemBase.Cast(GetGame().CreateObject(material,action_data.m_Player.GetPosition(), false));
-					m_MinedItem[i].SetQuantity(increment);
+					m_MinedItem[i].SetQuantity(adjusted_increment);
 				}
 				else 
 				{
 					if ( (m_MinedItem[i].GetQuantity() + increment) >= m_MinedItem[i].GetQuantityMax() )
 					{
 						increment -= m_MinedItem[i].GetQuantityMax() - m_MinedItem[i].GetQuantity();
+						adjusted_increment = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( increment, m_Action.GetSpecialtyWeight(), true, 0 );
+						adjusted_increment = Math.Round( adjusted_increment );
 						m_MinedItem[i].SetQuantityMax();
 						m_MinedItem[i] = ItemBase.Cast(GetGame().CreateObject(material,action_data.m_Player.GetPosition(), false));
-						m_MinedItem[i].SetQuantity(increment,false);
+						m_MinedItem[i].SetQuantity(adjusted_increment,false);
 					}
 					else
 					{
-						m_MinedItem[i].AddQuantity(increment,false);
+						m_MinedItem[i].AddQuantity(adjusted_increment,false);
 					}
 				}
 			}

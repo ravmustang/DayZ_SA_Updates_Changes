@@ -23,7 +23,7 @@ class ActionEnterLadder: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Enter ladder";
+		return "#enter_ladder";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -122,7 +122,7 @@ class ActionEnterLadder: ActionInteractBase
 	
 	override void Start( ActionData action_data )
 	{
-
+		super.Start( action_data );
 		Building 	b;
 		Class.CastTo(b, action_data.m_Target.GetObject());
 		

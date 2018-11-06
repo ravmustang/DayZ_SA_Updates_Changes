@@ -8,11 +8,13 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	protected RichTextWidget				m_DetailsText;
 	
 	protected ref NumericOptionsAccess		m_FOVOption;
+	protected ref ListOptionsAccess			m_LanguageOption;
 	#ifdef PLATFORM_CONSOLE
 	protected ref NumericOptionsAccess		m_BrightnessOption;
 	protected ref OptionSelectorSlider		m_BrightnessSelector;
 	#endif
 	
+	protected ref OptionSelectorMultistate	m_LanugageSelector;
 	protected ref OptionSelectorSlider		m_FOVSelector;
 	protected ref OptionSelectorMultistate	m_ShowHUDSelector;
 	protected ref OptionSelectorMultistate	m_ShowCrosshairSelector;
@@ -22,11 +24,11 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	protected ref OptionSelectorMultistate	m_ShowPlayerSelector;
 	
 	protected GameOptions					m_Options;
-	protected OptionsMenuNew				m_Menu;
+	protected OptionsMenu					m_Menu;
 	
 	protected ref map<int, ref Param2<string, string>> m_TextMap;
 	
-	void OptionsMenuGame( Widget parent, Widget details_root, GameOptions options, OptionsMenuNew menu )
+	void OptionsMenuGame( Widget parent, Widget details_root, GameOptions options, OptionsMenu menu )
 	{
 		#ifdef PLATFORM_CONSOLE
 			m_Root					= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/xbox/game_tab.layout", parent );
@@ -57,13 +59,15 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 		#else
 		#ifdef PLATFORM_WINDOWS
 		m_Root.FindAnyWidget( "quickbar_setting_option" ).SetUserID( 3 );
+		m_Root.FindAnyWidget( "language_setting_option" ).SetUserID( AT_OPTIONS_LANGUAGE );
 		#endif
 		#endif
 		
 		FillTextMap();
 		
-		ref array<string> opt		= { "Disabled", "Enabled" };
-		ref array<string> opt2		= { "Show", "Hide" };
+		ref array<string> opt		= { "#options_controls_disabled", "#options_controls_enabled" };
+		ref array<string> opt2		= { "#options_controls_enabled", "#options_controls_disabled" };
+		ref array<string> opt3		= new array<string>;
 		
 		m_FOVSelector				= new OptionSelectorSlider( m_Root.FindAnyWidget( "fov_setting_option" ), m_FOVOption.ReadValue(), this, false, m_FOVOption.GetMin(), m_FOVOption.GetMax() );
 		m_ShowHUDSelector			= new OptionSelectorMultistate( m_Root.FindAnyWidget( "hud_setting_option" ), g_Game.GetProfileOption( EDayZProfilesOptions.HUD ), this, false, opt );
@@ -85,16 +89,35 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 			m_BrightnessSelector.m_OptionChanged.Insert( UpdateBrightnessOption );
 		#else
 		#ifdef PLATFORM_WINDOWS
+			m_LanguageOption		= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_LANGUAGE ) );
+			for( int i = 0; i < m_LanguageOption.GetItemsCount(); i++ )
+			{
+				string text;
+				m_LanguageOption.GetItemText( i, text );
+				opt3.Insert( text );
+			}
+			m_LanugageSelector		= new OptionSelectorMultistate( m_Root.FindAnyWidget( "language_setting_option" ), m_LanguageOption.GetIndex(), this, false, opt3 );
+			m_LanugageSelector.m_OptionChanged.Insert( UpdateLanguageOption );
+		
 			m_ShowQuickbarSelector	= new OptionSelectorMultistate( m_Root.FindAnyWidget( "quickbar_setting_option" ), g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR ), this, false, opt );
 			m_ShowQuickbarSelector.m_OptionChanged.Insert( UpdateQuickbarOption );
 		#endif
 		#endif
+		
+		float x, y, y2;
+		m_Root.FindAnyWidget( "game_settings_scroll" ).GetScreenSize( x, y );
+		m_Root.FindAnyWidget( "game_settings_root" ).GetScreenSize( x, y2 );
+		int f = ( y2 > y );
+		m_Root.FindAnyWidget( "game_settings_scroll" ).SetAlpha( f );
 	}
 	
 	void ~OptionsMenuGame()
 	{
-		m_FOVOption.Revert();
-		g_Game.SetUserFOV( m_FOVOption.ReadValue() );
+		if( m_FOVOption )
+		{
+			m_FOVOption.Revert();
+			g_Game.SetUserFOV( m_FOVOption.ReadValue() );
+		}
 	}
 	
 	void Focus()
@@ -143,21 +166,33 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	
 	void Revert()
 	{
-		m_ShowHUDSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.HUD ), false );
-		m_ShowCrosshairSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.CROSSHAIR ), false );
-		m_FOVSelector.SetValue( m_FOVOption.ReadValue(), false );
+		if( m_ShowHUDSelector )
+			m_ShowHUDSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.HUD ), false );
+		if( m_ShowCrosshairSelector )
+			m_ShowCrosshairSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.CROSSHAIR ), false );
+		if( m_FOVOption )
+		{
+			m_FOVSelector.SetValue( m_FOVOption.ReadValue(), false );
+			g_Game.SetUserFOV( m_FOVOption.ReadValue() );
+		}
+		if( m_LanguageOption )
+			m_LanugageSelector.SetValue( m_LanguageOption.GetIndex(), false );
+		if( m_ShowGameSelector )
+			m_ShowGameSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.GAME_MESSAGES ), false );
+		if( m_ShowAdminSelector )
+			m_ShowAdminSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.ADMIN_MESSAGES ), false );
+		if( m_ShowPlayerSelector )
+			m_ShowPlayerSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.PLAYER_MESSAGES ), false );
 		
-		m_ShowGameSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.GAME_MESSAGES ), false );
-		m_ShowAdminSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.ADMIN_MESSAGES ), false );
-		m_ShowPlayerSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.PLAYER_MESSAGES ), false );
 		
-		g_Game.SetUserFOV( m_FOVOption.ReadValue() );
 		
 		#ifdef PLATFORM_WINDOWS
-		m_ShowQuickbarSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR ), false );
+			if( m_ShowQuickbarSelector )
+				m_ShowQuickbarSelector.SetValue( g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR ), false );
 		#else
 		#ifdef PLATFORM_CONSOLE
-			m_BrightnessSelector.SetValue( m_BrightnessOption.ReadValue(), false );
+			if( m_BrightnessSelector )
+				m_BrightnessSelector.SetValue( m_BrightnessOption.ReadValue(), false );
 		#endif
 		#endif
 	}
@@ -170,6 +205,27 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	void SetOptions( GameOptions options )
 	{
 		m_Options = options;
+		
+		m_FOVOption					= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_FIELD_OF_VIEW ) );
+		if( m_FOVSelector )
+			m_FOVSelector.SetValue( m_FOVOption.ReadValue(), false );
+		#ifdef PLATFORM_CONSOLE
+			m_BrightnessOption		= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_BRIGHT_SLIDER ) );
+			if( m_BrightnessOption )
+				m_BrightnessSelector.SetValue( m_BrightnessOption.ReadValue(), false );
+		#else
+		#ifdef PLATFORM_WINDOWS
+			m_LanguageOption		= ListOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_LANGUAGE ) );
+			if( m_LanguageOption )
+				m_LanugageSelector.SetValue( m_LanguageOption.GetIndex(), false );
+		#endif
+		#endif
+	}
+	
+	void UpdateLanguageOption( int new_index )
+	{
+		m_LanguageOption.SetIndex( new_index );
+		m_Menu.OnChanged();
 	}
 	
 	void UpdateFOVOption( float new_value )
@@ -240,9 +296,9 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 				m_DetailsRoot.Show( true );
 				m_DetailsLabel.SetText( p.param1 );
 				m_DetailsText.SetText( p.param2 );
-				int sx, sy;
-				float lines = m_DetailsText.GetContentHeight();
-				m_DetailsText.SetSize( 1, lines );
+				
+				//float lines = m_DetailsText.GetContentHeight();
+				//m_DetailsText.SetSize( 1, lines );
 				
 				m_DetailsText.Update();
 				m_DetailsLabel.Update();
@@ -257,14 +313,15 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	void FillTextMap()
 	{
 		m_TextMap = new map<int, ref Param2<string, string>>;
-		m_TextMap.Insert( AT_OPTIONS_FIELD_OF_VIEW, new Param2<string, string>( "Field of View", "#options_game_field_of_view_desc" ) );
-		m_TextMap.Insert( 1, new Param2<string, string>( "Show HUD", "#options_game_show_HUD_desc" ) );
-		m_TextMap.Insert( 2, new Param2<string, string>( "Show Crosshair", "#options_game_show_crosshair_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_LANGUAGE, new Param2<string, string>( "#options_game_select_language", "#options_game_select_language_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_FIELD_OF_VIEW, new Param2<string, string>( "#options_game_field_of_view", "#options_game_field_of_view_desc" ) );
+		m_TextMap.Insert( 1, new Param2<string, string>( "#options_game_show_HUD", "#options_game_show_HUD_desc" ) );
+		m_TextMap.Insert( 2, new Param2<string, string>( "#options_game_show_crosshair", "#options_game_show_crosshair_desc" ) );
 		#ifdef PLATFORM_WINDOWS
-		m_TextMap.Insert( 3, new Param2<string, string>( "Show Quickbar", "#options_game_show_quickbar_desc" ) );
+		m_TextMap.Insert( 3, new Param2<string, string>( "#options_game_show_quickbar", "#options_game_show_quickbar_desc" ) );
 		#else
 		#ifdef PLATFORM_CONSOLE
-		m_TextMap.Insert( AT_OPTIONS_BRIGHT_SLIDER, new Param2<string, string>( "Brightness", "#options_video_brightness_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_BRIGHT_SLIDER, new Param2<string, string>( "#options_video_brightness", "#options_video_brightness_desc" ) );
 		#endif
 		#endif
 	}

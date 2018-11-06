@@ -19,6 +19,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		//synchronized variables
 		RegisterNetSyncVariableBool( "m_IsOpened" );
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
 	override bool IsHeavyBehaviour()
@@ -32,7 +33,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 	}
 	
 	//ATTACHMENTS
-	override bool CanReceiveAttachment( EntityAI attachment )
+	override bool CanReceiveAttachment( EntityAI attachment, int slotId )
 	{
 		ItemBase item = ItemBase.Cast( attachment );
 		
@@ -229,6 +230,27 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		Synchronize();
 	}
 	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+		
+		if ( IsOpened() && IsSoundSynchRemote() )
+		{
+			SoundBarrelOpenPlay();
+		}
+		
+		if ( !IsOpened() && IsSoundSynchRemote() )
+		{
+			SoundBarrelClosePlay();
+		}
+	}
+	
+	void SoundBarrelOpenPlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( "barrel_open_SoundSet", GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
+	
 	override void Open()
 	{
 		//update visual
@@ -240,6 +262,14 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		//refresh
 		RefreshFireParticlesAndSounds( true );
+				
+		SoundSynchRemote();
+	}
+	
+	void SoundBarrelClosePlay()
+	{
+		EffectSound sound =	SEffectManager.PlaySound( "barrel_close_SoundSet", GetPosition() );
+		sound.SetSoundAutodestroy( true );
 	}
 	
 	override void Close()
@@ -253,124 +283,100 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		//refresh
 		RefreshFireParticlesAndSounds( true );
+		
+		SoundSynchRemote();
 	}
 	
-	//particles
-	override void RefreshFireParticlesAndSounds( bool force_refresh = false )
+	//Can extinguish fire
+	override bool CanExtinguishFire()
 	{
-		FireplaceFireState fire_state = GetFireState();
-		
-		if ( m_LastFireState != fire_state || force_refresh )
+		if ( IsOpened() && IsBurning() )
 		{
-			if ( fire_state == FireplaceFireState.START_FIRE )
-			{
-				//particles
-				ParticleFireStartStart();
-				
-				//sounds
-				SoundBurningStop();
-				SoundBurningSmallStart();
-			}
-			else if ( fire_state == FireplaceFireState.SMALL_FIRE )
-			{
-				//particles
-				ParticleFireStartStop();
-				
-				ParticleSmallFireStart();
-				if ( IsOpened() ) 
-				{
-					ParticleSmallSmokeStart();
-				}
-				else
-				{
-					ParticleSmallSmokeStop();
-				}
-				
-				ParticleNormalFireStop();
-				ParticleNormalSmokeStop();
-				
-				//sounds
-				SoundBurningStop();
-				SoundBurningSmallStart();
-			}
-			else if ( fire_state == FireplaceFireState.NORMAL_FIRE )
-			{
-				//particles
-				ParticleFireStartStop();
-				
-				ParticleSmallFireStop();
-				ParticleSmallSmokeStop();
-				
-				ParticleNormalFireStart();
-				if ( IsOpened() ) 
-				{
-					ParticleNormalSmokeStart();
-				}
-				else
-				{
-					ParticleNormalSmokeStop();
-				}
-				
-				//sounds
-				SoundBurningStop();
-				SoundBurningNormalStart();
-			}
-			else if ( fire_state == FireplaceFireState.END_FIRE )
-			{
-				//particles
-				ParticleFireStartStop();
-				
-				ParticleSmallFireStop();
-				ParticleSmallSmokeStop();
-
-				ParticleNormalFireStop();
-				ParticleNormalSmokeStop();
-
-				ParticleFireEndStart();
-				
-				//sounds
-				SoundBurningStop();
-				SoundBurningNoFuelStart();
-			}
-			else if ( fire_state == FireplaceFireState.EXTINGUISH_FIRE )
-			{
-				//particles
-				ParticleFireStartStop();
-				
-				ParticleSmallFireStop();
-				ParticleSmallSmokeStop();
-
-				ParticleNormalFireStop();
-				ParticleNormalSmokeStop();	
-
-				ParticleFireEndStop();
-				
-				ParticleSteamEndStart();
-				
-				//sounds
-				SoundBurningStop();
-				SoundBurningNoFuelStart();
-			}
-			else if ( fire_state == FireplaceFireState.NO_FIRE )
-			{
-				//particles
-				ParticleFireStartStop();
-				
-				ParticleSmallFireStop();
-				ParticleSmallSmokeStop();
-
-				ParticleNormalFireStop();
-				ParticleNormalSmokeStop();	
-
-				ParticleFireEndStop();
-				
-				ParticleSteamEndStop();
-				
-				//sounds
-				SoundBurningStop();
-			}
-
-			m_LastFireState = fire_state;
+			return true;
 		}
+		
+		return false;
+	}	
+	
+	//particles
+	override bool CanShowSmoke()
+	{
+		return IsOpened();
+	}
+	
+	// Item-to-item fire distribution
+	override bool HasFlammableMaterial()
+	{
+		return true;
+	}
+	
+	override bool CanBeIgnitedBy( EntityAI igniter = NULL )
+	{
+		if ( HasAnyKindling() && !IsBurning() && IsOpened() )
+		{
+			return true;
+		}
+			
+		return false;
+	}
+	
+	override bool CanIgniteItem( EntityAI ignite_target = NULL )
+	{
+		if ( IsBurning() && IsOpened() )
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	override bool IsIgnited()
+	{
+		return IsBurning();
+	}
+	
+	override void OnIgnitedTarget( EntityAI fire_source )
+	{	
+		//remove grass
+		Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , GetPosition() );
+		cc_object.SetOrientation ( GetOrientation() );
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( DestroyClutterCutter, 0.2, false, cc_object );
+		
+		//start fire
+		StartFire(); 
+	}
+	
+	void DestroyClutterCutter( Object clutter_cutter )
+	{
+		GetGame().ObjectDelete( clutter_cutter );
+	}
+	
+	override bool IsThisIgnitionSuccessful( EntityAI item_source = NULL )
+	{
+		//check kindling
+		if ( !HasAnyKindling() && IsOpened() )
+		{
+			return false;
+		}
+		
+		//check roof
+		if ( !IsEnoughRoomForFireAbove() )
+		{
+			return false;
+		}
+		
+		//check surface
+		if ( IsWaterSurface() )
+		{
+			return false;
+		}
+
+		//check wetness/rain/wind
+		if ( IsWet() || IsRainingAbove() || IsWindy() )
+		{
+			return false;
+		}
+		
+		return true;	
 	}
 }

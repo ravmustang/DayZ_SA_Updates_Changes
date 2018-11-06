@@ -1,5 +1,7 @@
 class ActionOpenCarDoors: ActionInteractBase
 {
+	string m_AnimSource = "";
+	
 	void ActionOpenCarDoors()
 	{
 		m_MessageSuccess = "";
@@ -12,7 +14,7 @@ class ActionOpenCarDoors: ActionInteractBase
 	override void CreateConditionComponents()
 	{
 		m_ConditionItem = new CCINone;
-		m_ConditionTarget = new CCTNone;
+		m_ConditionTarget = new CCTParent(10);
 	}
 
 	override int GetType()
@@ -22,7 +24,7 @@ class ActionOpenCarDoors: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Open Car door";
+		return "#open_car_door";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -32,31 +34,50 @@ class ActionOpenCarDoors: ActionInteractBase
 		//if( !IsTransport(action_data.m_Target) ) return false;
 		if( !IsInReach(player, target, UAMaxDistances.DEFAULT) ) return false;
 		
-		Car car = Car.Cast(target.GetParent());
-		CarDoor carDoor = CarDoor.Cast(target.GetObject());
-		if ( carDoor && car )
+		CarScript car;
+		if ( Class.CastTo(car, target.GetParent()) )
 		{
-			if ( carDoor.GetAnimationPhase("DoorsSource") <= 0.5 )
-				return true;
+			array<string> selections = new array<string>();
+
+			CarDoor carDoor = CarDoor.Cast(target.GetObject());
+			if (carDoor)
+			{
+				carDoor.GetActionComponentNameList(target.GetComponentIndex(), selections);
+				
+				for (int i = 0; i < selections.Count(); i++)
+				{
+					m_AnimSource = car.GetAnimSourceFromSelection( selections[i]);
+					if ( m_AnimSource != "" )
+					{
+						if ( car.GetAnimationPhase( m_AnimSource ) <= 0.5 )
+							return true;
+					}
+				}
+			}
 		}
 		return false;
 	}
 	
 	override void OnStartServer( ActionData action_data )
 	{
-		CarDoor carDoor;
-		if ( Class.CastTo(carDoor, action_data.m_Target.GetObject()) )
+		Car car = Car.Cast(action_data.m_Target.GetParent());
+		if( car )
 		{
-			carDoor.SetAnimationPhase("DoorsSource", 1.0);
+			car.SetAnimationPhase( m_AnimSource, 1.0);
 		}
 	}
 
 	override void OnStartClient( ActionData action_data )
 	{
-		CarDoor carDoor;
-		if ( Class.CastTo(carDoor, action_data.m_Target.GetObject()) )
+		Car car = Car.Cast(action_data.m_Target.GetParent());
+		if( car )
 		{
-			carDoor.SetAnimationPhase("DoorsSource", 1.0);
+			car.SetAnimationPhase( m_AnimSource, 1.0);
 		}
+	}
+	
+	override bool CanBeUsedInVehicle()
+	{
+		return true;
 	}
 };

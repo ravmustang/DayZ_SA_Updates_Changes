@@ -1,4 +1,4 @@
-class Testing: ModifierBase
+class TestingMdfr: ModifierBase
 {
 	float stuff;
 	bool swch;
@@ -13,7 +13,7 @@ class Testing: ModifierBase
 	override void OnActivate(PlayerBase player)
 	{
 		//m_Timer1.Run(1, this, "BadaBang");
-		player.GetStateManager().QueueUpPrimaryState( StateIDs.STATE_COUGH );
+		player.GetSymptomManager().QueueUpPrimarySymptom( SymptomIDs.SYMPTOM_COUGH );
 		
 	}
 

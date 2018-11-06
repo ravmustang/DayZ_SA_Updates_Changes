@@ -1,4 +1,4 @@
-class GardenPlot_TO_BE_RELEASED extends GardenBase // garden plots are temporarily disabled for the first 063 exps.
+class GardenPlot extends GardenBase // garden plots are temporarily disabled for the first 063 exps. Also uncomment stuff in EEDelete event!
 {
 	ClutterCutter6x6 	m_clutter_cutter;
 	const string COMPATIBLE_SURFACES[] = {"cp_dirt", "cp_broadleaf_dense1", "cp_broadleaf_dense2", "cp_broadleaf_sparse1", "cp_broadleaf_sparse2", "cp_conifer_common1", "cp_conifer_common2", "cp_conifer_moss1", "cp_conifer_moss2", "cp_grass", "cp_grass_tall", "cp_gravel", "cp_rock", "textile_carpet_int"};
@@ -6,7 +6,6 @@ class GardenPlot_TO_BE_RELEASED extends GardenBase // garden plots are temporari
 	
 	void GardenPlot()
 	{
-		FIRST_SLOT_COMPONENT_INDEX = 2;
 		m_BaseFertility = 0.8;
 		InitializeSlots();
 		DigAllSlots(); // TO DO: Slots should be digged by default, so remove this function when that change is made.
@@ -27,13 +26,17 @@ class GardenPlot_TO_BE_RELEASED extends GardenBase // garden plots are temporari
 		}	
 	}	
 	
-	void ~GardenPlot_TO_BE_RELEASED()
+	override void EEDelete(EntityAI parent)
 	{
+		super.EEDelete(parent);
+		
+		/*
 		if (m_clutter_cutter  &&  GetGame())
 		{
 			GetGame().ObjectDelete(m_clutter_cutter);
 			m_clutter_cutter = NULL;
 		}
+		*/
 	}
 
 	override int GetGardenSlotsCount()

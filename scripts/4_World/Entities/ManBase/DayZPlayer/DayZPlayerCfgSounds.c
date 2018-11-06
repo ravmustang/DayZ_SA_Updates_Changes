@@ -159,11 +159,12 @@ class DayZPlayerTypeSoundTableImpl extends DayZPlayerTypeAnimTable
 			GetGame().ConfigGetChildName(soundsCfgPath, i, soundName);			
 			string soundPath = soundsCfgPath + soundName + " ";
 			AnimSoundEvent soundEvent = new AnimSoundEvent(soundPath);
-			m_animSoundEvents.Insert(soundEvent);
+			if(soundEvent.IsValid())
+				m_animSoundEvents.Insert(soundEvent);
 		}
 	}
 	
-	AnimSoundEvent GetSoundEvent(int event_id)
+	override AnimSoundEvent GetSoundEvent(int event_id)
 	{
 		for(int i = 0; i < m_animSoundEvents.Count(); i++)
 		{
@@ -195,11 +196,12 @@ class DayZPlayerSoundVoiceTableImpl extends DayZPlayerTypeAnimTable
 			GetGame().ConfigGetChildName(soundsCfgPath, i, soundName);			
 			string soundPath = soundsCfgPath + soundName + " ";
 			AnimSoundEvent soundEvent = new AnimSoundEvent(soundPath);
-			m_animSoundEvents.Insert(soundEvent);
+			if(soundEvent.IsValid())
+				m_animSoundEvents.Insert(soundEvent);
 		}
 	}
 	
-	AnimSoundEvent GetSoundEvent(int event_id)
+	override AnimSoundEvent GetSoundEvent(int event_id)
 	{
 		for(int i = 0; i < m_animSoundEvents.Count(); i++)
 		{
@@ -229,7 +231,7 @@ void DayZPlayerTypeRegisterSounds(DayZPlayerType pType)
 	if(GetGame().IsClient() || !GetGame().IsMultiplayer())//attachments don't generate noise, so we can ignore them on server
 		pType.RegisterSoundEvent("SoundAttachment", 0.2);
 	
-	//pType.RegisterParticleEvent("Particle", -1);
+	pType.RegisterParticleEvent("Particle", -1);
 
 	if(GetGame().IsClient() || !GetGame().IsMultiplayer())//sounds are unnecessary on server
 	{

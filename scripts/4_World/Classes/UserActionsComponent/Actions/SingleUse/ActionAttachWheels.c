@@ -95,7 +95,7 @@ class ActionAttachWheels: ActionAttach
  		return false;
 	}
 
-	override void OnCompleteLoopServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		EntityAI target_entity;
 		Class.CastTo(target_entity,  action_data.m_Target.GetObject() ); // cast to ItemBase
@@ -104,7 +104,7 @@ class ActionAttachWheels: ActionAttach
 		if (!target_entity.LocalTakeEntityAsAttachmentEx( action_data.m_MainItem, slot_index ))
 			target_entity.LocalTakeEntityAsAttachment( action_data.m_MainItem );
 	}
-	override void OnCompleteLoopClient( ActionData action_data )
+	override void OnExecuteClient( ActionData action_data )
 	{
 		EntityAI target_entity;
 		Class.CastTo(target_entity,  action_data.m_Target.GetObject() ); // cast to ItemBase

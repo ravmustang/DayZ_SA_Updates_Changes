@@ -3,7 +3,7 @@
  * \desc constants for various timers
  * @{
  */ 
-const int DISPLAY_STATUS_UPDATE_INTERVAL = 1000;
+const int VIRTUAL_HUD_UPDATE_INTERVAL = 1000;
 /** @}*/
 
 /**
@@ -26,6 +26,7 @@ const int IDC_MAIN_PLAY         	= 142;
 const int IDC_MAIN_CHARACTER		= 143;
 const int IDC_MAIN_ONLINE			= 124;
 const int IDC_MULTI_REFRESH			= 123;
+const int IDC_MULTI_INVITE			= 126;
 
 
 const int IDC_BOOK_VIEWER_PREV  	= 102;
@@ -158,7 +159,6 @@ const int DEV_RPC_CLEAR_INV                     = 102;
 const int DEV_RPC_TELEPORT                      = 103;
 const int DEV_RPC_SET_PLAYER_DIRECTION          = 104;
 const int DEV_RPC_SEND_SERVER_LOG               = 105;
-const int DEV_RPC_TOGGLE_GOD_MODE               = 106;
 const int DEV_RPC_STATS_DATA					= 107;
 const int DEV_RPC_MODS_DATA						= 108;
 const int DEV_RPC_AGENTS_DATA					= 109;
@@ -277,7 +277,6 @@ const int ID_EMOTE_SURRENDER 	= 61;
 const float ENVIRO_TICK_RATE 						= 2;		//! in secs. how often should enviro effet process
 const float	ENVIRO_TICKS_TO_WETNESS_CALCULATION 	= 2;	  	//! each X (ticks) is processed wetness on items on player
 const float ENVIRO_TICK_ROOF_RC_CHECK 				= 10;	  	//! in secs. how often we should check if player is under the roof (raycast)
-const float ENVIRO_WET_PENALTY_EFFECT 				= 5;	  	//! how much wetness of clothes affects players heatcomfort
 const float ENVIRO_WET_INCREMENT 					= 0.01;	  	//! amount of wetness added to items wet value each tick if is raining
 const float ENVIRO_DRY_INCREMENT 					= 0.0005; 	//! amount of wetness subtracted from items wet value each tick if is not raining due to player heat
 const float ENVIRO_SUN_INCREMENT 					= 0.002;	//! amount of wetness subtracted from items wet value each tick if is not raining due to sun
@@ -288,12 +287,33 @@ const float ENVIRO_WET_PENALTY 						= 0.5;		//! at which state of item wetness 
 const float ENVIRO_WET_PASSTHROUGH_COEF 			= 0.1;		//! how many times slower is wetting/drying items in backpacks
 const float ENVIRO_ITEM_HEAT_TRANSFER_COEF 			= 0.01;		//! converts temperature of items to entities heatcomfort gain
 const float ENVIRO_WATER_TEMPERATURE_COEF 			= 0.5;		//! how many time is water colder than air
-const float ENVIRO_DEFAULT_ENTITY_HEAT 				= 3;		//! heat entity generates if not moving
+const float ENVIRO_DEFAULT_ENTITY_HEAT 				= 0.5;		//! heat entity generates if not moving
 const float ENVIRO_TEMPERATURE_HEIGHT_REDUCTION 	= 0.0065;	//! amount of ?C reduced for each 100 meteres of height above water level
 const float ENVIRO_TEMPERATURE_INSIDE_COEF 			= 1.25;		//! increases temp in interiors
 const float ENVIRO_TEMPERATURE_UNDERROOF_COEF		= 1.1;
 const float ENVIRO_WIND_EFFECT 						= 1;		//! amount of % wind affect drying/wetting
 const float ENVIRO_HIGH_NOON 						= 12;		//! when is sun highest on sky
+
+const float ENVIRO_HEATCOMFORT_HEADPARTS_WEIGHT		= 0.3;		//! how much this head parts (clothing) affects final heatcomfort
+const float ENVIRO_HEATCOMFORT_BODYPARTS_WEIGHT		= 1.0;		//! how much this body parts (clothing) affects final heatcomfort
+const float ENVIRO_HEATCOMFORT_FEETPARTS_WEIGHT		= 0.5;		//! how much this feet parts (clothing) affects final heatcomfort
+const float ENVIRO_LOW_TEMP_LIMIT					= -40;		//! lowest temperature(deg Celsius) where the player gets lowest possible heat comfort (-1)
+const float ENVIRO_HIGH_TEMP_LIMIT					= 50;		//! highest temperature(deg Celsius) where the player gets highest possible heat comfort (1)
+const float ENVIRO_PLAYER_COMFORT_TEMP				= 18;		//! comfort temperature of environment for the player
+
+//! impact of item wetness to the heat isolation
+const float ENVIRO_ISOLATION_WETFACTOR_DRY			= 1.0;
+const float ENVIRO_ISOLATION_WETFACTOR_DAMP			= 0.75;
+const float ENVIRO_ISOLATION_WETFACTOR_WET			= 0.5;
+const float ENVIRO_ISOLATION_WETFACTOR_SOAKED		= 0.0;
+const float ENVIRO_ISOLATION_WETFACTOR_DRENCHED 	= -1.0;
+//! impact of item health (state) to the heat isolation
+const float ENVIRO_ISOLATION_HEALTHFACTOR_PRISTINE  = 1.0;
+const float ENVIRO_ISOLATION_HEALTHFACTOR_WORN		= 0.75;
+const float ENVIRO_ISOLATION_HEALTHFACTOR_DAMAGED	= 0.5;
+const float ENVIRO_ISOLATION_HEALTHFACTOR_B_DAMAGED = 0.25;
+const float ENVIRO_ISOLATION_HEALTHFACTOR_RUINED  	= 0.0;
+
 /** @}*/
 
 /**
@@ -317,15 +337,20 @@ const int		ITEMSGEN_ITEMS_AMOUNT = 5;
 const int 	STAMINA_DRAIN_STANDING_SPRINT_PER_SEC = 5; //in units (how much sprint depletes stamina)
 const int 	STAMINA_DRAIN_CROUCHED_SPRINT_PER_SEC = 1; //in units (how much sprint in crouch depletes stamina)
 const int 	STAMINA_DRAIN_PRONE_SPRINT_PER_SEC = 3; //in units (how much sprint in prone depletes stamina)
+const int	STAMINA_DRAIN_SWIM_FAST_PER_SEC = 7; //in units (how much fast swimming depletes stamina)
+const int	STAMINA_DRAIN_LADDER_FAST_PER_SEC = 10; //in units (how much fast ladder climb depletes stamina)
+
 const float	STAMINA_DRAIN_HOLD_BREATH = 0.2; //in units (how much holding breath depletes stamina)
-const int	STAMINA_DRAIN_JUMP = 20;		// in units (how much jumping depletes stamina)
-const int	STAMINA_DRAIN_MELEE_LIGHT = 5; //in units (how much light melee punch depletes stamina)
+const float	STAMINA_DRAIN_JUMP = 20;		// in units (how much jumping depletes stamina)
+const float	STAMINA_DRAIN_MELEE_LIGHT = 5; //in units (how much light melee punch depletes stamina)
 const float	STAMINA_DRAIN_MELEE_HEAVY = 20; //in units (how much heavy melee punch depletes stamina)
-const int	STAMINA_DRAIN_MELEE_EVADE = 8; // in units (how much evade depletes stamina)
+const float	STAMINA_DRAIN_MELEE_EVADE = 8; // in units (how much evade depletes stamina)
 	
 const int 	STAMINA_GAIN_JOG_PER_SEC = 2; //in units (how much of stamina units is gained while jogging)
-const int 	STAMINA_GAIN_WALK_PER_SEC = 4; //in units (how much of stamina unitsis gained while walking)
-const int 	STAMINA_GAIN_IDLE_PER_SEC = 1; //in units (how much of stamina unitsis gained while iddling)
+const int 	STAMINA_GAIN_WALK_PER_SEC = 4; //in units (how much of stamina units is gained while walking)
+const int 	STAMINA_GAIN_IDLE_PER_SEC = 5; //in units (how much of stamina units is gained while iddling)
+const int	STAMINA_GAIN_SWIM_PER_SEC = 1; //in units (how much of stamina units is gained while slowly swim)
+const int	STAMINA_GAIN_LADDER_PER_SEC = 1; //in units (how much of stamina units is gained while slowly swim)
 const float STAMINA_GAIN_BONUS_CAP = 3.0; //in units (tells how much extra units can be added at best to stamina regain)
 
 const float STAMINA_KG_TO_STAMINAPERCENT_PENALTY = 2.5; //in units (by how many  units is max stamina bar reduced for each 1 kg of load weight)
@@ -412,15 +437,10 @@ const int AGT_TRANSFER_COPY	= 4;
 const int AGT_UACTION_TOUCH		= 5;
 const int AGT_WATER_POND		= 6;
 const int AGT_AIRBOURNE			= 7;
-	
+const int AGT_UACTION_TO_PLAYER	= 8;
+const int AGT_UACTION_TO_ITEM	= 9;
+
 const int DEF_BIOLOGICAL		= 1;
-//agent list
-const int AGT_CHOLERA 			= 1;
-const int AGT_INFLUENZA 		= 2;
-const int AGT_SALMONELLA		= 4;
-const int AGT_BRAIN 			= 8;
-
-
 /** @}*/
 			
 const int QUANTITY_HIDDEN = 0;
@@ -509,6 +529,30 @@ const int VARIABLE_ISLIT		= 32;
 const int VARIABLE_COLOR		= 64;
 /** @}*/
 
+/**
+ * \defgroup Item Health States (ItemBase.GetHealthLevel)
+ * \desc Constants for Item Health States
+ * @{
+ */
+const int STATE_RUINED 		 	= 4;
+const int STATE_BADLY_DAMAGED 	= 3;
+const int STATE_DAMAGED 	  	= 2;
+const int STATE_WORN 		  	= 1;
+const int STATE_PRISTINE 	  	= 0;
+/** @}*/
+	
+/**
+ * \defgroup Item Wetness States (ItemBase.GetWet)
+ * \desc Constants for Item Wetness States
+ * @{
+ */
+const float STATE_DRENCHED		= 0.8;
+const float STATE_SOAKING_WET	= 0.5;
+const float STATE_WET			= 0.25;
+const float STATE_DAMP			= 0.05;
+const float STATE_DRY			= 0;
+/** @}*/
+
 const float CRAFTING_TIME_UNIT_SIZE = 4.0;// time unit size for crafting, this value is multiplied by the length given by a recipe
 
 const float PROJECTED_CURSOR_DISTANCE = 5;//how long is the raycast from the weapon for projected cursor
@@ -523,3 +567,21 @@ const float DZPLAYER_CAMERA_FOV_EYEZOOM		= 0.3926;	// 45deg
 const float DZPLAYER_CAMERA_FOV_IRONSIGHTS	= 0.5236;	// 60deg
 
 const string DEFAULT_CHARACTER_NAME = "Survivor";
+
+
+/**
+  * \ misc
+ */
+const float DEBUG_QUICK_UNRESTRAIN_TIME = 1.0;
+
+/**
+ * \defgroup Cars Fluids 
+ * \desc Constants for car fluids
+ * @{
+ */
+const int CARS_FLUIDS_TICK 		= 1;
+const int CARS_LEAK_TICK_MIN 	= 0.02;
+const int CARS_LEAK_TICK_MAX 	= 0.05;
+const int CARS_LEAK_THRESHOLD	= 0.5;
+
+/** @}*/

@@ -2,8 +2,8 @@ class ActionEatTetracyclineAntibiotics: ActionConsume
 {
 	void ActionEatTetracyclineAntibiotics()
 	{
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EATPILLS;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EATPILLS;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EAT;
 	}
 
 	override int GetType()

@@ -21,6 +21,7 @@ class ComponentEnergyManager : Component
 	protected 		Shape			m_DebugPlugArrow;
 	
 	protected 		bool			m_IsSwichedOn;
+	protected 		bool			m_IsSwichedOnPreviousState; // Necesarry due to synchronization of m_IsSwichedOn
 	protected 		bool			m_IsPassiveDevice;
 	protected 		bool			m_IsWorking;
 	protected 		bool			m_CanWork;
@@ -29,6 +30,7 @@ class ComponentEnergyManager : Component
 	protected 		bool			m_AutoSwitchOff;
 	protected 		bool			m_ShowSocketsInInventory;
 	protected 		bool			m_HasElectricityIcon; // Electricity icon over the item in inventory
+	protected 		bool			m_AutoSwitchOffWhenInCargo;
 	
 	protected 		int				m_MySocketID = -1;
 	protected 		int				m_PlugType;
@@ -144,6 +146,7 @@ class ComponentEnergyManager : Component
 		bool switch_on					= GetGame().ConfigGetFloat (param_access_energy_sys + "switchOnAtSpawn");
 		m_AutoSwitchOff					= GetGame().ConfigGetFloat (param_access_energy_sys + "autoSwitchOff");
 		m_HasElectricityIcon			= GetGame().ConfigGetFloat (param_access_energy_sys + "hasIcon");
+		m_AutoSwitchOffWhenInCargo 		= GetGame().ConfigGetFloat (param_access_energy_sys + "autoSwitchOffWhenInCargo");
 		
 		m_Energy						= GetGame().ConfigGetFloat (param_access_energy_sys + "energyAtSpawn");
 		m_EnergyStorageMax				= GetGame().ConfigGetFloat (param_access_energy_sys + "energyStorageMax");
@@ -262,6 +265,8 @@ class ComponentEnergyManager : Component
 	//! Energy manager: Switches ON the device so it starts doing its work if it has enough energy.
 	void SwitchOn()
 	{
+		m_IsSwichedOnPreviousState = m_IsSwichedOn;
+		
 		if ( GetGame().IsServer() )
 		{
 			if ( CanSwitchOn() )
@@ -275,13 +280,14 @@ class ComponentEnergyManager : Component
 				// 'Wakes up' all connected devices
 				WakeUpWholeBranch( m_ThisEntityAI );
 				
+				UpdateCanWork();
+				
 				// Call event
 				GetGame().GameScript.CallFunction(m_ThisEntityAI, "OnSwitchOn", NULL, 0);
-				UpdateCanWork();
 			}
 		}
 		
-		if ( !GetGame().IsServer()  &&  GetGame().IsMultiplayer() )
+		if ( !GetGame().IsServer()  &&  GetGame().IsMultiplayer()/*  &&  CanSwitchOn() */) // I want the CanSwitchOn() check, but when it's here, the OnSwitchOn() event is never called on client-side due to engine's synchronization system changing the m_IsSwichedOn to true without any specific event beign called. (Yes there is OnVariablesSynchronized() but that is called also when m_CanWork is synchronized, so I need to write a method of knowing when was this specific value changed.)
 		{
 			GetGame().GameScript.CallFunction(m_ThisEntityAI, "OnSwitchOn", NULL, 0);
 		}
@@ -290,6 +296,8 @@ class ComponentEnergyManager : Component
 	//! Energy manager: Switches OFF the device.
 	void SwitchOff()
 	{
+		m_IsSwichedOnPreviousState = m_IsSwichedOn;
+		
 		if ( GetGame().IsServer() )
 		{
 			if ( CanSwitchOff() )
@@ -305,15 +313,17 @@ class ComponentEnergyManager : Component
 				
 				// 'Wakes up' all connected devices
 				WakeUpWholeBranch( m_ThisEntityAI );
-				
+
+				UpdateCanWork();
+								
 				// Call event
 				GetGame().GameScript.CallFunction(m_ThisEntityAI, "OnSwitchOff", NULL, 0);
-				UpdateCanWork();
 			}
 		}
 		
 		if ( !GetGame().IsServer()  &&  GetGame().IsMultiplayer() )
 		{
+			m_IsSwichedOn = false;
 			GetGame().GameScript.CallFunction(m_ThisEntityAI, "OnSwitchOff", NULL, 0);
 		}
 	}
@@ -575,6 +585,14 @@ class ComponentEnergyManager : Component
 		}
 	}
 	
+	void HandleMoveInsideCargo(EntityAI container)
+	{
+		if ( m_AutoSwitchOffWhenInCargo )
+		{
+			SwitchOff();
+		}
+	}
+	
 	
 	
 	// Returns true if this device was plugged into something at the end of previous session
@@ -604,17 +622,7 @@ class ComponentEnergyManager : Component
 	/**
 	\brief Energy manager: Checks whenever this device can do work or not.
 		\param test_energy \p float optional parameter will overwite the default energy consumption value of this device.
-		\return \p bool Returns true if this device will work (even if its switched off right now. Use IsSwitchedOn() to check switch state). Otherwise it returns false.
-		@code
-			vector position_player = GetGame().GetPlayer().GetPosition();
-			
-			if ( my_device.GetCompEM().IsEnergySourceAtReach( position_player )  )
-			{
-				Print("Power source is at reach!");
-			}else{
-				Print("Power source is NOT at reach!");
-			}
-		@endcode
+		\return \p bool Returns true if this device will work when it's switched on. Otherwise it returns false.
 	*/
 	bool CanWork( float test_energy = -1)
 	{
@@ -627,7 +635,7 @@ class ComponentEnergyManager : Component
 		if (m_ThisEntityAI.IsRuined())
 			return false;
 		
-		// Check if the (serially connected) power source(s) can provide needed energy.
+		// Check if the power source(s) (which can be serially connected) can provide needed energy.
 		float 		energy_usage 	= test_energy;
 		float 		gathered_energy = GetEnergy();
 		EntityAI	energy_source 	= GetEnergySource();
@@ -660,7 +668,7 @@ class ComponentEnergyManager : Component
 		return true;
 	}
 
-	//! Energy manager: Checks if this device can work with its current wetness status. Returns true if yes, false if not.
+	//! Energy manager: Checks if this device is being stopped from working by its wetness level. Returns true when its wetness is not blocking it, false when its to owet to work.
 	bool CheckWetness()
 	{
 		return (m_ThisEntityAI.GetWet() < 1-m_WetnessExposure);
@@ -677,7 +685,13 @@ class ComponentEnergyManager : Component
 		return IsSwitchedOn();
 	}
 
-	//! Energy manager: Returns state of the switch. Whenever the device is working is not accounted for. Use IsWorking() for that.
+	// Returns previous state of the switch.
+	bool GetPreviousSwitchState()
+	{
+		return m_IsSwichedOnPreviousState;
+	}
+	
+	//! Energy manager: Returns state of the switch. Whenever the device is working or not does not matter. Use IsWorking() to account for that as well.
 	bool IsSwitchedOn()
 	{
 		return m_IsSwichedOn;
@@ -1112,7 +1126,7 @@ class ComponentEnergyManager : Component
 		UpdateCanWork();
 		
 		m_ThisEntityAI.OnIsPlugged(source_device);
-		SynchPlug(source_device);
+		SynchPlug(source_device, true);
 	}
 
 	// Called when this device is UNPLUGGED from the energy source
@@ -1120,7 +1134,7 @@ class ComponentEnergyManager : Component
 	{
 		m_ThisEntityAI.OnIsUnplugged( last_energy_source );
 		
-		SynchPlug();
+		SynchPlug(last_energy_source, false);
 	}
 
 	// When something is plugged into this device
@@ -1415,7 +1429,7 @@ class ComponentEnergyManager : Component
 		if ( !m_IsPassiveDevice )
 		{
 			// 'm_ThisEntityAI' and 'this' must be checked because this method is caled from a timer
-			if ( m_ThisEntityAI  &&  this  &&  IsSwitchedOn()  &&  !m_ThisEntityAI.IsRuined()  &&  CheckWetness()  &&  m_CanWork ) // TO DO: Use CanWork here isntead of whole long condition?
+			if ( m_ThisEntityAI  &&  this  &&  IsSwitchedOn()  &&  !m_ThisEntityAI.IsRuined()  &&  CheckWetness()  &&  m_CanWork  &&  !GetGame().IsMissionMainMenu() ) // TO DO: Use CanWork() here isntead of whole long condition?
 			{
 				bool was_powered = IsWorking();
 				
@@ -1429,7 +1443,7 @@ class ComponentEnergyManager : Component
 					float consume_energy = GetEnergyUsage() * consumed_energy_coef;
 					bool has_consumed_enough = true;
 					
-					if (GetGame().IsServer()  &&  GetGame().IsMultiplayer()) // is server side multiplayer or singleplayer
+					if (GetGame().IsServer()) // single player or server side multiplayer
 						has_consumed_enough = ConsumeEnergy( consume_energy );
 					
 					SetPowered( has_consumed_enough );
@@ -1492,22 +1506,33 @@ class ComponentEnergyManager : Component
 	====================================*/
 	
 	// Synchronizes plug state (plugged/unplugged)
-	protected void SynchPlug( EntityAI source_device = NULL )
+	protected void SynchPlug( EntityAI source_device, bool is_plugging_in )
 	{
 		if ( GetGame().IsServer() )
 		{
-			Param1<EntityAI> p;
+			// Filter: Do not synchronize plug connections when energy source is attachment of this device, or this device is energy source of attachment. These cases are already handled client-side to save on traffic.
+			Object attachment = m_ThisEntityAI.GetAttachmentByType( source_device.Type() );
 			
-			if ( IsPlugged() )
+			if (attachment == source_device)
+				return;
+
+			attachment = source_device.GetAttachmentByType(m_ThisEntityAI.Type());
+			
+			if (attachment == m_ThisEntityAI)
+				return;
+			
+			// Filter was passed, now let's send signals.
+		
+			if (is_plugging_in)
 			{
-				p = new Param1<EntityAI>(source_device);
+				// Send plug in signal with source_device
+				GetGame().RPCSingleParam( m_ThisEntityAI, ERPCs.RPC_EM_PLUG_CHANGED, new Param1<EntityAI>(source_device), true);
 			}
 			else
 			{
-				p = new Param1<EntityAI>(NULL); // NULL means unplug
+				// Send unplug signal
+				GetGame().RPCSingleParam( m_ThisEntityAI, ERPCs.RPC_EM_PLUG_CHANGED, new Param1<EntityAI>(NULL), true);
 			}
-			
-			GetGame().RPCSingleParam( m_ThisEntityAI, ERPCs.RPC_EM_PLUG_CHANGED, p, true);
 		}
 	}
 }

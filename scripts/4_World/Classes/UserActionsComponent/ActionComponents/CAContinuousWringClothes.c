@@ -27,8 +27,12 @@ class CAContinuousWringClothes : CAContinuousQuantityRepeat
 		{
 			return UA_ERROR;
 		}
+				
+		float wetness = action_data.m_MainItem.GetWet();		
+		int trim_wetness = wetness * 100;		
+		float rounded_wetness = trim_wetness/100;
 		
-		if ( action_data.m_MainItem.GetWet() <= 0 )
+		if ( rounded_wetness <= 0.25 )
 		{
 			return UA_FINISHED;
 		}
@@ -36,11 +40,16 @@ class CAContinuousWringClothes : CAContinuousQuantityRepeat
 		{
 			if ( m_SpentQuantityTotal < m_InitItemQuantity )
 			{
-				m_SpentQuantity += m_QuantityUsedPerSecond * action_data.m_Player.GetDeltaT();
+				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);
+				m_SpentQuantity += m_AdjustedQuantityUsedPerSecond * action_data.m_Player.GetDeltaT();
 				m_TimeElpased += action_data.m_Player.GetDeltaT();
 
 				if (m_TimeElpased > m_DefaultTimeToRepeat)
+				{
+					OnCompletePogress(action_data);
 					m_TimeElpased -= m_DefaultTimeToRepeat;
+				}
+					
 				
 				if ( GetGame().IsServer() )
 				{
@@ -60,6 +69,7 @@ class CAContinuousWringClothes : CAContinuousQuantityRepeat
 			}
 			else
 			{
+				OnCompletePogress(action_data);
 				return UA_FINISHED;
 			}
 		}

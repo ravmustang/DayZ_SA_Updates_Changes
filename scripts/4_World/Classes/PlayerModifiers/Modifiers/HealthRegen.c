@@ -1,4 +1,4 @@
-class HealthRegen: ModifierBase
+class HealthRegenMdfr: ModifierBase
 {
 	override void Init()
 	{
@@ -31,6 +31,7 @@ class HealthRegen: ModifierBase
 		float blood =  player.GetHealth("GlobalHealth", "Blood");
 
 		float blood_scale_normalized = Math.InverseLerp(PlayerConstants.BLOOD_THRESHOLD_FATAL, player.GetMaxHealth("", "Blood"), blood);
+		blood_scale_normalized = Math.Clamp(blood_scale_normalized,0,1);
 		float regen_speed = Math.Lerp(PlayerConstants.HEALTH_REGEN_MIN, PlayerConstants.HEALTH_REGEN_MAX, blood_scale_normalized);
 		regen_speed = regen_speed * deltaT;
 		player.AddHealth("GlobalHealth", "Health" ,  regen_speed );

@@ -1,6 +1,6 @@
 class ActionFillBottleBaseCB : ActionContinuousBaseCB
 {
-	private const float QUANTITY_FILLED_PER_SEC = 50;
+	private const float QUANTITY_FILLED_PER_SEC = 200;
 	private int m_liquid_type;
 	
 	override void CreateActionComponent()
@@ -51,12 +51,13 @@ class ActionFillBottleBase: ActionContinuousBase
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		ItemBase item = player.GetItemInHands();
 
-		return "Fill "+item.GetDisplayName().Substring(0,(item.GetDisplayName().Length() )); //crops the '' bit from the displayname
-		//return " fill bottle"; //default
+		return "#fill" + " " + item.GetDisplayName().Substring(0,(item.GetDisplayName().Length() ));
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
-	{	
+	{
+		if ( item.IsFullQuantity() )
+			return false;		
 		if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
 			return true;
 		if ( GetLiquidType( player,target,item ) != -1 && !player.IsPlacingLocal() )
@@ -76,11 +77,11 @@ class ActionFillBottleBase: ActionContinuousBase
 		return false;
 	}
 	
-	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extraData = NULL)
+	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL)
 	{	
 		SetupStance( player );
 	
-		if( super.SetupAction(player, target, item, action_data, extraData ))
+		if( super.SetupAction(player, target, item, action_data, extra_data ))
 		{
 			if ( target.GetObject() )
 			{
@@ -106,16 +107,16 @@ class ActionFillBottleBase: ActionContinuousBase
 		}
 	}
 	
-	override bool ReadFromContext(ParamsReadContext ctx, ActionData action_data )
+	override bool ReadFromContext(ParamsReadContext ctx, out ActionReciveData action_recive_data )
 	{		
-		super.ReadFromContext(ctx, action_data);
+		super.ReadFromContext(ctx, action_recive_data);
 		
 		if( HasTarget() )
 		{
 			vector cursor_position;
 			if ( !ctx.Read(cursor_position) )
 				return false;
-			action_data.m_Target.SetCursorHitPos(cursor_position);
+			action_recive_data.m_Target.SetCursorHitPos(cursor_position);
 		}
 		return true;
 	}
@@ -145,10 +146,16 @@ class ActionFillBottleBase: ActionContinuousBase
 	int GetLiquidType( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		vector pos_cursor = target.GetCursorHitPos();
+		string surfType;
+		int liquidType;
+		g_Game.SurfaceUnderObject(player, surfType, liquidType);
+		
 		if( g_Game.SurfaceIsPond(pos_cursor[0], pos_cursor[2]) || (target.GetObject() && (target.GetObject().GetType() == "Land_Misc_Well_Pump_Yellow" || target.GetObject().GetType() == "Land_Misc_Well_Pump_Blue")) )
 		{
 			if ( vector.Distance(player.GetPosition(), pos_cursor) < UAMaxDistances.DEFAULT && Liquid.CanFillContainer(item, LIQUID_WATER ) )
 			{
+				float dist = vector.Distance(player.GetPosition(), pos_cursor);
+				bool can = Liquid.CanFillContainer(item, LIQUID_WATER );
 				return LIQUID_WATER;
 			}
 		}
@@ -159,6 +166,12 @@ class ActionFillBottleBase: ActionContinuousBase
 				return LIQUID_GASOLINE;
 			}
 		}
+		//if it does not return target on cursor, check under player for liquid type
+		else if(liquidType > 0)
+		{
+			return liquidType;
+		}
+		
 		return -1;
 	}
 	

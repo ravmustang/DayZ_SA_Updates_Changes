@@ -18,11 +18,11 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 	protected ref OptionSelectorSlider	m_MusicSelector;
 	
 	protected GameOptions				m_Options;
-	protected OptionsMenuNew			m_Menu;
+	protected OptionsMenu			m_Menu;
 	
 	protected ref map<int, ref Param2<string, string>> m_TextMap;
 	
-	void OptionsMenuSounds( Widget parent, Widget details_root, GameOptions options, OptionsMenuNew menu )
+	void OptionsMenuSounds( Widget parent, Widget details_root, GameOptions options, OptionsMenu menu )
 	{
 		#ifdef PLATFORM_CONSOLE
 			m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/xbox/sound_tab.layout", parent );
@@ -60,6 +60,12 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 		m_EffectsSelector.m_OptionChanged.Insert( UpdateEffects );
 		m_VOIPSelector.m_OptionChanged.Insert( UpdateVOIP );
 		m_MusicSelector.m_OptionChanged.Insert( UpdateMusic );
+		
+		float x, y, y2;
+		m_Root.FindAnyWidget( "sound_settings_scroll" ).GetScreenSize( x, y );
+		m_Root.FindAnyWidget( "sound_settings_root" ).GetScreenSize( x, y2 );
+		int f = ( y2 > y );
+		m_Root.FindAnyWidget( "sound_settings_scroll" ).SetAlpha( f );
 	}
 	
 	void Focus()
@@ -71,7 +77,7 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 	
 	override bool OnFocus( Widget w, int x, int y )
 	{
-		OptionsMenuNew menu = OptionsMenuNew.Cast( GetGame().GetUIManager().GetMenu() );
+		OptionsMenu menu = OptionsMenu.Cast( GetGame().GetUIManager().GetMenu() );
 		if( menu )
 			menu.OnFocus( w, x, y );
 		if( w )
@@ -82,9 +88,9 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 				m_DetailsRoot.Show( true );
 				m_DetailsLabel.SetText( p.param1 );
 				m_DetailsText.SetText( p.param2 );
-				int sx, sy;
-				float lines = m_DetailsText.GetContentHeight();
-				m_DetailsText.SetSize( 1, lines );
+				
+				//float lines = m_DetailsText.GetContentHeight();
+				//m_DetailsText.SetSize( 1, lines );
 				
 				m_DetailsText.Update();
 				m_DetailsLabel.Update();
@@ -108,10 +114,14 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 	
 	void Revert()
 	{
-		m_MasterSelector.SetValue( m_MasterOption.ReadValue() );
-		m_EffectsSelector.SetValue( m_EffectsOption.ReadValue() );
-		m_VOIPSelector.SetValue( m_VOIPOption.ReadValue() );
-		m_MusicSelector.SetValue( m_MusicOption.ReadValue() );
+		if( m_MasterOption )
+			m_MasterSelector.SetValue( m_MasterOption.ReadValue() );
+		if( m_EffectsOption )
+			m_EffectsSelector.SetValue( m_EffectsOption.ReadValue() );
+		if( m_VOIPOption )
+			m_VOIPSelector.SetValue( m_VOIPOption.ReadValue() );
+		if( m_MusicOption )
+			m_MusicSelector.SetValue( m_MusicOption.ReadValue() );
 	}
 	
 	void ReloadOptions()
@@ -122,6 +132,13 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 	void SetOptions( GameOptions options )
 	{
 		m_Options = options;
+		
+		m_MasterOption			= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_MASTER_VOLUME ) );
+		m_EffectsOption			= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_EFFECTS_SLIDER ) );
+		m_VOIPOption			= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_VON_SLIDER ) );
+		m_MusicOption			= NumericOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_MUSIC_SLIDER ) );
+		
+		Revert();
 	}
 	
 	void UpdateMaster( float value )
@@ -151,9 +168,9 @@ class OptionsMenuSounds extends ScriptedWidgetEventHandler
 	void FillTextMap()
 	{
 		m_TextMap = new map<int, ref Param2<string, string>>;
-		m_TextMap.Insert( AT_OPTIONS_MASTER_VOLUME, new Param2<string, string>( "Master Volume", "#options_sound_master_volume_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_EFFECTS_SLIDER, new Param2<string, string>( "Effects Volume", "#options_sound_effects_volume_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_VON_SLIDER, new Param2<string, string>( "VoIP Volume", "#options_sound_VOIP_volume_desc" ) );
-		m_TextMap.Insert( AT_OPTIONS_MUSIC_SLIDER, new Param2<string, string>( "Music Volume", "Sets the volume level for any music in the game." ) );
+		m_TextMap.Insert( AT_OPTIONS_MASTER_VOLUME, new Param2<string, string>( "#options_sound_master_volume", "#options_sound_master_volume_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_EFFECTS_SLIDER, new Param2<string, string>( "#options_sound_effects_volume", "#options_sound_effects_volume_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_VON_SLIDER, new Param2<string, string>( "#options_sound_VOIP_volume", "#options_sound_VOIP_volume_desc" ) );
+		m_TextMap.Insert( AT_OPTIONS_MUSIC_SLIDER, new Param2<string, string>( "#options_sound_music_volume", "#options_sound_music_volume_desc" ) );
 	}
 }

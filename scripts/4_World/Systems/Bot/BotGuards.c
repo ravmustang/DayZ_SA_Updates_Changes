@@ -55,3 +55,21 @@ class BotGuardOr extends BotGuardBase
 	}
 };
 
+class BotGuardHasItemInHands extends HandGuardBase
+{
+	protected Man m_Player;
+	void BotGuardHasItemInHands (Man p = NULL) { m_Player = p; }
+
+	override bool GuardCondition (HandEventBase e)
+	{
+		if (m_Player.GetHumanInventory().GetEntityInHands())
+		{
+			hndDebugPrint("[botfsm] guard - has valid entity in hands");
+			return true;
+		}
+
+		hndDebugPrint("[botfsm] guard - no entity in hands");
+		return false;
+	}
+};
+

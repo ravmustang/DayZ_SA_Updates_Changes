@@ -12,9 +12,7 @@ class Tripod_Proxy_Test extends ItemBase
 		SetAnimationPhase( TRIPOD_COLLAPSED, 0 );
 		AddProxyPhysics( TRIPOD_COLLAPSED );
 		
-		/*
 		SetAnimationPhase( TRIPOD_DEPLOYED, 1 );
-		RemoveProxyPhysics( TRIPOD_DEPLOYED );	
-		*/
+		RemoveProxyPhysics( TRIPOD_DEPLOYED );
 	}
 }

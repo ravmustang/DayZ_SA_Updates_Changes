@@ -28,7 +28,7 @@ class ActionViewCompass : ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Use compass";
+		return "#use_compass";
 	}
 	
 	override bool HasProgress()

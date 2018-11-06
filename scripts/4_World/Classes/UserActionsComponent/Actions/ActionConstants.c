@@ -29,6 +29,7 @@ class UATimeSpent
 	const float DEFAULT_SORT = 2;
 	const float DEFAULT_CONSTRUCT = 5;
 	const float DEFAULT_DECONSTRUCT = 5;
+	const float DEFAULT_DESTROY = 10;
 	const float DEFAULT_PLACE = 0;
 	const float DEFAULT_DEPLOY = 5;
 	const float DEFAULT_CRAFT = 6;
@@ -80,6 +81,7 @@ class UAMaxDistances
 {
 	const float DEFAULT = 2.0;
 	const float LADDERS = 1.3;
+	const float BASEBUILDING = 20;
 };
 
 /**@class	Constants for specialty weight and type

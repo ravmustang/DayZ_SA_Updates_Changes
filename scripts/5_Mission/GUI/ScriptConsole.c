@@ -607,8 +607,9 @@ class ScriptConsole extends UIScriptedMenu
 			return true;
 		}
 		else if ( w == m_CloseConsoleButton )
-		{
+		{		
 			Close();
+			GetGame().GetMission().PlayerControlEnable();
 			return true;
 		}
 		else if ( w == m_PresetsTextListbox )

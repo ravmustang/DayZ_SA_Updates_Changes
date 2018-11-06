@@ -13,7 +13,33 @@ class DayZPlayerSyncJunctures
 	static const int SJ_ACTION_ACK_REJECT				= 7;
 	static const int SJ_WEAPON_ACTION_ACK_ACCEPT		= 8;
 	static const int SJ_WEAPON_ACTION_ACK_REJECT		= 9;
-	static const int SJ_UNCONSCIOUSNESS					= 10;
+	static const int SJ_WEAPON_SET_JAMMING_CHANCE		= 10;
+	static const int SJ_UNCONSCIOUSNESS					= 11;
+	static const int SJ_DEATH					     	= 12;
+
+	//-------------------------------------------------------------
+	//!
+	//! Death
+	//! 
+
+	static void SendDeath(DayZPlayer pPlayer, int pType, float pHitDir)
+	{
+		ScriptJunctureData ctx = new ScriptJunctureData;
+		
+		ctx.Write(pType);
+		ctx.Write(pHitDir);
+		pPlayer.SendSyncJuncture(SJ_DEATH, ctx);
+	}
+	
+	static bool ReadDeathParams(ParamsReadContext pCtx, out int pType, out float pHitDir)
+	{
+		if (!pCtx.Read(pType))
+			return false;
+		if (!pCtx.Read(pHitDir))
+			return false;
+
+		return true;
+	}
 
 	//-------------------------------------------------------------
 	//!
@@ -95,7 +121,7 @@ class DayZPlayerSyncJunctures
 	//! Full body
 	//! 
 	
-	static void SendPlayerStateAnim(DayZPlayer pPlayer, DayZPlayerConstants anim_id, int state_uid, int stance_mask, float duration)
+	static void SendPlayerSymptomAnim(DayZPlayer pPlayer, DayZPlayerConstants anim_id, int state_uid, int stance_mask, float duration)
 	{
 		ScriptJunctureData ctx = new ScriptJunctureData;
 		ctx.Write(anim_id);
@@ -107,7 +133,7 @@ class DayZPlayerSyncJunctures
 		pPlayer.SendSyncJuncture(SJ_PLAYER_STATES, ctx);
 	}
 	
-	static bool ReadPlayerStateAnimParams(ParamsReadContext pCtx, out DayZPlayerConstants anim_id, out int state_uid, out int stance_mask, out float duration)
+	static bool ReadPlayerSymptomAnimParams(ParamsReadContext pCtx, out DayZPlayerConstants anim_id, out int state_uid, out int stance_mask, out float duration)
 	{
 		if ( !pCtx.Read(anim_id) )
 			return false; // error
@@ -180,6 +206,14 @@ class DayZPlayerSyncJunctures
 		pPlayer.SendSyncJuncture(SJ_QUICKBAR_SET_SHORTCUT, ctx);
 	}
 	
+	static void SendWeaponJamChance(DayZPlayer pPlayer, float jamChance )
+	{
+		ScriptJunctureData ctx = new ScriptJunctureData;
+		ctx.Write(jamChance);
+
+		pPlayer.SendSyncJuncture(SJ_WEAPON_SET_JAMMING_CHANCE, ctx);
+	}
+
 	/*static bool ReadQuickbarSetShortcut(ParamsReadContext pCtx, out EntityAI item, out int index)
 	{	
 		Param2<EntityAI,int> shortcutParam = new Param2<EntityAI,int>(NULL,-1);

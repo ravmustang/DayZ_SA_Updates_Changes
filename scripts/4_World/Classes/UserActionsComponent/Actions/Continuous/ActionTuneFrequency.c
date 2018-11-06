@@ -1,6 +1,6 @@
 class ActionTuneFrequencyCB : ActionContinuousBaseCB
 {
-	private const float REPEAT_AFTER_SEC = 2.0;
+	private const float REPEAT_AFTER_SEC = 1.0;
 	
 	override void CreateActionComponent()
 	{
@@ -13,8 +13,8 @@ class ActionTuneFrequency: ActionContinuousBase
 	void ActionTuneFrequency()
 	{
 		m_CallbackClass = ActionTuneFrequencyCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_WALKIETALKIETUNE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_WALKIETALKIETUNE;		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_TUNE;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_TUNE;		
 		m_MessageStartFail = "I have failed the tunning.";
 		m_MessageStart = "I have started the tunning.";
 		m_MessageFail = "I have failed the tunning.";
@@ -45,7 +45,7 @@ class ActionTuneFrequency: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "Tune frequency";
+		return "#tune_frequency";
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -54,7 +54,7 @@ class ActionTuneFrequency: ActionContinuousBase
 		{
 			TransmitterBase transmitter = TransmitterBase.Cast( item );
 			
-			if ( transmitter.CanOperate() ) 
+			if ( transmitter.GetCompEM().IsWorking() ) 
 			{
 				transmitter.DisplayRadioInfo( transmitter.GetTunedFrequency().ToString(), player );
 				
@@ -65,7 +65,7 @@ class ActionTuneFrequency: ActionContinuousBase
 		return false;
 	}
 
-	override void OnRepeatServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		TransmitterBase transmitter =  TransmitterBase.Cast( action_data.m_MainItem );
 		transmitter.SetNextFrequency( action_data.m_Player );

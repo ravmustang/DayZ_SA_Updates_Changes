@@ -1,4 +1,4 @@
-class Burning: ModifierBase
+class BurningMdfr: ModifierBase
 {
 	private const float	 	BURNING_TRESHOLD = 199;
 	private const float	 	HEALTH_DECREMENT_PER_SEC = -5;
@@ -45,6 +45,6 @@ class Burning: ModifierBase
 	{
 		float currenthealth = player.GetHealth("GlobalHealth", "Health");
 		player.SetHealth("GlobalHealth", "Health" , ( currenthealth + (HEALTH_DECREMENT_PER_SEC*deltaT) ) );	
-		player.GetStatTemperature().Set( player.GetStatTemperature().GetMax() );
+		//player.GetStatTemperature().Set( player.GetStatTemperature().GetMax() );
 	}
 };

@@ -37,7 +37,7 @@ class ActionUncoverHeadSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "Uncover head";
+		return "#uncover_head";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -48,7 +48,7 @@ class ActionUncoverHeadSelf: ActionContinuousBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		action_data.m_Player.GetInventory().CreateInInventory("BurlapSack");
 		

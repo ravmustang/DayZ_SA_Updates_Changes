@@ -29,4 +29,39 @@ class UniversalLight extends Switchable_Base
 		
 		return false;
 	}
+	
+	//copied from Flashlight, TODO redo
+	bool ignore1cycle = true;
+	
+	void UniversalLight()
+	{
+	}
+	
+	//--- POWER EVENTS
+	override void OnWorkStart()
+	{
+		ignore1cycle = true;
+		SetPilotLight(true);
+	}
+
+	override void OnWorkStop()
+	{
+		ignore1cycle = true;
+		SetPilotLight(false);
+	}
+	
+	/*override void OnWork( float consumed_energy)
+	{
+	}*/
+	
+	void FixColdContact()
+	{
+		ItemBase battery = ItemBase.Cast( GetInventory().GetAttachmentFromIndex(0) );
+		
+		if (battery)
+		{
+			ignore1cycle = true;
+			GetCompEM().PlugThisInto(battery);
+		}
+	}
 }

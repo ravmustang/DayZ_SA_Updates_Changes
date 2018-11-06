@@ -194,6 +194,10 @@ class HudDebugWinCharModifiers extends HudDebugWinBase
 		//set lock based on checkbox value
 		CheckBoxWidget checkbox = CheckBoxWidget.Cast( checkbox_widget );
 		checkbox.SetChecked( state );
+		
+		AutoHeightSpacer WgtModifiersContent_panel_script;
+		m_WgtModifiersContent.GetScript( WgtModifiersContent_panel_script );
+		WgtModifiersContent_panel_script.Update();
 	}
 
 	void ClearModifiers()

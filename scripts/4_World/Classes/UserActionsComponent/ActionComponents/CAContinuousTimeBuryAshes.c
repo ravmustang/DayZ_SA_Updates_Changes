@@ -54,7 +54,8 @@ class CAContinuousTimeBuryAshes : CAContinuousBase
 				string reason = GetReasonToCancel( action_data.m_Target, action_data.m_MainItem );
 				if ( reason != "" )
 				{
-					m_BuryAshesAction.SetReasonToCancel( reason );
+					BuryAshesActionData ba_action_data = BuryAshesActionData.Cast(action_data);
+					ba_action_data.m_ReasonToCancel = reason;
 					
 					return UA_CANCEL;
 				}
@@ -69,6 +70,7 @@ class CAContinuousTimeBuryAshes : CAContinuousBase
 				m_SpentUnits.param1 = m_TimeElpased;
 				SetACData( m_SpentUnits );
 			}
+			OnCompletePogress(action_data);
 			return UA_FINISHED;
 		}
 	}
@@ -101,7 +103,7 @@ class CAContinuousTimeBuryAshes : CAContinuousBase
 		string surface_type;
 		vector position = target_object.GetPosition();
 		GetGame().SurfaceGetType ( position[0], position[2], surface_type ); 
-		if ( surface_type == "cp_dirt"  ||  surface_type == "cp_grass"  ||  surface_type == "cp_grass_tall"  ||  surface_type == "cp_conifer_common1"  ||  surface_type == "cp_conifer_common2" ||  surface_type == "cp_conifer_moss1"  ||  surface_type == "cp_conifer_moss2"  ||  surface_type == "cp_broadleaf_dense1"  ||  surface_type == "cp_broadleaf_dense2" ||  surface_type == "cp_broadleaf_sparse1"  ||  surface_type == "cp_broadleaf_sparse2" || surface_type == "cp_gravel" )
+		if ( !GetGame().IsSurfaceSoftGround( surface_type ) )
 		{
 			return fireplace_target.MESSAGE_BURY_ASHES_FAILED_SURFACE;
 		}

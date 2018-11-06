@@ -192,4 +192,18 @@ class PortableGasStove extends ItemBase
 		
 		return true;
 	}	
+	
+	//================================================================
+	// ITEM-TO-ITEM FIRE DISTRIBUTION
+	//================================================================
+	
+	override bool IsIgnited()
+	{
+		return GetCompEM().IsWorking();
+	}
+	
+	override bool CanIgniteItem(EntityAI ignite_target = NULL)
+	{
+		return GetCompEM().IsWorking();
+	}
 }

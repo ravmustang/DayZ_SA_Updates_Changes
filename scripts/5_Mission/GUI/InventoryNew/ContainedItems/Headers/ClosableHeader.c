@@ -2,19 +2,19 @@ class ClosableHeader: Header
 {
 	protected float		m_SquareSize;
 	
-	void ClosableHeader( ContainerBase parent, string function_name )
+	void ClosableHeader( LayoutHolder parent, string function_name )
 	{
-		WidgetEventHandler.GetInstance().RegisterOnDrag( GetMainPanel() ,  this, "OnDragHeader" );
-		WidgetEventHandler.GetInstance().RegisterOnDrop( GetMainPanel() ,  this, "OnDropHeader" );
-		WidgetEventHandler.GetInstance().RegisterOnMouseEnter( GetMainPanel(),  this, "MouseEnter" );
-		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( GetMainPanel(),  this, "MouseLeave" );
+		WidgetEventHandler.GetInstance().RegisterOnDrag( GetMainWidget() ,  this, "OnDragHeader" );
+		WidgetEventHandler.GetInstance().RegisterOnDrop( GetMainWidget() ,  this, "OnDropHeader" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseEnter( GetMainWidget(),  this, "MouseEnter" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( GetMainWidget(),  this, "MouseLeave" );
 		float temp;
-		GetMainPanel().GetScreenSize( temp, m_SquareSize );
+		GetMainWidget().GetScreenSize( temp, m_SquareSize );
 	}
 
 	override void SetLayoutName()
 	{
-		#ifdef PLATFORM_CONSOLE
+		#ifdef PLATFORM_XBOX
 		m_LayoutName = WidgetLayoutName.ClosableHeaderXbox;
 		#else
 		m_LayoutName = WidgetLayoutName.ClosableHeader;
@@ -24,10 +24,11 @@ class ClosableHeader: Header
 	void OnDragHeader( Widget w, int x, int y )
 	{
 		ClosableContainer parent = ClosableContainer.Cast( m_Parent );
-		if( parent && GetMainPanel() && m_Entity )
+		if( parent && GetMainWidget() && m_Entity )
 		{
-			ItemPreviewWidget item_preview_drag = ItemPreviewWidget.Cast( GetMainPanel().FindAnyWidget( "Drag_Render" ) );
-
+			ItemPreviewWidget item_preview_drag = ItemPreviewWidget.Cast( GetMainWidget().FindAnyWidget( "Drag_Render" ) );
+			item_preview_drag.SetFlags(WidgetFlags.EXACTPOS );
+			item_preview_drag.GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().AddChild(GetMainWidget());
 			if( item_preview_drag && m_Entity )
 			{
 				item_preview_drag.SetItem( m_Entity );
@@ -38,30 +39,28 @@ class ClosableHeader: Header
 			
 			parent.HideContent();
 			
-			GetMainPanel().FindAnyWidget( "PanelWidget" ).Show( false );
-			if( GetMainPanel().FindAnyWidget( "Drag_Render" ) )
-				GetMainPanel().FindAnyWidget( "Drag_Render" ).Show( true );
+			GetMainWidget().FindAnyWidget( "PanelWidget" ).Show( false );
+			if( item_preview_drag )
+				item_preview_drag.Show( true );
 			
 			int ww, hh;
 			
 			GetGame().GetInventoryItemSize( InventoryItem.Cast( m_Entity ), ww, hh );
-			
-			GetMainPanel().FindAnyWidget( "Drag_Render" ).SetSize( ww * m_SquareSize, hh * m_SquareSize );
-			
-			parent.UpdateSpacer();
+			if( item_preview_drag )
+			item_preview_drag.SetSize( ww * m_SquareSize, hh * m_SquareSize );
 		}
 	}
 	
 	void OnDropHeader( Widget w )
 	{
 		ClosableContainer parent = ClosableContainer.Cast( m_Parent );
+		parent.GetMainWidget().AddChild( GetMainWidget() );
 		if( parent )
 		{
-			GetMainPanel().FindAnyWidget( "PanelWidget" ).Show( true );
-			GetMainPanel().FindAnyWidget( "Drag_Render" ).Show( false );
+			GetMainWidget().FindAnyWidget( "PanelWidget" ).Show( true );
+			GetMainWidget().FindAnyWidget( "Drag_Render" ).Show( false );
 			
 			parent.ShowContent();
-			parent.UpdateSpacer();
 			
 			ItemManager.GetInstance().SetIsDragging( false );
 			ItemManager.GetInstance().HideDropzones();

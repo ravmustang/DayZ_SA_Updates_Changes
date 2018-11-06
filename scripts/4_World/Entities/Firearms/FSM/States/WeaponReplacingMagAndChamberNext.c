@@ -58,6 +58,43 @@ class DetachOldMagazine extends WeaponStateBase
 		m_oldSrc = NULL;
 		super.OnExit(e);
 	}
+	
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_oldMagazine))
+		{
+			Error("[wpnfsm] DetachOldMagazine.SaveCurrentFSMState: cannot write m_oldMagazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationWriteToContext(m_oldSrc, ctx))
+		{
+			Error("[wpnfsm] DetachOldMagazine.SaveCurrentFSMState: cannot write m_oldSrc for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_oldMagazine))
+		{
+			Error("[wpnfsm] DetachOldMagazine.LoadCurrentFSMState: cannot read m_oldMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_oldSrc, ctx))
+		{
+			Error("[wpnfsm] DetachOldMagazine.LoadCurrentFSMState: cannot read m_oldSrc for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
 };
 
 /**@class		OldMagazineHide
@@ -90,6 +127,32 @@ class OldMagazineHide : MagazineHide
 		m_oldMagazine = NULL;
 
 		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_oldMagazine))
+		{
+			Error("[wpnfsm] OldMagazineHide.SaveCurrentFSMState: cannot write m_oldMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_oldMagazine))
+		{
+			Error("[wpnfsm] OldMagazineHide.LoadCurrentFSMState: cannot read m_oldMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -194,10 +257,10 @@ class SwapOldAndNewMagazine extends WeaponStateBase
 
 		m_newMagazine = NULL;
 		m_oldMagazine = NULL;
-		m_oldSrc = NULL;
-		m_oldDst = NULL;
 		m_newSrc = NULL;
 		m_newDst = NULL;
+		m_oldSrc = NULL;
+		m_oldDst = NULL;
 
 		super.OnAbort(e);
 	}
@@ -206,12 +269,92 @@ class SwapOldAndNewMagazine extends WeaponStateBase
 	{
 		m_newMagazine = NULL;
 		m_oldMagazine = NULL;
-		m_oldSrc = NULL;
-		m_oldDst = NULL;
 		m_newSrc = NULL;
 		m_newDst = NULL;
+		m_oldSrc = NULL;
+		m_oldDst = NULL;
 
 		super.OnExit(e);
+	}
+	
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_newMagazine))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.SaveCurrentFSMState: cannot write m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		
+		if (!ctx.Write(m_oldMagazine))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.SaveCurrentFSMState: cannot write m_oldMagazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationWriteToContext(m_newSrc, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.SaveCurrentFSMState: cannot write m_newSrc for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationWriteToContext(m_newDst, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.SaveCurrentFSMState: cannot write m_newDst for weapon=" + m_weapon);
+			return false;
+		}
+		
+		if (!OptionalLocationWriteToContext(m_oldSrc, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.SaveCurrentFSMState: cannot write m_oldSrc for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationWriteToContext(m_oldDst, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.SaveCurrentFSMState: cannot write m_oldDst for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_newMagazine))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.LoadCurrentFSMState: cannot read m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!ctx.Read(m_oldMagazine))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.LoadCurrentFSMState: cannot read m_oldMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_newSrc, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.LoadCurrentFSMState: cannot read m_newSrc for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_newDst, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.LoadCurrentFSMState: cannot read m_newDst for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationReadFromContext(m_oldSrc, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.LoadCurrentFSMState: cannot read m_oldSrc for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_oldDst, ctx))
+		{
+			Error("[wpnfsm] SwapOldAndNewMagazine.LoadCurrentFSMState: cannot read m_oldDst for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 
@@ -269,6 +412,43 @@ class AttachNewMagazine extends WeaponStateBase
 		m_newMagazine = NULL;
 		m_newDst = NULL;
 		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_newMagazine))
+		{
+			Error("[wpnfsm] AttachNewMagazine.SaveCurrentFSMState: cannot write m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+
+		if (!OptionalLocationWriteToContext(m_newDst, ctx))
+		{
+			Error("[wpnfsm] AttachNewMagazine.SaveCurrentFSMState: cannot write m_newDst for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_newMagazine))
+		{
+			Error("[wpnfsm] AttachNewMagazine.LoadCurrentFSMState: cannot read m_newMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		if (!OptionalLocationReadFromContext(m_newDst, ctx))
+		{
+			Error("[wpnfsm] AttachNewMagazine.LoadCurrentFSMState: cannot read m_newDst for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
 	}
 };
 

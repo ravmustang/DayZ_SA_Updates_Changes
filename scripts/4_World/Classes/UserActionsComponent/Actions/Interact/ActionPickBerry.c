@@ -24,7 +24,7 @@ class ActionPickBerry: ActionInteractLoopBase
 		m_MessageStartFail = "Fail..";
 		//m_MaximalActionDistance = 1;
 		
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BERRIES;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_MEDIUM;
@@ -45,7 +45,7 @@ class ActionPickBerry: ActionInteractLoopBase
 
 	override string GetText()
 	{
-		return "Harvest";
+		return "#harvest";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -59,8 +59,8 @@ class ActionPickBerry: ActionInteractLoopBase
 	}
 
 	//deprecated
-	override void OnCompleteServer( ActionData action_data )
-	{
+	////override void OnCompleteServer( ActionData action_data )
+	//{
 		/*Object targetObject = action_data.m_Target.GetObject();
 		WoodBase ntarget = WoodBase.Cast( targetObject );
 		string drop_name = ntarget.GetMaterial(NULL);
@@ -72,5 +72,5 @@ class ActionPickBerry: ActionInteractLoopBase
 		drop.SetQuantity(drop_quantity, false);
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );*/
-	}
+	//}
 };

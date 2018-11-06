@@ -13,6 +13,12 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 	protected 	ItemOptics 		m_opticsUsed;
 	protected ref array<float> 	temp_array;
 
+	//! camera dynamics
+	float m_velocityYaw[1];
+	float m_velocityPitch[1];
+	float m_dynamicsStrength;
+	float m_dynamicsSmoothTime;
+	
 	void 	DayZPlayerCameraIronsights(DayZPlayer pPlayer, HumanInputController pInput)
 	{
 		if (!temp_array)
@@ -26,6 +32,9 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		GetCurrentSightInfo(m_OpticsCamPos, m_OpticsCamDir);
 		m_isEntering = true;
 		m_WeaponSwayModifier = 0.2;
+		
+		m_dynamicsStrength = 2;
+		m_dynamicsSmoothTime = 0.3;
 	}
 	
 	//
@@ -60,18 +69,38 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		}
 		return false;
 	}
-
+	
 	//	
 	override void 		OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
 	{
 		//! update angles from input 
 		float 	udAngle 	= UpdateUDAngle(m_fUpDownAngle, m_fUpDownAngleAdd, CONST_UD_MIN, CONST_UD_MAX, pDt);
+		m_CurrentCameraPitch = udAngle;
 		m_fLeftRightAngle	= UpdateLRAngle(m_fLeftRightAngle, CONST_LR_MIN, CONST_LR_MAX, pDt);
 
 		// get model space transform matrix of the gun's eye vector 
+		vector matTM[4];
 		HumanItemAccessor hia = m_pPlayer.GetItemAccessor();
 		if(GetCurrentSightEntity())
-			hia.WeaponGetCameraPointBoneRelative(GetCurrentSightEntity(), m_OpticsCamPos, m_OpticsCamDir, m_iBoneIndex, pOutResult.m_CameraTM);
+			hia.WeaponGetCameraPointBoneRelative(GetCurrentSightEntity(), m_OpticsCamPos, m_OpticsCamDir, m_iBoneIndex, matTM);
+		
+		vector aimChangeYPR;
+		float aimChangeX = m_pInput.GetAimChange()[0] * Math.RAD2DEG;
+		float aimChangeY = m_pInput.GetAimChange()[1] * Math.RAD2DEG;
+
+		aimChangeYPR[0] = Math.SmoothCD(aimChangeYPR[0], -(m_dynamicsStrength * aimChangeY), m_velocityYaw, m_dynamicsSmoothTime, 1000, pDt);
+		aimChangeYPR[1] = Math.SmoothCD(aimChangeYPR[1], -(m_dynamicsStrength * aimChangeX), m_velocityPitch, m_dynamicsSmoothTime, 1000, pDt);
+		aimChangeYPR[2] = 0;
+
+		vector dynamics[4];
+		Math3D.YawPitchRollMatrix(aimChangeYPR, dynamics);
+		dynamics[3] = vector.Zero;
+		
+		vector aimingMatTM[4];
+		hia.WeaponGetAimingModelDirTm(aimingMatTM);
+		
+		//Math3D.MatrixMultiply4(dynamics, aimingMatTM, dynamics);
+		Math3D.MatrixMultiply4(dynamics, matTM, pOutResult.m_CameraTM);
 	
 		AdjustCameraParameters(pDt, pOutResult);
 	}
@@ -128,7 +157,7 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		{
 			PPEffects.ResetPPMask();
 			PPEffects.SetLensEffect(0, 0, 0, 0);
-			PPEffects.OverrideDOF(false, 0, 0, 0, 0, 0);
+			PPEffects.OverrideDOF(false, 0, 0, 0, 0, 1);
 			PPEffects.SetBlurOptics(0);
 		}
 		else
@@ -142,14 +171,10 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 				//temp_array.Clear();
 				temp_array = m_weaponUsed.GetWeaponDOF();
 				if (temp_array.Count() == 6)
-				{
-					#ifdef PLATFORM_WINDOWS
-						PPEffects.OverrideDOF(temp_array[0],temp_array[1],temp_array[2],temp_array[3],temp_array[4],temp_array[5]);
-					#endif
-				}
+					PPEffects.OverrideDOF(temp_array[0],temp_array[1],temp_array[2],temp_array[3],temp_array[4],temp_array[5]);
 			}
 			else
-				PPEffects.OverrideDOF(false, 0, 0, 0, 0, 0);
+				PPEffects.OverrideDOF(false, 0, 0, 0, 0, 1);
 			PPEffects.SetBlurOptics(0);
 		}
 	}
@@ -281,7 +306,7 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 		{
 			PPEffects.ResetPPMask();
 			PPEffects.SetLensEffect(0, 0, 0, 0);
-			PPEffects.OverrideDOF(false, 0, 0, 0, 0, 0);
+			PPEffects.OverrideDOF(false, 0, 0, 0, 0, 1);
 			PPEffects.SetBlurOptics(0);
 		}
 		else
@@ -299,7 +324,7 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 						PPEffects.OverrideDOF(temp_array[0],temp_array[1],temp_array[2],temp_array[3],temp_array[4],temp_array[5]);
 				}
 				else
-					PPEffects.OverrideDOF(false, 0, 0, 0, 0, 0);
+					PPEffects.OverrideDOF(false, 0, 0, 0, 0, 1);
 			}
 			else
 			{
@@ -338,15 +363,13 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 				}
 				else
 				{
-					PPEffects.OverrideDOF(false, 0, 0, 0, 0, 0);
+					PPEffects.OverrideDOF(false, 0, 0, 0, 0, 1);
 				}
 				
 				//optics blur
 				if (m_opticsUsed.GetOpticsPPBlur() != 0)
 				{
-					#ifdef PLATFORM_WINDOWS
-						PPEffects.SetBlurOptics(m_opticsUsed.GetOpticsPPBlur());
-					#endif
+					PPEffects.SetBlurOptics(m_opticsUsed.GetOpticsPPBlur());
 				}
 				else
 					PPEffects.SetBlurOptics(0);
@@ -374,7 +397,7 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 		else
 		{
 			//Print("---optics---else");
-			m_CameraPPDelay = DayZPlayerCameras.TIME_CAMERACHANGE_015;
+			m_CameraPPDelay = 0;
 		}
 	}
 };

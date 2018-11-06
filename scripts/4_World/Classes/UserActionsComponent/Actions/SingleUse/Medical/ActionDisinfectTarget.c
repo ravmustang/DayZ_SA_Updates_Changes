@@ -5,7 +5,7 @@ class ActionDisinfectTargetCB : ActionSingleUseBaseCB
 		m_ActionData.m_ActionComponent = new CASingleUseQuantity(UAQuantityConsumed.DISINFECT);
 	}
 
-	bool CancelCondition()
+	/*bool CancelCondition()
 	{
 		if ( !m_Interrupted && (GetState() == STATE_LOOP_LOOP || GetState() == STATE_LOOP_LOOP2) )
 		{	
@@ -13,7 +13,7 @@ class ActionDisinfectTargetCB : ActionSingleUseBaseCB
 			action.Do(m_ActionData,m_ActionData.m_State);
 		}
 		return DefaultCancelCondition(); 
-	}
+	}*/
 	override void InitActionComponent()
 	{
 		super.InitActionComponent();
@@ -49,8 +49,9 @@ class ActionDisinfectTarget: ActionSingleUseBase
 		return "#disinfect";
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnEndServer( ActionData action_data )
 	{
+		//Print(action_data.m_Player.GetSoftSkillManager());
 		//RemoveModifiers(target, item); ?
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

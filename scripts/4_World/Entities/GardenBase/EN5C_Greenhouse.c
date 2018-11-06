@@ -1,19 +1,15 @@
-class Land_Misc_Greenhouse_TO_BE_RELEASED extends GardenBase // Greenhouses are temporarily disabled for the first 063 exps.
+class Land_Misc_Greenhouse extends GardenBase
 {
 	ref Timer m_Timer;
 	
 	void Land_Misc_Greenhouse()
 	{
-		//SetAnimationPhase("slotCovered_01", 1);
-		
 		m_Timer = new Timer( CALL_CATEGORY_GAMEPLAY );
-		//m_Timer.Run( Math.RandomFloat(1, 20), this, "OnTimer", NULL, false ); // Temporal solution for initial lag. Commented out as a quick fix for DAYZ-30633
+		m_Timer.Run( Math.RandomFloat(19, 20), this, "OnTimer", NULL, false ); // Temporal solution for initial lag. Commented out as a quick fix for DAYZ-30633
 	}
 	
 	void OnTimer()
 	{
-		FIRST_SLOT_COMPONENT_INDEX = 115;
-		
 		m_BaseFertility = 1.0;
 		InitializeSlots();
 		DigAllSlots();

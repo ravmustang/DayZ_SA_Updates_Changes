@@ -4,7 +4,7 @@ class ActionCloseBarrel: ActionInteractBase
 	{
 		m_MessageSuccess = "I have closed it.";
 		//m_Animation = "close";
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_HUDCursorIcon = CursorIcons.CloseHood;
 	}
@@ -16,7 +16,7 @@ class ActionCloseBarrel: ActionInteractBase
 
 	override string GetText()
 	{
-		return "Close";
+		return "#close";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -36,7 +36,7 @@ class ActionCloseBarrel: ActionInteractBase
 		return false;
 	}
 
-	override void OnCompleteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
 		Object target_object = action_data.m_Target.GetObject();
 		Barrel_ColorBase ntarget = Barrel_ColorBase.Cast( target_object );
@@ -44,6 +44,16 @@ class ActionCloseBarrel: ActionInteractBase
 		if( ntarget )
 		{
 			ntarget.DetermineAction(action_data.m_Player);
+		}
+	}
+	
+	override void OnEndServer( ActionData action_data )
+	{
+		Object target_object = action_data.m_Target.GetObject();
+		Barrel_ColorBase ntarget = Barrel_ColorBase.Cast( target_object );
+		if( ntarget )
+		{
+			ntarget.SoundSynchRemoteReset();
 		}
 	}
 }

@@ -45,8 +45,8 @@ class MainMenuNewsfeed extends ScriptedWidgetEventHandler
 		if( g_Game.IsStressTest() )
 		{
 			m_MainImage.LoadImageFile( 0, "set:main_menu_newsfeed image:image_1_1" );
-			m_MainText1.SetText( "Welcome to Stress Test Branch!" );
-			m_MainText2.SetText( "Click to read more about Stress Tests." );
+			m_MainText1.SetText( "#main_menu_news" );
+			m_MainText2.SetText( "#main_menu_news_desc" );
 		}
 		
 		m_Root.SetHandler( this );
@@ -103,7 +103,7 @@ class MainMenuNewsfeed extends ScriptedWidgetEventHandler
 	
 	void OpenTwitter()
 	{
-		GetGame().OpenURL( "https://twitter.com/dayzdevteam" );
+		GetGame().OpenURL( "https://twitter.com/DayZ" );
 	}
 	
 	void OpenYoutube()
@@ -196,7 +196,11 @@ class MainMenuNewsfeed extends ScriptedWidgetEventHandler
 	
 	bool IsFocusable( Widget w )
 	{
-		return ( w == m_NewsMain || w == m_NewsSec1 || w == m_NewsSec2 || w == m_Feedback || w == m_DayZForum || w == m_Twitter || w == m_Youtube );
+		if( w )
+		{
+			return ( w == m_NewsMain || w == m_NewsSec1 || w == m_NewsSec2 || w == m_Feedback || w == m_DayZForum || w == m_Twitter || w == m_Youtube );
+		}
+		return false;
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)

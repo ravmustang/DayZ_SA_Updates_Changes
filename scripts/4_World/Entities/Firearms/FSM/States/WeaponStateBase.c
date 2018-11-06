@@ -12,6 +12,8 @@ class WeaponStateBase
 	Weapon_Base m_weapon; /// weapon that this state relates to
 	WeaponStateBase m_parentState; /// hierarchical parent state of this state (or null)
 	ref WeaponFSM m_fsm; /// nested state machine (or null)
+	int m_InternalID = -1; /// internal state id used for load/restore
+
 	void WeaponStateBase (Weapon_Base w = NULL, WeaponStateBase parent = NULL) { m_weapon = w; m_parentState = parent; }
 
 	/**@fn		SetParentState
@@ -25,6 +27,55 @@ class WeaponStateBase
 
 	bool HasFSM () { return m_fsm != NULL; }
 	WeaponFSM GetFSM () { return m_fsm; }
+
+	void SetInternalStateID (int i) { m_InternalID = i; }
+	int GetInternalStateID () { return m_InternalID; }
+
+	bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (HasFSM())
+		{
+			if (IsIdle())
+			{
+				wpnDebugSpam("[wpnfsm] WeaponStateBase::SaveCurrentFSMState - idle state, skipping other substates");
+				return m_fsm.SaveCurrentFSMState(ctx);
+			}
+			else
+			{
+				// if parent state is !idle (unstable) then save whole machine
+				wpnDebugSpam("[wpnfsm] WeaponStateBase::SaveCurrentFSMState - NOT idle state, saving full submachine state");
+				return m_fsm.SaveCurrentUnstableFSMState(ctx);
+			}
+			return false;
+		}
+		return true;
+	}
+
+	bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (HasFSM())
+		{
+			if (IsIdle())
+			{
+				wpnDebugSpam("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - idle state, skipping other substates");
+				if (m_fsm.LoadCurrentFSMState(ctx))
+					return true;
+				else
+					Error("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - Cannot load stable state for weapon=" + this);
+			}
+			else
+			{
+				// if parent state is !idle (unstable) then load whole machine
+				wpnDebugSpam("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - NOT idle state, loading full submachine state");
+				if (m_fsm.LoadCurrentUnstableFSMState(ctx))
+					return true;
+				else
+					Error("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - Cannot load unstable state for weapon=" + this);
+			}
+			return false;
+		}
+		return true;
+	}
 
 	bool ProcessEvent (WeaponEventBase e)
 	{
@@ -112,6 +163,13 @@ class WeaponStateBase
 	 * @param[in]	dst		to state (current)
 	 **/
 	void OnSubMachineChanged (WeaponStateBase src, WeaponStateBase dst) { }
+
+	/**@fn		OnStateChanged
+	 * @brief	called on current state when state machine has changed its state
+	 * @param[in]	src		from state (previous)
+	 * @param[in]	dst		to state (current)
+	 **/
+	void OnStateChanged (WeaponStateBase src, WeaponStateBase dst) { }
 };
 
 
