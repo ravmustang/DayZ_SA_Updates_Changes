@@ -2408,6 +2408,9 @@ class DayZPlayerImplement extends DayZPlayer
 		if( !IsAlive() )
 			return;
 		
+		if( GetCommand_Vehicle() )
+			return;
+
 		Transport transport = Transport.Cast(other);
 		if( transport )
 		{

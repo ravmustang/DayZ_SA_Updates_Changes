@@ -6,6 +6,7 @@ class PluginRecipesManagerBase extends PluginBase
 	{
 	}
 	
+	//! Please do not delete commented recipes, they are usually commented out for a reason
 	void RegisterRecipies()
 	{
 		RegisterRecipe(new CraftTorch);
@@ -29,8 +30,8 @@ class PluginRecipesManagerBase extends PluginBase
 		RegisterRecipe(new PaintFirefighterAxe);
 		RegisterRecipe(new CleanWeapon);
 		RegisterRecipe(new RepairWithTape);
-		RegisterRecipe(new CraftArrow);
-		RegisterRecipe(new CraftArrowBone);
+		//RegisterRecipe(new CraftArrow);
+		//RegisterRecipe(new CraftArrowBone);
 		RegisterRecipe(new CraftBoneHook);
 		RegisterRecipe(new CraftBurlapStrips);
 		RegisterRecipe(new CraftLeatherCourierBag);
@@ -43,7 +44,7 @@ class PluginRecipesManagerBase extends PluginBase
 		RegisterRecipe(new DeCraftImprovisedLeatherBag);
 		RegisterRecipe(new SplitLongWoodenStick);
 		RegisterRecipe(new SplitFirewood);
-		RegisterRecipe(new CraftSplint);
+		//RegisterRecipe(new CraftSplint);
 		RegisterRecipe(new DeCraftSplint);
 		RegisterRecipe(new CraftHandDrillKit);
 		RegisterRecipe(new CraftSpear);
@@ -60,12 +61,12 @@ class PluginRecipesManagerBase extends PluginBase
 		RegisterRecipe(new CraftSalineBagIV);
 		RegisterRecipe(new PurifyWater);
 		RegisterRecipe(new CraftBloodBagIV);
-		RegisterRecipe(new CraftCamoNetShelter);
+		//RegisterRecipe(new CraftCamoNetShelter);
 		RegisterRecipe(new DeCraftCamoNetShelter);
 		RegisterRecipe(new FuelChainsaw);
 		RegisterRecipe(new CraftFireplace);
-		RegisterRecipe(new CraftTripWire);
-		RegisterRecipe(new CraftRabbitSnare);
+		//RegisterRecipe(new CraftTripWire);
+		//RegisterRecipe(new CraftRabbitSnare);
 		RegisterRecipe(new DeCraftSnareTrap);
 		RegisterRecipe(new DeCraftTripWire);
 		RegisterRecipe(new PaintGhillieHoodGreen);

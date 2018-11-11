@@ -1045,7 +1045,7 @@ class ItemBase extends InventoryItem
 			}
 		}
 	}
-
+	
 	void SplitItem(PlayerBase player)
 	{
 		if ( !CanBeSplit() )
@@ -1057,22 +1057,13 @@ class ItemBase extends InventoryItem
 		float split_quantity_new = Math.Floor( quantity / 2 );
 		
 		InventoryLocation invloc = new InventoryLocation;
-		player.GetInventory().FindFirstFreeLocationForNewEntity(GetType(), FindInventoryLocationType.ATTACHMENT, invloc);
+		bool found = player.GetInventory().FindFirstFreeLocationForNewEntity(GetType(), FindInventoryLocationType.ATTACHMENT, invloc);
+		
 		ItemBase new_item;
-		new_item = player.CopyInventoryItem( this );
-
-		if( !new_item )//when we are not working within the player's inventory OR there is no space in player inventory, spawn new item on ground
-		{
-			//new_item = GetGame().CreateObject(this.GetType(), this.GetPosition() + "1 0 0" );
-			new_item = ItemBase.Cast( SpawnEntityOnGroundPos( this.GetType(), player.GetPosition() ) );
-			new_item.PlaceOnSurface();
-		}
-
+		new_item = player.CreateCopyOfItemInInventoryOrGround(this);
 		if( new_item )
 		{
-			MiscGameplayFunctions.TransferItemProperties(this,new_item);
-			
-			if (invloc && invloc.GetType() == InventoryLocationType.ATTACHMENT && split_quantity_new > 1)
+			if (found && invloc.IsValid() && invloc.GetType() == InventoryLocationType.ATTACHMENT && split_quantity_new > 1)
 			{
 				AddQuantity(-1);
 				new_item.SetQuantity(1);
@@ -1082,7 +1073,7 @@ class ItemBase extends InventoryItem
 				AddQuantity(-split_quantity_new);
 				new_item.SetQuantity( split_quantity_new );
 			}
-		}
+		}	
 	}
 	
 	override void OnRightClick()
@@ -1193,7 +1184,7 @@ class ItemBase extends InventoryItem
 				this.AddQuantity(quantity_used);
 				other_item.AddQuantity(-quantity_used);
 			}
-		}		
+		}
 	}
 	// -------------------------------------------------------------------------
 	// Mirek: whole user action system moved to script

@@ -62,13 +62,11 @@ class Spotlight extends ItemBase
 		if (new_owner)
 		{
 			Fold();
-			GetCompEM().SwitchOff();
 		}
 	}
 
 	override void OnIsPlugged(EntityAI source_device)
 	{
-		GetCompEM().SwitchOn(); // Switch on for better convenience
 		UpdateAllSelections();
 	}
 	
@@ -135,7 +133,6 @@ class Spotlight extends ItemBase
 	void Unfold()
 	{
 		m_IsFolded = false;
-		GetCompEM().SwitchOn();
 		
 		UpdateAllSelections();
 	}

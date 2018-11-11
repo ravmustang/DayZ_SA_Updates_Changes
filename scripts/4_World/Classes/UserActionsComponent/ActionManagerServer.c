@@ -142,8 +142,6 @@ class ActionManagerServer: ActionManagerBase
 			return;
 		}
 		
-		m_Player.SetActionEndInput();
-		
 		ActionBase picked_action;
 		bool accepted = false;
 		bool is_target_free = true;
@@ -153,6 +151,9 @@ class ActionManagerServer: ActionManagerBase
 		picked_action = m_CurrentActionData.m_Action;
 		target = m_CurrentActionData.m_Target;
 		item = m_CurrentActionData.m_MainItem;
+		
+		if ( picked_action.CanBePerformedFromQuickbar() )
+			m_CurrentActionData.m_Player.SetActionEndInput();
 
 		if( is_target_free && !m_Player.GetCommandModifier_Action() && !m_Player.GetCommand_Action() && !m_Player.IsSprinting() && picked_action && picked_action.Can(m_Player,target,item)) 
 		{

@@ -375,7 +375,20 @@ class TextListboxWidget extends SimpleListboxWidget
 	proto native void SetItemColor(int row, int column, int color );
 };
 
-class ScrollWidget extends UIWidget
+class SpacerBaseWidget extends UIWidget
+{
+	proto native void AddChildAfter(Widget child,Widget after, bool immedUpdate = true);
+}
+
+class GridSpacerWidget extends SpacerBaseWidget
+{
+}
+
+class WrapSpacerWidget extends SpacerBaseWidget
+{
+}
+
+class ScrollWidget extends SpacerBaseWidget
 {
 	proto native float GetScrollbarWidth();
 

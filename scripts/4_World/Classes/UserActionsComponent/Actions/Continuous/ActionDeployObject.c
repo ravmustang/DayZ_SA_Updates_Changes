@@ -25,7 +25,7 @@ class ActiondeployObjectCB : ActionContinuousBaseCB
 		if (m_ActionData.m_State == UA_CANCEL )
 		{
 			m_Canceled = true;
- 			SetCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
+ 			SetCommand(DayZPlayerConstants.CMD_ACTIONINT_INTERRUPT);
 			return;
 		}
 	}

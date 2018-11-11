@@ -171,13 +171,7 @@ class Magazine : InventoryItemSuper
 		}
 
 		
-		Magazine new_pile = Magazine.Cast( player.CopyInventoryItem( this ) );
-		
-		if(!new_pile)
-		{
-			//new_pile = GetGame().CreateObject(this.GetType(), this.GetPosition() + "0.2 0 0" );
-			new_pile = Magazine.Cast( SpawnEntityOnGroundPos( this.GetType(), this.GetPosition() ) );
-		}
+		Magazine new_pile = Magazine.Cast( player.CreateCopyOfItemInInventoryOrGround( this ) );
 
 		new_pile.ServerSetAmmoCount(0);
 		int quantity = this.GetAmmoCount();

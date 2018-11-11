@@ -131,7 +131,8 @@ class CAContinuousFillOil : CAContinuousBase
 		
 		if ( GetGame().IsServer() )
 		{
-			action_data.m_MainItem.AddQuantity( -m_SpentQuantity );
+			if ( action_data.m_MainItem ) // Item EngineOil gets deleted after full consumption
+				action_data.m_MainItem.AddQuantity( -m_SpentQuantity );
 			
 			Car car = Car.Cast(action_data.m_Target.GetObject());	
 			car.Fill( CarFluid.OIL, (m_SpentQuantity * 0.001) );

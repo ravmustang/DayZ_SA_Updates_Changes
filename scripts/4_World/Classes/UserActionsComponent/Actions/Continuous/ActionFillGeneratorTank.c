@@ -4,7 +4,7 @@ class ActionFillGeneratorTankCB : ActionContinuousBaseCB
 	
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousFill(QUANTITY_FILLED_PER_SEC, LIQUID_GASOLINE);
+		m_ActionData.m_ActionComponent = new CAContinuousFillPowerGenerator(QUANTITY_FILLED_PER_SEC, LIQUID_GASOLINE);
 	}
 };
 

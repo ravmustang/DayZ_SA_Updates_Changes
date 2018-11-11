@@ -135,6 +135,17 @@ class HumanInventory : GameInventory
 				return true;
 			}
 		}
+		
+		if (dst.GetType() == InventoryLocationType.HANDS)
+		{
+			Man man_dst = Man.Cast(dst.GetParent());
+			if (man_dst.IsAlive())
+			{
+				hndDebugPrint("[inv] HI::RedirectToHandEvent - dst location == HANDS, player has to handle this");
+				man_dst.GetHumanInventory().HandEvent(mode, new HandEventTake(man_dst, src.GetItem()));
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -144,13 +155,6 @@ class HumanInventory : GameInventory
 
 		if (RedirectToHandEvent(mode, src, dst))
 			return true;
-
-		if (dst.GetType() == InventoryLocationType.HANDS)
-		{
-			Man man_dst = Man.Cast(dst.GetParent());
-			if (!man_dst.IsAlive()) // @FIXME @TODO neni todle blbe?
-				return false;
-		}
 
 		return super.TakeToDst(mode, src, dst);
 	}
@@ -163,35 +167,11 @@ class HumanInventory : GameInventory
 			InventoryLocation dst = new InventoryLocation;
 			if (FindFreeLocationFor(item, flags, dst))
 			{
-				if (dst.GetType() == InventoryLocationType.HANDS)
-				{
-					hndDebugPrint("[inv] HumanInventory::Take2H(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item);
-					HandEvent(mode, new HandEventTake(GetManOwner(), item));
+				if (RedirectToHandEvent(mode, src, dst))
 					return true;
-				}
-				else
-				{
-					switch (src.GetType())
-					{
-						case InventoryLocationType.HANDS:
-						{
-							if (GetInventoryOwner().IsAlive())
-							{
-								hndDebugPrint("[inv] HumanInventory::Take2Inv(" + typename.EnumToString(InventoryMode, mode) + ") from H (alive) item=" + item);
-								HandEvent(mode, new HandEventMoveTo(GetManOwner(), item, dst));
-								return true;
-							}
 
-							hndDebugPrint("[inv] HumanInventory::Take2Inv(" + typename.EnumToString(InventoryMode, mode) + ") from H (dead) item=" + item);
-							return super.TakeEntityToInventory(mode, flags, item);
-						}
-						default:
-						{
-							Print("[inv] HumanInventory::Take2Inv(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item);
-							return super.TakeEntityToInventory(mode, flags, item);
-						}
-					}
-				}
+				Print("[inv] HumanInventory::Take2Inv(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item);
+				return super.TakeEntityToInventory(mode, flags, item);
 			}
 			else
 			{

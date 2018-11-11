@@ -888,6 +888,17 @@ class UAInput
 	proto native bool LocalHold();
 	proto native bool LocalDoubleClick();
 
+	proto native bool IsCombo();	// return true if there is currently combo bind
+
+	// normal state is there are no limits, input generates all the events
+	// but if there is an limiter, 
+	proto native bool IsLimited();	// return true if there is an event limit
+	
+	proto native bool IsPressLimit();		// if limited to PRESS
+	proto native bool IsReleaseLimit();		// if limited to RELEASE
+	proto native bool IsHoldLimit();		// if limited to HOLD
+	proto native bool IsDoubleClickLimit();	// if limited to DOUBLE CLICK
+
 };
 
 // -------------------------------------------------------------------------

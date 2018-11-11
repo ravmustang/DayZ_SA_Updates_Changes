@@ -151,10 +151,10 @@ class DayzPlayerItemBehaviorCfg extends HumanItemBehaviorCfg
 	{
 		SetIKStance(DayZPlayerConstants.STANCEIDX_ERECT, false, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_CROUCH, false, true, true);
-		SetIKStance(DayZPlayerConstants.STANCEIDX_PRONE, false, true, false);
+		SetIKStance(DayZPlayerConstants.STANCEIDX_PRONE, false, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDERECT, false, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDCROUCH, false, false, false);
-		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDPRONE, false, false, false);
+		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDPRONE, false, true, true);
 	}
 
 	void	SetEmptyHanded()
@@ -671,7 +671,9 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("ButaneCanister", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 					"dz/anims/anm/player/ik/gear/ButanCanister.anm");	
 		pType.AddItemInHandsProfileIK("Bark_Oak", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 							"dz/anims/anm/player/ik/gear/Bark_oak.anm");
 		pType.AddItemInHandsProfileIK("Bark_Birch", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/gear/Bark_birch.anm");
-		
+		pType.AddItemInHandsProfileIK("RabbitPelt", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,				 		"dz/anims/anm/player/ik/gear/Pelt_Rabbit.anm");
+		pType.AddItemInHandsProfileIK("PigPelt", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,				 			"dz/anims/anm/player/ik/gear/Pelt_Pig.anm");
+
 			
 		//! Consumables two handed	
 		pType.AddItemInHandsProfileIK("Stone", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded, 									"dz/anims/anm/player/ik/two_handed/stone.anm");
@@ -683,12 +685,14 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("GardenLime", "dz/anims/workspaces/player/player_main/weapons/player_main_2h_extinguisher.asi", twoHanded,		"dz/anims/anm/player/ik/two_handed/gardenlime.anm");
 		pType.AddItemInHandsProfileIK("CowPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Cow.anm");
 		pType.AddItemInHandsProfileIK("DeerPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Deer.anm");
-		pType.AddItemInHandsProfileIK("RabbitPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Rabbit.anm");
+		//pType.AddItemInHandsProfileIK("RabbitPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Rabbit.anm");//
 		pType.AddItemInHandsProfileIK("FoxPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Fox.anm");
 		pType.AddItemInHandsProfileIK("WildboarPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 			"dz/anims/anm/player/ik/two_handed/Pelt_Wildboar.anm");
 		pType.AddItemInHandsProfileIK("GoatPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Goat.anm");
-		pType.AddItemInHandsProfileIK("PigPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Pig.anm");
 		pType.AddItemInHandsProfileIK("MouflonPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 			"dz/anims/anm/player/ik/two_handed/Pelt_Mouflon.anm");
+		pType.AddItemInHandsProfileIK("BearPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Bear.anm");
+		pType.AddItemInHandsProfileIK("WolfPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Wolf.anm");
+		pType.AddItemInHandsProfileIK("SheepPelt", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 				"dz/anims/anm/player/ik/two_handed/Pelt_Sheep.anm");
 
 
 	}	

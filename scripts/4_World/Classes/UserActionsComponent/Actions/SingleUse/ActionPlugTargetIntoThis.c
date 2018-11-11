@@ -71,6 +71,11 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 	{
 		Process(action_data);
 	}
+	
+	override void OnExecuteClient( ActionData action_data )
+	{
+		action_data.m_Player.PlacingCancelLocal(); // Cance advanced placement without unplugging main object from power source
+	}
 
 	void Process( ActionData action_data )
 	{
@@ -106,6 +111,6 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 		}
 		
 		target_IB.GetInventory().TakeEntityAsAttachment( InventoryMode.LOCAL, action_data.m_MainItem );
-		action_data.m_Player.LocalDropEntity( action_data.m_MainItem );
+		action_data.m_Player.ServerDropEntity( action_data.m_MainItem );
 	}
 };

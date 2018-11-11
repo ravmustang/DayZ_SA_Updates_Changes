@@ -530,7 +530,8 @@ class ActionManagerClient: ActionManagerBase
 				return;
 			}
 			Debug.Log("[AM] Action data created (" + m_Player + ")");
-			m_Player.SetActionEndInput();
+			if ( action.CanBePerformedFromQuickbar() )
+				m_Player.SetActionEndInput();
 			
 			if ( GetGame().IsMultiplayer() && !action.IsLocal() )
 			{

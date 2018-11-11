@@ -557,9 +557,10 @@ class CGame
 	proto native NoiseSystem GetNoiseSystem();
 	
 	// inventory
-	proto native bool		AddInventoryJuncture(Man player, notnull EntityAI item, InventoryLocation dst, bool test_dst_occupancy, int timeout_ms);
-	proto native bool		AddActionJuncture(Man player, notnull EntityAI item, int timeout_ms);
-	proto native bool		ClearJuncture(Man player, notnull EntityAI item);
+	proto native bool	AddInventoryJuncture(Man player, notnull EntityAI item, InventoryLocation dst, bool test_dst_occupancy, int timeout_ms);
+	proto native bool 	HasInventoryJunctureDestination (Man player, notnull InventoryLocation dst);
+	proto native bool	AddActionJuncture(Man player, notnull EntityAI item, int timeout_ms);
+	proto native bool	ClearJuncture(Man player, notnull EntityAI item);
 
 	// support
 	//! Delevoper only: Executes Enforce Script expression, if there is an error, is printed into the script console
