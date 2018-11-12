@@ -1,5 +1,5 @@
 // -----------------------------------------------------------
-class InventoryGridController: ScriptedWidgetEventHandler
+class InventoryGridController extends ScriptedWidgetEventHandler
 {
 	void OnItemEnter(InventoryGrid grid, Widget w, int row, int col) {}
 	void OnItemLeave(InventoryGrid grid, Widget w) {}
@@ -20,16 +20,16 @@ class InventoryGridController: ScriptedWidgetEventHandler
 	{
 		return Vector(0, 1, 1);
 	}
-	string GetItemQuantityText( InventoryItem item );
-	int HasItemQuantity( InventoryItem item );
-	float GetItemQuantity( InventoryItem item );
+	string GetItemQuantityText( InventoryItem item ) {}
+	int HasItemQuantity( InventoryItem item ) {}
+	float GetItemQuantity( InventoryItem item ) {}
 };
 
 // -----------------------------------------------------------
 //! map: item x vector(index, width, height)
 typedef map<InventoryItem, vector> TItemsMap
 
-class InventoryGrid: ScriptedWidgetEventHandler
+class InventoryGrid extends ScriptedWidgetEventHandler
 {
 	// AARRGGBB
 	static int ITEM_COLOR_QUICKBAR_NORMAL = 0x7F858585;
@@ -748,8 +748,6 @@ class InventoryGrid: ScriptedWidgetEventHandler
 			item_w = bck.FindAnyWidget("GridItem");
 			if ( item_w )
 			{
-				// LogInfo( item.GetName(), LogTemplates.TEMPLATE_JANOSIK );
-	
 				int has_quantity = m_controller.HasItemQuantity( item );
 				Widget quantity_panel = bck.FindAnyWidget("QuantityPanel");
 				TextWidget item_quantity = TextWidget.Cast( bck.FindAnyWidget("Quantity") );
@@ -770,16 +768,10 @@ class InventoryGrid: ScriptedWidgetEventHandler
 					}
 					else if ( has_quantity == QUANTITY_PROGRESS )
 					{
-						// LogInfo( " QUANTITY_PROGRESS", LogTemplates.TEMPLATE_JANOSIK );
-	
 						float progress_max = quantity_progress.GetMax();
 						int max = item.ConfigGetInt("varQuantityMax");
 						int count = item.ConfigGetInt("count");
 						float quantity = m_controller.GetItemQuantity( item );
-						// LogInfo( " " + ftoa( max ), LogTemplates.TEMPLATE_JANOSIK );
-						// LogInfo( " " + ftoa( quantity ), LogTemplates.TEMPLATE_JANOSIK );
-						// [removed line]
-						// LogInfo( " " + ftoa( quantity ), LogTemplates.TEMPLATE_JANOSIK );	
 						if ( count > 0 )
 						{
 							max = count;
@@ -788,7 +780,6 @@ class InventoryGrid: ScriptedWidgetEventHandler
 						{
 	
 							float value = Math.Round( ( quantity / max ) * 100 );
-							// LogInfo( " ==" + ftoa( value ), LogTemplates.TEMPLATE_JANOSIK );
 							quantity_progress.SetCurrent( value );
 						}
 						quantity_stack.Show( false );
@@ -798,7 +789,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 				
 				if ( show_temperature )
 				{
-					if ( item && item.IsInherited( InventoryItem) )
+					if ( item && item.IsInherited( InventoryItem ) )
 					{
 						int color = m_controller.GetItemColor( this, item); // !!!!!
 						if ( color )
@@ -858,7 +849,7 @@ class InventoryGrid: ScriptedWidgetEventHandler
 			Widget quantity_stack_panel = item_w.FindAnyWidget("QuantityStackPanel");
 			quantity_stack_panel.SetSize( m_quantity_panel_size,m_quantity_panel_size );
 			
-			//RefreshItemVariables( item, data, true, true );
+			RefreshItemVariables( item, data, true, true );
 		}
 	}
 

@@ -782,9 +782,9 @@ class DayZPlayerImplement extends DayZPlayer
 		}
 
 		// interupt melee for non-blocked hit or heavy hit
-		if( !m_MeleeFightLogic.IsInBlock() || animHitFullbody )
+		if( /*m_MeleeFightLogic.IsInBlock() ||*/ animHitFullbody )
 		{
-			HumanCommandMelee hcm = GetCommand_Melee();
+			HumanCommandMelee2 hcm = GetCommand_Melee2();
 			if(hcm) hcm.Cancel();
 		}
 		
@@ -984,6 +984,7 @@ class DayZPlayerImplement extends DayZPlayer
 			}
 		}
 
+		Input input = GetGame().GetInput();
 		//! reset ironsights && optics
 		bool	prevIronSights 	= m_CameraIronsighs;
 		bool	prevOptics		= m_CameraOptics;
@@ -1024,8 +1025,8 @@ class DayZPlayerImplement extends DayZPlayer
 		// exits optics completely, comment to return to ADS
 		if (m_LiftWeapon_player && (IsInOptics() || IsInIronsights()))
 			ExitSights();
-		
-		if (hic.IsSightChange() && !m_LiftWeapon_player) // || sightChange)
+
+		if ((input.GetActionDown(UAADSToggle, false) || input.GetActionDown(UAZoomIn, false)) && !m_LiftWeapon_player) // || sightChange)
 		{
 			HumanItemAccessor 	hia = GetItemAccessor();
 			HumanCommandWeapons	hcw = GetCommandModifier_Weapons();
@@ -1131,11 +1132,8 @@ class DayZPlayerImplement extends DayZPlayer
 
 		////////////////////////////////////////////////
 		// Eye Zoom logic
-#ifdef WIP_INPUTS
-		if (hic.IsZoom() && !m_CameraEyeZoom)
-#else
-		if (hic.IsZoom() && !m_CameraEyeZoom && !hic.IsMeleeFastAttackModifier())
-#endif
+
+		if (input.GetActionDown(UAZoomIn, false) && !m_CameraEyeZoom && !input.GetActionDown(UAADSToggle, false))
 		{
 			m_CameraEyeZoom = true;
 			//Print("To EyeZoom " +  m_CameraEyeZoom.ToString());
@@ -1162,7 +1160,6 @@ class DayZPlayerImplement extends DayZPlayer
 
 		//! Sprint attack limiting - player has to be in full sprint for at least 0.5s
 		//--------------------------------------------
-		
 		HumanCommandMove hcm = GetCommand_Move();
 		if (hcm && hcm.GetCurrentMovementSpeed() > 2.99 && m_MovementState.m_iMovement == 3)
 		{
@@ -1984,8 +1981,8 @@ class DayZPlayerImplement extends DayZPlayer
 				SoundObject soundObject = soundBuilder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
-					WaveKind kind = WaveKind.WAVEENVIRONMENTEX;
-					if (GetGame().GetPlayer() != NULL && IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding())
+					WaveKind kind = WaveKind.WAVEEFFECTEX;
+					if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
 					{
 						kind = WaveKind.WAVEATTALWAYS;
 					}
@@ -2149,8 +2146,8 @@ class DayZPlayerImplement extends DayZPlayer
 				SoundObject soundObject = builder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
-					WaveKind kind = WaveKind.WAVEWEAPONSEX;
-					if (GetGame().GetPlayer() != NULL && IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding())
+					WaveKind kind = WaveKind.WAVEEFFECTEX;
+					if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
 					{
 						kind = WaveKind.WAVEATTALWAYS;
 					}
@@ -2201,8 +2198,8 @@ class DayZPlayerImplement extends DayZPlayer
 				SoundObject soundObject = soundBuilder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
-					WaveKind kind = WaveKind.WAVEENVIRONMENTEX;
-					if (GetGame().GetPlayer() != NULL && IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding())
+					WaveKind kind = WaveKind.WAVEEFFECTEX;
+					if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
 					{
 						kind = WaveKind.WAVEATTALWAYS;
 					}
@@ -2230,8 +2227,15 @@ class DayZPlayerImplement extends DayZPlayer
 			{
 				SoundObjectBuilder objectBuilder = soundEvent.GetSoundBuilder();
 				objectBuilder.UpdateEnvSoundControllers(GetPosition());
+
 				SoundObject soundObject = objectBuilder.BuildSoundObject();
-				soundObject.SetKind(WaveKind.WAVEEFFECTEX);
+				WaveKind kind = WaveKind.WAVEEFFECTEX;
+				if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
+				{
+					kind = WaveKind.WAVEATTALWAYS;
+				}
+				soundObject.SetKind(kind);
+
 				PlaySound(soundObject, objectBuilder);
 			}
 			
@@ -2272,6 +2276,13 @@ class DayZPlayerImplement extends DayZPlayer
 				objectBuilder.SetVariable("female", isFemale);
 				
 				SoundObject soundObject = objectBuilder.BuildSoundObject();
+				WaveKind kind = WaveKind.WAVEEFFECTEX;
+				if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
+				{
+					kind = WaveKind.WAVEATTALWAYS;
+				}
+				soundObject.SetKind(kind);
+
 				return PlaySound(soundObject, objectBuilder);
 			}
 			

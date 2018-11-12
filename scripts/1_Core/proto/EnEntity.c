@@ -493,7 +493,7 @@ class IEntity: Managed
 	//@{
 
 	//!Add Entity to hierarchy. Pivot is pivot index, or -1 for center of parent.
-	proto native external int AddChild(notnull IEntity child, int pivot);
+	proto native external int AddChild(notnull IEntity child, int pivot, bool positionOnly = false);
 	//!Remove Entity from hierarchy
 	proto native external void RemoveChild(notnull IEntity child);
 

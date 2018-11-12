@@ -1,26 +1,36 @@
 class MeleeAttackSoundEvents extends PlayerSoundEventBase
 {
+	void MeleeAttackSoundEvents()
+	{
+		m_Type = EPlayerSoundEventType.MELEE;
+		m_HasPriorityOverTypes = -1;
+	}
+	
 	override bool CanPlay()
 	{
 		return true;
 	}
 	
-	override bool IsCurrentHasPriority(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type)
+	override bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type_other)
 	{
-		if(type == EPlayerSoundEventType.DAMAGE)
+		if( type_other == EPlayerSoundEventType.DAMAGE )
 		{
 			return false;
 		}
 		return true;
 	}
+	
+	override void OnEnd()
+	{
+		//m_Player.GetStaminaSoundHandlerClient().PostponeStamina(300);
+		StaminaSoundHandlerClient.Cast(m_Player.m_PlayerSoundManagerClient.GetHandler(eSoundHandlers.STAMINA)).PostponeStamina(300);
+	}
 }
-
 
 class MeleeAttackLightEvent extends MeleeAttackSoundEvents
 {
 	void MeleeAttackLightEvent()
 	{
-		m_Type = EPlayerSoundEventType.MELEE;
 		m_ID = EPlayerSoundEventID.MELEE_ATTACK_LIGHT;
 		m_SoundVoiceAnimEventClassID = 16;
 	}
@@ -30,10 +40,8 @@ class MeleeAttackHeavyEvent extends MeleeAttackSoundEvents
 {
 	void MeleeAttackHeavyEvent()
 	{
-		m_Type = EPlayerSoundEventType.MELEE;
 		m_ID = EPlayerSoundEventID.MELEE_ATTACK_HEAVY;
 		m_SoundVoiceAnimEventClassID = 17;
 	}
 	
 }
-

@@ -723,16 +723,12 @@ class MissionGameplay extends MissionBase
 			break;
 			
 		case WindowsResizeEventTypeID:
-			if( m_InventoryMenu != NULL )
-			{
-				m_InventoryMenu.Reset();
-			}
-			else if( WidgetCache.GetInstance() )
+			if( WidgetCache.GetInstance() )
 			{
 				WidgetCache.GetInstance().Reset();
 			}
-			CloseAllMenus();
 			DestroyAllMenus();
+			m_Hud.OnResizeScreen();
 			
 			break;
 			
@@ -797,7 +793,6 @@ class MissionGameplay extends MissionBase
 	
 	void CloseAllMenus()
 	{
-		HideInventory();
 		GetUIManager().CloseAll();
 	}
 	

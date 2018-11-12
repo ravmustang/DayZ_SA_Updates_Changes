@@ -671,7 +671,7 @@ class ComponentEnergyManager : Component
 	//! Energy manager: Checks if this device is being stopped from working by its wetness level. Returns true when its wetness is not blocking it, false when its to owet to work.
 	bool CheckWetness()
 	{
-		return (m_ThisEntityAI.GetWet() < 1-m_WetnessExposure);
+		return (m_ThisEntityAI.GetWet() <= 1-m_WetnessExposure);
 	}
 	
 	//! Energy manager: Checks if the device can be switched OFF

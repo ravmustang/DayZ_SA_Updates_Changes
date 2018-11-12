@@ -416,11 +416,6 @@ class OptionsMenu extends UIScriptedMenu
 		Refresh();
 	}
 	
-	override void OnHide()
-	{
-		super.OnHide();
-	}
-	
 	override void Update( float timeslice )
 	{
 		super.Update( timeslice );

@@ -24,16 +24,8 @@ class ControlsXbox extends UIScriptedMenu
 	{
 		PPEffects.SetBlurMenu( 0 );
 	}
-
-	//============================================
-	// Menu Controls
-	//============================================	
-	void OpenMenu()
-	{
-		GetGame().GetUIManager().EnterScriptedMenu( MENU_XBOX_CONTROLS, NULL );
-	}
 	
-	void CloseMenu()
+	void Back()
 	{
 		GetGame().GetUIManager().Back();
 	}
@@ -291,22 +283,10 @@ class ControlsXbox extends UIScriptedMenu
 			m_TabScript.NextTab();
 			DrawConnectingLines( m_TabScript.GetSelectedIndex() );
 		}
-	}
-	
-	//============================================
-	// Events
-	//============================================	
-	override bool OnController(Widget w, int control, int value)
-	{
-		super.OnController(w, control, value);
 		
-		if ( control == ControlID.CID_BACK )
+		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
 		{
-			CloseMenu();
-			
-			return true;
+			Back();
 		}
-		
-		return false;
 	}
 }

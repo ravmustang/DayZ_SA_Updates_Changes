@@ -40,9 +40,17 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		m_PreviouslyPlayedFilter	= new OptionSelector( root.FindAnyWidget( "prev_played_setting_option" ), 0, this, false );
 		m_FullServerFilter			= new OptionSelector( root.FindAnyWidget( "full_server_setting_option" ), 0, this, false );
 		
+		m_RegionFilter.m_OptionChanged.Insert( OnFilterChanged );
+		m_PingFilter.m_OptionChanged.Insert( OnFilterChanged );
+		m_FavoritedFilter.m_OptionChanged.Insert( OnFilterChanged );
+		m_FriendsPlayingFilter.m_OptionChanged.Insert( OnFilterChanged );
+		m_PreviouslyPlayedFilter.m_OptionChanged.Insert( OnFilterChanged );
+		m_FullServerFilter.m_OptionChanged.Insert( OnFilterChanged );
+		
 		#ifdef PLATFORM_CONSOLE
 			m_SortingFilter			= new OptionSelectorMultistate( root.FindAnyWidget( "sort_setting_option" ), 0, this, false, sort_options );
 			m_SortingFilter.m_OptionChanged.Insert( OnSortChanged );
+			m_SortingFilter.m_OptionChanged.Insert( OnFilterChanged );
 			m_PingFilter.Disable();
 			m_FriendsPlayingFilter.Disable();
 		#endif
@@ -56,9 +64,22 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				m_ThirdPersonFilter			= new OptionSelector( root.FindAnyWidget( "tps_setting_option" ), 0, this, false );
 				m_PublicFilter				= new OptionSelector( root.FindAnyWidget( "public_setting_option" ), 0, this, false );
 				m_AcceleratedTimeFilter		= new OptionSelector( root.FindAnyWidget( "accelerated_time_setting_option" ), 0, this, false );
+		
+				m_CharacterAliveFilter.m_OptionChanged.Insert( OnFilterChanged );
+				m_BattleyeFilter.m_OptionChanged.Insert( OnFilterChanged );
+				m_PasswordFilter.m_OptionChanged.Insert( OnFilterChanged );
+				m_VersionMatchFilter.m_OptionChanged.Insert( OnFilterChanged );
+				m_ThirdPersonFilter.m_OptionChanged.Insert( OnFilterChanged );
+				m_PublicFilter.m_OptionChanged.Insert( OnFilterChanged );
+				m_AcceleratedTimeFilter.m_OptionChanged.Insert( OnFilterChanged );
 			#endif
 		#endif
 		LoadFilters();
+	}
+	
+	void OnFilterChanged()
+	{
+		m_Tab.OnFilterChanged();
 	}
 	
 	void LoadFilters()
@@ -73,15 +94,15 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		
 		if( options && options.Count() >= 6 )
 		{
-			m_RegionFilter.SetStringOption( options.Get( "m_RegionFilter" ) );
-			m_PingFilter.SetStringOption( options.Get( "m_PingFilter" ) );
-			m_FavoritedFilter.SetStringOption( options.Get( "m_FavoritedFilter" ) );
-			m_FriendsPlayingFilter.SetStringOption( options.Get( "m_FriendsPlayingFilter" ) );
-			m_PreviouslyPlayedFilter.SetStringOption( options.Get( "m_PreviouslyPlayedFilter" ) );
-			m_FullServerFilter.SetStringOption( options.Get( "m_FullServerFilter" ) );
+			m_RegionFilter.SetStringOption( options.Get( "m_RegionFilter" ), false );
+			m_PingFilter.SetStringOption( options.Get( "m_PingFilter" ), false );
+			m_FavoritedFilter.SetStringOption( options.Get( "m_FavoritedFilter" ), false );
+			m_FriendsPlayingFilter.SetStringOption( options.Get( "m_FriendsPlayingFilter" ), false );
+			m_PreviouslyPlayedFilter.SetStringOption( options.Get( "m_PreviouslyPlayedFilter" ), false );
+			m_FullServerFilter.SetStringOption( options.Get( "m_FullServerFilter" ), false );
 			
 			#ifdef PLATFORM_CONSOLE
-				m_SortingFilter.SetStringOption( options.Get( "m_SortingFilter" ) );
+				m_SortingFilter.SetStringOption( options.Get( "m_SortingFilter" ), false );
 			#endif
 			
 			if( options.Count() >= 12 )
@@ -90,13 +111,13 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 					#ifndef PLATFORM_CONSOLE
 						m_SearchByName.SetText( options.Get( "m_SearchByName" ) );
 						m_SearchByIP.SetText( options.Get( "m_SearchByIP" ) );
-						m_CharacterAliveFilter.SetStringOption( options.Get( "m_CharacterAliveFilter" ) );
-						m_BattleyeFilter.SetStringOption( options.Get( "m_BattleyeFilter" ) );
-						m_PasswordFilter.SetStringOption( options.Get( "m_PasswordFilter" ) );
-						m_VersionMatchFilter.SetStringOption( options.Get( "m_VersionMatchFilter" ) );
-						m_ThirdPersonFilter.SetStringOption( options.Get( "m_ThirdPersonFilter" ) );
-						m_PublicFilter.SetStringOption( options.Get( "m_PublicFilter" ) );
-						m_AcceleratedTimeFilter.SetStringOption( options.Get( "m_AcceleratedTimeFilter" ) );
+						m_CharacterAliveFilter.SetStringOption( options.Get( "m_CharacterAliveFilter" ), false );
+						m_BattleyeFilter.SetStringOption( options.Get( "m_BattleyeFilter" ), false );
+						m_PasswordFilter.SetStringOption( options.Get( "m_PasswordFilter" ), false );
+						m_VersionMatchFilter.SetStringOption( options.Get( "m_VersionMatchFilter" ), false );
+						m_ThirdPersonFilter.SetStringOption( options.Get( "m_ThirdPersonFilter" ), false );
+						m_PublicFilter.SetStringOption( options.Get( "m_PublicFilter" ), false );
+						m_AcceleratedTimeFilter.SetStringOption( options.Get( "m_AcceleratedTimeFilter" ), false );
 					#endif
 				#endif
 			}
@@ -201,6 +222,45 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		#endif
 	}
 	
+	override bool OnEvent( EventType eventType, Widget target, int parameter0, int parameter1 )
+	{
+		if( target )
+		{
+			if( target == m_SearchByName || target == m_SearchByIP )
+			{
+				OnFilterChanged();
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	override bool OnChange( Widget w, int x, int y, bool finished )
+	{
+		if( w )
+		{
+			if( w == m_SearchByName || w == m_SearchByIP )
+			{
+				OnFilterChanged();
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	override bool OnUpdate( Widget w )
+	{
+		if( w )
+		{
+			if( w == m_SearchByName || w == m_SearchByIP )
+			{
+				OnFilterChanged();
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	override bool OnFocus( Widget w, int x, int y )
 	{
 		m_Tab.FilterFocus( ( w != null ) );
@@ -211,9 +271,8 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 	{
 		ref GetServersInput input = new GetServersInput;
 		
-		input.m_Page = 0;
 		input.m_RowsPerPage = SERVER_BROWSER_PAGE_SIZE;
-		input.m_Platform = 1;
+		//input.m_Platform = 1;
 
 		#ifdef PLATFORM_XBOX
 			input.m_Platform = 2;

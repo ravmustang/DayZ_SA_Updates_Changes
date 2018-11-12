@@ -62,7 +62,7 @@ class ActionGetOutTransport: ActionInteractBase
 				if ( Class.CastTo(car, trans) )
 				{
 					float speed = car.GetSpeedometer();
-					if ( speed <= 5 )
+					if ( speed <= 8 )
 					{
 						vehCommand.GetOutVehicle();
 					}
@@ -74,7 +74,7 @@ class ActionGetOutTransport: ActionInteractBase
 			}
 		}
 	}
-	
+
 	override void OnUpdate(ActionData action_data)
 	{
 

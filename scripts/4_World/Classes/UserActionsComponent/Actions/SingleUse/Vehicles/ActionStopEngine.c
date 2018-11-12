@@ -34,9 +34,10 @@ class ActionStopEngine: ActionSingleUseBase
 			Transport trans = vehCmd.GetTransport();
 			if ( trans )
 			{
-				if ( Class.CastTo(car, trans) &&  car.IsEngineOn() )
+				if ( Class.CastTo(car, trans) && car.IsEngineOn() )
 				{
-					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
+					//if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
+					if ( car.GetSpeedometer() <= 8 )
 						return true;
 				}
 			}

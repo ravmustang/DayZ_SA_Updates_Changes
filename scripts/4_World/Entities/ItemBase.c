@@ -1119,6 +1119,7 @@ class ItemBase extends InventoryItem
 				return false;
 			}
 		}
+		
 		if(!can_this_be_combined || !other_item) 
 		{
 			return false;

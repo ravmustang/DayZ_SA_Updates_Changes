@@ -1,4 +1,4 @@
-class InventoryQuickbar: InventoryGridController
+class InventoryQuickbar extends InventoryGridController
 {
 	
 	protected ref TItemsMap	m_Items;//tmp
@@ -271,7 +271,7 @@ class InventoryQuickbar: InventoryGridController
 		return m_QuickBarGridWidth;
 	}
 	
-	int GetQuickbarItemColor( InventoryGrid grid, ItemBase item )
+	override int GetQuickbarItemColor( InventoryGrid grid, InventoryItem item )
 	{
 		int color = InventoryGrid.ITEM_COLOR_QUICKBAR_NORMAL;
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
@@ -295,17 +295,17 @@ class InventoryQuickbar: InventoryGridController
 	}
 
 	
-	int HasItemQuantity( ItemBase item )
+	override int HasItemQuantity( InventoryItem item )
 	{
 		return QuantityConversions.HasItemQuantity( item );
 	}
 
-	string GetItemQuantityText( ItemBase item )
+	override string GetItemQuantityText( InventoryItem item )
 	{
 		return QuantityConversions.GetItemQuantityText( item );
 	}
 
-	float GetItemQuantity( ItemBase item )
+	override float GetItemQuantity( InventoryItem item )
 	{
 		return QuantityConversions.GetItemQuantity( item );
 	}

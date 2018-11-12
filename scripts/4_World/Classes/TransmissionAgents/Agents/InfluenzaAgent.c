@@ -1,6 +1,6 @@
 class InfluenzaAgent extends AgentBase
 {
-	const float INFLUENZA_AGENT_AUTOINFECT_THRESHOLD_HC = -0.2;//degrees celsius
+	const float INFLUENZA_AGENT_AUTOINFECT_THRESHOLD_HC = -0.2;
 	const float INFLUENZA_AGENT_AUTOINFECT_THRESHOLD_IMMUNITY = 0.5;//[0..1]
 
 	override void Init()

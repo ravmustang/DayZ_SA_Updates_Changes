@@ -446,7 +446,7 @@ class MiscGameplayFunctions
 		}
 		else
 		{
-			Error("no value for 'OnRestrainChange' config parameter");
+			Error("current_item:" +current_item+ ", tool:" +tool +"no value for 'OnRestrainChange' config parameter");
 		}
 	}
 	

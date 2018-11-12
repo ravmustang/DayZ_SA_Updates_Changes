@@ -30,7 +30,7 @@ class PlayerBase extends ManBase
 	ref EmoteManager 				m_EmoteManager;
 //	ref VehicleManager 				m_VehicleManager;
 	ref SymptomManager				m_SymptomManager;
-	ref VirtualHud 				m_VirtualHud;
+	ref VirtualHud 					m_VirtualHud;
 	ref StaminaHandler				m_StaminaHandler;
 	ref InjuryHandler				m_InjuryHandler;
 	ref SoftSkillsManager			m_SoftSkillsManager;
@@ -53,7 +53,8 @@ class PlayerBase extends ManBase
 	ref CraftingManager 			m_CraftingManager;
 	ref InventoryActionHandler 		m_InventoryActionHandler;
 	ref protected QuickBarBase		m_QuickBarBase;
-	ref StaminaSoundHandler			m_StaminaSoundHandler;
+	ref PlayerSoundManagerServer			m_PlayerSoundManagerServer;
+	ref PlayerSoundManagerClient			m_PlayerSoundManagerClient;
 	bool 							m_QuickBarHold;
 	Hud 							m_Hud;
 	protected bool					m_CancelAction;
@@ -71,7 +72,6 @@ class PlayerBase extends ManBase
 	float							m_UnconsciousTime;
 	int 							m_ShockSimplified;
 	bool							m_IsRestrained;
-	int 							m_ShockSimplifiedSent = -1;
 	float							m_UnconsciousVignetteTarget = 2;
 	float							m_CameraSwayModifier = 0.2;
 	float 							m_LastShockHitTime;
@@ -82,6 +82,8 @@ class PlayerBase extends ManBase
 	protected bool					m_AllowQuickRestrain;
 	protected int					m_Shakes;
 	protected int					m_BreathVapour;
+	int 							m_HealthLevel;
+	int 							m_MixedSoundStates;
 	
 
 	ref protected RandomGeneratorSyncManager m_RGSManager;
@@ -155,6 +157,10 @@ class PlayerBase extends ManBase
 	string							m_DatabaseID;
 	ref Timer						m_AnalyticsTimer;
 	
+	//! melee stats
+	protected int					m_MeleeLastHitTime;
+	protected EntityAI 				m_MeleeSource;
+		
 	void PlayerBase()
 	{	
 		Init();		
@@ -191,32 +197,31 @@ class PlayerBase extends ManBase
 		m_QuickBarHold = false;
 		
 		m_AnalyticsTimer = new Timer( CALL_CATEGORY_SYSTEM );
-		
-		
-		if(  GetGame().IsClient() || ( !GetGame().IsMultiplayer() && GetGame().IsServer() ) )
-		{
-			m_StanceIndicator = new StanceIndicator(this);
-			m_BleedingManagerRemote = new BleedingSourcesManagerRemote(this);
-		}
+
+		m_StaminaHandler = new StaminaHandler(this);//current stamina calculation
+		m_InjuryHandler = new InjuryHandler(this);
 		if( GetGame().IsServer() )
 		{
+			m_MeleeSource = null;
+			m_MeleeLastHitTime = -1;
 			m_PlayerStats = new PlayerStats(this);//player stats
 			m_NotifiersManager = new NotifiersManager(this); // player notifiers 
 			m_AgentPool = new PlayerAgentPool(this); // agent pool manager
 			m_BleedingManagerServer = new BleedingSourcesManagerServer(this);
-			
 			m_Environment = new Environment(this);//environment effects on player
 			m_ModifiersManager = new ModifiersManager(this); // player modifiers 
+			m_PlayerSoundManagerServer = new PlayerSoundManagerServer(this);
 		}
+		
 		m_SymptomManager = new SymptomManager(this); // state manager
 		m_ModuleRecipesManager = PluginRecipesManager.Cast(GetPlugin(PluginRecipesManager));
 		m_VirtualHud = new VirtualHud(this);
 		m_TrasferValues = new TransferValues(this);
 		m_EmoteManager = new EmoteManager(this);
 		m_SoftSkillsManager = new SoftSkillsManager(this);//Soft Skills calculation
-		m_StaminaHandler = new StaminaHandler(this);//current stamina calculation
-		m_StaminaSoundHandler = new StaminaSoundHandler(m_StaminaHandler, this);
-		m_InjuryHandler = new InjuryHandler(this);
+		
+		
+		
 		m_WeaponManager = new WeaponManager(this);
 		m_DebugMonitorValues = new DebugMonitorValues(this);
 		m_RGSManager = new RandomGeneratorSyncManager(this);
@@ -226,6 +231,9 @@ class PlayerBase extends ManBase
 			m_CraftingManager = new CraftingManager(this,m_ModuleRecipesManager);
 			m_InventoryActionHandler = new InventoryActionHandler(this);
 			m_PlayerSoundEventHandler = new PlayerSoundEventHandler(this);
+			m_BleedingManagerRemote = new BleedingSourcesManagerRemote(this);
+			m_PlayerSoundManagerClient = new PlayerSoundManagerClient(this);
+			m_StanceIndicator = new StanceIndicator(this);
 		}
 
 		m_ActionManager = NULL;
@@ -288,11 +296,13 @@ class PlayerBase extends ManBase
 		RegisterNetSyncVariableInt("m_LifeSpanState", LifeSpanState.BEARD_NONE, LifeSpanState.COUNT);
 		RegisterNetSyncVariableInt("m_BloodType", 0, 127);
 		RegisterNetSyncVariableInt("m_ShockSimplified",0, SIMPLIFIED_SHOCK_CAP);
-		RegisterNetSyncVariableInt("m_SoundEvent",0,31);
+		RegisterNetSyncVariableInt("m_SoundEvent",0, EPlayerSoundEventID.ENUM_COUNT - 1);
 		RegisterNetSyncVariableInt("m_StaminaState",0,7);
 		RegisterNetSyncVariableInt("m_BleedingBits");
 		RegisterNetSyncVariableInt("m_Shakes", -SHAKE_LEVEL_MAX, SHAKE_LEVEL_MAX);
 		RegisterNetSyncVariableInt("m_BreathVapour", 0, BREATH_VAPOUR_LEVEL_MAX);
+		RegisterNetSyncVariableInt("m_HealthLevel", eInjuryHandlerLevels.PRISTINE, eInjuryHandlerLevels.RUINED);
+		RegisterNetSyncVariableInt("m_MixedSoundStates", 0, eMixedSoundStates.COUNT - 1);
 		
 		RegisterNetSyncVariableBool("m_IsUnconscious");
 		RegisterNetSyncVariableBool("m_IsRestrained");
@@ -322,6 +332,33 @@ class PlayerBase extends ManBase
 		return m_BreathVapour;
 	}
 	
+	
+	
+	// adds state to and syncs sound states variable which is used to generate sound client-side
+	void UnsetMixedSoundState(eMixedSoundStates state)
+	{
+		int bit_mask_remove = ~state;
+		
+		eMixedSoundStates new_states = m_MixedSoundStates & bit_mask_remove;
+
+		if(new_states != m_MixedSoundStates)
+		{
+			m_MixedSoundStates = new_states;
+			SetSynchDirty();
+		}
+	}
+	
+	// adds state to and syncs sound states variable which is used to generate sound client-side
+	void SetMixedSoundState(eMixedSoundStates state)
+	{
+		eMixedSoundStates new_states = m_MixedSoundStates | state;
+		
+		if(new_states != m_MixedSoundStates)
+		{
+			m_MixedSoundStates = new_states;
+			SetSynchDirty();
+		}
+	}
 	
 	bool IsBleeding()
 	{
@@ -401,11 +438,23 @@ class PlayerBase extends ManBase
 		} 
 		
 		GetSymptomManager().OnPlayerKilled();
+		
+		//! log melee kill in case of melee
+		LogMeleeKill();
 	}
 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos);
+		
+		//! melee specific stuff
+		if (damageType == 0)
+		{
+			//! save melee source for further processing (eg. ADM log)
+			m_MeleeLastHitTime = GetGame().GetTime();
+			m_MeleeSource = source;
+		}
+		
 		if( damageResult != null && damageResult.GetDamage(dmgZone, "Shock") > 0)
 		{
 			m_LastShockHitTime = GetGame().GetTime();
@@ -460,6 +509,59 @@ class PlayerBase extends ManBase
 	override string GetDefaultHitComponent()
 	{
 		return GetDayZPlayerType().GetDefaultHitComponent();
+	}
+	
+	protected void LogMeleeKill()
+	{
+		if (GetGame().IsServer())
+		{
+			//! dont't log
+			if (GetGame().GetTime() > m_MeleeLastHitTime + 3000)
+			{
+				return;
+			}
+
+			Man killer;
+			Man victim;
+			PlayerIdentity victimIdentity;
+			PlayerIdentity killerIdentity;
+			
+			EntityAI weapon;
+
+			//! victim setup
+			victim = Man.Cast(this);
+			victimIdentity = victim.GetIdentity();
+
+			if( m_MeleeSource.IsMan() )
+			{
+				//! bare hand fight
+				killer = Man.Cast(m_MeleeSource);
+				killerIdentity = killer.GetIdentity();
+				weapon = null;
+
+			}
+			else
+			{
+				//! melee weapon
+				killer = Man.Cast(m_MeleeSource.GetHierarchyParent());
+				killerIdentity = killer.GetIdentity();
+				weapon = m_MeleeSource;
+			}
+			
+			if (victimIdentity && killerIdentity)
+			{
+				if (weapon)
+				{
+					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ") with " + weapon.GetDisplayName() );
+					//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ") with " + weapon.GetDisplayName() );
+				}
+				else
+				{
+					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ")");
+					//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ")");
+				}
+			}
+		}
 	}
 
 	//--------------------------------------------------------------------------
@@ -620,6 +722,11 @@ class PlayerBase extends ManBase
 	}
 	
 	
+	PlayerSoundManagerServer GetPlayerSoundManagerServer()
+	{
+		return m_PlayerSoundManagerServer;
+	}
+		
 	// --------------------------------------------------
 	// User Actions
 	//---------------------------------------------------
@@ -909,14 +1016,17 @@ class PlayerBase extends ManBase
 	{
 		//SendSoundEvent(SoundSetMap.GetSoundSetID("releaseBreath_male_Char_SoundSet"));
 		RequestSoundEvent(EPlayerSoundEventID.RELEASE_BREATH, true);
-		
 	}
 	
 	override bool IsHoldingBreath()
 	{
 		return m_IsHoldingBreath;
-	}	
+	}
 	
+	eMixedSoundStates GetMixedSoundStates()
+	{
+		return m_MixedSoundStates;
+	}
 	
 	AbstractWave SaySoundSet(string name)
 	{
@@ -1541,6 +1651,7 @@ class PlayerBase extends ManBase
 		}
 		if ( GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER || !GetGame().IsMultiplayer() )
 		{
+			GetPlayerSoundManagerServer().Update();
 			ShockRefill(pDt);
 			ShakeCheck();
 			AirTemperatureCheck();
@@ -1891,12 +2002,14 @@ class PlayerBase extends ManBase
 		m_UnconsciousTime += pDt;
 		if( GetGame().IsServer() )
 		{
-			m_ShockSimplified = SimplifyShock();
-			if( m_ShockSimplifiedSent != m_ShockSimplified )
+			int shock_simplified = SimplifyShock();
+			
+			if( m_ShockSimplified != shock_simplified )
 			{
+				m_ShockSimplified = shock_simplified;
 				SetSynchDirty();
-				m_ShockSimplifiedSent = m_ShockSimplified;
 			}
+			
 			//PrintString(last_command.ToString());
 			//PrintString(DayZPlayerConstants.COMMANDID_SWIM.ToString());
 			
@@ -3498,7 +3611,7 @@ class PlayerBase extends ManBase
 	
 	bool CanSpawnBreathVaporEffect()
 	{
-		if( IsAlive() && !IsSwimming() )
+		if( !ToDelete() && IsAlive() && !IsSwimming() )
 		{
 			return true;
 		}
@@ -3508,7 +3621,6 @@ class PlayerBase extends ManBase
 	void SpawnBreathVaporEffect()
 	{
 		int boneIdx = GetBoneIndexByName("Head");
-			
 		if( boneIdx != -1 )
 		{
 			EffectParticle eff;
@@ -4239,10 +4351,10 @@ class PlayerBase extends ManBase
 		switch( pJunctureID )
 		{
 			case DayZPlayerSyncJunctures.SJ_INJURY:
-				float damage;
+				eInjuryHandlerLevels level;
 				bool enable;
-				DayZPlayerSyncJunctures.ReadInjuryParams(pCtx, enable, damage);
-				m_InjuryHandler.SetInjuryCommandParams(enable, damage);
+				DayZPlayerSyncJunctures.ReadInjuryParams(pCtx, enable, level);
+				m_InjuryHandler.SetInjuryCommandParams(enable, level);
 				break;
 			case DayZPlayerSyncJunctures.SJ_ACTION_INTERRUPT:
 				m_CancelAction = true;

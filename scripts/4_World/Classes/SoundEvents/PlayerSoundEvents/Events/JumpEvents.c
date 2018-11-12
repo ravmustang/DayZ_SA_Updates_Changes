@@ -1,6 +1,6 @@
 class JumpEventsBase extends PlayerSoundEventBase
 {
-	override bool IsCurrentHasPriority(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type)
+	override bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type_other)
 	{
 		return true;
 	}
@@ -13,12 +13,19 @@ class JumpEventsBase extends PlayerSoundEventBase
 		}
 		return true;
 	}
+	
+	override void OnEnd()
+	{
+		//m_Player.GetStaminaSoundHandlerClient().PostponeStamina(1000);
+		StaminaSoundHandlerClient.Cast(m_Player.m_PlayerSoundManagerClient.GetHandler(eSoundHandlers.STAMINA)).PostponeStamina(1000);
+	}
 }
 
-class JumpSoundEvent extends SymptomSoundEventBase
+class JumpSoundEvent extends JumpEventsBase
 {
 	void JumpSoundEvent()
 	{
+		m_HasPriorityOverTypes = -1;//-1 for all
 		m_Type = EPlayerSoundEventType.GENERAL;
 		m_ID = EPlayerSoundEventID.JUMP;
 		m_SoundVoiceAnimEventClassID = 18;

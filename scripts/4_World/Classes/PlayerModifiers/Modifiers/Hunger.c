@@ -3,8 +3,6 @@ class HungerMdfr: ModifierBase
 	protected float	m_EnergyDelta;
 	protected float	m_LastEnergyLevel;
 	ref HumanMovementState		m_MovementState	= new HumanMovementState();
-	
-	
 		
 	override void Init()
 	{
@@ -13,6 +11,7 @@ class HungerMdfr: ModifierBase
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= 1;
 	}
+	
 	override bool ActivateCondition(PlayerBase player)
 	{
 		return true;
@@ -42,17 +41,12 @@ class HungerMdfr: ModifierBase
 		player.GetStatEnergy().Add( -metabolic_speed * deltaT );
 		if ( energy <= PlayerConstants.LOW_ENERGY_THRESHOLD )
 		{
-			/*
-			float currenthealth = player.GetHealth("GlobalHealth", "Health");
-			float currentblood = player.GetHealth("GlobalHealth", "Blood");
-			
-			float health_delta = ( 1 - Math.InverseLerp(0,PlayerConstants.LOW_ENERGY_THRESHOLD, player.GetStatEnergy().Get()) ) * -PlayerConstants.DAMAGE_PER_SEC * deltaT;
-			
-			player.AddHealth("GlobalHealth", "", health_delta);
-			*/
+			player.SetMixedSoundState( eMixedSoundStates.HUNGRY );
 			player.AddHealth("GlobalHealth", "Health", -PlayerConstants.LOW_ENERGY_DAMAGE_PER_SEC * deltaT );
 		}
+		else
+		{
+			player.UnsetMixedSoundState( eMixedSoundStates.HUNGRY );
+		}
 	}
-	
-	
 };

@@ -25,6 +25,15 @@ class BleedingCheckMdfr: ModifierBase
 	override void OnActivate(PlayerBase player)
 	{
 		player.SetHealth("","",-1000);
+		
+		if (GetGame().IsServer())
+		{
+			PlayerIdentity identity = m_Player.GetIdentity();
+			if (identity)
+			{
+				GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player '" + identity.GetName() + "' (id=" + identity.GetId() + ") bled out.");
+			}
+		}
 	}
 
 	override void OnDeactivate(PlayerBase player)

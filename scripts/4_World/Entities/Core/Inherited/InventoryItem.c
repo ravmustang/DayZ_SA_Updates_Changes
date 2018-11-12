@@ -99,7 +99,7 @@ class CarWheel extends InventoryItemSuper
 				newWheel = "CivSedanWheel_Ruined";
 			break;	
 		}
-		
+
 		if ( newWheel != "" )
 		{
 			ReplaceWheelLambda lambda = new ReplaceWheelLambda ( this, newWheel, NULL);
@@ -165,10 +165,21 @@ class CarDoor extends InventoryItemSuper
 
 class CarRadiator extends InventoryItemSuper
 {
+	override void OnWasAttached ( EntityAI parent, int slot_id )
+	{	
+		if ( GetGame().IsServer() && parent )
+		{
+			Car car;
+		 	Class.CastTo( car, parent );
+
+			if ( car )
+				car.SetHealth( "Radiator", "Health", GetHealth() );
+		}
+	}
 
 	override void OnWasDetached ( EntityAI parent, int slot_id )
 	{
-		if ( parent )
+		if ( GetGame().IsServer() && parent )
 		{
 			Car car;
 		 	Class.CastTo( car, parent );
@@ -176,20 +187,22 @@ class CarRadiator extends InventoryItemSuper
 			if ( car )
 			{
 				car.Leak( CarFluid.COOLANT, car.GetFluidFraction(CarFluid.COOLANT)*car.GetFluidCapacity(CarFluid.COOLANT) );
+				car.SetHealth( "Radiator", "Health", 0);
 			}
 		}
 	}
 	
 	override void EEKilled(Object killer)
 	{
-		Car car;
-		EntityAI parent = GetHierarchyParent();
-		
-		Class.CastTo( car, parent );
-
-		if ( car )
+		if ( GetGame().IsServer() )
 		{
-			car.Leak( CarFluid.COOLANT, car.GetFluidFraction(CarFluid.COOLANT)*car.GetFluidCapacity(CarFluid.COOLANT) );
+			Car car;
+			EntityAI parent = GetHierarchyParent();
+			
+			Class.CastTo( car, parent );
+
+			if ( car )
+				car.Leak( CarFluid.COOLANT, car.GetFluidFraction(CarFluid.COOLANT)*car.GetFluidCapacity(CarFluid.COOLANT) );
 		}
 	}
 

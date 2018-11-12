@@ -5,11 +5,6 @@ class InGameMenu extends UIScriptedMenu
 	protected ButtonWidget					m_RestartButton;
 	protected ButtonWidget					m_OptionsButton;
 	
-	void InGameMenu()
-	{
-		//nic
-	}
-	
 	void ~InGameMenu()
 	{
 		Mission mission = GetGame().GetMission();
@@ -22,8 +17,6 @@ class InGameMenu extends UIScriptedMenu
 				hud.ToggleQuickBar( hud.GetQuickBarState(), true );
 			}
 		}
-		
-		UnlockControls();
 	}
 
 	override Widget Init()

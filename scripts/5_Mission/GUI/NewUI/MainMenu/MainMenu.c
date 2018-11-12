@@ -376,7 +376,7 @@ class MainMenu extends UIScriptedMenu
 
 	override void Update(float timeslice)
 	{
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) && g_Game.GetLoadState() != DayZGameState.CONNECTING )
+		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) && g_Game.GetLoadState() != DayZGameState.CONNECTING && !GetGame().GetUIManager().IsDialogVisible() )
 		{
 			#ifdef PLATFORM_CONSOLE
 				g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );

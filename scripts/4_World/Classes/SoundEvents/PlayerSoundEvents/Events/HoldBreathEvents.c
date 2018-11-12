@@ -2,6 +2,7 @@ class HoldBreathSoundEventBase extends PlayerSoundEventBase
 {
 	void HoldBreathSoundEventBase()
 	{
+		m_HasPriorityOverTypes = -1;
 		m_SkipForControlledCharacter = true;
 	}
 	
@@ -21,13 +22,22 @@ class HoldBreathSoundEvent extends HoldBreathSoundEventBase
 		m_SoundVoiceAnimEventClassID = 20;
 	}
 	
-	override bool IsCurrentHasPriority(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type)
+	override bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type_other)
 	{
+		/*
+		if( other_state_id == EPlayerSoundEventID.RELEASE_BREATH)
+		{
+			return true;
+		}
+		return false;
+		*/
+		
 		if( other_state_id == EPlayerSoundEventID.RELEASE_BREATH)
 		{
 			return false;
 		}
-		return false;
+		return true;
+		
 	}
 }
 
@@ -40,12 +50,19 @@ class ReleaseBreathSoundEvent extends HoldBreathSoundEventBase
 		m_SoundVoiceAnimEventClassID = 21;
 	}
 	
-	override bool IsCurrentHasPriority(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type)
+	override bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type_other)
 	{
+		/*
+		if( other_state_id == EPlayerSoundEventID.HOLD_BREATH)
+		{
+			return true;
+		}
+		return false;
+		*/
 		if( other_state_id == EPlayerSoundEventID.HOLD_BREATH)
 		{
 			return false;
 		}
-		return false;
+		return true;
 	}
 }

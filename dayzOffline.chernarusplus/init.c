@@ -12,13 +12,13 @@ void main()
 	weather.GetRain().SetLimits( 0.0 , 1.0 );
 	weather.GetFog().SetLimits( 0.0 , 0.25 );
 
-	weather.GetOvercast().SetForecastChangeLimits( 0.0, 0.2 );
-	weather.GetRain().SetForecastChangeLimits( 0.0, 0.1 );
-	weather.GetFog().SetForecastChangeLimits( 0.15, 0.45 );
+	weather.GetOvercast().SetForecastChangeLimits( 0.5, 0.8 );
+	weather.GetRain().SetForecastChangeLimits( 0.1, 0.3 );
+	weather.GetFog().SetForecastChangeLimits( 0.05, 0.10 );
 
-	weather.GetOvercast().SetForecastTimeLimits( 1800 , 1800 );
-	weather.GetRain().SetForecastTimeLimits( 600 , 600 );
-	weather.GetFog().SetForecastTimeLimits( 1800 , 1800 );
+	weather.GetOvercast().SetForecastTimeLimits( 3600 , 3600 );
+	weather.GetRain().SetForecastTimeLimits( 300 , 300 );
+	weather.GetFog().SetForecastTimeLimits( 3600 , 3600 );
 
 	weather.GetOvercast().Set( Math.RandomFloatInclusive(0.0, 0.3), 0, 0);
 	weather.GetRain().Set( Math.RandomFloatInclusive(0.0, 0.2), 0, 0);

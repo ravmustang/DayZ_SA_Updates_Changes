@@ -4,9 +4,9 @@ class OffroadHatchback extends CarScript
 	{
 		super.Init();
 		m_dmgContactCoef = 0.095;
-		m_enginePtcPos = "0 0.95 1.25";
-		m_coolantPtcPos = "0.30 0.95 1.60";
-		m_exhaustPtcPos = "-0.63 0.58 -1.98";
+		//m_enginePtcPos = "0 0.95 1.25";
+		//m_coolantPtcPos = "0.30 0.95 1.60";
+		//m_exhaustPtcPos = "-0.63 0.58 -1.98";
 	}
 
 	override int GetAnimInstance()

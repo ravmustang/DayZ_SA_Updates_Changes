@@ -1,17 +1,20 @@
 class DamageSoundEvents extends PlayerSoundEventBase
 {
+	
+	void DamageSoundEvents()
+	{
+		m_HasPriorityOverTypes = -1;//-1 for all
+		m_Type = EPlayerSoundEventType.DAMAGE;
+	}
+	
 	override bool CanPlay()
 	{
 		return true;
 	}
 	
-	override bool IsCurrentHasPriority(PlayerBase player, EPlayerSoundEventID other_state_id,EPlayerSoundEventType type )
+	override bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id,EPlayerSoundEventType type_other )
 	{
-		if(type != EPlayerSoundEventType.DAMAGE)
-		{
-			return true;
-		}
-		return false;
+		return true;
 	}
 }
 
@@ -19,7 +22,7 @@ class DamageLightSoundEvent extends DamageSoundEvents
 {
 	void DamageLightSoundEvent()
 	{
-		m_Type = EPlayerSoundEventType.DAMAGE;
+		
 		m_ID = EPlayerSoundEventID.TAKING_DMG_LIGHT;
 		m_SoundVoiceAnimEventClassID = 12;
 	}
@@ -27,9 +30,8 @@ class DamageLightSoundEvent extends DamageSoundEvents
 
 class DamageHeavySoundEvent extends DamageSoundEvents
 {
-	void DamageLightSoundEvent()
+	void DamageHeavySoundEvent()
 	{
-		m_Type = EPlayerSoundEventType.DAMAGE;
 		m_ID = EPlayerSoundEventID.TAKING_DMG_HEAVY;
 		m_SoundVoiceAnimEventClassID = 13;
 	}

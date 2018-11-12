@@ -196,7 +196,7 @@ class DayZPlayerType
 	proto native 	void SetAimLimits(float pDown, float pUp, float pLeft, float pRight);
 
 	//! sets aim limits for a player
-	proto native 	void SetCameraShootParams(float pRayDistance, float pRayRadius);
+	proto native 	void SetCameraShootParams(float pRayDistance, float pRayRadius, float pMaxAngleCos);
 
 	//!----------------------------------------------------
 	// bone indices

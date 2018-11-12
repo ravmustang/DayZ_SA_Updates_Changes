@@ -530,6 +530,7 @@ class Hud: Managed
 	bool IsXboxDebugCursorEnabled();
 	void ShowVehicleInfo();
 	void HideVehicleInfo();
+	void OnResizeScreen();
 
 	void SetPermanentCrossHair( bool show ) {}
 
@@ -876,10 +877,18 @@ proto native Hive GetHive();
 // -------------------------------------------------------------------------
 class UAInput
 {
-	proto native int Hash();
+	proto native int Hash();	// return input hash
 
-	proto native void BindButton( string sButtonName );
-	proto native void UnBindButton( string sButtonName );
+	proto native int BindingCount();	// return binding count
+	proto native int Binding( int iIndex );	// return binding at index
+
+	proto native void ClearBinding();	// remove all bindings
+
+	proto native void BindButton( string sButtonName );		// bind button to this input by name
+	proto native void UnBindButton( string sButtonName );	// unbind button to this input by name
+
+	proto native void BindButtonByHash( int iHash );		// bind button to this input by hash
+	proto native void UnBindButtonByHash( int iHash );		// unbind button to this input by hash
 
 	proto native float LocalValue();
 
@@ -888,7 +897,7 @@ class UAInput
 	proto native bool LocalHold();
 	proto native bool LocalDoubleClick();
 
-	proto native bool IsCombo();	// return true if there is currently combo bind
+	proto native bool IsCombo();	// return true if there is currently combo bind - use Binding() result !!!
 
 	// normal state is there are no limits, input generates all the events
 	// but if there is an limiter, 
@@ -911,9 +920,14 @@ class UAInputAPI
 
 	proto native UAInput GetInputByID( int iID );
 	proto native UAInput GetInputByName( string sInputName );
+
+	proto native string GetButtonName( int iHash );	// get localized name for any button hash
 	
-	proto bool GetButtonNameByDik( int iDikCode, out string sName );
-	proto native int GetButtonIDByDik( int iDikCode );
+	// for options only mapping, do not call normally as it is not performance wise!
+	proto int DeterminePressedButton();	// return code of recently pressed key, mouse button or pad button (returns zero if nothing pressed)
+
+/*raist todo: remove*/	proto bool GetButtonNameByDik( int iDikCode, out string sName );
+/*raist todo: remove*/	proto native int GetButtonIDByDik( int iDikCode );
 
 	proto native UAInput RegisterInput( string sInputName, string sLoc, string sGroupName );
 	proto native void DeRegisterInput( string sInputName );
@@ -925,7 +939,7 @@ class UAInputAPI
 	proto native void ActivateExclude( string sExcludeName );
 	proto native void ActivateModificator( string sModName );
 
-	proto native void Export();
+	proto native void Export();	// export XML (user) configuration
 };
 
 proto native UAInputAPI GetUApi();

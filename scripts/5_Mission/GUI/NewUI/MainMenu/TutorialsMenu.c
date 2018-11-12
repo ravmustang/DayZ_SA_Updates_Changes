@@ -38,15 +38,7 @@ class TutorialsMenu extends UIScriptedMenu
 		PPEffects.SetBlurMenu( 0 );
 	}
 
-	//============================================
-	// Menu Controls
-	//============================================	
-	void OpenMenu()
-	{
-		GetGame().GetUIManager().EnterScriptedMenu( MENU_XBOX_CONTROLS, NULL );
-	}
-	
-	void CloseMenu()
+	void Back()
 	{
 		GetGame().GetUIManager().Back();
 	}
@@ -293,6 +285,11 @@ class TutorialsMenu extends UIScriptedMenu
 		{
 			m_TabScript.NextTab();
 			DrawConnectingLines( m_TabScript.GetSelectedIndex() );
+		}
+		
+		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
+		{
+			Back();
 		}
 	}
 }

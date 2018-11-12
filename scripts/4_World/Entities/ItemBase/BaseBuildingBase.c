@@ -240,6 +240,12 @@ class BaseBuildingBase extends ItemBase
 		GetGame().ObjectDelete( construction_kit );
 	}
 	
+	//--- CONSTRUCTION
+	void DestroyConstruction()
+	{
+		GetGame().ObjectDelete( this );
+	}	
+	
 	// --- EVENTS
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{   
@@ -333,7 +339,7 @@ class BaseBuildingBase extends ItemBase
 		if ( constrution_part.IsBase() )
 		{
 			//Destroy construction
-			GetGame().ObjectDelete( this );
+			DestroyConstruction();
 		}
 		
 		//check gate state
@@ -584,7 +590,7 @@ class BaseBuildingBase extends ItemBase
 	void FoldBaseBuildingObject()
 	{
 		CreateConstructionKit();
-		GetGame().ObjectDelete( this );
+		DestroyConstruction();
 	}
 	
 	//Damage triggers (barbed wire)

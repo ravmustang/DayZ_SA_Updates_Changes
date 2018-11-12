@@ -23,6 +23,10 @@ class IngameHud extends Hud
 	protected Widget							m_VehiclePanel;
 	protected Widget							m_VehiclePanelRPMPointer;
 	
+	protected ImageWidget						m_VehiclePanelBatteryIcon;
+	protected ImageWidget						m_VehiclePanelLiquidIcon;
+	protected ImageWidget						m_VehiclePanelFuelIcon;
+	protected ImageWidget						m_VehiclePanelFuel2Icon;
 	protected ProgressBarWidget					m_VehiclePanelBatteryMeter;
 	protected ProgressBarWidget					m_VehiclePanelLiquidMeter;
 	protected ProgressBarWidget					m_VehiclePanelFuelMeter;
@@ -187,6 +191,10 @@ class IngameHud extends Hud
 		m_VehiclePanelNextGearValue		= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Next") );
 		m_VehiclePanelPrevGearValue		= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Prev") );
 		
+		m_VehiclePanelBatteryIcon		= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconBattery") );
+		m_VehiclePanelLiquidIcon		= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconLiquid") );
+		m_VehiclePanelFuelIcon			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconFuel") );
+		m_VehiclePanelFuel2Icon			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconFuel0") );
 		m_VehiclePanelBatteryMeter		= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("BatteryMeter") );
 		m_VehiclePanelLiquidMeter		= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("LiquidMeter") );
 		m_VehiclePanelFuelMeter			= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("FuelMeter") );
@@ -222,7 +230,7 @@ class IngameHud extends Hud
 
 		#ifndef NO_GUI
 			m_Timer = new Timer( CALL_CATEGORY_GAMEPLAY );
-			m_Timer.Run(1, this, "RefreshQuickbar", NULL, true );
+			m_Timer.Run(0.05, this, "RefreshQuickbar", NULL, true );
 			//m_Timer.Run(1, this, "CheckHudElementsVisibility", NULL, true ); //modify duration if needed, currently on 1s "update"
 		#endif
 
@@ -309,6 +317,16 @@ class IngameHud extends Hud
 		SetLeftStatsVisibility( true );
 		ToggleHud( g_Game.GetProfileOption( EDayZProfilesOptions.HUD ) );
 		ToggleQuickBar( g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR ) );
+	}
+	
+	override void OnResizeScreen()
+	{
+		float x, y;
+		m_HudPanelWidget.GetScreenSize( x, y );
+		Print( "m_HudPanelWidget: " + x.ToString() + "x" + y.ToString() );
+		m_HudPanelWidget.Update();
+		m_Badges.Update();
+		m_Notifiers.SetPos( 0, 0 );
 	}
 	
 	override bool IsXboxDebugCursorEnabled()
@@ -761,6 +779,12 @@ class IngameHud extends Hud
 		}
 	}
 	
+	int		m_VehicleGearCount = -1;
+	int		m_VehicleRPMMax = 1;
+	float	m_TimeSinceLastEngineLightChange;
+	bool	m_VehicleHasOil;
+	bool	m_VehicleHasCoolant;
+	
 	override void ShowVehicleInfo()
 	{
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
@@ -783,6 +807,19 @@ class IngameHud extends Hud
 					
 					m_VehicleGearCount	= gears.Count() + 1;
 					
+					//m_VehicleHasOil		= GetGame().ConfigGetFloat( "CfgVehicles " + m_CurrentVehicle.GetType() + " SimulationModule Engine rpmRedline" );
+					//m_VehicleHasCoolant	= GetGame().ConfigGetFloat( "CfgVehicles " + m_CurrentVehicle.GetType() + " SimulationModule Engine rpmRedline" );
+					
+					if( !m_VehicleHasOil )
+					{
+						m_VehiclePanel.FindAnyWidget( "Battery" ).Show( false );
+					}
+					
+					if( !m_VehicleHasCoolant )
+					{
+						m_VehiclePanel.FindAnyWidget( "Liquid" ).Show( false );
+					}
+					
 					m_HudPanelWidget.FindAnyWidget("PlayerPanel").Show( false );
 					m_Presence.Show( false );
 					m_StancePanel.Show( false );
@@ -792,9 +829,6 @@ class IngameHud extends Hud
 			}
 		}
 	}
-	
-	int m_VehicleGearCount = -1;
-	int m_VehicleRPMMax = 1;
 	
 	override void HideVehicleInfo()
 	{
@@ -808,15 +842,7 @@ class IngameHud extends Hud
 		m_VehicleGearCount = -1;
 	}
 	
-	void BlinkEngineFailure()
-	{
-		if ( m_CurrentVehicle )
-		{
-			//m_CurrentVehicle.GetInventory().Slot
-		}
-	}
-	
-	void RefreshVehicleHud()
+	void RefreshVehicleHud( float timeslice )
 	{
 		if ( m_CurrentVehicle )
 		{
@@ -840,13 +866,26 @@ class IngameHud extends Hud
 			}
 			
 			int health = m_CurrentVehicle.GetHealthLevel();
-			if( m_CurrentVehicle.IsEngineOn() && health > 0 )
+			int color;
+			if( m_CurrentVehicle.IsEngineOn() && health > 0 && health < 4 )
 			{
 				m_VehiclePanelEngineHealth.Show( true );
-				int color = ItemManager.GetInstance().GetItemHealthColor( m_CurrentVehicle );
+				color = ItemManager.GetItemHealthColor( m_CurrentVehicle );
 				
 				m_VehiclePanelEngineHealth.SetColor( color );
 				m_VehiclePanelEngineHealth.SetAlpha( 1 );
+			}
+			else if( health > 3 )
+			{
+				if( m_TimeSinceLastEngineLightChange > 0.7 )
+				{
+					m_VehiclePanelEngineHealth.Show( !m_VehiclePanelEngineHealth.IsVisible() );
+					color = ItemManager.GetItemHealthColor( m_CurrentVehicle );
+					m_VehiclePanelEngineHealth.SetColor( color );
+					m_VehiclePanelEngineHealth.SetAlpha( 1 );
+					m_TimeSinceLastEngineLightChange = 0;
+				}
+				m_TimeSinceLastEngineLightChange += timeslice;
 			}
 			else
 			{
@@ -868,10 +907,26 @@ class IngameHud extends Hud
 			m_VehiclePanelNextGearValue.SetText( m_VehicleGearTable.Get( next_gear ) );
 			m_VehiclePanelPrevGearValue.SetText( m_VehicleGearTable.Get( prev_gear ) );
 			
-			m_VehiclePanelBatteryMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.OIL ) );
-			m_VehiclePanelLiquidMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.COOLANT ) );
+			if( !m_VehicleHasOil )
+			{
+				m_VehiclePanelBatteryMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.OIL ) );
+				color = ItemManager.ColorFromFloat( m_CurrentVehicle.GetFluidFraction( CarFluid.OIL ) );
+				m_VehiclePanelBatteryIcon.SetColor( color );
+				m_VehiclePanelFuelIcon.SetAlpha( 1 );
+			}
+				
+			if( !m_VehicleHasCoolant )
+			{	
+				m_VehiclePanelLiquidMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.COOLANT ) );
+				color = ItemManager.ColorFromFloat( m_CurrentVehicle.GetFluidFraction( CarFluid.COOLANT ) );
+				m_VehiclePanelLiquidIcon.SetColor( color );
+				m_VehiclePanelFuelIcon.SetAlpha( 1 );
+			}
+			
 			m_VehiclePanelFuelMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.FUEL ) );
-			//m_VehiclePanelFuel2Meter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.BRAKE ) );
+			color = ItemManager.ColorFromFloat( m_CurrentVehicle.GetFluidFraction( CarFluid.FUEL ) );
+			m_VehiclePanelFuelIcon.SetColor( color );
+			m_VehiclePanelFuelIcon.SetAlpha( 1 );
 		}
 	}
 	
@@ -1139,6 +1194,6 @@ class IngameHud extends Hud
 		m_LastTime = GetGame().GetTime();
 		//
 		
-		RefreshVehicleHud();
+		RefreshVehicleHud( timeslice );
 	}
 }

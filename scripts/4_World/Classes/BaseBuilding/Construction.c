@@ -502,25 +502,28 @@ class Construction
 				//material still attached
 				if ( lockable )			//if lockable 
 				{
-					InventoryLocation inventory_location = new InventoryLocation;
-					attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
-					GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
-					
-					if ( receive_materials )		//drop attachment if true
+					if ( attachment )
 					{
-						//detach
-						if ( GetGame().IsMultiplayer() )
+						InventoryLocation inventory_location = new InventoryLocation;
+						attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
+						GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
+						
+						if ( receive_materials )		//drop attachment if true
 						{
-							GetParent().GetInventory().DropEntity( InventoryMode.PREDICTIVE, GetParent(), attachment );
+							//detach
+							if ( GetGame().IsMultiplayer() )
+							{
+								GetParent().GetInventory().DropEntity( InventoryMode.PREDICTIVE, GetParent(), attachment );
+							}
+							else
+							{
+								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
+							}
 						}
 						else
 						{
-							GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
+							GetGame().ObjectDelete( attachment );		//delete object if not
 						}
-					}
-					else
-					{
-						GetGame().ObjectDelete( attachment );		//delete object if not
 					}
 				}
 				else

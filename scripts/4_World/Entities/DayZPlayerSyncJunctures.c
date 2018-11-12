@@ -72,20 +72,20 @@ class DayZPlayerSyncJunctures
 	//! Injury
 	//! 
 	
-	static void SendInjury(DayZPlayer pPlayer, bool pEnable, float pValue)
+	static void SendInjury(DayZPlayer pPlayer, bool pEnable, eInjuryHandlerLevels level)
 	{
 		ScriptJunctureData ctx = new ScriptJunctureData;
 		ctx.Write(pEnable);
-		ctx.Write(pValue);
+		ctx.Write(level);
 
 		pPlayer.SendSyncJuncture(SJ_INJURY, ctx);
 	}
 	
-	static bool ReadInjuryParams(ParamsReadContext pCtx, out bool pEnable, out float pValue)
+	static bool ReadInjuryParams(ParamsReadContext pCtx, out bool pEnable, out eInjuryHandlerLevels level)
 	{
 		if ( !pCtx.Read(pEnable) )
 			return false; // error		
-		if ( !pCtx.Read(pValue) )
+		if ( !pCtx.Read(level) )
 			return false; // error
 		
 		return true;

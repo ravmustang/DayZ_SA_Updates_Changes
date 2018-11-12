@@ -12,11 +12,6 @@ class InventoryMenu extends UIScriptedMenu
 		m_Inventory.UpdateInterval();
 		m_context_menu = new ContextMenu;
 	}
-
-	void ~InventoryMenu()
-	{
-		UnlockControls();
-	}
 	
 	override Widget Init()
 	{
@@ -57,7 +52,6 @@ class InventoryMenu extends UIScriptedMenu
 		PPEffects.SetBlurInventory(1);
 		if(m_Inventory)
 			m_Inventory.OnShow();
-		LockControls();
 		SetFocus( layoutRoot );
 		MissionGameplay mission = MissionGameplay.Cast( GetGame().GetMission() );
 		if( mission )
@@ -99,7 +93,6 @@ class InventoryMenu extends UIScriptedMenu
 		PPEffects.SetBlurInventory(0);
 		if(m_Inventory)
 			m_Inventory.OnHide();
-		UnlockControls();
 		MissionGameplay mission = MissionGameplay.Cast( GetGame().GetMission() );
 		if( mission )
 		{

@@ -27,7 +27,7 @@ void DayZPlayerTypeCreate(DayZPlayerType pType)
 	pType.SetAimLimits(-85, 85, -180, 180);		
 
 	//! camera shoot params
-	pType.SetCameraShootParams(250, 0.01);
+	pType.SetCameraShootParams(250, 0.01, 0.866);
 	
 	//! register hit components for AI melee
 	pType.RegisterHitComponentsForAI();
@@ -141,7 +141,7 @@ class DayzPlayerItemBehaviorCfg extends HumanItemBehaviorCfg
 	{
 		SetIKStance(DayZPlayerConstants.STANCEIDX_ERECT, false, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_CROUCH, false, true, true);
-		SetIKStance(DayZPlayerConstants.STANCEIDX_PRONE, false, true, false);
+		SetIKStance(DayZPlayerConstants.STANCEIDX_PRONE, false, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDERECT, true, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDCROUCH, true, true, true);
 		SetIKStance(DayZPlayerConstants.STANCEIDX_RAISEDPRONE, true, true, true);

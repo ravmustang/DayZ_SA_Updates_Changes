@@ -15,7 +15,12 @@ enum EPlayerSoundEventID
 	SYMPTOM_SNEEZE,
 	JUMP,
 	MELEE_ATTACK_LIGHT,
-	MELEE_ATTACK_HEAVY,
+	MELEE_ATTACK_HEAVY
+	INJURED_LIGHT,
+	INJURED_MEDIUM,
+	INJURED_HIGH,
+	//--------------
+	// Count bellow, put enums above
 	//--------------
 	ENUM_COUNT,
 }
@@ -49,6 +54,9 @@ class PlayerSoundEventHandler extends SoundEventHandler
 		RegisterState(new MeleeAttackLightEvent());
 		RegisterState(new MeleeAttackHeavyEvent());
 		RegisterState(new StaminaNormalDummy());
+		RegisterState(new InjuryLightSoundEvent());
+		RegisterState(new InjuryMediumSoundEvent());
+		RegisterState(new InjuryHeavySoundEvent());
 	}
 	
 	void RegisterState(PlayerSoundEventBase state)
@@ -100,7 +108,6 @@ class PlayerSoundEventHandler extends SoundEventHandler
 			Error("EPlayerSoundEventID out of bounds");
 		}
 		PlayerSoundEventBase requested_state = m_AvailableStates[id];
-		
 		if( sent_from_server && requested_state.IsSkipForControlled() && m_Player.GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_CLIENT )
 		{
 			return false;
@@ -113,12 +120,7 @@ class PlayerSoundEventHandler extends SoundEventHandler
 		
 		if(m_CurrentState)
 		{
-			if( m_CurrentState.IsDummy())
-			{
-				if(m_CurrentState.IsDummyFinished())
-					delete m_CurrentState;
-			}
-		 	else if(!m_CurrentState.IsSoundCallbackExist())
+			if( m_CurrentState.IsFinished())
 			{
 				delete m_CurrentState;
 			}
@@ -126,13 +128,18 @@ class PlayerSoundEventHandler extends SoundEventHandler
 		
 		if(m_CurrentState)
 		{
-			if( requested_state.IsDummy() )
-				return false;
-			if( !m_CurrentState.IsDummy() && m_CurrentState.IsCurrentHasPriority(m_Player, id, PlayerSoundEventHandler.GetSoundEventType(id)) )
+			int current_type =  m_CurrentState.GetSoundEventType();
+			//int requested_type = requested_state.GetSoundEventType();
+			
+			if( (requested_state.GetPriorityOverTypes() & current_type) == 0 )
 			{
-				// do nothing
 				return false;
 			}
+			if (!requested_state.HasPriorityOverCurrent(m_Player, id, current_type) )
+			{
+				return false;
+			}
+
 			m_CurrentState.Stop();
 		}
 		

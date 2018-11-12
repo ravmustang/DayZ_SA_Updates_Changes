@@ -96,18 +96,5 @@ class MissionMainMenu extends MissionBase
 		{
 			m_IntroScenePC.Update();
 		}
-		
-		if( m_mainmenu )
-		{
-			m_mainmenu.Update(timeslice);
-		}
-
-		if (GetGame().GetInput().GetActionDown(UAUIBack, false))
-		{
-			if (GetGame().GetUIManager().GetMenu() != m_mainmenu)
-			{
-				GetGame().GetUIManager().Back();
-			}
-		}
 	}
 }

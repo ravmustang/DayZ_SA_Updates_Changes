@@ -34,6 +34,7 @@ class CarScript extends Car
 	float m_dmgContactCoef;
 
 	protected vector m_exhaustPtcPos;
+	protected vector m_exhaustPtcDir;
 	protected vector m_enginePtcPos;
 	protected vector m_coolantPtcPos;
 
@@ -53,16 +54,51 @@ class CarScript extends Car
 		m_EngineHealth = 1;
 		m_FuelTankHealth = 1;
 		m_RadiatorHealth = -1;
-		
+
 		m_enginePtcFx = -1;
 		m_coolantPtcFx = -1;
 		m_exhaustPtcFx = -1;
-		
+
 		m_dmgContactCoef = 0;
+
+		//proto native vector GetMemoryPointPos(string memoryPointName);
+ 		//proto native bool MemoryPointExists(string memoryPoint);
+
+		if 	( MemoryPointExists("ptcExhaust_end") )
+		{
+			Print( "CarScript Init " + GetType() );
+			m_exhaustPtcPos = GetMemoryPointPos("ptcExhaust_end");
+			if ( MemoryPointExists("ptcExhaust_start") )
+			{
+				vector exhaustStart = GetMemoryPointPos("ptcExhaust_start");
+				vector tempOri = vector.Direction( exhaustStart, m_exhaustPtcPos);//.Normalized();//.VectorToAngles();
+				
+				//m_exhaustPtcDir = tempOri;
+
+				m_exhaustPtcDir[0] = -tempOri[2];
+				m_exhaustPtcDir[1] = tempOri[1];
+				m_exhaustPtcDir[2] = tempOri[0];
+				
+				m_exhaustPtcDir = m_exhaustPtcDir.Normalized().VectorToAngles();
+
+			}
+		}
+		else
+		{
+			m_exhaustPtcPos = "0 0 0";
+			m_exhaustPtcDir = "1 1 1";
+		}
+	
+		if 	( MemoryPointExists("ptcEnginePos") )
+			m_enginePtcPos = GetMemoryPointPos("ptcEnginePos");
+		else
+			m_enginePtcPos = "0 0 0";		
+
 		
-		m_enginePtcPos = "0 0 0";
-		m_coolantPtcPos = "0 0 0";
-		m_exhaustPtcPos = "0 0 0";
+		if 	( MemoryPointExists("ptcCoolantPos") )
+			m_coolantPtcPos = GetMemoryPointPos("ptcCoolantPos");
+		else
+			m_coolantPtcPos = "0 0 0";		
 	}
 /*
 	here we should handle the damage dealt in OnContact event, but maybe we will react even in that event 
@@ -134,7 +170,6 @@ class CarScript extends Car
 					
 					if ( IsVitalRadiator() )
 					{
-					
 						if ( GetFluidFraction(CarFluid.COOLANT) < 0.5 && GetFluidFraction(CarFluid.COOLANT) > 0 )
 							DecreaseHealth( "Engine", "Health", 1.0);
 					}
@@ -146,7 +181,7 @@ class CarScript extends Car
 					if ( !SEffectManager.IsEffectExist(m_exhaustPtcFx) )
 					{
 						m_exhaustFx = new EffExhaustSmoke();
-						m_exhaustPtcFx = SEffectManager.PlayOnObject(m_exhaustFx, this, m_exhaustPtcPos );
+						m_exhaustPtcFx = SEffectManager.PlayOnObject(m_exhaustFx, this, m_exhaustPtcPos, m_exhaustPtcDir );
 					}
 
 					m_exhaustFx.SetParticleStateLight();
@@ -154,7 +189,7 @@ class CarScript extends Car
 					if ( IsVitalRadiator() && SEffectManager.IsEffectExist(m_coolantPtcFx) )
 						SEffectManager.Stop(m_coolantPtcFx);
 					
-					if ( GetFluidFraction(CarFluid.COOLANT) < 0.5 )
+					if ( IsVitalRadiator() && GetFluidFraction(CarFluid.COOLANT) < 0.5 )
 					{
 						if ( !SEffectManager.IsEffectExist(m_coolantPtcFx) )
 						{
@@ -185,6 +220,9 @@ class CarScript extends Car
 				{
 					if ( SEffectManager.IsEffectExist(m_exhaustPtcFx) )
 						SEffectManager.Stop(m_exhaustPtcFx);
+					
+					if ( SEffectManager.IsEffectExist(m_coolantPtcFx) )
+						SEffectManager.Stop(m_coolantPtcFx);
 				}
 			}
 		}
@@ -192,12 +230,15 @@ class CarScript extends Car
 		//FX only on Client and in Single
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
-			if ( !SEffectManager.IsEffectExist(m_enginePtcFx) && m_EngineHealth <= 0 )
+			if ( m_EngineHealth <= 0 )
 			{
-				m_engineFx = new EffEngineSmoke();
-				m_enginePtcFx = SEffectManager.PlayOnObject(m_engineFx, this, m_enginePtcPos );
-				//m_engineFx.SetParticleStateLight();
-				m_engineFx.SetParticleStateHeavy();
+				if ( !SEffectManager.IsEffectExist(m_enginePtcFx) )
+				{
+					m_engineFx = new EffEngineSmoke();
+					m_enginePtcFx = SEffectManager.PlayOnObject(m_engineFx, this, m_enginePtcPos );
+					//m_engineFx.SetParticleStateLight();
+					m_engineFx.SetParticleStateHeavy();
+				}
 			}
 		}
 	}
@@ -228,8 +269,8 @@ class CarScript extends Car
 				if ( GetGame().IsServer() && zoneName != "")
 				{
 					float dmgMin = 120.0;	
-					float dmgThreshold = 200.0;
-					float dmgKillCrew = 2000.0;
+					float dmgThreshold = 500.0;
+					float dmgKillCrew = 2100.0;
 					float dmg = data.Impulse * m_dmgContactCoef;
 
 					if ( dmg < dmgThreshold )

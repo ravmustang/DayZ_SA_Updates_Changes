@@ -1,8 +1,10 @@
 class CombinationLock extends ItemBase
 {
 	static const int COMBINATION_LENGTH = 3;			//how many digits will the combination contain
-	int m_Combination;									//actual combination that is dialed on lock
-	int m_CombinationLocked;							//combination that was dialed on lock before the shuffle
+	int m_Combination 		= 111;									//actual combination that is dialed on lock
+	int m_CombinationLocked = 999;							//combination that was dialed on lock before the shuffle
+	
+	bool m_IsLockAttached;								//for storing to db
 	
 	void CombinationLock()
 	{
@@ -11,6 +13,7 @@ class CombinationLock extends ItemBase
 		//synchronized variables
 		RegisterNetSyncVariableInt( "m_Combination", 		0, combination_length - 1 );
 		RegisterNetSyncVariableInt( "m_CombinationLocked", 	0, combination_length - 1 );
+		RegisterNetSyncVariableBool( "m_IsLockAttached" );
 	}
 	
 	override void EEInit()
@@ -21,10 +24,22 @@ class CombinationLock extends ItemBase
 		UpdateVisuals();
 	}	
 	
+	void SetLockAttachedState( bool state )
+	{
+		m_IsLockAttached = state;
+		
+		Synchronize();
+	}
+	
+	bool IsLockAttached()
+	{
+		return m_IsLockAttached;
+	}	
+	
 	// --- VISUALS
 	void UpdateVisuals()
 	{
-		if ( IsLocked() )
+		if ( IsLockedOnGate() )
 		{
 			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( HideItem, 		0, false );
 			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( ShowAttached, 	0, false );
@@ -66,15 +81,27 @@ class CombinationLock extends ItemBase
 		//write data
 		ctx.Write( m_Combination );
 		ctx.Write( m_CombinationLocked );
+		ctx.Write( m_IsLockAttached );
 	}
 	
 	override void OnStoreLoad( ParamsReadContext ctx )
 	{
 		super.OnStoreLoad( ctx );
 		
-		//read data
-		ctx.Read( m_Combination );
-		ctx.Read( m_CombinationLocked );
+		//combination
+		int combination;
+		ctx.Read( combination );
+		SetCombination( combination );
+		
+		//combination locked
+		int combination_locked;
+		ctx.Read( combination_locked );
+		SetCombinationLocked( combination_locked );
+		
+		//lock attached
+		int is_lock_attached;
+		ctx.Read( is_lock_attached );
+		SetLockAttachedState( is_lock_attached );		
 	}
 	
 	// --- SYNCHRONIZATION
@@ -87,6 +114,14 @@ class CombinationLock extends ItemBase
 			UpdateVisuals();
 		}
 	}
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+
+		//update visuals (client)
+		UpdateVisuals();
+	}	
 	
 	void SetCombination( int combination )
 	{
@@ -145,13 +180,19 @@ class CombinationLock extends ItemBase
 	//Lock lock
 	void Lock( EntityAI parent )
 	{
-		SetLockCombination();
-		ShuffleLock();
-		
-		//set slot lock
-		InventoryLocation inventory_location = new InventoryLocation;
-		GetInventory().GetCurrentInventoryLocation( inventory_location );		
-		parent.GetInventory().SetSlotLock( inventory_location.GetSlot(), true );		
+		if ( !IsLockAttached() )
+		{
+			SetCombinationLocked( m_Combination );
+			ShuffleLock();
+			
+			//set slot lock
+			InventoryLocation inventory_location = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( inventory_location );		
+			parent.GetInventory().SetSlotLock( inventory_location.GetSlot(), true );
+			
+			//set lock attached
+			SetLockAttachedState( true );
+		}
 	}
 	
 	void Unlock( EntityAI parent )
@@ -170,6 +211,9 @@ class CombinationLock extends ItemBase
 		{
 			parent.GetInventory().DropEntity( InventoryMode.LOCAL, parent, this );
 		}
+		
+		//set lock attached
+		SetLockAttachedState( false );
 	}
 	
 	//Shuffle lock
@@ -196,16 +240,15 @@ class CombinationLock extends ItemBase
 		SetCombination( shuffled_text.ToInt() );
 	}
 	
-	void SetLockCombination()
+	bool IsLockedOnGate()
 	{
-		SetCombinationLocked( m_Combination );
-	}
-	
-	bool IsLocked()
-	{
-		if ( m_Combination != m_CombinationLocked )
+		Fence fence = Fence.Cast( GetHierarchyParent() );
+		if ( fence )
 		{
-			return true;
+			if ( m_Combination != m_CombinationLocked )
+			{
+				return true;
+			}
 		}
 		
 		return false;

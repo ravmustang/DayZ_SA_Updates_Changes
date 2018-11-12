@@ -897,7 +897,11 @@ class EmoteManager
 				m_Player.SetSuicide(true);
 				weapon.ProcessWeaponEvent(weapon_event);
 				m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
-				if (m_Player.IsAlive()) 	(GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(this.KillPlayer);
+				if (m_Player.IsAlive()) 
+				{
+					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(this.KillPlayer);
+					LogSuicide();
+				}
 			}
 			else
 			{
@@ -911,6 +915,8 @@ class EmoteManager
 			m_Callback.RegisterAnimationEvent("Death",1);
 			m_Player.SetSuicide(true);
 			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
+			
+			LogSuicide();
 			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(this.KillPlayer, 4000, false);
 		}
 		//unarmed "suicide" :)
@@ -925,6 +931,18 @@ class EmoteManager
 		if (GetGame().IsServer())
 		{
 			m_Player.SetHealth(0);
+		}
+	}
+	
+	void LogSuicide()
+	{
+		if (GetGame().IsServer())
+		{
+			PlayerIdentity identity = m_Player.GetIdentity();
+			if (identity)
+			{
+				GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player '" + identity.GetName() + "' (id=" + identity.GetId() + ") committed suicide.");
+			}
 		}
 	}
 	

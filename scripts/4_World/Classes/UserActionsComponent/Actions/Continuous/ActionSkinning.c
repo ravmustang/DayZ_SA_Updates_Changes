@@ -104,7 +104,16 @@ class ActionSkinning: ActionContinuousBase
 			PlayerBase body_PB = PlayerBase.Cast(body);
 			
 			if (body_PB.IsRestrained())
-				MiscGameplayFunctions.TransformRestrainItem(body_PB.GetHumanInventory().GetEntityInHands(), action_data.m_Player.GetHumanInventory().GetEntityInHands(), action_data.m_Player, body_PB);
+			{
+				MiscGameplayFunctions.TransformRestrainItem(body_PB.GetHumanInventory().GetEntityInHands(), null, action_data.m_Player, body_PB);
+				/*
+				EntityAI item_in_hands = action_data.m_MainItem;
+				body_PB.SetRestrained(false);
+				string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands);			
+				MiscGameplayFunctions.TurnItemInHandsIntoItemEx(body_PB, new UnrestrainSelfPlayer(item_in_hands, new_item_name));
+				*/
+			}
+				
 			
 			DropEquipAndDestroyRootLambda lambda(body_PB, "", action_data.m_Player);
 			action_data.m_Player.ServerReplaceItemWithNew(lambda);

@@ -326,6 +326,22 @@ class ItemManager
 			
 		return 0x00FFFFFF;
 	}
+	
+	static int ColorFromFloat( float fraction )
+	{
+		if( fraction > 1 || fraction < 0 )
+			return 0x00FFFFFF;
+		else if( fraction > 0.80 )
+			return Colors.COLOR_PRISTINE;
+		else if( fraction > 0.6 )
+			return Colors.COLOR_WORN;
+		else if( fraction > 0.4 )
+			return Colors.COLOR_DAMAGED;
+		else if( fraction > 0.2 )
+			return Colors.COLOR_BADLY_DAMAGED;
+		else
+			return Colors.COLOR_RUINED;	
+	}
 
 	void SetTemperature( EntityAI item, Widget item_w )
 	{

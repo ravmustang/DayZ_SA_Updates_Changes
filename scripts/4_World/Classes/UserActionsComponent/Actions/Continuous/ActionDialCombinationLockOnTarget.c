@@ -78,7 +78,7 @@ class ActionDialCombinationLockOnTarget: ActionContinuousBase
 			combination_lock.DialNextNumber( m_NextDialAction.GetDialIndex() );
 			
 			//if not locked, unlock the combination lock
-			if ( !combination_lock.IsLocked() )
+			if ( !combination_lock.IsLockedOnGate() )
 			{
 				EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
 				combination_lock.Unlock( target_entity );

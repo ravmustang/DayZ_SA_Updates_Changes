@@ -1,10 +1,11 @@
 enum EPlayerSoundEventType
 {
-	GENERAL = 1,
-	MELEE = 2,
-	STAMINA = 4,
-	DAMAGE = 8,
-	DUMMY = 16,
+	GENERAL 	= 1,
+	MELEE 		= 2,
+	STAMINA 	= 4,
+	DAMAGE 		= 8,
+	DUMMY 		= 16,
+	INJURY 		= 32,
 }
 
 class PlayerSoundEventBase extends SoundEventBase
@@ -14,10 +15,16 @@ class PlayerSoundEventBase extends SoundEventBase
 	float 		m_DummyStartTime;
 	bool		m_IsDummyType;
 	float 		m_PlayTime;
+	EPlayerSoundEventType m_HasPriorityOverTypes;
 	
 	bool IsDummy()
 	{
 		return m_IsDummyType;
+	}
+	
+	EPlayerSoundEventType GetPriorityOverTypes()
+	{
+		return m_HasPriorityOverTypes;
 	}
 	
 	void PlayerSoundEventBase()
@@ -35,9 +42,21 @@ class PlayerSoundEventBase extends SoundEventBase
 		return m_SoundVoiceAnimEventClassID;
 	}
 	
-	bool IsCurrentHasPriority(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type)
+	bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type_other)
 	{
 		return true;
+	}
+	
+	bool IsFinished()
+	{
+		if(IsDummy())
+		{
+			return IsDummyFinished();
+		}
+		else
+		{
+			return !IsSoundCallbackExist();
+		}
 	}
 	
 	bool IsDummyFinished()
@@ -66,13 +85,30 @@ class PlayerSoundEventBase extends SoundEventBase
 		m_Player = player;
 	}
 	
+	void OnEnd()
+	{
+		//PrintString("OnEnd - " + this.ToString());
+	}
+	
+	void OnInterupt()
+	{
+		//PrintString("OnInterupt - " + this.ToString());
+	}
+
 	override void Play()
 	{
 		super.Play();
 	
-		if( !IsDummy() ) 
+		if( !IsDummy() )
 		{
 			m_SoundSetCallback = m_Player.ProcessVoiceEvent("","", m_SoundVoiceAnimEventClassID);
+			
+			if(m_SoundSetCallback)
+			{
+				AbstractWaveEvents events = AbstractWaveEvents.Cast(m_SoundSetCallback.GetUserData());
+				events.Event_OnSoundWaveEnded.Insert( OnEnd );
+				events.Event_OnSoundWaveStopped.Insert( OnInterupt );
+			}
 		}
 		else
 		{

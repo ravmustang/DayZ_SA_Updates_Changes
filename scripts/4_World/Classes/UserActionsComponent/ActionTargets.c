@@ -350,6 +350,10 @@ class ActionTargets
 		{
 			if( pTarget == cursorTarget )
 			{
+				//! ground and static objects
+				if(pTarget.GetType() == string.Empty)
+					return 0.01;
+
 				if( pTarget.IsBuilding() )
 					return 0.01;
 
@@ -454,12 +458,21 @@ class ActionTargets
 				{
 					float util = m_Targets.Get(i).GetUtility();
 					int compIdx = m_Targets.Get(i).GetComponentIndex();
+					string compName;
 					array<string> compNames = new array<string>;
+					compName = obj.GetActionComponentName(compIdx);
 					obj.GetActionComponentNameList(compIdx, compNames);
 
-					for ( int c = 0; c < compNames.Count(); c++ )
+					if( compNames.Count() > 0 )
 					{
-						DbgUI.Text(obj.GetDisplayName() + " :: " + obj + " | util: " + util + " | compIdx: " + compIdx + " | compName: " + compNames[c] + "| wPos: " + obj.GetWorldPosition() );
+						for ( int c = 0; c < compNames.Count(); c++ )
+						{
+							DbgUI.Text(obj.GetDisplayName() + " :: " + obj + " | util: " + util + " | compIdx: " + compIdx + " | compName: " + compNames[c] + "| wPos: " + obj.GetWorldPosition() );
+						}
+					}
+					else
+					{
+						DbgUI.Text(obj.GetDisplayName() + " :: " + obj + " | util: " + util + " | compIdx: " + compIdx + " | compName: " + compName + "| wPos: " + obj.GetWorldPosition() );					
 					}
 				}
 				else

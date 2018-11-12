@@ -29,7 +29,7 @@ class BarbedWire extends ItemBase
 		m_IsPlaced 		= false;
 		
 		//synchronized variables
-		RegisterNetSyncVariableInt( "m_IsMounted" );		
+		RegisterNetSyncVariableBool( "m_IsMounted" );		
 	}
 	
 	void ~BarbedWire() {}

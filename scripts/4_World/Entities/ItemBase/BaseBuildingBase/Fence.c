@@ -1,7 +1,7 @@
 class Fence extends BaseBuildingBase
 {	
-	protected bool m_IsOpened = false;
-
+	protected bool m_IsOpened 		= false;
+	
 	typename ATTACHMENT_BARBED_WIRE			= BarbedWire;
 	typename ATTACHMENT_CAMONET 			= CamoNet;
 	typename ATTACHMENT_COMBINATION_LOCK 	= CombinationLock;
@@ -13,9 +13,29 @@ class Fence extends BaseBuildingBase
 		CONSTRUCTION_KIT		= "FenceKit";
 		
 		//synchronized variables
-		RegisterNetSyncVariableInt( "m_IsOpened" );		
+		RegisterNetSyncVariableBool( "m_IsOpened" );
 	}
 	
+	// --- EVENTS
+	override void OnStoreSave( ParamsWriteContext ctx )
+	{   
+		super.OnStoreSave( ctx );
+		
+		//write
+		ctx.Write( m_IsOpened );
+	}
+	
+	override void OnStoreLoad( ParamsReadContext ctx )
+	{
+		super.OnStoreLoad( ctx );
+		
+		//is opened
+		bool is_opened;
+		ctx.Read( is_opened );
+		SetOpenedState( is_opened );
+	}	
+	
+	// ---
 	void SetOpenedState( bool state )
 	{
 		m_IsOpened = state;
@@ -31,7 +51,7 @@ class Fence extends BaseBuildingBase
 	bool IsLocked()
 	{
 		CombinationLock combination_lock = GetCombinationLock();
-		if ( combination_lock && combination_lock.IsLocked() )
+		if ( combination_lock && combination_lock.IsLockedOnGate() )
 		{
 			return true;
 		}
@@ -86,7 +106,7 @@ class Fence extends BaseBuildingBase
 	
 	override void EEItemAttached( EntityAI item, string slot_name )
 	{
-		super.EEItemAttached ( item, slot_name );
+		super.EEItemAttached( item, slot_name );
 		
 		//Check combination lock
 		if ( item.IsInherited( CombinationLock ) )
