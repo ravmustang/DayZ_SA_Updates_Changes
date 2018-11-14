@@ -29,7 +29,7 @@ class ActionBuildPartSwitch: ActionSingleUseBase
 			ConstructionActionData construction_action_data = player.GetConstructionActionData();
 			
 			string main_part_name = targetObject.GetActionComponentName( target.GetComponentIndex() );
-			construction_action_data.RefreshPartsToBuild( main_part_name );
+			construction_action_data.RefreshPartsToBuild( main_part_name, item );
 			
 			if ( construction_action_data.GetConstructionPartsCount() > 1 && base_building.IsFacingBack( player ) )
 			{

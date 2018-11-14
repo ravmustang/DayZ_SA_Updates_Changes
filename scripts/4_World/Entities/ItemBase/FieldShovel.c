@@ -1,0 +1,4 @@
+class FieldShovel extends ItemBase
+{
+	
+}

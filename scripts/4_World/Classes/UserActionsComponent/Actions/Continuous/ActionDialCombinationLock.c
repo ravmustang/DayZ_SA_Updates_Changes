@@ -10,8 +10,6 @@ class ActionDialCombinationLockCB : ActionContinuousBaseCB
 
 class ActionDialCombinationLock: ActionContinuousBase
 {
-	ActionNextCombinationLockDial m_NextDialAction;
-	
 	void ActionDialCombinationLock()
 	{
 		m_CallbackClass = ActionDialCombinationLockCB;
@@ -47,47 +45,36 @@ class ActionDialCombinationLock: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#dial_combination_lock" + " " + GetDialNumberText();
+		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		string combination_lock_text;
+		
+		if ( player )
+		{
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			combination_lock_text = construction_action_data.GetDialNumberText();
+		}		
+		
+		return "#dial_combination_lock" + " " + combination_lock_text;
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
-		m_NextDialAction = ActionNextCombinationLockDial.Cast( player.GetActionManager().GetAction( AT_NEXT_COMBINATION_LOCK_DIAL ) );
+		if ( item.IsInherited( CombinationLock ) )
+		{
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			construction_action_data.SetCombinationLock( CombinationLock.Cast( item ) );
+	
+			return true;
+		}
 		
-		return true;
+		return false;
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		CombinationLock combination_lock =  CombinationLock.Cast( action_data.m_MainItem );
-		combination_lock.DialNextNumber( m_NextDialAction.GetDialIndex() );
+		//set dialed number
+		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
+		CombinationLock combination_lock =  construction_action_data.GetCombinationLock();
+		combination_lock.DialNextNumber( construction_action_data.GetDialIndex() );
 	}
-	
-	protected string GetDialNumberText()
-	{
-		string dial_text;
-		string combination_text = m_NextDialAction.GetCombinationLock().m_Combination.ToString();
-		
-		//insert zeros to dials with 0 value
-		int length_diff = m_NextDialAction.GetCombinationLock().COMBINATION_LENGTH - combination_text.Length();
-		for ( int i = 0; i < length_diff; ++i )
-		{
-			combination_text = "0" + combination_text;
-		}
-		
-		//assemble the whole combination with selected part
-		for ( int j = 0; j < m_NextDialAction.GetCombinationLock().COMBINATION_LENGTH; ++j )
-		{
-			if ( j == m_NextDialAction.GetDialIndex() )
-			{
-				dial_text += string.Format( "[%1]", combination_text.Get( j ) );
-			}
-			else
-			{
-				dial_text += string.Format( " %1 ", combination_text.Get( j ) );
-			}
-		}
-		
-		return dial_text;
-	}	
 }

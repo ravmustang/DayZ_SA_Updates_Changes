@@ -1,17 +1,13 @@
 class ActionNextCombinationLockDial: ActionSingleUseBase
 {
-	protected CombinationLock 	m_CombinationLock;
-	protected int 				m_DialIndex;
-	
 	void ActionNextCombinationLockDial()
 	{
-		m_DialIndex = 0;
 	}
 	
 	override void CreateConditionComponents()  
 	{	
-		m_ConditionItem = new CCINonRuined;
-		m_ConditionTarget = new CCTNone;
+		m_ConditionItem		= new CCINonRuined;
+		m_ConditionTarget 	= new CCTNone;
 	}
 
 	override bool HasTarget()
@@ -41,42 +37,23 @@ class ActionNextCombinationLockDial: ActionSingleUseBase
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
-		m_CombinationLock = CombinationLock.Cast( item );
+		if ( item.IsInherited( CombinationLock ) )
+		{
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			construction_action_data.SetCombinationLock( CombinationLock.Cast( item ) );
+
+			return true;
+		}
 		
-		return true;
+		return false;
 	}
 
 	override void Start( ActionData action_data )
 	{
-		SetNextDialIndex();
-	}	
-	
-	int GetDialIndex()
-	{
-		return m_DialIndex;
-	}
-	
-	CombinationLock GetCombinationLock()
-	{
-		return m_CombinationLock;
-	}
-	
-	protected void SetNextDialIndex()
-	{
-		if ( m_CombinationLock.COMBINATION_LENGTH > 1 )
-		{
-			if ( m_DialIndex <= m_CombinationLock.COMBINATION_LENGTH - 2 )
-			{
-				m_DialIndex++;
-			}
-			else if ( m_DialIndex >= m_CombinationLock.COMBINATION_LENGTH >  - 1 )
-			{
-				m_DialIndex = 0;
-			}
-		}
-		else
-		{
-			m_DialIndex = 0;
-		}
+		super.Start( action_data );
+		
+		//set next dial
+		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
+		construction_action_data.SetNextDialIndex();
 	}
 }

@@ -304,48 +304,55 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	/**@fn			HandleInputData
 	 * @brief		real processing of the input data
 	 **/
-	bool HandleInputData (bool juncture, bool remote, ParamsReadContext ctx)
+	bool HandleInputData (bool handling_juncture, bool remote, ParamsReadContext ctx)
 	{
 		int type = -1;
 		if (!ctx.Read(type))
 			return false;
 
-		InventoryLocation src = new InventoryLocation;
-		InventoryLocation dst = new InventoryLocation;
-
 		switch (type)
 		{
 			case InventoryCommandType.SYNC_MOVE:
 			{
+				InventoryLocation src = new InventoryLocation;
+				InventoryLocation dst = new InventoryLocation;
 				src.ReadFromContext(ctx);
 				dst.ReadFromContext(ctx);
 
 				if (remote && (!src.GetItem() || !dst.GetItem()))
 				{
-					Error("[syncinv] remote input (cmd=SYNC_MOVE) dropped, item not in bubble! src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+					Error("[syncinv] HandleInputData remote input (cmd=SYNC_MOVE) dropped, item not in bubble! src=" + src.DumpToString() + " dst=" + dst.DumpToString());
 					break; // not in bubble
 				}
 				
 				if (false == GameInventory.CheckMoveToDstRequest(GetManOwner(), src.GetItem(), dst))
 				{
-					Error("[cheat] man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
 					return false; // cheater
 				}
 				
-				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms received cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
-				if (!juncture && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
+				syncDebugPrint("[syncinv] HandleInputData t=" + GetGame().GetTime() + "ms received cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+
+				if (!handling_juncture && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
 				{
-					if (GetDayZPlayerOwner().NeedInventoryJunctureFromServer(src.GetItem(), src.GetParent(), dst.GetParent()))
+					JunctureRequestResult result_mv = TryAcquireInventoryJunctureFromServer(GetDayZPlayerOwner(), src, dst);
+					if (result_mv == JunctureRequestResult.JUNCTURE_NOT_REQUIRED)
 					{
-						syncDebugPrint("[syncinv] redir to juncture cmd=" + typename.EnumToString(InventoryCommandType, type) + " dst=" + dst.DumpToString());
-						if (GetGame().AddInventoryJuncture(GetDayZPlayerOwner(), src.GetItem(), dst, true, GameInventory.c_InventoryReservationTimeoutMS))
-							GetDayZPlayerOwner().SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx);
-						else
-						{
-							syncDebugPrint("[syncinv] redir to juncture DENIED");
-							return true; // abort, do not send anything to remotes
-						}
-						break;
+						// ok, perform sync move
+					}
+					else if (result_mv == JunctureRequestResult.JUNCTURE_ACQUIRED)
+					{
+						GetDayZPlayerOwner().SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx); // ok, send juncture
+						break; // and do NOT perform sync move
+					}
+					else if (result_mv == JunctureRequestResult.JUNCTURE_DENIED)
+					{
+						return true; // abort, do not send anything to remotes
+					}
+					else
+					{
+						Error("[syncinv] HandleInputData: unexpected return code from AcquireInventoryJunctureFromServer"); return true;
+						return true; // abort, do not send anything to remotes
 					}
 				}
 
@@ -359,41 +366,42 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 
 				if (remote && !e.m_Entity)
 				{
-					Error("[syncinv] remote input (cmd=HAND_EVENT) dropped, item not in bubble");
+					Error("[syncinv] HandleInputData remote input (cmd=HAND_EVENT) dropped, item not in bubble");
 					break; // not in bubble
 				}
 
 				if (false == e.CheckRequest())
 				{
-					Error("[cheat] man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e);
+					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e);
 					return false; // cheater
 				}
 
-				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms received cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e);
-				if (e.m_Entity.GetInventory().GetCurrentInventoryLocation(src))
-				{
-					dst = e.GetDst();
-					if (!juncture && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
-					{
-						if (GetDayZPlayerOwner().NeedInventoryJunctureFromServer(src.GetItem(), src.GetParent(), dst.GetParent()))
-						{
-							syncDebugPrint("[syncinv] redir to juncture cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e);
-							bool test_dst_occupancy = !e.IsSwapEvent();
-							if (GetGame().AddInventoryJuncture(GetDayZPlayerOwner(), e.m_Entity, dst, test_dst_occupancy, GameInventory.c_InventoryReservationTimeoutMS))
-								GetDayZPlayerOwner().SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx);
-							else
-							{
-								syncDebugPrint("[syncinv] redir to juncture DENIED");
-								return true; // abort, do not send anything to remotes
-							}
-							break;
-						}
-					}
+				syncDebugPrint("[syncinv] HandleInputData t=" + GetGame().GetTime() + "ms received cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e);
 
-					e.m_Player.GetHumanInventory().PostHandEvent(e);
+				if (!handling_juncture && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
+				{
+					JunctureRequestResult result_ev = e.AcquireInventoryJunctureFromServer(GetDayZPlayerOwner());
+					if (result_ev == JunctureRequestResult.JUNCTURE_NOT_REQUIRED)
+					{
+						// ok, post event
+					}
+					else if (result_ev == JunctureRequestResult.JUNCTURE_ACQUIRED)
+					{
+						GetDayZPlayerOwner().SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx); // ok, send juncture
+						break; // and do NOT perform post event
+					}
+					else if (result_ev == JunctureRequestResult.JUNCTURE_DENIED)
+					{
+						return true; // abort, do not send anything to remotes
+					}
+					else
+					{
+						Error("[syncinv] HandleInputData: unexpected return code from AcquireInventoryJunctureFromServer"); return true;
+						return true; // abort, do not send anything to remotes
+					}
 				}
-				else
-					Error("OnInputData HandEvent - no inv loc for entity=" + e.m_Entity.GetName() + "@" + this + " ev=" + e.DumpToString());
+
+				e.m_Player.GetHumanInventory().PostHandEvent(e);
 				break;
 			}
 
@@ -405,13 +413,13 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 				
 				if (remote && (!item1 || !item2))
 				{
-					Error("[syncinv] remote input (cmd=SWAP) dropped, item not in bubble");
+					Error("[syncinv] HandleInputData remote input (cmd=SWAP) dropped, item not in bubble");
 					break; // not in bubble
 				}
 
 				if (false == GameInventory.CheckSwapItemsRequest(GetManOwner(), item1, item2))
 				{
-					Error("[cheat] man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
 					return false; // cheater
 				}
 
@@ -422,37 +430,38 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 					dst1.CopyLocationFrom(src2);
 					dst2.Copy(src2);
 					dst2.CopyLocationFrom(src1);
-					syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms received Swap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString() + "dst2=" + dst2.DumpToString());
 
-					if (!juncture && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
+					if (!handling_juncture && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
 					{
-						bool need_j1 = GetDayZPlayerOwner().NeedInventoryJunctureFromServer(src1.GetItem(), src1.GetParent(), dst1.GetParent());
-						bool need_j2 = GetDayZPlayerOwner().NeedInventoryJunctureFromServer(src2.GetItem(), src2.GetParent(), dst2.GetParent());
-						if (need_j1 || need_j2)
+						JunctureRequestResult result_sw = TryAcquireTwoInventoryJuncturesFromServer(GetDayZPlayerOwner(), src1, src2, dst1, dst2);
+						if (result_sw == JunctureRequestResult.JUNCTURE_NOT_REQUIRED)
 						{
-							syncDebugPrint("[syncinv] redir to juncture cmd=" + typename.EnumToString(InventoryCommandType, type) + " dst1=" + dst1.DumpToString());
-							bool acq_j1 = true;
-							if (need_j1)
-								GetGame().AddInventoryJuncture(GetDayZPlayerOwner(), item1, dst1, false, GameInventory.c_InventoryReservationTimeoutMS);
-							
-							bool acq_j2 = true;
-							if (need_j2)
-								GetGame().AddInventoryJuncture(GetDayZPlayerOwner(), item2, dst2, false, GameInventory.c_InventoryReservationTimeoutMS);
-							if (acq_j1 && acq_j2)
-								GetDayZPlayerOwner().SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx);
-							else
-							{
-								syncDebugPrint("[syncinv] redir to juncture DENIED");
-								return true; // abort, do not send anything to remotes
-							}
-							break;
+							// ok, perform swap
+						}
+						else if (result_sw == JunctureRequestResult.JUNCTURE_ACQUIRED)
+						{
+							GetDayZPlayerOwner().SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx); // ok, send juncture
+							break; // and do NOT perform swap
+						}
+						else if (result_sw == JunctureRequestResult.JUNCTURE_DENIED)
+						{
+							return true; // abort, do not send anything to remotes
+						}
+						else
+						{
+							Error("[syncinv] HandleInputData: unexpected return code from TryAcquireTwoInventoryJuncturesFromServer"); return true;
+							return true; // abort, do not send anything to remotes
 						}
 					}
 
 					LocationSwap(src1, src2, dst1, dst2);
 				}
 				else
-					Error("MakeSrcAndDstForSwap - no inv loc");
+				{
+					Error("HandleInputData: cmd=" + typename.EnumToString(InventoryCommandType, type) + " MakeSrcAndDstForSwap failed - no inv loc");
+					return true; // abort, do not send anything to remotes
+				}
+
 				break;
 			}
 
@@ -465,17 +474,17 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			case InventoryCommandType.DESTROY:
 			{
 				src.ReadFromContext(ctx);
-				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms received cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString());
+				syncDebugPrint("[syncinv] HandleInputData t=" + GetGame().GetTime() + "ms received cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString());
 
 				if (remote && !src.GetItem())
 				{
-					Error("[syncinv] remote input (cmd=DESTROY) dropped, item not in bubble");
+					Error("[syncinv] HandleInputData remote input (cmd=DESTROY) dropped, item not in bubble");
 					break; // not in bubble
 				}
 
 				if (false == GameInventory.CheckDropRequest(GetManOwner(), src.GetItem()))
 				{
-					Error("[cheat] man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString());
+					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString());
 					return false; // cheater
 				}
 
@@ -484,9 +493,9 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			}
 		}
 
-		if (!juncture && !remote && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
+		if (!handling_juncture && !remote && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
 		{
-			syncDebugPrint("[syncinv] forward to remotes cmd=" + typename.EnumToString(InventoryCommandType, type));
+			syncDebugPrint("[syncinv] HandleInputData forwarding to remotes cmd=" + typename.EnumToString(InventoryCommandType, type));
 			GetDayZPlayerOwner().StoreInputForRemotes(ctx); // @NOTE: needs to be called _after_ the operation
 		}
 

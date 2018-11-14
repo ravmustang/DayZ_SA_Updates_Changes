@@ -89,7 +89,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		m_Filters				= new ServerBrowserFilterContainer( m_Root.FindAnyWidget( "filters_content" ), this );
 		
-		SelectHostSort();
+		SetSort( ESortType.HOST, ESortOrder.DESCENDING );
 		
 		m_Root.SetHandler( this );
 	}
@@ -106,12 +106,12 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	void LoadFakeData( int entries )
 	{
 		ref GetServersResult result = new GetServersResult;
-		
+		m_CurrentFilterInput = m_Filters.GetFilterOptions();
 		result.m_Page = 1;
-		result.m_Pages = 1;
+		result.m_Pages = 2;
 		result.m_Results = new GetServersResultRowArray;
-		
-		for( int i = 0; i < entries; i++ )
+		int i;
+		for( i = 0; i < entries; i++ )
 		{
 			ref GetServersResultRow row = new GetServersResultRow;
 			row.m_Id = "#server_browser_tab_id" + i.ToString();
@@ -133,6 +133,26 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		m_Loading = true;
 		OnLoadServersAsync( result, EBiosError.OK, "" );
+		
+		ref GetServersResult result2 = new GetServersResult;
+		
+		result2.m_Page = 2;
+		result2.m_Pages = 2;
+		result2.m_Results = new GetServersResultRowArray;
+		
+		for( i = 0; i < entries; i++ )
+		{
+			ref GetServersResultRow row2 = new GetServersResultRow;
+			row2.m_Id = "wtf" + i.ToString();
+			row2.m_Name = "wtf" + i.ToString();
+			row2.m_Official = true;
+			row2.m_MaxPlayers = 10;
+			row2.m_MinPlayers = 0;
+			row2.m_CurrentNumberPlayers = 0;
+			
+			result2.m_Results.Insert( row2 );
+		}
+		OnLoadServersAsync( result2, EBiosError.OK, "" );
 	}
 	
 	override bool OnClick( Widget w, int x, int y, int button )
@@ -445,6 +465,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_TotalServers = 0;
 		m_TotalLoadedServers = 0;
 		m_CurrentLoadedPage = 0;
+		
 		m_Entries.Clear();
 		m_EntryWidgets.Clear();
 		
@@ -454,10 +475,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			m_CurrentFilterInput = m_Filters.GetFilterOptions();
 		
 		m_CurrentFilterInput.m_Page = 0;
+		
 		#ifdef PLATFORM_CONSOLE
 		m_CurrentFilterInput.m_SortBy = GetSortOption();
-		#endif
 		m_CurrentFilterInput.m_SortOrder = m_SortOrder;
+		#endif
 		
 		m_Loading = true;
 		switch( m_TabType )
@@ -488,8 +510,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	{
 		if( m_TotalPages > 0 && m_LastLoadedPage < m_TotalPages )
 		{
-			m_CurrentFilterInput.m_Page = m_LastLoadedPage + 1;
-			OnlineServices.LoadServers( m_CurrentFilterInput );
+			//m_CurrentFilterInput.m_Page = m_LastLoadedPage + 1;
+			//OnlineServices.LoadServers( m_CurrentFilterInput );
 		}
 	}
 	
@@ -522,7 +544,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 						entry.FillInfo( result );
 						entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
 						m_EntryWidgets.Insert( result.m_Id, entry );
-						AddSorted( result );
+						//AddSorted( result );
 						m_TotalLoadedServers++;
 						m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 					}
@@ -557,28 +579,16 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			else
 				text += "#server_browser_tab_no_servers_with_filter";
 			m_LoadingText.SetText( text );
-			#ifdef PLATFORM_XBOX
-				m_Filters.Focus();
-			#endif
+			m_Filters.Focus();
 			return;
 		}
 		
 		if( result_list.m_Page == 1 )
 		{
 			m_TotalPages = result_list.m_Pages;
-			
-			#ifdef PLATFORM_CONSOLE
 			m_TotalServers = Math.Clamp( ( result_list.m_Pages - 1 ) * SERVER_BROWSER_PAGE_SIZE, 0, 10000000 );
-			#else
-			m_TotalServers = 0;
-			#endif
-			
 			m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_TotalServers + " " +  "#server_browser_servers_desc" );
 		}
-		
-		#ifndef PLATFORM_CONSOLE
-		m_TotalPages = result_list.m_Pages;
-		#endif
 
 		m_LastLoadedPage = result_list.m_Page;
 		for ( int i = 0; i < result_list.m_Results.Count(); i++ )
@@ -586,29 +596,20 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			m_Entries.Insert( result_list.m_Results.Get(i) );
 		}
 		
-
-		#ifdef PLATFORM_CONSOLE
 		if( m_LastLoadedPage == m_TotalPages )
 		{
 			m_TotalServers += result_list.m_Results.Count();
 		}
-		#else
-		m_TotalServers += result_list.m_Results.Count();
-		#endif
 		
-		#ifdef PLATFORM_CONSOLE
 		if( m_TotalPages > m_LastLoadedPage )
 		{
 			GetNextPage();
 		}
-		#endif
 		
-		#ifdef PLATFORM_CONSOLE
 		if( m_TotalPages > 0 )
 		{
-			GetGame().GameScript.Call( this, "LoadEntries", new Param2<int, int>( 1, m_TotalPages ) );
+			GetGame().GameScript.Call( this, "LoadEntries", new Param2<int, ref GetServersResultRowArray>( result_list.m_Page, result_list.m_Results ) );
 		}
-		#endif
 	}
 	
 	bool IsPingInRange( int ping, string max_ping )
@@ -647,44 +648,36 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		return true;
 	}
 	
-	void LoadEntries( Param2<int, int> pages_to_load )
+	void LoadEntries( Param2<int, ref GetServersResultRowArray> page )
 	{
-		int start_page	= Math.Clamp( pages_to_load.param1, 1, pages_to_load.param2 );
-		int end_page	= pages_to_load.param2;
-		
 		if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
 			return;
-		ref GetServersResultRowArray results = m_Entries;
-		int index;
-		
-		if( results )
+		int index = page.param1 * SERVER_BROWSER_PAGE_SIZE;
+		ref GetServersResultRowArray page_entries = page.param2;
+		if( page_entries )
 		{
-			while( m_Menu.IsRefreshing() )
+			foreach( GetServersResultRow result : page_entries )
 			{
-				foreach( GetServersResultRow result : results )
+				if( PassFilter( result ) )
 				{
-					if( !m_EntryWidgets.Contains( result.m_Id ) && PassFilter( result ) )
-					{
-						ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
-						entry.FillInfo( result );
-						entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
-						m_EntryWidgets.Insert( result.m_Id, entry );
-						index++;
-						m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_TotalServers + " " + "#server_browser_servers_desc" );
-					}
-					
-					if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
-						return;
-					
-					if( index % 10 == 0 )
-					{
-						Sleep( 0.01 );
-					}
+					ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
+					entry.FillInfo( result );
+					entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
+					m_EntryWidgets.Insert( result.m_Id, entry );
+					index++;
+					m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_TotalServers + " " + "#server_browser_servers_desc" );
 				}
-				Print( "Sleeping for " + ( m_EntryWidgets.Count() / results.Count() * 100 ) );
-				Sleep( m_EntryWidgets.Count() / results.Count() * 100 );
-				m_ServerList.Update();
+				
+				if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
+					return;
+				
+				if( index % 10 == 0 )
+				{
+					Sleep( 0.01 );
+				}
 			}
+			Sleep( 0.1 );
+			m_ServerList.Update();
 		}
 		
 		if( m_EntryWidgets.Count() > 0 )
@@ -703,8 +696,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		if ( !m_Menu )
 			return;
 		
-		m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
-		m_Menu.SetRefreshing( TabType.NONE );
+		if( m_LastLoadedPage == m_TotalPages )
+		{
+			m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+			m_Menu.SetRefreshing( TabType.NONE );
+		}
 	}
 	
 	void Update( float timeslice )
@@ -726,42 +722,82 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void SelectHostSort()
 	{
-		ESortOrder order;
+		ESortOrder order = ESortOrder.DESCENDING;
 		if( m_SortType == ESortType.HOST )
+		{
 			order = !m_SortOrder;
-		SetSort( ESortType.HOST, order );
+			SetSort( ESortType.HOST, order );
+			InvertSort();
+		}
+		else
+		{
+			SetSort( ESortType.HOST, order );
+			Sort();
+		}
 	}
 	
 	void SelectTimeSort()
 	{
-		ESortOrder order;
+		ESortOrder order = ESortOrder.DESCENDING;
 		if( m_SortType == ESortType.TIME )
+		{
 			order = !m_SortOrder;
-		SetSort( ESortType.TIME, order );
+			SetSort( ESortType.TIME, order );
+			GetGame().GameScript.Call( this, "InvertSort", null );
+		}
+		else
+		{
+			SetSort( ESortType.TIME, order );
+			GetGame().GameScript.Call( this, "Sort", null );
+		}
 	}
 	
 	void SelectPopulationSort()
 	{
-		ESortOrder order;
+		ESortOrder order = ESortOrder.DESCENDING;
 		if( m_SortType == ESortType.POPULATION )
+		{
 			order = !m_SortOrder;
-		SetSort( ESortType.POPULATION, order );
+			SetSort( ESortType.POPULATION, order );
+			GetGame().GameScript.Call( this, "InvertSort", null );
+		}
+		else
+		{
+			SetSort( ESortType.POPULATION, order );
+			GetGame().GameScript.Call( this, "Sort", null );
+		}
 	}
 	
 	void SelectSlotSort()
 	{
-		ESortOrder order;
+		ESortOrder order = ESortOrder.DESCENDING;
 		if( m_SortType == ESortType.SLOTS )
+		{
 			order = !m_SortOrder;
-		SetSort( ESortType.SLOTS, order );
+			SetSort( ESortType.SLOTS, order );
+			GetGame().GameScript.Call( this, "InvertSort", null );
+		}
+		else
+		{
+			SetSort( ESortType.SLOTS, order );
+			GetGame().GameScript.Call( this, "Sort", null );
+		}
 	}
 	
 	void SelectPingSort()
 	{
-		ESortOrder order;
+		ESortOrder order = ESortOrder.DESCENDING;
 		if( m_SortType == ESortType.PING )
+		{
 			order = !m_SortOrder;
-		SetSort( ESortType.PING, order );
+			SetSort( ESortType.PING, order );
+			GetGame().GameScript.Call( this, "InvertSort", null );
+		}
+		else
+		{
+			SetSort( ESortType.PING, order );
+			GetGame().GameScript.Call( this, "Sort", null );
+		}
 	}
 	
 	string GetSortOption()
@@ -859,11 +895,29 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		root.SetColor( ARGBF( 1, 1, 0, 0 ) );
 		
 		m_Root.FindAnyWidget( w_name ).Show( true );
-		m_Root.FindAnyWidget( w_name + "_dsc" ).Show( !m_SortOrder );
-		m_Root.FindAnyWidget( w_name + "_asc" ).Show( m_SortOrder );
+		m_Root.FindAnyWidget( w_name + "_dsc" ).Show( m_SortOrder );
+		m_Root.FindAnyWidget( w_name + "_asc" ).Show( !m_SortOrder );
 		#endif
-		
-		if( m_Entries )
+	}
+	
+	void InvertSort()
+	{
+		if( m_Entries && m_Entries.Count() > 1 )
+		{
+			reversearray( m_Entries );
+			for( int i = 0; i < m_Entries.Count(); i++ )
+			{
+				if( m_EntryWidgets.Contains( m_Entries.Get( i ).m_Id ) )
+				{
+					m_EntryWidgets.Get( m_Entries.Get( i ).m_Id ).GetRoot().SetSort( i );
+				}
+			}
+		}
+	}
+	
+	void Sort()
+	{
+		if( m_Entries && m_Entries.Count() > 1 )
 		{
 			Sort( m_Entries, 0, m_Entries.Count() - 1 );
 			for( int i = 0; i < m_Entries.Count(); i++ )
@@ -878,12 +932,37 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void Sort( array<ref GetServersResultRow> entries, int low, int high )
 	{
-		if( low < high )
+		array<int> stack = new array<int>;
+		int stack_size = 2 * Math.Log2( high - low ) + 10;
+  		for( int i = 0; i <= stack_size; i++ )
 		{
-			int pi = Partition( entries, low, high );
-			Sort( entries, low, pi - 1 );
-			Sort( entries, pi + 1, high );
+			stack.Insert( 0 );
 		}
+		
+	    int top = -1; 
+	  
+	    stack[ ++top ] = low;
+	    stack[ ++top ] = high; 
+	  
+	    while( top >= 0 ) 
+	    { 
+	        high = stack[ top-- ]; 
+	        low = stack[ top-- ]; 
+	  
+	        int p = Partition( entries, low, high ); 
+	  
+	        if( ( p - 1 ) > low ) 
+	        { 
+	            stack[ ++top ] = low; 
+	            stack[ ++top ] = p - 1; 
+	        } 
+	  
+	        if( ( p + 1 ) < high ) 
+	        { 
+	            stack[ ++top ] = p + 1; 
+	            stack[ ++top ] = high; 
+	        } 
+	    }
 	}
 	
 	int Partition( array<ref GetServersResultRow> entries, int low, int high )
@@ -901,6 +980,25 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		}
 		entries.SwapItems( i + 1, high );
 		return ( i + 1 );
+	}
+	
+	void InsertSort( array<ref GetServersResultRow> entries )
+	{
+		int i, j;
+		int n = entries.Count();
+		
+		for (i = 1; i < n; i++) 
+		{ 
+			GetServersResultRow key = entries[i];
+			j = i - 1;
+					
+			while( j >= 0 && Compare( entries[j], key ) )
+			{
+				entries[j + 1] = entries[j]; 
+				j = j - 1;
+			}
+			entries[j + 1] = key;
+		} 
 	}
 	
 	bool Compare( GetServersResultRow a, GetServersResultRow b )
@@ -940,13 +1038,15 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		return false;
 	}
 	
-	void AddSorted( GetServersResultRow entry )
+	void AddSorted( Param1<ref GetServersResultRow> entry )
 	{
+		ref GetServersResultRow row = entry.param1;
 		if( m_Entries )
 		{
-			m_Entries.Insert( entry );
-			Sort( m_Entries, 0, m_Entries.Count() - 1 );
-			int index = m_Entries.Find( entry );
+			m_Entries.Insert( row );
+			if( m_Entries.Count() > 1 )
+				InsertSort( m_Entries );
+			int index = m_Entries.Find( row );
 			if( index > 0 )
 			{
 				ServerBrowserEntry curr = m_EntryWidgets.Get( m_Entries.Get( index ).m_Id );

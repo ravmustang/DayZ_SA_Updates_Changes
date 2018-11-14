@@ -2,7 +2,7 @@ class ActionStartCarCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousTime(UATimeSpent.DEFAULT);
+		m_ActionData.m_ActionComponent = new CAContinuousTime(UATimeSpent.START_ENGINE);
 	}
 };
 
@@ -123,10 +123,28 @@ class ActionStartEngine: ActionContinuousBase
 					float fuel = car.GetFluidFraction( CarFluid.FUEL );	
 					if (  fuel > 0 )
 						m_FuelCon = true;
+
+					if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+					{
+						if ( m_FuelCon && m_BeltCon && m_SparkCon && m_BatteryCon )
+						{
+							SEffectManager.PlaySound("offroad_engine_start_SoundSet", car.GetPosition() );
+						}
+						else
+						{
+							if ( !m_FuelCon )
+								SEffectManager.PlaySound("offroad_engine_failed_start_fuel_SoundSet", car.GetPosition() );
+							else if ( !m_SparkCon )
+								SEffectManager.PlaySound("offroad_engine_failed_start_sparkplugs_SoundSet", car.GetPosition() );
+							else if ( !m_BatteryCon )
+								SEffectManager.PlaySound("offroad_engine_failed_start_battery_SoundSet", car.GetPosition() );
+						}
+					}
 				}
 			}
 		}
 	}
+
 	override void OnFinishProgressServer( ActionData action_data )
 	{
 		HumanCommandVehicle vehCommand = action_data.m_Player.GetCommand_Vehicle();
@@ -138,25 +156,8 @@ class ActionStartEngine: ActionContinuousBase
 				CarScript car;
 				if ( Class.CastTo(car, trans) )
 				{
-					//TODO:: Sounds are not played - waiting for 
 					if ( m_FuelCon && m_BeltCon && m_SparkCon && m_BatteryCon )
-					{
-						car.PlaySound("offroad_engine_start_SoundSet", 5, false);
 						car.EngineStart();
-					}
-					else
-					{
-						if ( !m_FuelCon )
-							car.PlaySound("offroad_engine_failed_start_fuel_SoundSet", 5, false);
-							
-							// offroad_engine_failed_start_fuel_SoundSet	
-							// offroad_engine_failed_start_battery_SoundSet
-							// offroad_engine_failed_start_sparkplugs_SoundSet
-							
-							// offroad_engine_stop_SoundSet
-							// offroad_engine_stop_fuel_SoundSet
-						
-					}
 				}
 			}
 		}

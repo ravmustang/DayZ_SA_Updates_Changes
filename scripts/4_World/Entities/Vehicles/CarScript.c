@@ -277,14 +277,14 @@ class CarScript extends Car
 					{					
 						if ( dmg > dmgMin )
 						{
-							Print( GetType() + " >>> " + " SmallHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos);
+							//Print( GetType() + " >>> " + " SmallHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos);
 							DecreaseHealth( zoneName, "Health", dmg);
 						}
 					}
 					else
 					{
 						
-						Print( GetType() + " >>> " + " BIGHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos );
+						//Print( GetType() + " >>> " + " BIGHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos );
 						//Print( dmg );
 
 						if ( dmg > dmgKillCrew )

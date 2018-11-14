@@ -205,10 +205,9 @@ class ActionConstructor
 		actions.Insert(new ActionUnmountBarbedWire);
 		actions.Insert(new ActionDialCombinationLock);
 		actions.Insert(new ActionDialCombinationLockOnTarget);
-		actions.Insert(new ActionBuildBasePart);
-		actions.Insert(new ActionDismantleBasePart);
 		actions.Insert(new ActionFillCoolant);
 		actions.Insert(new ActionFillOil);
+		actions.Insert(new ActionDestroyCombinationLock);
 		
 		// Interact actions
 		actions.Insert(new ActionPullOutPlug);

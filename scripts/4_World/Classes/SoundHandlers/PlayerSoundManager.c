@@ -66,6 +66,11 @@ class PlayerSoundManagerServer extends PlayerSoundManagerBase
 	
 	override void Update()
 	{
+		if( m_Player.IsUnconscious() )
+		{
+			return;
+		}
+		
 		for(int i = 0; i < (MAX_HANDLERS_COUNT - 1); i++)
 		{
 			m_Handlers[i].Update();
@@ -117,6 +122,7 @@ class PlayerSoundManagerClient extends PlayerSoundManagerBase
 		if( !m_Player.IsAlive() )
 		{
 			SetAllowUpdate(false);
+			return;
 		}
 		
 		for(int i = 0; i < MAX_HANDLERS_COUNT; i++)

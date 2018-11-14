@@ -1,5 +1,5 @@
 
-#ifdef PLATFORM_XBOX
+//#ifdef PLATFORM_XBOX
 
 enum EAchievementError
 {
@@ -57,4 +57,4 @@ class AchievementsXbox
 	proto static native EAchievementError SendEventKill(EAchievementTargetId target_id, EAchievementRankId rank_id, EAchievementRangeId range_id, EAchievementHitId hit_id, float distance);
 };
 
-#endif
+//#endif

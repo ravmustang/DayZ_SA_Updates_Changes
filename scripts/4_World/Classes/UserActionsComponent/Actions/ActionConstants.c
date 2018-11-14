@@ -29,7 +29,7 @@ class UATimeSpent
 	const float DEFAULT_SORT = 2;
 	const float DEFAULT_CONSTRUCT = 5;
 	const float DEFAULT_DECONSTRUCT = 5;
-	const float DEFAULT_DESTROY = 10;
+	const float DEFAULT_DESTROY = 60;
 	const float DEFAULT_PLACE = 0;
 	const float DEFAULT_DEPLOY = 5;
 	const float DEFAULT_CRAFT = 6;
@@ -72,7 +72,7 @@ class UATimeSpent
 	const float FIREPLACE_HANDDRILL = 8;
 	const float SALINE = 10;
 	
-	const float START_ENGINE = 3;
+	const float START_ENGINE = 0.5;
 };
 
 /**@class	Constants for maximal Distances where from the action can be done

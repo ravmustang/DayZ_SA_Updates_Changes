@@ -12,7 +12,7 @@ class HungerSoundHandlerBase extends SoundHandlerBase
 //---------------------------
 class HungerSoundHandlerClient extends HungerSoundHandlerBase
 {
-	const float SOUND_INTERVALS_LIGHT_MIN = 3;	const float SOUND_INTERVALS_LIGHT_MAX = 20;
+	const float SOUND_INTERVALS_LIGHT_MIN = 10;	const float SOUND_INTERVALS_LIGHT_MAX = 30;
 	float m_SoundTime;
 	EffectSound m_Sound;
 	

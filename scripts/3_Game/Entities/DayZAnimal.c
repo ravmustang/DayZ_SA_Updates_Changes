@@ -22,6 +22,8 @@ class DayZCreatureAI extends DayZCreature
 {
 	proto native AIAgent GetAIAgent();
 
+	proto native bool IsSoundInsideBuilding();
+
 	proto native void DebugDisableAIControl();
 	proto native void DebugRestoreAIControl();
 	
@@ -150,6 +152,7 @@ class DayZCreatureAI extends DayZCreature
 			{
 				objectBuilder.UpdateEnvSoundControllers(GetPosition());
 				SoundObject soundObject = objectBuilder.BuildSoundObject();
+				AttenuateSoundIfNecessary(soundObject);
 				PlaySound(soundObject, objectBuilder);
 			}
 		}
@@ -171,7 +174,7 @@ class DayZCreatureAI extends DayZCreature
 			
 			soundBuilder.UpdateEnvSoundControllers(GetPosition());
 			SoundObject soundObject = soundBuilder.BuildSoundObject();
-
+			AttenuateSoundIfNecessary(soundObject);
 			PlaySound(soundObject, soundBuilder);
 		}
 		
@@ -189,6 +192,18 @@ class DayZCreatureAI extends DayZCreature
 	private void ProcessDamageEvent(AnimDamageEvent damage_event)
 	{
 		AddDamageSphere(damage_event.m_DamageParams);
+	}
+	
+	protected void AttenuateSoundIfNecessary(SoundObject soundObject)
+	{
+		if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || GetGame().GetPlayer().IsCameraInsideVehicle()))
+		{
+			soundObject.SetKind(WaveKind.WAVEATTALWAYS);
+		}
+		else
+		{
+			soundObject.SetKind(WaveKind.WAVEEFFECTEX);
+		}
 	}
 }
 

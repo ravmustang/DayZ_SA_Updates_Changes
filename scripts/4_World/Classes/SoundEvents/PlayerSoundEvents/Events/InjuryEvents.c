@@ -3,7 +3,7 @@ class InjurySoundEvents extends PlayerSoundEventBase
 	
 	void InjurySoundEvents()
 	{
-		m_HasPriorityOverTypes = EPlayerSoundEventType.STAMINA | EPlayerSoundEventType.DUMMY;//-1 for all
+		m_HasPriorityOverTypes = EPlayerSoundEventType.DUMMY;//-1 for all
 		m_Type = EPlayerSoundEventType.INJURY;
 	}
 	

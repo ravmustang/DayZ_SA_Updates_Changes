@@ -1,0 +1,4 @@
+class Pliers extends ItemBase
+{
+	
+}

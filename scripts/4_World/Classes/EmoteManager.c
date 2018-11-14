@@ -64,6 +64,7 @@ class EmoteManager
 	ItemBase				m_item;
 	EmoteCB					m_Callback;
 	HumanInputController 	m_HIC;
+	ref array<string> 		m_InterruptInputs;
 	ref InventoryLocation 	m_HandInventoryLocation;
 	ref EmoteFromMenu 		m_MenuEmote;
 	bool					m_bEmoteIsPlaying;
@@ -90,6 +91,34 @@ class EmoteManager
 		m_HIC = m_Player.GetInputController();
 		m_ItemIsOn = false;
 		m_RPSOutcome = -1;
+		
+		// new input-based interrupt keys
+		m_InterruptInputs = new array<string>;
+		m_InterruptInputs.Insert("UAMoveForward");
+		m_InterruptInputs.Insert("UAMoveBack");
+		m_InterruptInputs.Insert("UATurnLeft");
+		m_InterruptInputs.Insert("UATurnRight");
+		m_InterruptInputs.Insert("UAMoveUp");
+		m_InterruptInputs.Insert("UAMoveDown");
+		m_InterruptInputs.Insert("UAMoveLeft");
+		m_InterruptInputs.Insert("UAMoveRight");
+		m_InterruptInputs.Insert("UAEvasiveForward");
+		m_InterruptInputs.Insert("UAEvasiveLeft");
+		m_InterruptInputs.Insert("UAEvasiveRight");
+		m_InterruptInputs.Insert("UAEvasiveBack");
+		m_InterruptInputs.Insert("UAStand");
+		m_InterruptInputs.Insert("UACrouch");
+		m_InterruptInputs.Insert("UAProne");
+		m_InterruptInputs.Insert("UALeanLeft");
+		m_InterruptInputs.Insert("UALeanRight");
+		m_InterruptInputs.Insert("UALeanIronsightLeft");
+		m_InterruptInputs.Insert("UALeanIronsightRight");
+		m_InterruptInputs.Insert("UALeanLeftToggle");
+		m_InterruptInputs.Insert("UALeanRightToggle");
+		m_InterruptInputs.Insert("UAPersonCamSwitchSide");
+		m_InterruptInputs.Insert("UAWalkRunToggle");
+		m_InterruptInputs.Insert("UAWalkRunTemp");
+		// end of new input-based interrupt keys
 		
 		//leave this here?
 		m_HandInventoryLocation = new InventoryLocation;
@@ -153,7 +182,7 @@ class EmoteManager
 					
 			//jtomasik - asi bych nemel checkovat jestli hrac klika v menu nebo ve scene tady, ale mel by to vedet input manager?
 			//HACK - handle differently with new input controller
-			if( (gestureSlot > 0 && gestureSlot != 12 ) || (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
+			if( (gestureSlot > 0 && gestureSlot != 12 ) || (InterruptGesture() && m_Callback.m_IsFullbody) || (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
 			{
 				//Print("gestureslot pressed: " + gestureSlot);
 				if (m_CurrentGestureID == ID_EMOTE_SUICIDE  && m_HIC.IsSingleUse() /*m_MouseButtonPressed*/)
@@ -1193,6 +1222,21 @@ class EmoteManager
 			
 			data.End();
 		}
+	}
+	
+	bool InterruptGesture()
+	{
+		for( int idx = 0; idx < m_InterruptInputs.Count(); idx++ )
+		{
+			string inputName = m_InterruptInputs[idx];
+			UAInput inp = GetUApi().GetInputByName(inputName);
+			
+			if( inp.LocalPress() )
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	bool IsEmotePlaying()

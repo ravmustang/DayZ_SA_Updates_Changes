@@ -884,11 +884,17 @@ class UAInput
 
 	proto native void ClearBinding();	// remove all bindings
 
-	proto native void BindButton( string sButtonName );		// bind button to this input by name
-	proto native void UnBindButton( string sButtonName );	// unbind button to this input by name
+/**/	proto native void BindButton( string sButtonName );		// bind button to this input by name (single button)
+/**/	proto native void BindButtonByHash( int iHash );		// bind button to this input by hash (single button)
 
-	proto native void BindButtonByHash( int iHash );		// bind button to this input by hash
-	proto native void UnBindButtonByHash( int iHash );		// unbind button to this input by hash
+	proto native void BindCombo( string sButtonName );		// bind combo to this input by name (single/ or append to existing button)
+	proto native void BindComboByHash( int iHash );			// bind combo to this input by hash (single/ or append to existing button)
+
+	proto native void AddAlternative();						// add new alternative keybind
+	proto native void ClearAlternative( int iIndex );		// clear binding alternative by index
+	proto native void SelectAlternative( int iIndex );		// select binding alternative by index
+	proto native int AlternativeCount();					// get currently assigned alternative count
+	proto native int AlternativeIndex();					// get currently selected alternative index
 
 	proto native float LocalValue();
 
@@ -908,6 +914,10 @@ class UAInput
 	proto native bool IsHoldLimit();		// if limited to HOLD
 	proto native bool IsDoubleClickLimit();	// if limited to DOUBLE CLICK
 
+	proto native bool IsLocked();			// determine if locked (not active ATM)
+	proto native void Lock();				// lock (until unlock called or exclusion is selected)
+	proto native void Unlock();				// unlock exclusively
+
 };
 
 // -------------------------------------------------------------------------
@@ -924,7 +934,9 @@ class UAInputAPI
 	proto native string GetButtonName( int iHash );	// get localized name for any button hash
 	
 	// for options only mapping, do not call normally as it is not performance wise!
-	proto int DeterminePressedButton();	// return code of recently pressed key, mouse button or pad button (returns zero if nothing pressed)
+	proto native int DeterminePressedButton();	// recently pressed key, mouse button or pad button (returns zero if nothing pressed)
+	proto native int DeterminedCount(); // all buttons (keys, etc.) pressed during determination test (call only when DeterminePressedButton() returned something !)
+	proto native int GetDetermined( int iIndex ); // total count of pressed buttons (call only when DeterminePressedButton() returned something !)
 
 /*raist todo: remove*/	proto bool GetButtonNameByDik( int iDikCode, out string sName );
 /*raist todo: remove*/	proto native int GetButtonIDByDik( int iDikCode );
@@ -945,6 +957,40 @@ class UAInputAPI
 proto native UAInputAPI GetUApi();
 
 // -------------------------------------------------------------------------
+
+/*
+	ECE_SETUP									= BITF(1),	// process full entity setup (when creating NEW entity)
+	ECE_TRACE									= BITF(2),	// trace under entity when being placed
+	ECE_CENTER								= BITF(3),	// placement center
+	ECE_POINTAREA							= BITF(4),	// use point are when placing (otherwise point directly)
+	ECE_UPDATEPATHGRAPH				= BITF(5),	// update navmesh data after creation
+	ECE_RETRACEPOINT					= BITF(6),	// trace point placement
+	ECE_FORCE									= BITF(7),	// force spawn (ignore checks)
+	ECE_EQUIP									= BITF(8),	// equip with configured attachments/ cargo
+	ECE_ROTATIONFLAGS					= BITF(9),	// to enable rotation flags
+	ECE_OVERRIDEHERDLIMIT			= BITF(10),	// override spawn limit when spawning herd (herd will be bigger)
+
+	ECE_FULL									= ECE_TRACE|ECE_ROTATIONFLAGS|ECE_EQUIP, // basic spawn flags for most of CE stuff
+*/	
+/*const int CESPAWN_NONE							= 0;	// 
+	
+const int CESPAWN_SETUP							= 1;	// 
+const int CESPAWN_TRACE							= 2;	// 
+const int CESPAWN_CENTER						= 4;	// 
+const int CESPAWN_POINTAREA						= 8;	// 
+const int CESPAWN_UPDATEPATHGRAPH				= 16;	// 
+const int CESPAWN_RETRACEPOINT					= 32;	// 
+const int ECE_FORCE_POINTKEEP					= 64;	// 
+const int CESPAWN_EQUIP							= 128;	// 
+const int CESPAWN_ROTATIONFLAGS					= 256;	// 
+
+const int CESPAWN_NOSURFACEALIGN				= 262144;	// do not use surface align (enabled by default)
+
+const int CESPAWN_OVERRIDEHERDLIMIT				= -1;	// todo:
+
+const int CESPAWN_FULL							= 386;	// TRACE + ROTATIONFLAGS + EQUIP
+*/
+
 class CETesting
 {
 	proto native void ExportSpawnData();
@@ -962,7 +1008,8 @@ class CETesting
 	proto native void NewRestock( bool bEnable );
 
 	proto native void SpawnGroup( string sEvName, vector vPos );
-	proto native void SpawnDE( string sEvName, vector vPos, float fAngle );
+	proto native void SpawnDE( string sEvName, vector vPos, float fAngle ); /* THIS WILL BE OBSOLETE OR PREFERABLY DEFAULT? */
+//	proto native void SpawnDE_WIP( string sEvName, vector vPos, float fAngle, int uFlags );
 	proto native void SpawnLoot( string sEvName, vector vPos, float fAngle, int iCount, float fRange );
 
 	proto native void SpawnDynamic( vector vPos, bool bShowCylinders );

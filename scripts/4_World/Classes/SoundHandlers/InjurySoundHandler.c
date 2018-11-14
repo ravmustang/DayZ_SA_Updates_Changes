@@ -23,9 +23,9 @@ class InjurySoundHandlerBase extends SoundHandlerBase
 //---------------------------
 class InjurySoundHandlerClient extends InjurySoundHandlerBase
 {
-	const float SOUND_INTERVALS_LIGHT_MIN 	= 3; const float SOUND_INTERVALS_LIGHT_MAX = 30;
-	const float SOUND_INTERVALS_MEDIUM_MIN 	= 3; const float SOUND_INTERVALS_MEDIUM_MAX = 25;
-	const float SOUND_INTERVALS_HEAVY_MIN	= 3; const float SOUND_INTERVALS_HEAVY_MAX = 25;
+	const float SOUND_INTERVALS_LIGHT_MIN 	= 15; const float SOUND_INTERVALS_LIGHT_MAX = 30;
+	const float SOUND_INTERVALS_MEDIUM_MIN 	= 10; const float SOUND_INTERVALS_MEDIUM_MAX = 25;
+	const float SOUND_INTERVALS_HEAVY_MIN	= 3; const float SOUND_INTERVALS_HEAVY_MAX = 12;
 	
 	ref HumanMovementState m_MovementState = new HumanMovementState;
 	eInjurySoundZones m_InjurySoundZone;
@@ -44,6 +44,11 @@ class InjurySoundHandlerClient extends InjurySoundHandlerBase
 		
 		//int stance_lvl_down = DayZPlayerConstants.STANCEMASK_PRONE | DayZPlayerConstants.STANCEMASK_CROUCH;
 		
+		if( speed == 0 ) 
+			return eInjurySoundZones.NONE;
+		
+		level--;// shift the level so that we play from higher damage
+		
 		if( stance ==  DayZPlayerConstants.STANCEIDX_PRONE || stance ==  DayZPlayerConstants.STANCEIDX_CROUCH )
 		{
 			level--;
@@ -57,7 +62,7 @@ class InjurySoundHandlerClient extends InjurySoundHandlerBase
 		{
 			level++;
 		}
-		Math.Clamp(level, eInjurySoundZones.NONE, eInjurySoundZones.HEAVY);
+		level = Math.Clamp(level, eInjurySoundZones.NONE, eInjurySoundZones.HEAVY);
 		return level;
 	}
 	
@@ -75,11 +80,17 @@ class InjurySoundHandlerClient extends InjurySoundHandlerBase
 	
 	void ProcessSound(eInjurySoundZones zone)
 	{
+		//Print("injury sound zone:"+ zone);
 		// process sound here
 		if( GetGame().GetTime() > m_SoundTime)
 		{
 			float offset_time;
-			
+			if(zone == eInjurySoundZones.NONE)
+			{
+				offset_time = 3000;
+				m_SoundTime = GetGame().GetTime() + offset_time;
+				return;
+			}
 			if(zone == eInjurySoundZones.LIGHT)
 			{
 				offset_time = Math.RandomFloatInclusive(SOUND_INTERVALS_LIGHT_MIN, SOUND_INTERVALS_LIGHT_MAX) * 1000;

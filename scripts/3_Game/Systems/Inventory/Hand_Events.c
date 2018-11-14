@@ -22,6 +22,14 @@ enum HandEventID
 	ANIMEVENT_CHANGE_HIDE
 };
 
+enum JunctureRequestResult
+{
+	JUNCTURE_NOT_REQUIRED,
+	JUNCTURE_ACQUIRED,
+	JUNCTURE_DENIED,
+	ERROR,
+}
+
 /**@class	HandEventBase
  * @brief	represents event that triggers transition from state to state
  **/
@@ -47,6 +55,7 @@ class HandEventBase
 	InventoryLocation GetDst () { return null; }
 	int GetAnimationID () { return m_AnimationID; }
 	bool IsSwapEvent () { return false; }
+	bool AcquireInventoryJunctureFromServer (notnull Man player) { return false; }
 	bool CheckRequest () { return true; }
 	bool IsServerSideOnly () { return false; }
 
@@ -130,7 +139,19 @@ class HandEventTake extends HandEventBase
 	
 	override bool CheckRequest ()
 	{
-		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst()));
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst());
+	}
+
+	override bool AcquireInventoryJunctureFromServer (notnull Man player)
+	{
+		InventoryLocation src = new InventoryLocation;
+		if (m_Entity.GetInventory().GetCurrentInventoryLocation(src))
+		{
+			InventoryLocation dst = GetDst();
+			return TryAcquireInventoryJunctureFromServer(player, src, dst);
+		}
+		Error("HandEventTake. AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		return JunctureRequestResult.ERROR;
 	}
 };
 
@@ -156,7 +177,19 @@ class HandEventMoveTo extends HandEventBase
 	
 	override bool CheckRequest ()
 	{
-		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst()));
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst());
+	}
+
+	override bool AcquireInventoryJunctureFromServer (notnull Man player)
+	{
+		InventoryLocation src = new InventoryLocation;
+		if (m_Entity.GetInventory().GetCurrentInventoryLocation(src))
+		{
+			InventoryLocation dst = GetDst();
+			return TryAcquireInventoryJunctureFromServer(player, src, dst);
+		}
+		Error("HandEventMoveTo.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		return JunctureRequestResult.ERROR;
 	}
 };
 
@@ -177,9 +210,22 @@ class HandEventDrop extends HandEventBase
 	
 	override bool CheckRequest ()
 	{
-		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst()));
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst());
+	}
+
+	override bool AcquireInventoryJunctureFromServer (notnull Man player)
+	{
+		InventoryLocation src = new InventoryLocation;
+		if (m_Entity.GetInventory().GetCurrentInventoryLocation(src))
+		{
+			InventoryLocation dst = GetDst();
+			return TryAcquireInventoryJunctureFromServer(player, src, dst);
+		}
+		Error("HandEventDrop.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		return JunctureRequestResult.ERROR;
 	}
 };
+
 class HandEventSwap extends HandEventBase
 {
 	int m_Animation2ID = -1;
@@ -228,7 +274,36 @@ class HandEventSwap extends HandEventBase
 		}
 		return false;
 	}
+
+	override bool AcquireInventoryJunctureFromServer (notnull Man player)
+	{
+		EntityAI item1 = m_Entity;
+		EntityAI item2 = m_Player.GetHumanInventory().GetEntityInHands();
+
+		if (item1 && item2)
+		{
+			InventoryLocation src1, src2, dst1, dst2;
+			if (GameInventory.MakeSrcAndDstForSwap(item1, item2, src1, src2, dst1, dst2))
+			{
+				dst1.Copy(src1);
+				dst1.CopyLocationFrom(src2);
+				dst2.Copy(src2);
+				dst2.CopyLocationFrom(src1);
+
+				return TryAcquireTwoInventoryJuncturesFromServer(player, src1, src2, dst1, dst2);
+			}
+			else
+			{
+				Error("HandEventSwap.AcquireInventoryJunctureFromServer: GameInventory.MakeSrcAndDstForSwap failed");
+				return JunctureRequestResult.ERROR;
+			}
+		}
+
+		Error("HandEventSwap.AcquireInventoryJunctureFromServer: one of items is null: item1=" + item1 + " or item2=" + item2);
+		return JunctureRequestResult.ERROR;
+	}
 };
+
 class HandEventForceSwap extends HandEventBase
 {
 	ref InventoryLocation m_Dst; /// destination of item in hands

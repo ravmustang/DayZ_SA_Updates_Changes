@@ -187,9 +187,9 @@ class Construction
 	}
 
 	//CONSTRUCTION
-	ConstructionPart GetConstructionPartToBuild( string part_name )
+	ConstructionPart GetConstructionPartToBuild( string part_name, ItemBase tool )
 	{
-		if ( CanBuildPart( part_name ) )
+		if ( CanBuildPart( part_name, tool ) )
 		{
 			return GetConstructionPart( part_name );
 		}
@@ -197,9 +197,9 @@ class Construction
 		return NULL;
 	}
 	
-	bool CanBuildPart( string part_name )
+	bool CanBuildPart( string part_name, ItemBase tool )
 	{
-		if ( !IsPartConstructed( part_name ) && HasRequiredPart( part_name ) && !HasConflictPart( part_name ) && HasMaterials( part_name ) )
+		if ( !IsPartConstructed( part_name ) && HasRequiredPart( part_name ) && !HasConflictPart( part_name ) && HasMaterials( part_name ) && CanUseToolToBuildPart( part_name, tool ) )
 		{
 			return true;
 		}
@@ -208,7 +208,7 @@ class Construction
 	}
 	
 	//Get all construction parts that can be build (at that current time)
-	void GetConstructionPartsToBuild( string main_part_name, out array<ConstructionPart> construction_parts )
+	void GetConstructionPartsToBuild( string main_part_name, out array<ConstructionPart> construction_parts, ItemBase tool )
 	{
 		construction_parts.Clear();
 		
@@ -217,7 +217,7 @@ class Construction
 			string key = m_ConstructionParts.GetKey( i );
 			ConstructionPart value = m_ConstructionParts.Get( key );
 		
-			if ( main_part_name == value.GetMainPartName() && CanBuildPart( value.GetPartName() ) )
+			if ( main_part_name == value.GetMainPartName() && CanBuildPart( value.GetPartName(), tool ) )
 			{
 				construction_parts.Insert( value );
 			}
@@ -266,9 +266,9 @@ class Construction
 	}	
 	
 	//DECONSTRUCTION
-	ConstructionPart GetConstructionPartToDismantle( string part_name )
+	ConstructionPart GetConstructionPartToDismantle( string part_name, ItemBase tool )
 	{
-		if ( CanDismantlePart( part_name ) )
+		if ( CanDismantlePart( part_name, tool ) )
 		{
 			return GetConstructionPart( part_name );
 		}
@@ -276,9 +276,9 @@ class Construction
 		return NULL;
 	}	
 
-	bool CanDismantlePart( string part_name )
+	bool CanDismantlePart( string part_name, ItemBase tool )
 	{
-		if ( IsPartConstructed( part_name ) && !HasDependentPart( part_name ) )
+		if ( IsPartConstructed( part_name ) && !HasDependentPart( part_name ) && CanUseToolToDismantlePart( part_name, tool ) )
 		{
 			return true;
 		}
@@ -513,7 +513,9 @@ class Construction
 							//detach
 							if ( GetGame().IsMultiplayer() )
 							{
-								GetParent().GetInventory().DropEntity( InventoryMode.PREDICTIVE, GetParent(), attachment );
+								GetGame().RemoteObjectTreeDelete(attachment);
+								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
+								GetGame().RemoteObjectTreeCreate(attachment);	
 							}
 							else
 							{
@@ -576,6 +578,55 @@ class Construction
 			}
 		}
 	}	
+	
+	//============================================
+	// Construction tools
+	//============================================	
+	bool CanUseToolToBuildPart( string part_name, ItemBase tool )
+	{
+		ConstructionPart construction_part = GetConstructionPart( part_name );
+		string part_cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + construction_part.GetMainPartName() + " " + construction_part.GetPartName() + " " + "build_action_type";
+		if ( GetGame().ConfigIsExisting( part_cfg_path ) )
+		{
+			int part_build_action_type = GetGame().ConfigGetInt( part_cfg_path );
+			string tool_cfg_path = "cfgVehicles" + " " + tool.GetType() + " " + "build_action_type";
+			
+			if ( GetGame().ConfigIsExisting( tool_cfg_path ) )
+			{
+				int tool_build_action_type = GetGame().ConfigGetInt( tool_cfg_path );
+  
+				if ( ( part_build_action_type & tool_build_action_type ) > 0 )
+				{
+					return true;
+				}				
+			}
+		}
+		
+		return false;
+	}
+	
+	bool CanUseToolToDismantlePart( string part_name, ItemBase tool )
+	{
+		ConstructionPart construction_part = GetConstructionPart( part_name );
+		string part_cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + construction_part.GetMainPartName() + " " + construction_part.GetPartName() + " " + "dismantle_action_type";
+		if ( GetGame().ConfigIsExisting( part_cfg_path ) )
+		{
+			int part_dismantle_action_type = GetGame().ConfigGetInt( part_cfg_path );
+			string tool_cfg_path = "cfgVehicles" + " " + tool.GetType() + " " + "dismantle_action_type";
+			
+			if ( GetGame().ConfigIsExisting( tool_cfg_path ) )
+			{
+				int tool_dismantle_action_type = GetGame().ConfigGetInt( tool_cfg_path );
+  
+				if ( ( part_dismantle_action_type & tool_dismantle_action_type ) > 0 )
+				{
+					return true;
+				}				
+			}
+		}
+		
+		return false;
+	}
 	
 	//============================================
 	// Collision check

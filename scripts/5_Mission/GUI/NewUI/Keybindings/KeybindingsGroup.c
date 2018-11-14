@@ -4,6 +4,8 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 	protected KeybindingsMenu							m_Menu;
 	
 	protected ref map<int, ref KeybindingElement>		m_KeyWidgets;
+	protected int										m_CurrentSettingKeyIndex = -1;
+	protected int										m_CurrentSettingAlternateKeyIndex = -1;
 	
 	protected ref DropdownPrefab						m_KBDropdown;
 	protected ref DropdownPrefab						m_ConsoleDropdown;
@@ -110,9 +112,149 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		}
 	}
 	
-	void ShowKeybiningInputWindow( int key_index )
+	void StartEnteringKeybind( int key_index )
 	{
-		m_Menu.ShowKeybiningInputWindow( key_index );
+		m_CurrentSettingAlternateKeyIndex	= -1;
+		m_CurrentSettingKeyIndex			= key_index;
+		m_Menu.StartEnteringKeybind( key_index );
+	}
+	
+	void CancelEnteringKeybind()
+	{
+		if( m_CurrentSettingKeyIndex != -1 )
+		{
+			m_KeyWidgets.Get( m_CurrentSettingKeyIndex ).CancelEnteringKeybind();
+			m_CurrentSettingKeyIndex = -1;
+		}
+	}
+	
+	void StartEnteringAlternateKeybind( int key_index )
+	{
+		m_CurrentSettingKeyIndex			= -1;
+		m_CurrentSettingAlternateKeyIndex	= key_index;
+		m_Menu.StartEnteringAlternateKeybind( key_index );
+	}
+	
+	void CancelEnteringAlternateKeybind()
+	{
+		if( m_CurrentSettingAlternateKeyIndex != -1 )
+		{
+			m_KeyWidgets.Get( m_CurrentSettingAlternateKeyIndex ).CancelEnteringAlternateKeybind();
+			m_CurrentSettingAlternateKeyIndex = -1;
+		}
+	}
+	
+	bool IsChanged()
+	{
+		foreach( int index, KeybindingElement element : m_KeyWidgets )
+		{
+			if( element.IsChanged() || element.IsAlternateChanged() )
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	void Apply()
+	{
+		UAInputAPI ua_api	= GetUApi();
+		foreach( int index, KeybindingElement element : m_KeyWidgets )
+		{
+			UAInput input = ua_api.GetInputByID( index );
+			int i;
+			if( element.IsChanged() )
+			{
+				array<int> new_keys		= element.GetChangedBinds();
+				
+				if( input.AlternativeCount() == 0 )
+				{
+					input.AddAlternative();
+				}
+				else
+				{
+					input.SelectAlternative( 0 );
+					input.ClearAlternative( 0 );
+				}
+				
+				input.BindComboByHash( new_keys.Get( 0 ) );
+				for( i = 1; i < new_keys.Count(); i++ )
+				{
+					input.BindComboByHash( new_keys.Get( i ) );
+				}
+			}
+			
+			if( element.IsAlternateChanged() )
+			{
+				array<int> new_alt_keys = element.GetChangedAlternateBinds();
+				
+				if( input.AlternativeCount() == 0 )
+				{
+					input.AddAlternative();				
+				}
+				
+				if( input.AlternativeCount() < 2 )
+				{
+					input.AddAlternative();
+				}
+				else
+				{
+					input.SelectAlternative( 1 );
+					input.ClearAlternative( 1 );
+				}
+				
+				input.BindComboByHash( new_alt_keys.Get( 0 ) );
+				for( i = 1; i < new_alt_keys.Count(); i++ )
+				{
+					input.BindComboByHash( new_alt_keys.Get( i ) );
+				}
+			}
+			element.Reload();
+		}
+	}
+	
+	void Reset()
+	{
+		foreach( int index, KeybindingElement element : m_KeyWidgets )
+		{
+			if( element.IsChanged() || element.IsAlternateChanged() )
+			{
+				element.Reload();
+			}
+		}
+	}
+	
+	void Update( float timeslice )
+	{
+		if( m_CurrentSettingKeyIndex != -1 || m_CurrentSettingAlternateKeyIndex != -1 )
+		{
+			UAInputAPI ua_api = GetUApi();
+			if( ua_api.DeterminePressedButton() != 0 )
+			{
+				string name;
+				string text;
+				ref array<int> new_keybinds = new array<int>;
+				
+				for( int i = 0; i < ua_api.DeterminedCount(); ++i )
+				{
+					int kb_id = ua_api.GetDetermined( i );
+					new_keybinds.Insert( kb_id );
+				}
+				
+				if( m_CurrentSettingKeyIndex != -1 )
+				{
+					m_Menu.ConfirmKeybindEntry( new_keybinds );
+					m_KeyWidgets.Get( m_CurrentSettingKeyIndex ).Reload( new_keybinds, false );
+					m_CurrentSettingKeyIndex = -1;
+				}
+				else if( m_CurrentSettingAlternateKeyIndex != -1 )
+				{
+					m_Menu.ConfirmAlternateKeybindEntry( new_keybinds );
+					m_KeyWidgets.Get( m_CurrentSettingAlternateKeyIndex ).Reload( new_keybinds, true );
+					m_CurrentSettingAlternateKeyIndex = -1;
+				}
+			}
+		}
 	}
 	
 	override bool OnMouseButtonDown( Widget w, int x, int y, int button )

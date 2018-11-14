@@ -88,6 +88,8 @@ class DropdownPrefab extends ScriptedWidgetEventHandler
 		if( m_IsExpanded )
 		{
 			m_Scroller.Show( false );
+			m_ImageExpand.Show( false );
+			m_ImageCollapse.Show( true );
 		}
 	}
 	
@@ -109,18 +111,13 @@ class DropdownPrefab extends ScriptedWidgetEventHandler
 	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
 	{
-		if( w == m_Button && button == MouseState.LEFT )
+		if( w == m_Root && button == MouseState.LEFT )
 		{
-			if( m_IsExpanded )
-			{
-				m_Scroller.Show( false );
-			}
-			else
-			{
-				m_Scroller.Show( true );
-				
-			}
 			m_IsExpanded = !m_IsExpanded;
+			m_Scroller.Show( m_IsExpanded );
+			m_ImageExpand.Show( !m_IsExpanded );
+			m_ImageCollapse.Show( m_IsExpanded );
+			
 			m_Root.Update();
 			return true;
 		}

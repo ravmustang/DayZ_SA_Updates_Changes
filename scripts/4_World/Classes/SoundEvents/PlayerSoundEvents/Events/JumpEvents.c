@@ -17,7 +17,7 @@ class JumpEventsBase extends PlayerSoundEventBase
 	override void OnEnd()
 	{
 		//m_Player.GetStaminaSoundHandlerClient().PostponeStamina(1000);
-		StaminaSoundHandlerClient.Cast(m_Player.m_PlayerSoundManagerClient.GetHandler(eSoundHandlers.STAMINA)).PostponeStamina(1000);
+		StaminaSoundHandlerClient.Cast(m_Player.m_PlayerSoundManagerClient.GetHandler(eSoundHandlers.STAMINA)).PostponeStamina(1300);
 	}
 }
 

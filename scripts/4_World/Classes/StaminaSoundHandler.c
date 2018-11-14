@@ -1,7 +1,7 @@
 const float TICK_INTERVAL = 1;
 
-const float STAMINA_SOUND_TR1 = 0.7;
-const float STAMINA_SOUND_TR2 = 0.4;
+const float STAMINA_SOUND_TR1 = 0.55;
+const float STAMINA_SOUND_TR2 = 0.25;
 
 enum eStaminaZones
 {

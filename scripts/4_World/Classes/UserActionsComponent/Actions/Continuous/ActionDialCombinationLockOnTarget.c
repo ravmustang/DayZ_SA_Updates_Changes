@@ -10,8 +10,6 @@ class ActionDialCombinationLockOnTargetCB : ActionContinuousBaseCB
 
 class ActionDialCombinationLockOnTarget: ActionContinuousBase
 {
-	ActionNextCombinationLockDialOnTarget m_NextDialAction;
-	
 	void ActionDialCombinationLockOnTarget()
 	{
 		m_CallbackClass = ActionDialCombinationLockOnTargetCB;
@@ -42,7 +40,16 @@ class ActionDialCombinationLockOnTarget: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#dial_combination_lock_on_target" + " " + GetDialNumberText();
+		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		string combination_lock_text;
+		
+		if ( player )
+		{
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			combination_lock_text = construction_action_data.GetDialNumberText();
+		}		
+
+		return "#dial_combination_lock_on_target" + " " + combination_lock_text;	
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
@@ -58,7 +65,8 @@ class ActionDialCombinationLockOnTarget: ActionContinuousBase
 				
 				if ( selection == "wall_interact" )
 				{
-					m_NextDialAction = ActionNextCombinationLockDialOnTarget.Cast( player.GetActionManager().GetAction( AT_NEXT_COMBINATION_LOCK_DIAL_ON_TARGET ) );
+					ConstructionActionData construction_action_data = player.GetConstructionActionData();
+					construction_action_data.SetCombinationLock( fence.GetCombinationLock() );
 					
 					return true;
 				}
@@ -70,47 +78,16 @@ class ActionDialCombinationLockOnTarget: ActionContinuousBase
 
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		Fence fence = Fence.Cast( action_data.m_Target.GetObject() );
-		CombinationLock combination_lock =  fence.GetCombinationLock();
-		
-		if ( combination_lock )
+		//set dialed number
+		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
+		CombinationLock combination_lock =  construction_action_data.GetCombinationLock();
+		combination_lock.DialNextNumber( construction_action_data.GetDialIndex() );		
+
+		//check for unlock state
+		if ( !combination_lock.IsLockedOnGate() )
 		{
-			combination_lock.DialNextNumber( m_NextDialAction.GetDialIndex() );
-			
-			//if not locked, unlock the combination lock
-			if ( !combination_lock.IsLockedOnGate() )
-			{
-				EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
-				combination_lock.Unlock( target_entity );
-			}
+			EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
+			combination_lock.Unlock( target_entity );
 		}
 	}
-	
-	protected string GetDialNumberText()
-	{
-		string dial_text;
-		string combination_text = m_NextDialAction.GetCombinationLock().m_Combination.ToString();
-		
-		//insert zeros to dials with 0 value
-		int length_diff = m_NextDialAction.GetCombinationLock().COMBINATION_LENGTH - combination_text.Length();
-		for ( int i = 0; i < length_diff; ++i )
-		{
-			combination_text = "0" + combination_text;
-		}
-		
-		//assemble the whole combination with selected part
-		for ( int j = 0; j < m_NextDialAction.GetCombinationLock().COMBINATION_LENGTH; ++j )
-		{
-			if ( j == m_NextDialAction.GetDialIndex() )
-			{
-				dial_text += string.Format( "[%1]", combination_text.Get( j ) );
-			}
-			else
-			{
-				dial_text += string.Format( " %1 ", combination_text.Get( j ) );
-			}
-		}
-		
-		return dial_text;
-	}	
 }

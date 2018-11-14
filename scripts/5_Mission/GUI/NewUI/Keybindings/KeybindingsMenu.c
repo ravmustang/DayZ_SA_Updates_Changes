@@ -3,8 +3,6 @@ class KeybindingsMenu extends UIScriptedMenu
 	protected TabberUI							m_Tabber;
 	protected ref array<ref KeybindingsGroup>	m_Tabs;
 	
-	protected ref KeybindingsEntryWindow		m_BindingEntryWindow;
-	
 	protected TextWidget						m_Version;
 	
 	protected ButtonWidget						m_Apply;
@@ -12,6 +10,8 @@ class KeybindingsMenu extends UIScriptedMenu
 	protected ButtonWidget						m_Reset;
 	
 	protected int								m_CurrentSettingKeyIndex = -1;
+	protected int								m_CurrentSettingAlternateKeyIndex = -1;
+	protected ref array<int>					m_SetKeybinds;
 	
 	override Widget Init()
 	{
@@ -66,24 +66,46 @@ class KeybindingsMenu extends UIScriptedMenu
 		return m_Tabs.Get( m_Tabber.GetSelectedIndex() );
 	}
 	
-	void ShowKeybiningInputWindow( int key_index )
+	void StartEnteringKeybind( int key_index )
 	{
-		m_CurrentSettingKeyIndex	= key_index;
-		m_BindingEntryWindow		= new KeybindingsEntryWindow( m_CurrentSettingKeyIndex, layoutRoot, this );
+		m_CurrentSettingAlternateKeyIndex	= -1;
+		m_CurrentSettingKeyIndex			= key_index;
 	}
 	
-	void CancelKeybindEntry()
+	void CancelEnteringKeybind()
 	{
-		m_BindingEntryWindow = null;
+		GetCurrentTab().CancelEnteringKeybind();
 		m_CurrentSettingKeyIndex = -1;
+	}
+	
+	void StartEnteringAlternateKeybind( int key_index )
+	{
+		m_CurrentSettingKeyIndex			= -1;
+		m_CurrentSettingAlternateKeyIndex	= key_index;
+	}
+	
+	void CancelEnteringAlternateKeybind()
+	{
+		GetCurrentTab().CancelEnteringAlternateKeybind();
+		m_CurrentSettingAlternateKeyIndex = -1;
 	}
 	
 	void ConfirmKeybindEntry( TIntArray new_keys )
 	{
-		GetGame().GetInput().SetActionKeys( m_CurrentSettingKeyIndex, new_keys );
-		GetCurrentTab().ReloadAction( m_CurrentSettingKeyIndex );
-		m_BindingEntryWindow = null;
 		m_CurrentSettingKeyIndex = -1;
+		m_Apply.Enable( true );
+		m_Apply.ClearFlags( WidgetFlags.IGNOREPOINTER );
+		m_Reset.Enable( true );
+		m_Reset.ClearFlags( WidgetFlags.IGNOREPOINTER );
+	}
+	
+	void ConfirmAlternateKeybindEntry( TIntArray new_keys )
+	{
+		m_CurrentSettingAlternateKeyIndex = -1;
+		m_Apply.Enable( true );
+		m_Apply.ClearFlags( WidgetFlags.IGNOREPOINTER );
+		m_Reset.Enable( true );
+		m_Reset.ClearFlags( WidgetFlags.IGNOREPOINTER );
 	}
 	
 	override void Update(float timeslice)
@@ -93,19 +115,10 @@ class KeybindingsMenu extends UIScriptedMenu
 			Back();
 		}
 		
-		if( m_BindingEntryWindow && m_BindingEntryWindow.IsListening() )
+		if( GetCurrentTab() )
 		{
-			m_BindingEntryWindow.Update( timeslice );
+			GetCurrentTab().Update( timeslice );
 		}
-	}
-	
-	override bool OnKeyDown( Widget w, int x, int y, int key )
-	{
-		if( m_CurrentSettingKeyIndex > -1 && m_BindingEntryWindow && m_BindingEntryWindow.IsListening() )
-		{
-			m_BindingEntryWindow.OnKeyDown( w, x, y, key );
-		}
-		return false;
 	}
 	
 	override bool OnClick( Widget w, int x, int y, int button )
@@ -135,21 +148,34 @@ class KeybindingsMenu extends UIScriptedMenu
 	{
 		m_Apply.Enable( false );
 		m_Apply.SetFlags( WidgetFlags.IGNOREPOINTER );
-		layoutRoot.FindAnyWidget( "Apply" ).Show( false );
 		m_Reset.Enable( false );
 		m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
-		layoutRoot.FindAnyWidget( "Reset" ).Show( false );
+		
+		foreach( KeybindingsGroup group : m_Tabs )
+		{
+			group.Apply();
+		}
 	}
 	
 	void Back()
 	{
-		if( m_CurrentSettingKeyIndex > -1 || m_BindingEntryWindow )
+		if( m_CurrentSettingKeyIndex != -1 )
 		{
-			m_BindingEntryWindow.Cancel();
+			CancelEnteringKeybind();
+			return;
+		}
+		
+		if( m_CurrentSettingAlternateKeyIndex != -1 )
+		{
+			CancelEnteringAlternateKeybind();
 			return;
 		}
 		
 		bool changed = false;
+		foreach( KeybindingsGroup group : m_Tabs )
+		{
+			changed = changed || group.IsChanged();
+		}
 
 		if( changed )
 			g_Game.GetUIManager().ShowDialog("#main_menu_configure", "#main_menu_configure_desc", 1337, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
@@ -163,11 +189,28 @@ class KeybindingsMenu extends UIScriptedMenu
 	{
 		m_Apply.Enable( false );
 		m_Apply.SetFlags( WidgetFlags.IGNOREPOINTER );
-		layoutRoot.FindAnyWidget( "Apply" ).Show( false );
 		
 		m_Reset.Enable( false );
 		m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
-		layoutRoot.FindAnyWidget( "Reset" ).Show( false );
+		
+		foreach( KeybindingsGroup group : m_Tabs )
+		{
+			group.Reset();
+		}
+	}
+	
+	override bool OnModalResult( Widget w, int x, int y, int code, int result )
+	{
+		if( code == 1337 )
+		{
+			if( result == 2 )
+			{
+				Reset();
+				GetGame().GetUIManager().Back();
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	override void Refresh()

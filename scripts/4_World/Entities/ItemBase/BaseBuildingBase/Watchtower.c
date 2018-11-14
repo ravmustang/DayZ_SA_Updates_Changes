@@ -50,7 +50,6 @@ class Watchtower extends BaseBuildingBase
 		return false;
 	}	
 	
-	//TODO - add proper direction conditions to IsFacingBack and IsFacingFront
 	//--- ACTION CONDITIONS
 	override bool IsFacingFront( PlayerBase player )
 	{

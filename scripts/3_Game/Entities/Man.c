@@ -18,7 +18,7 @@ class Man extends EntityAI
 	//! Material that is used on the Man's face and hands
 	proto native void SetFaceMaterial(string material_name);
 
-	proto native float IsSoundInsideBuilding();
+	proto native bool IsSoundInsideBuilding();
 	proto native bool IsCameraInsideVehicle();
 
 	void Man()

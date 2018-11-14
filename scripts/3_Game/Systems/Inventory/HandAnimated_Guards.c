@@ -40,13 +40,17 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 			case InventorySlots.BODY:
 			case InventorySlots.LEGS:
 			case InventorySlots.BACK:
-				return WeaponHideShowTypes.HIDESHOW_SLOT_PISTOLBELT; // @NOTE: this is DUMMY for "generic take" anim
+				return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK; // @NOTE: this is DUMMY for "generic take" anim
 			
 			default:
 				Print("[hndfsm] SlotToAnimType -  not animated slot in src_loc=" + src.DumpToString());
 		};
 		//
 		//if (InventorySlots.GetSlotIdFromString("Pistol"))
+	}
+	else if (src.GetType() == InventoryLocationType.CARGO)
+	{
+		return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK; // @NOTE: placeholder
 	}
 	return -1;
 }

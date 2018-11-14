@@ -76,6 +76,7 @@ class ActionStopEngine: ActionSingleUseBase
 				if ( Class.CastTo(car, trans) )
 				{
 					car.EngineStop();
+					SEffectManager.PlaySound("offroad_engine_stop_fuel_SoundSet", car.GetPosition() );
 				}
 			}
 		}

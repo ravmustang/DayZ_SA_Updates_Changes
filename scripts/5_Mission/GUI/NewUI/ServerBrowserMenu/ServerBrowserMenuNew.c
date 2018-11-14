@@ -64,7 +64,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		LoadData();
 		
 		m_OfficialTab.RefreshList();
-		//m_OfficialTab.LoadFakeData( 300 );
+		//m_OfficialTab.LoadFakeData( 100 );
 		
 		#ifdef PLATFORM_PS4
 			ImageWidget toolbar_a = layoutRoot.FindAnyWidget( "ConnectIcon" );

@@ -363,8 +363,8 @@ class ZombieBase extends DayZInfected
 			
 			soundObjectBuilder = new SoundObjectBuilder( soundParams );
 			soundObject = soundObjectBuilder.BuildSoundObject();
-			soundObject.SetKind( WaveKind.WAVEEFFECTEX );
-			
+			AttenuateSoundIfNecessary(soundObject);
+
 			return PlaySound(soundObject, soundObjectBuilder);
 		}
 
@@ -407,7 +407,7 @@ class ZombieBase extends DayZInfected
 			{
 				objectBuilder.UpdateEnvSoundControllers(GetPosition());
 				SoundObject soundObject = objectBuilder.BuildSoundObject();
-				soundObject.SetKind(WaveKind.WAVEEFFECTEX);
+				AttenuateSoundIfNecessary(soundObject);
 				aw = PlaySound(soundObject, objectBuilder);
 			}
 		}

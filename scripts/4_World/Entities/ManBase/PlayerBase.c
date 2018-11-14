@@ -520,6 +520,11 @@ class PlayerBase extends ManBase
 			{
 				return;
 			}
+			
+			if (!m_MeleeSource)
+			{
+				return
+			}
 
 			Man killer;
 			Man victim;
@@ -540,25 +545,37 @@ class PlayerBase extends ManBase
 				weapon = null;
 
 			}
-			else
+			else if (m_MeleeSource.IsMeleeWeapon() )
 			{
 				//! melee weapon
 				killer = Man.Cast(m_MeleeSource.GetHierarchyParent());
 				killerIdentity = killer.GetIdentity();
 				weapon = m_MeleeSource;
 			}
-			
-			if (victimIdentity && killerIdentity)
+			else
 			{
-				if (weapon)
+				killerIdentity = null;
+			}
+			
+			if(victimIdentity)
+			{
+				if( killerIdentity )
 				{
-					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ") with " + weapon.GetDisplayName() );
-					//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ") with " + weapon.GetDisplayName() );
+					if( weapon )
+					{
+						GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ") with " + weapon.GetType() );
+						//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ") with " + weapon.GetDisplayName() );
+					}
+					else
+					{
+						GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ")");
+						//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ")");
+					}
 				}
 				else
 				{
-					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ")");
-					//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by .... " + killerIdentity.GetName() + " (id=" + killerIdentity.GetId() + ")");
+						GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by " + m_MeleeSource.GetType());
+						//Print("Player " + GetIdentity().GetName() + " (id=" + GetIdentity().GetId() + ") killed by " + m_MeleeSource.GetDisplayName());				
 				}
 			}
 		}

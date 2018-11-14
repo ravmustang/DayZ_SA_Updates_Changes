@@ -1,11 +1,7 @@
 class ActionNextCombinationLockDialOnTarget: ActionInteractBase
 {
-	protected CombinationLock 	m_CombinationLock;
-	protected int 				m_DialIndex;	
-	
 	void ActionNextCombinationLockDialOnTarget()
 	{
-		m_DialIndex = 0;
 	}
 
 	override void CreateConditionComponents()  
@@ -36,13 +32,14 @@ class ActionNextCombinationLockDialOnTarget: ActionInteractBase
 		{
 			Fence fence = Fence.Cast( targetObject );
 			
-			if ( fence && fence.IsLocked() )
+			if ( fence && fence.IsLocked() && !player.GetItemInHands() )
 			{
 				string selection = fence.GetActionComponentName( target.GetComponentIndex() );
 				
 				if ( selection == "wall_interact" )
 				{
-					m_CombinationLock = fence.GetCombinationLock();
+					ConstructionActionData construction_action_data = player.GetConstructionActionData();
+					construction_action_data.SetCombinationLock( fence.GetCombinationLock() );
 					
 					return true;
 				}
@@ -54,35 +51,10 @@ class ActionNextCombinationLockDialOnTarget: ActionInteractBase
 	
 	override void Start( ActionData action_data )
 	{
-		SetNextDialIndex();
+		super.Start( action_data );
+		
+		//set next dial
+		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
+		construction_action_data.SetNextDialIndex();
 	}
-	
-	int GetDialIndex()
-	{
-		return m_DialIndex;
-	}
-	
-	CombinationLock GetCombinationLock()
-	{
-		return m_CombinationLock;
-	}
-	
-	protected void SetNextDialIndex()
-	{
-		if ( m_CombinationLock.COMBINATION_LENGTH > 1 )
-		{
-			if ( m_DialIndex <= m_CombinationLock.COMBINATION_LENGTH - 2 )
-			{
-				m_DialIndex++;
-			}
-			else if ( m_DialIndex >= m_CombinationLock.COMBINATION_LENGTH >  - 1 )
-			{
-				m_DialIndex = 0;
-			}
-		}
-		else
-		{
-			m_DialIndex = 0;
-		}
-	}	
 }

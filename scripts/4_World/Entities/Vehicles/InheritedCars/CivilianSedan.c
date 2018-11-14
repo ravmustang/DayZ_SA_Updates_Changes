@@ -24,59 +24,34 @@ class CivilianSedan extends CarScript
 
 	override bool CrewCanGetThrough( int posIdx )
 	{
-		CarDoor carDoor;
 		switch( posIdx )
 		{
 			case 0:
-				Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanDriverDoors") );
-				if ( carDoor )
-				{
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5 ) return true;
-				}
-				else
-				{
-					return true;
-				}
-				return false;
+				if ( GetCarDoorsState( "CivSedanDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+					return false;
+
+				return true;
 			break;
 			
 			case 1:
-				Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanCoDriverDoors") );
-				if ( carDoor )
-				{
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5 ) return true;
-				}
-				else
-				{
-					return true;
-				}
-				return false;
+				if ( GetCarDoorsState( "CivSedanCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+					return false;
+
+				return true;
 			break;
 
 			case 2:
-				Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanCargo1Doors") );
-				if ( carDoor )
-				{
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5 ) return true;
-				}
-				else
-				{
-					return true;
-				}
-				return false;
+				if ( GetCarDoorsState( "CivSedanCargo1Doors" ) == CarDoorState.DOORS_CLOSED )
+					return false;
+
+				return true;
 			break;
 
 			case 3:
-				Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanCargo2Doors") );
-				if ( carDoor )
-				{
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5 ) return true;
-				}
-				else
-				{
-					return true;
-				}
-				return false;
+				if ( GetCarDoorsState( "CivSedanCargo2Doors" ) == CarDoorState.DOORS_CLOSED )
+					return false;
+
+				return true;
 			break;
 		}
 

@@ -69,11 +69,11 @@ class ActionBuildPart: ActionContinuousBase
 			
 			if ( !GetGame().IsMultiplayer() || GetGame().IsServer() )
 			{
-				construction_action_data.RefreshPartsToBuild( main_part_name );
+				construction_action_data.RefreshPartsToBuild( main_part_name, item );
 			}
 			ConstructionPart constrution_part = construction_action_data.GetCurrentBuildPart();
 			
-			if ( constrution_part && !constrution_part.IsBase() && base_building.IsFacingBack( player ) )
+			if ( constrution_part && base_building.IsFacingBack( player ) )
 			{
 				return true;
 			}			
@@ -89,7 +89,7 @@ class ActionBuildPart: ActionContinuousBase
 		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
 		string part_name = construction_action_data.GetCurrentBuildPart().GetPartName();
 		
-		if ( !construction.IsColliding( part_name ) && construction.CanBuildPart( part_name ) )
+		if ( !construction.IsColliding( part_name ) && construction.CanBuildPart( part_name, action_data.m_MainItem ) )
 		{
 			//build
 			construction.BuildPart( part_name, true );
@@ -103,5 +103,35 @@ class ActionBuildPart: ActionContinuousBase
 		}
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+	}
+	
+	//setup
+	override bool SetupAction( PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL )
+	{	
+		if( super.SetupAction( player, target, item, action_data, extra_data ) )
+		{
+			SetBuildingAnimation( item );
+			
+			return true;
+		}
+		
+		return false;
+	}
+	
+	void SetBuildingAnimation( ItemBase item )
+	{
+		switch( item.Type() )
+		{
+			case Shovel:
+			case FieldShovel:
+				m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
+				break;
+			case Pliers:
+				m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BANDAGETARGET;
+				break;				
+			default:
+				m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_ASSEMBLE;
+				break;
+		}
 	}
 }

@@ -769,13 +769,11 @@ class ItemBase extends InventoryItem
 					return;
 				
 				if (detach_types.Get(idx) != "")
-					//MiscGameplayFunctions.TurnItemIntoItem(this, detach_types.Get(idx), player);
 				//quantity override is needed here, otherwise optional
 				{
 					TurnItemIntoItemLambda lamb = new TurnItemIntoItemLambda(this, detach_types.Get(idx), player);
 					lamb.SetTransferParams(true, true, true, false,1);
 					MiscGameplayFunctions.TurnItemIntoItemEx(player, lamb);
-					//SetTransferParams (bool transfer_agents = true, bool transfer_variables = true, bool transfer_health = true, bool exclude_quantity = false)
 				}
 			}
 		}

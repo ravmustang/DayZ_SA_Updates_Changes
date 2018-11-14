@@ -234,7 +234,8 @@ class MissionGameplay extends MissionBase
 		UpdateDummyScheduler();//for external entities
 		UIScriptedMenu menu = m_UIManager.GetMenu();
 		InventoryMenu inventory = InventoryMenu.Cast( m_UIManager.FindMenu(MENU_INVENTORY) );
-		MapMenu mapmenu = MapMenu.Cast( m_UIManager.FindMenu(MENU_MAP) );
+		MapMenu map_menu = MapMenu.Cast( m_UIManager.FindMenu(MENU_MAP) );
+		GesturesMenu gestures_menu = GesturesMenu.Cast(m_UIManager.FindMenu(MENU_GESTURES));
 		//m_InventoryMenu = inventory;
 		InspectMenuNew inspect = InspectMenuNew.Cast( m_UIManager.FindMenu(MENU_INSPECT) );
 		Input input = GetGame().GetInput();
@@ -321,25 +322,6 @@ class MissionGameplay extends MissionBase
 			}
 		}
 
-		//Gestures
-		if(input.GetActionDown(UAUIGesturesOpen, false))
-		{
-			//open gestures menu
-			if ( !GetUIManager().IsMenuOpen( MENU_GESTURES ) )
-			{
-				GesturesMenu.OpenMenu();
-			}
-		}
-		
-		if(input.GetActionUp(UAUIGesturesOpen, false))
-		{
-			//close gestures menu
-			if ( GetUIManager().IsMenuOpen( MENU_GESTURES ) )
-			{
-				GesturesMenu.CloseMenu();
-			}
-		}
-
 		//Radial quickbar
 		if(input.GetActionDown(UAUIQuickbarRadialOpen, false))
 		{
@@ -370,6 +352,24 @@ class MissionGameplay extends MissionBase
 			}
 		}		
 #endif
+		//Gestures
+		if(input.GetActionDown(UAUIGesturesOpen, false))
+		{
+			//open gestures menu
+			if ( !GetUIManager().IsMenuOpen( MENU_GESTURES ) )
+			{
+				GesturesMenu.OpenMenu();
+			}
+		}
+		
+		if(input.GetActionUp(UAUIGesturesOpen, false))
+		{
+			//close gestures menu
+			if ( GetUIManager().IsMenuOpen( MENU_GESTURES ) )
+			{
+				GesturesMenu.CloseMenu();
+			}
+		}
 
 		if (player && m_LifeState == EPlayerStates.ALIVE && !player.IsUnconscious() )
 		{
@@ -560,9 +560,14 @@ class MissionGameplay extends MissionBase
 					m_UIManager.Back();
 					PlayerControlEnable();
 				}
-				else if(menu == mapmenu && !m_ControlDisabled)
+				else if(menu == map_menu && !m_ControlDisabled)
 				{
 					PlayerControlDisable();
+				}
+				else if(menu == gestures_menu && !m_ControlDisabled)
+				{
+					PlayerMouseControlDisable();
+					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
 				}
 				
 			}
@@ -570,6 +575,10 @@ class MissionGameplay extends MissionBase
 			{
 				Pause();
 				PlayerControlDisable();
+			}
+			else if (!menu && m_ControlDisabled)
+			{
+				PlayerControlEnable();
 			}
 		}
 		
@@ -781,6 +790,16 @@ class MissionGameplay extends MissionBase
 		//Print("Disabling Controls");
 #ifdef WIP_INPUTS
 			GetUApi().ActivateExclude("inventory");
+			GetUApi().ActivateGroup("infantry");
+#endif
+		m_ControlDisabled = true;
+	}
+	
+	void PlayerMouseControlDisable()
+	{
+		//Print("Disabling Controls");
+#ifdef WIP_INPUTS
+			GetUApi().ActivateExclude("radialmenu");
 			GetUApi().ActivateGroup("infantry");
 #endif
 		m_ControlDisabled = true;

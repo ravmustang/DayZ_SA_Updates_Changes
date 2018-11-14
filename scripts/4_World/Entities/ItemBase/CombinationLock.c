@@ -205,7 +205,9 @@ class CombinationLock extends ItemBase
 		//drop entity from attachment slot
 		if ( GetGame().IsMultiplayer() )
 		{
-			parent.GetInventory().DropEntity( InventoryMode.PREDICTIVE, parent, this );
+			GetGame().RemoteObjectTreeDelete( this );
+			parent.GetInventory().DropEntity( InventoryMode.LOCAL, parent, this );
+			GetGame().RemoteObjectTreeCreate( this );
 		}
 		else
 		{

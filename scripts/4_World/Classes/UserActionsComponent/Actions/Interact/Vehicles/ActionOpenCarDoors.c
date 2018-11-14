@@ -64,6 +64,8 @@ class ActionOpenCarDoors: ActionInteractBase
 		if( car )
 		{
 			car.SetAnimationPhase( m_AnimSource, 1.0);
+			if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+				SEffectManager.PlaySound("offroad_door_open_SoundSet", car.GetPosition() );
 		}
 	}
 

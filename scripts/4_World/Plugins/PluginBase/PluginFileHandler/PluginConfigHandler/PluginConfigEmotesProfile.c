@@ -42,7 +42,7 @@ class PluginConfigEmotesProfile extends PluginConfigHandler
 	{
 		CfgParamInt param = CfgParamInt.Cast( GetParamByName( key, CFG_TYPE_INT ) );
 		param.SetValue( value );
-		SaveConfigToFile();
+		//SaveConfigToFile();
 		return param;
 	}
 

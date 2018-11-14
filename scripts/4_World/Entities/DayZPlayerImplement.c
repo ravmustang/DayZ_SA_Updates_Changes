@@ -1026,19 +1026,19 @@ class DayZPlayerImplement extends DayZPlayer
 		if (m_LiftWeapon_player && (IsInOptics() || IsInIronsights()))
 			ExitSights();
 
-		if ((input.GetActionDown(UAADSToggle, false) || input.GetActionDown(UAZoomIn, false)) && !m_LiftWeapon_player) // || sightChange)
+		if ((input.GetActionDown(UAADSToggle, false) || input.GetActionDown(UAZoomIn, false)) && !m_LiftWeapon_player && IsFireWeaponRaised()) // || sightChange)
 		{
 			HumanItemAccessor 	hia = GetItemAccessor();
 			HumanCommandWeapons	hcw = GetCommandModifier_Weapons();
 			PlayerBase playerPB = PlayerBase.Cast(this);
-			if (hia.IsItemInHandsWeapon() && playerPB.GetWeaponManager() && !playerPB.GetWeaponManager().IsRunning() )
+			if (hia.IsItemInHandsWeapon() && playerPB.GetWeaponManager() && !playerPB.GetWeaponManager().IsRunning())
 			{
 				Weapon_Base weapon = Weapon_Base.Cast(GetHumanInventory().GetEntityInHands());
 				ItemOptics optic = weapon.GetAttachedOptics();
 				if (weapon.CanEnterIronsights() && !m_ShouldReturnToOptics)
 				{
 					m_CameraIronsighs = !m_CameraIronsighs;
-					Print("To ironsights " +  m_CameraIronsighs.ToString());
+					//Print("To ironsights " +  m_CameraIronsighs.ToString());
 	
 					if (m_CameraIronsighs)
 					{
@@ -1051,7 +1051,7 @@ class DayZPlayerImplement extends DayZPlayer
 							GetMovementState(m_MovementState);
 							if (!hic.IsWeaponRaised() || m_MovementState.m_iMovement == 3)
 							{
-								Print("To ironsights or optics: failed -> sprint or no aim");
+								//Print("To ironsights or optics: failed -> sprint or no aim");
 								ExitSights();
 							}
 						}
@@ -1092,7 +1092,7 @@ class DayZPlayerImplement extends DayZPlayer
 				GetMovementState(m_MovementState);
 				if (!m_MovementState.IsRaised())
 				{
-					Print("From ironsights and optics");
+					//Print("From ironsights and optics");
 			
 					if (hcw) hcw.SetADS(false);
 					ExitSights();
@@ -1976,18 +1976,12 @@ class DayZPlayerImplement extends DayZPlayer
 				soundBuilder = table.GetSoundBuilder(pUserInt, state.m_iMovement, m_LastSurfaceUnderHash, GetBootsType());
 			}
 
-			if(soundBuilder != NULL && GetGame().GetPlayer())
+			if (soundBuilder != NULL && GetGame().GetPlayer())
 			{
 				SoundObject soundObject = soundBuilder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
-					WaveKind kind = WaveKind.WAVEEFFECTEX;
-					if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
-					{
-						kind = WaveKind.WAVEATTALWAYS;
-					}
-					soundObject.SetKind(kind);
-					
+					AttenuateSoundIfNecessary(soundObject);
 					PlaySound(soundObject, soundBuilder);
 				}
 			}
@@ -2146,13 +2140,7 @@ class DayZPlayerImplement extends DayZPlayer
 				SoundObject soundObject = builder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
-					WaveKind kind = WaveKind.WAVEEFFECTEX;
-					if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
-					{
-						kind = WaveKind.WAVEATTALWAYS;
-					}
-					soundObject.SetKind(kind);
-					
+					AttenuateSoundIfNecessary(soundObject);
 					PlaySound(soundObject, builder);
 				}
 			}
@@ -2198,13 +2186,7 @@ class DayZPlayerImplement extends DayZPlayer
 				SoundObject soundObject = soundBuilder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
-					WaveKind kind = WaveKind.WAVEEFFECTEX;
-					if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
-					{
-						kind = WaveKind.WAVEATTALWAYS;
-					}
-					soundObject.SetKind(kind);
-					
+					AttenuateSoundIfNecessary(soundObject);
 					PlaySound(soundObject, soundBuilder);
 				}
 			}
@@ -2229,13 +2211,7 @@ class DayZPlayerImplement extends DayZPlayer
 				objectBuilder.UpdateEnvSoundControllers(GetPosition());
 
 				SoundObject soundObject = objectBuilder.BuildSoundObject();
-				WaveKind kind = WaveKind.WAVEEFFECTEX;
-				if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
-				{
-					kind = WaveKind.WAVEATTALWAYS;
-				}
-				soundObject.SetKind(kind);
-
+				AttenuateSoundIfNecessary(soundObject);
 				PlaySound(soundObject, objectBuilder);
 			}
 			
@@ -2276,13 +2252,7 @@ class DayZPlayerImplement extends DayZPlayer
 				objectBuilder.SetVariable("female", isFemale);
 				
 				SoundObject soundObject = objectBuilder.BuildSoundObject();
-				WaveKind kind = WaveKind.WAVEEFFECTEX;
-				if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
-				{
-					kind = WaveKind.WAVEATTALWAYS;
-				}
-				soundObject.SetKind(kind);
-
+				AttenuateSoundIfNecessary(soundObject);
 				return PlaySound(soundObject, objectBuilder);
 			}
 			
@@ -2429,6 +2399,18 @@ class DayZPlayerImplement extends DayZPlayer
 			{
 				RegisterTransportHit(transport);
 			}			
+		}
+	}
+	
+	protected void AttenuateSoundIfNecessary(SoundObject soundObject)
+	{
+		if (GetGame().GetPlayer() != NULL && (IsSoundInsideBuilding() != GetGame().GetPlayer().IsSoundInsideBuilding() || IsCameraInsideVehicle() != GetGame().GetPlayer().IsCameraInsideVehicle()))
+		{
+			soundObject.SetKind(WaveKind.WAVEATTALWAYS);
+		}
+		else
+		{
+			soundObject.SetKind(WaveKind.WAVEEFFECTEX);
 		}
 	}
 }
