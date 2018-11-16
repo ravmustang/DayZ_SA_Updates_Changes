@@ -10,6 +10,11 @@ class ActionEatTetracyclineAntibiotics: ActionConsume
 	{
 		return AT_EAT_TETRACYCLINE_ANTIBIOTICS;
 	}
+	
+	override int IsEat()
+	{
+		return true;
+	}
 
 	override void ApplyModifiers( ActionData action_data )
 	{

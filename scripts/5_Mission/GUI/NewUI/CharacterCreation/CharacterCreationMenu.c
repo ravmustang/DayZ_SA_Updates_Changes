@@ -99,6 +99,8 @@ class CharacterCreationMenu extends UIScriptedMenu
 			toolbar_y.LoadImageFile( 0, "set:playstation_buttons image:triangle" );
 		#endif
 		
+		SetCharacter();
+		
 		return layoutRoot;
 	}
 	
@@ -118,7 +120,9 @@ class CharacterCreationMenu extends UIScriptedMenu
 		m_Scene.GetIntroCharacter().SaveCharacterSetup();
 		m_Scene.GetIntroCharacter().SaveCharName();
 		m_Scene.GetIntroCharacter().SaveDefaultCharacter();
-		SetCharacter();
+		
+		//SaveCharacters
+		
 		GetGame().GetUIManager().Back();
 	}
 	

@@ -189,6 +189,7 @@ class AnimatedActionBase : ActionBase
 				OnExecuteClient(action_data);
 			}
 			action_data.m_WasExecuted = true;
+			action_data.m_WasActionStarted  = true;
 		}
 	}
 	
@@ -442,7 +443,25 @@ class AnimatedActionBase : ActionBase
 			{
 				OnEndClient(action_data);
 			}
+			
+			// Xbox Achievemnts
+			if ( action_data.m_WasActionStarted )
+			{
+				if ( IsEat() )
+				{
+					AnalyticsManager.OnActionEat();
+				}
+				else if ( IsDrink() )
+				{
+					AnalyticsManager.OnActionDrink();
+				}
+				
+				action_data.m_WasActionStarted = false;
+			}
+			
 			action_data.m_Player.GetActionManager().OnActionEnd();
+			
+			
 		}
 		else
 		{

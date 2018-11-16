@@ -17,4 +17,5 @@ class BiosClientServices
 	proto native BiosSocialService GetSocialService();
 	proto native BiosLobbyService GetLobbyService();
 	proto native BiosSessionService GetSessionService();
+	proto native BiosPackageService GetPackageService();
 };

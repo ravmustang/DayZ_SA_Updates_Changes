@@ -28,7 +28,13 @@ class SyncEvents
 			case ESyncEvent.PlayerList:
 			{
 				ClientData.SyncEvent_OnRecievedPlayerList( data.m_ServerPlayerList );
+				break;
 			}
+			case ESyncEvent.EntityKill:
+			{
+				ClientData.SyncEvent_OnEntityKilled( data.m_EntityKill );
+				break;
+			}			
 		}
 	}
 	
@@ -39,6 +45,32 @@ class SyncEvents
 		data.m_ServerPlayerList.CreatePlayerList();
 		
 		SendSyncEvent( ERPCs.RPC_SYNC_EVENT, ESyncEvent.PlayerList, data, true );
+	}
+	
+	static void SendEntityKilled( EntityAI victim, EntityAI killer, EntityAI source, bool is_headshot )
+	{
+		if ( (victim && victim.IsPlayer()) || (killer && killer.IsPlayer()) )
+		{
+			ref SyncData data = new SyncData;
+			data.m_EntityKill = new SyncEntityKillInfo;
+			
+			data.m_EntityKill.m_EntityVictim	= victim;
+			data.m_EntityKill.m_EntityKiller	= killer;
+			data.m_EntityKill.m_EntitySource	= source;
+			data.m_EntityKill.m_IsHeadShot		= is_headshot;
+			
+			if ( victim && victim.IsPlayer() )
+			{
+				Man man_victim = Man.Cast(victim);
+				SendSyncEvent( ERPCs.RPC_SYNC_EVENT, ESyncEvent.EntityKill, data, true, man_victim.GetIdentity() );
+			}
+			
+			if ( killer && killer.IsPlayer() && victim.GetID() != killer.GetID() )
+			{
+				Man man_killer = Man.Cast(killer);
+				SendSyncEvent( ERPCs.RPC_SYNC_EVENT, ESyncEvent.EntityKill, data, true, man_killer.GetIdentity() );
+			}
+		}
 	}
 	
 	private static void SendSyncEvent( ERPCs rpc_event_id, ESyncEvent sync_event_type, ref SyncData data = null, bool guaranteed = true, PlayerIdentity player_target = null )

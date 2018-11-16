@@ -13,10 +13,10 @@ class LandMineTrap extends TrapBase
 		m_AddDeactivationDefect = true;
 	}
 	
-	override bool IsOneHandedBehaviour()
+	/*override bool IsOneHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

@@ -19,6 +19,7 @@ enum EPlayerSoundEventID
 	INJURED_LIGHT,
 	INJURED_MEDIUM,
 	INJURED_HIGH,
+	FREEZING,
 	//--------------
 	// Count bellow, put enums above
 	//--------------
@@ -57,6 +58,7 @@ class PlayerSoundEventHandler extends SoundEventHandler
 		RegisterState(new InjuryLightSoundEvent());
 		RegisterState(new InjuryMediumSoundEvent());
 		RegisterState(new InjuryHeavySoundEvent());
+		RegisterState(new FreezingSoundEvent());
 	}
 	
 	void RegisterState(PlayerSoundEventBase state)

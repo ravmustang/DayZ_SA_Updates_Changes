@@ -539,12 +539,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				{
 					if( PassFilter( result ) )
 					{
-						m_Entries.Insert( result );
-						ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, m_TotalLoadedServers, this );
+						ref ServerBrowserEntry entry = new ServerBrowserEntry( null, m_TotalLoadedServers, this );
 						entry.FillInfo( result );
 						entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
 						m_EntryWidgets.Insert( result.m_Id, entry );
-						//AddSorted( result );
+						AddSorted( result );
 						m_TotalLoadedServers++;
 						m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 					}
@@ -558,7 +557,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				m_LoadingText.SetText( "Finished loading " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 				m_Menu.SetRefreshing( TabType.NONE );
 			}
-			m_ServerList.Update();
+			//m_ServerList.Update();
 
 		}
 		else
@@ -705,7 +704,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void Update( float timeslice )
 	{
-		m_ServerList.Update();
+		//m_ServerList.Update();
 	}
 	
 	void Connect( ServerBrowserEntry server )
@@ -900,11 +899,26 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		#endif
 	}
 	
+	void InplaceReverse()
+	{
+		int left = 0;
+		int right = m_Entries.Count() - 1;
+		if( right > 1 )
+		{
+			while( left < right )
+			{
+				GetServersResultRow temp = m_Entries[left];
+				m_Entries[left++] = m_Entries[right];
+				m_Entries[right--] = temp;
+			}
+		}
+	}
+	
 	void InvertSort()
 	{
 		if( m_Entries && m_Entries.Count() > 1 )
 		{
-			reversearray( m_Entries );
+			InplaceReverse();
 			for( int i = 0; i < m_Entries.Count(); i++ )
 			{
 				if( m_EntryWidgets.Contains( m_Entries.Get( i ).m_Id ) )
@@ -1038,9 +1052,9 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		return false;
 	}
 	
-	void AddSorted( Param1<ref GetServersResultRow> entry )
+	void AddSorted( GetServersResultRow entry )
 	{
-		ref GetServersResultRow row = entry.param1;
+		ref GetServersResultRow row = entry;
 		if( m_Entries )
 		{
 			m_Entries.Insert( row );
@@ -1053,7 +1067,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				ServerBrowserEntry prev = m_EntryWidgets.Get( m_Entries.Get( index - 1 ).m_Id );
 				if( prev && curr )
 				{
-					m_ServerList.AddChildAfter( curr.GetRoot(), prev.GetRoot() );
+					m_ServerList.AddChildAfter( curr.GetRoot(), prev.GetRoot(), false );
+					curr.GetRoot().Show( true );
 				}
 			}
 		}

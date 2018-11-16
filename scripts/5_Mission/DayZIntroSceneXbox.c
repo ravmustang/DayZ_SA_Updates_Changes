@@ -153,7 +153,12 @@ class DayZIntroSceneXbox: Managed
 		
 		GetGame().ObjectDelete( m_SceneCharacter );
 		GetGame().ObjectDelete( m_SceneCamera );
-		m_MenuData.ClearCharacters();
+		
+		if ( m_MenuData )
+		{
+			m_MenuData.ClearCharacters();
+		}
+		
 		Material material = GetGame().GetWorld().GetMaterial("graphics/materials/postprocess/chromaber");
 		material.SetParam("PowerX", 0.0);
 		material.SetParam("PowerY", 0.0);

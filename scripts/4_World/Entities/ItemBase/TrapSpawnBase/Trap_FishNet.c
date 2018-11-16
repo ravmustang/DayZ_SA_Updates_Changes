@@ -32,10 +32,10 @@ class Trap_FishNet extends TrapSpawnBase
 		m_CatchesGroundAnimal = new multiMap<string, float>;
 	}
 	
-	override bool IsOneHandedBehaviour()
+	/*override bool IsOneHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{
@@ -80,7 +80,7 @@ class Trap_FishNet extends TrapSpawnBase
 		}
 	}
 
-	override bool CanRelaseCargo( EntityAI child )
+	override bool CanReleaseCargo( EntityAI child )
 	{
 		if ( GetHierarchyRootPlayer() == NULL )
 		{

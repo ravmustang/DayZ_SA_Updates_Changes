@@ -11,10 +11,10 @@ class Barrel_ColorBase : Container_Base
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	bool IsLocked()
 	{

@@ -522,7 +522,7 @@ class AttachmentCategoriesRow: ClosableContainer
 					item.SplitIntoStackMaxClient( player, -1 );
 				}
 				else
-					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, item );
+					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, item );
 			}
 			else
 			{
@@ -648,23 +648,22 @@ class AttachmentCategoriesRow: ClosableContainer
 			}
 			
 			item_w.FindAnyWidget("Mounted"+j%7).Show(false);
-			
+			bool draggable;
 			if ( item_w && item )
 			{				
 				if( m_Entity.GetInventory().GetSlotLock( slot_id ) && ItemManager.GetInstance().GetDraggedItem() != item )
 				{
 					item_w.FindAnyWidget("Mounted"+j%7).Show( true );
-					item_preview2.GetParent().ClearFlags( WidgetFlags.DRAGGABLE );
 				}
 				else
 				{
 					item_w.FindAnyWidget("Mounted"+j%7).Show( false );
-					item_preview2.GetParent().SetFlags( WidgetFlags.DRAGGABLE );
+					draggable = true;
 				}
 				
 				if( !m_Entity.CanReleaseAttachment( item ) )
 				{
-					item_preview2.GetParent().ClearFlags( WidgetFlags.DRAGGABLE );
+					draggable = false;
 				}
 				
 				int has_quantity = QuantityConversions.HasItemQuantity( item );
@@ -718,11 +717,22 @@ class AttachmentCategoriesRow: ClosableContainer
 				if ( image_widget4 && AttchmentsOutOfReach.IsAttachmentReachable(entity, slot_name) )
 				{
 					image_widget4.Show(false);
+					draggable = true;
 				}
 				else if ( image_widget4 )
 				{
 					image_widget4.Show(true);
+					draggable = false;
 				}
+			}
+			
+			if( draggable )
+			{
+				item_preview2.GetParent().SetFlags( WidgetFlags.DRAGGABLE );
+			}
+			else
+			{
+				item_preview2.GetParent().ClearFlags( WidgetFlags.DRAGGABLE );
 			}
 		}
 	}

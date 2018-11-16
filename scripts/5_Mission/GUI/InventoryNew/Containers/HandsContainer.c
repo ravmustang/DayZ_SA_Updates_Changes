@@ -868,7 +868,7 @@ class HandsContainer: Container
 				if( item_in_hands )
 				{
 					item_in_hands.GetInventory().GetCurrentInventoryLocation( inv_loc_src );
-					player.GetInventory().FindFreeLocationFor( item_in_hands, FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, inv_loc_dst );
+					player.GetInventory().FindFreeLocationFor( item_in_hands, FindInventoryLocationType.ANY, inv_loc_dst );
 
 					// todle je nejaky divny ne?
 					//TryMoveEntity( inv_loc_src, inv_loc_dst );
@@ -1284,7 +1284,7 @@ class HandsContainer: Container
 				if( item.ConfigGetFloat("varStackMax") )
 					item.SplitIntoStackMaxClient( player, -1, );
 				else
-					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, InventoryItem.Cast( item ) );
+					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
 			}
 			else
 			{

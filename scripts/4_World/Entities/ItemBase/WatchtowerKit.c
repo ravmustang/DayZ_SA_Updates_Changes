@@ -45,10 +45,10 @@ class WatchtowerKit extends ItemBase
 		RemoveProxyPhysics( "Placing" );		
 	}
 	
-	override bool IsOneHandedBehaviour()
+	/*override bool IsOneHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

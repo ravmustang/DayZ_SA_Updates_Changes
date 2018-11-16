@@ -249,6 +249,7 @@ class UIManager
 		{
 			hud = GetGame().GetMission().GetHud();
 		}
+		
 		if( hud && hud.IsXboxDebugCursorEnabled(  ) )
 		{
 			ShowCursor( true );

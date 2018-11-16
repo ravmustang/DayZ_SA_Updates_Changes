@@ -48,11 +48,13 @@ class MissionGameplay extends MissionBase
 		
 		m_ToggleHudTimer			= new Timer(CALL_CATEGORY_GUI);
 		
-		g_Game.m_loadingScreenOn	= true;
+		g_Game.m_IsPlayerSpawning	= true;
 		
 		SyncEvents.RegisterEvents();
 		g_Game.SetGameState( DayZGameState.IN_GAME );
 		PlayerBase.Event_OnPlayerDeath.Insert( Pause );
+		
+		AnalyticsManager.RegisterEvents();
 	}
 	
 	void ~MissionGameplay()
@@ -68,6 +70,8 @@ class MissionGameplay extends MissionBase
 			g_Game.GetUIManager().ScreenFadeOut(0);
 		}
 	#endif
+		
+		AnalyticsManager.UnregisterEvents();
 
 	}
 	
@@ -87,7 +91,7 @@ class MissionGameplay extends MissionBase
 		
 		m_UIManager = GetGame().GetUIManager();
 			
-		g_Game.m_loadingScreenOn	= true;
+		g_Game.m_IsPlayerSpawning	= true;
 		m_Initialized				= true;
 
 		// init hud ui
@@ -239,6 +243,7 @@ class MissionGameplay extends MissionBase
 		//m_InventoryMenu = inventory;
 		InspectMenuNew inspect = InspectMenuNew.Cast( m_UIManager.FindMenu(MENU_INSPECT) );
 		Input input = GetGame().GetInput();
+		//UAInput input = GetUApi().GetInputByID(GetUApi().DeterminePressedButton());
 		
 		//TODO should be switchable
 		if (playerPB && playerPB.enterNoteMenuRead)
@@ -368,6 +373,16 @@ class MissionGameplay extends MissionBase
 			if ( GetUIManager().IsMenuOpen( MENU_GESTURES ) )
 			{
 				GesturesMenu.CloseMenu();
+			}
+		}
+		
+		if(GetUApi().GetInputByName("UADropItem").LocalPress())
+		{
+			//drops item
+			if (playerPB && playerPB.GetItemInHands() && !GetUIManager().GetMenu())
+			{
+				ActionManagerClient manager = ActionManagerClient.Cast(playerPB.GetActionManager());
+				manager.ActionDropItemStart(playerPB.GetItemInHands(),null);
 			}
 		}
 
@@ -592,37 +607,9 @@ class MissionGameplay extends MissionBase
 		super.OnKeyPress(key);
 		m_Hud.KeyPress(key);
 		
-		
-		//temporary
-		//Gestures [.]
-#ifdef DEVELOPER
-		/*if ( key == KeyCode.KC_PERIOD )
-		{
-			//open gestures menu
-			if ( !GetUIManager().IsMenuOpen( MENU_GESTURES ) )
-			{
-				//TODO reconnect when appropriate
-				GesturesMenu.OpenMenu();
-			}
-		}*/
-#endif
-		/*
-		//temporary
-		//Radial Quickbar [,]
-		if ( key == KeyCode.KC_COMMA )
-		{
-			//open radial quickbar menu
-			if ( !GetGame().GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
-			{
-				//TODO reconnect when appropriate
-				RadialQuickbarMenu.OpenMenu();
-			}
-		}
-		*/
-		
 #ifdef DEVELOPER
 		// drop item prototype
-		if ( key == KeyCode.KC_N )
+		/*if ( key == KeyCode.KC_N )
 		{
 			PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
 			if (player && player.GetItemInHands() && !GetUIManager().GetMenu())
@@ -630,38 +617,27 @@ class MissionGameplay extends MissionBase
 				ActionManagerClient manager = ActionManagerClient.Cast(player.GetActionManager());
 				manager.ActionDropItemStart(player.GetItemInHands(),null);
 			}
-		}
-		
-		/*if ( key == KeyCode.KC_P )
-		{
-			if (!player)
-				player = PlayerBase.Cast(GetGame().GetPlayer());
-			player.SetHealth("Brain","Health",0);
-			player.SetHealth("","Health",0);
-		}*/
-		
-		/*if ( key == KeyCode.KC_P )
-		{
-			if (!player)
-				player = PlayerBase.Cast(GetGame().GetPlayer());
-			int slot_id = InventorySlots.GetSlotIdFromString("Legs"); 
- 			EntityAI players_legs = player.GetInventory().FindPlaceholderForSlot( slot_id );
-			Print("--attachment type = " + players_legs.GetType());
-		}*/
-		
-		/*if ( key == KeyCode.KC_P )
-		{
-			if (!player)
-				player = PlayerBase.Cast(GetGame().GetPlayer());
-			if (player && player.m_EmoteManager && player.GetItemInHands())
-			{
-				player.DropItem(player.GetItemInHands());
-			}
 		}*/
 		
 		if ( key == KeyCode.KC_Q )
 		{
 			//SEffectManager.PlaySound("HandCuffs_A_SoundSet", GetGame().GetPlayer().GetPosition(), 0, 0, false);
+			/*
+			PlayerBase player2 = PlayerBase.Cast( GetGame().GetPlayer() );
+		
+			ItemBase item;
+			for ( int i = 0; i < player2.GetInventory().GetAttachmentSlotsCount(); ++i )
+			{
+				int slot_id = player2.GetInventory().GetAttachmentSlotId( i );
+				
+				Print("index: "+ i +"  slot_id: "+ slot_id);
+				
+				EntityAI att_item = player2.GetInventory().FindAttachment( slot_id );
+				
+				Print("Item: "+ att_item);
+			}
+			*/
+			
 		}
 #endif
 	}
@@ -671,33 +647,6 @@ class MissionGameplay extends MissionBase
 	override void OnKeyRelease(int key)
 	{
 		super.OnKeyRelease(key);
-		
-		//temporary
-		//Gestures [.]
-#ifdef DEVELOPER
-		/*if ( key == KeyCode.KC_PERIOD )
-		{
-			//close gestures menu
-			if ( GetUIManager().IsMenuOpen( MENU_GESTURES ) )
-			{
-				//TODO reconnect when appropriate
-				GesturesMenu.CloseMenu();
-			}
-		}*/
-#endif
-		/*
-		//temporary
-		//Radial Quickbar [,]
-		if ( key == KeyCode.KC_COMMA )
-		{
-			//close radial quickbar menu
-			if ( GetGame().GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
-			{
-				//TODO reconnect when appropriate
-				RadialQuickbarMenu.CloseMenu();
-			}
-		}
-		*/
 	}
 	
 	override void OnEvent(EventType eventTypeId, Param params)
@@ -972,7 +921,7 @@ class MissionGameplay extends MissionBase
 	
 	override void Pause()
 	{
-		if ( IsPaused() )
+		if ( IsPaused() || g_Game.IsPlayerSpawning() )
 		{
 			return;
 		} 

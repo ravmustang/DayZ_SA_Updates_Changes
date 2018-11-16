@@ -66,6 +66,22 @@ class KeybindingsMenu extends UIScriptedMenu
 		return m_Tabs.Get( m_Tabber.GetSelectedIndex() );
 	}
 	
+	void ClearKeybind( int key_index )
+	{
+		m_Apply.Enable( true );
+		m_Apply.ClearFlags( WidgetFlags.IGNOREPOINTER );
+		m_Reset.Enable( true );
+		m_Reset.ClearFlags( WidgetFlags.IGNOREPOINTER );
+	}
+	
+	void ClearAlternativeKeybind( int key_index )
+	{
+		m_Apply.Enable( true );
+		m_Apply.ClearFlags( WidgetFlags.IGNOREPOINTER );
+		m_Reset.Enable( true );
+		m_Reset.ClearFlags( WidgetFlags.IGNOREPOINTER );
+	}
+	
 	void StartEnteringKeybind( int key_index )
 	{
 		m_CurrentSettingAlternateKeyIndex	= -1;

@@ -1,8 +1,5 @@
 class ActionPlaceFireplaceIndoor: ActionSingleUseBase
 {
-	private ref FireplacePoint 	m_ActualFireplacePoint;
-	private const float 		FIRE_POINT_MAX_DISTANCE = 2;		//maximum distance from the fireplace interact point
-
 	void ActionPlaceFireplaceIndoor()
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
@@ -36,56 +33,37 @@ class ActionPlaceFireplaceIndoor: ActionSingleUseBase
 		if ( !IsInReach(player, target, UAMaxDistances.DEFAULT) ) return false;
 
 		Object target_object = target.GetObject();
-		string action_selection = target_object.GetActionComponentName(target.GetComponentIndex());
+		string action_selection = target_object.GetActionComponentName( target.GetComponentIndex() );
+		BuildingWithFireplace building = BuildingWithFireplace.Cast( target_object );
 		
-		if ( target_object && target_object.IsInherited( BuildingWithFireplace ) )
+		if ( target_object && building && action_selection.Contains( FireplaceIndoor.FIREPOINT_ACTION_SELECTION ) )
 		{
-			BuildingWithFireplace building = BuildingWithFireplace.Cast( target_object );
-			
-			if ( item && building.IsFireplaceActionSelection( action_selection )  )
+			vector fire_point_pos_world;
+			int fire_point_index = FireplaceIndoor.GetFirePointIndex( action_selection );
+			if ( FireplaceIndoor.CanPlaceFireplaceInSelectedSpot( building, fire_point_index, fire_point_pos_world ) )
 			{
-				FireplacePoint fireplace_point = building.GetFirePointByActionSelection( action_selection );
-				string fire_point = fireplace_point.GetFirePoint();
-				vector fire_point_pos = building.GetSelectionPosition( fire_point );
-				vector fire_point_pos_world = building.ModelToWorld( fire_point_pos );				
 				float fire_point_dist = vector.Distance( fire_point_pos_world, player.GetPosition() );
-				
-				//check point availability and distance from action_data.m_Player
-				if ( building.IsPointAvailable( action_selection ) && fire_point_dist <= FIRE_POINT_MAX_DISTANCE )
+				if ( fire_point_dist <= 2 )
 				{
+					player.SetLastFirePoint( fire_point_pos_world );
+					player.SetLastFirePointIndex( fire_point_index );
+					
 					return true;
 				}
-			}			
+			}
 		}
 		
 		return false;
 	}
-	
-	override void OnStartServer( ActionData action_data )
-	{
-		//get actual action_selection
-		BuildingWithFireplace building = BuildingWithFireplace.Cast( action_data.m_Target.GetObject() );
-		string action_selection = building.GetActionComponentName(action_data.m_Target.GetComponentIndex());
 		
-		//get and set FireplacePoint reference
-		m_ActualFireplacePoint = building.GetFirePointByActionSelection( action_selection );
-	}
-	
 	override void OnExecuteServer( ActionData action_data )
 	{	
 		FireplaceBase fireplace_in_hands = FireplaceBase.Cast( action_data.m_MainItem );
 		
-		//get 'fire point pos' from 'fire point' memory point
-		string fire_point = m_ActualFireplacePoint.GetFirePoint();
-		BuildingWithFireplace building = BuildingWithFireplace.Cast( action_data.m_Target.GetObject() );
-		//
-		//set position and direction to fireplace_pointX
-		vector fire_point_pos = building.GetSelectionPosition( fire_point );
-		vector fire_point_pos_world = building.ModelToWorld( fire_point_pos );
-
-		FireplaceToIndoorsLambda lambda = new FireplaceToIndoorsLambda(fireplace_in_hands, "FireplaceIndoor", action_data.m_Player, fire_point_pos_world);
-		lambda.SetTransferParams(true, true, true);
-		action_data.m_Player.ServerReplaceItemInHandsWithNewElsewhere(lambda);
+		//replace fireplace with lambda
+		FireplaceToIndoorsLambda lambda = new FireplaceToIndoorsLambda( fireplace_in_hands, "FireplaceIndoor", action_data.m_Player, action_data.m_Player.GetLastFirePoint(), action_data.m_Target.GetObject() );
+		lambda.SetTransferParams( true, true, true );
+		action_data.m_Player.ServerReplaceItemInHandsWithNewElsewhere( lambda );
 
 		//add to soft skills
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
@@ -95,22 +73,41 @@ class ActionPlaceFireplaceIndoor: ActionSingleUseBase
 
 class FireplaceToIndoorsLambda : TurnItemIntoItemLambda
 {
-	vector m_Pos;
-
-	void FireplaceToIndoorsLambda (EntityAI old_item, string new_item_type, PlayerBase player, vector pos)
+	int 		m_FirePointIndex;
+	vector 		m_SmokePosition;
+	
+	void FireplaceToIndoorsLambda( EntityAI old_item, string new_item_type, PlayerBase player, vector pos, Object target )
 	{
-		m_Pos = pos;
-
 		InventoryLocation gnd = new InventoryLocation;
 		vector mtx[4];
-		Math3D.MatrixIdentity4(mtx);
+		Math3D.MatrixIdentity4( mtx );
 		mtx[3] = pos;
-		gnd.SetGround(NULL, mtx);
-		OverrideNewLocation(gnd);
+		gnd.SetGround( NULL, mtx );
+		OverrideNewLocation( gnd );
+		
+		//set fire point index and smoke point position in world
+		m_FirePointIndex = player.GetLastFirePointIndex();
+		
+		vector smoke_point_pos = target.GetSelectionPosition( FireplaceIndoor.FIREPOINT_SMOKE_POSITION + m_FirePointIndex.ToString() );
+		vector smoke_point_pos_world = target.ModelToWorld( smoke_point_pos );		
+		m_SmokePosition = smoke_point_pos_world;
 	}
 
 	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
 	{
-		super.CopyOldPropertiesToNew(old_item, new_item);
+		super.CopyOldPropertiesToNew( old_item, new_item );
+		
+		FireplaceIndoor fireplace_indoor = FireplaceIndoor.Cast( new_item );
+		if ( fireplace_indoor )
+		{
+			//set fire point index
+			fireplace_indoor.SetFirePointIndex( m_FirePointIndex );
+			
+			//get fire and smoke position
+			fireplace_indoor.SetSmokePointPosition( m_SmokePosition );
+			
+			//synchronize
+			fireplace_indoor.Synchronize();
+		}
 	}
 };

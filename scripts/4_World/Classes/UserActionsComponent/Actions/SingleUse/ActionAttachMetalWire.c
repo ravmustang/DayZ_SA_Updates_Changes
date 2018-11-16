@@ -53,7 +53,7 @@ class ActionAttachMetalWire: ActionSingleUseBase
 	{
 		EntityAI target_EAI = EntityAI.Cast( target.GetObject() );
 		
-		if ( target_EAI.GetInventory().CanAddAttachment(item) )
+		if ( target_EAI && target_EAI.GetInventory().CanAddAttachment(item) )
 		{
 			return true;
 		}

@@ -21,6 +21,68 @@ class CivilianSedan extends CarScript
 
 		return 0;
 	}
+	
+	override int GetCarDoorsState( string slotType )
+	{
+		CarDoor carDoor;
+
+		Class.CastTo( carDoor, FindAttachmentBySlotName( slotType ) );
+		if ( !carDoor )
+			return CarDoorState.DOORS_MISSING;
+	
+		switch( slotType )
+		{
+			case "CivSedanDriverDoors":
+				if ( GetAnimationPhase("DoorsDriver") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+
+			break;
+			
+			case "CivSedanCoDriverDoors":
+				if ( GetAnimationPhase("DoorsCoDriver") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+
+			break;
+			
+			case "CivSedanCargo1Doors":
+				if ( GetAnimationPhase("DoorsCargo1") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+
+			break;
+			
+			case "CivSedanCargo2Doors":
+				if ( GetAnimationPhase("DoorsCargo2") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+			break;
+			
+			case "CivSedanDoorsTrunk":
+				if ( GetAnimationPhase("DoorsTrunk") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+
+			break;
+			
+			case "CivSedanDoorsHood":
+				if ( GetAnimationPhase("DoorsHood") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+
+			break;
+		}
+
+		return CarDoorState.DOORS_MISSING;
+	}
+	
 
 	override bool CrewCanGetThrough( int posIdx )
 	{
@@ -67,70 +129,30 @@ class CivilianSedan extends CarScript
 				float newValue = 0;
 				
 				//-----
-				CarDoor carDoor;
-			 	Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanDriverDoors") );
-				if ( carDoor )
-				{	
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
-					{
-						newValue = newValue + 0.7;
-					}
-				}
-				else
-				{
-					newValue = newValue + 0.7;
-				}
+				if ( GetCarDoorsState( "CivSedanDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+					newValue += 0.25;
 
 				//-----
-
-			 	Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanCoDriverDoors") );
-				if ( carDoor )
-				{	
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
-					{
-						newValue = newValue + 0.7;
-					}
-				}
-				else
-				{
-					newValue = newValue + 0.7;
-				}
+				if ( GetCarDoorsState( "CivSedanCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+					newValue += 0.25;
 			
 				//-----
-			 	Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanCargo1Doors") );
-				if ( carDoor )
-				{	
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
-					{
-						newValue = newValue + 0.7;
-					}
-				}
-				else
-				{
-					newValue = newValue + 0.7;
-				}
+				if ( GetCarDoorsState( "CivSedanCargo1Doors" ) == CarDoorState.DOORS_CLOSED )
+					newValue += 0.25;
 
 				//-----
-				Class.CastTo( carDoor, FindAttachmentBySlotName("CivSedanCargo2Doors") );
-				if ( carDoor )
-				{	
-					if ( carDoor.GetAnimationPhase("DoorsSource") > 0.5)
-					{
-						newValue = newValue + 0.7;
-					}
-				}
-				else
-				{
-					newValue = newValue + 0.7;
-				}
+				if ( GetCarDoorsState( "CivSedanCargo2Doors" ) == CarDoorState.DOORS_CLOSED )
+					newValue += 0.25;
 
 				if ( newValue > 1 )
 					newValue = 1;
 			
+				m_enviroCoef = newValue;
 				return newValue;
 			break;
 		}
 
+		m_enviroCoef = oldValue;
 		return oldValue;
 	}
 	
@@ -164,5 +186,63 @@ class CivilianSedan extends CarScript
 	override bool IsVitalGlowPlug()
 	{
 		return false;
+	}
+	
+	override bool CanReachSeatFromSeat( int currentSeat, int nextSeat )
+	{
+		switch( currentSeat )
+		{
+		case 0:
+			if ( nextSeat == 1 )
+				return true;
+			break;
+		case 1:
+			if ( nextSeat == 0 )
+				return true;
+			break;
+		case 2:
+			if ( nextSeat == 3 )
+				return true;
+			break;
+		case 3:
+			if ( nextSeat == 2 )
+				return true;
+			break;
+		}
+		
+		return false;
+	}
+
+	override bool CanReachDoorsFromSeat( string pDoorsSelection, int pCurrentSeat )
+	{
+		switch( pCurrentSeat )
+		{
+		case 0:
+			if (pDoorsSelection == "DoorsDriver")
+			{
+				return true;
+			}
+		break;
+		case 1:
+			if (pDoorsSelection == "DoorsCoDriver")
+			{
+				return true;
+			}
+		break;
+		case 2:
+			if (pDoorsSelection == "DoorsCargo1")
+			{
+				return true;
+			}
+		break;
+		case 3:
+			if (pDoorsSelection == "DoorsCargo2")
+			{
+				return true;
+			}
+		break;
+		}
+		
+		return false;		
 	}
 }

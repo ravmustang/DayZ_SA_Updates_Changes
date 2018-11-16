@@ -13,10 +13,10 @@ class BearTrap extends TrapBase
 		m_AnimationPhaseTriggered = "placing";
 	}
 	
-	override bool IsTwoHandedBehaviour()
+	/*override bool IsTwoHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

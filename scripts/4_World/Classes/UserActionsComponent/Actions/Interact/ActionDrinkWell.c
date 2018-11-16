@@ -12,6 +12,11 @@ class ActionDrinkWell extends ActionInteractBase
 		return AT_DRINK_WELL_ONE;
 	}
 
+	override bool IsDrink()
+	{
+		return true;
+	}
+	
 	override string GetText()
 	{
 		return "#take_a_sip";

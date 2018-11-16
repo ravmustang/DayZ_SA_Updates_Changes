@@ -33,10 +33,10 @@ class Spotlight extends ItemBase
 		return "spotlight_deploy_SoundSet";
 	}	
 	
-	override bool IsTwoHandedBehaviour()
+	/*override bool IsTwoHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

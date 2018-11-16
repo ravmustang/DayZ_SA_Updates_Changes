@@ -22,10 +22,10 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsBarrelWithHoles()
 	{
@@ -192,7 +192,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		return true;
 	}
 
-	override bool CanRelaseCargo( EntityAI cargo )
+	override bool CanReleaseCargo( EntityAI cargo )
 	{
 		if ( IsBurning() && IsOpened() )
 		{

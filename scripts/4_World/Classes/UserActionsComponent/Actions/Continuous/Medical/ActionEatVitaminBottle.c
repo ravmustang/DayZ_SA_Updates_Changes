@@ -11,6 +11,11 @@ class ActionEatVitaminBottle: ActionConsume
 		return AT_EAT_VITAMIN_BOTTLE;
 	}
 
+	override int IsEat()
+	{
+		return true;
+	}
+	
 	override void ApplyModifiers( ActionData action_data )
 	{
 		//action_data.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_CHEMICALPOISON);

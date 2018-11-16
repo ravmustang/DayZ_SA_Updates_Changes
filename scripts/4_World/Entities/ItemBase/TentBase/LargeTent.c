@@ -60,10 +60,10 @@ class LargeTent extends TentBase
 		return "largetent_deploy_SoundSet";
 	}	
 	
-	override bool IsTwoHandedBehaviour()
+	/*override bool IsTwoHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override string GetSoundOpen()
 	{

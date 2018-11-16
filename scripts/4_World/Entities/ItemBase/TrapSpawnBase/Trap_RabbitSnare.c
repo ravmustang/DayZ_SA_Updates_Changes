@@ -44,10 +44,10 @@ class Trap_RabbitSnare extends TrapSpawnBase
 		//m_CatchesGroundAnimal.Insert("Animal_LepusEuropaeus",1); Temporarily removed because rabbits don't sppawn now. Used Gallus Gallus as a placeholder.
 	}
 	
-	override bool IsOneHandedBehaviour()
+	/*override bool IsOneHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

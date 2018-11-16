@@ -174,7 +174,7 @@ class Icon: LayoutHolder
 			if( item.GetInventory().CanRemoveEntity())
 			{
 				InventoryLocation i2 = new InventoryLocation;
-				found = player.GetInventory().FindFreeLocationFor( item,FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, i2 );
+				found = player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, i2 );
 				if ( found )
 				{
 					if ( i2.GetType() == FindInventoryLocationType.ATTACHMENT )
@@ -187,7 +187,7 @@ class Icon: LayoutHolder
 			if ( found )
 			{
 				if (player.GetHumanInventory().CanAddEntityToInventory(item))
-					player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, item);
+					player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY, item);
 			}
 			else
 			{
@@ -914,7 +914,7 @@ class Icon: LayoutHolder
 	{
 		InventoryItem itemAtPos = InventoryItem.Cast( m_Obj );
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		bool draggable = !player.GetInventory().HasInventoryReservation( m_Obj, NULL ) && !player.GetInventory().IsInventoryLocked() ;
+		bool draggable = !player.GetInventory().HasInventoryReservation( m_Obj, NULL ) && !player.GetInventory().IsInventoryLocked();
 		
 		ItemManager.GetInstance().SetWidgetDraggable( w, draggable );
 		

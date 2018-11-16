@@ -1,15 +1,13 @@
 class FireplaceIndoor extends FireplaceBase
 {
-	//Fireplace point for Indoor fireplaces
-	protected ref FireplacePoint 	m_FireplacePoint;
-	//saved/loaded storage data 
-	protected string 				m_FirePoint;
-	
-	//Client side variables
 	protected float 				m_SmokePosX;
 	protected float 				m_SmokePosY;
 	protected float 				m_SmokePosZ;
-	protected vector				m_SmokePosition;
+	protected int					m_FirePointIndex;	//limited to 1 decimal place (0-9)
+	
+	static const string FIREPOINT_ACTION_SELECTION	= "fireplace_action";
+	static const string FIREPOINT_FIRE_POSITION 	= "fireplace_point";
+	static const string FIREPOINT_SMOKE_POSITION 	= "fireplace_smoke";
 	
 	void FireplaceIndoor()
 	{
@@ -23,21 +21,26 @@ class FireplaceIndoor extends FireplaceBase
 		PARTICLE_STEAM_END		= ParticleList.HOUSE_FIRE_STEAM_2END;		
 		
 		//register sync variables
-		RegisterNetSyncVariableFloat( "m_SmokePosX", -100000, 100000, 2 );
-		RegisterNetSyncVariableFloat( "m_SmokePosY", -100000, 100000, 2 );
-		RegisterNetSyncVariableFloat( "m_SmokePosZ", -100000, 100000, 2 );
+		RegisterNetSyncVariableFloat( "m_SmokePosX", 0, 0, 2 );
+		RegisterNetSyncVariableFloat( "m_SmokePosY", 0, 0, 2 );
+		RegisterNetSyncVariableFloat( "m_SmokePosZ", 0, 0, 2 );
+		RegisterNetSyncVariableInt( "m_FirePointIndex", 1, 9 );
 	}
-
+	
 	//================================================================
 	// ONSTORESAVE/LOAD/AFTERLOAD
 	//================================================================
-/*
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{   
 		super.OnStoreSave( ctx );
 
 		//fire point name
-		ctx.Write( m_FirePoint );
+		ctx.Write( m_FirePointIndex );
+		
+		//smoke position
+		ctx.Write( m_SmokePosX );
+		ctx.Write( m_SmokePosY );
+		ctx.Write( m_SmokePosZ );
 	}
 
 	override void OnStoreLoad( ParamsReadContext ctx )
@@ -45,102 +48,61 @@ class FireplaceIndoor extends FireplaceBase
 		super.OnStoreLoad( ctx );
 
 		//fire point name
-		ctx.Read( m_FirePoint );
-	}
-	
-	override void EEOnAfterLoad()
-	{
-		super.EEOnAfterLoad();
+		ctx.Read( m_FirePointIndex );
 		
-		//set fireplace point data
-		SetBuildingOnLoad();
-	}
-*/
-		
-	void SetBuildingOnLoad()
-	{
-		ref array<Object> nearest_objects = new array<Object>;
-		ref array<CargoBase> proxy_cargos = new array<CargoBase>;
-		vector position = GetPosition();
-		GetGame().GetObjectsAtPosition ( position, 50, nearest_objects, proxy_cargos );
-		
-		Print("SetBuildingOnLoad");
-		Print(nearest_objects.Count());
-		for ( int i = 0; i < nearest_objects.Count(); ++i )
-		{
-			Object object = nearest_objects.Get( i );
-			/*
-			Print(object.GetType() + " idx = " + i.ToString());
-			Print(object.ClassName() + " idx = " + i.ToString());
-			*/
-			
-			if ( object.IsInherited( BuildingWithFireplace ) )
-			{
-				BuildingWithFireplace building = BuildingWithFireplace.Cast( object );
-				
-				//check distance
-				vector fire_point_pos = building.GetSelectionPosition( m_FirePoint );
-				vector fire_point_pos_world = building.ModelToWorld( fire_point_pos );
-				
-				float distance = vector.Distance( position, fire_point_pos_world );
-				
-				Print( position );
-				Print( fire_point_pos_world );
-				Print( distance );
-				
-				if ( distance < 1 )
-				{
-					ref FireplacePoint fireplace_point = building.GetFirePointByFirePoint( m_FirePoint );
-					fireplace_point.SetObject( this );
-					SetFireplacePoint( fireplace_point );
-					
-					break;
-				}
-			}
-		}
-	}
+		//smoke position
+		ctx.Read( m_SmokePosX );
+		ctx.Read( m_SmokePosY );
+		ctx.Read( m_SmokePosZ );
 
-	//================================================================
-	// FIREPLACE POINT (INDOOR FIREPLACES)
-	//================================================================
-	FireplacePoint GetFireplacePoint()
-	{
-		return m_FireplacePoint;
-	}
-	
-	void SetFireplacePoint( FireplacePoint fireplace_point )
-	{
-		m_FireplacePoint = fireplace_point;
-		
-		if ( fireplace_point )
-		{
-			SetSmokePosition( fireplace_point );
-			m_FirePoint = fireplace_point.GetFirePoint();
-		}
-		else
-		{
-			m_FirePoint = "";
-		}
-		
 		//synchronize
 		Synchronize();
 	}
 	
-	void SetSmokePosition( FireplacePoint fireplace_point )
+	//================================================================
+	// FIRE POINT (HOUSE)
+	// LIMITED TO 1 DECIMAL PLACE (0-9)
+	//================================================================
+	static int GetFirePointIndex( string action_selection )
 	{
-		string memory_point = fireplace_point.GetSmokePoint();
-		vector smoke_point_local_pos = fireplace_point.GetBuilding().GetSelectionPosition( memory_point );
-		vector smoke_point_world_pos = fireplace_point.GetBuilding().ModelToWorld( smoke_point_local_pos );
-		
-		vector smoke_pos = WorldToModel( smoke_point_world_pos );
-		m_SmokePosX = smoke_pos[0];
-		m_SmokePosY = smoke_pos[1];
-		m_SmokePosZ = smoke_pos[2];
+		int index_location = action_selection.Length() - 1;
+		return action_selection.Substring( index_location, 1 ).ToInt();
 	}
 	
-	void ClearFireplacePoint()
+	void SetFirePointIndex( int fire_point_index )
 	{
-		SetFireplacePoint( NULL );
+		m_FirePointIndex = fire_point_index;
+	}
+	
+	static bool CanPlaceFireplaceInSelectedSpot( Object building, int fire_point_index, out vector fire_point_pos_world )
+	{
+		//Get fire point index position
+		vector fire_point_pos = building.GetSelectionPosition( FIREPOINT_FIRE_POSITION + fire_point_index.ToString() );
+		fire_point_pos_world = building.ModelToWorld( fire_point_pos );
+		
+		//check if there is any FireplaceIndoor objects near selected fire point
+		ref array<Object> nearest_objects = new array<Object>;
+		ref array<CargoBase> proxy_cargos = new array<CargoBase>;
+		GetGame().GetObjectsAtPosition3D( fire_point_pos_world, 1, nearest_objects, proxy_cargos );
+
+		for ( int i = 0; i < nearest_objects.Count(); ++i )
+		{
+			Object object = nearest_objects.Get( i );
+			
+			if ( object.IsInherited( FireplaceIndoor ) )
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	void SetSmokePointPosition( vector smoke_point_pos )
+	{
+		m_SmokePosX = smoke_point_pos[0];
+		m_SmokePosY = smoke_point_pos[1];
+		m_SmokePosZ = smoke_point_pos[2];
 	}
 	
 	//================================================================
@@ -294,7 +256,9 @@ class FireplaceIndoor extends FireplaceBase
 			//no attachments left & no ashes are present
 			if ( GetInventory().AttachmentCount() == 0 && !HasAshes() )
 			{
+				//TODO
 				//Clear point
+				/*
 				if ( GetGame().IsServer() )
 				{
 					if ( GetFireplacePoint() )
@@ -303,6 +267,7 @@ class FireplaceIndoor extends FireplaceBase
 						ClearFireplacePoint();						
 					}
 				}
+				*/
 
 				//destroy fireplace
 				DestroyFireplace();
@@ -353,7 +318,7 @@ class FireplaceIndoor extends FireplaceBase
 		return true;
 	}
 
-	override bool CanRelaseCargo( EntityAI cargo )
+	override bool CanReleaseCargo( EntityAI cargo )
 	{
 		if ( IsBurning() )
 		{

@@ -5,7 +5,7 @@ class Land_Misc_Greenhouse extends GardenBase
 	void Land_Misc_Greenhouse()
 	{
 		m_Timer = new Timer( CALL_CATEGORY_GAMEPLAY );
-		m_Timer.Run( Math.RandomFloat(19, 20), this, "OnTimer", NULL, false ); // Temporal solution for initial lag. Commented out as a quick fix for DAYZ-30633
+		m_Timer.Run( Math.RandomFloat(3, 20), this, "OnTimer", NULL, false ); // Temporal solution for initial lag. Commented out as a quick fix for DAYZ-30633
 	}
 	
 	void OnTimer()

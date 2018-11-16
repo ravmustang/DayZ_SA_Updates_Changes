@@ -40,10 +40,10 @@ class BatteryCharger extends ItemBase
 		RegisterNetSyncVariableInt("m_BatteryEnergy0To100");
 	}
 	
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

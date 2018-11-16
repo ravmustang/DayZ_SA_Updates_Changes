@@ -8,27 +8,15 @@ class StaminaSoundEventBase extends PlayerSoundEventBase
 	
 	override bool HasPriorityOverCurrent(PlayerBase player, EPlayerSoundEventID other_state_id, EPlayerSoundEventType type_other)
 	{
-		/*
-		if(type_other == EPlayerSoundEventType.STAMINA)
-		{
-			if( other_state_id == EPlayerSoundEventID.STAMINA_UP_END )
-			{
-				return false;
-			}
-			return true;
-		}
-		return false;
-		*/
 		return false;
 	}
 	
 	override void OnPlay(PlayerBase player)
 	{
-		//Material matColors = GetGame().GetWorld().GetMaterial("graphics/particles/materials/smoke/steam_small_cook_01");
-		//matColors.SetParam("AlphaTest", 0/*+add_additional_modifiers_here*/);
-		
+		super.OnPlay(player);
 		if( player.CanSpawnBreathVaporEffect() ) 
 			player.SpawnBreathVaporEffect();
+		
 		
 	}
 }

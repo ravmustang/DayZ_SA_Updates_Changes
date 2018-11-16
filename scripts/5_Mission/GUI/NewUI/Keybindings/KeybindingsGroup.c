@@ -112,6 +112,16 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		}
 	}
 	
+	void ClearKeybind( int key_index )
+	{
+		m_Menu.ClearKeybind( key_index );
+	}
+	
+	void ClearAlternativeKeybind( int key_index )
+	{
+		m_Menu.ClearAlternativeKeybind( key_index );
+	}
+	
 	void StartEnteringKeybind( int key_index )
 	{
 		m_CurrentSettingAlternateKeyIndex	= -1;
@@ -177,10 +187,13 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 					input.ClearAlternative( 0 );
 				}
 				
-				input.BindComboByHash( new_keys.Get( 0 ) );
-				for( i = 1; i < new_keys.Count(); i++ )
+				if( new_keys.Count() > 0 )
 				{
-					input.BindComboByHash( new_keys.Get( i ) );
+					input.BindComboByHash( new_keys.Get( 0 ) );
+					for( i = 1; i < new_keys.Count(); i++ )
+					{
+						input.BindComboByHash( new_keys.Get( i ) );
+					}
 				}
 			}
 			
@@ -203,10 +216,13 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 					input.ClearAlternative( 1 );
 				}
 				
-				input.BindComboByHash( new_alt_keys.Get( 0 ) );
-				for( i = 1; i < new_alt_keys.Count(); i++ )
+				if( new_alt_keys.Count() > 0 )
 				{
-					input.BindComboByHash( new_alt_keys.Get( i ) );
+					input.BindComboByHash( new_alt_keys.Get( 0 ) );
+					for( i = 1; i < new_alt_keys.Count(); i++ )
+					{
+						input.BindComboByHash( new_alt_keys.Get( i ) );
+					}
 				}
 			}
 			element.Reload();

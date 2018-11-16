@@ -126,6 +126,9 @@ class PlayerBase extends ManBase
 	
 	//Action data for base building actions
 	ref ConstructionActionData m_ConstructionActionData;
+	//Action data for fireplace (indoor)
+	vector m_LastFirePoint;
+	int m_LastFirePointIndex;
 	
 	//writing notes start
 	bool enterNoteMenuRead;
@@ -324,6 +327,20 @@ class PlayerBase extends ManBase
 	}
 	
 	//--------------------------------------------------------------------------
+	// Inventory overrides
+	//--------------------------------------------------------------------------
+	override bool CanDropEntity (notnull EntityAI item)
+	{ 
+		if( IsRestrained() )
+		{
+			if( GetHumanInventory().GetEntityInHands() == item )
+				return false;
+		}
+		
+		return true; 
+	}
+
+	//--------------------------------------------------------------------------
 	// PLAYER DAMAGE EVENT HANDLING
 	//--------------------------------------------------------------------------
 	
@@ -358,6 +375,11 @@ class PlayerBase extends ManBase
 			m_MixedSoundStates = new_states;
 			SetSynchDirty();
 		}
+	}
+	
+	override bool IsPlayer()
+	{
+		return true;
 	}
 	
 	bool IsBleeding()
@@ -406,22 +428,8 @@ class PlayerBase extends ManBase
 	{
 		Print("EEKilled, you have died");
 		
-		DayZPlayerSyncJunctures.SendDeath(this, -1, 0);
-		
 		if( GetBleedingManagerServer() ) delete GetBleedingManagerServer();
-		
-		if( GetHumanInventory().GetEntityInHands() )
-		{
-			if( CanDropEntity(this) )
-			{
-				if( !IsRestrained() )
-				{
-					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(ServerDropEntity,1000,false,( GetHumanInventory().GetEntityInHands()));
-				}
-			}
-			
-		}
-		
+
 		// kill character in database
 		if (GetHive())
 		{
@@ -937,6 +945,28 @@ class PlayerBase extends ManBase
 		return m_ConstructionActionData;
 	}
 	
+	// --------------------------------------------------
+	// Action data for fireplace (indoor)
+	//---------------------------------------------------	
+	vector GetLastFirePoint()
+	{
+		return m_LastFirePoint;
+	}	
+	
+	void SetLastFirePoint( vector last_fire_point )
+	{
+		m_LastFirePoint = last_fire_point;
+	}
+
+	int GetLastFirePointIndex()
+	{
+		return m_LastFirePointIndex;
+	}	
+	
+	void SetLastFirePointIndex( int last_fire_point_index )
+	{
+		m_LastFirePointIndex = last_fire_point_index;
+	}	
 	// --------------------------------------------------
 	// QuickBar
 	//---------------------------------------------------
@@ -1803,7 +1833,7 @@ class PlayerBase extends ManBase
 		if (m_StaminaHandler && hic)
 		{
 			//! SPRINT: enable/disable - based on stamina; disable also when raised
-			if ( !CanConsumeStamina(EStaminaConsumers.SPRINT) || IsRaised() )
+			if ( !CanConsumeStamina(EStaminaConsumers.SPRINT) || !CanSprint() )
 			{
 				hic.LimitsDisableSprint(true);
 			}
@@ -2732,6 +2762,16 @@ class PlayerBase extends ManBase
 		return false;
 	}
 
+	bool CanSprint()
+	{
+		ItemBase item = GetItemInHands();
+		if ( IsRaised() || (item && item.IsHeavyBehaviour()) )
+		{
+			return false;
+		}
+		return true;
+	}
+	
 	bool IsRaised()
 	{
 		//GetMovementState(m_MovementState);
@@ -2768,6 +2808,11 @@ class PlayerBase extends ManBase
 		{
 			return false;
 		}
+	}
+	
+	bool IsInVehicle()
+	{
+		return m_IsInVehicle;
 	}
 	
 	void OnItemInventoryEnter(EntityAI item)

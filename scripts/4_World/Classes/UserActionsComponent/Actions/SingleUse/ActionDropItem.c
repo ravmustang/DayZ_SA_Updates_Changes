@@ -11,7 +11,7 @@ class ActionDropItemCB : ActionSingleUseBaseCB
 		switch (pEventID)
 		{
 			case UA_ANIM_EVENT: 
-				if (( ( !GetGame().IsServer() && GetGame().IsMultiplayer() ) || (!GetGame().IsMultiplayer()) ) && m_ActionData.m_Player)
+				if (( ( !GetGame().IsServer() && GetGame().IsMultiplayer() ) || (!GetGame().IsMultiplayer()) ) && m_ActionData && m_ActionData.m_Player)
 				{
 					m_ActionData.m_Player.PredictiveDropEntity(m_ActionData.m_Player.GetItemInHands());
 				}

@@ -421,6 +421,17 @@ class HumanCommandFall
 }
 
 // *************************************************************************************
+// ! HumanCommandDeathCallback - called as action callback 
+// *************************************************************************************
+class HumanCommandDeathCallback
+{
+	//----------------------------------
+	// callbacks
+
+	void 	OnSimulationEnd()	{};		
+}
+
+// *************************************************************************************
 // ! HumanCommandDeath - actually dying
 // *************************************************************************************
 class HumanCommandDeath
@@ -958,9 +969,9 @@ class Human extends Man
 	//!----- Death -----
 
 	//! starts command - death
-	proto native 	HumanCommandDeath			StartCommand_Death(int pType, float pDirection);
+	proto native 	HumanCommandDeathCallback	StartCommand_Death(int pType, float pDirection, typename pCallbackClass);
 
-	proto native 	HumanCommandDeath			GetCommand_Death();
+	proto native 	HumanCommandDeathCallback	GetCommand_Death();
 
 
 	//! starts command - unconscious

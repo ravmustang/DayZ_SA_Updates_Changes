@@ -28,10 +28,10 @@ class HescoBox extends Inventory_Base
 		return "hescobox_deploy_SoundSet";
 	}
 	
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

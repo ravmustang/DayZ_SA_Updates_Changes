@@ -1,4 +1,3 @@
-
 //#ifdef PLATFORM_XBOX
 
 enum EAchievementError
@@ -55,6 +54,142 @@ class AchievementsXbox
 {
 	proto static native EAchievementError SendEventAction(EAchievementActionId action_id);
 	proto static native EAchievementError SendEventKill(EAchievementTargetId target_id, EAchievementRankId rank_id, EAchievementRangeId range_id, EAchievementHitId hit_id, float distance);
+	
+	//===================================
+	// OnActionEat
+	//===================================
+	static void OnActionEat()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_EAT ) );
+	}
+	
+	//===================================
+	// OnActionDrink
+	//===================================
+	static void OnActionDrink()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_DRINK ) );
+	}
+	
+	//===================================
+	// OnEquipdFullGear
+	//===================================
+	static void OnEquippedFullGear()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_EQUIP_GEAR ) );
+	}
+	
+	//===================================
+	// OnCookedSteak
+	//===================================
+	static void OnCookedSteak()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_COOK_STEAK ) );
+	}
+	
+	//===================================
+	// OnActionIgniteMatchbox
+	//===================================
+	static void OnActionIgniteMatchbox()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_IGNITE_FIRE_MATCHBOX ) );
+	}
+	
+	//===================================
+	// OnActionIgniteFlare
+	//===================================
+	static void OnActionIgniteFlare()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_IGNITE_FIRE_ROAD_FLARE ) );
+	}
+	
+	//===================================
+	// OnActionIgniteDrill
+	//===================================
+	static void OnActionIgniteDrill()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_IGNITE_FIRE_HAND_DRILL ) );
+	}
+	
+	//===================================
+	// OnActionShave
+	//===================================
+	static void OnActionShave()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_SHAVE ) );
+	}
+	
+	//===================================
+	// OnActionGutDeer
+	//===================================
+	static void OnActionGutDeer()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_GUT_DEER ) );
+	}
+	
+	//===================================
+	// OnActionMedsSurvivor
+	//===================================
+	static void OnActionMedsSurvivor()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_APPLY_MEDS_ON_SURVIVOR ) );
+	}
+	
+	//===================================
+	// OnActionHandcuff
+	//===================================
+	static void OnActionHandcuff()
+	{
+		CheckError( SendEventAction( EAchievementActionId.ACTION_HANDCUFF_SURVIVOR ) );
+	}	
+	
+	//===================================
+	// OnPlayerKilled
+	//===================================
+	static void OnPlayerKilled(EntityAI victim, EntityAI killer, EntityAI source, bool is_headshot)
+	{		
+		EAchievementTargetId	target_id		= EAchievementTargetId.TARGET_SURVIVOR;
+		EAchievementRankId		target_rank_id	= EAchievementRankId.RANK_SURVIVOR;
+		EAchievementRangeId		range_id		= EAchievementRangeId.RANGE_OTHER;
+		EAchievementHitId		hit_id			= EAchievementHitId.HIT_OTHER;
+		float 					distance		= 0;
+		
+		if ( victim.IsZombie() )
+		{
+			target_id = EAchievementTargetId.TARGET_INFECTED;
+			target_rank_id = EAchievementRankId.RANK_INFECTED;
+			
+			if ( victim.IsZombieMilitary() )
+			{
+				target_rank_id = EAchievementRankId.RANK_INFECTED_SOLDIER;
+			}
+		}		
+		
+		if ( source )
+		{
+			if ( source.IsMeleeWeapon() )
+			{
+				range_id = EAchievementRangeId.RANGE_MELEE;
+			}
+			else if ( source.IsWeapon() && killer )
+			{
+				range_id = EAchievementRangeId.RANGE_RANGED;
+				distance = vector.Distance( killer.GetPosition(), victim.GetPosition() );
+			}
+		}
+		
+		CheckError( SendEventKill(target_id, target_rank_id, range_id, hit_id, distance) );
+	}
+	
+	//-----------------------------------
+	// CheckError
+	//-----------------------------------
+	private static void CheckError(EAchievementError error)
+	{
+		if ( error != EAchievementError.ERR_OK )
+		{
+			Print("OnlineServices: Xbox Achievemnt: Can not send achievemnet event. Error ID: "+ error);
+		}
+	}
 };
-
 //#endif

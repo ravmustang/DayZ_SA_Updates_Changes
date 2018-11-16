@@ -14,6 +14,12 @@ class JumpEventsBase extends PlayerSoundEventBase
 		return true;
 	}
 	
+	override void OnPlay(PlayerBase player)
+	{
+		if( player.CanSpawnBreathVaporEffect() )
+			player.SpawnBreathVaporEffect();
+	}
+	
 	override void OnEnd()
 	{
 		//m_Player.GetStaminaSoundHandlerClient().PostponeStamina(1000);

@@ -111,7 +111,7 @@ class PlayerContainer: CollapsibleContainer
 				if( item.ConfigGetFloat("varStackMax") )
 					item.SplitIntoStackMaxClient( player, -1, );
 				else
-					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, InventoryItem.Cast( item ) );
+					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
 			}
 			else
 			{
@@ -876,7 +876,7 @@ class PlayerContainer: CollapsibleContainer
 			}
 			else if( receiver_item.GetInventory().CanAddEntityInCargo( item ) && !receiver_item.GetInventory().HasEntityInCargo( item ) )
 			{
-				GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( receiver_item, FindInventoryLocationType.ANY_CARGO | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, item );
+				GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( receiver_item, FindInventoryLocationType.ANY_CARGO, item );
 
 				if ( menu )
 				{

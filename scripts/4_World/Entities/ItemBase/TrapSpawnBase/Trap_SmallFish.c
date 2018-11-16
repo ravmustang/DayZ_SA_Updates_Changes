@@ -20,10 +20,10 @@ class Trap_SmallFish extends TrapSpawnBase
 		m_CatchesGroundAnimal = new multiMap<string, float>;
 	}
 	
-	override bool IsOneHandedBehaviour()
+	/*override bool IsOneHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override string GetDeploySoundset()
 	{
@@ -62,7 +62,7 @@ class Trap_SmallFish extends TrapSpawnBase
 		}
 	}
 
-	override bool CanRelaseCargo( EntityAI child )
+	override bool CanReleaseCargo( EntityAI child )
 	{
 		if ( GetHierarchyRootPlayer() == NULL )
 		{

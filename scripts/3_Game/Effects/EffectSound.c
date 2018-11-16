@@ -278,19 +278,19 @@ class EffectSound : Effect
 		
 		if ( m_SoundFadeInDuration > GetSoundWaveLenght() )
 		{
-			SoundError("FadeIn is longest as sound wave lengt.");
+			SoundError("FadeIn is longer than sound wave lengt.");
 			valid = false;
 		}
 		
 		if ( m_SoundFadeOutDuration > GetSoundWaveLenght() )
 		{
-			SoundError("FadeOut is longest as sound wave lengt.");
+			SoundError("FadeOut is longer than sound wave lengt.");
 			valid = false;
 		}
 		
 		if ( m_SoundFadeOutDuration + m_SoundFadeInDuration > GetSoundWaveLenght() )
 		{
-			SoundError("FadeIn & FadeOut are longest as sound wave lengt.");
+			SoundError("FadeIn & FadeOut are longer than sound wave lengt.");
 			valid = false;
 		}
 		

@@ -41,6 +41,7 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 			if( m_MainWidget )
 			{
 				m_ParentWidget.AddChild( m_MainWidget );
+				m_MainWidget.Update();
 			}
 		}
 	}

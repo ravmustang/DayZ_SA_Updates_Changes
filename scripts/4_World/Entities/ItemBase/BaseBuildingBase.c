@@ -215,10 +215,10 @@ class BaseBuildingBase extends ItemBase
 	}
 	
 	// --- PLACING
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

@@ -572,4 +572,22 @@ class OnlineServices
 		#endif
 		return false;
 	}
+	
+	static void CheckUpdate()
+	{
+		GetClientServices();
+		if ( m_ClientServices )
+		{
+			m_ClientServices.GetPackageService().CheckUpdateAsync();
+		}
+	}
+	
+	static void PromptUpdate()
+	{
+		GetClientServices();
+		if ( m_ClientServices )
+		{
+			m_ClientServices.GetPackageService().PromptUpdateAsync();
+		}
+	}
 }

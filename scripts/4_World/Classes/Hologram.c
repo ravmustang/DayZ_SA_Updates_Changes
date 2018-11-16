@@ -21,11 +21,10 @@ class Hologram
 	protected const string 		SELECTION_PLACING 				= "placing";
 	protected const string 		SELECTION_INVENTORY 			= "inventory";
 
-	protected const float 		SMALL_PROJECTION_RADIUS 		= 0.5;
+	protected const float 		SMALL_PROJECTION_RADIUS 		= 1;
 	protected const float 		SMALL_PROJECTION_GROUND 		= 2;
 	protected const float		DISTANCE_SMALL_PROJECTION		= 1;
 	protected const float		LARGE_PROJECTION_DISTANCE_LIMIT	= 6;
-	protected const float 		SLOPE_LIMIT 					= 0.25;
 	protected const float 		PROJECTION_TRANSITION			= 0.25;
 	protected const float 		LOOKING_TO_SKY					= 0.75;
 	
@@ -324,7 +323,7 @@ class Hologram
 		Object obj_right_far;
 
 		DayZPhysics.RaycastRV( from_left_close, to_left_close_down, contact_pos_left_close, contact_dir_left_close, contact_component_left_close, results_left_close, m_Projection, m_Projection, false, false );
-		DayZPhysics.RaycastRV( from_right_close, to_right_close_down, contact_pos_right_close, contact_dir_right_close, contact_component_right_close, results_right_close, m_Projection, m_Projection, false, false );
+		DayZPhysics.RaycastRV( from_right_close, to_right_close_down, contact_pos_right_close, contact_dir_right_close, contact_component_right_close, results_right_close,m_Projection, m_Projection, false, false );
 		DayZPhysics.RaycastRV( from_left_far, to_left_far_down, contact_pos_left_far, contact_dir_left_far, contact_component_left_far, results_left_far, m_Projection, m_Projection, false, false );
 		DayZPhysics.RaycastRV( from_right_far, to_right_far_down, contact_pos_right_far, contact_dir_right_far, contact_component_right_far, results_right_far, m_Projection, m_Projection, false, false );
 
@@ -403,41 +402,117 @@ class Hologram
 	}
 	
 	bool IsBehindObstacle()
-	{
-		vector parent_pos = GetParentEntity().GetPosition();
+	{			
+		vector starting_pos = GetParentEntity().GetPosition();
 		vector headingDirection = MiscGameplayFunctions.GetHeadingVector(m_Player);
 		array<Object> coneObjects = new array<Object>;
-		float c_MaxTargetDistance = 0.5;
-		float c_ConeAngle = 30.0;
-	 	float c_ConeHeightMin = -0.5;
-	 	float c_ConeHeightMax = 2;
-		int PLAYER_AND_PARENT = 2;
+		vector c_MaxTargetDistance = GetProjectionPosition() - m_Player.GetPosition();
+		float c_ConeAngle = c_MaxTargetDistance.Length() * 5;
+	 	float c_ConeHeightMin = 0;
+	 	float c_ConeHeightMax = 1;
 		Building building;
 		
-		DayZPlayerUtils.GetEntitiesInCone(parent_pos, headingDirection, c_ConeAngle, c_MaxTargetDistance, c_ConeHeightMin, c_ConeHeightMax, coneObjects);
-				
-		if ( coneObjects.Count() > PLAYER_AND_PARENT )
+		//DrawDebugCone( true, starting_pos, c_MaxTargetDistance.Length(), c_ConeAngle );
+		
+		DayZPlayerUtils.GetEntitiesInCone( starting_pos, headingDirection, c_ConeAngle, c_MaxTargetDistance.Length(), c_ConeHeightMin, c_ConeHeightMax, coneObjects );
+		
+		for ( int i = 0; i < coneObjects.Count(); i++ )
 		{
-			for ( int i = 0; i < coneObjects.Count(); i++ )
+			Object object = coneObjects.Get(i);
+			//Print("coneObjects.Count(): " + coneObjects.Count());
+			//Print("object: " + object.GetName());
+			//Print("index: " + i);
+					
+			//Tere is always 1 object in the cone and i am not able to find out what it is, so skip the object.
+			if ( coneObjects.Count() > 1 && i > 0 )
 			{
-				Object object = coneObjects.Get(i);
-				//Print("Obstacle: " + object);
+				if ( object == m_Player )
+				{
+					//Print( "Mame playera" );
+					continue;
+				}
+				
+				if ( object == GetParentEntity() )
+				{
+					//Print( "Mame GetParentEntity" );
+					continue;
+				}
+				
+				if ( object == GetProjectionEntity() )
+				{
+					//Print( "Mame GetProjectionEntity" );
+					continue;
+				}
+				
+				if ( object.IsTree() )
+				{
+					//Print( "Mame strom" );
+					continue;
+				}
 				
 				if ( Class.CastTo( building, object ) )
 				{
-					//Print("Object is a house");
-					return false;
+					//Print( "Mame budovu" );
+					continue;
 				}
+				
+				
+				return true;
 			}
-			
-			//Print("Object is behind Obtacle");
-			return true;	
 		}
 		
-		//Print("Object is NOT behind Obtacle");
-		return false;	
+		//Print("No obstacle in cone");
+		return false;
+	}
+	/*	
+	ref array<Shape> dbgConeShapes = new array<Shape>();
+	
+	private void DrawDebugCone(bool enabled, vector starting_pos, float MaxTargetDistance, float cone_angle )
+	{
+		// "cone" settings
+		vector start, endL, endR;
+		float playerAngle;
+		float xL,xR,zL,zR;
+		
+		float c_MaxTargetDistance = MaxTargetDistance;
+		float c_ConeAngle = cone_angle;
+		
+		if (enabled)
+		{
+			CleanupDebugShapes(dbgConeShapes);
+			
+			start = starting_pos;
+			playerAngle = MiscGameplayFunctions.GetHeadingAngle(m_Player);
+			
+			// offset position of the shape in height
+			start[1] = start[1] + 0.2;
+
+			endL = start;
+			endR = start;
+			xL = c_MaxTargetDistance * Math.Cos(playerAngle + Math.PI_HALF + c_ConeAngle * Math.DEG2RAD); // x
+			zL = c_MaxTargetDistance * Math.Sin(playerAngle + Math.PI_HALF + c_ConeAngle * Math.DEG2RAD); // z
+			xR = c_MaxTargetDistance * Math.Cos(playerAngle + Math.PI_HALF - c_ConeAngle * Math.DEG2RAD); // x
+			zR = c_MaxTargetDistance * Math.Sin(playerAngle + Math.PI_HALF - c_ConeAngle * Math.DEG2RAD); // z
+			endL[0] = endL[0] + xL;
+			endL[2] = endL[2] + zL;
+			endR[0] = endR[0] + xR;
+			endR[2] = endR[2] + zR;
+
+			dbgConeShapes.Insert( Debug.DrawLine(start, endL, COLOR_BLUE) );
+			dbgConeShapes.Insert( Debug.DrawLine(start, endR, COLOR_BLUE) ) ;
+			dbgConeShapes.Insert( Debug.DrawLine(endL, endR, COLOR_BLUE) );
+		}
 	}
 	
+	private void CleanupDebugShapes(array<Shape> shapesArr)
+	{
+		for ( int it = 0; it < shapesArr.Count(); ++it )
+		{
+			Debug.RemoveShape( shapesArr[it] );
+			shapesArr.Remove(it);
+		}
+	}
+	*/
 	bool IsBaseStatic( Object under_left_close, Object under_right_close, Object under_left_far, Object under_right_far )
 	{	
 		//check if the object below hologram is dynamic object. Dynamic objects like barrels can be taken to hands 
@@ -446,7 +521,7 @@ class Hologram
 		{
 			if( !under_left_close.IsBuilding() && !under_left_close.IsPlainObject() )
 			{
-				//Print("base is NOT static");
+				//Print("base is NOT static under_left_close");
 				return false;
 			}
 		}
@@ -454,7 +529,7 @@ class Hologram
 		{
 			if( !under_right_close.IsBuilding() && !under_right_close.IsPlainObject() )
 			{
-				//Print("base is NOT static");
+				//Print("base is NOT static under_right_close");
 				return false;
 			}
 		}
@@ -462,7 +537,7 @@ class Hologram
 		{
 			if( !under_left_far.IsBuilding() && !under_left_far.IsPlainObject() )
 			{
-				//Print("base is NOT static");
+				//Print("base is NOT static under_left_far");
 				return false;
 			}
 		}
@@ -470,7 +545,7 @@ class Hologram
 		{
 			if( !under_right_far.IsBuilding() && !under_right_far.IsPlainObject() )
 			{
-				//Print("base is NOT static");
+				//Print("base is NOT static under_right_far");
 				return false;
 			}
 		}
@@ -500,19 +575,27 @@ class Hologram
 		float slope_pos_right_close = projection_pos[1] - contact_pos_right_close[1];
 		float slope_pos_left_far = projection_pos[1] - contact_pos_left_far[1];
 		float slope_pos_right_far = projection_pos[1] - contact_pos_right_far[1];
-	
-		//Print(slope_pos_left_close);
-		//Print(slope_pos_right_close);
-		//Print(slope_pos_left_far);
-		//Print(slope_pos_right_far);
-	
-		if( slope_pos_left_close < SLOPE_LIMIT )
+		string config_path = "CfgVehicles" + " " + GetProjectionEntity().GetType() + " " + "slopeLimit";
+		
+		if ( GetGame().ConfigIsExisting( config_path ) )
 		{
-			if( slope_pos_right_close < SLOPE_LIMIT )
+			float slope_limit = GetGame().ConfigGetFloat( config_path );
+		}
+		
+		/*
+		Print(slope_pos_left_close);
+		Print(slope_pos_right_close);
+		Print(slope_pos_left_far);
+		Print(slope_pos_right_far);
+		*/
+		
+		if( slope_pos_left_close < 1 )
+		{
+			if( slope_pos_right_close < 1 )
 			{
-				if( slope_pos_left_far < SLOPE_LIMIT )
+				if( slope_pos_left_far < 1 )
 				{
-					if(  slope_pos_right_far < SLOPE_LIMIT )
+					if(  slope_pos_right_far < 1 )
 					{
 						//Print("base is flat");
 						return true;	
@@ -578,10 +661,10 @@ class Hologram
 			Class.CastTo(entity_for_placing, GetGame().CreateObject( m_Projection.GetType(), m_Projection.GetPosition() ));
 		}
 			
-		entity_for_placing.SetAffectPathgraph( true, false );
-
 		if( entity_for_placing.CanAffectPathgraph() )
-		{
+		{		
+			entity_for_placing.SetAffectPathgraph( true, false );
+			
 			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().UpdatePathgraphRegionByObject, 100, false, entity_for_placing);
 		}
 	}		

@@ -1,4 +1,5 @@
 enum ESyncEvent
 {
-	PlayerList
+	PlayerList,
+	EntityKill
 }

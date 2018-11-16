@@ -38,10 +38,10 @@ class PowerGenerator extends ItemBase
 		UpdateFuelMeter();
 	}
 	
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	// Play the loop sound
 	void StartLoopSound()

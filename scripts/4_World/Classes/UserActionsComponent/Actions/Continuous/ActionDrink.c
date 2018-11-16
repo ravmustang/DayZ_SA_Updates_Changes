@@ -36,6 +36,11 @@ class ActionDrink: ActionConsume
 		return AT_DRINK;
 	}
 
+	override bool IsDrink()
+	{
+		return true;
+	}
+	
 	override bool HasTarget()
 	{
 		return false;

@@ -7,6 +7,29 @@ this file is implemenation of dayzPlayer in script
 
 */
 
+class DayZPlayerCommandDeathCallback : HumanCommandDeathCallback
+{
+	//----------------------------------
+	// callbacks
+
+	override void 	OnSimulationEnd()
+	{
+		EntityAI itemInHands = m_pPlayer.GetHumanInventory().GetEntityInHands();
+		if( itemInHands )
+		{
+			if( m_pPlayer.CanDropEntity(itemInHands) )
+			{
+				vector transform[4];
+				itemInHands.GetTransform(transform);
+				m_pPlayer.ServerDropEntity(itemInHands);
+				itemInHands.SetTransform(transform);
+			}
+		}
+	}
+	
+	DayZPlayer m_pPlayer;
+}
+
 class DayZPlayerImplement extends DayZPlayer
 {
 	// Timer 	m_UpdateTick;
@@ -162,6 +185,7 @@ class DayZPlayerImplement extends DayZPlayer
 
 	int m_DeathAnimType = -2;
 	float m_DeathHitDir = 0;
+	bool m_DeathJuctureSent = false;
 
 	bool	HandleDeath(int pCurrentCommandID)
 	{
@@ -170,28 +194,17 @@ class DayZPlayerImplement extends DayZPlayer
 			return true;
 		}
 		
-		/*if ( ((GetGame().IsMultiplayer() && !GetGame().IsServer()) || (!GetGame().IsMultiplayer())) && GetGame().GetUIManager().ScreenFadeVisible())
-		{
-			return true;
-		}*/
-
 		if (m_DeathAnimType != -2 && g_Game.GetMissionState() == g_Game.MISSION_STATE_GAME)
 		{
-			//GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(ShowDeadScreen, DEAD_SCREEN_DELAY, false, true);
-			//GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(ShowDeadScreen, true);
-			//if (IsPlayerSelected()) 	GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(SimulateDeath, true);
-			
 			if (!m_Suicide) 	
 			{
 				int type = m_DeathAnimType;
 				if( type == -1 ) 
 					type = GetTypeOfDeath(pCurrentCommandID);
 				
-				float dir = m_DeathHitDir;
-				//Print("Death: " + type.ToString() + " dir:" + dir.ToString());
-				StartCommand_Death(type, dir);
+				DayZPlayerCommandDeathCallback callback = DayZPlayerCommandDeathCallback.Cast(StartCommand_Death(type, m_DeathHitDir, DayZPlayerCommandDeathCallback));
+				callback.m_pPlayer = this;
 			}
-			//StartCommand_Death();
 			
 			// disable voice communication
 			GetGame().GetWorld().SetVoiceOn(false);
@@ -228,9 +241,18 @@ class DayZPlayerImplement extends DayZPlayer
 		return 0;
 	}
 	
+	void SendDeathJuncture(int pAnimTypeDeath, float pAnimHitDirDeath)
+	{
+		if( m_DeathJuctureSent )
+			return;
+		
+		DayZPlayerSyncJunctures.SendDeath(this, pAnimTypeDeath, pAnimHitDirDeath);
+		m_DeathJuctureSent = true;
+	}
+	
 	override void EEKilled( Object killer )
 	{
-		DayZPlayerSyncJunctures.SendDeath(this, -1, 0);
+		SendDeathJuncture(-1, 0);
 		
 		super.EEKilled(killer);
 	}
@@ -761,7 +783,7 @@ class DayZPlayerImplement extends DayZPlayer
 			float animHitDirDeath;
 			if (EvaluateDeathAnimation(damageType, source, ammo, animTypeDeath, animHitDirDeath))
 			{
-				DayZPlayerSyncJunctures.SendDeath(this, animTypeDeath, animHitDirDeath);
+				SendDeathJuncture(animTypeDeath, animHitDirDeath);
 			}
 			dBodySetInteractionLayer(this, PhxInteractionLayers.AI_NO_COLLISION);
 		}
@@ -1978,6 +2000,41 @@ class DayZPlayerImplement extends DayZPlayer
 
 			if (soundBuilder != NULL && GetGame().GetPlayer())
 			{
+				vector orientation = Vector(0, 0, 0);
+				vector edgeLength = Vector(2, 2, 2);
+				array<Object> excludedObjects = new array<Object>;
+				array<Object> collidedObjects = new array<Object>;
+				
+				if (GetGame().IsBoxColliding(GetPosition(), orientation, edgeLength, excludedObjects, collidedObjects))
+				{
+					for (int i = 0; i < collidedObjects.Count(); ++i)
+					{
+						string objectClass = collidedObjects.Get(i).GetType();
+						
+						if (objectClass.Contains("BushSoft") || objectClass.Contains("BushHard"))
+						{
+							for (int j = 0; j < type.GetVegetationSounds().Count(); ++j)
+							{
+								VegetationSound vegetationSound = type.GetVegetationSounds().Get(j);
+								
+								if (vegetationSound.GetAnimEventIds().Find(pUserInt) >= 0)
+								{
+									SoundObjectBuilder vegSoundObjectBuilder = vegetationSound.GetSoundObjectBuilder();
+									SoundObject vegSoundObject = vegetationSound.GetSoundObjectBuilder().BuildSoundObject();
+									
+									vegSoundObject.SetPosition(GetPosition());
+									GetGame().GetSoundScene().Play3D(vegSoundObject, vegSoundObjectBuilder);
+									//PlaySound(vegSoundObject, vegSoundObjectBuilder);
+									
+									break;
+								}
+							}
+							
+							break;
+						}
+					}
+				}
+				
 				SoundObject soundObject = soundBuilder.BuildSoundObject();
 				if (soundObject != NULL)
 				{

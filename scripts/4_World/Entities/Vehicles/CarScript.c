@@ -31,12 +31,13 @@ class CarScript extends Car
 	protected int m_coolantPtcFx;
 	protected int m_exhaustPtcFx;
 	
-	float m_dmgContactCoef;
-
 	protected vector m_exhaustPtcPos;
 	protected vector m_exhaustPtcDir;
 	protected vector m_enginePtcPos;
 	protected vector m_coolantPtcPos;
+	
+	protected float m_dmgContactCoef;
+	protected float m_enviroCoef;
 
 	void CarScript()
 	{
@@ -60,6 +61,7 @@ class CarScript extends Car
 		m_exhaustPtcFx = -1;
 
 		m_dmgContactCoef = 0;
+		m_enviroCoef = 0;
 
 		//proto native vector GetMemoryPointPos(string memoryPointName);
  		//proto native bool MemoryPointExists(string memoryPoint);
@@ -145,70 +147,68 @@ class CarScript extends Car
 					if ( IsVitalRadiator() )
 					{
 						if ( GetFluidFraction(CarFluid.COOLANT) > 0 && m_RadiatorHealth < 0.5 ) //CARS_LEAK_THRESHOLD
-							LeakFluid(CarFluid.COOLANT);
+							LeakFluid( CarFluid.COOLANT );
 					}
 		
 					if ( GetFluidFraction(CarFluid.FUEL) > 0 && m_FuelTankHealth < 0.5 )
-						LeakFluid(CarFluid.FUEL);
+						LeakFluid( CarFluid.FUEL );
 					
 					if ( GetFluidFraction(CarFluid.BRAKE) > 0 && m_EngineHealth < 0.5 )
-						LeakFluid(CarFluid.BRAKE);
+						LeakFluid( CarFluid.BRAKE );
 					
 					if ( GetFluidFraction(CarFluid.OIL) > 0 && m_EngineHealth < 0.5 )
-						LeakFluid(CarFluid.OIL);
+						LeakFluid( CarFluid.OIL );
 					
 					if ( m_EngineHealth < 0.25 )
-					{
 						LeakFluid( CarFluid.OIL );
-					}
-	
-					if ( GetFluidFraction(CarFluid.OIL) < 1 )
+
+					float dmg;
+					if ( GetFluidFraction( CarFluid.OIL ) < 1 )
 					{
-						float dmg = ( 1 - GetFluidFraction(CarFluid.OIL) ) * Math.RandomFloat(0.02, 0.05);
-						DecreaseHealth( "Engine", "Health", dmg);
+						dmg = ( 1 - GetFluidFraction( CarFluid.OIL ) ) * Math.RandomFloat( 0.02, 10.00 );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
+						AddHealth( "Engine", "Health", -dmg);
 					}
 					
 					if ( IsVitalRadiator() )
 					{
-						if ( GetFluidFraction(CarFluid.COOLANT) < 0.5 && GetFluidFraction(CarFluid.COOLANT) > 0 )
-							DecreaseHealth( "Engine", "Health", 1.0);
+						if ( GetFluidFraction( CarFluid.COOLANT ) < 0.5 && GetFluidFraction( CarFluid.COOLANT ) >= 0 )
+						{
+							dmg = ( 1 - GetFluidFraction(CarFluid.COOLANT) ) * Math.RandomFloat( 0.02, 10.00 );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
+							AddHealth( "Engine", "Health", -dmg );
+						}
 					}
 				}
 				
 				//FX only on Client and in Single
 				if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 				{
-					if ( !SEffectManager.IsEffectExist(m_exhaustPtcFx) )
+					if ( !SEffectManager.IsEffectExist( m_exhaustPtcFx ) )
 					{
 						m_exhaustFx = new EffExhaustSmoke();
-						m_exhaustPtcFx = SEffectManager.PlayOnObject(m_exhaustFx, this, m_exhaustPtcPos, m_exhaustPtcDir );
+						m_exhaustPtcFx = SEffectManager.PlayOnObject( m_exhaustFx, this, m_exhaustPtcPos, m_exhaustPtcDir );
 					}
 
 					m_exhaustFx.SetParticleStateLight();
 				
-					if ( IsVitalRadiator() && SEffectManager.IsEffectExist(m_coolantPtcFx) )
+					if ( IsVitalRadiator() && SEffectManager.IsEffectExist( m_coolantPtcFx ) )
 						SEffectManager.Stop(m_coolantPtcFx);
 					
-					if ( IsVitalRadiator() && GetFluidFraction(CarFluid.COOLANT) < 0.5 )
+					if ( IsVitalRadiator() && GetFluidFraction( CarFluid.COOLANT ) < 0.5 )
 					{
-						if ( !SEffectManager.IsEffectExist(m_coolantPtcFx) )
+						if ( !SEffectManager.IsEffectExist( m_coolantPtcFx ) )
 						{
 							m_coolantFx = new EffCoolantSteam();
-							m_coolantPtcFx = SEffectManager.PlayOnObject(m_coolantFx, this, m_coolantPtcPos );
+							m_coolantPtcFx = SEffectManager.PlayOnObject( m_coolantFx, this, m_coolantPtcPos );
 						}
 	
-						if ( GetFluidFraction(CarFluid.COOLANT) > 0 )
-						{
+						if ( GetFluidFraction( CarFluid.COOLANT ) > 0 )
 							m_coolantFx.SetParticleStateLight();
-						}
 						else
-						{
 							m_coolantFx.SetParticleStateHeavy();
-						}
 					}
 					else
 					{
-						if ( SEffectManager.IsEffectExist(m_coolantPtcFx) )
+						if ( SEffectManager.IsEffectExist( m_coolantPtcFx ) )
 							SEffectManager.Stop(m_coolantPtcFx);
 					}
 				}
@@ -218,10 +218,10 @@ class CarScript extends Car
 				//FX only on Client and in Single
 				if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 				{
-					if ( SEffectManager.IsEffectExist(m_exhaustPtcFx) )
+					if ( SEffectManager.IsEffectExist( m_exhaustPtcFx ) )
 						SEffectManager.Stop(m_exhaustPtcFx);
 					
-					if ( SEffectManager.IsEffectExist(m_coolantPtcFx) )
+					if ( SEffectManager.IsEffectExist( m_coolantPtcFx ) )
 						SEffectManager.Stop(m_coolantPtcFx);
 				}
 			}
@@ -232,10 +232,10 @@ class CarScript extends Car
 		{
 			if ( m_EngineHealth <= 0 )
 			{
-				if ( !SEffectManager.IsEffectExist(m_enginePtcFx) )
+				if ( !SEffectManager.IsEffectExist( m_enginePtcFx ) )
 				{
 					m_engineFx = new EffEngineSmoke();
-					m_enginePtcFx = SEffectManager.PlayOnObject(m_engineFx, this, m_enginePtcPos );
+					m_enginePtcFx = SEffectManager.PlayOnObject( m_engineFx, this, m_enginePtcPos );
 					//m_engineFx.SetParticleStateLight();
 					m_engineFx.SetParticleStateHeavy();
 				}
@@ -268,9 +268,9 @@ class CarScript extends Car
 			default:
 				if ( GetGame().IsServer() && zoneName != "")
 				{
-					float dmgMin = 120.0;	
-					float dmgThreshold = 500.0;
-					float dmgKillCrew = 2100.0;
+					float dmgMin = 150.0;	
+					float dmgThreshold = 750.0;
+					float dmgKillCrew = 3000.0;
 					float dmg = data.Impulse * m_dmgContactCoef;
 
 					if ( dmg < dmgThreshold )
@@ -278,7 +278,7 @@ class CarScript extends Car
 						if ( dmg > dmgMin )
 						{
 							//Print( GetType() + " >>> " + " SmallHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos);
-							DecreaseHealth( zoneName, "Health", dmg);
+							AddHealth( zoneName, "Health", -dmg);
 						}
 					}
 					else
@@ -287,49 +287,37 @@ class CarScript extends Car
 						//Print( GetType() + " >>> " + " BIGHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos );
 						//Print( dmg );
 
-						if ( dmg > dmgKillCrew )
+						for( int i =0; i < CrewSize(); i++ )
 						{
-							for( int i =0; i < CrewSize(); i++ )
+							Human crew = CrewMember( i );
+							if ( !crew )
+								continue;
+
+							PlayerBase player;
+							if ( Class.CastTo(player, crew ) )
 							{
-								Human crew = CrewMember( i );
-								if ( crew )
+								if ( dmg > dmgKillCrew )
+								{		
+									player.SetHealth(0.0);
+								}
+								else
 								{
-									PlayerBase player;
-									if ( Class.CastTo(player, crew ) )
-									{
-										player.SetHealth(0.0);
-										//crew.ProcessDirectDamage( 3, null, zoneName, "EnviroDmg", "0 0 0", dmg );
-									}
+									//deal shock to player
+									float shockTemp = Math.InverseLerp(dmgThreshold, dmgKillCrew, dmg);
+									float shock = Math.Lerp( 50, 100, shockTemp );
+
+									player.AddHealth("", "Shock", -shock );
+									//Print( "SHOCK..........." + shock );
 								}
 							}
 						}
-						else
-						{
-							//deal shock to player
-							//crew.ProcessDirectDamage( 3, null, zoneName, "EnviroDmg", "0 0 0", dmg );
-						}
-
 
 						ProcessDirectDamage( 3, null, zoneName, "EnviroDmg", "0 0 0", dmg );
 
-						//DecreaseHealth( zoneName, "Health", dmg);
 					}
-
 				}
 			break;
 		}
-
-		//Print(zoneName);
-		//Print(other);
-		
-		//Print( data.Impulse);
-		//float		RelativeNormalVelocityBefore;
-		//float		RelativeNormalVelocityAfter;
-		//Print( data.Normal);
-		//Print( data.Position);
-		//vector		RelativeVelocityBefore;
-		//vector		RelativeVelocityAfter;
-
 	}
 
 	/*!
@@ -340,12 +328,19 @@ class CarScript extends Car
 	{
 		switch ( ctrl )
 		{
+			// in this controller the higher returned value the more muted sounds inside the car
 			case CarSoundCtrl.DOORS:
 				break;
 		}
 
 		// if you don't wanna change the behaviour, just return the old value.
 		return oldValue;
+	}
+	
+	float enviroCoef()
+	{
+		//range <-1;1> higher number, higher heatcomfort
+		return m_enviroCoef;
 	}
 
 	/*!

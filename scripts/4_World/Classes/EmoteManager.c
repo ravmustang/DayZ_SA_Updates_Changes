@@ -1067,6 +1067,13 @@ class EmoteManager
 		{	
 			return false;
 		}
+		
+		ItemBase item = m_Player.GetItemInHands();
+		if ( item && item.IsHeavyBehaviour() )
+		{
+			return false;
+		}
+		
 		if ( (m_Player.GetWeaponManager() && m_Player.GetWeaponManager().IsRunning()) || (m_Player.GetActionManager() && m_Player.GetActionManager().GetRunningAction()) )
 		{
 			return false;

@@ -54,6 +54,21 @@ class ZombieBase extends DayZInfected
 		}
 	}
 	
+	override bool IsZombie()
+	{
+		return true;
+	}
+	
+	override bool IsZombieMilitary()
+	{
+		if ( IsKindOf( "ZmbM_SoldierNormal_Base" ) )
+		{
+			return true;
+		}		
+		
+		return false;
+	}
+	
 	bool IsMale()
 	{
 		return true;

@@ -121,6 +121,31 @@ class DayZPlayerTypeAnimTable
 	}
 }
 
+// *************************************************************************************
+// ! VegetationSound
+// *************************************************************************************
+
+class VegetationSound
+{
+	private ref SoundObjectBuilder m_SoundObjectBuilder;
+	private ref TIntArray m_AnimEventIds;
+	
+	void VegetationSound(SoundObjectBuilder soundObjectBuilder, TIntArray animEventIds)
+	{
+		m_SoundObjectBuilder = soundObjectBuilder;
+		m_AnimEventIds = animEventIds;
+	}
+	
+	SoundObjectBuilder GetSoundObjectBuilder()
+	{
+		return m_SoundObjectBuilder;
+	}
+	
+	TIntArray GetAnimEventIds()
+	{
+		return m_AnimEventIds;
+	}
+}
 
 // *************************************************************************************
 // ! DayZPlayerType - DayZPlayer configuration 
@@ -256,6 +281,11 @@ class DayZPlayerType
 		return m_pSoundVoiceTable;
 	}
 	
+	array<ref VegetationSound> GetVegetationSounds()
+	{
+		return m_pVegetationSounds;
+	}
+	
 	NoiseParams GetNoiseParamsStand()
 	{
 		return m_pNoiseStepStand;
@@ -296,6 +326,33 @@ class DayZPlayerType
 			AnimSoundEvent soundEvent = new AnimSoundEvent(soundPath);
 			if(soundEvent.IsValid())
 				m_animSoundEventsAttack.Insert(soundEvent);
+		}
+	}
+	
+	void LoadVegetationSounds()
+	{
+		m_pVegetationSounds = new array<ref VegetationSound>;
+
+		string vegSoundsCfgPath = "CfgVehicles SurvivorBase VegetationSounds ";
+		int vegSoundsCount = GetGame().ConfigGetChildrenCount(vegSoundsCfgPath);
+
+		for (int v = 0; v < vegSoundsCount; ++v)
+		{
+			string vegSoundParamName;
+			GetGame().ConfigGetChildName(vegSoundsCfgPath, v, vegSoundParamName);
+			
+			string soundSet = "";
+			GetGame().ConfigGetText(vegSoundsCfgPath + vegSoundParamName + " soundSet", soundSet);
+
+			TIntArray animEventIds = new TIntArray;
+			GetGame().ConfigGetIntArray(vegSoundsCfgPath + vegSoundParamName + " animEventIds", animEventIds)
+
+			SoundParams soundParams = new SoundParams(soundSet);
+
+			if (soundParams.IsValid() && animEventIds.Count() > 0)
+			{
+				m_pVegetationSounds.Insert(new VegetationSound(new SoundObjectBuilder(soundParams), animEventIds));
+			}
 		}
 	}
 	
@@ -367,6 +424,7 @@ class DayZPlayerType
 		m_pNoiseLandHeavy.LoadFromPath(cfgPath + "NoiseLandHeavy");
 		
 		LoadSoundWeaponEvent();
+		LoadVegetationSounds();
 	}
 	
 	private void ~DayZPlayerType();
@@ -402,6 +460,8 @@ class DayZPlayerType
 	ref NoiseParams m_pNoiseStepProne;
 	ref NoiseParams m_pNoiseLandLight;
 	ref NoiseParams m_pNoiseLandHeavy;
+
+	ref array<ref VegetationSound> m_pVegetationSounds;
 
 	//! Melee hit components (AI targeting)	
 	protected ref array<ref DayZAIHitComponent> m_HitComponentsForAI;

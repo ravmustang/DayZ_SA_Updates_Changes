@@ -100,8 +100,6 @@ class MainMenu extends UIScriptedMenu
 			m_PlayVideo.Show( true );
 		#endif
 		
-		Refresh();
-		
 		string version;
 		GetGame().GetVersion( version );
 		#ifdef PLATFORM_CONSOLE
@@ -136,12 +134,44 @@ class MainMenu extends UIScriptedMenu
 			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:circle" );
 		#endif
 		
+		Refresh();
+		
+		UpdateNewsFeed();
+		
 		return layoutRoot;
 	}
 	
 	void ~MainMenu()
 	{
 		
+	}
+	
+	void UpdateNewsFeed()
+	{
+		#ifdef PLATFORM_XBOX
+			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
+		
+			if( OnlineServices.IsGameTrial( false ) )
+		    {
+				layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( true );
+				layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
+		    }
+		    else
+		    {
+				layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
+				layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( true );
+		    }
+		#endif		
+		#ifdef PLATFORM_PS4
+			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
+			layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
+			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
+		#endif
+		#ifdef PLATFORM_WINDOWS
+			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( true );
+			layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
+			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
+		#endif
 	}
 	
 	override bool OnMouseButtonDown( Widget w, int x, int y, int button )
@@ -337,7 +367,7 @@ class MainMenu extends UIScriptedMenu
 				}
 			}
 		#else
-			g_Game.GetPlayerNameShort( 14, name );
+			name = g_Game.GetPlayerGameName();
 		#endif
 		
 		m_PlayerName.SetText( name );
@@ -383,6 +413,7 @@ class MainMenu extends UIScriptedMenu
 				#ifndef PLATFORM_WINDOWS
 				GetGame().GetInput().ResetActiveGamepad();
 				#endif
+				GetGame().GetUIManager().Back();
 			#else
 				Exit();
 			#endif

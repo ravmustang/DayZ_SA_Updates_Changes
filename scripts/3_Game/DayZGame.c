@@ -96,7 +96,7 @@ Print("Loading Inc: "+ m_Counter);
 	
 		return false;
 	}
-
+	
 	void SetTitle( string title )
 	{
 		m_TextWidgetTitle.SetText( title );
@@ -473,7 +473,7 @@ class DayZGame extends CGame
 	private bool	m_IsRightAltHolding;
 	
 	private int 	m_queueTime;
-	bool			m_loadingScreenOn;
+	bool			m_IsPlayerSpawning;
 	private bool	m_IsStressTest;
 	int 			m_OriginalCharactersCount;
 	private string 	m_PlayerName;
@@ -547,6 +547,11 @@ class DayZGame extends CGame
 		g_Game = NULL;
 		SetDispatcher(NULL);
 		Print("~DayZGame()");
+	}
+	
+	bool IsPlayerSpawning()
+	{
+		return m_IsPlayerSpawning;
 	}
 	
 	// ------------------------------------------------------------
@@ -918,13 +923,13 @@ class DayZGame extends CGame
 		//Toggles logo (loading screen)
 		Mission mission = GetMission();
 		
-		if ( mission && m_loadingScreenOn )
+		if ( mission && m_IsPlayerSpawning )
 		{
 			m_loading = new LoadingScreen(this);
 			m_loading.Show();
 			//m_loading.SetTitle("Loading...");
 			m_loading.SetTitle("#dayz_game_loading");
-			m_loadingScreenOn = false;
+			m_IsPlayerSpawning = false;
 		}
 
 	}
@@ -1209,13 +1214,11 @@ class DayZGame extends CGame
 		SetGameState( DayZGameState.MAIN_MENU );
 		SetLoadState( DayZLoadState.MAIN_MENU_START );
 		
-		#ifdef PLATFORM_CONSOLE
-			StartRandomCutscene("Staroye");
-		#else
-			string worldName;
-			GetWorldName(worldName);
-			StartRandomCutscene(worldName);
-		#endif
+		//#ifdef PLATFORM_CONSOLE
+			//StartRandomCutscene("Staroye");
+		//#else
+			StartRandomCutscene(GetMainMenuWorld());
+		//#endif
 		
 		DeleteTitleScreen();
 	}
@@ -1223,9 +1226,12 @@ class DayZGame extends CGame
 	void MissionLaunch()
 	{
 		BiosUserManager user_manager = GetGame().GetUserManager();
-		if( user_manager.GetTitleInitiator() )
+		if( user_manager )
 		{
-			user_manager.SelectUser( user_manager.GetTitleInitiator() );
+			if( user_manager.GetTitleInitiator() )
+			{
+				user_manager.SelectUser( user_manager.GetTitleInitiator() );
+			}
 		}
 		
 		SetGameState( DayZGameState.IN_GAME );

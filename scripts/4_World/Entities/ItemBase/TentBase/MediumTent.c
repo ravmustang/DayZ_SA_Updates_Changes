@@ -45,10 +45,10 @@ class MediumTent extends TentBase
 		return "mediumtent_deploy_SoundSet";
 	}	
 	
-	override bool IsTwoHandedBehaviour()
+	/*override bool IsTwoHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override string GetSoundOpen()
 	{

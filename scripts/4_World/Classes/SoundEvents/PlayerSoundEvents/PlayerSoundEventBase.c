@@ -1,11 +1,12 @@
 enum EPlayerSoundEventType
 {
-	GENERAL 	= 1,
-	MELEE 		= 2,
-	STAMINA 	= 4,
-	DAMAGE 		= 8,
-	DUMMY 		= 16,
-	INJURY 		= 32,
+	GENERAL 	= 0x00000001,
+	MELEE 		= 0x00000002,
+	STAMINA 	= 0x00000004,
+	DAMAGE 		= 0x00000008,
+	DUMMY 		= 0x00000010,
+	INJURY 		= 0x00000020,
+	FREEZING	= 0x00000040,
 }
 
 class PlayerSoundEventBase extends SoundEventBase
@@ -93,6 +94,11 @@ class PlayerSoundEventBase extends SoundEventBase
 	void OnInterupt()
 	{
 		//PrintString("OnInterupt - " + this.ToString());
+	}
+	
+	override void OnPlay(PlayerBase player)
+	{
+
 	}
 
 	override void Play()

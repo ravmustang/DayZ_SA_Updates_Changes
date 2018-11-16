@@ -262,6 +262,11 @@ class DayZAnimal extends DayZCreatureAI
 		return false;
 	}	
 	
+	override bool IsAnimal()
+	{
+		return true;
+	}
+	
 	void CommandHandler(float dt, int currentCommandID, bool currentCommandFinished)
 	{
 		DayZAnimalInputController inputController = GetInputController();

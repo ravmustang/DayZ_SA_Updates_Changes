@@ -102,7 +102,7 @@ class ZombieContainer: CollapsibleContainer
 			GetGame().GetPlayer().PredictiveTakeEntityToTargetCargo( m_ZombieEntity, ipw.GetItem() );
 		else if( m_ZombieEntity.GetInventory().CanAddEntityToInventory( item ) )
 		{
-			GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( m_ZombieEntity, FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, ipw.GetItem() );
+			GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( m_ZombieEntity, FindInventoryLocationType.ANY, ipw.GetItem() );
 		}
 	}
 	
@@ -146,7 +146,7 @@ class ZombieContainer: CollapsibleContainer
 			}
 			else if( receiver_item.GetInventory().CanAddEntityInCargo( item ) && !receiver_item.GetInventory().HasEntityInCargo( item ) )
 			{
-				player.PredictiveTakeEntityToTargetInventory( receiver_item, FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, item );
+				player.PredictiveTakeEntityToTargetInventory( receiver_item, FindInventoryLocationType.ANY, item );
 				return;
 			}
 		}
@@ -159,7 +159,7 @@ class ZombieContainer: CollapsibleContainer
 			}
 			else if( m_ZombieEntity.GetInventory().CanAddEntityToInventory( item ) )
 			{
-				player.PredictiveTakeEntityToTargetInventory( m_ZombieEntity, FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, ipw.GetItem() );
+				player.PredictiveTakeEntityToTargetInventory( m_ZombieEntity, FindInventoryLocationType.ANY, ipw.GetItem() );
 			}
 		}
 	}
@@ -383,12 +383,12 @@ class ZombieContainer: CollapsibleContainer
 			if( item.GetInventory().CanRemoveEntity() )
 			{
 				InventoryLocation il = new InventoryLocation;
-				if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, il) )
+				if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
 				{
 					if( item.ConfigGetFloat("varStackMax") )
 						item.SplitIntoStackMaxClient( player, -1, );
 					else
-						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, InventoryItem.Cast( item ) );
+						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
 				}
 				else if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
 				{

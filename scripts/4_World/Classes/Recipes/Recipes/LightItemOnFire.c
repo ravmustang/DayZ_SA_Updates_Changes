@@ -29,11 +29,11 @@ class LightItemOnFire extends RecipeBase
 		//ingredient 1
 		InsertIngredient(0,"Torch");//you can insert multiple ingredients this way
 		InsertIngredient(0,"Matchbox");
-		InsertIngredient(0,"Fireplace");
+		InsertIngredient(0,"FireplaceBase");
 		InsertIngredient(0,"Roadflare");
 		InsertIngredient(0,"PortableGasStove");
 		InsertIngredient(0,"HandDrillKit");
-		InsertIngredient(1,"PortableGasStove");
+		InsertIngredient(0,"PortableGasStove");
 
 		m_IngredientAddHealth[0] = 0;// 0 = do nothing
 		m_IngredientSetHealth[0] = -1; // -1 = do nothing
@@ -44,7 +44,7 @@ class LightItemOnFire extends RecipeBase
 		//ingredient 2
 		InsertIngredient(1,"Torch");//you can insert multiple ingredients this way
 		InsertIngredient(1,"Matchbox");
-		InsertIngredient(1,"Fireplace");
+		InsertIngredient(1,"FireplaceBase");
 		InsertIngredient(1,"Roadflare");
 		InsertIngredient(1,"PortableGasStove");
 		InsertIngredient(1,"HandDrillKit");

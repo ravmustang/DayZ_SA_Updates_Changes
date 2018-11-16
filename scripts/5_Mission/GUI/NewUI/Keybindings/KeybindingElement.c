@@ -5,8 +5,10 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	protected Widget						m_Root;
 	protected TextWidget					m_ElementName;
 	protected TextWidget					m_ElementModifier;
-	protected ButtonWidget					m_KBBindButton;
-	protected ButtonWidget					m_ConsoleBindButton;
+	protected ButtonWidget					m_PrimaryBindButton;
+	protected ButtonWidget					m_AlternativeBindButton;
+	protected Widget						m_PrimaryClear;
+	protected Widget						m_AlternativeClear;
 	
 	protected int							m_ElementIndex;
 	protected bool							m_IsEdited;
@@ -17,14 +19,16 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	
 	void KeybindingElement( int key_index, Widget parent, KeybindingsGroup group )
 	{
-		m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_option.layout", parent );
-		m_ElementName		= TextWidget.Cast( m_Root.FindAnyWidget( "setting_label" ) );
-		m_ElementModifier	= TextWidget.Cast( m_Root.FindAnyWidget( "modifier_label" ) );
-		m_KBBindButton		= ButtonWidget.Cast( m_Root.FindAnyWidget( "kb_bind" ) );
-		m_ConsoleBindButton	= ButtonWidget.Cast( m_Root.FindAnyWidget( "console_bind" ) );
+		m_Root					= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_option.layout", parent );
+		m_ElementName			= TextWidget.Cast( m_Root.FindAnyWidget( "setting_label" ) );
+		m_ElementModifier		= TextWidget.Cast( m_Root.FindAnyWidget( "modifier_label" ) );
+		m_PrimaryBindButton		= ButtonWidget.Cast( m_Root.FindAnyWidget( "primary_bind" ) );
+		m_AlternativeBindButton	= ButtonWidget.Cast( m_Root.FindAnyWidget( "alternative_bind" ) );
+		m_PrimaryClear			= m_Root.FindAnyWidget( "primary_clear" );
+		m_AlternativeClear		= m_Root.FindAnyWidget( "alternative_clear" );
 		
-		m_Group				= group;
-		m_ElementIndex		= key_index;
+		m_Group					= group;
+		m_ElementIndex			= key_index;
 		
 		Reload();
 		m_Root.SetHandler( this );
@@ -97,21 +101,24 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 			{
 				if( input.BindingCount() > 0 )
 				{
-					output = GetUApi().GetButtonName( input.Binding( 0 ) );
+					if( input.Binding( 0 ) != 0 )
+						output = GetUApi().GetButtonName( input.Binding( 0 ) );
 				}
 				for( i = 1; i < input.BindingCount(); i++ )
 				{
-					output += " + " + GetUApi().GetButtonName( input.Binding( i ) );
+					if( input.Binding( i ) != 0 )
+						output += " + " + GetUApi().GetButtonName( input.Binding( i ) );
 				}
 			}
 			else
 			{
 				if( input.BindingCount() > 0 )
 				{
-					output = GetUApi().GetButtonName( input.Binding( 0 ) );
+					if( input.Binding( 0 ) != 0 )
+						output = GetUApi().GetButtonName( input.Binding( 0 ) );
 				}
 			}
-			m_KBBindButton.SetText( output );
+			m_PrimaryBindButton.SetText( output );
 		}
 			
 		if( input.AlternativeCount() > 1 )
@@ -121,21 +128,24 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 			{
 				if( input.BindingCount() > 0 )
 				{
-					output = GetUApi().GetButtonName( input.Binding( 0 ) );
+					if( input.Binding( 0 ) != 0 )
+						output = GetUApi().GetButtonName( input.Binding( 0 ) );
 				}
 				for( i = 1; i < input.BindingCount(); i++ )
 				{
-					output += " + " + GetUApi().GetButtonName( input.Binding( i ) );
+					if( input.Binding( i ) != 0 )
+						output += " + " + GetUApi().GetButtonName( input.Binding( i ) );
 				}
 			}
 			else
 			{
 				if( input.BindingCount() > 0 )
 				{
-					output = GetUApi().GetButtonName( input.Binding( 0 ) );
+					if( input.Binding( 0 ) != 0 )
+						output = GetUApi().GetButtonName( input.Binding( 0 ) );
 				}
 			}
-			m_ConsoleBindButton.SetText( output );
+			m_AlternativeBindButton.SetText( output );
 		}
 	}
 	
@@ -144,35 +154,38 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 		string output;
 		if( custom_binds.Count() > 1 )
 		{
-			output = GetUApi().GetButtonName( custom_binds.Get( 0 ) );
+			if( custom_binds.Get( 0 ) != 0 )
+				output = GetUApi().GetButtonName( custom_binds.Get( 0 ) );
 			for( int i = 1; i < custom_binds.Count(); i++ )
 			{
-				output += " + " + GetUApi().GetButtonName( custom_binds.Get( i ) );
+				if( custom_binds.Get( i ) != 0 )
+					output += " + " + GetUApi().GetButtonName( custom_binds.Get( i ) );
 			}
 		}
 		else if( custom_binds.Count() > 0 )
 		{
-			output = GetUApi().GetButtonName( custom_binds.Get( 0 ) );
+			if( custom_binds.Get( 0 ) > 0 )
+				output = GetUApi().GetButtonName( custom_binds.Get( 0 ) );
 		}
 		
 		if( is_alternate )
 		{
 			m_CustomAlternateBind = custom_binds;
 			m_IsAlternateEdited = true;
-			m_ConsoleBindButton.SetText( output );
+			m_AlternativeBindButton.SetText( output );
 		}
 		else
 		{
 			m_CustomBind = custom_binds;
 			m_IsEdited = true;
-			m_KBBindButton.SetText( output );
+			m_PrimaryBindButton.SetText( output );
 		}
 	}
 	
 	void StartEnteringKeybind()
 	{
 		m_Group.StartEnteringKeybind( m_ElementIndex );
-		m_KBBindButton.SetText( "#layout_keybinding_new_keybind" );
+		m_PrimaryBindButton.SetText( "#layout_keybinding_new_keybind" );
 	}
 	
 	void CancelEnteringKeybind()
@@ -183,7 +196,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	void StartEnteringAlternateKeybind()
 	{
 		m_Group.StartEnteringAlternateKeybind( m_ElementIndex );
-		m_ConsoleBindButton.SetText( "#layout_keybinding_new_keybind" );
+		m_AlternativeBindButton.SetText( "#layout_keybinding_new_keybind" );
 	}
 	
 	void CancelEnteringAlternateKeybind()
@@ -193,13 +206,79 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	
 	override bool OnClick( Widget w, int x, int y, int button )
 	{
-		if( w == m_KBBindButton )
+		if( w == m_PrimaryBindButton )
 		{
 			StartEnteringKeybind();
 		}
-		if( w == m_ConsoleBindButton )
+		if( w == m_AlternativeBindButton )
 		{
 			StartEnteringAlternateKeybind();
+		}
+		return false;
+	}
+	
+	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
+	{
+		if( w == m_PrimaryClear )
+		{
+			m_IsEdited				= true;
+			m_CustomBind			= new array<int>;
+			m_PrimaryBindButton.SetText( "" );
+			m_Group.ClearKeybind( m_ElementIndex );
+		}
+		if( w == m_AlternativeClear )
+		{
+			m_IsAlternateEdited		= true;
+			m_CustomAlternateBind	= new array<int>;
+			m_AlternativeBindButton.SetText( "" );
+			m_Group.ClearAlternativeKeybind( m_ElementIndex );
+		}
+		return false;
+	}
+	
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		if( w == m_PrimaryBindButton || w == m_PrimaryClear )
+		{
+			m_PrimaryBindButton.SetColor( ARGBF( 1, 1, 0, 0 ) );
+			m_PrimaryClear.Show( true );
+			m_AlternativeClear.Show( false );
+			return true;
+		}
+		else if( w == m_AlternativeBindButton || w == m_AlternativeClear )
+		{
+			m_AlternativeBindButton.SetColor( ARGBF( 1, 1, 0, 0 ) );
+			m_PrimaryClear.Show( false );
+			m_AlternativeClear.Show( true );
+			return true;
+		}
+		else
+		{
+			m_PrimaryBindButton.SetColor( ARGBF( 0, 0, 0, 0 ) );
+			m_AlternativeBindButton.SetColor( ARGBF( 1, 0, 0, 0 ) );
+			m_PrimaryClear.Show( false );
+			m_AlternativeClear.Show( false );
+		}
+		return false;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		if( w == m_PrimaryClear || w == m_PrimaryBindButton )
+		{
+			if( enterW != m_PrimaryClear && enterW != m_PrimaryBindButton )
+			{
+				m_PrimaryClear.Show( false );
+				m_PrimaryBindButton.SetColor( ARGBF( 1, 0, 0, 0 ) );
+			}
+		}
+		if( w == m_AlternativeClear || w == m_AlternativeBindButton )
+		{
+			if( enterW != m_AlternativeClear && enterW != m_AlternativeBindButton )
+			{
+				m_AlternativeClear.Show( false );
+				m_AlternativeBindButton.SetColor( ARGBF( 1, 0, 0, 0 ) );
+			}
 		}
 		return false;
 	}

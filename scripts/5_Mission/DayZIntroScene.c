@@ -127,15 +127,6 @@ class DayZIntroScene : Managed
 		//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( SceneCharacterSetPos, 250 );
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	protected void GetSelectedUserName()
 	{
 		string name;

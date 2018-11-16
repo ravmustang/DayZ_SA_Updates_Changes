@@ -884,9 +884,6 @@ class UAInput
 
 	proto native void ClearBinding();	// remove all bindings
 
-/**/	proto native void BindButton( string sButtonName );		// bind button to this input by name (single button)
-/**/	proto native void BindButtonByHash( int iHash );		// bind button to this input by hash (single button)
-
 	proto native void BindCombo( string sButtonName );		// bind combo to this input by name (single/ or append to existing button)
 	proto native void BindComboByHash( int iHash );			// bind combo to this input by hash (single/ or append to existing button)
 

@@ -42,8 +42,9 @@ class HeatComfortMdfr: ModifierBase
 			health_loss = deltaT * Math.Lerp(PlayerConstants.HEALTH_LOSS_HC_PLUS_LOW, PlayerConstants.HEALTH_LOSS_HC_PLUS_HIGH, value_normalized);
 			
 		}
-		else if( heat_comfort < PlayerConstants.ENERGY_LOSS_THRESHOLD_HC_MINUS_LOW )
+		if( heat_comfort < PlayerConstants.ENERGY_LOSS_THRESHOLD_HC_MINUS_LOW )
 		{
+			player.SetMixedSoundState( eMixedSoundStates.FREEZING );
 			value_normalized = Math.InverseLerp(PlayerConstants.ENERGY_LOSS_THRESHOLD_HC_MINUS_LOW, PlayerConstants.ENERGY_LOSS_THRESHOLD_HC_MINUS_HIGH, heat_comfort);
 			value_normalized = Math.Clamp(value_normalized,0,1);
 			float energy_loss = deltaT * Math.Lerp(PlayerConstants.ENERGY_LOSS_HC_MINUS_LOW, PlayerConstants.ENERGY_LOSS_HC_MINUS_HIGH, value_normalized);
@@ -52,6 +53,10 @@ class HeatComfortMdfr: ModifierBase
 			//-----------------------------------------
 			//connected to energy range
 			health_loss = deltaT * Math.Lerp(PlayerConstants.HEALTH_LOSS_HC_MINUS_LOW, PlayerConstants.HEALTH_LOSS_HC_MINUS_HIGH, value_normalized);
+		}
+		else
+		{
+			player.UnsetMixedSoundState( eMixedSoundStates.FREEZING );
 		}
 		
 		if( health_loss !=0 )

@@ -21,6 +21,7 @@ class ActionData
 	ref array<ref InventoryLocation>	m_ReservedInventoryLocations;
 	int									m_RefreshReservationTimer;
 	bool								m_WasExecuted;
+	bool								m_WasActionStarted;
 }
 
 class ActionBase
@@ -87,6 +88,7 @@ class ActionBase
 		action_data.m_ReservedInventoryLocations = new array<ref InventoryLocation>;
 		action_data.m_RefreshReservationTimer = 150;
 		action_data.m_WasExecuted = false;
+		action_data.m_WasActionStarted = false;
 		
 		ActionReciveData action_recive_data = player.GetActionManager().GetReciveData();
 		if ( action_recive_data )
@@ -163,6 +165,16 @@ class ActionBase
 	int GetType()  //returns action uid
 	{
 		return 0;
+	}
+	
+	int IsEat()
+	{
+		return false;
+	}
+	
+	bool IsDrink()
+	{
+		return false;
 	}
 
 	string GetText() //text game displays in HUD hint 

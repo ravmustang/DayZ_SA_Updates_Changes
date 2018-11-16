@@ -154,7 +154,7 @@ class LeftArea: Container
 		if( active_container.IsFirstIndex() )
 		{
 			--m_ActiveIndex;
-			if ( m_ActiveIndex < 0 )
+			if ( m_ActiveIndex <= 0 )
 			{
 				m_ActiveIndex = m_Body.Count() - 1;
 			}

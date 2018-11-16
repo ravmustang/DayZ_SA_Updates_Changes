@@ -8,6 +8,8 @@ enum SurfaceAnimationBone
 
 class EntityAI extends Entity
 {
+	ref array<EntityAI> m_AttachmentsWithCargo;
+	
 	void EntityAI ()
 	{
 		// Set up the Energy Manager
@@ -25,6 +27,8 @@ class EntityAI extends Entity
 		
 		// Item preview index
 		RegisterNetSyncVariableInt( "m_ViewIndex", 0, 99 );
+		
+		m_AttachmentsWithCargo = new array<EntityAI>;
 	}
 	
 	void ~EntityAI()
@@ -216,6 +220,11 @@ class EntityAI extends Entity
 			return false;
 		}
 	}
+	
+	array<EntityAI> GetAttachmentsWithCargo()
+	{
+		return m_AttachmentsWithCargo;
+	}
 
 	int GetAgents() { return 0; }
 	void RemoveAgent(int agent_id);
@@ -224,6 +233,26 @@ class EntityAI extends Entity
 	void InsertAgent(int agent, float count);
 
 	override bool IsEntityAI() { return true; }
+	
+	bool IsPlayer()
+	{
+		return false;
+	}
+	
+	bool IsAnimal()
+	{
+		return false;
+	}
+	
+	bool IsZombie()
+	{
+		return false;
+	}
+	
+	bool IsZombieMilitary()
+	{
+		return false;
+	}
 
 	/**@brief Delete this object in next frame
 	 * @return \p void
@@ -307,9 +336,34 @@ class EntityAI extends Entity
 	{
 	}
 
-	void EEKilled(Object killer) { }
+	void EEKilled(Object killer)
+	{
+		
+	}
 	
-	void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos) { }
+	void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
+	{
+		if ( source )
+		{
+			Man killer = source.GetHierarchyRootPlayer();
+			
+			if( killer && killer.IsPlayer() )
+			{
+				if ( damageResult.GetDamage( "", "health" ) <= 0 )
+				{
+					bool is_headshot = false;
+				
+					// was player killed by headshot?
+					if (dmgZone == "Brain")
+					{
+						is_headshot = true;
+					}
+					
+					SyncEvents.SendEntityKilled(this, killer, source, is_headshot);
+				}
+			}
+		}
+	}
 	
 	// called only on the client who caused the hit
 	void EEHitByRemote(int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos) { }
@@ -335,6 +389,10 @@ class EntityAI extends Entity
 			GetCompEM().OnAttachmentAdded(item); // Inner code is meant to be executed client and server side to avoid unnecesarry network synchronization
 		}
 		
+		if( item.GetInventory().GetCargo() )
+		{
+			m_AttachmentsWithCargo.Insert( item );
+		}
 		//SwitchItemSelectionTexture(item, slot_name);
 	}
 	
@@ -361,6 +419,11 @@ class EntityAI extends Entity
 		if ( this.HasEnergyManager()  &&  item.HasEnergyManager() )
 		{
 			GetCompEM().OnAttachmentRemoved(item);
+		}
+		
+		if( m_AttachmentsWithCargo.Find( item ) > -1 )
+		{
+			m_AttachmentsWithCargo.RemoveItem( item );
 		}
 		
 		//SwitchItemSelectionTexture(item, slot_name);
@@ -563,13 +626,13 @@ class EntityAI extends Entity
 		return true;
 	}
 
-	/**@fn		CanRelaseCargo
-	 * @brief	calls this->CanRelaseCargo(cargo)
+	/**@fn		CanReleaseCargo
+	 * @brief	calls this->CanReleaseCargo(cargo)
 	 * @return	true if action allowed
 	 *
-	 * @note: return scriptConditionExecute(this, cargo, "CanRelaseCargo");
+	 * @note: return scriptConditionExecute(this, cargo, "CanReleaseCargo");
 	 **/
-	bool CanRelaseCargo (EntityAI cargo)
+	bool CanReleaseCargo (EntityAI cargo)
 	{
 		return true;
 	}
@@ -1336,5 +1399,23 @@ class EntityAI extends Entity
 	string GetAttachmentSoundType()
 	{
 		return "None";
+	}
+	
+	//! returns item behaviour of item (more in ItemBase)
+	bool IsHeavyBehaviour()
+	{
+		return false;
+	}
+	
+	//! returns item behaviour of item (more in ItemBase)
+	bool IsOneHandedBehaviour()
+	{
+		return false;
+	}
+	
+	//! returns item behaviour of item (more in ItemBase)
+	bool IsTwoHandedBehaviour()
+	{
+		return false;
 	}
 };

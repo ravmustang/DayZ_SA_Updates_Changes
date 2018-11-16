@@ -1,7 +1,7 @@
-class ActionTakeItemReciveData : ActionReciveData
+/*class ActionTakeItemReciveData : ActionReciveData
 {
 	ref InventoryLocation		m_InventoryLocation;
-}
+}*/
 
 class ActionTakeItem: ActionInteractBase
 {
@@ -108,7 +108,7 @@ class ActionTakeItem: ActionInteractBase
 		ItemBase targetItem;
 		if ( ItemBase.CastTo(targetItem, action_data.m_Target.GetObject()) )
 		{
-			action_data.m_Player.GetInventory().FindFreeLocationFor( targetItem , FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, il );
+			action_data.m_Player.GetInventory().FindFreeLocationFor( targetItem , FindInventoryLocationType.ANY, il );
 			if ( action_data.m_Player.GetInventory().HasInventoryReservation( targetItem, il) )
 			{
 				success = false;

@@ -67,21 +67,24 @@ class V3S_Chassis extends CarScript
 				//-----
 				if ( GetCarDoorsState( "V3SDriverDoors" ) == CarDoorState.DOORS_CLOSED )
 				{
-					newValue = newValue + 0.4;
+					newValue += 0.4;
+					m_enviroCoef += 0.5;
 				}
 
 				if ( GetCarDoorsState( "V3SCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
 				{
-					newValue = newValue + 0.4;
+					newValue += 0.4;
+					m_enviroCoef += 0.5;
 				}
 
 				if ( newValue > 1 )
 					newValue = 1;
 
-				return newValue;
+			return newValue;
 			break;
 		}
 
+		m_enviroCoef = oldValue;
 		return oldValue;
 	}
 	
@@ -148,6 +151,27 @@ class V3S_Chassis extends CarScript
 		}
 
 		return "";
+	}
+
+	override bool CanReachDoorsFromSeat( string pDoorsSelection, int pCurrentSeat )
+	{
+		switch( pCurrentSeat )
+		{
+		case 0:
+			if (pDoorsSelection == "DoorsDriver")
+			{
+				return true;
+			}
+		break;
+		case 1:
+			if (pDoorsSelection == "DoorsCoDriver")
+			{
+				return true;
+			}
+		break;
+		}
+		
+		return false;		
 	}
 
 	override bool IsVitalCarBattery()

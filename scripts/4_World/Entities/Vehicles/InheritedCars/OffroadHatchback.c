@@ -86,78 +86,67 @@ class OffroadHatchback extends CarScript
 		if ( newLevel == 4 )
 	}
 */
-	override int GetCarDoorsState( string slotType )
+/*
+	int GetAnimationPhaseBySlot( string slotType )
 	{
 		CarDoor carDoor;
 		
+		if ( Class.CastTo( carDoor, FindAttachmentBySlotName( slotType ) ) )
+		{
+			if ( GetAnimationPhase("DoorsDriver") > 0.5 )
+			{
+				return CarDoorState.DOORS_OPEN;
+			}
+			else
+			{
+				return CarDoorState.DOORS_CLOSED;
+			}
+		}
+		
+		return CarDoorState.DOORS_MISSING;
+	}
+*/
+
+	override int GetCarDoorsState( string slotType )
+	{
+		CarDoor carDoor;
+
+		Class.CastTo( carDoor, FindAttachmentBySlotName( slotType ) );
+		if ( !carDoor )
+			return CarDoorState.DOORS_MISSING;
+
 		switch( slotType )
 		{
 			case "NivaDriverDoors":
-				Class.CastTo( carDoor, FindAttachmentBySlotName("NivaDriverDoors") );
-				if ( carDoor )
-				{
-					if ( GetAnimationPhase("DoorsDriver") > 0.5 )
-					{
-						return CarDoorState.DOORS_OPEN;
-					}
-					else
-					{
-						return CarDoorState.DOORS_CLOSED;
-					}
-				}
+				if ( GetAnimationPhase("DoorsDriver") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
 
-				return CarDoorState.DOORS_MISSING;
 			break;
 			
 			case "NivaCoDriverDoors":
-				Class.CastTo( carDoor, FindAttachmentBySlotName("NivaCoDriverDoors") );
-				if ( carDoor )
-				{
-					if ( GetAnimationPhase("DoorsCoDriver") > 0.5 )
-					{
-						return CarDoorState.DOORS_OPEN;
-					}
-					else
-					{
-						return CarDoorState.DOORS_CLOSED;
-					}
-				}
+				if ( GetAnimationPhase("DoorsCoDriver") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
 
-				return CarDoorState.DOORS_MISSING;
 			break;
 			
 			case "NivaHood":
-				Class.CastTo( carDoor, FindAttachmentBySlotName("NivaHood") );
-				if ( carDoor )
-				{
-					if ( GetAnimationPhase("DoorsHood") > 0.5 )
-					{
-						return CarDoorState.DOORS_OPEN;
-					}
-					else
-					{
-						return CarDoorState.DOORS_CLOSED;
-					}
-				}
-		
-				return CarDoorState.DOORS_MISSING;
+				if ( GetAnimationPhase("DoorsHood") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
+
 			break;
 			
 			case "NivaTrunk":
-				Class.CastTo( carDoor, FindAttachmentBySlotName("NivaTrunk") );
-				if ( carDoor )
-				{
-					if ( GetAnimationPhase("DoorsTrunk") > 0.5 )
-					{
-						return CarDoorState.DOORS_OPEN;
-					}
-					else
-					{
-						return CarDoorState.DOORS_CLOSED;
-					}
-				}
+				if ( GetAnimationPhase("DoorsTrunk") > 0.5 )
+					return CarDoorState.DOORS_OPEN;
+				else
+					return CarDoorState.DOORS_CLOSED;
 
-				return CarDoorState.DOORS_MISSING;
 			break;
 		}
 
@@ -171,65 +160,37 @@ class OffroadHatchback extends CarScript
 		{
 			case 0:
 				if ( GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED )
-				{
 					return false;
-				}
-				else
-				{
-					if ( GetAnimationPhase("SeatDriver") > 0.5 )
-					{
-						return false;
-					}
-				}
-			
+				else if ( GetAnimationPhase("SeatDriver") > 0.5 )
+					return false;
+
 				return true;
 			break;
-			
+
 			case 1:
 				if ( GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
-				{
 					return false;
-				}
-				else
-				{
-					if ( GetAnimationPhase("SeatCoDriver") > 0.5 )
-					{
-						return false;
-					}
-				}
-			
+				else if ( GetAnimationPhase("SeatCoDriver") > 0.5 )
+					return false;
+
 				return true;
 			break;
 
 			case 2:
 				if ( GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED )
-				{
 					return false;
-				}
-				else
-				{
-					if ( GetAnimationPhase("SeatDriver") <= 0.5 )
-					{
-						return false;
-					}
-				}
-			
+				else if ( GetAnimationPhase("SeatDriver") <= 0.5 )
+					return false;
+
 				return true;
 			break;
 
 			case 3:
 				if ( GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
-				{
 					return false;
-				}
-				else
-				{
-					if ( GetAnimationPhase("SeatCoDriver") <= 0.5 )
-					{
-						return false;
-					}
-				}
-			
+				else if ( GetAnimationPhase("SeatCoDriver") <= 0.5 )
+					return false;
+
 				return true;
 			break;
 		}
@@ -246,27 +207,23 @@ class OffroadHatchback extends CarScript
 
 				//-----
 				if ( GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED )
-				{
-					newValue = newValue + 0.5;
-				}
+					newValue += 0.5;
 
 				if ( GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
-				{
-					newValue = newValue + 0.5;
-				}
+					newValue += 0.5;
 
 				if ( GetCarDoorsState( "NivaTrunk" ) == CarDoorState.DOORS_CLOSED )
-				{
-					newValue = newValue + 0.1;
-				}
+					newValue += 0.1;
 
 				if ( newValue > 1 )
 					newValue = 1;
 			
+				m_enviroCoef = newValue;
 				return newValue;
 			break;
 		}
 
+		m_enviroCoef = oldValue;
 		return oldValue;
 	}
 
@@ -351,5 +308,38 @@ class OffroadHatchback extends CarScript
 		}
 		
 		return false;
+	}
+
+	override bool CanReachDoorsFromSeat( string pDoorsSelection, int pCurrentSeat )
+	{
+		switch( pCurrentSeat )
+		{
+		case 0:
+			if (pDoorsSelection == "DoorsDriver")
+			{
+				return true;
+			}
+		break;
+		case 1:
+			if (pDoorsSelection == "DoorsCoDriver")
+			{
+				return true;
+			}
+		break;
+		case 2:
+			if (pDoorsSelection == "DoorsDriver")
+			{
+				return true;
+			}
+		break;
+		case 3:
+			if (pDoorsSelection == "DoorsCoDriver")
+			{
+				return true;
+			}
+		break;
+		}
+		
+		return false;		
 	}
 }

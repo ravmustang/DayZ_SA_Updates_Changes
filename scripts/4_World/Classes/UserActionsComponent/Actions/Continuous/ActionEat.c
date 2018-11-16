@@ -30,6 +30,11 @@ class ActionEat: ActionConsume
 	{
 		return AT_EAT;
 	}
+	
+	override int IsEat()
+	{
+		return true;
+	}
 
 	override bool HasTarget()
 	{

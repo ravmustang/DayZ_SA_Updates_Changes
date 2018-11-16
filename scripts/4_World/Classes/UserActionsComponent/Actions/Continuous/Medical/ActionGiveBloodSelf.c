@@ -1,3 +1,8 @@
+class ActionGiveBloodData : ActionData
+{
+	int m_ItemBloodType;
+}
+
 class ActionGiveBloodSelfCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
@@ -44,10 +49,27 @@ class ActionGiveBloodSelf: ActionContinuousBase
 	{
 		return "#give_blood";
 	}
+	
+	override ActionData CreateActionData()
+	{
+		ActionGiveBloodData action_data = new ActionGiveBloodData;
+		return action_data;
+	}
+	
+	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL )
+	{
+		if ( super.SetupAction(player, target, item, action_data, extra_data ) )
+		{
+			ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
+			action_data_b.m_ItemBloodType = action_data.m_MainItem.GetLiquidType();
+			return true;
+		}
+		return false;
+	}
 
 	override void OnEndAnimationLoopServer( ActionData action_data )
 	{
-		OnFinishProgressServer(action_data);
+		//OnFinishProgressServer(action_data);
 
 		if ( action_data.m_MainItem.IsKindOf("BloodSyringe") )
 		{
@@ -55,37 +77,31 @@ class ActionGiveBloodSelf: ActionContinuousBase
 			lambda.SetTransferParams(true, true, true);
 			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, lambda);
 		}
-		else
-		{
-			if ( action_data.m_MainItem.GetQuantity() <= 0 )
-			{
-				GetGame().ObjectDelete( action_data.m_MainItem );
-			}	
-		}
 		
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 	override void OnEndServer(ActionData action_data)
 	{
-		Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
+		ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
+		
+		Param1<float> nacdata = Param1<float>.Cast( action_data_b.m_ActionComponent.GetACData() );
 		float delta = nacdata.param1;
 		
-		action_data.m_Player.AddHealth("","Blood",delta);
+		action_data_b.m_Player.AddHealth("","Blood",delta);
 		//action_data.m_Player.SetHealth("GlobalHealth", "Blood", action_data.m_Player.GetHealth("GlobalHealth", "Blood") );
-		
-		int itembloodtype = action_data.m_MainItem.GetLiquidType();
-		int bloodtypetarget = action_data.m_Player.GetStatBloodType().Get();
-		bool bloodmatch = BloodTypes.MatchBloodCompatibility(itembloodtype, bloodtypetarget);
+
+		int bloodtypetarget = action_data_b.m_Player.GetStatBloodType().Get();
+		bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);
 
 		if ( !bloodmatch )
 		{
-			action_data.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+			action_data_b.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
 		}
 		
-		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0.01 )
+		if ( action_data_b.m_MainItem && action_data_b.m_MainItem.GetQuantity() <= 0.01 )
 		{
-			action_data.m_MainItem.SetQuantity(0, false, false);
+			action_data_b.m_MainItem.SetQuantity(0);
 		}
 	}
 };

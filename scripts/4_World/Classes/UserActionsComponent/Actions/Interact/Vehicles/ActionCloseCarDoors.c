@@ -49,6 +49,11 @@ class ActionCloseCarDoors: ActionInteractBase
 					m_AnimSource = car.GetAnimSourceFromSelection( selections[i]);
 					if ( m_AnimSource != "" )
 					{
+						//! if player is in car and cannot reach doors
+						if (player.IsInVehicle() && !car.CanReachDoorsFromSeat(m_AnimSource, car.CrewMemberIndex( player )) )
+							return false;
+
+						//! is in reach, should close the door
 						if ( car.GetAnimationPhase( m_AnimSource ) > 0.5 )
 							return true;
 					}

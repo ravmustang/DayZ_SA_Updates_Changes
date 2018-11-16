@@ -38,7 +38,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 			m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/pc/server_browser_list_entry.layout", parent );
 		#endif
 		#endif
-		m_Root.SetSort( index );
+		//m_Root.SetSort( index );
 		
 		m_Favorite				= m_Root.FindAnyWidget( "favorite_button" );
 		m_Expand				= m_Root.FindAnyWidget( "expand_button" );

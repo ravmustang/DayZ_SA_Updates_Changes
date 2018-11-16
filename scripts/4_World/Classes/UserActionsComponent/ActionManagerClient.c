@@ -246,7 +246,7 @@ class ActionManagerClient: ActionManagerBase
 	{
 		RemoveActions();
 		
-		if (m_Player.IsRaised())
+		if (m_Player.IsRaised() || !ActionPossibilityCheck(pCurrentCommandID) )
 		{
 			m_SelectableActions.Clear();
 			return;

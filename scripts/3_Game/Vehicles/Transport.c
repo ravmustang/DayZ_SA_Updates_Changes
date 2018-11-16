@@ -123,4 +123,9 @@ class Transport extends EntityAI
 	{
 		return false;
 	}
+
+	bool CanReachDoorsFromSeat( string pDoorsSelection, int pCurrentSeat )
+	{
+		return false;
+	}
 };

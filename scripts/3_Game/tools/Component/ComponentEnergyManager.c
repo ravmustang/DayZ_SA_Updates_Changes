@@ -1116,7 +1116,7 @@ class ComponentEnergyManager : Component
 		if (m_DebugPlugs)
 		{
 			if (!m_DebugUpdate)
-				m_DebugUpdate = new Timer( CALL_CATEGORY_GAMEPLAY );
+				m_DebugUpdate = new Timer( CALL_CATEGORY_SYSTEM );
 			
 			if (!m_DebugUpdate.IsRunning())
 				m_DebugUpdate.Run(0.01, this, "DebugUpdate", NULL, true);
@@ -1186,7 +1186,7 @@ class ComponentEnergyManager : Component
 		if ( !m_IsPassiveDevice )
 		{
 			if (!m_UpdateTimer)
-				m_UpdateTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+				m_UpdateTimer = new Timer( CALL_CATEGORY_SYSTEM );
 			
 			if ( !m_UpdateTimer.IsRunning() ) // Makes sure the timer is NOT running already
 			{
@@ -1419,6 +1419,21 @@ class ComponentEnergyManager : Component
 		m_ThisEntityAI.SetSynchDirty();
 	}
 	
+	void ClearLastUpdateTime()
+	{
+		m_LastUpdateTime = 0;
+	}
+	
+	void RememberLastUpdateTime()
+	{
+		m_LastUpdateTime = GetGame().GetTime();
+	}
+	
+	float GetLastUpdateTime()
+	{
+		return GetGame().GetTime();
+	}
+	
 	// Updates the device's state of power. This function is visualized in the diagram at DayZ Confluence >> Camping & Squatting >> Electricity >> Energy Manager functionalities
 	void DeviceUpdate()
 	{
@@ -1429,17 +1444,25 @@ class ComponentEnergyManager : Component
 		if ( !m_IsPassiveDevice )
 		{
 			// 'm_ThisEntityAI' and 'this' must be checked because this method is caled from a timer
-			if ( m_ThisEntityAI  &&  this  &&  IsSwitchedOn()  &&  !m_ThisEntityAI.IsRuined()  &&  CheckWetness()  &&  m_CanWork  &&  !GetGame().IsMissionMainMenu() ) // TO DO: Use CanWork() here isntead of whole long condition?
+			if ( m_ThisEntityAI  &&  this  &&  IsSwitchedOn()  &&  !m_ThisEntityAI.IsRuined()  &&  CheckWetness()  &&  m_CanWork  &&  !GetGame().IsMissionMainMenu() )
 			{
 				bool was_powered = IsWorking();
-				
+				float consumed_energy_coef;
 				// Make sure to use only as much % of energy as needed since this function can be called at random.
-				float consumed_energy_coef = Math.Clamp(GetGame().GetTime() - m_LastUpdateTime, 0, CONSUME_ENERGY_INTERVAL * 1000 );
-				consumed_energy_coef = consumed_energy_coef / (CONSUME_ENERGY_INTERVAL * 1000);
+				
+				if ( m_LastUpdateTime == 0 )
+				{
+					RememberLastUpdateTime();
+					consumed_energy_coef = 1000 / (CONSUME_ENERGY_INTERVAL * 1000);
+				}
+				else
+				{
+					consumed_energy_coef = (GetLastUpdateTime() - m_LastUpdateTime) / (CONSUME_ENERGY_INTERVAL * 1000);
+				}
 				
 				if (consumed_energy_coef > 0) // Prevents calling of OnWork events when no energy is consumed
 				{
-					m_LastUpdateTime = GetGame().GetTime();
+					m_LastUpdateTime = GetLastUpdateTime();
 					float consume_energy = GetEnergyUsage() * consumed_energy_coef;
 					bool has_consumed_enough = true;
 					
@@ -1467,6 +1490,7 @@ class ComponentEnergyManager : Component
 							if (m_CanStopWork)
 							{
 								m_CanStopWork = false;
+								ClearLastUpdateTime();
 								GetGame().GameScript.CallFunction(m_ThisEntityAI, "OnWorkStop", NULL, 0); // This event is called only once when the device STOPS being powered
 								UpdateCanWork();
 								
@@ -1480,6 +1504,10 @@ class ComponentEnergyManager : Component
 						StopUpdates();
 					}
 				}
+				else
+				{
+					ClearLastUpdateTime();
+				}
 			}
 			else if(this  &&  m_ThisEntityAI)
 			{
@@ -1489,6 +1517,7 @@ class ComponentEnergyManager : Component
 				if (m_CanStopWork)
 				{
 					m_CanStopWork = false;
+					ClearLastUpdateTime();
 					GetGame().GameScript.CallFunction(m_ThisEntityAI, "OnWorkStop", NULL, 0); // This event is called only once when the device STOPS being powered
 					UpdateCanWork();
 					

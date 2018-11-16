@@ -529,12 +529,12 @@ class VicinitySlotsContainer: Container
 			if( item.GetInventory().CanRemoveEntity() )
 			{
 				InventoryLocation il = new InventoryLocation;
-				if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, il) )
+				if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
 				{
 					if( item.ConfigGetFloat("varStackMax") )
 						item.SplitIntoStackMaxClient( player, -1, );
 					else
-						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY | FindInventoryLocationType.NO_SLOT_AUTO_ASSIGN, InventoryItem.Cast( item ) );
+						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
 				}
 				else if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
 				{

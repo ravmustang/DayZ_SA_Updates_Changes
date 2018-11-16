@@ -39,10 +39,10 @@ class CarTent extends TentBase
 		return "cartent_deploy_SoundSet";
 	}	
 	
-	override bool IsHeavyBehaviour()
+	/*override bool IsHeavyBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsDeployable()
 	{

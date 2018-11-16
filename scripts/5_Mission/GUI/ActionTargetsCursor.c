@@ -561,7 +561,7 @@ class ActionTargetsCursor extends ObjectFollower
 		if(!m_AM) return;
 		if(!m_Target) return;
 		if(m_Player.IsSprinting()) return;
-		if(m_Player.GetCommand_Vehicle()) return; // TODO: TMP: Car AM rework needed
+		if(m_Player.IsInVehicle()) return; // TODO: TMP: Car AM rework needed
 
 		TSelectableActionInfoArray selectableActions = m_AM.GetSelectableActions();
 		int selectedActionIndex = m_AM.GetSelectedActionIndex();
@@ -585,7 +585,7 @@ class ActionTargetsCursor extends ObjectFollower
 		if (m_Target && m_Target.GetObject() && m_Target.GetObject().IsItemBase())
 		{
 			ItemBase item = ItemBase.Cast(m_Target.GetObject());
-			if( !item.IsTakeable() )
+			if( !item.IsTakeable() || m_Player.IsInVehicle() )
 			{
 				m_Hidden = true;
 			}

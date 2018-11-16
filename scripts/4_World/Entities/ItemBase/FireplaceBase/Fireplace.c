@@ -12,10 +12,10 @@ class Fireplace extends FireplaceBase
 		PARTICLE_STEAM_END		= ParticleList.CAMP_STEAM_2END;
 	}
 	
-	override bool IsTwoHandedBehaviour()
+	/*override bool IsTwoHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 	
 	override bool IsBaseFireplace()
 	{
@@ -252,7 +252,7 @@ class Fireplace extends FireplaceBase
 		return true;
 	}
 
-	override bool CanRelaseCargo( EntityAI cargo )
+	override bool CanReleaseCargo( EntityAI cargo )
 	{
 		if ( IsBurning() )
 		{

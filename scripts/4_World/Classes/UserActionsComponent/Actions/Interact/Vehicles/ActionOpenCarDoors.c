@@ -33,12 +33,12 @@ class ActionOpenCarDoors: ActionInteractBase
 		//if( IsDamageDestroyed(action_data.m_Target) ) return false;
 		//if( !IsTransport(action_data.m_Target) ) return false;
 		if( !IsInReach(player, target, UAMaxDistances.DEFAULT) ) return false;
-		
+
 		CarScript car;
 		if ( Class.CastTo(car, target.GetParent()) )
 		{
 			array<string> selections = new array<string>();
-
+			
 			CarDoor carDoor = CarDoor.Cast(target.GetObject());
 			if (carDoor)
 			{
@@ -49,6 +49,11 @@ class ActionOpenCarDoors: ActionInteractBase
 					m_AnimSource = car.GetAnimSourceFromSelection( selections[i]);
 					if ( m_AnimSource != "" )
 					{
+						//! if player is in car and cannot reach doors
+						if (player.IsInVehicle() && !car.CanReachDoorsFromSeat(m_AnimSource, car.CrewMemberIndex( player )) )
+							return false;
+
+						//! is in reach, should open the door
 						if ( car.GetAnimationPhase( m_AnimSource ) <= 0.5 )
 							return true;
 					}

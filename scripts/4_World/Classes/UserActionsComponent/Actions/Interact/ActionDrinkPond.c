@@ -11,6 +11,11 @@ class ActionDrinkPond: ActionInteractBase
 	{
 		return AT_DRINK_POND_ONE;
 	}
+	
+	override bool IsDrink()
+	{
+		return true;
+	}
 
 	override string GetText()
 	{

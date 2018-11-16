@@ -8,6 +8,10 @@ class PointlightBase extends LightBase
 		SetVisibleDuringDaylight(true);
 		SetRadius( 30 );
 		SetCastShadow(true);
+		SetEnabled(true);
+		SetDiffuseColor( 1, 1, 1 );
+		SetAmbientColor( 1, 1, 1 );
+		SetAmbientAlpha( 1 );
 	}
 	
 	/*override void EOnFrame(IEntity other, float timeSlice)

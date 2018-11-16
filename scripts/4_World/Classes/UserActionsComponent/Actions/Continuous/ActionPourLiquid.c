@@ -7,7 +7,7 @@ class ActionPourLiquidCB : ActionContinuousBaseCB
 		m_ActionData.m_ActionComponent = new CAContinuousQuantityLiquidTransfer(UAQuantityConsumed.POUR_LIQUID, TIME_TO_REPEAT);
 	}
 	
-	override void OnAnimationEvent(int pEventID)	
+/*	override void OnAnimationEvent(int pEventID)	
 	{
 		super.OnAnimationEvent( pEventID );
 				
@@ -57,7 +57,7 @@ class ActionPourLiquidCB : ActionContinuousBaseCB
 		{		
 		
 		}
-	}
+	}*/
 };
 
 class ActionPourLiquid: ActionContinuousBase
@@ -125,6 +125,12 @@ class ActionPourLiquid: ActionContinuousBase
 		return false;
 	}
 	
+	override void OnExecuteServer( ActionData action_data ) 
+	{
+		Bottle_Base target_vessel = Bottle_Base.Cast( action_data.m_Target.GetObject());
+		if (target_vessel) target_vessel.PlayPouringSound();
+	}
+	
 	override void OnStartServer( ActionData action_data )
 	{
 		action_data.m_Player.SetLiquidTendencyDrain(false);
@@ -132,6 +138,8 @@ class ActionPourLiquid: ActionContinuousBase
 	
 	override void OnEndServer( ActionData action_data )
 	{
+		Bottle_Base target_vessel = Bottle_Base.Cast( action_data.m_Target.GetObject());
+		if (target_vessel) target_vessel.StopPouringSound();
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

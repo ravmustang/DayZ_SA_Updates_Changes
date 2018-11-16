@@ -18,9 +18,10 @@ class GardenBase extends Building
 	
 	// slot names
 	private static const string SLOT_SELECTION_DIGGED_PREFIX 	= "slotDigged_";
-	static const string SLOT_SELECTION_COVERED_PREFIX 	= "slotCovered_";
+	static const string 		SLOT_SELECTION_COVERED_PREFIX 	= "slotCovered_";
 	private static const string SLOT_COMPONENT_PREFIX 			= "slot_";
 	private static const string SLOT_MEMORY_POINT_PREFIX 		= "slot_";
+	private static const string SLOT_SEEDBASE_PREFIX 			= "seedbase_";
 	
 	
 	private static const int 	CHECK_RAIN_INTERVAL 			= 30;
@@ -38,17 +39,17 @@ class GardenBase extends Building
 		m_DeleteWithDelayTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
 		
 		// Prepare m_map_slots
-		for (int i = 1;  i <= GetGardenSlotsCount() + 1;  ++i)
+		for (int i = 1;  i <= GetGardenSlotsCount() ;  ++i)
 		{
 			// m_map_slots is supposed to be: <input, output>
-			string input = "seedbase_" + i.ToString();
+			string input = SLOT_SEEDBASE_PREFIX + i.ToString();
 			string output = SLOT_COMPONENT_PREFIX;
 			
 			if (i < 10)
 				output = output + "0"; // Example: '1' changes to '01'
 			
-			int i_add = i + 1; // + 1 because input like 'seedbase_5' must output 'component06' due to how p3d files work.
-			output = output + i_add.ToString();
+			//int i_add = i + 1; // + 1 because input like 'seedbase_5' must output 'component06' due to how p3d files work.
+			output = output + i.ToString();
 			
 			m_map_slots.Set(input, output);
 		}
@@ -318,7 +319,9 @@ class GardenBase extends Building
 			Print(index);
 			Print(converted_slot_name);
 			
-			PlantSeed( NULL, ItemBase.Cast( item ), converted_slot_name);
+			PlayerBase player = PlayerBase.Cast( item.GetParent() ); // TO DO: Get player somehow!
+			
+			PlantSeed( player, ItemBase.Cast( item ), converted_slot_name);
 			SynchSlots();
 		}
 	}
@@ -329,26 +332,19 @@ class GardenBase extends Building
 		
 		if ( !g_Game.IsServer() ) return;
 		
-		//slot_name = "SeedBase_9"; // TO DO: Remove this!
+		slot_name.ToLower();
 
 		string path = "CfgVehicles " + item.GetType() + " Horticulture " + "PlantType";
 		bool IsItemSeed = GetGame().ConfigIsExisting(path); // Is this item a seed?
 		
 		if ( IsItemSeed ) 
 		{
-			//Print(item);
-			//Print(slot_name); // TO DO: (BLOKER) Until new system for attachment slots is implemented, slot_name is incorrect!
 			string converted_slot_name = ConvertAttSlotToPlantSlot(slot_name);
-			//Print(converted_slot_name);
 			Slot slot = GetSlotBySelection(converted_slot_name);
-			//Print(slot);
 			
 			if (slot)
 			{
-				// TO DO: Manipuluje sa tu so zlym slotom! Ma sa resetnut slot 4, ale v skutocnosti sa resetne slot 0!
-				//Print(slot.m_State);
 				slot.m_State = Slot.STATE_DIGGED;
-				//Print(slot.m_State);
 				slot.SetSeed(NULL);
 			}
 			
@@ -422,31 +418,22 @@ class GardenBase extends Building
 	// Creates a plant
 	void CreatePlant(Slot slot )
 	{
-		// WIP!
-		
 		ItemBase seed = slot.GetSeed();
 		SproutLambda lambda = new SproutLambda(seed, slot.m_PlantType, NULL, this, slot);
 		lambda.SetTransferParams(true, true, true);
 		GetInventory().ReplaceItemWithNew(InventoryMode.SERVER, lambda);
 
-		//int slot_index = GetSlotBySelection(slot.GetSlotComponent()).GetSlotIndex();
 		int slot_index = slot.GetSlotIndex();
 		vector pos = GetSlotPosition(slot_index);
-		//PlantBase plant = PlantBase.Cast( GetGame().CreateObject( slot.m_PlantType, pos ) );
-		//plant.SetPosition(pos);
-		//slot.SetPlant(plant);
+		PlantBase plant = lambda.m_Plant;
+		plant.SetPosition(pos);
+		slot.SetPlant(plant);
 		slot.m_State = Slot.STATE_COVERED;
-		//plant.Init( this, slot.m_Fertility, slot.m_HarvestingEfficiency, slot.GetWater() );
+		plant.Init( this, slot.m_Fertility, slot.m_HarvestingEfficiency, slot.GetWater() );
 		ShowSelection(SLOT_SELECTION_COVERED_PREFIX + (slot_index + 1).ToStringLen(2));
 		
 		GetGame().ObjectDelete(seed);
 		
-		/*if ( GetGame().IsServer() )
-     		GetInventory().TakeEntityAsAttachmentEx( InventoryMode.SERVER, plant, slot.GetSlotId() );
-			//ServerTakeEntityAsAttachmentEx( plant,  slot.GetSlotId() );
-		else
-     		GetInventory().TakeEntityAsAttachmentEx( InventoryMode.JUNCTURE, plant, slot.GetSlotId() );
-		*/
 		Param1<ItemBase> param_seed = new Param1<ItemBase>(seed);
 		m_DeleteWithDelayTimer.Run(0.1, this, "DeleteWithDelay", param_seed, false);
 	}
@@ -847,8 +834,13 @@ class SproutLambda : TurnItemIntoItemLambda
 {
 	GardenBase m_GB;
 	Slot m_Slot;
+	PlantBase m_Plant;
 
-	void SproutLambda (EntityAI old_item, string new_item_type, PlayerBase player, GardenBase gb = NULL, Slot slot = NULL) { m_GB = gb; m_Slot = slot; }
+	void SproutLambda (EntityAI old_item, string new_item_type, PlayerBase player, GardenBase gb = NULL, Slot slot = NULL) 
+	{
+		m_GB = gb;
+		m_Slot = slot;
+	}
 
 	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
 	{
@@ -856,13 +848,13 @@ class SproutLambda : TurnItemIntoItemLambda
 
 		if (new_item) 
 		{							
-			PlantBase plant = PlantBase.Cast(new_item);
+			m_Plant = PlantBase.Cast(new_item);
 			
 			int slot_index = m_Slot.GetSlotIndex();
 			
-			m_Slot.SetPlant(plant);
+			m_Slot.SetPlant(m_Plant);
 			m_Slot.m_State = Slot.STATE_COVERED;
-			plant.Init( m_GB, m_Slot.m_Fertility, m_Slot.m_HarvestingEfficiency, m_Slot.GetWater() );
+			m_Plant.Init( m_GB, m_Slot.m_Fertility, m_Slot.m_HarvestingEfficiency, m_Slot.GetWater() );
 			m_GB.ShowSelection(GardenBase.SLOT_SELECTION_COVERED_PREFIX + (slot_index + 1).ToStringLen(2));
 		}
 		else

@@ -34,10 +34,10 @@ class TripwireTrap : TrapBase
 		m_SurfaceForSetup.Insert("cp_rock");
 	}
 	
-	override bool IsOneHandedBehaviour()
+	/*override bool IsOneHandedBehaviour()
 	{
 		return true;
-	}
+	}*/
 
 	override bool IsDeployable()
 	{

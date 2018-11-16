@@ -22,6 +22,7 @@ class ItemBase extends InventoryItem
 	float 	m_ItemModelLength;
 	int 	m_VarLiquidType;
 	int		m_Item_Stage;
+	int 	m_ItemBehaviour = -1; // -1 = not specified; 0 = heavy item; 1= onehanded item; 2 = twohanded item
 	bool	m_IsBeingPlaced;
 	bool	m_IsHologram;
 	bool	m_IsTakeable;
@@ -103,6 +104,10 @@ class ItemBase extends InventoryItem
 		m_HeatIsolation = GetHeatIsolation();
 		m_Absorbency = GetAbsorbency();
 		m_ItemModelLength = GetItemModelLength();
+		if(ConfigIsExisting("itemBehaviour"))
+		{
+			m_ItemBehaviour = ConfigGetBool("itemBehaviour");
+		}
 		
 		//RegisterNetSyncVariableInt("m_VariablesMask");
 		if ( HasQuantity() ) RegisterNetSyncVariableFloat("m_VarQuantity", GetQuantityMin(), GetQuantityMax() );
@@ -2853,18 +2858,24 @@ class ItemBase extends InventoryItem
 	
 	//----------------------------------------------------------------
 	//Item Behaviour
-	bool IsHeavyBehaviour()
+	override bool IsHeavyBehaviour()
 	{
+		if (m_ItemBehaviour == 0)
+			return true;
 		return false;
 	}
 	
-	bool IsOneHandedBehaviour()
+	override bool IsOneHandedBehaviour()
 	{
+		if (m_ItemBehaviour == 1)
+			return true;
 		return false;
 	}
 	
-	bool IsTwoHandedBehaviour()
+	override bool IsTwoHandedBehaviour()
 	{
+		if (m_ItemBehaviour == 2)
+			return true;
 		return false;
 	}
 	

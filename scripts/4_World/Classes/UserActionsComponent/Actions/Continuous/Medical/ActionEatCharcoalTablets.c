@@ -10,6 +10,11 @@ class ActionEatCharcoalTablets: ActionConsume
 	{
 		return AT_EAT_CHARCOAL_TABLETS;
 	}
+	
+	override int IsEat()
+	{
+		return true;
+	}
 
 	override void ApplyModifiers( ActionData action_data )
 	{

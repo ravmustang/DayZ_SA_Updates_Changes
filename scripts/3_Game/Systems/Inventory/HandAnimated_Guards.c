@@ -10,6 +10,10 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_RFLLEFTBACK;
 				}
+				else if (src.GetItem() && src.GetItem().IsOneHandedBehaviour())
+				{
+					return WeaponHideShowTypes.HIDESHOW_SLOT_1HDLEFTBACK;
+				}
 				return WeaponHideShowTypes.HIDESHOW_SLOT_2HDLEFTBACK;
 			}
 			case InventorySlots.MELEE:
@@ -17,6 +21,10 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 				if (src.GetItem() && src.GetItem().IsWeapon())
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_RFLRIGHTBACK;
+				}
+				else if (src.GetItem() && src.GetItem().IsOneHandedBehaviour())
+				{
+					return WeaponHideShowTypes.HIDESHOW_SLOT_1HDRIGHTBACK;
 				}
 				return WeaponHideShowTypes.HIDESHOW_SLOT_2HDRIGHTBACK;
 			}
@@ -40,7 +48,7 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 			case InventorySlots.BODY:
 			case InventorySlots.LEGS:
 			case InventorySlots.BACK:
-				return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK; // @NOTE: this is DUMMY for "generic take" anim
+				return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;
 			
 			default:
 				Print("[hndfsm] SlotToAnimType -  not animated slot in src_loc=" + src.DumpToString());
@@ -50,7 +58,7 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 	}
 	else if (src.GetType() == InventoryLocationType.CARGO)
 	{
-		return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK; // @NOTE: placeholder
+		return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;
 	}
 	return -1;
 }

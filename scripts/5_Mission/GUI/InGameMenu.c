@@ -111,8 +111,6 @@ class InGameMenu extends UIScriptedMenu
 			GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(GetGame().GetMission().CreateLogoutMenu, this);
 			
 			//GetGame().GetUIManager().ShowDialog("EXIT", "Are you sure you want to exit?", IDC_INT_EXIT, DBT_YESNO, DBB_YES, DMT_QUESTION, NULL);
-				
-			
 			return true;
 		}
 		case IDC_INT_RETRY:

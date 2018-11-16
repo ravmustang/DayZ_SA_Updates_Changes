@@ -86,7 +86,7 @@ class ActionContinuousBaseCB : ActionBaseCB
 	}
 	
 	override void EndActionComponent()
-	{
+	{		
 		// TODO for second type animation SetCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 		if ( m_ActionData.m_State == UA_FINISHED )
 		{
@@ -145,6 +145,8 @@ class ActionContinuousBase : AnimatedActionBase
 	
 	void OnStartAnimationLoop( ActionData action_data )
 	{
+		Print("OnStartAnimationLoop");
+		
 		if(GetGame().IsServer())
 		{
 			OnStartAnimationLoopServer(action_data);
@@ -170,7 +172,7 @@ class ActionContinuousBase : AnimatedActionBase
 	}
 	
 	void OnFinishProgress( ActionData action_data )
-	{
+	{		
 		if(GetGame().IsServer())
 		{
 			OnFinishProgressServer(action_data);
@@ -180,7 +182,6 @@ class ActionContinuousBase : AnimatedActionBase
 			OnFinishProgressClient(action_data);
 		}
 		action_data.m_WasExecuted = false;
-	
 	}
 	
 	
