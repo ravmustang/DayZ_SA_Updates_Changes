@@ -345,7 +345,7 @@ class DayZPlayerType
 			GetGame().ConfigGetText(vegSoundsCfgPath + vegSoundParamName + " soundSet", soundSet);
 
 			TIntArray animEventIds = new TIntArray;
-			GetGame().ConfigGetIntArray(vegSoundsCfgPath + vegSoundParamName + " animEventIds", animEventIds)
+			GetGame().ConfigGetIntArray(vegSoundsCfgPath + vegSoundParamName + " animEventIds", animEventIds);
 
 			SoundParams soundParams = new SoundParams(soundSet);
 
