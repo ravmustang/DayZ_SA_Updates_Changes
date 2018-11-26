@@ -50,7 +50,7 @@ class ActionStartEngine: ActionContinuousBase
 			if ( trans )
 			{
 				Car car;
-				if ( Class.CastTo(car, trans) && !car.IsEngineOn() )
+				if ( Class.CastTo(car, trans) && !car.EngineIsOn() )
 				{
 					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
 						return true;

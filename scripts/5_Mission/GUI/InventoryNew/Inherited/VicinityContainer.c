@@ -459,12 +459,17 @@ class VicinityContainer: CollapsibleContainer
 		
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		if ( ( ItemBase.Cast( receiver_item ) ).CanBeCombined( ItemBase.Cast( item ) ) )
 		{
 			( ItemBase.Cast( receiver_item ) ).CombineItemsClient( ItemBase.Cast( item ) );
 		}
 		else if( GameInventory.CanSwapEntities( receiver_item, item ) )
 		{
+			if( !receiver_item.GetInventory().CanRemoveEntity() )
+				return;
 			player.PredictiveSwapEntities( item, receiver_item );
 		}
 		else if( player.CanDropEntity( item ) )
@@ -515,7 +520,10 @@ class VicinityContainer: CollapsibleContainer
 		}
 		
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		if( player.CanDropEntity( item ) )
 		{
 			ItemBase item_base = ItemBase.Cast( item );

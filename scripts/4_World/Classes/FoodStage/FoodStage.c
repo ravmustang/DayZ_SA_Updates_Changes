@@ -263,14 +263,11 @@ class FoodStage
 		}
 		
 		//refresh visual
-		RefreshVisuals();
+		GetFoodItem().Synchronize();
 	}	
 
 	void RefreshVisuals()
 	{
-		if ( GetGame() && GetGame().IsServer() )
-		{
-
 			Edible_Base food_item = GetFoodItem();
 			
 			//if item has no food stages
@@ -310,7 +307,6 @@ class FoodStage
 			food_item.SetObjectTexture( GetSelectionIndex(), config_textures.Get( GetTextureIndex() ) );
 			//set materials
 			food_item.SetObjectMaterial( GetSelectionIndex(), config_materials.Get( GetMaterialIndex() ) );
-		}
 	}
 
 	//Food States

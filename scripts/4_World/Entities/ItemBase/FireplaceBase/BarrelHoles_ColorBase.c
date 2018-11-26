@@ -22,6 +22,14 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
+	override void EEInit()
+	{
+		super.EEInit();
+		
+		//hide in inventory
+		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
+	}
+	
 	/*override bool IsHeavyBehaviour()
 	{
 		return true;
@@ -161,7 +169,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 			
 			//remove audio visuals
 			Bottle_Base cooking_pot = Bottle_Base.Cast( item );
-			cooking_pot.RemoveAudioVisuals();	
+			cooking_pot.RemoveAudioVisualsOnClient();	
 		}
 		
 		//refresh fireplace visuals
@@ -262,7 +270,10 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		//refresh
 		RefreshFireParticlesAndSounds( true );
-				
+		
+		//show in inventory
+		GetInventory().UnlockInventory(HIDE_INV_FROM_SCRIPT);
+		
 		SoundSynchRemote();
 	}
 	
@@ -283,6 +294,9 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		//refresh
 		RefreshFireParticlesAndSounds( true );
+		
+		//hide in inventory
+		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
 		
 		SoundSynchRemote();
 	}
@@ -335,7 +349,11 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		return IsBurning();
 	}
 	
-	override void OnIgnitedTarget( EntityAI fire_source )
+	override void OnIgnitedTarget( EntityAI ignited_item )
+	{
+	}
+	
+	override void OnIgnitedThis( EntityAI fire_source )
 	{	
 		//remove grass
 		Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , GetPosition() );
@@ -349,7 +367,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 	void DestroyClutterCutter( Object clutter_cutter )
 	{
 		GetGame().ObjectDelete( clutter_cutter );
-	}
+	}	
 	
 	override bool IsThisIgnitionSuccessful( EntityAI item_source = NULL )
 	{

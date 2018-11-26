@@ -48,16 +48,35 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		}
 	}
 	
+	override void RecomputeOpenedContainers()
+	{
+		m_OpenedContainers.Clear();
+		m_OpenedContainers.Insert( m_Body[0] );
+		for ( int i = 0; i < m_Body.Count(); i++ )
+		{
+			ClosableContainer cnt = ClosableContainer.Cast( m_Body.Get( i ) );
+			if( cnt && cnt.IsOpened() )
+			{
+				m_OpenedContainers.Insert( cnt );
+			}
+			AttachmentCategoriesSlotsContainer att_cnt = AttachmentCategoriesSlotsContainer.Cast( m_Body.Get( i ) );
+			if( att_cnt )
+			{
+				m_OpenedContainers.Insert( att_cnt );
+			}
+		}
+	}
+	
 	override void SelectItem()
 	{
 		GetFocusedContainer().SelectItem();	
 	}
 	
-	/*void SetLastActive()
+	override void MoveGridCursor( int direction )
 	{
-		Container cont = Container.Cast( m_Body[m_Body.Count() - 1] );
-		cont.SetActive( true );
-	}*/
+		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
+		active_container.MoveGridCursor( direction );
+	}
 	
 	void LoadAttachmentCategoriesIcon( SlotsContainer items_cont, string icon_name, int slot_number )
 	{
@@ -80,7 +99,7 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		return GetGame().ConfigGetChildrenCount( config_path );
 	}
 
-	private SlotsContainer GetSlotsContainer( int icons_row )
+	SlotsContainer GetSlotsContainer( int icons_row )
 	{
 		AttachmentCategoriesSlotsContainer items_cont;
 		items_cont = AttachmentCategoriesSlotsContainer.Cast( m_Body.Get( icons_row + 1 ) );
@@ -136,11 +155,11 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		string config_path_attachment_categories = "CfgVehicles " + type + " GUIInventoryAttachmentsProps";
 
 		int attachments_categories_count = GetAttachmentCategoriesCount( config_path_attachment_categories );
-		AttachmentCategoriesSlotsContainer items_cont;
 		for ( int i = 0; i < (attachments_categories_count/7) + 1; i++ )
 		{
-			items_cont = new AttachmentCategoriesSlotsContainer(this);
+			ref AttachmentCategoriesSlotsContainer items_cont = new AttachmentCategoriesSlotsContainer(this);
 			m_Body.Insert(items_cont);
+			m_OpenedContainers.Insert(items_cont);
 		}
 	}
 	
@@ -278,12 +297,12 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 			iw = ItemPreviewWidget.Cast( w );
 		}
 		if( !iw.GetItem() )
-		return;
-		if( m_Entity.GetInventory().CanAddAttachment( iw.GetItem() ) )
+			return;
+		if( m_Entity.GetInventory().CanAddAttachment( iw.GetItem() ) && iw.GetItem().GetInventory().CanRemoveEntity() )
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToTargetAttachment( m_Entity, iw.GetItem() );
 		}
-		else if ( m_Entity.GetInventory().CanAddEntityToInventory( iw.GetItem() ))
+		else if ( m_Entity.GetInventory().CanAddEntityToInventory( iw.GetItem() ) && iw.GetItem().GetInventory().CanRemoveEntity() )
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( m_Entity, FindInventoryLocationType.ANY, iw.GetItem() );
 		}

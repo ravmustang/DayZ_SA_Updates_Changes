@@ -7,6 +7,12 @@ class CZ61 : RifleBoltLock_Base
 	{
 	}
 	
+	
+	override RecoilBase SpawnRecoilObject()
+	{
+		return new Cz61Recoil(this);
+	}
+	
 	//some command is different for this weapon
 	override int GetWeaponSpecificCommand(int weaponAction ,int subCommand)
 	{

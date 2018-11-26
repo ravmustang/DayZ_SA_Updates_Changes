@@ -58,9 +58,15 @@ enum CarGear
 //!	Base native class for all motorized wheeled vehicles.
 class Car extends Transport
 {
+	//!	Returns the instance of vehicle's controller.
+	proto native CarController GetController();
+
 	//!	Returns the current speed of the vehicle in km/h.
 	proto native float GetSpeedometer();
-	
+
+//-----------------------------------------------------------------------------
+// fluids
+
 	/*!
 		Returns tank capacity for the specified vehicle's fluid.
 
@@ -79,23 +85,36 @@ class Car extends Transport
 	//! Removes from the specified fluid the specified amount.
 	proto native void Leak( CarFluid fluid, float amount );
 
+	//! Removes all the specified fluid from vehicle.
+	proto native void LeakAll( CarFluid fluid );
+
 	//! Adds to the specified fluid the specified amount.
 	proto native void Fill( CarFluid fluid, float amount );
+//-----------------------------------------------------------------------------
 
-	//!	Returns the instance of vehicle's controller.
-	proto native CarController GetController();
+
+//-----------------------------------------------------------------------------
+// engine
+
+	//! Returns engine's max rpm before engine blows up.
+	proto native float EngineGetRPMMax();
+
+	//! Returns engine's maximal working rpm without damaging the engine.
+	proto native float EngineGetRPMRedline();
 
 	//! Returns engine's rpm value.
-	proto native float GetEngineRPM();
+	proto native float EngineGetRPM();
 
 	//! Returns true when engine is running, false otherwise.
-	proto native bool IsEngineOn();
+	proto native bool EngineIsOn();
 
 	//! Starts the engine.
 	proto native void EngineStart();
 
 	//! Stops the engine.
 	proto native void EngineStop();
+
+//-----------------------------------------------------------------------------
 
 	//! Returns total number of gears.
 	proto native int GetGearsCount();

@@ -12,6 +12,7 @@ class RecoilBase
 	float m_MouseOffsetRangeMin;//in degrees min
 	float m_MouseOffsetRangeMax;//in degrees max
 	float m_MouseOffsetRelativeTime = 1;//[0..1] a time it takes to move the mouse the required distance relative to the reload time of the weapon(firing mode)
+	float m_HandsOffsetRelativeTime = 1;//[0..1] a time it takes to move the hands the required distance given by the curve relative to the reload time of the weapon(firing mode)
 	float m_MouseOffsetDistance;//how far should the mouse travel
 	
 	//protected float m_MouseOffsetResult;//in degrees max
@@ -71,18 +72,10 @@ class RecoilBase
 	// called externally per update, not to be overriden in children
 	void Update( out float axis_mouse_x, out float axis_mouse_y, out float axis_hands_x, out float axis_hands_y, float pDt )
 	{
-		m_Time += pDt;
-		
-		if( m_Time >= m_ReloadTime )
-		{
-			Destroy();
-		}
-		
 		if( m_DeleteRequested )
 		{
 			delete this;
 		}
-		
 		
 		ApplyMouseOffset(pDt, axis_mouse_x, axis_mouse_y);
 		ApplyHandsOffset(pDt, axis_hands_x, axis_hands_y);
@@ -94,38 +87,44 @@ class RecoilBase
 		
 		axis_hands_x = axis_hands_x * recoil_modifier[0];
 		axis_hands_y = axis_hands_y * recoil_modifier[1];
+	
+		
+		if( m_Time >= m_ReloadTime )
+		{
+			Destroy();
+		}
+		
+		m_Time += pDt;
 		
 		
-		
-
 	}
 	
 	void ApplyHandsOffset(float pDt, out float pRecResultX, out float pRecResultY)
 	{
 		float time_normalized = Math.InverseLerp(0, m_ReloadTime, m_Time);
 		time_normalized = Math.Clamp(time_normalized, 0,0.99);
-
-		
-		vector pos_on_curve = GetPositionOnCurve(m_HandsCurvePoints, time_normalized);
-		
+		float relative_time = time_normalized / Math.Clamp(m_HandsOffsetRelativeTime, 0.001,1);
+		vector pos_on_curve = GetPositionOnCurve(m_HandsCurvePoints, relative_time);
+		/*
 		float offset_x = pos_on_curve[0] - m_LastPosOnCurve[0];
 		float offset_y = pos_on_curve[1] - m_LastPosOnCurve[1];
 		
 		m_LastPosOnCurve = pos_on_curve;
-		
+		*/
 		if(m_DebugMode)
 		{
 			PrintString("normalized time: " + time_normalized.ToString());
 			PrintString("elapsed time: " + m_Time.ToString());
 			PrintString("curve pos x: " + pos_on_curve[0].ToString());
 			PrintString("curve pos y: " + pos_on_curve[1].ToString());
+			PrintString("relative_time: " + relative_time.ToString());
 			
-			PrintString("hands offset_x: " + offset_x.ToString());
-			PrintString("hands offset_y: " + offset_y.ToString());
+			//PrintString("hands offset_x: " + offset_x.ToString());
+			//PrintString("hands offset_y: " + offset_y.ToString());
 		}
 		
-		pRecResultX = offset_x;
-		pRecResultY = offset_y;
+		pRecResultX = pos_on_curve[0];
+		pRecResultY = pos_on_curve[1];
 	}
 	
 	void ApplyMouseOffset(float pDt, out float pRecResultX, out float pRecResultY)

@@ -2,7 +2,7 @@ class ActionDestroyPartCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousTime(UATimeSpent.DEFAULT_DESTROY);
+		m_ActionData.m_ActionComponent = new CAContinuousTime( UATimeSpent.DEFAULT_DESTROY );
 	}
 };
 
@@ -21,7 +21,7 @@ class ActionDestroyPart: ActionContinuousBase
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINonRuined;
-		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.BASEBUILDING);
+		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.BASEBUILDING );
 	}
 
 	override int GetType()
@@ -61,7 +61,7 @@ class ActionDestroyPart: ActionContinuousBase
 			if ( construction_part && base_building.IsFacingFront( player ) )
 			{
 				//if part is base but more attachments are present
-				if ( base_building.HasAttachmentsBesidesBase() )
+				if ( construction_part.IsBase() && base_building.HasAttachmentsBesidesBase() )
 				{
 					return false;
 				}
@@ -89,11 +89,7 @@ class ActionDestroyPart: ActionContinuousBase
 			construction.DestroyPart( construction_part.GetPartName() );
 			
 			//add damage to tool
-			action_data.m_MainItem.DecreaseHealth ( "", "", 2, true );
-		}
-		else
-		{
-			SendMessageToClient( action_data.m_Player, base_building.MESSAGE_CANNOT_BE_DECONSTRUCTED );
+			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DESTROY );
 		}
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

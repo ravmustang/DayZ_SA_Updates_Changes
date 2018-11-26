@@ -10,8 +10,11 @@ class Edible_Base extends ItemBase
 		}
 		
 		//synchronized variables
-		RegisterNetSyncVariableInt( "m_FoodStage.m_FoodStageType", FoodStageType.NONE, FoodStageType.COUNT );
-		RegisterNetSyncVariableFloat( "m_FoodStage.m_CookingTime", 0, 600, 0 );						//min = 0; max = 0; precision = 0;
+		RegisterNetSyncVariableInt( "m_FoodStage.m_FoodStageType", 	FoodStageType.NONE, FoodStageType.COUNT );
+		RegisterNetSyncVariableInt( "m_FoodStage.m_SelectionIndex", 0, 6 );
+		RegisterNetSyncVariableInt( "m_FoodStage.m_TextureIndex", 	0, 6 );
+		RegisterNetSyncVariableInt( "m_FoodStage.m_MaterialIndex", 	0, 6 );
+		RegisterNetSyncVariableFloat( "m_FoodStage.m_CookingTime", 	0, 600, 0 );						//min = 0; max = 0; precision = 0;
 	}
 	
 	override void EEInit()
@@ -26,6 +29,30 @@ class Edible_Base extends ItemBase
 	{
 		GetFoodStage().RefreshVisuals();
 	}
+	
+	//================================================================
+	// SYNCHRONIZATION
+	//================================================================	
+	void Synchronize()
+	{
+		if ( GetGame().IsServer() )
+		{
+			SetSynchDirty();
+			
+			if ( GetGame().IsMultiplayer() )
+			{
+				RefreshVisuals();
+			}
+		}
+	}
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+		
+		//refresh visuals
+		RefreshVisuals();
+	}	
 	
 	//================================================================
 	// SERIALIZATION
@@ -72,22 +99,9 @@ class Edible_Base extends ItemBase
 		GetFoodStage().SetMaterialIndex( material_idx );
 		
 		//refresh visual after load
-		RefreshVisuals();
+		Synchronize();
 	}
-	
-	//================================================================
-	// SYNCHRONIZATION
-	//================================================================	
-	void Synchronize()
-	{
-		SetSynchDirty();
-	}
-	
-	override void OnVariablesSynchronized()
-	{
-		super.OnVariablesSynchronized();
-	}
-	
+
 	//get food stage
 	FoodStage GetFoodStage()
 	{
@@ -242,6 +256,7 @@ class Edible_Base extends ItemBase
 		Synchronize();
 	}
 	
+	//replace edible with new item (opening cans)
 	void ReplaceEdibleWithNew (string typeName)
 	{
 		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());

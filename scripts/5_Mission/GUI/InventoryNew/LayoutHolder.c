@@ -92,6 +92,7 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 
 	void SetActive( bool active )
 	{
+		m_IsActive = active;
 	}
 
 	bool IsActive()

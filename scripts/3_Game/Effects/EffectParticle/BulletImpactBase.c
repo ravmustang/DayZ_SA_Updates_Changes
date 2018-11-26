@@ -293,7 +293,11 @@ class EffBulletImpactBase : EffectParticle
 			if (scaling_by_distance > 1.1)
 			{
 				Particle p_distant = Particle.Play(ParticleList.IMPACT_DISTANT_DUST, m_Pos);
-							
+				
+				particle_orientation = m_SurfNormal.VectorToAngles();
+				particle_orientation[1] = particle_orientation[1] + 270;
+				p_distant.SetOrientation(particle_orientation);
+				
 				p_distant.ScaleParticleParam(EmitorParam.SIZE, scaling_by_distance - 0.5);
 				p_distant.ScaleParticleParam(EmitorParam.BIRTH_RATE, scaling_by_distance * 0.1);
 				p_distant.ScaleParticleParam(EmitorParam.BIRTH_RATE_RND, scaling_by_distance * 0.1);

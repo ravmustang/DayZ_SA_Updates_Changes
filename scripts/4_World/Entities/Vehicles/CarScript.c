@@ -139,7 +139,7 @@ class CarScript extends Car
 			m_Time = 0;
 
 			//! actions runned when the engine on
-			if ( IsEngineOn()  )
+			if ( EngineIsOn()  )
 			{
 				if ( GetGame().IsServer() )
 				{

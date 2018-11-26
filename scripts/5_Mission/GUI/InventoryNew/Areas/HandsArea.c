@@ -209,10 +209,13 @@ class HandsArea: LayoutHolder
 		  ipw = ItemPreviewWidget.Cast( w );
 		}
 		
-		if( !ipw || ipw.GetItem() == NULL || !ipw.IsInherited( ItemPreviewWidget ) )
+		if( !ipw || !ipw.GetItem() || !ipw.IsInherited( ItemPreviewWidget ) )
 		{
 			return;
 		}
+		
+		if( !ipw.GetItem().GetInventory().CanRemoveEntity() )
+			return;
 		
 		if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( ipw.GetItem() ) )
 		{

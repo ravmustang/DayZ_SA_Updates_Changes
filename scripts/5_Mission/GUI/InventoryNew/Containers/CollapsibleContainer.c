@@ -110,7 +110,13 @@ class CollapsibleContainer: Container
 	
 	void SetFirstActive()
 	{
-		Container cont = Container.Cast( m_Body[1] );
+		Container cont = Container.Cast( m_Body[m_ActiveIndex] );
+		if( m_ActiveIndex != 1 && cont )
+			cont.SetActive( false );
+		if( m_FocusedContainer )
+			m_FocusedContainer.SetActive( false );
+		
+		cont = Container.Cast( m_Body[1] );
 		cont.SetActive( true );
 		SetFocusedContainer( cont );
 		m_ActiveIndex = 1;
@@ -118,7 +124,13 @@ class CollapsibleContainer: Container
 	
 	void SetLastActive()
 	{
-		Container cont = Container.Cast( m_Body[Count() - 1] );
+		Container cont = Container.Cast( m_Body[m_ActiveIndex] );
+		if( cont )
+			cont.SetActive( false );
+		if( m_FocusedContainer )
+			m_FocusedContainer.SetActive( false );
+		
+		cont = Container.Cast( m_Body[Count() - 1] );
 		cont.SetActive( true );
 		SetFocusedContainer( cont );
 		m_ActiveIndex = Count() - 1;
@@ -127,6 +139,7 @@ class CollapsibleContainer: Container
 	override void SetActive( bool active )
 	{
 		Container cont;
+		m_IsActive = active;
 		if( active )
 		{
 			cont = Container.Cast( m_Body[1] );

@@ -27,8 +27,8 @@ class ActionDropItem: ActionSingleUseBase
 	void ActionDropItem()
 	{
 		m_MessageSuccess    = "";
-		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_INVENTORY;
-		m_CommandUIDProne	= DayZPlayerConstants.CMD_ACTIONFB_PICKUP_INVENTORY;
+		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_DROPITEM_HANDS;
+		m_CommandUIDProne	= DayZPlayerConstants.CMD_ACTIONFB_DROPITEM_HANDS;
 		m_CallbackClass 	= ActionDropItemCB;
 		//m_HUDCursorIcon     = CursorIcons.LootCorpse;
 	}
@@ -51,7 +51,7 @@ class ActionDropItem: ActionSingleUseBase
 	
 	override bool HasProneException()
 	{
-		return false;
+		return true;
 	}
 	
 	override bool HasTarget()

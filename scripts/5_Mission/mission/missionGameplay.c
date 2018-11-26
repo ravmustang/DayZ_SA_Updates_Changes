@@ -376,7 +376,8 @@ class MissionGameplay extends MissionBase
 			}
 		}
 		
-		if(GetUApi().GetInputByName("UADropItem").LocalPress())
+		//if(GetUApi().GetInputByName("UADropitem").LocalPress())
+		if(input.GetActionDown(UADropitem, false))
 		{
 			//drops item
 			if (playerPB && playerPB.GetItemInHands() && !GetUIManager().GetMenu())
@@ -921,10 +922,11 @@ class MissionGameplay extends MissionBase
 	
 	override void Pause()
 	{
-		if ( IsPaused() || g_Game.IsPlayerSpawning() )
-		{
+		if ( IsPaused() )
 			return;
-		} 
+
+		if ( g_Game.IsClient() && g_Game.IsPlayerSpawning() )
+			return;
 		
 		CloseAllMenus();
 		

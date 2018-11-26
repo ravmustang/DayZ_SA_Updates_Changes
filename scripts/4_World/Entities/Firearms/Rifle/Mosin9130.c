@@ -270,3 +270,11 @@ class Mosin9130 extends Mosin9130_Base
 		return new MosinRecoil(this);
 	}
 };
+
+class SawedoffMosin9130_Base extends Mosin9130_Base
+{
+	override RecoilBase SpawnRecoilObject()
+	{
+		return new MosinSawedOffRecoil(this);
+	}
+};

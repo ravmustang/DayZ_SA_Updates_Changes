@@ -573,13 +573,20 @@ class OnlineServices
 		return false;
 	}
 	
-	static void CheckUpdate()
+	static bool CheckUpdate()
 	{
 		GetClientServices();
 		if ( m_ClientServices )
 		{
-			m_ClientServices.GetPackageService().CheckUpdateAsync();
+			EBiosError error = m_ClientServices.GetPackageService().CheckUpdateAsync();
+			
+			if ( !error )
+			{
+				return true;
+			}
 		}
+		
+		return false;
 	}
 	
 	static void PromptUpdate()

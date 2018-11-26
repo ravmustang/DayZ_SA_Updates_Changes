@@ -431,7 +431,11 @@ class DayZPlayerImplement extends DayZPlayer
 	void RequestSoundEvent(EPlayerSoundEventID id, bool from_server_and_client = false);
 	protected void SendSoundEvent(EPlayerSoundEventID id);
 	
-	override void OnItemInHandsChanged () { GetItemAccessor().OnItemInHandsChanged(); }
+	override void OnItemInHandsChanged ()
+	{
+		Print("inv: DayZPlayerImplement::OnItemInHandsChanged");
+		GetItemAccessor().OnItemInHandsChanged();
+	}
 
 	WeaponManager GetWeaponManager () { return null; }
 
@@ -524,16 +528,14 @@ class DayZPlayerImplement extends DayZPlayer
 			m_IsFireWeaponRaised = true;
 		
 		
-		#ifdef PLATFORM_XBOX
-			if ( !pInputs.IsMeleeFastAttackModifier() )
-			{
-		#else
-		#ifdef PLATFORM_PS4
+		#ifdef PLATFORM_CONSOLE
 			if ( !pInputs.IsMeleeFastAttackModifier() )
 			{
 		#endif
+		#ifdef SERVER_FOR_CONSOLE
+			if ( !pInputs.IsMeleeFastAttackModifier() )
+			{
 		#endif
-		
 		
 		//! fire
 		if (!m_LiftWeapon_player && weapon && !weapon.IsDamageDestroyed() && weapon.CanProcessWeaponEvents() )
@@ -555,13 +557,12 @@ class DayZPlayerImplement extends DayZPlayer
 				}
 			}
 		}
-				
-		#ifdef PLATFORM_XBOX
-			}
-		#else
-		#ifdef PLATFORM_PS4
+		
+		#ifdef PLATFORM_CONSOLE
 			}
 		#endif
+		#ifdef SERVER_FOR_CONSOLE
+			}
 		#endif
 	}
 	
@@ -987,8 +988,8 @@ class DayZPlayerImplement extends DayZPlayer
 
 	#ifdef WIP_INPUTS
 		camChange = hic.CameraViewChanged();
-		if( IsCameraBlending() )
-			camChange = false; // do not switch camera, while still switching
+//		if( IsCameraBlending() )
+//			camChange = false; // do not switch camera, while still switching
 	#else
 		camChange = hic.CameraViewChanged();
 	#endif
@@ -1160,7 +1161,7 @@ class DayZPlayerImplement extends DayZPlayer
 			m_CameraEyeZoom = true;
 			//Print("To EyeZoom " +  m_CameraEyeZoom.ToString());
 		}
-		else if (!hic.IsZoom() && m_CameraEyeZoom )
+		else if (input.GetActionUp(UAZoomIn, false) && m_CameraEyeZoom )
 		{
 			//Print("From EyeZoom " +  m_CameraEyeZoom.ToString());
 			m_CameraEyeZoom = false;
@@ -2001,7 +2002,7 @@ class DayZPlayerImplement extends DayZPlayer
 			if (soundBuilder != NULL && GetGame().GetPlayer())
 			{
 				vector orientation = Vector(0, 0, 0);
-				vector edgeLength = Vector(2, 2, 2);
+				vector edgeLength = Vector(0.5, 1.5, 0.5);
 				array<Object> excludedObjects = new array<Object>;
 				array<Object> collidedObjects = new array<Object>;
 				
@@ -2022,9 +2023,7 @@ class DayZPlayerImplement extends DayZPlayer
 									SoundObjectBuilder vegSoundObjectBuilder = vegetationSound.GetSoundObjectBuilder();
 									SoundObject vegSoundObject = vegetationSound.GetSoundObjectBuilder().BuildSoundObject();
 									
-									vegSoundObject.SetPosition(GetPosition());
-									GetGame().GetSoundScene().Play3D(vegSoundObject, vegSoundObjectBuilder);
-									//PlaySound(vegSoundObject, vegSoundObjectBuilder);
+									PlaySound(vegSoundObject, vegSoundObjectBuilder);
 									
 									break;
 								}

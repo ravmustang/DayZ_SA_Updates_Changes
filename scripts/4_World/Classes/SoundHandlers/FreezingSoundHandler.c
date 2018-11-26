@@ -12,7 +12,7 @@ class FreezingSoundHandlerBase extends SoundHandlerBase
 //---------------------------
 class FreezingSoundHandlerClient extends FreezingSoundHandlerBase
 {
-	const float SOUND_INTERVALS_LIGHT_MIN = 5;	const float SOUND_INTERVALS_LIGHT_MAX = 15;
+	const float SOUND_INTERVALS_LIGHT_MIN = 5;	const float SOUND_INTERVALS_LIGHT_MAX = 20;
 	float m_SoundTime;
 	EffectSound m_Sound;
 	

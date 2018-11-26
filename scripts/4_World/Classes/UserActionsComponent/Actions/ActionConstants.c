@@ -95,3 +95,13 @@ class UASoftSkillsWeight
 	const float PRECISE_MEDIUM = -0.02;
 	const float PRECISE_HIGH = -0.03;
 };
+
+/**@class	Constants for damage values that are applied to item when using certain action
+ */
+class UADamageApplied
+{
+	const float BUILD 		= 5;
+	const float DISMANTLE 	= 5;
+	const float DESTROY 	= 20;
+	const float SAW_LOCK 	= 50;
+};

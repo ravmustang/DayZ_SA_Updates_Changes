@@ -1,15 +1,15 @@
 class Icon: LayoutHolder
 {
 	int m_sizeX, m_sizeY, m_posX, m_posY;
-	protected Widget m_WhiteBackground ;
-	protected EntityAI m_Obj;
-	ref array<Widget> m_WhiteBackgrounds;
-	ref array<ref Pos> m_Pos;
-	protected bool m_HandsIcon;
-	protected int m_CargoPos;
-	protected bool m_IsDragged;
-	protected EntityAI m_am_entity1, m_am_entity2;
-	protected ref array<ref Timer> m_Timers;
+	protected Widget				m_WhiteBackground;
+	protected EntityAI				m_Obj;
+	ref array<Widget>				m_WhiteBackgrounds;
+	ref array<ref Pos>				m_Pos;
+	protected bool					m_HandsIcon;
+	protected int					m_CargoPos;
+	protected bool					m_IsDragged;
+	protected EntityAI				m_am_entity1, m_am_entity2;
+	protected ref array<ref Timer>	m_Timers;
 
 	const int NUMBER_OF_TIMERS = 2;
 
@@ -55,7 +55,6 @@ class Icon: LayoutHolder
 	
 	override void SetParentWidget()
 	{
-		//#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		if( m_Parent.IsInherited( HandsPreview ) )
 		{ 
@@ -65,7 +64,6 @@ class Icon: LayoutHolder
 		{
 			if( m_Parent != NULL )
 			{
-				//m_ParentWidget = m_Parent.GetMainWidget().FindAnyWidget("Icon9");
 				ContainerWithCargo iwc = ContainerWithCargo.Cast( m_Parent.m_Parent );
 				ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent );
 				if( iwc )
@@ -86,7 +84,6 @@ class Icon: LayoutHolder
 		#else
 		super.SetParentWidget();
 		#endif
-		//#endif
 	}
 
 	void RefreshQuickbar()
@@ -101,107 +98,115 @@ class Icon: LayoutHolder
 
 	void DoubleClick(Widget w, int x, int y, int button)
 	{
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if( player.GetInventory().HasInventoryReservation( m_Obj, NULL ) || player.GetInventory().IsInventoryLocked() )
+		if( button == MouseState.LEFT )
 		{
-			return;
-		}
-		
-		InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu( MENU_INVENTORY ) );
-		if( w == NULL )
-		{
-			return;
-		}
-		ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-		if( !iw )
-		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		}
-		if( !iw )
-		{
-		  iw = ItemPreviewWidget.Cast( w );
-		}
-		if( !iw.GetItem() )
-		{
-			return;
-		}
-
-		EntityAI item = iw.GetItem();
-		
-		if( m_HandsIcon )
-		{
-			if( player.GetHumanInventory().CanRemoveEntityInHands() )
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+			if( player.GetInventory().HasInventoryReservation( m_Obj, NULL ) || player.GetInventory().IsInventoryLocked() )
 			{
-				player.PredictiveMoveItemFromHandsToInventory();
+				return;
 			}
+			
+			InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu( MENU_INVENTORY ) );
+			if( w == NULL )
+			{
+				return;
+			}
+			ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
+			if( !iw )
+			{
+			  string name = w.GetName();
+			  name.Replace( "PanelWidget", "Render" );
+			  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			}
+			
+			if( !iw )
+			{
+			  iw = ItemPreviewWidget.Cast( w );
+			}
+			
+			if( !iw.GetItem() )
+			{
+				return;
+			}
+	
+			EntityAI item = iw.GetItem();
+			
+			if( !item.GetInventory().CanRemoveEntity() )
+				return;
+			
+			if( m_HandsIcon )
+			{
+				if( player.GetHumanInventory().CanRemoveEntityInHands() )
+				{
+					player.PredictiveMoveItemFromHandsToInventory();
+				}
+				ItemManager.GetInstance().HideTooltip();
+				if ( menu )
+				{
+					menu.RefreshQuickbar();
+				}
+				return;
+			}
+	
+			InventoryLocation i1 = new InventoryLocation;
+			EntityAI hands_item = player.GetHumanInventory().GetEntityInHands();
+			EntityAI item_root_owner = item.GetHierarchyRoot();
+			
+			
+			if ( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
+			{
+				player.PredictiveTakeEntityToHands( item );
+			}
+			else if( hands_item && item_root_owner == GetGame().GetPlayer() )
+			{
+				/*if( hands_item.GetInventory().CanAddAttachment( item ) )
+				{
+					CombineItems( hands_item, item ); //INVTODO Check if wanted.
+				}
+				else */if( player.GetInventory().CanSwapEntities( item, hands_item ) )
+				{
+					player.PredictiveTakeEntityToHands( item );
+				}
+				else if( player.GetInventory().CanForceSwapEntities( item, hands_item, i1 ) )
+				{
+					player.PredictiveSwapEntities( item, hands_item );
+				}
+			}
+			else
+			{
+				bool found = false;
+				if( item.GetInventory().CanRemoveEntity())
+				{
+					InventoryLocation i2 = new InventoryLocation;
+					found = player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, i2 );
+					if ( found )
+					{
+						if ( i2.GetType() == FindInventoryLocationType.ATTACHMENT )
+						{
+							if ( i2.GetParent() != player )
+								found = false;
+						}
+					}
+				}
+				if ( found )
+				{
+					if (player.GetHumanInventory().CanAddEntityToInventory(item))
+						player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY, item);
+				}
+				else
+				{
+					if( player.GetHumanInventory().CanAddEntityInHands( item ) )
+					{
+						player.PredictiveTakeEntityToHands( item );
+					}
+				}
+			}
+	
 			ItemManager.GetInstance().HideTooltip();
 			if ( menu )
 			{
 				menu.RefreshQuickbar();
 			}
-			return;
-		}
-
-		InventoryLocation i1 = new InventoryLocation;
-		EntityAI hands_item = player.GetHumanInventory().GetEntityInHands();
-		EntityAI item_root_owner = item.GetHierarchyRoot();
-		
-		
-		if ( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
-		{
-			player.PredictiveTakeEntityToHands( item );
-		}
-		else if( hands_item && item_root_owner == GetGame().GetPlayer() )
-		{
-			/*if( hands_item.GetInventory().CanAddAttachment( item ) )
-			{
-				CombineItems( hands_item, item ); //INVTODO Check if wanted.
-			}
-			else */if( player.GetInventory().CanSwapEntities( item, hands_item ) )
-			{
-				player.PredictiveTakeEntityToHands( item );
-			}
-			else if( player.GetInventory().CanForceSwapEntities( item, hands_item, i1 ) )
-			{
-				player.PredictiveSwapEntities( item, hands_item );
-			}
-		}
-		else
-		{
-			bool found = false;
-			if( item.GetInventory().CanRemoveEntity())
-			{
-				InventoryLocation i2 = new InventoryLocation;
-				found = player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, i2 );
-				if ( found )
-				{
-					if ( i2.GetType() == FindInventoryLocationType.ATTACHMENT )
-					{
-						if ( i2.GetParent() != player )
-							found = false;
-					}
-				}
-			}
-			if ( found )
-			{
-				if (player.GetHumanInventory().CanAddEntityToInventory(item))
-					player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY, item);
-			}
-			else
-			{
-				if( player.GetHumanInventory().CanAddEntityInHands( item ) )
-				{
-					player.PredictiveTakeEntityToHands( item );
-				}
-			}
-		}
-
-		ItemManager.GetInstance().HideTooltip();
-		if ( menu )
-		{
-			menu.RefreshQuickbar();
 		}
 	}
 
@@ -914,8 +919,11 @@ class Icon: LayoutHolder
 	{
 		InventoryItem itemAtPos = InventoryItem.Cast( m_Obj );
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		bool draggable = !player.GetInventory().HasInventoryReservation( m_Obj, NULL ) && !player.GetInventory().IsInventoryLocked();
-		
+		InventoryLocation il = new InventoryLocation;
+		m_Obj.GetInventory().GetCurrentInventoryLocation( il );
+		bool draggable = !player.GetInventory().HasInventoryReservation( m_Obj, null ) && !player.GetInventory().IsInventoryLocked();
+		draggable = draggable && ( m_Obj.GetHierarchyRoot() && m_Obj.GetInventory().CanRemoveEntity() || !m_Obj.GetHierarchyRoot() && AttchmentsOutOfReach.IsAttachmentReachable( m_Obj, "", il.GetSlot() ) );
+				
 		ItemManager.GetInstance().SetWidgetDraggable( w, draggable );
 		
 		if ( button == MouseState.RIGHT )

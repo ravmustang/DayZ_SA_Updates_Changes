@@ -104,8 +104,9 @@ class ActionUnrestrainSelf: ActionContinuousBase
 		if(item_in_hands)
 		{
 			player.SetRestrained(false);
-			string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands);			
-			MiscGameplayFunctions.TurnItemInHandsIntoItemEx(player, new UnrestrainSelfPlayer(item_in_hands, new_item_name));
+			MiscGameplayFunctions.TransformRestrainItem(item_in_hands, null, null, player);
+			//string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands);			
+			//MiscGameplayFunctions.TurnItemInHandsIntoItemEx(player, new UnrestrainSelfPlayer(item_in_hands, new_item_name));
 		}
 	}
 	

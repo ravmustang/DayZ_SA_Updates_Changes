@@ -133,7 +133,7 @@ class PortableGasStove extends ItemBase
 		if ( GetCookingEquipment() )
 		{
 			Bottle_Base cooking_pot = Bottle_Base.Cast( GetCookingEquipment() );
-			cooking_pot.RemoveAudioVisuals();
+			cooking_pot.RemoveAudioVisualsOnClient();
 		}
 	}	
 	

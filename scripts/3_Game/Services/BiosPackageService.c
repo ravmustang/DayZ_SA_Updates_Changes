@@ -33,7 +33,10 @@ class BiosPackageService
 	*/
 	void OnCheckUpdate(BiosCheckUpdateResult checkUpdateResult, EBiosError error)
 	{
-		
+		if ( !error && ( checkUpdateResult.m_IsUpdate || checkUpdateResult.m_IsMandatory ) )
+		{
+			OnlineServices.PromptUpdate();
+		}
 	}
 	
 	

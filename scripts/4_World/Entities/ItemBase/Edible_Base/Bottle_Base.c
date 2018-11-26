@@ -26,6 +26,12 @@ class Bottle_Base extends Edible_Base
 	protected bool 				m_IsPouring;
 	protected bool 				m_IsEmptying;
 	
+	//cooking data
+	protected CookingMethodType 	m_CookingMethod;
+	protected bool 					m_CookingIsDone;
+	protected bool 					m_CookingIsEmpty;
+	protected bool 					m_CookingIsBurned;	
+	
 	//Boiling
 	const string SOUND_BOILING_EMPTY 		= "boilingWater";
 	const string SOUND_BOILING_START 		= "boilingWater";
@@ -49,6 +55,11 @@ class Bottle_Base extends Edible_Base
 		
 		RegisterNetSyncVariableBool("m_IsPouring");
 		RegisterNetSyncVariableBool("m_IsEmptying");
+		
+		RegisterNetSyncVariableInt( "m_CookingMethod", CookingMethodType.NONE, CookingMethodType.COUNT );
+		RegisterNetSyncVariableBool("m_CookingIsDone");
+		RegisterNetSyncVariableBool("m_CookingIsEmpty");
+		RegisterNetSyncVariableBool("m_CookingIsBurned");
 	}
 	
 	void ~Bottle_Base()
@@ -73,6 +84,13 @@ class Bottle_Base extends Edible_Base
 	//is_done - is the food baked, boiled, dried?
 	//is_empty - is cooking quipment (cargo) empty?
 	//is_burned - is any of the food items in the cargo in burned food stage?
+	override void Synchronize()
+	{
+		if ( GetGame() && GetGame().IsServer() )
+		{
+			SetSynchDirty();
+		}
+	}
 	
 	override void OnVariablesSynchronized()
 	{
@@ -97,6 +115,35 @@ class Bottle_Base extends Edible_Base
 		{
 			StopEmptyingSound();
 		}
+		
+		//refresh audio visuals
+		if ( m_CookingMethod != CookingMethodType.NONE )
+		{
+			RefreshAudioVisuals( m_CookingMethod, m_CookingIsDone, m_CookingIsEmpty, m_CookingIsBurned );
+		}
+		else
+		{
+			RemoveAudioVisuals();
+		}
+	}
+	
+	void RemoveAudioVisualsOnClient()
+	{
+		m_CookingMethod		= CookingMethodType.NONE;
+		
+		//synchronize
+		Synchronize();
+	}
+	
+	void RefreshAudioVisualsOnClient( CookingMethodType cooking_method, bool is_done, bool is_empty, bool is_burned )
+	{
+		m_CookingMethod		= cooking_method;
+		m_CookingIsDone 	= is_done;
+		m_CookingIsEmpty	= is_empty;
+		m_CookingIsBurned	= is_burned;
+		
+		//synchronize
+		Synchronize();
 	}
 	
 	void RefreshAudioVisuals( CookingMethodType cooking_method, bool is_done, bool is_empty, bool is_burned )
@@ -207,38 +254,33 @@ class Bottle_Base extends Edible_Base
 	//get position for steam particle
 	protected vector GetSteamPosition()
 	{
-		//TODO set steam position to pot (proxy) memory point (new hierarchy needed)
-		/*
-		vector steam_point_local_pos = GetSelectionPosition( "steam" );
-		vector steam_point_world_pos = ModelToWorld( steam_point_local_pos );
-		
-		return WorldToModel( steam_point_world_pos );
-		*/
-		
 		EntityAI parent = GetHierarchyParent();
 		vector particle_pos = parent.GetPosition();
 		float steam_offset = 0;
 		
-		if ( parent.IsInherited( PortableGasStove ) )
+		if ( parent )
 		{
-			steam_offset = 0.2;
-		}
-		else if ( parent.IsInherited( FireplaceBase ) )
-		{
-			FireplaceBase fireplace = FireplaceBase.Cast( parent );
-			
-			if ( fireplace.IsBaseFireplace() )
+			if ( parent.IsInherited( PortableGasStove ) )
 			{
-				steam_offset = 0.8;
+				steam_offset = 0.2;
 			}
-			else if ( fireplace.IsBarrelWithHoles() )
+			else if ( parent.IsInherited( FireplaceBase ) )
 			{
-				steam_offset = 1.1;
+				FireplaceBase fireplace = FireplaceBase.Cast( parent );
+				
+				if ( fireplace.IsBaseFireplace() )
+				{
+					steam_offset = 0.8;
+				}
+				else if ( fireplace.IsBarrelWithHoles() )
+				{
+					steam_offset = 1.1;
+				}
+				else if ( fireplace.IsFireplaceIndoor() )
+				{
+					steam_offset = 0.45;
+				}		
 			}
-			else if ( fireplace.IsFireplaceIndoor() )
-			{
-				steam_offset = 0.45;
-			}		
 		}
 		
 		particle_pos[1] = particle_pos[1] + steam_offset;

@@ -100,9 +100,11 @@ class ParticleList
 	
 	static const int GUN_CZ61						= RegisterParticle("weapon_shot_cz61_01");
 	static const int GUN_LONG_WINDED_SMOKE			= RegisterParticle("weapon_shot_winded_smoke");
+	static const int GUN_LONG_WINDED_SMOKE_SMALL	= RegisterParticle("weapon_shot_winded_smoke_small");
 	static const int SMOKING_BARREL					= RegisterParticle("smoking_barrel");
 	static const int SMOKING_BARREL_SMALL			= RegisterParticle("smoking_barrel_small");
 	static const int SMOKING_BARREL_STEAM			= RegisterParticle("smoking_barrel_steam");
+	static const int SMOKING_BARREL_STEAM_SMALL		= RegisterParticle("smoking_barrel_steam_small");
 	static const int SMOKING_BARREL_HOT				= RegisterParticle("smoking_barrel_heavy");
 	
 	// BULLET & MELEE IMPACTS
@@ -123,8 +125,8 @@ class ParticleList
 	static const int IMPACT_FOLIAGE_ENTER			= RegisterParticle("impacts/hit_foliage_ent_01");
 	static const int IMPACT_FOLIAGE_RICOCHET		= RegisterParticle("impacts/hit_foliage_ric_01");
 	static const int IMPACT_FOLIAGE_EXIT			= RegisterParticle("impacts/hit_foliage_ext_01");
-	static const int IMPACT_GRASS_ENTER				= RegisterParticle("impacts/hit_dirt_ent_01");
-	static const int IMPACT_GRASS_RICOCHET			= RegisterParticle("impacts/hit_dirt_ric_01");
+	static const int IMPACT_GRASS_ENTER				= RegisterParticle("impacts/hit_grass_ent_01");
+	static const int IMPACT_GRASS_RICOCHET			= RegisterParticle("impacts/hit_grass_ric_01");
 	static const int IMPACT_DIRT_ENTER				= RegisterParticle("impacts/hit_dirt_ent_01");
 	static const int IMPACT_DIRT_RICOCHET			= RegisterParticle("impacts/hit_dirt_ric_01");
 	static const int IMPACT_DIRT_EXIT				= RegisterParticle("impacts/hit_dirt_ext_01");

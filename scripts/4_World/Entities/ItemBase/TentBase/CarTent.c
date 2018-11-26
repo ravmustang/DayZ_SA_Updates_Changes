@@ -23,26 +23,17 @@ class CarTent extends TentBase
 	override void OnPlacementComplete( Man player )
 	{		
 		super.OnPlacementComplete( player );
-
-		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
-		{
-			SoundParams soundParams = new SoundParams("placeCarTent_SoundSet");
-			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-			SoundObject soundObject = soundBuilder.BuildSoundObject();
-			soundObject.SetPosition(GetPosition());
-			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
-		}		
 	}
-	
+
 	override string GetDeploySoundset()
 	{
-		return "cartent_deploy_SoundSet";
-	}	
+		return "placeCarTent_SoundSet";
+	}
 	
-	/*override bool IsHeavyBehaviour()
+	override string GetLoopDeploySoundset()
 	{
-		return true;
-	}*/
+		return "cartent_deploy_SoundSet";
+	}
 	
 	override bool IsDeployable()
 	{

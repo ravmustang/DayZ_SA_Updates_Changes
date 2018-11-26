@@ -121,9 +121,9 @@ class ReplaceWheelLambda : TurnItemIntoItemLambda
 		m_oldOri = old_item.GetOrientation();
 	}
 	
-	override protected void OnNewEntityCreated (EntityAI new_item)
+	override protected void OnSuccess (EntityAI new_item)
 	{
-		super.OnNewEntityCreated( new_item );
+		super.OnSuccess( new_item );
 		if (new_item)
 			new_item.SetOrientation( m_oldOri );
 	}

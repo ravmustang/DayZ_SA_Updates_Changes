@@ -360,7 +360,7 @@ class DayZAnimal extends DayZCreatureAI
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos);
 		
 		ComponentAnimalBleeding animal_bleeding = ComponentAnimalBleeding.Cast( GetComponent( COMP_TYPE_ANIMAL_BLEEDING ) );
-		animal_bleeding.CreateWound( dmgZone, ammo );
+		animal_bleeding.CreateWound( damageResult, dmgZone, ammo );
 		
 		int type = 0;
 		int direction = 0;

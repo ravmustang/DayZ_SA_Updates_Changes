@@ -25,7 +25,7 @@ class ActiondeployObjectCB : ActionContinuousBaseCB
 		if (m_ActionData.m_State == UA_CANCEL )
 		{
 			m_Canceled = true;
- 			SetCommand(DayZPlayerConstants.CMD_ACTIONINT_INTERRUPT);
+ 			SetCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 			return;
 		}
 	}
@@ -197,6 +197,7 @@ class ActionDeployObject: ActionContinuousBase
 			
 			GetGame().AddActionJuncture( action_data.m_Player, entity_for_placing, 10000 );
 			action_data.m_MainItem.SetIsBeingPlaced( true );
+			action_data.m_MainItem.SoundSynchRemote();
 		}
 		else
 		{
@@ -249,7 +250,8 @@ class ActionDeployObject: ActionContinuousBase
 		GetGame().ClearJuncture( action_data.m_Player, entity_for_placing );
 		action_data.m_MainItem.SetIsBeingPlaced( false );
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
-		poActionData.m_AlreadyPlaced = true;
+		poActionData.m_AlreadyPlaced = true;	
+		action_data.m_MainItem.SoundSynchRemoteReset();
 	}
 	
 	override void OnEndClient( ActionData action_data  )
@@ -278,6 +280,7 @@ class ActionDeployObject: ActionContinuousBase
 			if ( GetGame().IsMultiplayer() )
 			{	
 				action_data.m_Player.PlacingCancelServer();
+				action_data.m_MainItem.SoundSynchRemoteReset();
 			}
 			else
 			{
@@ -383,7 +386,7 @@ class ActionDeployObject: ActionContinuousBase
 			}
 			else
 			{
-				Print("check " + item + " behaviour");
+				Print("Error: check " + item + " behaviour");
 			}
 		}
 		else
@@ -402,7 +405,7 @@ class ActionDeployObject: ActionContinuousBase
 			}
 			else
 			{
-				Print("check " + item + " behaviour");
+				Print("Error: check " + item + " behaviour");
 			}
 		}
 	}

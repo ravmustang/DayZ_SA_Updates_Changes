@@ -271,38 +271,25 @@ class FireplaceBase extends ItemBase
 		{
 			if ( GetGame() && GetGame().IsServer() ) 
 			{
-				StartFire();
+				StartFire();			//will be auto-synchronized when starting fire
 			}
 		}
 	}
-	
-	/*
-	override void EEOnAfterLoad()
-	{
-		super.EEOnAfterLoad();
-		
-		//refresh visual after load
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
-	}
-	*/
 	
 	//================================================================
 	// SYNCHRONIZATION
 	//================================================================	
 	void Synchronize()
 	{
-		if ( GetGame() && GetGame().IsMultiplayer() && GetGame().IsServer() )
+		if ( GetGame() && GetGame().IsServer() )
 		{
 			SetSynchDirty();
 			
-			//Refresh visuals (on server)
-			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
-		}
-		else
-		{
-			//Refresh local visuals
-			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
-			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireParticlesAndSounds, false );
+			if ( GetGame().IsMultiplayer() )
+			{
+				//Refresh visuals (on server)
+				GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
+			}
 		}
 	}
 	
@@ -1492,7 +1479,7 @@ class FireplaceBase extends ItemBase
 		if ( GetCookingEquipment() )
 		{
 			Bottle_Base cooking_pot = Bottle_Base.Cast( GetCookingEquipment() );
-			cooking_pot.RemoveAudioVisuals();
+			cooking_pot.RemoveAudioVisualsOnClient();
 		}
 	}
 	

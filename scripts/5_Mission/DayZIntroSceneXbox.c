@@ -28,6 +28,7 @@ class DayZIntroSceneXbox: Managed
 	ref Timer m_TimerUpdate = new Timer( CALL_CATEGORY_GAMEPLAY );
 	ref Timer m_TimerParticle = new Timer( CALL_CATEGORY_GAMEPLAY );
 	ref Timer m_TimerDate = new Timer( CALL_CATEGORY_GAMEPLAY );
+	ref Timer m_TimerClientUpdate = new Timer( CALL_CATEGORY_GAMEPLAY );
 
 	//==================================
 	// DayZIntroSceneXbox
@@ -118,9 +119,12 @@ class DayZIntroSceneXbox: Managed
 		
 		Init();
 	
-		m_TimerParticle.Run(0.1, this, "SetupParticles", NULL, false);
-		m_TimerDate.Run(1.0, this, "SetupDate", NULL, true);
-		m_TimerUpdate.Run(0.5, this, "SetupCharacter", NULL, true);
+		m_TimerParticle.Run(0.1, this, "SetupParticles", null, false);
+		m_TimerDate.Run(1.0, this, "SetupDate", null, true);
+		m_TimerUpdate.Run(0.5, this, "SetupCharacter", null, true);
+		
+		// Xbox check update
+		CheckXboxClientUpdateLoopStart();
 		
 		Material material = GetGame().GetWorld().GetMaterial("graphics/materials/postprocess/chromaber");
 		material.SetParam("PowerX", 0.002);
@@ -150,6 +154,8 @@ class DayZIntroSceneXbox: Managed
 			delete m_TimerDate;
 			m_TimerDate = null;
 		}
+		
+		CheckXboxClientUpdateLoopStop();
 		
 		GetGame().ObjectDelete( m_SceneCharacter );
 		GetGame().ObjectDelete( m_SceneCamera );
@@ -251,6 +257,38 @@ class DayZIntroSceneXbox: Managed
 	void SetupDate()
 	{
 		g_Game.GetWorld().SetDate(m_Date.Get(0), m_Date.Get(1), m_Date.Get(2), m_Date.Get(3), m_Date.Get(4));
+	}
+	
+	//==================================
+	// CheckXboxClientUpdateLoopStart
+	//==================================
+	void CheckXboxClientUpdateLoopStart()
+	{
+		if ( CheckXboxClientUpdate() )
+		{
+			m_TimerClientUpdate.Run(30, this, "CheckXboxClientUpdate", null, true);
+		}
+	}
+	
+	//==================================
+	// CheckXboxClientUpdateLoopStop
+	//==================================
+	void CheckXboxClientUpdateLoopStop()
+	{
+		if ( m_TimerClientUpdate )
+		{
+			m_TimerClientUpdate.Stop();
+			delete m_TimerClientUpdate;
+			m_TimerClientUpdate = null;
+		}
+	}
+	
+	//==================================
+	// CheckXboxClientUpdate
+	//==================================
+	bool CheckXboxClientUpdate()
+	{
+		return OnlineServices.CheckUpdate();
 	}
 	
 	//==================================

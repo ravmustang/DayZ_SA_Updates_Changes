@@ -186,6 +186,21 @@ class MissionServer extends MissionBase
 			
 			OnClientRespawnEvent(identity, player);
 			break;
+			
+		case ClientReconnectEventTypeID:
+			ClientReconnectEventParams reconnectParams;
+			Class.CastTo(reconnectParams, params);
+			
+			identity = reconnectParams.param1;
+			Class.CastTo(player, reconnectParams.param2);
+			if (!player)
+			{
+				Debug.Log("ClientReconnectEvent: Player is empty");
+				return;
+			}
+			
+			OnClientReconnectEvent(identity, player);
+			break;
 		
 		case ClientDisconnectedEventTypeID:
 			ClientDisconnectedEventParams discoParams;
@@ -371,6 +386,10 @@ class MissionServer extends MissionBase
 			}
 		}
 	}
+	
+	void OnClientReconnectEvent(PlayerIdentity identity, PlayerBase player)
+	{
+	}	
 	
 	void OnClientDisconnectedEvent(PlayerIdentity identity, PlayerBase player, int queueTime, bool authFailed)
 	{

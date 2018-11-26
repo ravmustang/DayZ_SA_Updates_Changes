@@ -4,7 +4,9 @@ enum CookingMethodType
 	BAKING		= 1,
 	BOILING		= 2,
 	DRYING		= 3,
-	TIME		= 4
+	TIME		= 4,
+	
+	COUNT
 }
 
 class Cooking
@@ -109,12 +111,12 @@ class Cooking
 			{
 				if ( is_water_boiling )
 				{
-					bottle_base.RefreshAudioVisuals( cooking_method, is_done, is_empty, is_burned );		//if empty, refresh audio and visuals only on boiling point
+					bottle_base.RefreshAudioVisualsOnClient( cooking_method, is_done, is_empty, is_burned );		//if empty, refresh audio and visuals only on boiling point
 				}				
 			}
 			else
 			{
-				bottle_base.RefreshAudioVisuals( cooking_method, is_done, is_empty, is_burned );			//if not empty, refresh audio and visuals
+				bottle_base.RefreshAudioVisualsOnClient( cooking_method, is_done, is_empty, is_burned );			//if not empty, refresh audio and visuals
 			}
 		}
 		
@@ -354,26 +356,29 @@ class Cooking
 	//add temperature to item
 	protected void AddTemperatureToItem( ItemBase cooked_item, ItemBase cooking_equipment, float min_temperature )
 	{
-		float item_temperature = cooked_item.GetTemperature();
-		
-		//set actual cooking temperature
-		float actual_cooking_temp = DEFAULT_COOKING_TEMPERATURE;	//default
-		if ( cooking_equipment )
+		if ( cooked_item.GetTemperatureMax() >= FireplaceBase.PARAM_ITEM_HEAT_MIN_TEMP )
 		{
-			actual_cooking_temp = cooking_equipment.GetTemperature();
-		}
-		
-		//add temperature
-		if ( actual_cooking_temp > item_temperature )
-		{
+			float item_temperature = cooked_item.GetTemperature();
 			
-			item_temperature = actual_cooking_temp * 0.5;
-			item_temperature = Math.Clamp( item_temperature, min_temperature, FOOD_MAX_COOKING_TEMPERATURE );
-			
-			//set new temperature
-			if ( GetGame() && GetGame().IsServer() )
+			//set actual cooking temperature
+			float actual_cooking_temp = DEFAULT_COOKING_TEMPERATURE;	//default
+			if ( cooking_equipment )
 			{
-				cooked_item.SetTemperature( item_temperature );
+				actual_cooking_temp = cooking_equipment.GetTemperature();
+			}
+			
+			//add temperature
+			if ( actual_cooking_temp > item_temperature )
+			{
+				
+				item_temperature = actual_cooking_temp * 0.5;
+				item_temperature = Math.Clamp( item_temperature, min_temperature, FOOD_MAX_COOKING_TEMPERATURE );
+				
+				//set new temperature
+				if ( GetGame() && GetGame().IsServer() )
+				{
+					cooked_item.SetTemperature( item_temperature );
+				}
 			}
 		}
 	}

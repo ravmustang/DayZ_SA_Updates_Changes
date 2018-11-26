@@ -44,9 +44,9 @@ class OpenAndSwitchLambda : TurnItemIntoItemLambda
 		super.CopyOldPropertiesToNew(old_item, new_item);
 	}
 	
-	override void OnNewEntityCreated (EntityAI new_item)
+	override void OnSuccess (EntityAI new_item)
 	{
-		super.OnNewEntityCreated(new_item);
+		super.OnSuccess(new_item);
 
 		ItemBase ib = ItemBase.Cast(new_item);
 		if ( new_item ) 

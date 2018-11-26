@@ -44,10 +44,16 @@ class ActionCollectBloodTarget: ActionContinuousBase
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		Param1<float> nacdata;
 		Class.CastTo(nacdata,  action_data.m_ActionComponent.GetACData() );
-		float delta = (nacdata.param1 / UATimeSpent.COLLECT_BLOOD);
+		float delta = 0;
+		if(nacdata)
+			delta = (nacdata.param1 / UATimeSpent.COLLECT_BLOOD);
+		
+		if(delta > 0)
+		{
 
-		ActionCollectBloodTargetLambda lambda = new ActionCollectBloodTargetLambda(action_data.m_MainItem, "BloodBagFull", action_data.m_Player, m_SpecialtyWeight, ntarget, delta);
-		action_data.m_Player.ServerReplaceItemInHandsWithNew(lambda);
+			ActionCollectBloodTargetLambda lambda = new ActionCollectBloodTargetLambda(action_data.m_MainItem, "BloodBagFull", action_data.m_Player, m_SpecialtyWeight, ntarget, delta);
+			action_data.m_Player.ServerReplaceItemInHandsWithNew(lambda);
+		}
 		//action_data.m_Player.GetItemInHands().SetQuantity();
 	}
 };

@@ -106,7 +106,7 @@ class ItemBase extends InventoryItem
 		m_ItemModelLength = GetItemModelLength();
 		if(ConfigIsExisting("itemBehaviour"))
 		{
-			m_ItemBehaviour = ConfigGetBool("itemBehaviour");
+			m_ItemBehaviour = ConfigGetInt("itemBehaviour");
 		}
 		
 		//RegisterNetSyncVariableInt("m_VariablesMask");
@@ -2994,6 +2994,11 @@ class ItemBase extends InventoryItem
 	}
 	
 	string GetDeploySoundset()
+	{
+		
+	}
+	
+	string GetLoopDeploySoundset()
 	{
 		
 	}

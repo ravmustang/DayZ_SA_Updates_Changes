@@ -557,6 +557,7 @@ enum DayZPlayerConstants
 	COMMANDID_UNCONSCIOUS,	// type is int (overridden from C++) - unconscious
 	COMMANDID_SWIM,			// type is int (overridden from C++) - swimming
 	COMMANDID_VEHICLE,		// type is int (overridden from C++) - vehicle
+	COMMANDID_MODIFIER,		// type is int (overridden from C++) - modifier
 
 
 	//! modifier commands - additive behaviour 
@@ -564,6 +565,7 @@ enum DayZPlayerConstants
 	COMMANDID_MOD_WEAPONS,   	// weapons - always on 
     COMMANDID_MOD_ACTION,		// action - additive action 
 	COMMANDID_MOD_DAMAGE,		// damage - additive damage 
+	COMMANDID_MOD_MODIFIER,		// modifier - additive modifier
 
 
 
@@ -726,6 +728,8 @@ enum DayZPlayerConstants
 	CMD_ACTIONFB_ATTACHBARREL			= 517,		// pne
 	CMD_ACTIONFB_RESTRAIN				= 518,		// erc,cro,pne
 	CMD_ACTIONFB_PICKUP_HEAVY			= 519,		// erc
+
+	CMD_ACTIONFB_DROPITEM_HANDS		= 900,			// pne, pne back
 	
     
     //! ---------------------------------------------------------

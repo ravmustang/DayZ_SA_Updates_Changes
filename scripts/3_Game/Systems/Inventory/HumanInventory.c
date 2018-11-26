@@ -127,11 +127,11 @@ class HumanInventory : GameInventory
 	{
 		if (src.GetType() == InventoryLocationType.HANDS)
 		{
-			Man man = GetManOwner();
-			if (man.IsAlive())
+			Man man_src = Man.Cast(src.GetParent());
+			if (man_src.IsAlive())
 			{
 				hndDebugPrint("[inv] HI::RedirectToHandEvent - source location == HANDS, player has to handle this");
-				man.GetHumanInventory().HandEvent(mode, new HandEventMoveTo(man, src.GetItem(), dst));
+				man_src.GetHumanInventory().HandEvent(mode, new HandEventMoveTo(man_src, src.GetItem(), dst));
 				return true;
 			}
 		}
@@ -375,7 +375,7 @@ class HumanInventory : GameInventory
 					return false;
 			}
 		}
-		Error("[inv] HumanInventory::ReplaceItemInHandsWithNewImpl No");
+		Error("[inv] HumanInventory::ReplaceItemInHandsWithNewImpl No item in hands, event=" + e.DumpToString());
 		return false;
 	}
 

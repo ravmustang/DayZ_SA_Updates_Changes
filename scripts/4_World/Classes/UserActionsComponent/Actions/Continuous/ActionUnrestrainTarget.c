@@ -139,13 +139,13 @@ class ActionUnrestrainTarget: ActionContinuousBase
 
 };
 
-class ReplaceAndDestroy : TurnItemIntoItemLambdaAnimSysNotify
+class ReplaceAndDestroyLambda : TurnItemIntoItemLambdaAnimSysNotifyLambda
 {
 	PlayerBase m_TargetPlayer;
 	bool	m_Destroy;
 	bool	m_Drop;
 	
-	void ReplaceAndDestroy (EntityAI old_item, string new_item_type, PlayerBase player, bool destroy = false)
+	void ReplaceAndDestroyLambda (EntityAI old_item, string new_item_type, PlayerBase player, bool destroy = false)
 	{
 		m_TargetPlayer = player;
 		m_Destroy = destroy;
@@ -157,9 +157,9 @@ class ReplaceAndDestroy : TurnItemIntoItemLambdaAnimSysNotify
 		super.CopyOldPropertiesToNew(old_item, new_item);
 	}
 	
-	override void OnNewEntityCreated(EntityAI new_item)
+	override void OnSuccess (EntityAI new_item)
 	{
-		super.OnNewEntityCreated(new_item);
+		super.OnSuccess(new_item);
 		
 		if( m_Destroy )
 		{

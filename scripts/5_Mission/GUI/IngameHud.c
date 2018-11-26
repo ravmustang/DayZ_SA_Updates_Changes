@@ -780,7 +780,6 @@ class IngameHud extends Hud
 	}
 	
 	int		m_VehicleGearCount = -1;
-	int		m_VehicleRPMMax = 1;
 	float	m_TimeSinceLastEngineLightChange;
 	bool	m_VehicleHasOil;
 	bool	m_VehicleHasCoolant;
@@ -803,7 +802,6 @@ class IngameHud extends Hud
 					TFloatArray gears	= new TFloatArray;
 					
 					GetGame().ConfigGetFloatArray( "CfgVehicles " + m_CurrentVehicle.GetType() + " SimulationModule Gearbox ratios" , gears );
-					m_VehicleRPMMax = GetGame().ConfigGetFloat( "CfgVehicles " + m_CurrentVehicle.GetType() + " SimulationModule Engine rpmRedline" );
 					
 					m_VehicleGearCount	= gears.Count() + 1;
 					
@@ -846,7 +844,7 @@ class IngameHud extends Hud
 	{
 		if ( m_CurrentVehicle )
 		{
-			float rpm_value = ( m_CurrentVehicle.GetEngineRPM() / m_VehicleRPMMax ) ;
+			float rpm_value = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMRedline() ) ;
 			
 			m_VehiclePanelRPMPointer.SetRotation( 0, 0, rpm_value * 100 - 20, true );
 			m_VehiclePanelSpeedValue.SetText( Math.Floor( m_CurrentVehicle.GetSpeedometer() ).ToString() );
@@ -867,7 +865,7 @@ class IngameHud extends Hud
 			
 			int health = m_CurrentVehicle.GetHealthLevel();
 			int color;
-			if( m_CurrentVehicle.IsEngineOn() && health > 0 && health < 4 )
+			if( m_CurrentVehicle.EngineIsOn() && health > 0 && health < 4 )
 			{
 				m_VehiclePanelEngineHealth.Show( true );
 				color = ItemManager.GetItemHealthColor( m_CurrentVehicle );

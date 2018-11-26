@@ -11,7 +11,8 @@ class TentBase extends ItemBase
 	protected ref map< ref ToggleAnimations, bool> m_ToggleAnimations;
 	protected ref array<string> m_ShowAnimationsWhenPitched;
 	protected ref array<string> m_ShowAnimationsWhenPacked;
-	protected Object m_ClutterCutter;
+	protected Object			m_ClutterCutter;
+	ref protected EffectSound 	m_LoopDeploySound;
 	
 	void TentBase()
 	{
@@ -110,15 +111,59 @@ class TentBase extends ItemBase
 			}
 			else
 			{
-				Pitch();
+				Pitch();	
+				PlayDeploySound();
 			}
 		}
 		else
 		{
 			Pack();
-		}			
+		}		
+			
+		if ( IsBeingPlaced() && IsSoundSynchRemote() )
+		{
+			PlayLoopDeploySound();
+		}
+					
+		if ( m_LoopDeploySound && !IsBeingPlaced() && !IsSoundSynchRemote() )
+		{
+			StopLoopDeploySound();
+		}
 	}
 
+	void PlayLoopDeploySound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{		
+			m_LoopDeploySound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			/*
+			SoundParams soundParams = new SoundParams( GetLoopDeploySoundset());
+			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
+			SoundObject soundObject = soundBuilder.BuildSoundObject();
+			soundObject.SetPosition(GetGame().GetPlayer().GetPosition());
+			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
+			*/
+		}
+	}
+	
+	void PlayDeploySound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{		
+			EffectSound sound =	SEffectManager.PlaySound( GetDeploySoundset(), GetPosition() );
+			sound.SetSoundAutodestroy( true );
+		}
+	}
+	
+	void StopLoopDeploySound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		{	
+			m_LoopDeploySound.SoundStop();
+			delete m_LoopDeploySound;
+		}
+	}
+	
 	void HideAllAnimationsAndProxyPhysics()
 	{		
 		string cfg_path = "cfgVehicles " + GetType() + " AnimationSources";

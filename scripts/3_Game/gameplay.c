@@ -350,7 +350,9 @@ typedef Param3<PlayerIdentity, vector, Serializer> ClientNewEventParams;
 //! PlayerIdentity, Man
 typedef Param2<PlayerIdentity, Man> ClientRespawnEventParams; 
 //! PlayerIdentity, Man
-typedef Param2<PlayerIdentity, Man> ClientReadyEventParams; 
+typedef Param2<PlayerIdentity, Man> ClientReadyEventParams;
+//! PlayerIdentity, Man
+typedef Param2<PlayerIdentity, Man> ClientReconnectEventParams; 
 //! PlayerIdentity, Man
 typedef Param4<PlayerIdentity, Man, int, bool> ClientDisconnectedEventParams; 
 //! PlayerIdentity, QueueTime, NewChar
@@ -413,6 +415,8 @@ enum EventType
 	ClientNewEventTypeID,	
 	//! params: \ref ClientRespawnEventParams
 	ClientRespawnEventTypeID,
+	//! params: \ref ClientReconnectEventParams
+	ClientReconnectEventTypeID,
 	//! params: \ref ClientReadyEventParams
 	ClientReadyEventTypeID,
 	//! params: \ref ClientDisconnectedEventParams
@@ -915,6 +919,8 @@ class UAInput
 	proto native void Lock();				// lock (until unlock called or exclusion is selected)
 	proto native void Unlock();				// unlock exclusively
 
+	proto native int ConflictCount();		// get number of conflicts with other inputs
+
 };
 
 // -------------------------------------------------------------------------
@@ -946,7 +952,17 @@ class UAInputAPI
 
 	proto native void ActivateGroup( string sGroupName );
 	proto native void ActivateExclude( string sExcludeName );
+	proto native void ActivateContext( string sContextName );
 	proto native void ActivateModificator( string sModName );
+
+	proto native void DeactivateContext();
+
+	proto native bool PresetCreateNew(); // create new preset from the selected one - (false == cannot create new == too many presets!)
+	proto native bool PresetDelete( int index ); // delete specific preset - (false == not deletable!)
+	proto native int PresetCurrent(); // determine index of current preset - (-1 == not selected)
+	proto native void PresetSelect( int index ); // select specific preset
+	proto native int PresetCount(); // count of presets
+	proto native string PresetName( int index ); // name of selected preset
 
 	proto native void Export();	// export XML (user) configuration
 };

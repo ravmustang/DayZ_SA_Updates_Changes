@@ -18,6 +18,7 @@ class InGameMenuXbox extends UIScriptedMenu
 	
 	void InGameMenuXbox()
 	{
+		ControlSchemeManager.SetControlScheme( EControlSchemeState.UI );
 	}
 
 	void ~InGameMenuXbox()
@@ -35,6 +36,8 @@ class InGameMenuXbox extends UIScriptedMenu
 			}
 		}
 		PPEffects.SetBlurMenu( 0 );
+		
+		ControlSchemeManager.SetControlScheme( EControlSchemeState.None );
 	}
 	
 	override Widget Init()
@@ -99,7 +102,7 @@ class InGameMenuXbox extends UIScriptedMenu
 			OnlineServices.m_PermissionsAsyncInvoker.Insert( OnPermissionsUpdate );
 			ClientData.SyncEvent_OnPlayerListUpdate.Insert( SyncEvent_OnRecievedPlayerList );
 			
-			m_ServerInfoPanel.Reload( CreateFakePlayerList( 100 ) );
+			m_ServerInfoPanel.Reload( ClientData.m_PlayerList );
 			m_ServerInfoPanel.ReloadLocal( OnlineServices.GetMuteList() );
 			
 			TextWidget mute_text = TextWidget.Cast( layoutRoot.FindAnyWidget( "Mute" ).FindAnyWidget( "MuteText" ) );

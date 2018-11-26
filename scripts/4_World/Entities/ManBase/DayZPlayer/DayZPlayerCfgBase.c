@@ -761,7 +761,7 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("Torch", "dz/anims/workspaces/player/player_main/props/player_main_1h_torch.asi", toolsOneHanded,					"dz/anims/anm/player/ik/gear/torch.anm");
 		pType.AddItemInHandsProfileIK("ChickenFeather", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,					"dz/anims/anm/player/ik/gear/banana.anm"); // Not configured
 		pType.AddItemInHandsProfileIK("GorkaHelmetVisor", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 					"dz/anims/anm/player/ik/gear/Maska_glass_g.anm");
-		pType.AddItemInHandsProfileIK("HandDrillKit", "dz/anims/workspaces/player/player_main/props/player_main_1h_handdrillkit.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/gear/hand_drill_kit.anm");
+		pType.AddItemInHandsProfileIK("HandDrillKit", "dz/anims/workspaces/player/player_main/props/player_main_1h_handdrillkit.asi", toolsOneHanded, 	"dz/anims/anm/player/ik/gear/hand_drill_kit.anm");
 		pType.AddItemInHandsProfileIK("WoodenStick", "dz/anims/workspaces/player/player_main/weapons/player_main_1h_pipe.asi", toolsOneHanded,			"dz/anims/anm/player/ik/gear/WoodenStick.anm"); 
 		pType.AddItemInHandsProfileIK("LongWoodenStick", "dz/anims/workspaces/player/player_main/weapons/player_main_1h_pipe.asi", toolsOneHanded,		"dz/anims/anm/player/ik/gear/LongWoodenStick.anm");
 		pType.AddItemInHandsProfileIK("BurlapSack", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/gear/bp_burlap_sack.anm");
@@ -967,6 +967,8 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("GreatHelm", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,							"dz/anims/anm/player/ik/gear/greathelm.anm");
 		pType.AddItemInHandsProfileIK("Ssh68Helmet", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,						"dz/anims/anm/player/ik/gear/ssh68_helmet.anm");
 		pType.AddItemInHandsProfileIK("DirtBikeHelmet_ColorBase", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,			"dz/anims/anm/player/ik/gear/dirtbike_helmet.anm");
+		pType.AddItemInHandsProfileIK("DirtBikeHelmet_Visor", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,				"dz/anims/anm/player/ik/gear/dirtbike_visor.anm");
+		pType.AddItemInHandsProfileIK("DirtBikeHelmet_Mouthguard", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,			"dz/anims/anm/player/ik/gear/dirtbike_mouthguard.anm");
 		pType.AddItemInHandsProfileIK("NioshFaceMask", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,						"dz/anims/anm/player/ik/gear/nioshface_mask.anm");
 		pType.AddItemInHandsProfileIK("DallasMask", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,						"dz/anims/anm/player/ik/gear/dallas_mask.anm");
 		pType.AddItemInHandsProfileIK("HoxtonMask", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded,						"dz/anims/anm/player/ik/gear/dallas_mask.anm");

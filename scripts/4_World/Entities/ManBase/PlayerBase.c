@@ -449,6 +449,8 @@ class PlayerBase extends ManBase
 		
 		//! log melee kill in case of melee
 		LogMeleeKill();
+		
+		super.EEKilled( killer );
 	}
 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
@@ -1986,8 +1988,11 @@ class PlayerBase extends ManBase
 			if( heat_comfort <= PlayerConstants.THRESHOLD_HEAT_COMFORT_MINUS_WARNING )
 			{
 				float value = Math.InverseLerp( PlayerConstants.THRESHOLD_HEAT_COMFORT_MINUS_WARNING, PlayerConstants.THRESHOLD_HEAT_COMFORT_MINUS_CRITICAL,heat_comfort);
+				level = Math.Lerp(1,7,value);
+				/*
 				value = Math.Clamp(value,0,1);
 				level = Math.Round(value * SHAKE_LEVEL_MAX);//translate from normalized value to levels
+				*/
 			}
 			if( level != m_Shakes )
 			{
@@ -2285,7 +2290,7 @@ class PlayerBase extends ManBase
 		if(!GetStaminaHandler()) return false;
 		
 		//TODO REDO
-		return (GetStaminaHandler().HasEnoughStaminaFor(consumer) && !IsOverloaded() && !IsRestrained() && !IsInFBEmoteState());
+		return (GetStaminaHandler().HasEnoughStaminaFor(consumer) /*&& !IsOverloaded()*/ && !IsRestrained() && !IsInFBEmoteState());
 	}
 	
 	// -------------------------------------------------------------------------

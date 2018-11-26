@@ -112,6 +112,26 @@ class FireplaceIndoor extends FireplaceBase
 	{
 		return Vector( m_SmokePosX, m_SmokePosY, m_SmokePosZ );
 	}
+	
+	protected vector GetSmokeRelativePosition()
+	{
+		vector fire_position = GetPosition();
+		vector smoke_position = GetSmokeEffectPosition();
+		
+		return Vector( smoke_position[0] - fire_position[0], smoke_position[1] - fire_position[1], smoke_position[2] - fire_position[2] );
+	}
+	
+	//small smoke
+	override void ParticleSmallSmokeStart()
+	{
+		PlayParticle( m_ParticleSmallSmoke, PARTICLE_SMALL_SMOKE, GetSmokeRelativePosition() );
+	}
+	
+	//normal smoke
+	override void ParticleNormalSmokeStart()
+	{
+		PlayParticle( m_ParticleNormalSmoke, PARTICLE_NORMAL_SMOKE, GetSmokeRelativePosition() );
+	}	
 
 	//================================================================
 	// STATE
@@ -284,7 +304,7 @@ class FireplaceIndoor extends FireplaceBase
 			
 			//remove audio visuals
 			Bottle_Base cooking_pot = Bottle_Base.Cast( item );
-			cooking_pot.RemoveAudioVisuals();
+			cooking_pot.RemoveAudioVisualsOnClient();
 		}	
 		//TODO
 		//frying pan		
@@ -380,10 +400,6 @@ class FireplaceIndoor extends FireplaceBase
 	
 	override void OnIgnitedThis( EntityAI fire_source )
 	{	
-		//remove grass
-		Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , GetPosition() );
-		cc_object.SetOrientation ( GetOrientation() );
-		
 		//start fire
 		StartFire(); 
 	}

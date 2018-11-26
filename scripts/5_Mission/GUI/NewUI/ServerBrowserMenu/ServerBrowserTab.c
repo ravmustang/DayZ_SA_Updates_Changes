@@ -510,8 +510,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	{
 		if( m_TotalPages > 0 && m_LastLoadedPage < m_TotalPages )
 		{
-			//m_CurrentFilterInput.m_Page = m_LastLoadedPage + 1;
-			//OnlineServices.LoadServers( m_CurrentFilterInput );
+			m_CurrentFilterInput.m_Page = m_LastLoadedPage + 1;
+			OnlineServices.LoadServers( m_CurrentFilterInput );
 		}
 	}
 	
@@ -569,7 +569,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void OnLoadServersAsync( ref GetServersResult result_list, EBiosError error, string response )
 	{
-		if( m_Menu.IsRefreshing() != m_TabType || !result_list )
+		if( m_Menu.IsRefreshing() != m_TabType || !result_list || ( !result_list.m_Results || result_list.m_Results.Count() == 0 ) )
 		{
 			m_Menu.SetRefreshing( TabType.NONE );
 			string text = "#server_browser_tab_unable_to_get_server";

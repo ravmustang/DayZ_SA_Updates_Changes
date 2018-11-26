@@ -98,11 +98,14 @@ class ZombieContainer: CollapsibleContainer
 		
 		EntityAI item = ipw.GetItem();
 		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		if (m_ZombieEntity.GetInventory().CanAddEntityInCargo( item ))
-			GetGame().GetPlayer().PredictiveTakeEntityToTargetCargo( m_ZombieEntity, ipw.GetItem() );
+			GetGame().GetPlayer().PredictiveTakeEntityToTargetCargo( m_ZombieEntity, item );
 		else if( m_ZombieEntity.GetInventory().CanAddEntityToInventory( item ) )
 		{
-			GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( m_ZombieEntity, FindInventoryLocationType.ANY, ipw.GetItem() );
+			GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( m_ZombieEntity, FindInventoryLocationType.ANY, item );
 		}
 	}
 	
@@ -136,6 +139,9 @@ class ZombieContainer: CollapsibleContainer
 		
 		EntityAI item = ipw.GetItem();
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
 		
 		if( receiver_item )
 		{
@@ -350,57 +356,63 @@ class ZombieContainer: CollapsibleContainer
 	
 	void DoubleClick(Widget w, int x, int y, int button)
 	{
-		if( w == NULL )
+		if( button == MouseState.LEFT )
 		{
-			return;
-		}
-		ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-		if( !iw )
-		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		} 
-		if( !iw )
-		{
-		  iw = ItemPreviewWidget.Cast( w );
-		}
-		if( !iw.GetItem() )
-		{
-			return;
-		}
-		
-		ItemBase item = ItemBase.Cast( iw.GetItem() );
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-				
-		if (player.GetInventory().HasEntityInInventory( item ) && GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
-		{
-			player.PredictiveTakeEntityToHands( item );
-		}
-		else
-		{
-			if( item.GetInventory().CanRemoveEntity() )
+			if( w == NULL )
 			{
-				InventoryLocation il = new InventoryLocation;
-				if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
+				return;
+			}
+			ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
+			if( !iw )
+			{
+			  string name = w.GetName();
+			  name.Replace( "PanelWidget", "Render" );
+			  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			} 
+			if( !iw )
+			{
+			  iw = ItemPreviewWidget.Cast( w );
+			}
+			if( !iw.GetItem() )
+			{
+				return;
+			}
+			
+			ItemBase item = ItemBase.Cast( iw.GetItem() );
+			
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+			
+			if( !item.GetInventory().CanRemoveEntity() )
+				return;
+			
+			if (player.GetInventory().HasEntityInInventory( item ) && GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
+			{
+				player.PredictiveTakeEntityToHands( item );
+			}
+			else
+			{
+				if( item.GetInventory().CanRemoveEntity() )
 				{
-					if( item.ConfigGetFloat("varStackMax") )
-						item.SplitIntoStackMaxClient( player, -1, );
-					else
-						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
-				}
-				else if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
-				{
-					player.PredictiveTakeEntityToHands( item );
+					InventoryLocation il = new InventoryLocation;
+					if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
+					{
+						if( item.ConfigGetFloat("varStackMax") )
+							item.SplitIntoStackMaxClient( player, -1, );
+						else
+							player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
+					}
+					else if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
+					{
+						player.PredictiveTakeEntityToHands( item );
+					}
 				}
 			}
+			iw.SetItem( NULL );
+			name.Replace( "Render", "GhostSlot" );
+			w.GetParent().FindAnyWidget( name ).Show( true );
+			
+			ItemManager.GetInstance().HideTooltip();
 		}
-		iw.SetItem( NULL );
-		name.Replace( "Render", "GhostSlot" );
-		w.GetParent().FindAnyWidget( name ).Show( true );
-		
-		ItemManager.GetInstance().HideTooltip();
 	}
 	
 	void LoadIconIntoWidgetSlot( string icon_name, int slot_number  )

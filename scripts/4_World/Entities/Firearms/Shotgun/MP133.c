@@ -161,6 +161,12 @@ ref WeaponStateBase F;
 ref WeaponStateBase L;
 ref WeaponStateBase J;
 	
+	
+	override RecoilBase SpawnRecoilObject()
+	{
+		return new Mp133Recoil(this);
+	}
+	
 	override void GetContinuousActions( out TIntArray actions )
 	{
 		actions.Insert(AT_LOAD_MULTI_BULLET_TO_WEAPON);

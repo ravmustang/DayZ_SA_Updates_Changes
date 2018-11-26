@@ -8,6 +8,11 @@ class Izh18_Base extends Weapon_Base
 	{
 	}
 	
+	override RecoilBase SpawnRecoilObject()
+	{
+		return new Izh18Recoil(this);
+	}
+	
 	override void InitStateMachine()
 	{
 		// setup abilities

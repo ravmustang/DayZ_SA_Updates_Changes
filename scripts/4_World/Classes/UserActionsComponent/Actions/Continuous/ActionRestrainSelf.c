@@ -76,7 +76,7 @@ class ActionRestrainSelf: ActionContinuousBase
 		if( item_in_hands )
 		{
 			string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands);
-			MiscGameplayFunctions.TurnItemIntoItemEx(player, new TurnItemIntoItemLambdaRestrain(item_in_hands, new_item_name, action_data.m_Player));
+			MiscGameplayFunctions.TurnItemIntoItemEx(player, new TurnItemIntoItemLambdaRestrainLambda(item_in_hands, new_item_name, action_data.m_Player));
 		}
 	}
 };

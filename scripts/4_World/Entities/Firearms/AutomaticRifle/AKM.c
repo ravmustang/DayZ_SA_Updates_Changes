@@ -1,5 +1,9 @@
 class AKM : RifleBoltFree_Base
 {
+	override RecoilBase SpawnRecoilObject()
+	{
+		return new AkmRecoil(this);
+	}
 	
 	override int GetWeaponSpecificCommand(int weaponAction ,int subCommand)
 	{

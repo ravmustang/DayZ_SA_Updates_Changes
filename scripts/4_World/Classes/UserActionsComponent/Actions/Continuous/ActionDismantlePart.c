@@ -2,7 +2,7 @@ class ActionDismantlePartCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousTime(UATimeSpent.DEFAULT_DECONSTRUCT);
+		m_ActionData.m_ActionComponent = new CAContinuousTime( UATimeSpent.DEFAULT_DECONSTRUCT );
 	}
 };
 
@@ -23,7 +23,7 @@ class ActionDismantlePart: ActionContinuousBase
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINonRuined;
-		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.BASEBUILDING);
+		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.BASEBUILDING );
 	}
 
 	override int GetType()
@@ -63,7 +63,7 @@ class ActionDismantlePart: ActionContinuousBase
 			if ( construction_part && base_building.IsFacingBack( player ) )
 			{
 				//if part is base but more attachments are present
-				if ( base_building.HasAttachmentsBesidesBase() )
+				if ( construction_part.IsBase() && base_building.HasAttachmentsBesidesBase() )
 				{
 					return false;
 				}
@@ -91,11 +91,7 @@ class ActionDismantlePart: ActionContinuousBase
 			construction.DismantlePart( construction_part.GetPartName(), true );
 			
 			//add damage to tool
-			action_data.m_MainItem.DecreaseHealth ( "", "", 2, true );
-		}
-		else
-		{
-			SendMessageToClient( action_data.m_Player, base_building.MESSAGE_CANNOT_BE_DECONSTRUCTED );
+			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DISMANTLE );
 		}
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

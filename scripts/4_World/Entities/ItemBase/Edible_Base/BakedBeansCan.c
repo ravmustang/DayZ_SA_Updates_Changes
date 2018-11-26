@@ -7,7 +7,7 @@ class BakedBeansCan : Edible_Base
 	
 	override void Open()
 	{	
-		super.Open();
+		//super.Open();
 		ReplaceEdibleWithNew("BakedBeansCan_Opened");
 	}
 }

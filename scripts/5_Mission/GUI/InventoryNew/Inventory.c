@@ -73,13 +73,13 @@ class Inventory: LayoutHolder
 		
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "LeftBackground" ),  this, "OnLeftPanelDropReceived" );
 		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "LeftBackground" ),  this, "DraggingOverLeftPanel" );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "rootFrame" ),  this, "OnLeftPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "rootFrame" ),  this, "DraggingOverLeftPanel" );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "Scroller" ),  this, "OnLeftPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "Scroller" ),  this, "DraggingOverLeftPanel" );
 		
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "RightBackground" ),  this, "OnRightPanelDropReceived" );
 		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "RightBackground" ),  this, "DraggingOverRightPanel" );
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "rootFrame" ),  this, "OnRightPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "rootFrame" ),  this, "DraggingOverRightPanel" );
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "Scroller" ),  this, "OnRightPanelDropReceived" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "Scroller" ),  this, "DraggingOverRightPanel" );
 		
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "CharacterPanel" ),  this, "OnCenterPanelDropReceived" );
 		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "CharacterPanel" ),  this, "DraggingOverCenterPanel" );
@@ -137,12 +137,11 @@ class Inventory: LayoutHolder
 		m_ControllerRightStickTimerEnd = true;
 		m_ControllerRightStickTimer.Stop();
 	}
-	int once;
+	
 	protected int m_ControllerAngle;
 	protected int m_ControllerTilt;
 	protected bool m_ControllerRightStickTimerEnd = true;
 	ref Timer m_ControllerRightStickTimer;
-
 
 	bool Controller( Widget w, int control, int value )
 	{
@@ -199,7 +198,6 @@ class Inventory: LayoutHolder
 		
 		UpdateConsoleToolbar();
 		
-		once++;
 		if( control == ControlID.CID_SELECT && value != 0 )
 		{
 			if( m_RightArea.IsActive() )
@@ -345,6 +343,8 @@ class Inventory: LayoutHolder
 			EntityAI item = ipw.GetItem();
 			if( item )
 			{
+				if( !item.GetInventory().CanRemoveEntity() )
+					return;
 				PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 				if( player && ( player.GetInventory().CanAddAttachment( item ) ) || player.GetHumanInventory().HasEntityInHands( item ) )
 				{
@@ -541,7 +541,7 @@ class Inventory: LayoutHolder
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUISelectItem , false ) )
+		if( GetGame().GetInput().GetActionDown( UAUISelectItem, false ) )
 		{
 			ItemManager.GetInstance().SetItemMicromanagmentMode( true );
 			
@@ -608,11 +608,11 @@ class Inventory: LayoutHolder
 			}
 			if( m_LeftArea.IsActive() )
 			{
-				m_LeftArea.SetPreviousActive( );
+				m_LeftArea.SetPreviousActive();
 			}
 			if( m_RightArea.IsActive() )
 			{
-				m_RightArea.SetPreviousActive( );
+				m_RightArea.SetPreviousActive();
 			}
 			if( m_HandsArea.IsActive() )
 			{
@@ -888,15 +888,15 @@ class Inventory: LayoutHolder
 	}
 	
 	#ifdef PLATFORM_XBOX
-	string to_hands_swap = "<image set=\"xbox_buttons\" name=\"A\" /> To hands/swap    ";
-	string drop = "<image set=\"xbox_buttons\" name=\"Y\" />(hold) Drop    ";
-	string equip = "<image set=\"xbox_buttons\" name=\"X\" /> Equip    ";
-	string split = "<image set=\"xbox_buttons\" name=\"X\" /> Split    ";
-	string to_inventory = "<image set=\"xbox_buttons\" name=\"Y\" /> To inventory    ";
-	string open_close_container = "<image set=\"xbox_buttons\" name=\"RS\" /> Open/Close container    ";
-	string combine = "<image set=\"xbox_buttons\" name=\"B\" /> Combine";
-	string micromanagment = "<image set=\"xbox_buttons\" name=\"A\" /> (hold) Micromanagment    ";
-	string quickslot = "<image set=\"xbox_buttons\" name=\"LS\" /> (hold) Quickslot    ";
+	string to_hands_swap = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_to_hands_swap" + "    ";
+	string drop = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#datz_context_menu_drop" + "    ";
+	string equip = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_equip" + "    ";
+	string split = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_split" + "    ";
+	string to_inventory = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_to_inventory" + "    ";
+	string open_close_container = "<image set=\"xbox_buttons\" name=\"RS\" /> " + "#dayz_context_menu_open_close" + "    ";
+	string combine = "<image set=\"xbox_buttons\" name=\"B\" /> " + "#dayz_context_menu_combine";
+	string micromanagment = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_micro" + "    ";
+	string quickslot = "<image set=\"xbox_buttons\" name=\"LS\" /> " + "#dayz_context_menu_quickslot" + "    ";
 	#else
 	string to_hands_swap = "<image set=\"playstation_buttons\" name=\"cross\" /> To hands/swap    ";
 	string drop = "<image set=\"playstation_buttons\" name=\"triangle\" />(hold) Drop    ";
@@ -977,7 +977,7 @@ class Inventory: LayoutHolder
 		string context_text;
 		
 		#ifdef PLATFORM_XBOX
-		general_text = "<image set=\"xbox_buttons\" name=\"LB\" />/<image set=\"xbox_buttons\" name=\"RB\" /> Switch column        <image set=\"xbox_buttons\" name=\"LT\" />/<image set=\"xbox_buttons\" name=\"RT\"/> Switch cargo container";
+		general_text = "<image set=\"xbox_buttons\" name=\"LB\" />/<image set=\"xbox_buttons\" name=\"RB\" /> " + "#dayz_context_menu_switch_column" + "        <image set=\"xbox_buttons\" name=\"LT\" />/<image set=\"xbox_buttons\" name=\"RT\"/>" + "#dayz_context_menu_switch_cargo_container";
 		#else
 		general_text = "<image set=\"playstation_buttons\" name=\"L2\" />/<image set=\"playstation_buttons\" name=\"R2\" /> Switch column        <image set=\"playstation_buttons\" name=\"L1\" />/<image set=\"playstation_buttons\" name=\"R1\"/> Switch cargo container";
 		#endif

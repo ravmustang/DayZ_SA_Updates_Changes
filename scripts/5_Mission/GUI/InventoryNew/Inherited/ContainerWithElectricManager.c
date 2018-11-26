@@ -294,6 +294,10 @@ class ContainerWithElectricManager: ClosableContainer
 		Weapon_Base wpn;
 		Magazine mag;
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		if ( Class.CastTo(wpn,  m_Entity ) && Class.CastTo(mag,  item ) )
 		{
 			if( player.GetWeaponManager().CanAttachMagazine( wpn, mag ) )
@@ -309,6 +313,8 @@ class ContainerWithElectricManager: ClosableContainer
 			}
 			else if( GameInventory.CanSwapEntities( receiver_item, item ) )
 			{
+				if( !receiver_item.GetInventory().CanRemoveEntity() )
+					return;
 				GetGame().GetPlayer().PredictiveSwapEntities( item, receiver_item );
 			}
 		}

@@ -149,9 +149,18 @@ class Hologram
 	// update loop for visuals and collisions of the hologram
 	void UpdateHologram()
 	{
+		if ( !m_Parent )
+		{
+			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(m_Player.TogglePlacingLocal);
+			
+			return
+		}
+		
 		if ( m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsRaised() )
 		{
 			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(m_Player.TogglePlacingLocal);
+			
+			return
 		}
 		
 		EvaluateCollision();

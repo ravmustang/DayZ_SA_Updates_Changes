@@ -30,14 +30,30 @@ class Container extends LayoutHolder
 	float GetFocusedContainerHeight()
 	{
 		float x, y;
-		GetFocusedContainer().GetMainWidget().GetScreenSize( x, y );
+		if( GetFocusedContainer() )
+			GetFocusedContainer().GetMainWidget().GetScreenSize( x, y );
+		else
+			GetMainWidget().GetScreenSize( x, y );
 		return y;
 	}
 	
 	float GetFocusedContainerYPos()
 	{
 		float x, y;
-		GetFocusedContainer().GetMainWidget().GetPos( x, y );
+		if( GetFocusedContainer() )
+			GetFocusedContainer().GetMainWidget().GetPos( x, y );
+		else
+			GetMainWidget().GetPos( x, y );
+		return y;
+	}
+	
+	float GetFocusedContainerYScreenPos()
+	{
+		float x, y;
+		if( GetFocusedContainer() )
+			GetFocusedContainer().GetMainWidget().GetScreenPos( x, y );
+		else
+			GetMainWidget().GetScreenPos( x, y );
 		return y;
 	}
 
@@ -96,6 +112,7 @@ class Container extends LayoutHolder
 	override void SetActive( bool active )
 	{
 		m_IsActive = active;
+		AttachmentCategoriesRow att_row;
 		if( m_MainWidget.FindAnyWidget("SelectedContainer") )
 		{
 			m_MainWidget.FindAnyWidget("SelectedContainer").Show(active);
@@ -135,7 +152,7 @@ class Container extends LayoutHolder
 			}
 			else if(this.IsInherited( AttachmentCategoriesRow ))
 			{
-				AttachmentCategoriesRow att_row = AttachmentCategoriesRow.Cast( this );
+				att_row = AttachmentCategoriesRow.Cast( this );
 				if( att_row )
 				{
 					att_row.SetDefaultFocus();
@@ -168,6 +185,33 @@ class Container extends LayoutHolder
 				}
 			}
 		}
+		else
+		{
+			if( this.IsInherited( AttachmentCategoriesRow ) )
+			{
+				att_row = AttachmentCategoriesRow.Cast( this );
+				if( att_row )
+				{
+					att_row.UnfocusAll();
+				}
+			}
+			else if( this.IsInherited( AttachmentCategoriesSlotsContainer ) )
+			{
+				AttachmentCategoriesSlotsContainer slot_row = AttachmentCategoriesSlotsContainer.Cast( this );
+				if( slot_row )
+				{
+					slot_row.UnfocusAll();
+				}
+			}
+			else if( this.IsInherited( VicinitySlotsContainer ) )
+			{
+				VicinitySlotsContainer vicinity_row = VicinitySlotsContainer.Cast( this );
+				if( vicinity_row )
+				{
+					vicinity_row.UnfocusAll();
+				}
+			}
+		}
 	}
 
 	void UnfocusAll()
@@ -176,7 +220,8 @@ class Container extends LayoutHolder
 		{
 			for ( int j = 0; j < ITEMS_IN_ROW; j++ )
 			{
-				Get( i ).GetMainWidget().FindAnyWidget( "Cursor" + j ).Show( false );
+				if( Get( i ) && Get( i ).GetMainWidget() && Get( i ).GetMainWidget().FindAnyWidget( "Cursor" + j ) )
+					Get( i ).GetMainWidget().FindAnyWidget( "Cursor" + j ).Show( false );
 			}
 		}
 	}
@@ -227,14 +272,18 @@ class Container extends LayoutHolder
 	
 	bool IsFirstContainerFocused()
 	{
-		Container first = Container.Cast( m_Body[1] );
+		Container first;
+		if( m_OpenedContainers.Count() > 0 )
+			first = Container.Cast( m_OpenedContainers[1] );
 		return GetFocusedContainer() == first;
 	}
 	
 	bool IsLastContainerFocused()
 	{
-		Container first = Container.Cast( m_Body[ m_Body.Count() - 1 ] );
-		return GetFocusedContainer() == first;
+		Container last;
+		if( m_OpenedContainers.Count() > 0 )
+			last = Container.Cast( m_OpenedContainers[ m_OpenedContainers.Count() - 1 ] );
+		return GetFocusedContainer() == last;
 	}
 	
 	void SetFocused()
@@ -254,48 +303,56 @@ class Container extends LayoutHolder
 		{
 			ItemManager.GetInstance().SetItemMoving( true );
 		}
-		Container active = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
+		Container active = Container.Cast( m_Body[m_ActiveIndex] );
 		if( !active.IsActive() )
 		{
 			return;
 		}
-		Container next;
-		++m_ActiveIndex;
-		if( m_ActiveIndex < m_OpenedContainers.Count() )
+		
+		if( !active.IsLastContainerFocused() )
 		{
-			next = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
-			if( m_ActiveIndex == m_OpenedContainers.Count() - 1 )
-			{
-				m_LastIndex = true;
-			}
-			else
-			{
-				m_LastIndex = false;
-			}
-		}
-		while( next && !next.GetMainWidget().IsVisible() )
-		{
-			++m_ActiveIndex;
-			if( m_ActiveIndex < m_OpenedContainers.Count() )
-			{
-				next = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
-			}
-		}
-		if( next )
-		{
-			active.SetActive( false );
-			next.SetActive( true );
-			SetFocusedContainer( next );
+			active.SetNextActive();
 		}
 		else
 		{
-			m_ActiveIndex = 1;
-			Container first = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
-			if( first )
+			++m_ActiveIndex;
+			Container next;
+			if( m_ActiveIndex < m_OpenedContainers.Count() )
+			{
+				next = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
+				if( m_ActiveIndex == m_OpenedContainers.Count() - 1 )
+				{
+					m_LastIndex = true;
+				}
+				else
+				{
+					m_LastIndex = false;
+				}
+			}
+			while( next && !next.GetMainWidget().IsVisible() )
+			{
+				++m_ActiveIndex;
+				if( m_ActiveIndex < m_OpenedContainers.Count() )
+				{
+					next = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
+				}
+			}
+			if( next )
 			{
 				active.SetActive( false );
-				first.SetActive( true );
-				SetFocusedContainer( first );
+				next.SetActive( true );
+				SetFocusedContainer( next );
+			}
+			else
+			{
+				m_ActiveIndex = 1;
+				Container first = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
+				if( first )
+				{
+					active.SetActive( false );
+					first.SetActive( true );
+					SetFocusedContainer( first );
+				}
 			}
 		}
 	}

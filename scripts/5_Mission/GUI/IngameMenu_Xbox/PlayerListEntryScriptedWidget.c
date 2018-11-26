@@ -15,10 +15,11 @@ class PlayerListEntryScriptedWidget extends ScriptedWidgetEventHandler
 	protected PlayerListScriptedWidget	m_Tab;
 	protected bool						m_Selected;
 	
-	void PlayerListEntryScriptedWidget( Widget parent, string name, string uid, bool show_permissions )
+	void PlayerListEntryScriptedWidget( Widget parent, string name, string uid, bool show_permissions, PlayerListScriptedWidget tab )
 	{
 		m_Name				= name;
 		m_UID				= uid;
+		m_Tab				= tab;
 		
 		m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/xbox/ingamemenu_xbox/player_info_entry.layout", parent );
 		m_PlayerName		= TextWidget.Cast( m_Root.FindAnyWidget( "Name" ) );
@@ -101,7 +102,7 @@ class PlayerListEntryScriptedWidget extends ScriptedWidgetEventHandler
 		if( !m_Selected )
 		{
 			#ifdef PLATFORM_CONSOLE
-			if( w == m_Root )
+			if( w == m_PlayerButton )
 			{
 				Select();
 			}
@@ -114,7 +115,7 @@ class PlayerListEntryScriptedWidget extends ScriptedWidgetEventHandler
 	override bool OnFocusLost( Widget w, int x, int y )
 	{
 		#ifdef PLATFORM_CONSOLE
-		if( w == m_Root )
+		if( w == m_PlayerButton )
 		{
 			Deselect();
 		}

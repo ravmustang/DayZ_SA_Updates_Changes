@@ -209,7 +209,7 @@ class Fireplace extends FireplaceBase
 			
 			//remove audio visuals
 			Bottle_Base cooking_pot = Bottle_Base.Cast( item );
-			cooking_pot.RemoveAudioVisuals();
+			cooking_pot.RemoveAudioVisualsOnClient();
 		}
 		
 		//TODO

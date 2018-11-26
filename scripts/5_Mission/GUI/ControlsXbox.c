@@ -222,7 +222,7 @@ class ControlsXbox extends UIScriptedMenu
 	{
 		array<ref JsonControlMappingInfo> control_mapping_info = new array<ref JsonControlMappingInfo>;
 		
-		string file_path =	"xbox/ControlMappingInfo.json";
+		string file_path =	"Xbox/PageDataControlIer.json";
 		FileHandle file_handle = OpenFile(file_path, FileMode.READ);
 		JsonSerializer js = new JsonSerializer();
 		

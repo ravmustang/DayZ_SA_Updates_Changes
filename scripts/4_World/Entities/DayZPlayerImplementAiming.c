@@ -94,24 +94,31 @@ class DayZPlayerImplementAiming
 		//! get sway
 		ApplyBreathingPattern(breathing_offset_x, breathing_offset_y, 3.0, m_TotalTime, m_SwayWeight);
 		ApplyHorizontalNoise(noise_offset_x, noise_offset_y, 0.2, 0.5, 3.0, speed, 3 * m_SwayWeight, pDt);
-		float shake_weight = Math.InverseLerp(0, PlayerBase.SHAKE_LEVEL_MAX, m_PlayerPb.GetShakeLevel());
-		ApplyShakes(shake_offset_x, shake_offset_y, shake_weight);
 		
+		int shake_level = m_PlayerPb.GetShakeLevel();
+		if(shake_level != 0)
+		{
+			ApplyShakes(shake_offset_x, shake_offset_y, shake_level);
+		}
+		//Print(shake_level);
 		//! get recoil
 		if( m_CurrentRecoil )
 		{
 			m_CurrentRecoil.Update(recoil_offset_mouse_x, recoil_offset_mouse_y, recoil_offset_hands_x, recoil_offset_hands_y, pDt);
 		}
 		
-		//! cam offset
-		pModel.m_fAimXCamOffset = breathing_offset_x + noise_offset_x;// + shake_offset_x;
-		pModel.m_fAimYCamOffset	= breathing_offset_y + noise_offset_y;// + shake_offset_y;
-
-		
 		//! hands offset
 		pModel.m_fAimXHandsOffset = breathing_offset_x + noise_offset_x + recoil_offset_hands_x + shake_offset_x;
 		pModel.m_fAimYHandsOffset = breathing_offset_y + noise_offset_y + recoil_offset_hands_y + shake_offset_y;
 
+		//! cam offset
+		pModel.m_fAimXCamOffset = -shake_offset_x - recoil_offset_hands_x;// + shake_offset_x;
+		pModel.m_fAimYCamOffset	= -shake_offset_y - recoil_offset_hands_y;// + shake_offset_y;
+		/*
+		pModel.m_fAimXCamOffset = -shake_offset_y - recoil_offset_hands_y;// + shake_offset_x;
+		pModel.m_fAimYCamOffset	= shake_offset_x + recoil_offset_hands_x;// + shake_offset_y;
+		*/
+		
 		//! clamp aim ranges 
 		if (stance_index == DayZPlayerConstants.STANCEIDX_RAISEDPRONE)
 		{			
@@ -149,15 +156,17 @@ class DayZPlayerImplementAiming
 		x_axis = (m_HorizontalNoise - 1) * weight;
 	}
 	
-	protected void ApplyShakes(out float x_axis, out float y_axis, float weight)
+	protected void ApplyShakes(out float x_axis, out float y_axis, int level)
 	{
+		float weight = level / PlayerBase.SHAKE_LEVEL_MAX;
 		m_ShakeCount++;
-		if(m_ShakeCount > Math.RandomIntInclusive(3, 6))
+		if(m_ShakeCount > Math.RandomIntInclusive(2, 4))
 		{
 			m_ShakeCount = 0;
-			float modifier = Math.RandomFloatInclusive(0.1,0.4);
-			x_axis = modifier * weight * (( Math.RandomFloat01() * 2) - 1);
-			y_axis = modifier * weight * ((Math.RandomFloat01() * 2) - 1);
+			float modifier = Math.RandomFloatInclusive(0.45,0.9);
+			x_axis = modifier * weight * Math.RandomFloat01();
+			y_axis = modifier * weight * Math.RandomFloat01();
+			//Print("applying shakes");
 			//PrintString("x>" + x_axis.ToString()+", y:" + y_axis.ToString());
 		}
 	}

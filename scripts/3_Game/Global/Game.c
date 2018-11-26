@@ -738,7 +738,7 @@ class CGame
 	proto protected native void		CreateMission(string path);
 	proto native void		RestartMission();
 	//! Returns to main menu, leave world empty for using last mission world
-	proto native void		AbortMission(string world = "");
+	proto native void		AbortMission();
 	proto native void		RespawnPlayer();
 	proto native bool		CanRespawnPlayer();
 

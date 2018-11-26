@@ -341,10 +341,33 @@ class Environment
 
 	protected float GetCurrentItemWetAbsorbency(ItemBase pItem)
 	{
-		float absorbency = pItem.GetAbsorbency();
+		float healthFactor;
+		float absorbency = pItem.GetAbsorbency();			//! item absorbency from config
+		float itemHealthLabel = pItem.GetHealthLevel();		//! item health (state)
+
+		//! health factor selection
+		switch (itemHealthLabel)
+		{
+		case STATE_PRISTINE:
+			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_PRISTINE;
+		break;
+		case STATE_WORN:
+			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_WORN;
+		break;
+		case STATE_DAMAGED:
+			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_DAMAGED;
+		break;
+		case STATE_BADLY_DAMAGED:
+			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_B_DAMAGED;
+		break;
+		case STATE_RUINED:
+			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_RUINED;
+		break;
+		}
 
 		//! takes into account health of item
-		absorbency = absorbency + (1 - pItem.GetHealth01("", "")) * 0.25;
+		absorbency = absorbency + (1 - healthFactor);
+
 		return Math.Min(1, absorbency);
 	}
 	

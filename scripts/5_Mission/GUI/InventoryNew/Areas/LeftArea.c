@@ -1,11 +1,13 @@
 class LeftArea: Container
 {
-	protected ref VicinityContainer m_VicinityContainer;
+	protected ref VicinityContainer		m_VicinityContainer;
+	protected ScrollWidget				m_ScrollWidget;
 	
 	void LeftArea( LayoutHolder parent )
 	{
 		m_MainWidget.Show( true );
-		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
+		m_ScrollWidget	= ScrollWidget.Cast( m_MainWidget.FindAnyWidget( "Scroller" ) );
+		m_MainWidget	= m_MainWidget.FindAnyWidget( "Content" );
 
 		m_VicinityContainer = new VicinityContainer( this );
 		m_Body.Insert( m_VicinityContainer );
@@ -120,12 +122,10 @@ class LeftArea: Container
 		if( active_container.IsLastContainerFocused() )
 		{
 			++m_ActiveIndex;
-			if( m_ActiveIndex < m_Body.Count() )
-			{
-			}
-			else
+			if( m_ActiveIndex >= m_Body.Count() )
 			{
 				m_ActiveIndex = 0;
+				m_ScrollWidget.VScrollToPos01( 0 );
 			}
 
 			active_container.SetActive( false );
@@ -139,7 +139,16 @@ class LeftArea: Container
 		else
 		{
 			active_container.SetNextActive();
-			float amount = active_container.GetFocusedContainerHeight() + active_container.GetFocusedContainerYPos();
+		}
+		
+		float x, y, y_s;
+		m_ScrollWidget.GetScreenPos( x, y );
+		m_ScrollWidget.GetScreenSize( x, y_s );
+		float amount	= y + active_container.GetFocusedContainerYScreenPos();
+		float next_pos	= active_container.GetFocusedContainerYScreenPos() + active_container.GetFocusedContainerHeight();
+		if( next_pos > ( y + y_s ) )
+		{
+			m_ScrollWidget.VScrollToPos( m_ScrollWidget.GetVScrollPos() + active_container.GetFocusedContainerHeight() + 2 );
 		}
 	}
 	
@@ -154,9 +163,10 @@ class LeftArea: Container
 		if( active_container.IsFirstIndex() )
 		{
 			--m_ActiveIndex;
-			if ( m_ActiveIndex <= 0 )
+			if ( m_ActiveIndex < 0 )
 			{
 				m_ActiveIndex = m_Body.Count() - 1;
+				m_ScrollWidget.VScrollToPos01( 1 );
 			}
 			
 			active_container.SetActive( false );
@@ -172,6 +182,13 @@ class LeftArea: Container
 			active_container.SetPreviousActive();
 		}
 		
+		float x, y;
+		m_ScrollWidget.GetScreenPos( x, y );
+		if( active_container.GetFocusedContainerYScreenPos() < y )
+		{
+			float amount = active_container.GetFocusedContainerYScreenPos() - y;
+			m_ScrollWidget.VScrollToPos( m_ScrollWidget.GetVScrollPos() + amount - 2 );
+		}
 	}
 	
 	void OnLeftPanelDropReceived( Widget w, int x, int y, Widget receiver )

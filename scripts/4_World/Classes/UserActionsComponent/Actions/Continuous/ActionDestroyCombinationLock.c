@@ -39,7 +39,7 @@ class ActionDestroyCombinationLock: ActionContinuousBase
 		string selection = target_object.GetActionComponentName( target.GetComponentIndex() );
 		Fence fence = Fence.Cast( target_object );
 		
-		if ( fence && fence.IsLocked() && item.GetHealth() >= 50 && selection == "wall_interact" )
+		if ( fence && fence.IsLocked() && selection == "wall_interact" )
 		{
 			return true;
 		}
@@ -56,11 +56,11 @@ class ActionDestroyCombinationLock: ActionContinuousBase
 			if ( combination_lock )
 			{
 				combination_lock.Unlock( fence );
-				combination_lock.DecreaseHealth( 100 );
+				combination_lock.DecreaseHealth( combination_lock.GetMaxHealth() );
 			}
 		}
 		
-		action_data.m_MainItem.DecreaseHealth( 50 );
+		action_data.m_MainItem.DecreaseHealth( UADamageApplied.SAW_LOCK );
 		
 		//soft skills
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

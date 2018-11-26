@@ -20,7 +20,7 @@ class CAContinuousRepeatStartEngine : CAContinuousRepeat
 			if ( trans )
 			{
 				Car car;
-				if ( Class.CastTo(car, trans) && car.IsEngineOn() )
+				if ( Class.CastTo(car, trans) && car.EngineIsOn() )
 				{
 					return UA_FINISHED;
 				}

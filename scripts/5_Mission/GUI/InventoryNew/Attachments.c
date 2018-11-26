@@ -28,7 +28,7 @@ class Attachments
 	bool IsItemActive()
 	{
 		ItemBase item = ItemBase.Cast( GetFocusedEntity() );
-		if( item == NULL )
+		if( !item )
 		{
 			return false;
 		}
@@ -38,7 +38,7 @@ class Attachments
 	bool IsItemWithQuantityActive()
 	{
 		ItemBase item = ItemBase.Cast( GetFocusedEntity() );
-		if( item == NULL )
+		if( !item )
 		{
 			return false;
 		}
@@ -60,10 +60,6 @@ class Attachments
 	{
 		m_FocusedRow = 0;
 		m_FocusedColumn = 0;
-		if( ItemManager.GetInstance().IsMicromanagmentMode() )
-		{
-			return;
-		}
 		m_Ics.Get( 0 ).GetMainWidget().FindAnyWidget( "Cursor" + 0 ).Show( true );
 		
 		EntityAI focused_item = GetFocusedEntity();
@@ -105,11 +101,10 @@ class Attachments
 		if( ItemManager.GetInstance().IsItemMoving() )
 		{
 			EntityAI selected_item = ItemManager.GetInstance().GetSelectedItem();
-			if( selected_item /*&& GetEntity()*/ )
+			if( selected_item )
 			{
 				bool can_add = m_Entity.GetInventory().CanAddAttachment( selected_item );
-				//bool in_cargo = !player.GetInventory().HasEntityInInventory( selected_item ) || !m_Entity.GetInventory().HasEntityInCargo( selected_item );
-				if( can_add)
+				if( can_add )
 				{
 					player.PredictiveTakeEntityToTargetAttachment(m_Entity, selected_item);
 					ItemManager.GetInstance().SetSelectedItem( NULL, NULL, NULL );
@@ -139,16 +134,17 @@ class Attachments
 		{
 			if ( prev_item )
 			{
-					EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
-					if( item_in_hands )
+				EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
+				InventoryLocation il = new InventoryLocation;
+				prev_item.GetInventory().GetCurrentInventoryLocation( il );
+				bool reachable = AttchmentsOutOfReach.IsAttachmentReachable( m_Entity, "", il.GetSlot() );
+				if( reachable && prev_item.GetInventory().CanRemoveEntity() )
+				{
+					if( item_in_hands && item_in_hands.GetInventory().CanRemoveEntity() )
 					{
 						if( GameInventory.CanSwapEntities( item_in_hands, prev_item ) )
 						{
 							player.PredictiveSwapEntities( item_in_hands, prev_item );
-						}
-						else
-						{
-							player.PredictiveSwapEntities( prev_item, item_in_hands);
 						}
 					}
 					else
@@ -158,6 +154,7 @@ class Attachments
 							player.PredictiveTakeEntityToHands( prev_item );
 						}
 					}
+				}
 			}		
 		}
 	}
@@ -357,6 +354,7 @@ class Attachments
 	{
 		Widget ghost_widget;
 		int slot_id;
+		bool draggable = true;;
 
 		for ( int i = 0; i < count; i++ )
 		{
@@ -431,6 +429,7 @@ class Attachments
 				if( m_Entity.GetInventory().GetSlotLock( slot_id ) && ItemManager.GetInstance().GetDraggedItem() != item )
 				{
 					item_w.FindAnyWidget( "Mounted" + i % 7 ).Show( true );
+					draggable = false;
 				}
 
 				int has_quantity	= QuantityConversions.HasItemQuantity( item );
@@ -474,19 +473,30 @@ class Attachments
 				}
 			}
 
-			if( m_Entity.GetInventory().FindAttachment( slot_id ) != NULL )
+			if( item )
 			{
 				ImageWidget image_widget3 = ImageWidget.Cast( item_preview2.GetParent().FindAnyWidget( "OutOfReach" + i % 7 ) );
-				Weapon_Base wpn;
 				PlayerBase p = PlayerBase.Cast( GetGame().GetPlayer() );
-				if ( AttchmentsOutOfReach.IsAttachmentReachable( m_Entity, slot_name ) && ( !Class.CastTo(wpn,  m_Entity ) || p.GetHumanInventory().GetEntityInHands() == m_Entity ) )
+				bool in_hands_condition		= m_Entity.GetHierarchyRoot() && item.GetInventory().CanRemoveEntity();
+				bool in_vicinity_condition	= !m_Entity.GetHierarchyRoot() && AttchmentsOutOfReach.IsAttachmentReachable( m_Entity, slot_name );
+				if( in_hands_condition || in_vicinity_condition )
 				{
 					image_widget3.Show( false );
 				}
 				else
 				{
 					image_widget3.Show( true );
+					draggable = false;
 				}
+			}
+					
+			if( draggable )
+			{
+				item_preview2.GetParent().SetFlags( WidgetFlags.DRAGGABLE );
+			}
+			else
+			{
+				item_preview2.GetParent().ClearFlags( WidgetFlags.DRAGGABLE );
 			}
 		}
 	}
@@ -542,8 +552,6 @@ class Attachments
 		for ( i = 0; i < count; i++ )
 		{
 			ItemPreviewWidget item_preview2 = ItemPreviewWidget.Cast( m_Parent.Get( ( i / 7 ) + 1 ).GetMainWidget().FindAnyWidget( "Icon" + i % 7 ).FindAnyWidget( "Render" + i % 7 ) );
-			//Print(item_preview2);
-			//Print(item_preview2.GetParent());
 			WidgetEventHandler.GetInstance().RegisterOnDrag( item_preview2.GetParent(), m_Parent, "OnIconDrag" );
 			WidgetEventHandler.GetInstance().RegisterOnDrop( item_preview2.GetParent(), m_Parent, "OnIconDrop" );
 			WidgetEventHandler.GetInstance().RegisterOnDoubleClick( item_preview2.GetParent(), m_Parent, "DoubleClick" );

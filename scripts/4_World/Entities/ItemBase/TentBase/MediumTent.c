@@ -23,16 +23,6 @@ class MediumTent extends TentBase
 	override void OnPlacementComplete( Man player )
 	{		
 		super.OnPlacementComplete( player );
-
-		//temporary used sound for car tent
-		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
-		{
-			SoundParams soundParams = new SoundParams("placeCarTent_SoundSet");
-			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-			SoundObject soundObject = soundBuilder.BuildSoundObject();
-			soundObject.SetPosition(GetPosition());
-			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
-		}	
 		
 		if ( GetGame().IsServer() )
 		{
@@ -40,15 +30,20 @@ class MediumTent extends TentBase
 		}	
 	}
 	
+	override bool IsTwoHandedBehaviour()
+	{
+		return true;
+	}
+	
 	override string GetDeploySoundset()
+	{
+		return "placeMediumTent_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
 	{
 		return "mediumtent_deploy_SoundSet";
 	}	
-	
-	/*override bool IsTwoHandedBehaviour()
-	{
-		return true;
-	}*/
 	
 	override string GetSoundOpen()
 	{

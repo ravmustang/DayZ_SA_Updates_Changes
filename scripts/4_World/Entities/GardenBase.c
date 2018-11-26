@@ -431,23 +431,6 @@ class GardenBase extends Building
 		slot.m_State = Slot.STATE_COVERED;
 		plant.Init( this, slot.m_Fertility, slot.m_HarvestingEfficiency, slot.GetWater() );
 		ShowSelection(SLOT_SELECTION_COVERED_PREFIX + (slot_index + 1).ToStringLen(2));
-		
-		GetGame().ObjectDelete(seed);
-		
-		Param1<ItemBase> param_seed = new Param1<ItemBase>(seed);
-		m_DeleteWithDelayTimer.Run(0.1, this, "DeleteWithDelay", param_seed, false);
-	}
-	
-	void DeleteWithDelay(ItemBase param_seed)
-	{
-		if (this)
-		{
-			ItemBase seed = param_seed;
-			if (seed)
-			{
-				GetGame().ObjectDelete( seed );
-			}
-		}
 	}
 		
 	string Fertilize( PlayerBase player, ItemBase item, float consumed_quantity, string selection_component )

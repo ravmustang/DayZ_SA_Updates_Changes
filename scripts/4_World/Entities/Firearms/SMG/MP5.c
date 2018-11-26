@@ -8,6 +8,11 @@ class MP5K_Base : RifleBoltFree_Base
 	{
 	}
 	
+	override RecoilBase SpawnRecoilObject()
+	{
+		return new Mp5kRecoil(this);
+	}
+	
 	
 	override int GetWeaponSpecificCommand(int weaponAction ,int subCommand)
 	{

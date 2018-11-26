@@ -27,8 +27,7 @@ class TurnItemIntoItemLambda extends ReplaceItemWithNewLambda
 		if (new_item) 
 		{
 			MiscGameplayFunctions.TransferItemProperties(old_item, new_item, m_TransferAgents, m_TransferVariables, m_TransferHealth, m_ExcludeQuantity);
-			MiscGameplayFunctions.TransferAttachments(old_item, new_item, m_Player);
-			//@TODO: Cargo? hands?
+			MiscGameplayFunctions.TransferInventory(old_item, new_item, m_Player);
 			
 			//quantity override
 			if (ItemBase.Cast(new_item) && m_quantity_override != -1)
@@ -44,21 +43,21 @@ class TurnItemIntoItemLambda extends ReplaceItemWithNewLambda
 	}
 };
 
-class TurnItemIntoItemLambdaAnimSysNotify extends TurnItemIntoItemLambda
+class TurnItemIntoItemLambdaAnimSysNotifyLambda extends TurnItemIntoItemLambda
 {
-	override void OnNewEntityCreated(EntityAI new_item)
+	override void OnSuccess (EntityAI new_item)
 	{
-		super.OnNewEntityCreated(new_item);
+		super.OnSuccess(new_item);
 		Human player = Human.Cast(m_Player);
 		player.GetItemAccessor().OnItemInHandsChanged();
 	}
 }
 
-class TurnItemIntoItemLambdaRestrain extends TurnItemIntoItemLambdaAnimSysNotify
+class TurnItemIntoItemLambdaRestrainLambda extends TurnItemIntoItemLambdaAnimSysNotifyLambda
 {
-	override void OnNewEntityCreated(EntityAI new_item)
+	override void OnSuccess (EntityAI new_item)
 	{
-		super.OnNewEntityCreated(new_item);
+		super.OnSuccess(new_item);
 		m_Player.SetRestrained(true);
 	}
 }
@@ -105,6 +104,11 @@ class DropEquipAndDestroyRootLambda : ReplaceItemWithNewLambdaBase
 	}
 }
 
+enum TransferInventoryResult
+{
+	Ok, DroppedSome
+};
+
 class MiscGameplayFunctions
 {	
 	//! will transform item' variables, agents and other local scripted properties as well as any relevant non-scripted properties like health
@@ -140,20 +144,50 @@ class MiscGameplayFunctions
 		}
 	}
 
-	static void TransferAttachments( EntityAI source, EntityAI target, PlayerBase player)
+	static TransferInventoryResult TransferInventory( EntityAI sourceItem, EntityAI targetItem, PlayerBase player)
 	{
-		for(int i = source.GetInventory().AttachmentCount() - 1; i > -1; i--)
+		TransferInventoryResult result = TransferInventoryResult.Ok;
+
+		array<EntityAI> children = new array<EntityAI>;
+		sourceItem.GetInventory().EnumerateInventory(InventoryTraversalType.LEVELORDER, children);
+		int count = children.Count();
+		for (int i = 0; i < count; i++)
 		{
-			EntityAI attachment = source.GetInventory().GetAttachmentFromIndex(i);
-			if( target.LocalTakeEntityAsAttachment(attachment) )
+			EntityAI child = children.Get(i);
+			if (child)
 			{
-				//pass
-			}
-			else
-			{
-				player.LocalDropEntity(attachment);
+				InventoryLocation child_src = new InventoryLocation;
+				child.GetInventory().GetCurrentInventoryLocation( child_src );
+				
+				InventoryLocation child_dst = new InventoryLocation;
+				child_dst.Copy( child_src );
+				child_dst.SetParent( targetItem );
+
+				bool drop = false;
+
+				if (GameInventory.LocationCanMoveEntity(child_src, child_dst))
+				{
+					// try to move it to the same exact place in dst
+					player.LocalTakeToDst(child_src, child_dst);
+					/*if (!GameInventory.LocationMoveEntity(child_src, child_dst))
+					{
+						Error("[inv] TransferInventory: Cannot move src to dst even if GameInventory.LocationCanMoveEntity allowed it");
+						drop = true; // failed, drop
+					}*/
+				}
+				else
+				{
+					drop = true; // or drop otherwise
+				}
+
+				if (drop)
+				{
+					player.LocalDropEntity(child);
+					result = TransferInventoryResult.DroppedSome;
+				}
 			}
 		}
+		return result;
 	}
 	
 	static void UnlimitedAmmoDebugCheck(Weapon_Base weapon)
@@ -436,17 +470,24 @@ class MiscGameplayFunctions
 			type = tool.ConfigGetBool("RestrainUnlockType");
 		}
 		string new_item_name = current_item.ConfigGetString( "OnRestrainChange");
-
+		
 		if( new_item_name != "" )
 		{
-			if (player_target.IsAlive())
-				MiscGameplayFunctions.TurnItemIntoItemEx(player_target, new ReplaceAndDestroy(current_item, new_item_name, player_target, type));
+			if( player_target )
+			{
+				if (player_target.IsAlive())
+					MiscGameplayFunctions.TurnItemIntoItemEx(player_target, new ReplaceAndDestroyLambda(current_item, new_item_name, player_target, type));
+				else
+					MiscGameplayFunctions.TurnItemIntoItemEx(player_source, new DestroyItemInCorpsesHandsAndCreateNewOnGndLambda(current_item, new_item_name, player_target, type));
+			}
 			else
-				MiscGameplayFunctions.TurnItemIntoItemEx(player_source, new DestroyItemInCorpsesHandsAndCreateNewOnGnd(current_item, new_item_name, player_target, type));
+			{
+				MiscGameplayFunctions.TurnItemIntoItemEx(player_target, new ReplaceAndDestroyLambda(current_item, new_item_name, player_target, type));
+			}
 		}
 		else
 		{
-			Error("current_item:" +current_item+ ", tool:" +tool +"no value for 'OnRestrainChange' config parameter");
+			Error("current_item:" +current_item+ ", tool:" +tool +". No value for 'OnRestrainChange' config parameter");
 		}
 	}
 	
@@ -457,7 +498,7 @@ class MiscGameplayFunctions
 	
 };
 
-class DestroyItemInCorpsesHandsAndCreateNewOnGnd : ReplaceAndDestroy
+class DestroyItemInCorpsesHandsAndCreateNewOnGndLambda : ReplaceAndDestroyLambda
 {
 	// @NOTE m_Player == target player - i.e. restrained one
 	void DestroyItemInCorpsesHandsAndCreateNewOnGnd (EntityAI old_item, string new_item_type, PlayerBase player, bool destroy = false)
@@ -470,9 +511,9 @@ class DestroyItemInCorpsesHandsAndCreateNewOnGnd : ReplaceAndDestroy
 		OverrideNewLocation(gnd);
 	}
 	
-	protected override void RemoveOldItemFromLocation (notnull EntityAI old_item)
+	protected override void RemoveOldItemFromLocation ()
 	{
-		super.RemoveOldItemFromLocation(old_item);
-		m_Player.GetHumanInventory().OnEntityInHandsDestroyed(old_item);
+		super.RemoveOldItemFromLocation();
+		m_Player.GetHumanInventory().OnEntityInHandsDestroyed(m_OldItem);
 	}
 }

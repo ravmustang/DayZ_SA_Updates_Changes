@@ -11,6 +11,12 @@ class Barrel_ColorBase : Container_Base
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
+	override void EEInit()
+	{
+		super.EEInit();
+		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
+	}
+	
 	/*override bool IsHeavyBehaviour()
 	{
 		return true;
@@ -60,7 +66,7 @@ class Barrel_ColorBase : Container_Base
 		
 		m_RainProcurement = new RainProcurementManager( this );
 		m_RainProcurement.InitRainProcurement();
-		
+		GetInventory().UnlockInventory(HIDE_INV_FROM_SCRIPT);
 		SoundSynchRemote();
 	}
 	
@@ -89,7 +95,7 @@ class Barrel_ColorBase : Container_Base
 		SetAnimationPhase("Lid2",1);
 		
 		m_RainProcurement.StopRainProcurement();
-		
+		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
 		SoundSynchRemote();
 	}
 
@@ -453,6 +459,15 @@ class Barrel_ColorBase : Container_Base
 	}
 
     override bool CanRemoveFromCargo(EntityAI cargo)
+	{
+		if ( IsOpened() )
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	override bool CanReleaseCargo(EntityAI attachment)
 	{
 		if ( IsOpened() )
 		{

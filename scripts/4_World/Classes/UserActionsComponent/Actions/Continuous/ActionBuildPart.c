@@ -2,7 +2,7 @@ class ActionBuildPartCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousTime(UATimeSpent.DEFAULT_CONSTRUCT);
+		m_ActionData.m_ActionComponent = new CAContinuousTime( UATimeSpent.DEFAULT_CONSTRUCT );
 	}
 };
 
@@ -26,7 +26,7 @@ class ActionBuildPart: ActionContinuousBase
 	override void CreateConditionComponents()  
 	{
 		m_ConditionItem = new CCINonRuined;
-		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.BASEBUILDING);
+		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.BASEBUILDING );
 	}
 
 	override int GetType()
@@ -95,11 +95,7 @@ class ActionBuildPart: ActionContinuousBase
 			construction.BuildPart( part_name, true );
 			
 			//add damage to tool
-			action_data.m_MainItem.DecreaseHealth ( 2 );
-		}
-		else
-		{
-			SendMessageToClient( action_data.m_Player, base_building.MESSAGE_CANNOT_BE_CONSTRUCTED );
+			action_data.m_MainItem.DecreaseHealth( UADamageApplied.BUILD );
 		}
 
 		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );

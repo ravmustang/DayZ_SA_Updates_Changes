@@ -491,45 +491,48 @@ class VicinitySlotsContainer: Container
 	
 	void DoubleClick(Widget w, int x, int y, int button)
 	{
-		if( w == NULL )
+		if( button == MouseState.LEFT )
 		{
-			return;
-		}
-		ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-		if( !iw )
-		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		} 
-		if( !iw )
-		{
-		  iw = ItemPreviewWidget.Cast( w );
-		}
-		if( !iw.GetItem() )
-		{
-			return;
-		}
-		
-		ItemBase item = ItemBase.Cast( iw.GetItem() );
-		
-		if( GetGame().GetPlayer().GetInventory().HasInventoryReservation( item, null ) )
-		{
-			return;
-		}
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-				
-		if ( player.GetInventory().HasEntityInInventory( item ) && GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
-		{
-			player.PredictiveTakeEntityToHands( item );
-		}
-		else
-		{
-			if( item.GetInventory().CanRemoveEntity() )
+			if( w == NULL )
+			{
+				return;
+			}
+			ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
+			if( !iw )
+			{
+			  string name = w.GetName();
+			  name.Replace( "PanelWidget", "Render" );
+			  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			} 
+			if( !iw )
+			{
+			  iw = ItemPreviewWidget.Cast( w );
+			}
+			if( !iw.GetItem() )
+			{
+				return;
+			}
+			
+			ItemBase item = ItemBase.Cast( iw.GetItem() );
+			
+			if( GetGame().GetPlayer().GetInventory().HasInventoryReservation( item, null ) )
+			{
+				return;
+			}
+			
+			if( !item.GetInventory().CanRemoveEntity() )
+				return;
+			
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+					
+			if ( player.GetInventory().HasEntityInInventory( item ) && GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
+			{
+				player.PredictiveTakeEntityToHands( item );
+			}
+			else
 			{
 				InventoryLocation il = new InventoryLocation;
-				if ( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
+				if( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
 				{
 					if( item.ConfigGetFloat("varStackMax") )
 						item.SplitIntoStackMaxClient( player, -1, );
@@ -541,13 +544,13 @@ class VicinitySlotsContainer: Container
 					player.PredictiveTakeEntityToHands( item );
 				}
 			}
-		}
-		
-		ItemManager.GetInstance().HideTooltip();
-		InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu( MENU_INVENTORY ) );
-		if ( menu )
-		{
-			menu.RefreshQuickbar();
+			
+			ItemManager.GetInstance().HideTooltip();
+			InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu( MENU_INVENTORY ) );
+			if( menu )
+			{
+				menu.RefreshQuickbar();
+			}
 		}
 	}
 	
@@ -665,6 +668,8 @@ class VicinitySlotsContainer: Container
 		EntityAI item = item_preview.GetItem();
 		bool draggable = !GetGame().GetPlayer().GetInventory().HasInventoryReservation( item, NULL );
 		draggable = draggable && item.CanPutIntoHands( GetGame().GetPlayer() );
+		draggable = draggable && item.GetInventory().CanRemoveEntity();
+		
 		ItemManager.GetInstance().SetWidgetDraggable( w, draggable );
 	}
 	
@@ -725,9 +730,16 @@ class VicinitySlotsContainer: Container
 		
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		EntityAI item = ipw.GetItem();
-		if( player.CanDropEntity( item ) )
+		
+		if( item )
 		{
-			player.PredictiveDropEntity( item );
+			if( !item.GetInventory().CanRemoveEntity() )
+				return;
+			
+			if( player.CanDropEntity( item ) )
+			{
+				player.PredictiveDropEntity( item );
+			}
 		}
 	}
 	

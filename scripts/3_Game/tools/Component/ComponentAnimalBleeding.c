@@ -9,7 +9,7 @@ class ComponentAnimalBleeding : Component
 {
 	// Member variables
 	protected ref Timer m_BleedTimer;
-	protected const float BASE_BLEED_RATE = 500;
+	protected const float BASE_BLEED_RATE = 250;
 	protected const float PASS_OUT_AMOUT = 500;
 
 	// Constructor
@@ -17,18 +17,49 @@ class ComponentAnimalBleeding : Component
 	{
 		
 	}
-
-	void CreateWound( string zone_name, string ammo )
+	
+	void InflictWoundDamage( TotalDamageResult damage_result, string zone_name, string ammo )
 	{
-		float bleed_chance = GetGame().ConfigGetFloat( "CfgVehicles " + m_ThisEntityAI.GetType() + " DamageSystem " + "DamageZones " + zone_name + " bleedChance" );
-		//Print("bleed_chance: " + bleed_chance );
+		if ( ammo == "MeleeWolf")
+		{
+			m_ThisEntityAI.SetHealth( "", "", 0 );
+		}	
+		
+		float animal_melee_multiplier = GetGame().ConfigGetFloat( "CfgAmmo " + ammo + " DamageApplied " + "additionAnimalMeleeMultiplier" );
+		float health_damage_inflicted = damage_result.GetDamage( zone_name, "Health");
+		float blood_damage_inflicted = damage_result.GetDamage( zone_name, "Blood");	
+		float wound_healt_damage = health_damage_inflicted * animal_melee_multiplier;
+		float wound_blood_damage = health_damage_inflicted * animal_melee_multiplier;
+		
+		m_ThisEntityAI.DecreaseHealth( zone_name, "Health", wound_healt_damage );
+		m_ThisEntityAI.DecreaseHealth( zone_name, "Blood", wound_blood_damage );
+		
+		//Print("damage_result Health: " + damage_result.GetDamage( zone_name, "Health" ) );
+		//Print("damage_result Blood: " + damage_result.GetDamage( zone_name, "Blood" ) );
+	}
+	
+	void CreateWound( TotalDamageResult damage_result, string zone_name, string ammo )
+	{
+		//Print( "GetHealth Health before creating wound@: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Health" ));
+		InflictWoundDamage( damage_result, zone_name, ammo );
+		//Print( "GetHealth Health after creating wood@: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Health" ));
+		
+		float can_bleed = GetGame().ConfigGetFloat( "CfgVehicles " + m_ThisEntityAI.GetType() + " DamageSystem " + "DamageZones " + zone_name + " canBleed" );
+		//Print("can_bleed: " + can_bleed );
+		float bleed_treshold = GetGame().ConfigGetFloat( "CfgAmmo " + ammo + " DamageApplied " + "bleedThreshold" );
+		//Print("bleed_treshold: " + bleed_treshold );
 		float chance = Math.RandomFloat01();
 		//Print("chance: " + chance );
 		
-		if( chance < bleed_chance )
+		//Print( "GetHealth Health @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Health" ));
+		//Print( "GetHealth Blood @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Blood" ));
+		//Print( "GetHealth Shock @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Shock" ));
+		
+		if ( can_bleed && chance <= bleed_treshold )
 		{
 			m_BleedTimer = new Timer();
-			float wound_intensity = GetWoundIntensity( ammo );
+			float wound_intensity = GetWoundIntensity( bleed_treshold );
+			//Print("wound_intensity: " + wound_intensity);
 			m_BleedTimer.Run( 1, this, "Bleed", new Param1<float>( wound_intensity ), true ); 
 		}
 		/*
@@ -54,15 +85,11 @@ class ComponentAnimalBleeding : Component
 				m_ThisEntityAI.SetHealth( "", "", 0 );
 				//Print("global_blood_lvl < PASS_OUT_AMOUT => Zabijam zviera.");	
 			}
-		
-			/*
-			Print( "GetHealth Global Health: " + m_ThisEntityAI.GetHealth( "", "Health" ));
-			Print( "GetHealth Global Blood: " + m_ThisEntityAI.GetHealth( "", "Blood" ));
-			Print( "GetHealth Global Shock: " + m_ThisEntityAI.GetHealth( "", "Shock" ));
-			Print( "GetHealth Health @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Health" ));
-			Print( "GetHealth Blood @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Blood" ));
-			Print( "GetHealth Shock @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Shock" ));
-			*/
+			
+			//Print( "GetHealth Global Health: " + m_ThisEntityAI.GetHealth( "", "Health" ));
+			//Print( "GetHealth Global Blood: " + m_ThisEntityAI.GetHealth( "", "Blood" ));
+			//Print( "GetHealth Global Shock: " + m_ThisEntityAI.GetHealth( "", "Shock" ));
+			
 		}
 		else
 		{
@@ -71,20 +98,9 @@ class ComponentAnimalBleeding : Component
 		}
 	}
 
-	float GetWoundIntensity( string ammo )
+	float GetWoundIntensity( float bleed_treshold )
 	{
-		ref map<string, float> caliber_bleed_rate = new map<string, float>;
-		float bleed_rate;
-
-		// lower bleeding rate
-		caliber_bleed_rate.Set("Bullet_9x19", 0.5 );
-		// default bleeding rate
-		caliber_bleed_rate.Set("Bullet_45ACP", 1 );
-		// higher bleeding rate
-		caliber_bleed_rate.Set("Bullet_762x39", 2 );
-
-		caliber_bleed_rate.Find( ammo, bleed_rate );
-
-		return bleed_rate;
+		//higher the bleeding treshold => more intense bleeding
+		return bleed_treshold * 2;
 	}
 }

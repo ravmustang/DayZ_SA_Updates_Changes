@@ -165,17 +165,24 @@ class HandsContainer: Container
 		}
 		else if( m_Atts && m_Atts.IsActive() )
 		{
-//			m_Atts.EquipItem();
+			m_Atts.EquipItem();
 		}
 		else
 		{
-			EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
-			if( item_in_hands && !item_in_hands.IsInherited( Magazine ) && GetGame().GetPlayer().GetHumanInventory().CanRemoveEntityInHands() )
+			ItemBase item_in_hands = ItemBase.Cast( GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
+			if( item_in_hands && !item_in_hands.IsInherited( Magazine )  )
 			{
-				if( GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, item_in_hands ) )
+				if( item_in_hands.CanBeSplit() )
 				{
-					m_MainWidget.FindAnyWidget("Selected").Show( false );
-					m_MainWidget.FindAnyWidget("hands_preview_root").SetAlpha( 1 );
+					item_in_hands.OnRightClick();
+				}
+				if( GetGame().GetPlayer().GetHumanInventory().CanRemoveEntityInHands() )
+				{
+					if( GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, item_in_hands ) )
+					{
+						m_MainWidget.FindAnyWidget("Selected").Show( false );
+						m_MainWidget.FindAnyWidget("hands_preview_root").SetAlpha( 1 );
+					}
 				}
 			}
 		}
@@ -326,45 +333,37 @@ class HandsContainer: Container
 		if( ItemManager.GetInstance().IsMicromanagmentMode() )
 		{
 			EntityAI selected_item = ItemManager.GetInstance().GetSelectedItem();
-			if( selected_item && item_in_hands )
+			if( selected_item && selected_item.GetInventory().CanRemoveEntity() )
 			{
-				if( GameInventory.CanSwapEntities( item_in_hands, selected_item ) )
+				if( item_in_hands && item_in_hands.GetInventory().CanRemoveEntity() )
 				{
-					player.PredictiveSwapEntities( item_in_hands, selected_item );
+					if( GameInventory.CanSwapEntities( item_in_hands, selected_item ) )
+					{
+						player.PredictiveSwapEntities( item_in_hands, selected_item );
+						to_reselect = true;
+						item_to_be_swap = selected_item;
+					}
 				}
 				else
 				{
-					player.PredictiveSwapEntities( selected_item, item_in_hands);
-				}
-				to_reselect = true;
-				item_to_be_swap = selected_item;
-			}
-			else
-			{
-				if( selected_item && player.GetHumanInventory().CanAddEntityInHands( selected_item ) )
-				{
- 					player.PredictiveTakeEntityToHands( selected_item );
-					Widget selected_widget = ItemManager.GetInstance().GetSelectedWidget();
-					if( selected_widget )
+					if( player.GetHumanInventory().CanAddEntityInHands( selected_item ) )
 					{
-						selected_widget.Show( false );
+		 				player.PredictiveTakeEntityToHands( selected_item );
+						Widget selected_widget = ItemManager.GetInstance().GetSelectedWidget();
+						if( selected_widget )
+						{
+							selected_widget.Show( false );
+						}
+						to_reselect = true;
 					}
-					to_reselect = true;
+					return;
 				}
-				return;
 			}
-			
 		}
-		if( m_Cargo == NULL )
+		else if( m_Cargo )
 		{
-			return;
-		}
-		EntityAI prev_item = EntityAI.Cast( m_Cargo.GetFocusedItem().GetObject() );
-		if ( prev_item )
-		{
-			Icon icon = m_IconsContainer.GetIcon( prev_item.GetID() );
-			
-			if( icon )
+			EntityAI prev_item = EntityAI.Cast( m_Cargo.GetFocusedItem().GetObject() );
+			if ( prev_item && prev_item.GetInventory().CanRemoveEntity() )
 			{
 				if( item_in_hands )
 				{
@@ -489,10 +488,12 @@ class HandsContainer: Container
 		name = receiver.GetName();
 		name.Replace("PanelWidget", "Render");
 		ItemPreviewWidget receiver_iw = ItemPreviewWidget.Cast( receiver.FindAnyWidget(name) );
-		if(receiver_iw)
-		receiver_item = receiver_iw.GetItem();
+		if( receiver_iw )
+			receiver_item = receiver_iw.GetItem();
 
-
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		Weapon_Base wpn;
 		Magazine mag;
 		if ( Class.CastTo(wpn,  item ) && Class.CastTo(mag,  ipw.GetItem() ) )
@@ -510,6 +511,8 @@ class HandsContainer: Container
 			}
 			else if( GameInventory.CanSwapEntities( receiver_item, ipw.GetItem() ) )
 			{
+				if( !receiver_item.GetInventory().CanRemoveEntity() )
+					return;
 				GetGame().GetPlayer().PredictiveSwapEntities( ipw.GetItem(), receiver_item );
 			}
 		}
@@ -1080,6 +1083,9 @@ class HandsContainer: Container
 			c_y = item_in_hands.GetInventory().GetCargo().GetWidth();
 		}
 		
+		if( !item_in_hands.GetInventory().CanRemoveEntity() )
+			return;
+		
 		if( c_x > x && c_y > y && item_in_hands.GetInventory().CanAddEntityInCargoEx( item, idx, x, y ) )
 		{
 			player.PredictiveTakeEntityToTargetCargoEx( item_in_hands, item, idx, x, y );
@@ -1242,64 +1248,70 @@ class HandsContainer: Container
 
 	void DoubleClick(Widget w, int x, int y, int button)
 	{
-		if( w == NULL )
+		if( button == MouseState.LEFT )
 		{
-			return;
-		}
-		ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-		if( !iw )
-		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		}
-		if( !iw )
-		{
-		  iw = ItemPreviewWidget.Cast( w );
-		}
-		if( !iw.GetItem() )
-		{
-			return;
-		}
-
-		ItemBase item = ItemBase.Cast( iw.GetItem() );
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		EntityAI item_in_hands = player.GetHumanInventory().GetEntityInHands();
-		Weapon_Base wpn;
-		Magazine mag;
-		if ( Class.CastTo(wpn,  item_in_hands ) )
-		{
-			return;
-		}
-
-		if ( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
-		{
-			player.PredictiveTakeEntityToHands( item );
-		}
-		else
-		{
-			if ( player.GetInventory().CanAddEntityToInventory( item ) && player.GetHumanInventory().CanRemoveEntityInHands() )
+			if( w == NULL )
 			{
-				if( item.ConfigGetFloat("varStackMax") )
-					item.SplitIntoStackMaxClient( player, -1, );
-				else
-					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
+				return;
+			}
+			ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
+			if( !iw )
+			{
+			  string name = w.GetName();
+			  name.Replace( "PanelWidget", "Render" );
+			  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			}
+			if( !iw )
+			{
+			  iw = ItemPreviewWidget.Cast( w );
+			}
+			if( !iw.GetItem() )
+			{
+				return;
+			}
+	
+			ItemBase item = ItemBase.Cast( iw.GetItem() );
+			
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+			EntityAI item_in_hands = player.GetHumanInventory().GetEntityInHands();
+			Weapon_Base wpn;
+			Magazine mag;
+			if( Class.CastTo(wpn, item_in_hands ) )
+			{
+				return;
+			}
+	
+			if( !item.GetInventory().CanRemoveEntity() )
+				return;
+			
+			if( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
+			{
+				player.PredictiveTakeEntityToHands( item );
 			}
 			else
 			{
-				if( player.GetHumanInventory().CanAddEntityInHands( item ) )
+				if( player.GetInventory().CanAddEntityToInventory( item ) && player.GetHumanInventory().CanRemoveEntityInHands() )
 				{
-					player.PredictiveTakeEntityToHands( item );
+					if( item.ConfigGetFloat("varStackMax") )
+						item.SplitIntoStackMaxClient( player, -1, );
+					else
+						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, InventoryItem.Cast( item ) );
+				}
+				else
+				{
+					if( player.GetHumanInventory().CanAddEntityInHands( item ) )
+					{
+						player.PredictiveTakeEntityToHands( item );
+					}
 				}
 			}
+	
+			ItemManager.GetInstance().HideTooltip();
+	
+			name = w.GetName();
+			name.Replace( "PanelWidget", "Temperature" );
+			w.FindAnyWidget( name ).Show( false );
 		}
-
-		ItemManager.GetInstance().HideTooltip();
-
-		name = w.GetName();
-		name.Replace( "PanelWidget", "Temperature" );
-		w.FindAnyWidget( name ).Show( false );
 	}
 	
 	int GetCargoHeight()

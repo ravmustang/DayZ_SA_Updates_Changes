@@ -99,7 +99,7 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		vector aimingMatTM[4];
 		hia.WeaponGetAimingModelDirTm(aimingMatTM);
 		
-		//Math3D.MatrixMultiply4(dynamics, aimingMatTM, dynamics);
+		Math3D.MatrixMultiply4(dynamics, aimingMatTM, dynamics);
 		Math3D.MatrixMultiply4(dynamics, matTM, pOutResult.m_CameraTM);
 	
 		AdjustCameraParameters(pDt, pOutResult);
@@ -217,7 +217,7 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 	{
 		if (!temp_array)
 			temp_array = new array<float>;
-		m_fShootFromCamera = 2.0;
+		m_fShootFromCamera = 0;
 	}
 	
 	override EntityAI GetCurrentSightEntity ()

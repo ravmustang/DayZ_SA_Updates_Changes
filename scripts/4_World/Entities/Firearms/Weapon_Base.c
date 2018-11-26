@@ -403,6 +403,17 @@ class Weapon_Base extends Weapon
 			player.SetReturnToOptics(false);
 		}
 	}
+	
+	override bool CanReleaseAttachment(EntityAI attachment)
+	{
+		PlayerBase player = PlayerBase.Cast( GetHierarchyRootPlayer() );
+		if( player )
+		{
+			if( player.GetItemInHands() == this )
+				return true;
+		}
+		return false;
+	}
 
 	bool IsRemoteWeapon ()
 	{

@@ -264,9 +264,9 @@ class ActionTargets
 				return true;
 
 			// use CE_CENTER mem point for obstruction check
-			if ( object.HasSelection(CE_CENTER) )
+			if ( object.MemoryPointExists(CE_CENTER) )
 			{
-				vector modelPos = object.GetSelectionPosition(CE_CENTER);
+				vector modelPos = object.GetMemoryPointPos(CE_CENTER);
 				objCenterPos = object.ModelToWorld(modelPos);
 			}
 			else

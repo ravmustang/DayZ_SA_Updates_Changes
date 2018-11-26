@@ -477,6 +477,8 @@ class Construction
 		{
 			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
 			
+			GetGame().RemoteObjectTreeDelete(GetParent());
+			
 			for ( int i = 0; i < child_count; i++ )
 			{
 				string child_name;
@@ -513,9 +515,7 @@ class Construction
 							//detach
 							if ( GetGame().IsMultiplayer() )
 							{
-								GetGame().RemoteObjectTreeDelete(attachment);
 								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
-								GetGame().RemoteObjectTreeCreate(attachment);	
 							}
 							else
 							{
@@ -563,19 +563,21 @@ class Construction
 						//material slot is empty, create a new material
 						else
 						{
-							attachment = ItemBase.Cast( GetGame().CreateObject( type, GetParent().GetPosition() ) );
+							//attach item
+							slot_id = InventorySlots.GetSlotIdFromString( slot_name );
+							InventoryLocation attLoc = new InventoryLocation;
+							attLoc.SetAttachment(GetParent(), null, slot_id);
+							attachment = GetParent().GetInventory().LocationCreateLocalEntity(attLoc, type); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
 							if ( quantity > 0 ) 					//object was deleted or the quantity is ignored
 							{
 								attachment.SetQuantity( quantity );
 							}
-							
-							//attach item
-							slot_id = InventorySlots.GetSlotIdFromString( slot_name );
-							GetParent().GetInventory().TakeEntityAsAttachmentEx( InventoryMode.LOCAL, attachment, slot_id );
 						}
 					}
 				}
 			}
+			
+			GetGame().RemoteObjectTreeCreate(GetParent());	
 		}
 	}	
 	

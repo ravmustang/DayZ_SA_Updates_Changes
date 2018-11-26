@@ -37,17 +37,6 @@ class LargeTent extends TentBase
 	override void OnPlacementComplete( Man player )
 	{		
 		super.OnPlacementComplete( player );
-
-		//temporary used sound for car tent
-		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
-		{
-			SoundParams soundParams = new SoundParams("placeCarTent_SoundSet");
-
-			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-			SoundObject soundObject = soundBuilder.BuildSoundObject();
-			soundObject.SetPosition(GetPosition());
-			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
-		}	
 		
 		if ( GetGame().IsServer() )
 		{
@@ -55,15 +44,20 @@ class LargeTent extends TentBase
 		}	
 	}
 	
-	override string GetDeploySoundset()
-	{
-		return "largetent_deploy_SoundSet";
-	}	
-	
-	/*override bool IsTwoHandedBehaviour()
+	override bool IsTwoHandedBehaviour()
 	{
 		return true;
-	}*/
+	}
+	
+	override string GetDeploySoundset()
+	{
+		return "placeLargeTent_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "largetent_deploy_SoundSet";
+	}
 	
 	override string GetSoundOpen()
 	{

@@ -68,24 +68,7 @@ class TakeFireplaceFromIndoorLambda : ReplaceItemWithNewLambdaBase
 	override void CopyOldPropertiesToNew( notnull EntityAI old_item, EntityAI new_item )
 	{
 		super.CopyOldPropertiesToNew( old_item, new_item );
-		
-		array<EntityAI> children = new array<EntityAI>;
-		old_item.GetInventory().EnumerateInventory( InventoryTraversalType.LEVELORDER, children );
-		int count = children.Count();
-		for ( int i = 0; i < count; i++ )
-		{
-			EntityAI child = children.Get(i);
-			if ( child )
-			{
-				InventoryLocation child_src = new InventoryLocation;
-				child.GetInventory().GetCurrentInventoryLocation( child_src );
-				
-				InventoryLocation child_dst = new InventoryLocation;
-				child_dst.Copy( child_src );
-				child_dst.SetParent( new_item );
-				
-				m_Player.LocalTakeToDst( child_src, child_dst );
-			}
-		}
+
+		MiscGameplayFunctions.TransferInventory(old_item, new_item, m_Player);		
 	}
 }

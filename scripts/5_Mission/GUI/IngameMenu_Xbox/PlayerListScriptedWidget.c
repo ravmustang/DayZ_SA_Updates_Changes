@@ -187,7 +187,7 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 	{
 		if( m_Entries )
 		{
-			m_Entries.Insert( UID, new PlayerListEntryScriptedWidget( m_Content, name, UID, show_permissions ) );
+			m_Entries.Insert( UID, new PlayerListEntryScriptedWidget( m_Content, name, UID, show_permissions, this ) );
 			m_TotalEntries++;
 		}
 	}
@@ -247,7 +247,7 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 			float x_s, y_s;
 			float x_l, y_l;
 			
-			Widget root			= entry.GetButtonWidget();
+			Widget root			= entry.GetButtonWidget().GetParent();
 			Widget first_child	= root.GetParent().GetChildren();
 			Widget last_child	= first_child;
 			while( last_child )

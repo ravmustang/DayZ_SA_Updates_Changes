@@ -1,36 +1,24 @@
 //BASE BUILDING BASE
 class BaseBuildingBase extends ItemBase
 {
-	//TODO - remove player messages???
-	static const string MESSAGE_CANNOT_BE_CONSTRUCTED		= "This part cannot be constructed.";
-	static const string MESSAGE_CANNOT_BE_DECONSTRUCTED		= "This part cannot be dismantled because of some other part.";
+	const string 	ANIMATION_DEPLOYED			= "Deployed";
+		  string 	CONSTRUCTION_KIT			= "";
 	
-	const string ANIMATION_DEPLOYED			= "Deployed";
-			string CONSTRUCTION_KIT			= "";
+	float 				m_ConstructionKitHealth;			//stored health value for used construction kit
 	
-	float 	m_ConstructionKitHealth;			//stored health value for used construction kit
+	ref Construction 	m_Construction;
 	
-	ref Construction 			m_Construction;
-	
-	bool 	m_HasBase = false;
-	bool 	m_HasGate = false;
-	//variables for synchronization of base building parts (2x32 is the current limit)
-	int 	m_SyncParts01;									//synchronization for already built parts (32)
-	int 	m_SyncParts02;									//synchronization for already built parts (64)
+	bool 				m_HasBase = false;
+	bool 				m_HasGate = false;
+	//variables for synchronization of base building parts (2x31 is the current limit)
+	int 				m_SyncParts01;									//synchronization for already built parts (31)
+	int 				m_SyncParts02;									//synchronization for already built parts (62)
 	
 	ref map<string, ref AreaDamageRegularDeferred> m_DamageTriggers;
 	
 	// Constructor
 	void BaseBuildingBase() 
 	{
-		//TODO - damage triggers
-		/*
-		SetFlags(EntityFlags.TRIGGER, false);
-		
-		m_DmgTriggers = new array<BarbedWireTrigger>;
-		m_BarbedWires = new map<string,BarbedWire>;
-		*/
-		
 		m_DamageTriggers = new ref map<string, ref AreaDamageRegularDeferred>;
 		
 		//synchronized variables
@@ -80,9 +68,9 @@ class BaseBuildingBase extends ItemBase
 			
 			m_SyncParts01 = m_SyncParts01 | mask;
 			
-			if ( part_id > 32 )
+			if ( part_id > 31 )
 			{
-				offset = ( part_id % 32 ) - 1;
+				offset = ( part_id % 31 ) - 1;
 				mask = 1 << offset;
 				
 				m_SyncParts02 = m_SyncParts02 | mask;
@@ -108,9 +96,9 @@ class BaseBuildingBase extends ItemBase
 			
 			m_SyncParts01 = m_SyncParts01 | mask;
 			
-			if ( part_id > 32 )
+			if ( part_id > 31 )
 			{
-				offset = ( part_id % 32 ) - 1;
+				offset = ( part_id % 31 ) - 1;
 				mask = 1 << offset;
 				
 				m_SyncParts02 = m_SyncParts02 & ~mask;
@@ -136,9 +124,9 @@ class BaseBuildingBase extends ItemBase
 			
 			m_SyncParts01 = m_SyncParts01 | mask;
 			
-			if ( part_id > 32 )
+			if ( part_id > 31 )
 			{
-				offset = ( part_id % 32 ) - 1;
+				offset = ( part_id % 31 ) - 1;
 				mask = 1 << offset;
 				
 				if ( ( m_SyncParts02 & mask ) > 0 )
@@ -265,8 +253,8 @@ class BaseBuildingBase extends ItemBase
 		ctx.Read( m_SyncParts01 );
 		ctx.Read( m_SyncParts02 );
 		
-		//restore parts from restored sync data
-		SetPartsFromSyncData();
+		//synchronize after load
+		Synchronize();
 	}
 	
 	override void EEInit()
@@ -536,12 +524,15 @@ class BaseBuildingBase extends ItemBase
 	
 	bool HasAttachmentsBesidesBase()
 	{
-		if ( GetInventory().AttachmentCount() > 1 )
+		int attachment_count = GetInventory().AttachmentCount();
+		if ( attachment_count > 0 )
 		{
-			if ( !HasBase() )
+			if ( HasBase() && attachment_count == 1 )
 			{
-				return true;
+				return false;
 			}
+			
+			return true;
 		}
 		
 		return false;

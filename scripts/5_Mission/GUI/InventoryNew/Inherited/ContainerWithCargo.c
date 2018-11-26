@@ -312,7 +312,7 @@ class ContainerWithCargo: ClosableContainer
 			c_y = m_Entity.GetInventory().GetCargo().GetWidth();
 		}
 		
-		if( m_Entity && c_x > x && c_y > y && m_Entity.GetInventory().CanAddEntityInCargoEx( item, 0, x, y ) )
+		if( m_Entity && c_x > x && c_y > y && m_Entity.GetInventory().CanAddEntityInCargoEx( item, 0, x, y ) && item.GetInventory().CanRemoveEntity() )
 		{
 			ItemManager.GetInstance().HideDropzones();
 			if( m_Entity.GetHierarchyParent() == GetGame().GetPlayer() )
@@ -394,7 +394,12 @@ class ContainerWithCargo: ClosableContainer
 	void TakeIntoHands( notnull PlayerBase player, notnull EntityAI item )
 	{
 		ItemBase item_base = ItemBase.Cast( item );
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		float stackable = item_base.ConfigGetFloat("varStackMax");
+		
 		if( stackable == 0 || stackable >= item_base.GetQuantity() )
 		{
 			player.PredictiveTakeEntityToHands( item );
@@ -408,7 +413,12 @@ class ContainerWithCargo: ClosableContainer
 	void TakeIntoCargo( notnull PlayerBase player, notnull EntityAI entity, notnull EntityAI item, int idx = -1, int row = 0, int col = 0 )
 	{
 		ItemBase item_base = ItemBase.Cast( item );
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
 		float stackable = item_base.ConfigGetFloat("varStackMax");
+		
 		if( stackable == 0 || stackable >= item_base.GetQuantity() )
 		{
 			if( idx != -1 )
@@ -440,7 +450,7 @@ class ContainerWithCargo: ClosableContainer
 		}
 		
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if( ( m_Entity.GetInventory().CanAddEntityInCargo( item ) && (!player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item )) ) || player.GetHumanInventory().HasEntityInHands( item ) )
+		if( item.GetInventory().CanRemoveEntity() && ( m_Entity.GetInventory().CanAddEntityInCargo( item ) && (!player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item )) ) || player.GetHumanInventory().HasEntityInHands( item ) )
 		{
 			ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
 			ItemManager.GetInstance().HideDropzones();

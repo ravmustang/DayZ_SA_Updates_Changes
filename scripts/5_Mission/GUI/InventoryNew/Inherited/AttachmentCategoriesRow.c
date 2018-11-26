@@ -15,28 +15,81 @@ class AttachmentCategoriesRow: ClosableContainer
 		return ipw.GetItem();
 	}
 	
+	int GetFocusedSlot()
+	{
+		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Ics.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Render" + m_FocusedColumn ) );
+		return ipw.GetUserID();
+	}
+	
 	override void SelectItem()
 	{
 		ItemBase item = ItemBase.Cast( GetFocusedEntity() );
-		ItemManager.GetInstance().SetSelectedItem( item, NULL, m_Ics.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ) );
+		ItemManager.GetInstance().SetSelectedItem( item, null, m_Ics.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ) );
 	}
 	
 	override void Select()
 	{
-		EntityAI prev_item = EntityAI.Cast( GetFocusedEntity() );
+		ItemBase prev_item = ItemBase.Cast( GetFocusedEntity() );
 		Man player = GetGame().GetPlayer();
 		
 		if( ItemManager.GetInstance().IsItemMoving() )
 		{
-			EntityAI selected_item = ItemManager.GetInstance().GetSelectedItem();
-			if( selected_item /*&& GetEntity()*/ )
+			ItemBase selected_item = ItemBase.Cast( ItemManager.GetInstance().GetSelectedItem() );
+			int selected_slot = GetFocusedSlot();
+			int stack_max;
+			if( selected_item && selected_item.GetInventory().CanRemoveEntity() )
 			{
-				bool can_add = m_Entity.GetInventory().CanAddEntityInCargo( selected_item );
-				//bool in_cargo = !player.GetInventory().HasEntityInInventory( selected_item ) || !m_Entity.GetInventory().HasEntityInCargo( selected_item );
-				if( can_add)
+				if( m_Entity.GetInventory().CanAddAttachmentEx( selected_item, selected_slot ) )
 				{
-					player.PredictiveTakeEntityToTargetAttachment(m_Entity, selected_item);
-					ItemManager.GetInstance().SetSelectedItem( NULL, NULL, NULL );
+					stack_max = InventorySlots.GetStackMaxForSlotId( selected_slot );
+					float quantity = selected_item.GetQuantity();
+					if( stack_max == 0 || stack_max >= quantity || !selected_item.CanBeSplit() )
+					{
+						GetGame().GetPlayer().PredictiveTakeEntityToTargetAttachmentEx( m_Entity, selected_item, selected_slot );
+					}
+					else
+					{
+						selected_item.SplitIntoStackMaxClient( m_Entity, selected_slot );
+					}
+				}
+				else if( selected_slot != -1 )
+				{
+					if ( prev_item )
+					{
+						InventoryLocation inv_loc = new InventoryLocation;
+						prev_item.GetInventory().GetCurrentInventoryLocation( inv_loc );
+						stack_max = InventorySlots.GetStackMaxForSlotId( inv_loc.GetSlot() );
+						quantity = prev_item.GetQuantity();
+						if ( prev_item.CanBeCombined( ItemBase.Cast( selected_item ) ) )
+						{
+							prev_item.CombineItemsClient( selected_item, true );
+						}
+						else if( stack_max == 0 && GameInventory.CanSwapEntities( prev_item, selected_item ) )
+						{
+							GetGame().GetPlayer().PredictiveSwapEntities( selected_item, prev_item );
+						}
+					}
+					else
+					{
+						InventoryLocation inv_loc_src = new InventoryLocation;
+						InventoryLocation inv_loc_dst = new InventoryLocation;
+						selected_item.GetInventory().GetCurrentInventoryLocation( inv_loc_src );
+						m_Entity.GetInventory().FindFreeLocationFor( selected_item, FindInventoryLocationType.ATTACHMENT, inv_loc_dst );
+						
+						if( inv_loc_dst.IsValid() && inv_loc_dst.GetType() == InventoryLocationType.ATTACHMENT )
+						{
+							stack_max = InventorySlots.GetStackMaxForSlotId( inv_loc_dst.GetSlot() );
+							quantity = selected_item.GetQuantity();
+							if( stack_max == 0 || stack_max >= quantity || !selected_item.CanBeSplit() )
+							{
+								GetGame().GetPlayer().PredictiveTakeEntityToTargetAttachmentEx( m_Entity, selected_item, inv_loc_dst.GetSlot() );
+							}
+							else if( stack_max >= 0 || !selected_item.CanBeSplit() )
+							{
+								selected_item.SplitIntoStackMaxClient( m_Entity, inv_loc_dst.GetSlot() );
+							}
+						}
+					}
 				}
 				else
 				{
@@ -61,27 +114,27 @@ class AttachmentCategoriesRow: ClosableContainer
 		}
 		else
 		{
-			if ( prev_item )
+			if ( prev_item && prev_item.GetInventory().CanRemoveEntity() )
 			{
-					EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
-					if( item_in_hands )
+				EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
+				if( item_in_hands && item_in_hands.GetInventory().CanRemoveEntity() )
+				{
+					if( GameInventory.CanSwapEntities( item_in_hands, prev_item ) )
 					{
-						if( GameInventory.CanSwapEntities( item_in_hands, prev_item ) )
-						{
-							player.PredictiveSwapEntities( item_in_hands, prev_item );
-						}
-						else
-						{
-							player.PredictiveSwapEntities( prev_item, item_in_hands);
-						}
+						player.PredictiveSwapEntities( item_in_hands, prev_item );
 					}
 					else
 					{
-						if( player.GetHumanInventory().CanAddEntityInHands( prev_item ) )
-						{
-							player.PredictiveTakeEntityToHands( prev_item );
-						}
+						player.PredictiveSwapEntities( prev_item, item_in_hands);
 					}
+				}
+				else
+				{
+					if( player.GetHumanInventory().CanAddEntityInHands( prev_item ) )
+					{
+						player.PredictiveTakeEntityToHands( prev_item );
+					}
+				}
 			}		
 		}
 	}
@@ -107,10 +160,6 @@ class AttachmentCategoriesRow: ClosableContainer
 	{
 		m_FocusedRow = 0;
 		m_FocusedColumn = 0;
-		if( ItemManager.GetInstance().IsMicromanagmentMode() )
-		{
-			return;
-		}
 		m_Ics.Get( 0 ).GetMainWidget().FindAnyWidget( "Cursor" + 0 ).Show( true );
 		
 		EntityAI focused_item = GetFocusedEntity();
@@ -238,6 +287,9 @@ class AttachmentCategoriesRow: ClosableContainer
 		}
 		ItemBase item = ItemBase.Cast( iw.GetItem() );
 		int stack_max;
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
 		if( m_Entity.GetInventory().CanAddAttachmentEx( item, receiver.GetUserID() ) )
 		{
 			stack_max = InventorySlots.GetStackMaxForSlotId( receiver.GetUserID() );
@@ -255,7 +307,9 @@ class AttachmentCategoriesRow: ClosableContainer
 		{
 			if ( receiver_item )
 			{
-				stack_max = InventorySlots.GetStackMaxForSlotId( receiver_item.GetInventory().GetSlotId(0) );
+				InventoryLocation inv_loc = new InventoryLocation;
+				receiver_item.GetInventory().GetCurrentInventoryLocation( inv_loc );
+				stack_max = InventorySlots.GetStackMaxForSlotId( inv_loc.GetSlot() );
 				quantity = receiver_item.GetQuantity();
 				if ( receiver_item.CanBeCombined( ItemBase.Cast( iw.GetItem() ) ) )
 				{
@@ -263,7 +317,8 @@ class AttachmentCategoriesRow: ClosableContainer
 				}
 				else if( stack_max == 0 && GameInventory.CanSwapEntities( receiver_item, item ) )
 				{
-					GetGame().GetPlayer().PredictiveSwapEntities( item, receiver_item );
+					if( receiver_item.GetInventory().CanRemoveEntity() )
+						GetGame().GetPlayer().PredictiveSwapEntities( item, receiver_item );
 				}
 			}
 			else
@@ -475,69 +530,70 @@ class AttachmentCategoriesRow: ClosableContainer
 	
 	void DoubleClick(Widget w, int x, int y, int button)
 	{
-		if( w == NULL )
+		if( button == MouseState.LEFT )
 		{
-			return;
-		}
-		ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-		if( !iw )
-		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		}
-		if( !iw )
-		{
-		  iw = ItemPreviewWidget.Cast( w );
-		}
-		if( !iw.GetItem() )
-		{
-			return;
-		}
-		
-		if( m_Entity.GetInventory().GetSlotLock( iw.GetUserID() ) )
-		{
-			return;
-		}
-		
-		if ( !m_Entity.CanReleaseAttachment( iw.GetItem() ) )
-		{
-			return;
-		}
-		
-		ItemBase item = ItemBase.Cast( iw.GetItem() );
-		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		
-		if ( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
-		{
-			player.PredictiveTakeEntityToHands( item );
-		}
-		else
-		{
-			if (player.GetInventory().CanAddEntityToInventory( item ) && item.GetInventory().CanRemoveEntity())
+			if( w == NULL )
 			{
-				if( item.ConfigGetFloat("varStackMax") )
-				{
-					item.SplitIntoStackMaxClient( player, -1 );
-				}
-				else
-					player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, item );
+				return;
+			}
+			ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
+			if( !iw )
+			{
+			  string name = w.GetName();
+			  name.Replace( "PanelWidget", "Render" );
+			  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			}
+			if( !iw )
+			{
+			  iw = ItemPreviewWidget.Cast( w );
+			}
+			if( !iw.GetItem() )
+			{
+				return;
+			}
+			
+			if( m_Entity.GetInventory().GetSlotLock( iw.GetUserID() ) )
+			{
+				return;
+			}
+			
+			ItemBase item = ItemBase.Cast( iw.GetItem() );
+			
+			if( !item.GetInventory().CanRemoveEntity() )
+				return;
+			
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+			
+			if ( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
+			{
+				player.PredictiveTakeEntityToHands( item );
 			}
 			else
 			{
-				if( player.GetHumanInventory().CanAddEntityInHands( item ) )
+				if (player.GetInventory().CanAddEntityToInventory( item ) && item.GetInventory().CanRemoveEntity())
 				{
-					player.PredictiveTakeEntityToHands( item );
+					if( item.ConfigGetFloat("varStackMax") )
+					{
+						item.SplitIntoStackMaxClient( player, -1 );
+					}
+					else
+						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, item );
+				}
+				else
+				{
+					if( player.GetHumanInventory().CanAddEntityInHands( item ) )
+					{
+						player.PredictiveTakeEntityToHands( item );
+					}
 				}
 			}
+			
+			ItemManager.GetInstance().HideTooltip();
+			
+			name = w.GetName();
+			name.Replace( "PanelWidget", "Temperature" );
+			w.FindAnyWidget( name ).Show( false );
 		}
-		
-		ItemManager.GetInstance().HideTooltip();
-		
-		name = w.GetName();
-		name.Replace( "PanelWidget", "Temperature" );
-		w.FindAnyWidget( name ).Show( false );
 	}
 	
 	void Init(int attachments_categories_count, int i, string attachment_category, string config_path_attachment_categories, EntityAI entity, int parent_m_Body_count )
@@ -638,8 +694,6 @@ class AttachmentCategoriesRow: ClosableContainer
 			item_preview2.SetModelOrientation( Vector(0, 0, 0) );
 			item_preview2.SetView( entity.GetViewIndex() );
 			
-			ItemManager.GetInstance().SetTemperature( entity.GetInventory().FindAttachment( slot_id ), item_preview2 );
-			
 			Widget item_w = item_preview2;
 			EntityAI item = m_Entity.GetInventory().FindAttachment(slot_id);
 			if( item == NULL )
@@ -647,18 +701,19 @@ class AttachmentCategoriesRow: ClosableContainer
 				item_w.FindAnyWidget("QuantityPanel"+j%7).Show(false);
 			}
 			
+			ItemManager.GetInstance().SetTemperature( item, item_preview2 );
 			item_w.FindAnyWidget("Mounted"+j%7).Show(false);
-			bool draggable;
+			bool draggable = true;
 			if ( item_w && item )
 			{				
 				if( m_Entity.GetInventory().GetSlotLock( slot_id ) && ItemManager.GetInstance().GetDraggedItem() != item )
 				{
 					item_w.FindAnyWidget("Mounted"+j%7).Show( true );
+					draggable = false;
 				}
 				else
 				{
 					item_w.FindAnyWidget("Mounted"+j%7).Show( false );
-					draggable = true;
 				}
 				
 				if( !m_Entity.CanReleaseAttachment( item ) )
@@ -711,17 +766,20 @@ class AttachmentCategoriesRow: ClosableContainer
 			WidgetEventHandler.GetInstance().RegisterOnDrop( item_preview2.GetParent(),  this, "OnIconDrop" );
 			WidgetEventHandler.GetInstance().RegisterOnDoubleClick( item_preview2.GetParent(),  this, "DoubleClick" );
 			
-			if(entity.GetInventory().FindAttachment(slot_id) != NULL)
+			if( item )
 			{
 				ImageWidget image_widget4 = ImageWidget.Cast( item_preview2.GetParent().FindAnyWidget("OutOfReach"+j%7) );
-				if ( image_widget4 && AttchmentsOutOfReach.IsAttachmentReachable(entity, slot_name) )
+				bool in_hands_condition		= m_Entity.GetHierarchyRoot() && item.GetInventory().CanRemoveEntity();
+				bool in_vicinity_condition	= !m_Entity.GetHierarchyRoot() && AttchmentsOutOfReach.IsAttachmentReachable( m_Entity, slot_name );
+				if( in_hands_condition || in_vicinity_condition )
 				{
-					image_widget4.Show(false);
-					draggable = true;
+					if( image_widget4 )
+						image_widget4.Show(false);
 				}
 				else if ( image_widget4 )
 				{
-					image_widget4.Show(true);
+					if( image_widget4 )
+						image_widget4.Show(true);
 					draggable = false;
 				}
 			}

@@ -92,7 +92,7 @@ class EmoteManager
 		m_ItemIsOn = false;
 		m_RPSOutcome = -1;
 		
-		// new input-based interrupt keys
+		// new input-based interrupt actions
 		m_InterruptInputs = new array<string>;
 		m_InterruptInputs.Insert("UAMoveForward");
 		m_InterruptInputs.Insert("UAMoveBack");
@@ -118,7 +118,7 @@ class EmoteManager
 		m_InterruptInputs.Insert("UAPersonCamSwitchSide");
 		m_InterruptInputs.Insert("UAWalkRunToggle");
 		m_InterruptInputs.Insert("UAWalkRunTemp");
-		// end of new input-based interrupt keys
+		// end of new input-based interrupt actions
 		
 		//leave this here?
 		m_HandInventoryLocation = new InventoryLocation;
@@ -179,7 +179,7 @@ class EmoteManager
 			{
 				uiGesture = GetGame().GetUIManager().IsMenuOpen(MENU_GESTURES);
 			}
-					
+			
 			//jtomasik - asi bych nemel checkovat jestli hrac klika v menu nebo ve scene tady, ale mel by to vedet input manager?
 			//HACK - handle differently with new input controller
 			if( (gestureSlot > 0 && gestureSlot != 12 ) || (InterruptGesture() && m_Callback.m_IsFullbody) || (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
@@ -251,6 +251,19 @@ class EmoteManager
 			{
 				PlaySurrenderInOut(false);
 				return;
+			}
+			// getting out of surrender state - hard cancel (TODO: refactor)
+			else if (m_IsSurrendered && (m_HIC.IsSingleUse() || m_HIC.IsContinuousUseStart() || m_HIC.IsWeaponRaised()))
+			{
+				//PlaySurrenderInOut(false);
+				if ( m_Player.GetItemInHands() )
+					m_Player.GetItemInHands().Delete();
+				return;
+				/*
+				SurrenderDataRestrain sdr = new SurrenderDataRestrain;
+				EndSurrenderRequest(sdr);
+				return;
+				*/
 			}
 			
 			// fallback in case lock does not end properly
@@ -790,9 +803,13 @@ class EmoteManager
 				break;
 			}
 		}
-		if ( m_bEmoteIsPlaying && m_Callback.m_IsFullbody )
+		if ( m_bEmoteIsPlaying )
 		{
-			SetEmoteLockState(true);
+			m_Player.SetInventorySoftLock(true);
+			if(m_Callback.m_IsFullbody)
+			{
+				SetEmoteLockState(true);
+			}
 		}
 		
 		return true;
@@ -1069,7 +1086,7 @@ class EmoteManager
 		}
 		
 		ItemBase item = m_Player.GetItemInHands();
-		if ( item && item.IsHeavyBehaviour() )
+		if ( item && item.IsHeavyBehaviour() &&  (id != ID_EMOTE_SURRENDER) )
 		{
 			return false;
 		}
@@ -1146,8 +1163,6 @@ class EmoteManager
 	//!
 	void SetEmoteLockState(bool state)
 	{
-		//Print("lock state " + state);
-			
 		if (!m_HandInventoryLocation)
 		{
 			m_HandInventoryLocation = new InventoryLocation;
@@ -1158,7 +1173,6 @@ class EmoteManager
 		{
 			if (m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation))
 			{
-				//Print("Clearing hand reservation... ");
 				m_Player.GetInventory().ClearInventoryReservation( null, m_HandInventoryLocation);
 			}
 			
@@ -1179,17 +1193,15 @@ class EmoteManager
 			//m_HandInventoryLocation.SetHands(m_Player,m_Player.GetItemInHands());
 			if (!m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation))
 			{
-				//Print("Adding hand reservation... ");
 				m_Player.GetInventory().AddInventoryReservation( null, m_HandInventoryLocation, 10000);
 			}
 				
 			if ( m_Player.GetActionManager() )
 				m_Player.GetActionManager().DisableActions();
-			//m_Player.GetInventory().LockInventory(LOCK_FROM_SCRIPT);
-			m_Player.SetInventorySoftLock(true);
+			
+			//m_Player.SetInventorySoftLock(true);
 			
 			//Movement lock in fullbody anims
-			//TODO check for better solution to prevent turning on back and borking the animation (surrender)
 			if (m_Callback && m_Callback.m_IsFullbody && !m_controllsLocked && m_CurrentGestureID == ID_EMOTE_SURRENDER)
 			{
 				m_controllsLocked = true;
@@ -1233,6 +1245,8 @@ class EmoteManager
 	
 	bool InterruptGesture()
 	{
+		//TODO connect to consoles once new inputs are in place
+		#ifndef PLATFORM_CONSOLE
 		for( int idx = 0; idx < m_InterruptInputs.Count(); idx++ )
 		{
 			string inputName = m_InterruptInputs[idx];
@@ -1243,6 +1257,7 @@ class EmoteManager
 				return true;
 			}
 		}
+		#endif
 		return false;
 	}
 	

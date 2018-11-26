@@ -1,10 +1,15 @@
 class AttchmentsOutOfReach
 {
-	protected static ref map<string, ref map<string, vector>> m_AttData;
+	protected static ref map<string, ref map<int, vector>> m_AttData;
 	
-	static bool IsAttachmentReachable(EntityAI e, string att_slot_name, float range = 1.5)
+	static bool IsAttachmentReachable(EntityAI e, string att_slot_name = "", int slot_id = -1, float range = 1.5)
 	{
-		vector pos_att = e.GetPosition() + GetAttachmentPosition(e, att_slot_name);
+		vector pos_att;
+		if( att_slot_name != "" )
+			pos_att = e.GetPosition() + GetAttachmentPosition(e, InventorySlots.GetSlotIdFromString( att_slot_name ) );
+		else if( slot_id != -1 )
+			pos_att = e.GetPosition() + GetAttachmentPosition(e, slot_id);
+		
 		vector pos_player = GetGame().GetPlayer().GetPosition();
 		
 		if ( vector.Distance(pos_player, pos_att) <= range )
@@ -15,28 +20,28 @@ class AttchmentsOutOfReach
 		return false;
 	}
 	
-	static vector GetAttachmentPosition(EntityAI e, string att_slot_name)
-	{		
+	static vector GetAttachmentPosition(EntityAI e, int slot_id)
+	{
 		if ( m_AttData == NULL )
 		{
-			m_AttData = new map<string, ref map<string, vector>>();
+			m_AttData = new map<string, ref map<int, vector>>();
 		}
 		
 		string type_name = e.GetType();
 		
 		if ( !m_AttData.Contains( type_name ) )
 		{
-			map<string, vector> att = CreateAttachmentsPositions(e);
+			map<int, vector> att = CreateAttachmentPosition( e );
 			
-			m_AttData.Insert(type_name, att);			
+			m_AttData.Insert( type_name, att );
 		}
 		
-		return m_AttData.Get( type_name ).Get( att_slot_name );
+		return m_AttData.Get( type_name ).Get( slot_id );
 	}
 	
-	static protected map<string, vector> CreateAttachmentsPositions(EntityAI entity)
+	static protected map<int, vector> CreateAttachmentPosition( EntityAI entity )
 	{
-		map<string, vector> ret_val = new map<string, vector>();
+		map<int, vector> ret_val = new map<int, vector>();
 		
 		string			type_name = entity.GetType();
 		TStringArray	cfg_attachments = new TStringArray;
@@ -57,8 +62,6 @@ class AttchmentsOutOfReach
 		}
 		
 		GetGame().ConfigGetTextArray(cfg_path, cfg_attachments);
-		
-		//cfg_attachments.Debug();
 		
 		int child_count = GetGame().ConfigGetChildrenCount("CfgNonAIVehicles");
 		
@@ -94,11 +97,7 @@ class AttchmentsOutOfReach
 							
 							if ( selection.Contains(model_path) )
 							{
-								//Print("Attachment Slot: "+ inventory_slot_name +" = "+ selections[i].GetName());
-								//Print("Vertex Count: "+ selections[i].GetVertexCount());
-								//Print("Position: "+ selections[i].GetVertexPosition(lod, 0) );
-								
-								ret_val.Set(inventory_slot_name, selections[i].GetVertexPosition(lod, 0));
+								ret_val.Set(InventorySlots.GetSlotIdFromString( inventory_slot_name ), selections[i].GetVertexPosition(lod, 0));
 							}
 						}
 					}

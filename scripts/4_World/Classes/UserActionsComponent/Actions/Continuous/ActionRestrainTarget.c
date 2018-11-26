@@ -123,7 +123,7 @@ class ActionRestrainTarget: ActionContinuousBase
 		else
 		{
 			Print("Restraining player with empty hands");
-			RestrainTargetPlayer lambda = new RestrainTargetPlayer(item_in_hands_source, new_item_name, target_player, item_in_hands_target);
+			RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player, item_in_hands_target);
 			source_player.LocalReplaceItemInHandsWithNewElsewhere(lambda);
 		}		
 		
@@ -132,12 +132,12 @@ class ActionRestrainTarget: ActionContinuousBase
 };
 
 
-class RestrainTargetPlayer : ReplaceItemWithNewLambdaBase
+class RestrainTargetPlayerLambda : ReplaceItemWithNewLambdaBase
 {
 	PlayerBase m_TargetPlayer;
 	EntityAI m_TargetItem;
 
-	void RestrainTargetPlayer (EntityAI old_item, string new_item_type, PlayerBase player, EntityAI targetItem)
+	void RestrainTargetPlayerLambda (EntityAI old_item, string new_item_type, PlayerBase player, EntityAI targetItem)
 	{
 		m_TargetPlayer = player;
 		m_TargetItem = targetItem;
@@ -147,9 +147,9 @@ class RestrainTargetPlayer : ReplaceItemWithNewLambdaBase
 		OverrideNewLocation(targetHnd);
 	}
 	
-	override void OnNewEntityCreated(EntityAI entity)
+	override void OnSuccess(EntityAI entity)
 	{
-		super.OnNewEntityCreated(new_item);
+		super.OnSuccess(new_item);
 
 		m_TargetPlayer.SetRestrained(true);
 	}

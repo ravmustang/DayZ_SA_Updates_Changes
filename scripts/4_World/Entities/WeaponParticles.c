@@ -329,7 +329,7 @@ class WeaponParticlesBase // This class represents every particle effect you see
 			
 			if (muzzle_owner.IsInherited(ItemSuppressor))
 			{
-				particle_ori = particle_ori + Vector(180,0,270); // This rotation is necesarry due to suppressors being rotated into ground in their p3d files
+				particle_ori = particle_ori + Vector(0,0,270); // This rotation is necesarry due to suppressors being rotated into ground in their p3d files
 			}
 		}
 		

@@ -556,6 +556,23 @@ class HumanCommandFullBodyDamage
 	// nothing here for now 
 }
 
+
+// *************************************************************************************
+// ! HumanCommandModifierAdditive - additive modifiers
+// *************************************************************************************
+class HumanCommandModifierAdditive
+{	
+	// nothing here for now 
+}
+
+// *************************************************************************************
+// ! HumanCommandModifierFullbody - fullbody modifiers
+// *************************************************************************************
+class HumanCommandModifierFullbody
+{	
+	// nothing here for now 
+}
+
 //! actions
 enum WeaponActions
 {
@@ -1048,6 +1065,16 @@ class Human extends Man
 
 
 
+	//!--- modifier animations - fullbody
+	
+	proto native	HumanCommandModifierFullbody	StartCommand_Modifier(int pType);
+	proto native 	HumanCommandModifierFullbody	GetCommand_Modifier();
+
+	//! starts additive modifier
+	//!--- modifier animations - additive
+	proto native	HumanCommandModifierAdditive	AddCommandModifier_Modifier(int pType);
+	proto native	HumanCommandModifierAdditive	GetCommandModifier_Modifier();
+	proto native	void							DeleteCommandModifier_Modifier(HumanCommandModifierAdditive pModifier);
 
 
 

@@ -7,7 +7,7 @@ class TacticalBaconCan : Edible_Base
 	
 	override void Open()
 	{
-		super.Open();
+		//super.Open();
 		ReplaceEdibleWithNew("TacticalBaconCan_Opened");
 	}
 }
