@@ -1,0 +1,12 @@
+ButtonWidgetClass dropdown_element {
+ position 0 0
+ size 1 30
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 1
+ style MainMenu
+ "no focus" 1
+ text_proportion 0.55
+ font "gui/fonts/sdf_MetronBook24"
+}

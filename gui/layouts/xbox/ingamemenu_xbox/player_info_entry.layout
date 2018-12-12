@@ -1,0 +1,110 @@
+PanelWidgetClass player_info_entry_root {
+ ignorepointer 1
+ color 0.3137 0.3137 0.3137 0.8627
+ position 0 0
+ size 1 42
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 1
+ style rover_sim_colorable
+ "no focus" 1
+ {
+  ButtonWidgetClass Button {
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   style EmptyHighlight
+   "no focus" 0
+   text_offset 10 0
+   text_proportion 0.6
+   text_halign left
+   font "gui/fonts/sdf_MetronBook24"
+   switch normal
+  }
+  FrameWidgetClass content {
+   inheritalpha 0
+   ignorepointer 1
+   position 0 0
+   size 1 42
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   {
+    ImageWidgetClass Avatar {
+     visible 0
+     inheritalpha 0
+     ignorepointer 1
+     position 0 0
+     size 42 42
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     image0 "set:dayz_gui image:icon_player"
+     mode blend
+     "src alpha" 1
+    }
+    TextWidgetClass Name {
+     ignorepointer 1
+     position 42 0
+     size 0.95 34
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     font "gui/fonts/sdf_MetronLight24"
+     "text offset" 16 0
+     "exact text" 0
+     "text valign" center
+    }
+    ImageWidgetClass Microphone {
+     visible 1
+     clipchildren 0
+     position 24 0
+     size 32 32
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     image0 "set:dayz_gui image:mic"
+     mode blend
+     "src alpha" 1
+     {
+      ImageWidgetClass Muted {
+       visible 0
+       color 1 0 0 1
+       size 32 32
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       image0 "set:dayz_gui image:icon_locked_sb"
+       mode blend
+       "src alpha" 1
+      }
+     }
+    }
+   }
+  }
+  ImageWidgetClass separator {
+   inheritalpha 0
+   ignorepointer 1
+   color 0.1961 0.1961 0.1961 1
+   size 1 3
+   valign bottom_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   scaled 1
+  }
+ }
+}

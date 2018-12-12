@@ -1,0 +1,38 @@
+ImageSetClass {
+ Name "inventory_icons"
+ RefSize 640 1024
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{0885D487256089E9}Gui/imagesets/atlasicons.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass bullet {
+   Name "bullet"
+   Pos 271 249
+   Size 107 105
+   Flags 0
+  }
+  ImageSetDefClass close {
+   Name "close"
+   Pos 33 497
+   Size 100 100
+   Flags 0
+  }
+  ImageSetDefClass open {
+   Name "open"
+   Pos 178 497
+   Size 100 100
+   Flags 0
+  }
+  ImageSetDefClass lock {
+   Name "lock"
+   Pos 307 497
+   Size 100 100
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

@@ -1,0 +1,348 @@
+FrameWidgetClass controls_tab_root {
+ position 0 0
+ size 1 1
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ {
+  ScrollWidgetClass controls_settings_scroll {
+   ignorepointer 1
+   color 1 1 1 0
+   position 0 0
+   size 600 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 0
+   "no focus" 1
+   "Scrollbar V" 1
+   {
+    GridSpacerWidgetClass controls_settings_root {
+     visible 1
+     ignorepointer 1
+     color 0 0 0 0
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 3
+     "no focus" 1
+     Padding 8
+     Margin 8
+     "Size To Content H" 1
+     "Size To Content V" 1
+     Columns 1
+     Rows 2
+     {
+      WrapSpacerWidgetClass controller_settings_root {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 473
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        PanelWidgetClass controller_settings_header {
+         visible 1
+         ignorepointer 1
+         color 0 0 0 0.9608
+         position 0 0
+         size 1 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style rover_sim_colorable
+         {
+          TextWidgetClass controller_text {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 1 22
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "CONTROLLER"
+           font "gui/fonts/sdf_MetronLight72"
+           "exact text" 0
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
+        GridSpacerWidgetClass controller_settings_content {
+         ignorepointer 1
+         color 0 0 0 0.8627
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         style Colorable
+         "no focus" 1
+         Padding 4
+         Margin 8
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 1
+         Rows 1
+         {
+          ButtonWidgetClass controller_invert_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "hsensitivity_button"
+           "next down" "vsensitivity_button"
+           {
+            GridSpacerWidgetClass controller_invert_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass controller_invert_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass controller_invert_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_xbox_controls_ivnert_vertical"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass controller_invert_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass controller_invert_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass controller_vsensitivity_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "invert_button"
+           "next down" "hsensitivity_button"
+           {
+            GridSpacerWidgetClass controller_vsensitivity_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass controller_vsensitivity_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass controller_vsensitivity_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_xbox_controls_sensitivity_ver"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass controller_vsensitivity_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass controller_vsensitivity_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass controller_hsensitivity_button {
+           ignorepointer 0
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "vsensitivity_button"
+           "next down" "invert_button"
+           {
+            GridSpacerWidgetClass controller_hsensitivity_setting {
+             ignorepointer 0
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass controller_hsensitivity_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass controller_hsensitivity_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_xbox_controls_sensitivity_hor"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass controller_hsensitivity_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass controller_hsensitivity_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

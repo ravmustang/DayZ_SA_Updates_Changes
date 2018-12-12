@@ -1,0 +1,26 @@
+ImageSetClass {
+ Name "toolbar"
+ RefSize 3840 17
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{69620D716468134B}Gui/textures/toolbar.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass top {
+   Name "top"
+   Pos 0 0
+   Size 3840 17
+   Flags 3
+  }
+  ImageSetDefClass pixel {
+   Name "pixel"
+   Pos 5 5
+   Size 1 1
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

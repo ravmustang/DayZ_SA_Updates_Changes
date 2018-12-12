@@ -1,0 +1,9 @@
+FrameWidgetClass Tab_x {
+ visible 0
+ position 80 160
+ size 1760 800
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+}

@@ -1,0 +1,988 @@
+ImageSetClass {
+ Name "rover_imageset"
+ RefSize 256 512
+ Textures {
+  ImageSetTextureClass {
+   mpix 3
+   path "{A1C80CDD1389C1A2}Gui/imagesets/rover_imageset.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass WhitePixel {
+   Name "WhitePixel"
+   Pos 1 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass HeaderR {
+   Name "HeaderR"
+   Pos 71 84
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HeaderRDisabled {
+   Name "HeaderRDisabled"
+   Pos 89 84
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HeaderL {
+   Name "HeaderL"
+   Pos 70 84
+   Size 1 16
+   Flags 0
+  }
+  ImageSetDefClass HeaderLDisabled {
+   Name "HeaderLDisabled"
+   Pos 88 84
+   Size 1 16
+   Flags 0
+  }
+  ImageSetDefClass BlackPixel {
+   Name "BlackPixel"
+   Pos 81 44
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonOver {
+   Name "ButtonOver"
+   Pos 3 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonOver2 {
+   Name "ButtonOver2"
+   Pos 9 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonOver3 {
+   Name "ButtonOver3"
+   Pos 11 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonOver4 {
+   Name "ButtonOver4"
+   Pos 13 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonNormal2 {
+   Name "ButtonNormal2"
+   Pos 15 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass BottonPushed2 {
+   Name "BottonPushed2"
+   Pos 17 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass BottonPushed3 {
+   Name "BottonPushed3"
+   Pos 11 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonNormal3 {
+   Name "ButtonNormal3"
+   Pos 21 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass TransparentPixel {
+   Name "TransparentPixel"
+   Pos 23 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonOver5 {
+   Name "ButtonOver5"
+   Pos 19 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonNormal {
+   Name "ButtonNormal"
+   Pos 5 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass BottonPushed {
+   Name "BottonPushed"
+   Pos 7 101
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ArrowLeft {
+   Name "ArrowLeft"
+   Pos 98 37
+   Size 32 14
+   Flags 0
+  }
+  ImageSetDefClass ArrowLeftBlack {
+   Name "ArrowLeftBlack"
+   Pos 98 61
+   Size 32 14
+   Flags 0
+  }
+  ImageSetDefClass ArrowRight {
+   Name "ArrowRight"
+   Pos 119 37
+   Size 32 14
+   Flags 0
+  }
+  ImageSetDefClass ArrowRightBlack {
+   Name "ArrowRightBlack"
+   Pos 119 61
+   Size 32 14
+   Flags 0
+  }
+  ImageSetDefClass XComboLeft {
+   Name "XComboLeft"
+   Pos 100 58
+   Size 32 1
+   Flags 0
+  }
+  ImageSetDefClass XComboRight {
+   Name "XComboRight"
+   Pos 96 58
+   Size 32 1
+   Flags 0
+  }
+  ImageSetDefClass XComboRightFull {
+   Name "XComboRightFull"
+   Pos 96 56
+   Size 32 1
+   Flags 0
+  }
+  ImageSetDefClass XComboLeftFull {
+   Name "XComboLeftFull"
+   Pos 100 56
+   Size 32 1
+   Flags 0
+  }
+  ImageSetDefClass XComboBlank {
+   Name "XComboBlank"
+   Pos 96 59
+   Size 32 1
+   Flags 0
+  }
+  ImageSetDefClass large_lander {
+   Name "large_lander"
+   Pos 0 288
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass all {
+   Name "all"
+   Pos 0 160
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass antenna {
+   Name "antenna"
+   Pos 32 288
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass small_lander {
+   Name "small_lander"
+   Pos 0 320
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass camera {
+   Name "camera"
+   Pos 32 320
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass small_rover {
+   Name "small_rover"
+   Pos 0 352
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass instrument {
+   Name "instrument"
+   Pos 32 352
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass instrumentpassive {
+   Name "instrumentpassive"
+   Pos 32 416
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass power {
+   Name "power"
+   Pos 64 288
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass medium_rover {
+   Name "medium_rover"
+   Pos 0 384
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass robotic_instrument {
+   Name "robotic_instrument"
+   Pos 32 384
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass large_rover {
+   Name "large_rover"
+   Pos 0 416
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass probe {
+   Name "probe"
+   Pos 64 320
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass probe_small {
+   Name "probe_small"
+   Pos 96 160
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass q_low {
+   Name "q_low"
+   Pos 64 352
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass q_norm {
+   Name "q_norm"
+   Pos 64 384
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass q_high {
+   Name "q_high"
+   Pos 64 416
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass PluginIconGame {
+   Name "PluginIconGame"
+   Pos 96 128
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass PluginIconTC {
+   Name "PluginIconTC"
+   Pos 128 160
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass PluginIconMod {
+   Name "PluginIconMod"
+   Pos 128 96
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass PluginIconAddon {
+   Name "PluginIconAddon"
+   Pos 128 128
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass "New Image" {
+   Name "New Image"
+   Pos 155 16
+   Size 12 5
+   Flags 0
+  }
+ }
+ Groups {
+  ImageSetGroupClass Checkbox {
+   Name "Checkbox"
+   Images {
+    ImageSetDefClass CheckboxHover {
+     Name "CheckboxHover"
+     Pos 35 102
+     Size 26 26
+     Flags 0
+    }
+    ImageSetDefClass CheckboxMark {
+     Name "CheckboxMark"
+     Pos 3 102
+     Size 26 26
+     Flags 0
+    }
+    ImageSetDefClass CheckboxDisabled {
+     Name "CheckboxDisabled"
+     Pos 99 102
+     Size 26 26
+     Flags 0
+    }
+    ImageSetDefClass CheckboxNormal {
+     Name "CheckboxNormal"
+     Pos 67 102
+     Size 26 26
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass SimBlack {
+   Name "SimBlack"
+   Images {
+    ImageSetDefClass SimBlackLeftTop {
+     Name "SimBlackLeftTop"
+     Pos 1 32
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass SimBlackRightTop {
+     Name "SimBlackRightTop"
+     Pos 37 32
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass SimBlackLeftBottom {
+     Name "SimBlackLeftBottom"
+     Pos 1 68
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass SimBlackRightBottom {
+     Name "SimBlackRightBottom"
+     Pos 37 68
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass SimBlackTopCenter {
+     Name "SimBlackTopCenter"
+     Pos 33 32
+     Size 1 32
+     Flags 0
+    }
+    ImageSetDefClass SimBlackLeftCenter {
+     Name "SimBlackLeftCenter"
+     Pos 1 64
+     Size 32 1
+     Flags 0
+    }
+    ImageSetDefClass SimBlackRightCenter {
+     Name "SimBlackRightCenter"
+     Pos 37 64
+     Size 32 1
+     Flags 0
+    }
+    ImageSetDefClass SimBlackBottomCenter {
+     Name "SimBlackBottomCenter"
+     Pos 33 68
+     Size 1 32
+     Flags 0
+    }
+    ImageSetDefClass SimBlackCenter {
+     Name "SimBlackCenter"
+     Pos 34 65
+     Size 1 1
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass SimBlack2 {
+   Name "SimBlack2"
+   Images {
+    ImageSetDefClass SimBlack2LeftTop {
+     Name "SimBlack2LeftTop"
+     Pos 70 32
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2RightTop {
+     Name "SimBlack2RightTop"
+     Pos 86 32
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2RightBottom {
+     Name "SimBlack2RightBottom"
+     Pos 86 48
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2LeftBottom {
+     Name "SimBlack2LeftBottom"
+     Pos 70 48
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2TopCenter {
+     Name "SimBlack2TopCenter"
+     Pos 80 32
+     Size 1 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2RightCenter {
+     Name "SimBlack2RightCenter"
+     Pos 86 41
+     Size 8 1
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2BottomCenter {
+     Name "SimBlack2BottomCenter"
+     Pos 80 48
+     Size 1 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2LeftCenter {
+     Name "SimBlack2LeftCenter"
+     Pos 70 41
+     Size 8 1
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2Center {
+     Name "SimBlack2Center"
+     Pos 80 41
+     Size 1 1
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass Listbox {
+   Name "Listbox"
+   Images {
+    ImageSetDefClass ListboxLeftTop {
+     Name "ListboxLeftTop"
+     Pos 2 17
+     Size 1 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxTopCenter {
+     Name "ListboxTopCenter"
+     Pos 4 17
+     Size 1 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxCenter {
+     Name "ListboxCenter"
+     Pos 8 17
+     Size 1 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightTop {
+     Name "ListboxRightTop"
+     Pos 2 1
+     Size 19 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightTopSim {
+     Name "ListboxRightTopSim"
+     Pos 40 0
+     Size 24 4
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightTopMain {
+     Name "ListboxRightTopMain"
+     Pos 87 0
+     Size 24 4
+     Flags 0
+    }
+    ImageSetDefClass ListboxLeftCenter {
+     Name "ListboxLeftCenter"
+     Pos 6 17
+     Size 1 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightCenter {
+     Name "ListboxRightCenter"
+     Pos 2 10
+     Size 19 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightCenterSim {
+     Name "ListboxRightCenterSim"
+     Pos 40 10
+     Size 24 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightCenterMain {
+     Name "ListboxRightCenterMain"
+     Pos 87 10
+     Size 24 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightBottom {
+     Name "ListboxRightBottom"
+     Pos 2 26
+     Size 19 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightBottomSim {
+     Name "ListboxRightBottomSim"
+     Pos 40 28
+     Size 24 4
+     Flags 0
+    }
+    ImageSetDefClass ListboxRightBottomMain {
+     Name "ListboxRightBottomMain"
+     Pos 87 28
+     Size 24 4
+     Flags 0
+    }
+    ImageSetDefClass ListboxBottomCenter {
+     Name "ListboxBottomCenter"
+     Pos 19 17
+     Size 1 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxLeftBottom {
+     Name "ListboxLeftBottom"
+     Pos 17 17
+     Size 1 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxScrollBarTop {
+     Name "ListboxScrollBarTop"
+     Pos 25 4
+     Size 19 2
+     Flags 0
+    }
+    ImageSetDefClass ListboxScrollBarCenter {
+     Name "ListboxScrollBarCenter"
+     Pos 25 10
+     Size 19 5
+     Flags 0
+    }
+    ImageSetDefClass ListboxScrollBarCenterSim {
+     Name "ListboxScrollBarCenterSim"
+     Pos 65 4
+     Size 24 24
+     Flags 0
+    }
+    ImageSetDefClass ListboxScrollBarCenterMain {
+     Name "ListboxScrollBarCenterMain"
+     Pos 112 4
+     Size 24 24
+     Flags 0
+    }
+    ImageSetDefClass ListboxScrollBarBottom {
+     Name "ListboxScrollBarBottom"
+     Pos 25 26
+     Size 19 2
+     Flags 0
+    }
+    ImageSetDefClass ListboxHighlight {
+     Name "ListboxHighlight"
+     Pos 47 16
+     Size 1 4
+     Flags 0
+    }
+    ImageSetDefClass ListboxHighlightMain {
+     Name "ListboxHighlightMain"
+     Pos 94 16
+     Size 1 4
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass Filter {
+   Name "Filter"
+   Images {
+    ImageSetDefClass FilterVideoFocus {
+     Name "FilterVideoFocus"
+     Pos 214 0
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterVideo {
+     Name "FilterVideo"
+     Pos 172 0
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterRenderFocus {
+     Name "FilterRenderFocus"
+     Pos 214 74
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterRender {
+     Name "FilterRender"
+     Pos 172 74
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterAudioFocus {
+     Name "FilterAudioFocus"
+     Pos 214 148
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterAudio {
+     Name "FilterAudio"
+     Pos 172 148
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterPresetFocus {
+     Name "FilterPresetFocus"
+     Pos 214 222
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterPreset {
+     Name "FilterPreset"
+     Pos 172 222
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterKeyFocus {
+     Name "FilterKeyFocus"
+     Pos 214 296
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterKey {
+     Name "FilterKey"
+     Pos 172 296
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterControlsFocus {
+     Name "FilterControlsFocus"
+     Pos 214 370
+     Size 42 74
+     Flags 0
+    }
+    ImageSetDefClass FilterControls {
+     Name "FilterControls"
+     Pos 172 370
+     Size 42 74
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass map {
+   Name "map"
+   Images {
+    ImageSetDefClass map_dependent {
+     Name "map_dependent"
+     Pos 0 448
+     Size 64 64
+     Flags 0
+    }
+    ImageSetDefClass map_dependent_wp {
+     Name "map_dependent_wp"
+     Pos 32 128
+     Size 64 64
+     Flags 0
+    }
+    ImageSetDefClass map_selected {
+     Name "map_selected"
+     Pos 128 448
+     Size 64 64
+     Flags 0
+    }
+    ImageSetDefClass map_selected_wp {
+     Name "map_selected_wp"
+     Pos 192 448
+     Size 64 64
+     Flags 0
+    }
+    ImageSetDefClass map_target_neglig_selected {
+     Name "map_target_neglig_selected"
+     Pos 0 192
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_minor_selected {
+     Name "map_target_minor_selected"
+     Pos 32 192
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_major_selected {
+     Name "map_target_major_selected"
+     Pos 64 192
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_neglig_highlighted {
+     Name "map_target_neglig_highlighted"
+     Pos 0 224
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_minor_highlighted {
+     Name "map_target_minor_highlighted"
+     Pos 32 224
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_major_highlighted {
+     Name "map_target_major_highlighted"
+     Pos 64 224
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_neglig {
+     Name "map_target_neglig"
+     Pos 0 256
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_minor {
+     Name "map_target_minor"
+     Pos 32 256
+     Size 32 32
+     Flags 0
+    }
+    ImageSetDefClass map_target_major {
+     Name "map_target_major"
+     Pos 64 256
+     Size 32 32
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass SimBlack2Focus {
+   Name "SimBlack2Focus"
+   Images {
+    ImageSetDefClass SimBlack2LeftTopFocus {
+     Name "SimBlack2LeftTopFocus"
+     Pos 70 58
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2RightTopFocus {
+     Name "SimBlack2RightTopFocus"
+     Pos 86 58
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2RightBottomFocus {
+     Name "SimBlack2RightBottomFocus"
+     Pos 86 74
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2LeftBottomFocus {
+     Name "SimBlack2LeftBottomFocus"
+     Pos 70 74
+     Size 8 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2TopCenterFocus {
+     Name "SimBlack2TopCenterFocus"
+     Pos 80 58
+     Size 1 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2RightCenterFocus {
+     Name "SimBlack2RightCenterFocus"
+     Pos 86 67
+     Size 8 1
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2BottomCenterFocus {
+     Name "SimBlack2BottomCenterFocus"
+     Pos 80 74
+     Size 1 8
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2LeftCenterFocus {
+     Name "SimBlack2LeftCenterFocus"
+     Pos 70 67
+     Size 8 1
+     Flags 0
+    }
+    ImageSetDefClass SimBlack2CenterFocus {
+     Name "SimBlack2CenterFocus"
+     Pos 80 67
+     Size 1 1
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass Button {
+   Name "Button"
+   Images {
+    ImageSetDefClass ButtonLeftTop {
+     Name "ButtonLeftTop"
+     Pos 35 102
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonLeft {
+     Name "ButtonLeft"
+     Pos 35 111
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonLeftBottom {
+     Name "ButtonLeftBottom"
+     Pos 35 121
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonTop {
+     Name "ButtonTop"
+     Pos 44 102
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonCenter {
+     Name "ButtonCenter"
+     Pos 42 109
+     Size 12 12
+     Flags 0
+    }
+    ImageSetDefClass ButtonBottom {
+     Name "ButtonBottom"
+     Pos 44 121
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonRightTop {
+     Name "ButtonRightTop"
+     Pos 54 102
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonRight {
+     Name "ButtonRight"
+     Pos 54 111
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonRightBottom {
+     Name "ButtonRightBottom"
+     Pos 54 121
+     Size 7 7
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass ButtonHighlited {
+   Name "ButtonHighlited"
+   Images {
+    ImageSetDefClass ButtonHighlitedLeftTop {
+     Name "ButtonHighlitedLeftTop"
+     Pos 67 102
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedLeft {
+     Name "ButtonHighlitedLeft"
+     Pos 67 111
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedLeftBottom {
+     Name "ButtonHighlitedLeftBottom"
+     Pos 67 121
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedTop {
+     Name "ButtonHighlitedTop"
+     Pos 76 102
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedCenter {
+     Name "ButtonHighlitedCenter"
+     Pos 75 109
+     Size 10 12
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedBottom {
+     Name "ButtonHighlitedBottom"
+     Pos 76 121
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedRightTop {
+     Name "ButtonHighlitedRightTop"
+     Pos 85 102
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedRight {
+     Name "ButtonHighlitedRight"
+     Pos 85 111
+     Size 8 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonHighlitedRightBottom {
+     Name "ButtonHighlitedRightBottom"
+     Pos 85 121
+     Size 8 7
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass ButtonPushed {
+   Name "ButtonPushed"
+   Images {
+    ImageSetDefClass ButtonPushedLeftTop {
+     Name "ButtonPushedLeftTop"
+     Pos 99 102
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedLeft {
+     Name "ButtonPushedLeft"
+     Pos 99 110
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedLeftBottom {
+     Name "ButtonPushedLeftBottom"
+     Pos 99 121
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedTop {
+     Name "ButtonPushedTop"
+     Pos 108 102
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedCenter {
+     Name "ButtonPushedCenter"
+     Pos 106 109
+     Size 12 12
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedBottom {
+     Name "ButtonPushedBottom"
+     Pos 108 121
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedRightTop {
+     Name "ButtonPushedRightTop"
+     Pos 118 102
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedRight {
+     Name "ButtonPushedRight"
+     Pos 118 110
+     Size 7 7
+     Flags 0
+    }
+    ImageSetDefClass ButtonPushedRightBottom {
+     Name "ButtonPushedRightBottom"
+     Pos 118 121
+     Size 7 7
+     Flags 0
+    }
+   }
+  }
+ }
+}

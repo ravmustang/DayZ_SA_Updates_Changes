@@ -1,0 +1,116 @@
+FrameWidgetClass wgt_pnl_load_mission {
+ clipchildren 0
+ color 1 1 1 1
+ position 0.02 0.02
+ size 0.96 0.96
+ halign left
+ valign top
+ hexactpos 0
+ vexactpos 0
+ hexactsize 0
+ vexactsize 0
+ priority 50
+ {
+  WindowWidgetClass wgt_missions_main_panel {
+   position 0 0
+   size 1 1
+   halign center_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 0
+   style rover_sim_black
+   {
+    WindowWidgetClass wgt_missions_panel_title {
+     position 0 0
+     size 1 0.05
+     halign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     style rover_sim_black
+     "title visible" 0
+     {
+      TextWidgetClass bgt_missions_title {
+       disabled 0
+       position 0 0
+       size 1 1
+       halign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       style Normal
+       text "#STR_wgt_pnl_load_mission_wgt_missions_main_panel_wgt_missions_panel_title_bgt_missions_title0"
+       font "gui/fonts/AmorSerifPro-Bold"
+       "exact text" 0
+       "text halign" center
+      }
+     }
+    }
+    WindowWidgetClass wgt_pnl_missions {
+     clipchildren 0
+     inheritalpha 1
+     position 0.01 0.06
+     size 0.37792 0.29091
+     hexactpos 0
+     vexactpos 0
+     style rover_sim_black
+     {
+      TextListboxWidgetClass wgt_lst_missions {
+       disabled 0
+       ignorepointer 0
+       position 0.012 0.017
+       size 0.68 0.966
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Default
+       "title visible" 0
+       colums "text;100"
+       lines 10
+      }
+      ButtonWidgetClass wgt_btn_mission_play {
+       visible 1
+       clipchildren 0
+       inheritalpha 1
+       position 5 5
+       size 0.29 0.1
+       halign right_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       style Default
+       text "#STR_wgt_pnl_load_mission_wgt_missions_main_panel_wgt_pnl_missions_wgt_btn_mission_play0"
+       text_offset 5 0
+       text_proportion 0.75
+       "text color" 0.8157 0.8157 0.8157 1
+       "disabled text color" 0.3373 0.3373 0.3373 1
+      }
+     }
+    }
+    ButtonWidgetClass wgt_btn_mission_close {
+     visible 1
+     clipchildren 0
+     inheritalpha 1
+     position 20 920
+     size 0.15 0.05
+     halign right_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     style Default
+     text "#STR_wgt_pnl_load_mission_wgt_missions_main_panel_wgt_btn_mission_close0"
+     text_offset 5 0
+     text_proportion 0.75
+     "text color" 0.8157 0.8157 0.8157 1
+     "disabled text color" 0.3373 0.3373 0.3373 1
+    }
+   }
+  }
+ }
+}

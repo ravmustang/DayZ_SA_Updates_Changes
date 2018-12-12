@@ -1,0 +1,162 @@
+ImageSetClass {
+ Name "xbox_buttons"
+ RefSize 256 256
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{4D5D9D938D933399}Gui/imagesets/xbox_buttons.edds"
+  }
+  ImageSetTextureClass {
+   mpix 2
+   path "{6ECA90DA4935E814}Gui/imagesets/xbox_buttons@2x.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass view {
+   Name "view"
+   Pos 57 6
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass menu {
+   Name "menu"
+   Pos 108 6
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass LS {
+   Name "LS"
+   Pos 153 0
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass RS {
+   Name "RS"
+   Pos 204 0
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass L_up {
+   Name "L_up"
+   Pos 153 51
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass L_down {
+   Name "L_down"
+   Pos 153 102
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass L_right {
+   Name "L_right"
+   Pos 153 153
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass L_left {
+   Name "L_left"
+   Pos 153 204
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass R_up {
+   Name "R_up"
+   Pos 204 51
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass R_down {
+   Name "R_down"
+   Pos 204 102
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass R_right {
+   Name "R_right"
+   Pos 204 153
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass R_left {
+   Name "R_left"
+   Pos 204 204
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass RB {
+   Name "RB"
+   Pos 5 57
+   Size 40 38
+   Flags 0
+  }
+  ImageSetDefClass LB {
+   Name "LB"
+   Pos 5 108
+   Size 40 38
+   Flags 0
+  }
+  ImageSetDefClass RT {
+   Name "RT"
+   Pos 8 153
+   Size 36 50
+   Flags 0
+  }
+  ImageSetDefClass LT {
+   Name "LT"
+   Pos 8 204
+   Size 36 50
+   Flags 0
+  }
+  ImageSetDefClass A {
+   Name "A"
+   Pos 57 57
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass B {
+   Name "B"
+   Pos 57 108
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass Y {
+   Name "Y"
+   Pos 57 158
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass X {
+   Name "X"
+   Pos 57 210
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass DPAD_up {
+   Name "DPAD_up"
+   Pos 102 51
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass DPAD_down {
+   Name "DPAD_down"
+   Pos 102 102
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass DPAD_right {
+   Name "DPAD_right"
+   Pos 102 153
+   Size 50 50
+   Flags 0
+  }
+  ImageSetDefClass DPAD_left {
+   Name "DPAD_left"
+   Pos 102 204
+   Size 50 50
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

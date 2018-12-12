@@ -1,0 +1,20 @@
+ImageSetClass {
+ Name "atlasicons"
+ RefSize 640 1024
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{0885D487256089E9}Gui/imagesets/atlasicons.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass 1235 {
+   Name "1235"
+   Pos 868 88
+   Size 107 105
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

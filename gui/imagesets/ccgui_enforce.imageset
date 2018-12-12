@@ -1,0 +1,5522 @@
+ImageSetClass {
+ Name "ccgui_enforce"
+ RefSize 1024 1024
+ Textures {
+  ImageSetTextureClass {
+   mpix 3
+   path "{52DDD34979EE096E}Gui/imagesets/ccgui_enforce.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass ButtonMenuDefaultLeftTop {
+   Name "ButtonMenuDefaultLeftTop"
+   Pos 598 683
+   Size 3 11
+   Flags 3
+  }
+  ImageSetDefClass ButtonMenuDefaultRightTop {
+   Name "ButtonMenuDefaultRightTop"
+   Pos 619 683
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonMenuDefaultRightBottom {
+   Name "ButtonMenuDefaultRightBottom"
+   Pos 619 704
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass ButtonMenuDefaultLeftBottom {
+   Name "ButtonMenuDefaultLeftBottom"
+   Pos 598 704
+   Size 3 11
+   Flags 3
+  }
+  ImageSetDefClass ButtonMenuDefaultCenter {
+   Name "ButtonMenuDefaultCenter"
+   Pos 603 696
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonMenuDefaultLeftTopFocus {
+   Name "ButtonMenuDefaultLeftTopFocus"
+   Pos 644 606
+   Size 3 11
+   Flags 3
+  }
+  ImageSetDefClass ButtonMenuDefaultRightTopFocus {
+   Name "ButtonMenuDefaultRightTopFocus"
+   Pos 665 606
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass ButtonMenuDefaultRightTopRoundFocus {
+   Name "ButtonMenuDefaultRightTopRoundFocus"
+   Pos 621 606
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonMenuDefaultSharpFocus {
+   Name "ButtonMenuDefaultSharpFocus"
+   Pos 621 617
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonMenuDefaultRightBottomFocus {
+   Name "ButtonMenuDefaultRightBottomFocus"
+   Pos 665 627
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonMenuDefaultLeftBottomFocus {
+   Name "ButtonMenuDefaultLeftBottomFocus"
+   Pos 644 627
+   Size 3 11
+   Flags 3
+  }
+  ImageSetDefClass ButtonMenuDefaultCenterFocus {
+   Name "ButtonMenuDefaultCenterFocus"
+   Pos 648 618
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonBlueRightTop {
+   Name "ButtonBlueRightTop"
+   Pos 621 643
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonBlueRightBottom {
+   Name "ButtonBlueRightBottom"
+   Pos 655 704
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonBlueLeftBottom {
+   Name "ButtonBlueLeftBottom"
+   Pos 634 704
+   Size 3 11
+   Flags 0
+  }
+  ImageSetDefClass ButtonBlueLeftTop {
+   Name "ButtonBlueLeftTop"
+   Pos 634 683
+   Size 3 11
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftTop {
+   Name "Button3DLeftTop"
+   Pos 912 635
+   Size 11 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DTopCenter {
+   Name "Button3DTopCenter"
+   Pos 924 635
+   Size 1 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTop {
+   Name "Button3DRightTop"
+   Pos 926 635
+   Size 96 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftTopFocus {
+   Name "Button3DLeftTopFocus"
+   Pos 912 782
+   Size 11 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DTopCenterFocus {
+   Name "Button3DTopCenterFocus"
+   Pos 924 782
+   Size 1 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopFocus {
+   Name "Button3DRightTopFocus"
+   Pos 926 782
+   Size 96 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftCenterFocus {
+   Name "Button3DLeftCenterFocus"
+   Pos 912 807
+   Size 11 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DCenterFocus {
+   Name "Button3DCenterFocus"
+   Pos 924 807
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterFocus {
+   Name "Button3DRightCenterFocus"
+   Pos 926 807
+   Size 96 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftBottomFocus {
+   Name "Button3DLeftBottomFocus"
+   Pos 912 809
+   Size 11 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DBottomCenterFocus {
+   Name "Button3DBottomCenterFocus"
+   Pos 924 809
+   Size 1 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomFocus {
+   Name "Button3DRightBottomFocus"
+   Pos 926 809
+   Size 96 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftCenter {
+   Name "Button3DLeftCenter"
+   Pos 912 660
+   Size 11 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DCenter {
+   Name "Button3DCenter"
+   Pos 924 660
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenter {
+   Name "Button3DRightCenter"
+   Pos 926 660
+   Size 96 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftBottom {
+   Name "Button3DLeftBottom"
+   Pos 912 662
+   Size 11 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DBottomCenter {
+   Name "Button3DBottomCenter"
+   Pos 924 662
+   Size 1 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottom {
+   Name "Button3DRightBottom"
+   Pos 926 662
+   Size 96 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftTopPushed {
+   Name "Button3DLeftTopPushed"
+   Pos 912 684
+   Size 11 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DTopCenterPushed {
+   Name "Button3DTopCenterPushed"
+   Pos 924 684
+   Size 1 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopPushed {
+   Name "Button3DRightTopPushed"
+   Pos 926 684
+   Size 96 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftCenterPushed {
+   Name "Button3DLeftCenterPushed"
+   Pos 912 709
+   Size 11 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DCenterPushed {
+   Name "Button3DCenterPushed"
+   Pos 924 709
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterPushed {
+   Name "Button3DRightCenterPushed"
+   Pos 926 709
+   Size 96 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftBottomPushed {
+   Name "Button3DLeftBottomPushed"
+   Pos 912 711
+   Size 11 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DBottomCenterPushed {
+   Name "Button3DBottomCenterPushed"
+   Pos 924 711
+   Size 1 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomPushed {
+   Name "Button3DRightBottomPushed"
+   Pos 926 711
+   Size 96 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftTopDisabled {
+   Name "Button3DLeftTopDisabled"
+   Pos 912 733
+   Size 11 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DTopCenterDisabled {
+   Name "Button3DTopCenterDisabled"
+   Pos 924 733
+   Size 1 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopDisabled {
+   Name "Button3DRightTopDisabled"
+   Pos 926 733
+   Size 96 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftCenterDisabled {
+   Name "Button3DLeftCenterDisabled"
+   Pos 912 758
+   Size 11 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DCenterDisabled {
+   Name "Button3DCenterDisabled"
+   Pos 924 758
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterDisabled {
+   Name "Button3DRightCenterDisabled"
+   Pos 926 758
+   Size 96 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftBottomDisabled {
+   Name "Button3DLeftBottomDisabled"
+   Pos 912 760
+   Size 11 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DBottomCenterDisabled {
+   Name "Button3DBottomCenterDisabled"
+   Pos 924 760
+   Size 1 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomDisabled {
+   Name "Button3DRightBottomDisabled"
+   Pos 926 760
+   Size 96 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftTopHighlight {
+   Name "Button3DLeftTopHighlight"
+   Pos 912 586
+   Size 11 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DTopCenterHighlight {
+   Name "Button3DTopCenterHighlight"
+   Pos 924 586
+   Size 1 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopHighlight {
+   Name "Button3DRightTopHighlight"
+   Pos 926 586
+   Size 96 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftCenterHighlight {
+   Name "Button3DLeftCenterHighlight"
+   Pos 912 611
+   Size 11 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DCenterHighlight {
+   Name "Button3DCenterHighlight"
+   Pos 924 611
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterHighlight {
+   Name "Button3DRightCenterHighlight"
+   Pos 926 611
+   Size 96 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftBottomHighlight {
+   Name "Button3DLeftBottomHighlight"
+   Pos 912 613
+   Size 11 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DBottomCenterHighlight {
+   Name "Button3DBottomCenterHighlight"
+   Pos 924 613
+   Size 1 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomHighlight {
+   Name "Button3DRightBottomHighlight"
+   Pos 926 613
+   Size 96 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftTopFocusSmall {
+   Name "Button3DLeftTopFocusSmall"
+   Pos 718 711
+   Size 11 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DTopCenterFocusSmall {
+   Name "Button3DTopCenterFocusSmall"
+   Pos 728 711
+   Size 1 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopFocusSmall {
+   Name "Button3DRightTopFocusSmall"
+   Pos 728 711
+   Size 16 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftCenterFocusSmall {
+   Name "Button3DLeftCenterFocusSmall"
+   Pos 718 736
+   Size 11 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DCenterFocusSmall {
+   Name "Button3DCenterFocusSmall"
+   Pos 728 736
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterFocusSmall {
+   Name "Button3DRightCenterFocusSmall"
+   Pos 728 736
+   Size 16 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DLeftBottomFocusSmall {
+   Name "Button3DLeftBottomFocusSmall"
+   Pos 718 738
+   Size 11 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DBottomCenterFocusSmall {
+   Name "Button3DBottomCenterFocusSmall"
+   Pos 728 738
+   Size 1 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomFocusSmall {
+   Name "Button3DRightBottomFocusSmall"
+   Pos 728 738
+   Size 16 21
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelLeftTopFocus {
+   Name "ObjectivesPanelLeftTopFocus"
+   Pos 675 733
+   Size 26 13
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelTopCenterFocus {
+   Name "ObjectivesPanelTopCenterFocus"
+   Pos 701 733
+   Size 1 13
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRightTopFocus {
+   Name "ObjectivesPanelRightTopFocus"
+   Pos 702 733
+   Size 13 13
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelLeftCenterFocus {
+   Name "ObjectivesPanelLeftCenterFocus"
+   Pos 675 747
+   Size 26 1
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelCenterFocus {
+   Name "ObjectivesPanelCenterFocus"
+   Pos 701 747
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRightCenterFocus {
+   Name "ObjectivesPanelRightCenterFocus"
+   Pos 702 747
+   Size 13 1
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelLeftBottomFocus {
+   Name "ObjectivesPanelLeftBottomFocus"
+   Pos 675 754
+   Size 26 5
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelBottomCenterFocus {
+   Name "ObjectivesPanelBottomCenterFocus"
+   Pos 701 754
+   Size 1 5
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRightBottomFocus {
+   Name "ObjectivesPanelRightBottomFocus"
+   Pos 702 754
+   Size 13 5
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelLeftTop {
+   Name "ObjectivesPanelLeftTop"
+   Pos 675 706
+   Size 26 13
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelTopCenter {
+   Name "ObjectivesPanelTopCenter"
+   Pos 701 706
+   Size 1 13
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRightTop {
+   Name "ObjectivesPanelRightTop"
+   Pos 702 706
+   Size 13 13
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelLeftCenter {
+   Name "ObjectivesPanelLeftCenter"
+   Pos 675 720
+   Size 26 1
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelCenter {
+   Name "ObjectivesPanelCenter"
+   Pos 701 720
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRightCenter {
+   Name "ObjectivesPanelRightCenter"
+   Pos 702 720
+   Size 13 1
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelLeftBottom {
+   Name "ObjectivesPanelLeftBottom"
+   Pos 675 727
+   Size 26 5
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelBottomCenter {
+   Name "ObjectivesPanelBottomCenter"
+   Pos 701 727
+   Size 1 5
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRightBottom {
+   Name "ObjectivesPanelRightBottom"
+   Pos 702 727
+   Size 13 5
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRollUp {
+   Name "ObjectivesPanelRollUp"
+   Pos 704 679
+   Size 40 26
+   Flags 0
+  }
+  ImageSetDefClass ObjectivesPanelRollDown {
+   Name "ObjectivesPanelRollDown"
+   Pos 704 652
+   Size 40 26
+   Flags 0
+  }
+  ImageSetDefClass MarkFailed {
+   Name "MarkFailed"
+   Pos 728 637
+   Size 14 14
+   Flags 0
+  }
+  ImageSetDefClass MarkDone {
+   Name "MarkDone"
+   Pos 728 622
+   Size 14 14
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopHighlightSmall {
+   Name "Button3DRightTopHighlightSmall"
+   Pos 1006 586
+   Size 16 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterHighlightSmall {
+   Name "Button3DRightCenterHighlightSmall"
+   Pos 1006 611
+   Size 16 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomHighlightSmall {
+   Name "Button3DRightBottomHighlightSmall"
+   Pos 1006 613
+   Size 16 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopSmall {
+   Name "Button3DRightTopSmall"
+   Pos 1006 635
+   Size 16 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterSmall {
+   Name "Button3DRightCenterSmall"
+   Pos 1006 660
+   Size 16 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomSmall {
+   Name "Button3DRightBottomSmall"
+   Pos 1006 662
+   Size 16 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopPushedSmall {
+   Name "Button3DRightTopPushedSmall"
+   Pos 1006 684
+   Size 16 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterPushedSmall {
+   Name "Button3DRightCenterPushedSmall"
+   Pos 1006 709
+   Size 16 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomPushedSmall {
+   Name "Button3DRightBottomPushedSmall"
+   Pos 1006 711
+   Size 16 21
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightTopDisabledSmall {
+   Name "Button3DRightTopDisabledSmall"
+   Pos 1006 733
+   Size 16 24
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightCenterDisabledSmall {
+   Name "Button3DRightCenterDisabledSmall"
+   Pos 1006 758
+   Size 16 1
+   Flags 0
+  }
+  ImageSetDefClass Button3DRightBottomDisabledSmall {
+   Name "Button3DRightBottomDisabledSmall"
+   Pos 1006 760
+   Size 16 21
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftTopPushed {
+   Name "ButtonContextLeftTopPushed"
+   Pos 884 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextTopCenterPushed {
+   Name "ButtonContextTopCenterPushed"
+   Pos 896 593
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightTopPushed {
+   Name "ButtonContextRightTopPushed"
+   Pos 898 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftCenterPushed {
+   Name "ButtonContextLeftCenterPushed"
+   Pos 884 606
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextCenterPushed {
+   Name "ButtonContextCenterPushed"
+   Pos 896 606
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightCenterPushed {
+   Name "ButtonContextRightCenterPushed"
+   Pos 898 606
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftBottomPushed {
+   Name "ButtonContextLeftBottomPushed"
+   Pos 884 607
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextBottomCenterPushed {
+   Name "ButtonContextBottomCenterPushed"
+   Pos 896 607
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightBottomPushed {
+   Name "ButtonContextRightBottomPushed"
+   Pos 898 607
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftTop {
+   Name "ButtonContextLeftTop"
+   Pos 884 625
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextTopCenter {
+   Name "ButtonContextTopCenter"
+   Pos 896 625
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightTop {
+   Name "ButtonContextRightTop"
+   Pos 898 625
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftCenter {
+   Name "ButtonContextLeftCenter"
+   Pos 884 638
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextCenter {
+   Name "ButtonContextCenter"
+   Pos 896 638
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightCenter {
+   Name "ButtonContextRightCenter"
+   Pos 898 638
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftBottom {
+   Name "ButtonContextLeftBottom"
+   Pos 884 639
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextBottomCenter {
+   Name "ButtonContextBottomCenter"
+   Pos 896 639
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightBottom {
+   Name "ButtonContextRightBottom"
+   Pos 898 639
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftTopHighlight {
+   Name "ButtonContextLeftTopHighlight"
+   Pos 884 653
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextTopCenterHighlight {
+   Name "ButtonContextTopCenterHighlight"
+   Pos 896 653
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightTopHighlight {
+   Name "ButtonContextRightTopHighlight"
+   Pos 898 653
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftCenterHighlight {
+   Name "ButtonContextLeftCenterHighlight"
+   Pos 884 666
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextCenterHighlight {
+   Name "ButtonContextCenterHighlight"
+   Pos 896 666
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightCenterHighlight {
+   Name "ButtonContextRightCenterHighlight"
+   Pos 898 666
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftBottomHighlight {
+   Name "ButtonContextLeftBottomHighlight"
+   Pos 884 667
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextBottomCenterHighlight {
+   Name "ButtonContextBottomCenterHighlight"
+   Pos 896 667
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightBottomHighlight {
+   Name "ButtonContextRightBottomHighlight"
+   Pos 898 667
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftTopDisabled {
+   Name "ButtonContextLeftTopDisabled"
+   Pos 884 682
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextTopCenterDisabled {
+   Name "ButtonContextTopCenterDisabled"
+   Pos 896 682
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightTopDisabled {
+   Name "ButtonContextRightTopDisabled"
+   Pos 898 682
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftCenterDisabled {
+   Name "ButtonContextLeftCenterDisabled"
+   Pos 884 695
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextCenterDisabled {
+   Name "ButtonContextCenterDisabled"
+   Pos 896 695
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightCenterDisabled {
+   Name "ButtonContextRightCenterDisabled"
+   Pos 898 695
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftBottomDisabled {
+   Name "ButtonContextLeftBottomDisabled"
+   Pos 884 696
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextBottomCenterDisabled {
+   Name "ButtonContextBottomCenterDisabled"
+   Pos 896 696
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightBottomDisabled {
+   Name "ButtonContextRightBottomDisabled"
+   Pos 898 696
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftTopFocus {
+   Name "ButtonContextLeftTopFocus"
+   Pos 884 713
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftTop {
+   Name "XCombo2LeftTop"
+   Pos 521 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightTop {
+   Name "XCombo2RightTop"
+   Pos 559 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightBottom {
+   Name "XCombo2RightBottom"
+   Pos 559 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftBottom {
+   Name "XCombo2LeftBottom"
+   Pos 521 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2TopCenter {
+   Name "XCombo2TopCenter"
+   Pos 557 428
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2BottomCenter {
+   Name "XCombo2BottomCenter"
+   Pos 557 442
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftCenter {
+   Name "XCombo2LeftCenter"
+   Pos 521 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightCenter {
+   Name "XCombo2RightCenter"
+   Pos 559 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2Center {
+   Name "XCombo2Center"
+   Pos 557 440
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2ArrowLeft {
+   Name "XCombo2ArrowLeft"
+   Pos 595 428
+   Size 36 26
+   Flags 0
+  }
+  ImageSetDefClass XCombo2ArrowRight {
+   Name "XCombo2ArrowRight"
+   Pos 633 428
+   Size 36 26
+   Flags 0
+  }
+  ImageSetDefClass XCombo2ArrowLeftDisabled {
+   Name "XCombo2ArrowLeftDisabled"
+   Pos 316 182
+   Size 36 26
+   Flags 0
+  }
+  ImageSetDefClass XCombo2ArrowRightDisabled {
+   Name "XCombo2ArrowRightDisabled"
+   Pos 354 182
+   Size 36 26
+   Flags 0
+  }
+  ImageSetDefClass XCombo2ArrowLeftHighlight {
+   Name "XCombo2ArrowLeftHighlight"
+   Pos 316 208
+   Size 36 26
+   Flags 0
+  }
+  ImageSetDefClass XCombo2ArrowRightHighlight {
+   Name "XCombo2ArrowRightHighlight"
+   Pos 354 208
+   Size 36 26
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftTopHighlight {
+   Name "XCombo2LeftTopHighlight"
+   Pos 669 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightTopHighlight {
+   Name "XCombo2RightTopHighlight"
+   Pos 707 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftBottomHighlight {
+   Name "XCombo2LeftBottomHighlight"
+   Pos 669 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightBottomHighlight {
+   Name "XCombo2RightBottomHighlight"
+   Pos 707 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftCenterHighlight {
+   Name "XCombo2LeftCenterHighlight"
+   Pos 669 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightCenterHighlight {
+   Name "XCombo2RightCenterHighlight"
+   Pos 707 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2TopCenterHighlight {
+   Name "XCombo2TopCenterHighlight"
+   Pos 705 428
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2BottomCenterHighlight {
+   Name "XCombo2BottomCenterHighlight"
+   Pos 705 442
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2CenterHighlight {
+   Name "XCombo2CenterHighlight"
+   Pos 705 440
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftTopDisabled {
+   Name "XCombo2LeftTopDisabled"
+   Pos 743 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightTopDisabled {
+   Name "XCombo2RightTopDisabled"
+   Pos 781 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightBottomDisabled {
+   Name "XCombo2RightBottomDisabled"
+   Pos 781 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftBottomDisabled {
+   Name "XCombo2LeftBottomDisabled"
+   Pos 743 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftCenterDisabled {
+   Name "XCombo2LeftCenterDisabled"
+   Pos 743 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightCenterDisabled {
+   Name "XCombo2RightCenterDisabled"
+   Pos 781 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2TopCenterDisabled {
+   Name "XCombo2TopCenterDisabled"
+   Pos 779 428
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2BottomCenterDisabled {
+   Name "XCombo2BottomCenterDisabled"
+   Pos 779 442
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2CenterDisabled {
+   Name "XCombo2CenterDisabled"
+   Pos 779 440
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftTopFocus {
+   Name "XCombo2LeftTopFocus"
+   Pos 817 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightTopFocus {
+   Name "XCombo2RightTopFocus"
+   Pos 855 428
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightBottomFocus {
+   Name "XCombo2RightBottomFocus"
+   Pos 855 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftBottomFocus {
+   Name "XCombo2LeftBottomFocus"
+   Pos 817 442
+   Size 36 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2LeftCenterFocus {
+   Name "XCombo2LeftCenterFocus"
+   Pos 817 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2RightCenterFocus {
+   Name "XCombo2RightCenterFocus"
+   Pos 855 440
+   Size 36 1
+   Flags 0
+  }
+  ImageSetDefClass XCombo2TopCenterFocus {
+   Name "XCombo2TopCenterFocus"
+   Pos 853 428
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2BottomCenterFocus {
+   Name "XCombo2BottomCenterFocus"
+   Pos 853 442
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass XCombo2CenterFocus {
+   Name "XCombo2CenterFocus"
+   Pos 853 440
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass EquipMarkerIn {
+   Name "EquipMarkerIn"
+   Pos 602 585
+   Size 28 20
+   Flags 0
+  }
+  ImageSetDefClass EquipMarkerOut {
+   Name "EquipMarkerOut"
+   Pos 630 585
+   Size 28 20
+   Flags 0
+  }
+  ImageSetDefClass EquipMarkerSwap {
+   Name "EquipMarkerSwap"
+   Pos 657 585
+   Size 28 20
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftTop {
+   Name "SliderLeftTop"
+   Pos 794 579
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderTopCenter {
+   Name "SliderTopCenter"
+   Pos 806 579
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass SliderRightTop {
+   Name "SliderRightTop"
+   Pos 808 579
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderRightCenter {
+   Name "SliderRightCenter"
+   Pos 808 591
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass SliderRightBottom {
+   Name "SliderRightBottom"
+   Pos 808 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderBottomCenter {
+   Name "SliderBottomCenter"
+   Pos 806 593
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftBottom {
+   Name "SliderLeftBottom"
+   Pos 794 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftCenter {
+   Name "SliderLeftCenter"
+   Pos 794 591
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass SliderCenter {
+   Name "SliderCenter"
+   Pos 806 591
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftTopEmpty {
+   Name "SliderLeftTopEmpty"
+   Pos 766 579
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderTopCenterEmpty {
+   Name "SliderTopCenterEmpty"
+   Pos 778 579
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass SliderRightTopEmpty {
+   Name "SliderRightTopEmpty"
+   Pos 780 579
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderRightCenterEmpty {
+   Name "SliderRightCenterEmpty"
+   Pos 780 591
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass SliderRightBottomEmpty {
+   Name "SliderRightBottomEmpty"
+   Pos 780 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderBottomCenterEmpty {
+   Name "SliderBottomCenterEmpty"
+   Pos 778 593
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftBottomEmpty {
+   Name "SliderLeftBottomEmpty"
+   Pos 766 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftCenterEmpty {
+   Name "SliderLeftCenterEmpty"
+   Pos 766 591
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass SliderCenterEmpty {
+   Name "SliderCenterEmpty"
+   Pos 778 591
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftTopDisabled {
+   Name "SliderLeftTopDisabled"
+   Pos 738 579
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderTopCenterDisabled {
+   Name "SliderTopCenterDisabled"
+   Pos 750 579
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass SliderRightTopDisabled {
+   Name "SliderRightTopDisabled"
+   Pos 752 579
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderRightCenterDisabled {
+   Name "SliderRightCenterDisabled"
+   Pos 752 591
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass SliderRightBottomDisabled {
+   Name "SliderRightBottomDisabled"
+   Pos 752 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderCenterDisabled {
+   Name "SliderCenterDisabled"
+   Pos 750 591
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass SliderBottomCenterDisabled {
+   Name "SliderBottomCenterDisabled"
+   Pos 750 593
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftBottomDisabled {
+   Name "SliderLeftBottomDisabled"
+   Pos 738 593
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass SliderLeftCenterDisabled {
+   Name "SliderLeftCenterDisabled"
+   Pos 738 591
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextTopCenterFocus {
+   Name "ButtonContextTopCenterFocus"
+   Pos 896 713
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightTopFocus {
+   Name "ButtonContextRightTopFocus"
+   Pos 898 713
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftCenterFocus {
+   Name "ButtonContextLeftCenterFocus"
+   Pos 884 726
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextCenterFocus {
+   Name "ButtonContextCenterFocus"
+   Pos 896 726
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightCenterFocus {
+   Name "ButtonContextRightCenterFocus"
+   Pos 898 726
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextLeftBottomFocus {
+   Name "ButtonContextLeftBottomFocus"
+   Pos 884 727
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextBottomCenterFocus {
+   Name "ButtonContextBottomCenterFocus"
+   Pos 896 727
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContextRightBottomFocus {
+   Name "ButtonContextRightBottomFocus"
+   Pos 898 727
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightTopPushed {
+   Name "ButtonContext2RightTopPushed"
+   Pos 871 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightCenterPushed {
+   Name "ButtonContext2RightCenterPushed"
+   Pos 871 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightBottomPushed {
+   Name "ButtonContext2RightBottomPushed"
+   Pos 871 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2BottomCenterPushed {
+   Name "ButtonContext2BottomCenterPushed"
+   Pos 869 566
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftBottomPushed {
+   Name "ButtonContext2LeftBottomPushed"
+   Pos 857 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftCenterPushed {
+   Name "ButtonContext2LeftCenterPushed"
+   Pos 857 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftTopPushed {
+   Name "ButtonContext2LeftTopPushed"
+   Pos 857 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftTop {
+   Name "ButtonContext2LeftTop"
+   Pos 831 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2TopCenter {
+   Name "ButtonContext2TopCenter"
+   Pos 843 552
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightTop {
+   Name "ButtonContext2RightTop"
+   Pos 845 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightCenter {
+   Name "ButtonContext2RightCenter"
+   Pos 845 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightBottom {
+   Name "ButtonContext2RightBottom"
+   Pos 845 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2BottomCenter {
+   Name "ButtonContext2BottomCenter"
+   Pos 843 566
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftBottom {
+   Name "ButtonContext2LeftBottom"
+   Pos 831 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftCenter {
+   Name "ButtonContext2LeftCenter"
+   Pos 831 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2Center {
+   Name "ButtonContext2Center"
+   Pos 843 565
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2TopCenterPushed {
+   Name "ButtonContext2TopCenterPushed"
+   Pos 869 552
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2CenterPushed {
+   Name "ButtonContext2CenterPushed"
+   Pos 869 565
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftTopHighlight {
+   Name "ButtonContext2LeftTopHighlight"
+   Pos 805 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2TopCenterHighlight {
+   Name "ButtonContext2TopCenterHighlight"
+   Pos 817 552
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightTopHighlight {
+   Name "ButtonContext2RightTopHighlight"
+   Pos 819 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightCenterHighlight {
+   Name "ButtonContext2RightCenterHighlight"
+   Pos 819 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightBottomHighlight {
+   Name "ButtonContext2RightBottomHighlight"
+   Pos 819 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2BottomCenterHighlight {
+   Name "ButtonContext2BottomCenterHighlight"
+   Pos 817 566
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftBottomHighlight {
+   Name "ButtonContext2LeftBottomHighlight"
+   Pos 805 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftCenterHighlight {
+   Name "ButtonContext2LeftCenterHighlight"
+   Pos 805 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2CenterHighlight {
+   Name "ButtonContext2CenterHighlight"
+   Pos 817 565
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftTopDisabled {
+   Name "ButtonContext2LeftTopDisabled"
+   Pos 779 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2TopCenterDisabled {
+   Name "ButtonContext2TopCenterDisabled"
+   Pos 791 552
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightTopDisabled {
+   Name "ButtonContext2RightTopDisabled"
+   Pos 793 552
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightCenterDisabled {
+   Name "ButtonContext2RightCenterDisabled"
+   Pos 793 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2RightBottomDisabled {
+   Name "ButtonContext2RightBottomDisabled"
+   Pos 793 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2BottomCenterDisabled {
+   Name "ButtonContext2BottomCenterDisabled"
+   Pos 791 566
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftBottomDisabled {
+   Name "ButtonContext2LeftBottomDisabled"
+   Pos 779 566
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2LeftCenterDisabled {
+   Name "ButtonContext2LeftCenterDisabled"
+   Pos 779 565
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonContext2CenterDisabled {
+   Name "ButtonContext2CenterDisabled"
+   Pos 791 565
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass IconResource {
+   Name "IconResource"
+   Pos 760 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconHealth {
+   Name "IconHealth"
+   Pos 545 630
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconEnergy {
+   Name "IconEnergy"
+   Pos 545 648
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconTime {
+   Name "IconTime"
+   Pos 742 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconStockpile {
+   Name "IconStockpile"
+   Pos 724 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconBuilding {
+   Name "IconBuilding"
+   Pos 724 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconProduction {
+   Name "IconProduction"
+   Pos 706 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconCarrier {
+   Name "IconCarrier"
+   Pos 688 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconWeight {
+   Name "IconWeight"
+   Pos 669 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconAmmo {
+   Name "IconAmmo"
+   Pos 680 653
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass IconManta {
+   Name "IconManta"
+   Pos 648 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass IconWalrus {
+   Name "IconWalrus"
+   Pos 628 542
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass Icon40Default {
+   Name "Icon40Default"
+   Pos 297 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Production {
+   Name "Icon40Production"
+   Pos 339 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Stockpile {
+   Name "Icon40Stockpile"
+   Pos 381 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40CarrierFuel {
+   Name "Icon40CarrierFuel"
+   Pos 423 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40VehicleFuel {
+   Name "Icon40VehicleFuel"
+   Pos 85 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40FuelTank {
+   Name "Icon40FuelTank"
+   Pos 127 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40WalrusUpgradeVolcanic {
+   Name "Icon40WalrusUpgradeVolcanic"
+   Pos 169 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MantaUpgradeVolcanic {
+   Name "Icon40MantaUpgradeVolcanic"
+   Pos 169 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40WalrusUpgradeIcelands {
+   Name "Icon40WalrusUpgradeIcelands"
+   Pos 211 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MantaUpgradeIcelands {
+   Name "Icon40MantaUpgradeIcelands"
+   Pos 211 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40WalrusUpgradeMarshes {
+   Name "Icon40WalrusUpgradeMarshes"
+   Pos 379 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MantaUpgradeMarshes {
+   Name "Icon40MantaUpgradeMarshes"
+   Pos 379 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MantaCamouflage {
+   Name "Icon40MantaCamouflage"
+   Pos 213 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Shield {
+   Name "Icon40Shield"
+   Pos 255 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40UAV {
+   Name "Icon40UAV"
+   Pos 171 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Drone {
+   Name "Icon40Drone"
+   Pos 129 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MantaHook {
+   Name "Icon40MantaHook"
+   Pos 87 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40ArmorHeavy {
+   Name "Icon40ArmorHeavy"
+   Pos 45 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40AmmoBox {
+   Name "Icon40AmmoBox"
+   Pos 381 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Scanner {
+   Name "Icon40Scanner"
+   Pos 423 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Walrus {
+   Name "Icon40Walrus"
+   Pos 339 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Manta {
+   Name "Icon40Manta"
+   Pos 297 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40APA {
+   Name "Icon40APA"
+   Pos 381 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40UEC {
+   Name "Icon40UEC"
+   Pos 423 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Defense {
+   Name "Icon40Defense"
+   Pos 339 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40ArmorMedium {
+   Name "Icon40ArmorMedium"
+   Pos 339 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Hammerhead {
+   Name "Icon40Hammerhead"
+   Pos 3 897
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40CapsuleDefense {
+   Name "Icon40CapsuleDefense"
+   Pos 339 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40CapsuleProduction {
+   Name "Icon40CapsuleProduction"
+   Pos 297 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40CapsuleResource {
+   Name "Icon40CapsuleResource"
+   Pos 255 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40CapsuleHack {
+   Name "Icon40CapsuleHack"
+   Pos 213 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Turbo {
+   Name "Icon40Turbo"
+   Pos 171 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Forsage {
+   Name "Icon40Forsage"
+   Pos 171 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Flares {
+   Name "Icon40Flares"
+   Pos 129 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Howitzer {
+   Name "Icon40Howitzer"
+   Pos 87 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Flak {
+   Name "Icon40Flak"
+   Pos 45 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MachineGun {
+   Name "Icon40MachineGun"
+   Pos 3 855
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40RepairGun {
+   Name "Icon40RepairGun"
+   Pos 43 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Grenade {
+   Name "Icon40Grenade"
+   Pos 1 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Plasma {
+   Name "Icon40Plasma"
+   Pos 1 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Gatling {
+   Name "Icon40Gatling"
+   Pos 85 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Missiles {
+   Name "Icon40Missiles"
+   Pos 127 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Rockets {
+   Name "Icon40Rockets"
+   Pos 169 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Tomahawk {
+   Name "Icon40Tomahawk"
+   Pos 211 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Bomb {
+   Name "Icon40Bomb"
+   Pos 253 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Torpedo {
+   Name "Icon40Torpedo"
+   Pos 295 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40AA {
+   Name "Icon40AA"
+   Pos 337 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Shell {
+   Name "Icon40Shell"
+   Pos 421 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40HEAT {
+   Name "Icon40HEAT"
+   Pos 463 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Laser {
+   Name "Icon40Laser"
+   Pos 43 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Mining {
+   Name "Icon40Mining"
+   Pos 297 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Emergency {
+   Name "Icon40Emergency"
+   Pos 255 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40EmergencyFocus {
+   Name "Icon40EmergencyFocus"
+   Pos 87 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Attack {
+   Name "Icon40Attack"
+   Pos 255 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40AttackFocus {
+   Name "Icon40AttackFocus"
+   Pos 87 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40DockAll {
+   Name "Icon40DockAll"
+   Pos 213 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40DockAllFocus {
+   Name "Icon40DockAllFocus"
+   Pos 45 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40DefendCarrier {
+   Name "Icon40DefendCarrier"
+   Pos 213 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40DefendCarrierFocus {
+   Name "Icon40DefendCarrierFocus"
+   Pos 45 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Assist {
+   Name "Icon40Assist"
+   Pos 171 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40AssistFocus {
+   Name "Icon40AssistFocus"
+   Pos 3 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40UndockAll {
+   Name "Icon40UndockAll"
+   Pos 171 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40UndockAllFocus {
+   Name "Icon40UndockAllFocus"
+   Pos 3 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Move {
+   Name "Icon40Move"
+   Pos 129 939
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40MoveFocus {
+   Name "Icon40MoveFocus"
+   Pos 129 981
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Offensive {
+   Name "Icon40Offensive"
+   Pos 253 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40OffensiveFocus {
+   Name "Icon40OffensiveFocus"
+   Pos 337 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Hold {
+   Name "Icon40Hold"
+   Pos 421 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40HoldFocus {
+   Name "Icon40HoldFocus"
+   Pos 463 429
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40Defensive {
+   Name "Icon40Defensive"
+   Pos 295 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon40DefensiveFocus {
+   Name "Icon40DefensiveFocus"
+   Pos 379 471
+   Size 40 40
+   Flags 0
+  }
+  ImageSetDefClass Icon28EmptySlot {
+   Name "Icon28EmptySlot"
+   Pos 908 1
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Plasma {
+   Name "Icon28Plasma"
+   Pos 937 1
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Laser {
+   Name "Icon28Laser"
+   Pos 966 1
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Gatling {
+   Name "Icon28Gatling"
+   Pos 995 1
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Missiles {
+   Name "Icon28Missiles"
+   Pos 908 30
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Rockets {
+   Name "Icon28Rockets"
+   Pos 937 30
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Tomahawk {
+   Name "Icon28Tomahawk"
+   Pos 966 30
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Bomb {
+   Name "Icon28Bomb"
+   Pos 995 30
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Torpedo {
+   Name "Icon28Torpedo"
+   Pos 908 59
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28AA {
+   Name "Icon28AA"
+   Pos 937 59
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Grenade {
+   Name "Icon28Grenade"
+   Pos 966 59
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28RepairGun {
+   Name "Icon28RepairGun"
+   Pos 995 59
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28FuelTank {
+   Name "Icon28FuelTank"
+   Pos 908 88
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Shell {
+   Name "Icon28Shell"
+   Pos 937 88
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28HEAT {
+   Name "Icon28HEAT"
+   Pos 966 88
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28MachineGun {
+   Name "Icon28MachineGun"
+   Pos 995 88
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Flak {
+   Name "Icon28Flak"
+   Pos 908 117
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Howitzer {
+   Name "Icon28Howitzer"
+   Pos 937 117
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Flares {
+   Name "Icon28Flares"
+   Pos 966 117
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Turbo {
+   Name "Icon28Turbo"
+   Pos 995 117
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Forsage {
+   Name "Icon28Forsage"
+   Pos 995 117
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28CapsuleHack {
+   Name "Icon28CapsuleHack"
+   Pos 908 146
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28CapsuleResource {
+   Name "Icon28CapsuleResource"
+   Pos 937 146
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28CapsuleProduction {
+   Name "Icon28CapsuleProduction"
+   Pos 966 146
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28CapsuleDefense {
+   Name "Icon28CapsuleDefense"
+   Pos 995 146
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28MantaHook {
+   Name "Icon28MantaHook"
+   Pos 908 175
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28MantaCamouflage {
+   Name "Icon28MantaCamouflage"
+   Pos 937 175
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Shield {
+   Name "Icon28Shield"
+   Pos 966 175
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28AmmoBox {
+   Name "Icon28AmmoBox"
+   Pos 995 175
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Health {
+   Name "Icon28Health"
+   Pos 908 204
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Energy {
+   Name "Icon28Energy"
+   Pos 937 204
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28UAV {
+   Name "Icon28UAV"
+   Pos 966 204
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Scanner {
+   Name "Icon28Scanner"
+   Pos 966 233
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Default {
+   Name "Icon28Default"
+   Pos 937 233
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Drone {
+   Name "Icon28Drone"
+   Pos 995 204
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass Icon28Hammerhead {
+   Name "Icon28Hammerhead"
+   Pos 995 233
+   Size 28 28
+   Flags 0
+  }
+  ImageSetDefClass IconAutopilot {
+   Name "IconAutopilot"
+   Pos 835 213
+   Size 16 10
+   Flags 3
+  }
+  ImageSetDefClass IconEnergyLow {
+   Name "IconEnergyLow"
+   Pos 873 213
+   Size 16 10
+   Flags 3
+  }
+  ImageSetDefClass IconDefensive {
+   Name "IconDefensive"
+   Pos 854 213
+   Size 16 10
+   Flags 0
+  }
+  ImageSetDefClass CrCursor {
+   Name "CrCursor"
+   Pos 545 496
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass CrSelect {
+   Name "CrSelect"
+   Pos 128 768
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass CrPure {
+   Name "CrPure"
+   Pos 0 768
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass CrAttack {
+   Name "CrAttack"
+   Pos 64 768
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass CrScrollV {
+   Name "CrScrollV"
+   Pos 384 235
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass CrScrollH {
+   Name "CrScrollH"
+   Pos 448 235
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass CrPan {
+   Name "CrPan"
+   Pos 192 768
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass CrMove {
+   Name "CrMove"
+   Pos 256 768
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapDroid {
+   Name "MapDroid"
+   Pos 512 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapSlot {
+   Name "MapSlot"
+   Pos 320 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapUnipost {
+   Name "MapUnipost"
+   Pos 256 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapTurret {
+   Name "MapTurret"
+   Pos 256 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapTurretAT {
+   Name "MapTurretAT"
+   Pos 320 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapCommandCenter {
+   Name "MapCommandCenter"
+   Pos 192 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapAttack {
+   Name "MapAttack"
+   Pos 128 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapScrambler {
+   Name "MapScrambler"
+   Pos 0 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapFuelStation {
+   Name "MapFuelStation"
+   Pos 640 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapMolo {
+   Name "MapMolo"
+   Pos 448 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapTurretMissile {
+   Name "MapTurretMissile"
+   Pos 640 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapUserMarker {
+   Name "MapUserMarker"
+   Pos 192 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapFirewall {
+   Name "MapFirewall"
+   Pos 576 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapDestroyed {
+   Name "MapDestroyed"
+   Pos 512 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapRadar {
+   Name "MapRadar"
+   Pos 384 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapShieldBooster {
+   Name "MapShieldBooster"
+   Pos 64 363
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapWaypoint {
+   Name "MapWaypoint"
+   Pos 352 806
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshair {
+   Name "HudCrosshair"
+   Pos 64 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairCross {
+   Name "HudCrosshairCross"
+   Pos 0 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairPoint {
+   Name "HudCrosshairPoint"
+   Pos 128 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairBullet {
+   Name "HudCrosshairBullet"
+   Pos 192 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairGrenade {
+   Name "HudCrosshairGrenade"
+   Pos 256 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairRocket {
+   Name "HudCrosshairRocket"
+   Pos 320 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairLaser {
+   Name "HudCrosshairLaser"
+   Pos 384 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairPlasma {
+   Name "HudCrosshairPlasma"
+   Pos 448 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairSide {
+   Name "HudCrosshairSide"
+   Pos 64 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudCrosshairDisabled {
+   Name "HudCrosshairDisabled"
+   Pos 128 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudUse {
+   Name "HudUse"
+   Pos 0 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudWaypoint {
+   Name "HudWaypoint"
+   Pos 448 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudDamageIndicator {
+   Name "HudDamageIndicator"
+   Pos 626 504
+   Size 150 36
+   Flags 0
+  }
+  ImageSetDefClass HudLock {
+   Name "HudLock"
+   Pos 256 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudGroundTarget {
+   Name "HudGroundTarget"
+   Pos 128 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudGroundTargetLeftTop {
+   Name "HudGroundTargetLeftTop"
+   Pos 128 704
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass HudGroundTargetRightTop {
+   Name "HudGroundTargetRightTop"
+   Pos 160 704
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass HudGroundTargetLeftBottom {
+   Name "HudGroundTargetLeftBottom"
+   Pos 128 736
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass HudGroundTargetRightBottom {
+   Name "HudGroundTargetRightBottom"
+   Pos 160 736
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass HudGroundTargetSelected {
+   Name "HudGroundTargetSelected"
+   Pos 192 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudAirTarget {
+   Name "HudAirTarget"
+   Pos 0 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudAirTargetSelected {
+   Name "HudAirTargetSelected"
+   Pos 64 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudMove {
+   Name "HudMove"
+   Pos 192 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudAssist {
+   Name "HudAssist"
+   Pos 320 235
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudAttack {
+   Name "HudAttack"
+   Pos 256 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudDefend {
+   Name "HudDefend"
+   Pos 320 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudUserMarker {
+   Name "HudUserMarker"
+   Pos 384 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudUndock {
+   Name "HudUndock"
+   Pos 0 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudDock {
+   Name "HudDock"
+   Pos 64 512
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudHack {
+   Name "HudHack"
+   Pos 128 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass MapGarageWalrus {
+   Name "MapGarageWalrus"
+   Pos 64 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudHook {
+   Name "HudHook"
+   Pos 192 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudEnter {
+   Name "HudEnter"
+   Pos 256 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudLeave {
+   Name "HudLeave"
+   Pos 320 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudAmmo {
+   Name "HudAmmo"
+   Pos 384 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudFuel {
+   Name "HudFuel"
+   Pos 448 576
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudRepair {
+   Name "HudRepair"
+   Pos 448 640
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudBuild {
+   Name "HudBuild"
+   Pos 320 704
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudRadarGroundTarget {
+   Name "HudRadarGroundTarget"
+   Pos 504 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarTurretTarget {
+   Name "HudRadarTurretTarget"
+   Pos 536 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarBuildingTarget {
+   Name "HudRadarBuildingTarget"
+   Pos 520 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarAirTarget {
+   Name "HudRadarAirTarget"
+   Pos 472 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarWaypoint {
+   Name "HudRadarWaypoint"
+   Pos 456 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarRadar {
+   Name "HudRadarRadar"
+   Pos 440 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarRearmPoint {
+   Name "HudRadarRearmPoint"
+   Pos 424 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarManta {
+   Name "HudRadarManta"
+   Pos 408 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarWalrus {
+   Name "HudRadarWalrus"
+   Pos 392 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarTurretMissile {
+   Name "HudRadarTurretMissile"
+   Pos 376 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarDrone {
+   Name "HudRadarDrone"
+   Pos 376 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarFuelStation {
+   Name "HudRadarFuelStation"
+   Pos 360 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarMolo {
+   Name "HudRadarMolo"
+   Pos 344 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarRepairPoint {
+   Name "HudRadarRepairPoint"
+   Pos 328 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarConstructionSite {
+   Name "HudRadarConstructionSite"
+   Pos 488 769
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarCommandCenter {
+   Name "HudRadarCommandCenter"
+   Pos 456 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarFirewall {
+   Name "HudRadarFirewall"
+   Pos 440 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarShieldBooster {
+   Name "HudRadarShieldBooster"
+   Pos 424 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarScrambler {
+   Name "HudRadarScrambler"
+   Pos 408 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarResearchCenter {
+   Name "HudRadarResearchCenter"
+   Pos 392 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarX {
+   Name "HudRadarX"
+   Pos 472 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarLockedUnit {
+   Name "HudRadarLockedUnit"
+   Pos 488 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarSlot {
+   Name "HudRadarSlot"
+   Pos 504 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarUnit {
+   Name "HudRadarUnit"
+   Pos 520 786
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarTurretAT {
+   Name "HudRadarTurretAT"
+   Pos 525 648
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarTurretAA {
+   Name "HudRadarTurretAA"
+   Pos 525 630
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarGarageWalrus {
+   Name "HudRadarGarageWalrus"
+   Pos 525 612
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadarGarageManta {
+   Name "HudRadarGarageManta"
+   Pos 525 594
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar1 {
+   Name "HudRadar1"
+   Pos 614 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar2 {
+   Name "HudRadar2"
+   Pos 630 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar3 {
+   Name "HudRadar3"
+   Pos 647 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar4 {
+   Name "HudRadar4"
+   Pos 664 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar5 {
+   Name "HudRadar5"
+   Pos 680 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar6 {
+   Name "HudRadar6"
+   Pos 696 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar7 {
+   Name "HudRadar7"
+   Pos 712 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar8 {
+   Name "HudRadar8"
+   Pos 728 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar9 {
+   Name "HudRadar9"
+   Pos 744 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudRadar0 {
+   Name "HudRadar0"
+   Pos 761 559
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass HudMantaHeavy {
+   Name "HudMantaHeavy"
+   Pos 458 807
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass HudMantaMedium {
+   Name "HudMantaMedium"
+   Pos 432 807
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass HudMantaLight {
+   Name "HudMantaLight"
+   Pos 406 807
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass HudWalrusHeavy {
+   Name "HudWalrusHeavy"
+   Pos 483 807
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass HudWalrusMedium {
+   Name "HudWalrusMedium"
+   Pos 504 807
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass HudWalrusLight {
+   Name "HudWalrusLight"
+   Pos 525 807
+   Size 20 20
+   Flags 0
+  }
+  ImageSetDefClass TutIconWalrusLight {
+   Name "TutIconWalrusLight"
+   Pos 704 299
+   Size 64 64
+   Flags 0
+  }
+  ImageSetDefClass HudHealthBar {
+   Name "HudHealthBar"
+   Pos 394 809
+   Size 6 15
+   Flags 0
+  }
+  ImageSetDefClass LiveMap {
+   Name "LiveMap"
+   Pos 741 608
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass Blank {
+   Name "Blank"
+   Pos 740 610
+   Size 2 2
+   Flags 0
+  }
+  ImageSetDefClass TabLeftSlant {
+   Name "TabLeftSlant"
+   Pos 553 754
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabCenter {
+   Name "TabCenter"
+   Pos 574 763
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass TabRightSlant {
+   Name "TabRightSlant"
+   Pos 576 754
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabLeftSlantPushed {
+   Name "TabLeftSlantPushed"
+   Pos 553 730
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabCenterPushed {
+   Name "TabCenterPushed"
+   Pos 574 738
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass TabRightSlantPushed {
+   Name "TabRightSlantPushed"
+   Pos 576 730
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabLeftSlantFlipped {
+   Name "TabLeftSlantFlipped"
+   Pos 553 779
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabRightSlantFlipped {
+   Name "TabRightSlantFlipped"
+   Pos 576 779
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabLeftRound {
+   Name "TabLeftRound"
+   Pos 553 804
+   Size 3 21
+   Flags 0
+  }
+  ImageSetDefClass TabLeftRoundFlipped {
+   Name "TabLeftRoundFlipped"
+   Pos 553 807
+   Size 3 21
+   Flags 0
+  }
+  ImageSetDefClass TabRightRound {
+   Name "TabRightRound"
+   Pos 594 804
+   Size 3 21
+   Flags 0
+  }
+  ImageSetDefClass TabRightRoundFlipped {
+   Name "TabRightRoundFlipped"
+   Pos 594 807
+   Size 3 21
+   Flags 0
+  }
+  ImageSetDefClass TabRightSlant90CCW {
+   Name "TabRightSlant90CCW"
+   Pos 518 665
+   Size 21 21
+   Flags 3
+  }
+  ImageSetDefClass TabSharp {
+   Name "TabSharp"
+   Pos 518 685
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass TabLeftRound90CCW {
+   Name "TabLeftRound90CCW"
+   Pos 518 706
+   Size 21 3
+   Flags 3
+  }
+  ImageSetDefClass Tab0LeftTopSlant {
+   Name "Tab0LeftTopSlant"
+   Pos 630 454
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0RightTopSlant {
+   Name "Tab0RightTopSlant"
+   Pos 652 454
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0LeftBottomSlant {
+   Name "Tab0LeftBottomSlant"
+   Pos 630 476
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0RightBottomSlant {
+   Name "Tab0RightBottomSlant"
+   Pos 652 476
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0LeftTopRound {
+   Name "Tab0LeftTopRound"
+   Pos 677 454
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0RightTopRound {
+   Name "Tab0RightTopRound"
+   Pos 699 454
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0LeftBottomRound {
+   Name "Tab0LeftBottomRound"
+   Pos 677 476
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0RightBottomRound {
+   Name "Tab0RightBottomRound"
+   Pos 699 476
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass Tab0Center {
+   Name "Tab0Center"
+   Pos 688 465
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintLeftTop {
+   Name "PersistentHintLeftTop"
+   Pos 546 468
+   Size 8 8
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintRightTop {
+   Name "PersistentHintRightTop"
+   Pos 565 468
+   Size 8 8
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintRightBottom {
+   Name "PersistentHintRightBottom"
+   Pos 565 487
+   Size 8 8
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintLeftBottom {
+   Name "PersistentHintLeftBottom"
+   Pos 546 487
+   Size 8 8
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintTopCenter {
+   Name "PersistentHintTopCenter"
+   Pos 559 468
+   Size 1 8
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintRightCenter {
+   Name "PersistentHintRightCenter"
+   Pos 565 481
+   Size 8 1
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintBottomCenter {
+   Name "PersistentHintBottomCenter"
+   Pos 559 487
+   Size 1 8
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintLeftCenter {
+   Name "PersistentHintLeftCenter"
+   Pos 546 481
+   Size 8 1
+   Flags 0
+  }
+  ImageSetDefClass PersistentHintCenter {
+   Name "PersistentHintCenter"
+   Pos 559 481
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowLeftTop {
+   Name "WindowGlowLeftTop"
+   Pos 544 530
+   Size 10 10
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowRightTop {
+   Name "WindowGlowRightTop"
+   Pos 580 530
+   Size 10 10
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowLeftBottom {
+   Name "WindowGlowLeftBottom"
+   Pos 544 566
+   Size 10 10
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowRightBottom {
+   Name "WindowGlowRightBottom"
+   Pos 580 566
+   Size 10 10
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowLeftCenter {
+   Name "WindowGlowLeftCenter"
+   Pos 544 552
+   Size 10 1
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowTopCenter {
+   Name "WindowGlowTopCenter"
+   Pos 566 530
+   Size 1 10
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowRightCenter {
+   Name "WindowGlowRightCenter"
+   Pos 580 552
+   Size 10 1
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowBottomCenter {
+   Name "WindowGlowBottomCenter"
+   Pos 566 566
+   Size 1 10
+   Flags 0
+  }
+  ImageSetDefClass WindowGlowCenter {
+   Name "WindowGlowCenter"
+   Pos 566 552
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackLeftTop {
+   Name "WindowBorderBlackLeftTop"
+   Pos 724 454
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackRightTop {
+   Name "WindowBorderBlackRightTop"
+   Pos 748 454
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackLeftBottom {
+   Name "WindowBorderBlackLeftBottom"
+   Pos 724 478
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackRightBottom {
+   Name "WindowBorderBlackRightBottom"
+   Pos 748 478
+   Size 22 22
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackLeftCenter {
+   Name "WindowBorderBlackLeftCenter"
+   Pos 724 476
+   Size 22 1
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackTopCenter {
+   Name "WindowBorderBlackTopCenter"
+   Pos 746 454
+   Size 1 22
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackRightCenter {
+   Name "WindowBorderBlackRightCenter"
+   Pos 748 476
+   Size 22 1
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackBottomCenter {
+   Name "WindowBorderBlackBottomCenter"
+   Pos 746 478
+   Size 1 22
+   Flags 0
+  }
+  ImageSetDefClass WindowBorderBlackCenter {
+   Name "WindowBorderBlackCenter"
+   Pos 746 476
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowLeftTopRound {
+   Name "WindowLeftTopRound"
+   Pos 634 683
+   Size 3 8
+   Flags 3
+  }
+  ImageSetDefClass WindowRightTopRound {
+   Name "WindowRightTopRound"
+   Pos 646 683
+   Size 20 8
+   Flags 3
+  }
+  ImageSetDefClass WindowLeftBottomRound {
+   Name "WindowLeftBottomRound"
+   Pos 634 707
+   Size 3 8
+   Flags 3
+  }
+  ImageSetDefClass WindowRightBottomRound {
+   Name "WindowRightBottomRound"
+   Pos 646 707
+   Size 20 8
+   Flags 3
+  }
+  ImageSetDefClass WindowLeftTop {
+   Name "WindowLeftTop"
+   Pos 634 720
+   Size 3 8
+   Flags 3
+  }
+  ImageSetDefClass WindowRightTop {
+   Name "WindowRightTop"
+   Pos 646 720
+   Size 20 8
+   Flags 3
+  }
+  ImageSetDefClass WindowLeftBottom {
+   Name "WindowLeftBottom"
+   Pos 634 744
+   Size 3 8
+   Flags 3
+  }
+  ImageSetDefClass WindowRightBottom {
+   Name "WindowRightBottom"
+   Pos 646 744
+   Size 20 8
+   Flags 3
+  }
+  ImageSetDefClass WindowCenter {
+   Name "WindowCenter"
+   Pos 652 701
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowFresnelLeftTopSlant {
+   Name "WindowFresnelLeftTopSlant"
+   Pos 644 643
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelRightTopSlant {
+   Name "WindowFresnelRightTopSlant"
+   Pos 665 643
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelLeftBottomSlant {
+   Name "WindowFresnelLeftBottomSlant"
+   Pos 644 664
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelRightBottomSlant {
+   Name "WindowFresnelRightBottomSlant"
+   Pos 665 664
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelRightTopRound {
+   Name "WindowFresnelRightTopRound"
+   Pos 620 720
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelLeftTopRound {
+   Name "WindowFresnelLeftTopRound"
+   Pos 599 720
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelLeftBottomRound {
+   Name "WindowFresnelLeftBottomRound"
+   Pos 599 741
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelRightBottomRound {
+   Name "WindowFresnelRightBottomRound"
+   Pos 620 741
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowFresnelCenter {
+   Name "WindowFresnelCenter"
+   Pos 658 656
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkenerLeftTopSlant {
+   Name "WindowDarkenerLeftTopSlant"
+   Pos 681 761
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerRightTopSlant {
+   Name "WindowDarkenerRightTopSlant"
+   Pos 702 761
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerLeftBottomSlant {
+   Name "WindowDarkenerLeftBottomSlant"
+   Pos 681 782
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerRightBottomSlant {
+   Name "WindowDarkenerRightBottomSlant"
+   Pos 702 782
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerLeftTopRound {
+   Name "WindowDarkenerLeftTopRound"
+   Pos 718 761
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkenerRightTopRound {
+   Name "WindowDarkenerRightTopRound"
+   Pos 739 761
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerLeftBottomRound {
+   Name "WindowDarkenerLeftBottomRound"
+   Pos 718 782
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerRightBottomRound {
+   Name "WindowDarkenerRightBottomRound"
+   Pos 739 782
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerLeftTopSharp {
+   Name "WindowDarkenerLeftTopSharp"
+   Pos 692 772
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerRightTopSharp {
+   Name "WindowDarkenerRightTopSharp"
+   Pos 691 773
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerRightBottomSharp {
+   Name "WindowDarkenerRightBottomSharp"
+   Pos 690 774
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerLeftBottomSharp {
+   Name "WindowDarkenerLeftBottomSharp"
+   Pos 689 775
+   Size 11 11
+   Flags 3
+  }
+  ImageSetDefClass WindowDarkenerCenter {
+   Name "WindowDarkenerCenter"
+   Pos 694 774
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90Sharp {
+   Name "WindowDarkener90Sharp"
+   Pos 648 807
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90RightTopRound {
+   Name "WindowDarkener90RightTopRound"
+   Pos 658 796
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90RightBottomRound {
+   Name "WindowDarkener90RightBottomRound"
+   Pos 658 817
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90LeftBottomRound {
+   Name "WindowDarkener90LeftBottomRound"
+   Pos 637 817
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90LeftTopRound {
+   Name "WindowDarkener90LeftTopRound"
+   Pos 637 796
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90RightTopSlant {
+   Name "WindowDarkener90RightTopSlant"
+   Pos 658 761
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90RightBottomSlant {
+   Name "WindowDarkener90RightBottomSlant"
+   Pos 658 782
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90LeftBottomSlant {
+   Name "WindowDarkener90LeftBottomSlant"
+   Pos 637 782
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90LeftTopSlant {
+   Name "WindowDarkener90LeftTopSlant"
+   Pos 637 761
+   Size 11 11
+   Flags 0
+  }
+  ImageSetDefClass WindowDarkener90Center {
+   Name "WindowDarkener90Center"
+   Pos 650 773
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltLeftTop {
+   Name "WindowAltLeftTop"
+   Pos 752 763
+   Size 102 38
+   Flags 0
+  }
+  ImageSetDefClass WindowAltTopCenter {
+   Name "WindowAltTopCenter"
+   Pos 855 763
+   Size 1 38
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightTopScroll {
+   Name "WindowAltRightTopScroll"
+   Pos 861 763
+   Size 24 38
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightTop {
+   Name "WindowAltRightTop"
+   Pos 886 763
+   Size 24 38
+   Flags 0
+  }
+  ImageSetDefClass WindowAltLeftCenter {
+   Name "WindowAltLeftCenter"
+   Pos 752 802
+   Size 102 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltCenter {
+   Name "WindowAltCenter"
+   Pos 855 802
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightCenterScroll {
+   Name "WindowAltRightCenterScroll"
+   Pos 861 802
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightCenter {
+   Name "WindowAltRightCenter"
+   Pos 886 802
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltLeftBottom {
+   Name "WindowAltLeftBottom"
+   Pos 752 804
+   Size 102 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltBottomCenter {
+   Name "WindowAltBottomCenter"
+   Pos 855 804
+   Size 1 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightBottomScroll {
+   Name "WindowAltRightBottomScroll"
+   Pos 861 804
+   Size 24 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightNoBottomScroll {
+   Name "WindowAltRightNoBottomScroll"
+   Pos 861 757
+   Size 24 4
+   Flags 0
+  }
+  ImageSetDefClass WindowAltLeftNoBottom {
+   Name "WindowAltLeftNoBottom"
+   Pos 752 757
+   Size 102 4
+   Flags 0
+  }
+  ImageSetDefClass WindowAltRightBottom {
+   Name "WindowAltRightBottom"
+   Pos 886 804
+   Size 24 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltScrollTop {
+   Name "WindowAltScrollTop"
+   Pos 886 757
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltScrollCenter {
+   Name "WindowAltScrollCenter"
+   Pos 886 758
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogLeftTop {
+   Name "WindowAltDialogLeftTop"
+   Pos 746 607
+   Size 109 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogTopCenter {
+   Name "WindowAltDialogTopCenter"
+   Pos 856 607
+   Size 1 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogRightTop {
+   Name "WindowAltDialogRightTop"
+   Pos 858 607
+   Size 24 27
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogLeftCenter {
+   Name "WindowAltDialogLeftCenter"
+   Pos 746 635
+   Size 109 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogCenter {
+   Name "WindowAltDialogCenter"
+   Pos 856 635
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogRightCenter {
+   Name "WindowAltDialogRightCenter"
+   Pos 858 635
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogLeftBottom {
+   Name "WindowAltDialogLeftBottom"
+   Pos 746 637
+   Size 109 118
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogBottomCenter {
+   Name "WindowAltDialogBottomCenter"
+   Pos 856 637
+   Size 1 118
+   Flags 0
+  }
+  ImageSetDefClass WindowAltDialogRightBottom {
+   Name "WindowAltDialogRightBottom"
+   Pos 858 637
+   Size 24 118
+   Flags 0
+  }
+  ImageSetDefClass ListboxAltRightCenter {
+   Name "ListboxAltRightCenter"
+   Pos 886 749
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass WindowAltScrollBottom {
+   Name "WindowAltScrollBottom"
+   Pos 886 758
+   Size 24 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxAltRightBottom {
+   Name "ListboxAltRightBottom"
+   Pos 886 749
+   Size 24 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxAltLeftCenter {
+   Name "ListboxAltLeftCenter"
+   Pos 886 753
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass ListboxAltLeftBottom {
+   Name "ListboxAltLeftBottom"
+   Pos 886 754
+   Size 24 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxAltRightTop {
+   Name "ListboxAltRightTop"
+   Pos 886 748
+   Size 24 1
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftTop {
+   Name "UnitLeftTop"
+   Pos 400 1
+   Size 36 36
+   Flags 3
+  }
+  ImageSetDefClass UnitTopCenter {
+   Name "UnitTopCenter"
+   Pos 436 1
+   Size 25 36
+   Flags 0
+  }
+  ImageSetDefClass UnitRightTop {
+   Name "UnitRightTop"
+   Pos 461 1
+   Size 42 36
+   Flags 3
+  }
+  ImageSetDefClass UnitLeftCenter {
+   Name "UnitLeftCenter"
+   Pos 400 37
+   Size 36 54
+   Flags 3
+  }
+  ImageSetDefClass UnitCenter {
+   Name "UnitCenter"
+   Pos 436 37
+   Size 25 54
+   Flags 3
+  }
+  ImageSetDefClass UnitRightCenter {
+   Name "UnitRightCenter"
+   Pos 461 37
+   Size 42 54
+   Flags 3
+  }
+  ImageSetDefClass UnitLeftBottom {
+   Name "UnitLeftBottom"
+   Pos 400 91
+   Size 36 24
+   Flags 0
+  }
+  ImageSetDefClass UnitBottomCenter {
+   Name "UnitBottomCenter"
+   Pos 436 91
+   Size 25 24
+   Flags 3
+  }
+  ImageSetDefClass UnitRightBottom {
+   Name "UnitRightBottom"
+   Pos 461 91
+   Size 42 24
+   Flags 3
+  }
+  ImageSetDefClass UnitLeftTopSmall {
+   Name "UnitLeftTopSmall"
+   Pos 608 1
+   Size 36 36
+   Flags 0
+  }
+  ImageSetDefClass UnitTopCenterSmall {
+   Name "UnitTopCenterSmall"
+   Pos 644 1
+   Size 25 36
+   Flags 0
+  }
+  ImageSetDefClass UnitRightTopSmall {
+   Name "UnitRightTopSmall"
+   Pos 669 1
+   Size 12 36
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftCenterSmall {
+   Name "UnitLeftCenterSmall"
+   Pos 608 37
+   Size 36 54
+   Flags 0
+  }
+  ImageSetDefClass UnitCenterSmall {
+   Name "UnitCenterSmall"
+   Pos 644 37
+   Size 25 54
+   Flags 0
+  }
+  ImageSetDefClass UnitRightCenterSmall {
+   Name "UnitRightCenterSmall"
+   Pos 669 37
+   Size 12 54
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftBottomSmall {
+   Name "UnitLeftBottomSmall"
+   Pos 608 91
+   Size 36 24
+   Flags 0
+  }
+  ImageSetDefClass UnitBottomCenterSmall {
+   Name "UnitBottomCenterSmall"
+   Pos 644 91
+   Size 25 24
+   Flags 0
+  }
+  ImageSetDefClass UnitRightBottomSmall {
+   Name "UnitRightBottomSmall"
+   Pos 669 91
+   Size 12 24
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftTopSmallHighlight {
+   Name "UnitLeftTopSmallHighlight"
+   Pos 682 1
+   Size 36 36
+   Flags 0
+  }
+  ImageSetDefClass UnitTopCenterSmallHighlight {
+   Name "UnitTopCenterSmallHighlight"
+   Pos 718 1
+   Size 25 36
+   Flags 0
+  }
+  ImageSetDefClass UnitRightTopSmallHighlight {
+   Name "UnitRightTopSmallHighlight"
+   Pos 743 1
+   Size 12 36
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftCenterSmallHighlight {
+   Name "UnitLeftCenterSmallHighlight"
+   Pos 682 37
+   Size 36 54
+   Flags 0
+  }
+  ImageSetDefClass UnitCenterSmallHighlight {
+   Name "UnitCenterSmallHighlight"
+   Pos 718 37
+   Size 25 54
+   Flags 0
+  }
+  ImageSetDefClass UnitRightCenterSmallHighlight {
+   Name "UnitRightCenterSmallHighlight"
+   Pos 743 37
+   Size 12 54
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftBottomSmallHighlight {
+   Name "UnitLeftBottomSmallHighlight"
+   Pos 682 91
+   Size 36 24
+   Flags 0
+  }
+  ImageSetDefClass UnitBottomCenterSmallHighlight {
+   Name "UnitBottomCenterSmallHighlight"
+   Pos 718 91
+   Size 25 24
+   Flags 0
+  }
+  ImageSetDefClass UnitRightBottomSmallHighlight {
+   Name "UnitRightBottomSmallHighlight"
+   Pos 743 91
+   Size 12 24
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftTopSmallPushed {
+   Name "UnitLeftTopSmallPushed"
+   Pos 608 116
+   Size 36 36
+   Flags 0
+  }
+  ImageSetDefClass UnitTopCenterSmallPushed {
+   Name "UnitTopCenterSmallPushed"
+   Pos 644 116
+   Size 25 36
+   Flags 0
+  }
+  ImageSetDefClass UnitRightTopSmallPushed {
+   Name "UnitRightTopSmallPushed"
+   Pos 669 116
+   Size 12 36
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftCenterSmallPushed {
+   Name "UnitLeftCenterSmallPushed"
+   Pos 608 152
+   Size 36 54
+   Flags 0
+  }
+  ImageSetDefClass UnitCenterSmallPushed {
+   Name "UnitCenterSmallPushed"
+   Pos 644 152
+   Size 25 54
+   Flags 0
+  }
+  ImageSetDefClass UnitRightCenterSmallPushed {
+   Name "UnitRightCenterSmallPushed"
+   Pos 669 152
+   Size 12 54
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftBottomSmallPushed {
+   Name "UnitLeftBottomSmallPushed"
+   Pos 608 206
+   Size 36 24
+   Flags 0
+  }
+  ImageSetDefClass UnitBottomCenterSmallPushed {
+   Name "UnitBottomCenterSmallPushed"
+   Pos 644 206
+   Size 25 24
+   Flags 0
+  }
+  ImageSetDefClass UnitRightBottomSmallPushed {
+   Name "UnitRightBottomSmallPushed"
+   Pos 669 206
+   Size 12 24
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftTopPushed {
+   Name "UnitLeftTopPushed"
+   Pos 400 116
+   Size 36 36
+   Flags 3
+  }
+  ImageSetDefClass UnitTopCenterPushed {
+   Name "UnitTopCenterPushed"
+   Pos 436 116
+   Size 25 36
+   Flags 3
+  }
+  ImageSetDefClass UnitRightTopPushed {
+   Name "UnitRightTopPushed"
+   Pos 461 116
+   Size 42 36
+   Flags 3
+  }
+  ImageSetDefClass UnitLeftCenterPushed {
+   Name "UnitLeftCenterPushed"
+   Pos 400 152
+   Size 36 54
+   Flags 3
+  }
+  ImageSetDefClass UnitCenterPushed {
+   Name "UnitCenterPushed"
+   Pos 436 152
+   Size 25 54
+   Flags 0
+  }
+  ImageSetDefClass UnitRightCenterPushed {
+   Name "UnitRightCenterPushed"
+   Pos 461 152
+   Size 42 54
+   Flags 3
+  }
+  ImageSetDefClass UnitLeftBottomPushed {
+   Name "UnitLeftBottomPushed"
+   Pos 400 206
+   Size 36 24
+   Flags 3
+  }
+  ImageSetDefClass UnitBottomCenterPushed {
+   Name "UnitBottomCenterPushed"
+   Pos 436 206
+   Size 25 24
+   Flags 3
+  }
+  ImageSetDefClass UnitRightBottomPushed {
+   Name "UnitRightBottomPushed"
+   Pos 461 206
+   Size 42 24
+   Flags 3
+  }
+  ImageSetDefClass UnitMultiselect {
+   Name "UnitMultiselect"
+   Pos 830 116
+   Size 64 96
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftTopHighlight {
+   Name "UnitLeftTopHighlight"
+   Pos 504 116
+   Size 36 36
+   Flags 0
+  }
+  ImageSetDefClass UnitTopCenterHighlight {
+   Name "UnitTopCenterHighlight"
+   Pos 540 116
+   Size 25 36
+   Flags 0
+  }
+  ImageSetDefClass UnitRightTopHighlight {
+   Name "UnitRightTopHighlight"
+   Pos 565 116
+   Size 42 36
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftCenterHighlight {
+   Name "UnitLeftCenterHighlight"
+   Pos 504 152
+   Size 36 54
+   Flags 0
+  }
+  ImageSetDefClass UnitCenterHighlight {
+   Name "UnitCenterHighlight"
+   Pos 540 152
+   Size 25 54
+   Flags 0
+  }
+  ImageSetDefClass UnitRightCenterHighlight {
+   Name "UnitRightCenterHighlight"
+   Pos 565 152
+   Size 42 54
+   Flags 0
+  }
+  ImageSetDefClass UnitLeftBottomHighlight {
+   Name "UnitLeftBottomHighlight"
+   Pos 504 206
+   Size 36 24
+   Flags 0
+  }
+  ImageSetDefClass UnitBottomCenterHighlight {
+   Name "UnitBottomCenterHighlight"
+   Pos 540 206
+   Size 25 24
+   Flags 0
+  }
+  ImageSetDefClass UnitRightBottomHighlight {
+   Name "UnitRightBottomHighlight"
+   Pos 565 206
+   Size 42 24
+   Flags 0
+  }
+  ImageSetDefClass UnitHit {
+   Name "UnitHit"
+   Pos 504 1
+   Size 103 114
+   Flags 0
+  }
+  ImageSetDefClass UnitActive {
+   Name "UnitActive"
+   Pos 756 1
+   Size 103 114
+   Flags 0
+  }
+  ImageSetDefClass UnitSmallHit {
+   Name "UnitSmallHit"
+   Pos 682 116
+   Size 73 114
+   Flags 0
+  }
+  ImageSetDefClass UnitSmallActive {
+   Name "UnitSmallActive"
+   Pos 756 116
+   Size 73 114
+   Flags 0
+  }
+  ImageSetDefClass ProgressCarrierSystemsFull {
+   Name "ProgressCarrierSystemsFull"
+   Pos 58 1
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressCarrierSystemsEmpty {
+   Name "ProgressCarrierSystemsEmpty"
+   Pos 58 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressCarrierFull {
+   Name "ProgressCarrierFull"
+   Pos 1 1
+   Size 56 88
+   Flags 0
+  }
+  ImageSetDefClass ProgressCarrierEmpty {
+   Name "ProgressCarrierEmpty"
+   Pos 1 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaLightFull {
+   Name "ProgressMantaLightFull"
+   Pos 115 1
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaLightEmpty {
+   Name "ProgressMantaLightEmpty"
+   Pos 115 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaMediumFull {
+   Name "ProgressMantaMediumFull"
+   Pos 172 1
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaMediumEmpty {
+   Name "ProgressMantaMediumEmpty"
+   Pos 172 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaHeavyFull {
+   Name "ProgressMantaHeavyFull"
+   Pos 229 1
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaHeavyEmpty {
+   Name "ProgressMantaHeavyEmpty"
+   Pos 229 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusLightFull {
+   Name "ProgressWalrusLightFull"
+   Pos 286 1
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusLightEmpty {
+   Name "ProgressWalrusLightEmpty"
+   Pos 286 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusMediumFull {
+   Name "ProgressWalrusMediumFull"
+   Pos 343 1
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusMediumEmpty {
+   Name "ProgressWalrusMediumEmpty"
+   Pos 343 90
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusHeavyFull {
+   Name "ProgressWalrusHeavyFull"
+   Pos 115 179
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusHeavyEmpty {
+   Name "ProgressWalrusHeavyEmpty"
+   Pos 172 179
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass UnitDocked {
+   Name "UnitDocked"
+   Pos 229 179
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMantaDead {
+   Name "ProgressMantaDead"
+   Pos 1 179
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressWalrusDead {
+   Name "ProgressWalrusDead"
+   Pos 58 179
+   Size 56 88
+   Flags 3
+  }
+  ImageSetDefClass ProgressMenuDefaultEmpty {
+   Name "ProgressMenuDefaultEmpty"
+   Pos 636 606
+   Size 1 8
+   Flags 0
+  }
+  ImageSetDefClass ProgressMenuDefaultEmptyFocus {
+   Name "ProgressMenuDefaultEmptyFocus"
+   Pos 674 761
+   Size 1 8
+   Flags 0
+  }
+  ImageSetDefClass ProgressMenuDefaultFull {
+   Name "ProgressMenuDefaultFull"
+   Pos 636 619
+   Size 1 8
+   Flags 0
+  }
+  ImageSetDefClass ProgressMenuDefaultFullFocus {
+   Name "ProgressMenuDefaultFullFocus"
+   Pos 674 774
+   Size 1 8
+   Flags 0
+  }
+  ImageSetDefClass ProgressMenuTileFull {
+   Name "ProgressMenuTileFull"
+   Pos 635 619
+   Size 6 8
+   Flags 3
+  }
+  ImageSetDefClass ProgressMenuTileEmpty {
+   Name "ProgressMenuTileEmpty"
+   Pos 635 630
+   Size 6 8
+   Flags 3
+  }
+  ImageSetDefClass ProgressHUDTileFull {
+   Name "ProgressHUDTileFull"
+   Pos 635 639
+   Size 6 18
+   Flags 3
+  }
+  ImageSetDefClass ProgressHUDTileEmpty {
+   Name "ProgressHUDTileEmpty"
+   Pos 635 660
+   Size 6 18
+   Flags 3
+  }
+  ImageSetDefClass ProgressHUDSmallFull {
+   Name "ProgressHUDSmallFull"
+   Pos 668 679
+   Size 6 12
+   Flags 3
+  }
+  ImageSetDefClass ProgressHUDSmallVerticalFull {
+   Name "ProgressHUDSmallVerticalFull"
+   Pos 688 678
+   Size 12 6
+   Flags 3
+  }
+  ImageSetDefClass ProgressHUDSmallVerticalEmpty {
+   Name "ProgressHUDSmallVerticalEmpty"
+   Pos 688 685
+   Size 12 6
+   Flags 3
+  }
+  ImageSetDefClass ProgressHUDSmallEmpty {
+   Name "ProgressHUDSmallEmpty"
+   Pos 678 679
+   Size 6 12
+   Flags 3
+  }
+  ImageSetDefClass BarVerticalFull4Empty {
+   Name "BarVerticalFull4Empty"
+   Pos 779 521
+   Size 12 30
+   Flags 3
+  }
+  ImageSetDefClass FilterManta {
+   Name "FilterManta"
+   Pos 913 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterMantaFocus {
+   Name "FilterMantaFocus"
+   Pos 913 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterNone {
+   Name "FilterNone"
+   Pos 969 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterNoneFocus {
+   Name "FilterNoneFocus"
+   Pos 969 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCarrier {
+   Name "FilterCarrier"
+   Pos 969 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCarrierFocus {
+   Name "FilterCarrierFocus"
+   Pos 969 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterWalrus {
+   Name "FilterWalrus"
+   Pos 913 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterWalrusFocus {
+   Name "FilterWalrusFocus"
+   Pos 913 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterArmor {
+   Name "FilterArmor"
+   Pos 857 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterArmorFocus {
+   Name "FilterArmorFocus"
+   Pos 857 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterWeapons {
+   Name "FilterWeapons"
+   Pos 801 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterWeaponsFocus {
+   Name "FilterWeaponsFocus"
+   Pos 801 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterEnhancements {
+   Name "FilterEnhancements"
+   Pos 857 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterEnhancementsFocus {
+   Name "FilterEnhancementsFocus"
+   Pos 857 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterAdvisors {
+   Name "FilterAdvisors"
+   Pos 521 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterAdvisorsFocus {
+   Name "FilterAdvisorsFocus"
+   Pos 521 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCombat {
+   Name "FilterCombat"
+   Pos 577 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCombatFocus {
+   Name "FilterCombatFocus"
+   Pos 577 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterLastDay {
+   Name "FilterLastDay"
+   Pos 633 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterLastDayFocus {
+   Name "FilterLastDayFocus"
+   Pos 633 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterLastWeek {
+   Name "FilterLastWeek"
+   Pos 689 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterLastWeekFocus {
+   Name "FilterLastWeekFocus"
+   Pos 689 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterOthers {
+   Name "FilterOthers"
+   Pos 745 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterOthersFocus {
+   Name "FilterOthersFocus"
+   Pos 745 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterUnits {
+   Name "FilterUnits"
+   Pos 801 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterUnitsFocus {
+   Name "FilterUnitsFocus"
+   Pos 801 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterLastMonth {
+   Name "FilterLastMonth"
+   Pos 521 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterLastMonthFocus {
+   Name "FilterLastMonthFocus"
+   Pos 521 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterEmpire {
+   Name "FilterEmpire"
+   Pos 577 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterEmpireFocus {
+   Name "FilterEmpireFocus"
+   Pos 577 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCompletedObjectives {
+   Name "FilterCompletedObjectives"
+   Pos 633 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCompletedObjectivesFocus {
+   Name "FilterCompletedObjectivesFocus"
+   Pos 633 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterFailedObjectives {
+   Name "FilterFailedObjectives"
+   Pos 689 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterFailedObjectivesFocus {
+   Name "FilterFailedObjectivesFocus"
+   Pos 689 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCurrentObjectives {
+   Name "FilterCurrentObjectives"
+   Pos 745 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterCurrentObjectivesFocus {
+   Name "FilterCurrentObjectivesFocus"
+   Pos 745 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterConfigure {
+   Name "FilterConfigure"
+   Pos 465 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterConfigureDisabled {
+   Name "FilterConfigureDisabled"
+   Pos 409 832
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterConfigureFocus {
+   Name "FilterConfigureFocus"
+   Pos 465 880
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterPlanet {
+   Name "FilterPlanet"
+   Pos 465 928
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterPlanetFocus {
+   Name "FilterPlanetFocus"
+   Pos 465 976
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterKeyBindingsFocus {
+   Name "FilterKeyBindingsFocus"
+   Pos 969 538
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterSoundFocus {
+   Name "FilterSoundFocus"
+   Pos 913 538
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterKeyBindings {
+   Name "FilterKeyBindings"
+   Pos 969 490
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterSound {
+   Name "FilterSound"
+   Pos 913 490
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterVideoFocus {
+   Name "FilterVideoFocus"
+   Pos 969 442
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterControlsFocus {
+   Name "FilterControlsFocus"
+   Pos 913 442
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterVideo {
+   Name "FilterVideo"
+   Pos 969 394
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterControls {
+   Name "FilterControls"
+   Pos 913 394
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterRenderFocus {
+   Name "FilterRenderFocus"
+   Pos 969 346
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterRender {
+   Name "FilterRender"
+   Pos 969 298
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterControls2Focus {
+   Name "FilterControls2Focus"
+   Pos 913 346
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass FilterControls2 {
+   Name "FilterControls2"
+   Pos 913 298
+   Size 55 48
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsLeftTopSlant {
+   Name "WindowControlsLeftTopSlant"
+   Pos 690 614
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsLeftBottomSlant {
+   Name "WindowControlsLeftBottomSlant"
+   Pos 690 638
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsRightBottomSlant {
+   Name "WindowControlsRightBottomSlant"
+   Pos 714 638
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsTopCenter {
+   Name "WindowControlsTopCenter"
+   Pos 708 614
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsRightTopSlant {
+   Name "WindowControlsRightTopSlant"
+   Pos 714 614
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsLeftCenter {
+   Name "WindowControlsLeftCenter"
+   Pos 690 631
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsCenter {
+   Name "WindowControlsCenter"
+   Pos 708 631
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsRightCenter {
+   Name "WindowControlsRightCenter"
+   Pos 714 631
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsLeftBottomRound {
+   Name "WindowControlsLeftBottomRound"
+   Pos 690 601
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsBottomCenter {
+   Name "WindowControlsBottomCenter"
+   Pos 708 638
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsRightBottomRound {
+   Name "WindowControlsRightBottomRound"
+   Pos 714 601
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsLeftTopRound {
+   Name "WindowControlsLeftTopRound"
+   Pos 690 577
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass WindowControlsRightTopRound {
+   Name "WindowControlsRightTopRound"
+   Pos 714 577
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass 1 {
+   Name "1"
+   Pos 615 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 2 {
+   Name "2"
+   Pos 631 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 3 {
+   Name "3"
+   Pos 648 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 4 {
+   Name "4"
+   Pos 665 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 5 {
+   Name "5"
+   Pos 681 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 6 {
+   Name "6"
+   Pos 697 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 7 {
+   Name "7"
+   Pos 713 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 8 {
+   Name "8"
+   Pos 729 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 9 {
+   Name "9"
+   Pos 745 560
+   Size 14 14
+   Flags 3
+  }
+  ImageSetDefClass 0 {
+   Name "0"
+   Pos 762 560
+   Size 14 14
+   Flags 0
+  }
+  ImageSetDefClass CheckboxNormal {
+   Name "CheckboxNormal"
+   Pos 884 625
+   Size 26 26
+   Flags 0
+  }
+  ImageSetDefClass CheckboxDisabled {
+   Name "CheckboxDisabled"
+   Pos 884 682
+   Size 26 26
+   Flags 0
+  }
+  ImageSetDefClass CheckboxHover {
+   Name "CheckboxHover"
+   Pos 823 579
+   Size 26 26
+   Flags 0
+  }
+  ImageSetDefClass CheckboxMark {
+   Name "CheckboxMark"
+   Pos 852 580
+   Size 26 26
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderLeftTop {
+   Name "ListboxHeaderLeftTop"
+   Pos 800 473
+   Size 9 11
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderLeftTop2 {
+   Name "ListboxHeaderLeftTop2"
+   Pos 844 487
+   Size 9 11
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderLeftCenter {
+   Name "ListboxHeaderLeftCenter"
+   Pos 800 485
+   Size 9 2
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderLeftCenter2 {
+   Name "ListboxHeaderLeftCenter2"
+   Pos 844 500
+   Size 9 2
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderLeftBottom {
+   Name "ListboxHeaderLeftBottom"
+   Pos 800 488
+   Size 9 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderLeftBottom2 {
+   Name "ListboxHeaderLeftBottom2"
+   Pos 844 504
+   Size 9 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderTopCenter {
+   Name "ListboxHeaderTopCenter"
+   Pos 819 473
+   Size 2 11
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderTopCenter2 {
+   Name "ListboxHeaderTopCenter2"
+   Pos 863 487
+   Size 2 11
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderCenter {
+   Name "ListboxHeaderCenter"
+   Pos 819 485
+   Size 2 2
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderCenter2 {
+   Name "ListboxHeaderCenter2"
+   Pos 863 500
+   Size 2 2
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderBottomCenter {
+   Name "ListboxHeaderBottomCenter"
+   Pos 819 488
+   Size 2 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderBottomCenter2 {
+   Name "ListboxHeaderBottomCenter2"
+   Pos 863 504
+   Size 2 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderRightBottom {
+   Name "ListboxHeaderRightBottom"
+   Pos 822 488
+   Size 18 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderRightBottom2 {
+   Name "ListboxHeaderRightBottom2"
+   Pos 866 504
+   Size 18 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderRightCenter {
+   Name "ListboxHeaderRightCenter"
+   Pos 822 485
+   Size 18 2
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderRightCenter2 {
+   Name "ListboxHeaderRightCenter2"
+   Pos 866 500
+   Size 18 2
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderRightTop {
+   Name "ListboxHeaderRightTop"
+   Pos 822 473
+   Size 18 11
+   Flags 0
+  }
+  ImageSetDefClass ListboxHeaderRightTop2 {
+   Name "ListboxHeaderRightTop2"
+   Pos 866 487
+   Size 18 11
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftTop {
+   Name "ListboxLeftTop"
+   Pos 800 499
+   Size 9 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftTop2 {
+   Name "ListboxLeftTop2"
+   Pos 844 507
+   Size 9 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTopSeparator {
+   Name "ListboxTopSeparator"
+   Pos 810 499
+   Size 8 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTopSeparator2 {
+   Name "ListboxTopSeparator2"
+   Pos 854 507
+   Size 8 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTopCenter {
+   Name "ListboxTopCenter"
+   Pos 819 499
+   Size 2 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTopCenter2 {
+   Name "ListboxTopCenter2"
+   Pos 863 507
+   Size 2 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightTop {
+   Name "ListboxRightTop"
+   Pos 810 499
+   Size 30 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightTop2 {
+   Name "ListboxRightTop2"
+   Pos 866 507
+   Size 18 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleLeftCenter {
+   Name "ListboxTitleLeftCenter"
+   Pos 800 508
+   Size 9 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleLeftCenter2 {
+   Name "ListboxTitleLeftCenter2"
+   Pos 844 516
+   Size 9 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleCenterSeparator {
+   Name "ListboxTitleCenterSeparator"
+   Pos 810 508
+   Size 8 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleCenterSeparator2 {
+   Name "ListboxTitleCenterSeparator2"
+   Pos 854 516
+   Size 8 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleCenter {
+   Name "ListboxTitleCenter"
+   Pos 819 508
+   Size 2 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleCenter2 {
+   Name "ListboxTitleCenter2"
+   Pos 863 516
+   Size 2 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleRightCenter {
+   Name "ListboxTitleRightCenter"
+   Pos 810 508
+   Size 30 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxTitleRightCenter2 {
+   Name "ListboxTitleRightCenter2"
+   Pos 866 516
+   Size 18 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightTopWithTitle {
+   Name "ListboxRightTopWithTitle"
+   Pos 810 517
+   Size 30 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightTopWithTitle2 {
+   Name "ListboxRightTopWithTitle2"
+   Pos 866 525
+   Size 18 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftTopWithTitle {
+   Name "ListboxLeftTopWithTitle"
+   Pos 800 517
+   Size 9 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftTopWithTitle2 {
+   Name "ListboxLeftTopWithTitle2"
+   Pos 844 525
+   Size 9 9
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightCenter {
+   Name "ListboxRightCenter"
+   Pos 810 528
+   Size 30 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightCenter2 {
+   Name "ListboxRightCenter2"
+   Pos 866 536
+   Size 18 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxCenter {
+   Name "ListboxCenter"
+   Pos 819 528
+   Size 2 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxCenter2 {
+   Name "ListboxCenter2"
+   Pos 863 536
+   Size 2 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxSeparator {
+   Name "ListboxSeparator"
+   Pos 810 528
+   Size 8 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxSeparator2 {
+   Name "ListboxSeparator2"
+   Pos 854 536
+   Size 8 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftCenter {
+   Name "ListboxLeftCenter"
+   Pos 800 528
+   Size 9 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftCenter2 {
+   Name "ListboxLeftCenter2"
+   Pos 844 536
+   Size 9 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightBottom {
+   Name "ListboxRightBottom"
+   Pos 810 534
+   Size 30 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxRightBottom2 {
+   Name "ListboxRightBottom2"
+   Pos 866 542
+   Size 18 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxBottomCenter {
+   Name "ListboxBottomCenter"
+   Pos 819 534
+   Size 2 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxBottomCenter2 {
+   Name "ListboxBottomCenter2"
+   Pos 863 542
+   Size 2 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxBottomSeparator {
+   Name "ListboxBottomSeparator"
+   Pos 810 534
+   Size 8 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxBottomSeparator2 {
+   Name "ListboxBottomSeparator2"
+   Pos 854 542
+   Size 8 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftBottom {
+   Name "ListboxLeftBottom"
+   Pos 800 534
+   Size 9 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxLeftBottom2 {
+   Name "ListboxLeftBottom2"
+   Pos 844 542
+   Size 9 7
+   Flags 0
+  }
+  ImageSetDefClass ListboxScrollBarTop {
+   Name "ListboxScrollBarTop"
+   Pos 810 542
+   Size 30 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxScrollBarTop2 {
+   Name "ListboxScrollBarTop2"
+   Pos 865 470
+   Size 18 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxScrollBarCenter {
+   Name "ListboxScrollBarCenter"
+   Pos 810 543
+   Size 30 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxScrollBarCenter2 {
+   Name "ListboxScrollBarCenter2"
+   Pos 865 475
+   Size 18 4
+   Flags 0
+  }
+  ImageSetDefClass ListboxScrollBarBottom {
+   Name "ListboxScrollBarBottom"
+   Pos 810 545
+   Size 30 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxScrollBarBottom2 {
+   Name "ListboxScrollBarBottom2"
+   Pos 865 481
+   Size 18 3
+   Flags 0
+  }
+  ImageSetDefClass ListboxHighlight {
+   Name "ListboxHighlight"
+   Pos 811 482
+   Size 4 1
+   Flags 0
+  }
+  ImageSetDefClass ListboxHighlightFocus {
+   Name "ListboxHighlightFocus"
+   Pos 811 490
+   Size 4 1
+   Flags 0
+  }
+  ImageSetDefClass WindowListboxRightCenter {
+   Name "WindowListboxRightCenter"
+   Pos 675 695
+   Size 20 3
+   Flags 0
+  }
+  ImageSetDefClass WindowListboxScrollbarTop {
+   Name "WindowListboxScrollbarTop"
+   Pos 675 699
+   Size 20 1
+   Flags 0
+  }
+  ImageSetDefClass WindowListboxScrollbarCenter {
+   Name "WindowListboxScrollbarCenter"
+   Pos 675 700
+   Size 20 1
+   Flags 0
+  }
+  ImageSetDefClass WindowListboxScrollbarBottom {
+   Name "WindowListboxScrollbarBottom"
+   Pos 675 701
+   Size 20 1
+   Flags 0
+  }
+  ImageSetDefClass XBoxX {
+   Name "XBoxX"
+   Pos 545 581
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxY {
+   Name "XBoxY"
+   Pos 568 581
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxA {
+   Name "XBoxA"
+   Pos 545 604
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxB {
+   Name "XBoxB"
+   Pos 568 604
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxDpadRight {
+   Name "XBoxDpadRight"
+   Pos 522 573
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxDpadLeft {
+   Name "XBoxDpadLeft"
+   Pos 522 551
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxDpadLeftRight {
+   Name "XBoxDpadLeftRight"
+   Pos 772 456
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxDpadUp {
+   Name "XBoxDpadUp"
+   Pos 522 529
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxDpadDown {
+   Name "XBoxDpadDown"
+   Pos 522 507
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxBack {
+   Name "XBoxBack"
+   Pos 522 485
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxStart {
+   Name "XBoxStart"
+   Pos 522 463
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLS {
+   Name "XBoxLS"
+   Pos 540 666
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLSLeft {
+   Name "XBoxLSLeft"
+   Pos 581 486
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLSRight {
+   Name "XBoxLSRight"
+   Pos 603 486
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLSDown {
+   Name "XBoxLSDown"
+   Pos 581 508
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLSUp {
+   Name "XBoxLSUp"
+   Pos 603 508
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRSRight {
+   Name "XBoxRSRight"
+   Pos 592 531
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRSLeft {
+   Name "XBoxRSLeft"
+   Pos 592 553
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRSDown {
+   Name "XBoxRSDown"
+   Pos 581 464
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRSUp {
+   Name "XBoxRSUp"
+   Pos 603 464
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRS {
+   Name "XBoxRS"
+   Pos 540 688
+   Size 21 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLT {
+   Name "XBoxLT"
+   Pos 562 630
+   Size 35 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRT {
+   Name "XBoxRT"
+   Pos 562 652
+   Size 35 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxLB {
+   Name "XBoxLB"
+   Pos 562 673
+   Size 35 21
+   Flags 0
+  }
+  ImageSetDefClass XBoxRB {
+   Name "XBoxRB"
+   Pos 562 694
+   Size 35 21
+   Flags 0
+  }
+  ImageSetDefClass XComboTopCenter {
+   Name "XComboTopCenter"
+   Pos 720 797
+   Size 1 3
+   Flags 0
+  }
+  ImageSetDefClass XComboTopCenterFocus {
+   Name "XComboTopCenterFocus"
+   Pos 720 810
+   Size 1 3
+   Flags 0
+  }
+  ImageSetDefClass XComboBottomCenter {
+   Name "XComboBottomCenter"
+   Pos 720 805
+   Size 1 3
+   Flags 0
+  }
+  ImageSetDefClass XComboBottomCenterFocus {
+   Name "XComboBottomCenterFocus"
+   Pos 720 818
+   Size 1 3
+   Flags 0
+  }
+  ImageSetDefClass XComboCenter {
+   Name "XComboCenter"
+   Pos 720 802
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass XComboCenterFocus {
+   Name "XComboCenterFocus"
+   Pos 720 815
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass XComboLeftTop {
+   Name "XComboLeftTop"
+   Pos 692 797
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboLeftTopFocus {
+   Name "XComboLeftTopFocus"
+   Pos 692 810
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboLeftBottom {
+   Name "XComboLeftBottom"
+   Pos 692 805
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboLeftBottomFocus {
+   Name "XComboLeftBottomFocus"
+   Pos 692 818
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboRightBottom {
+   Name "XComboRightBottom"
+   Pos 723 805
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboRightBottomFocus {
+   Name "XComboRightBottomFocus"
+   Pos 723 818
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboLeftCenter {
+   Name "XComboLeftCenter"
+   Pos 692 802
+   Size 26 1
+   Flags 0
+  }
+  ImageSetDefClass XComboLeftCenterFocus {
+   Name "XComboLeftCenterFocus"
+   Pos 692 815
+   Size 26 1
+   Flags 0
+  }
+  ImageSetDefClass XComboRightCenter {
+   Name "XComboRightCenter"
+   Pos 723 802
+   Size 26 1
+   Flags 0
+  }
+  ImageSetDefClass XComboRightCenterFocus {
+   Name "XComboRightCenterFocus"
+   Pos 723 815
+   Size 26 1
+   Flags 0
+  }
+  ImageSetDefClass XComboRightTop {
+   Name "XComboRightTop"
+   Pos 723 797
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboRightTopFocus {
+   Name "XComboRightTopFocus"
+   Pos 723 810
+   Size 26 3
+   Flags 3
+  }
+  ImageSetDefClass XComboArrowLeft {
+   Name "XComboArrowLeft"
+   Pos 672 795
+   Size 16 16
+   Flags 3
+  }
+  ImageSetDefClass XComboArrowRight {
+   Name "XComboArrowRight"
+   Pos 671 813
+   Size 16 16
+   Flags 3
+  }
+  ImageSetDefClass Ucho {
+   Name "Ucho"
+   Pos 598 576
+   Size 90 8
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelLeftTopFocus {
+   Name "ShiplogPanelLeftTopFocus"
+   Pos 599 758
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelRightTopFocus {
+   Name "ShiplogPanelRightTopFocus"
+   Pos 623 758
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelLeftBottomFocus {
+   Name "ShiplogPanelLeftBottomFocus"
+   Pos 599 790
+   Size 12 4
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelRightBottomFocus {
+   Name "ShiplogPanelRightBottomFocus"
+   Pos 623 790
+   Size 12 4
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelLeftTop {
+   Name "ShiplogPanelLeftTop"
+   Pos 599 794
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelRightBottom {
+   Name "ShiplogPanelRightBottom"
+   Pos 623 826
+   Size 12 4
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelLeftBottom {
+   Name "ShiplogPanelLeftBottom"
+   Pos 599 826
+   Size 12 4
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelTopCenterFocus {
+   Name "ShiplogPanelTopCenterFocus"
+   Pos 616 758
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelLeftCenterFocus {
+   Name "ShiplogPanelLeftCenterFocus"
+   Pos 599 775
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelRightCenterFocus {
+   Name "ShiplogPanelRightCenterFocus"
+   Pos 623 775
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelBottomCenterFocus {
+   Name "ShiplogPanelBottomCenterFocus"
+   Pos 616 790
+   Size 1 4
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelTopCenter {
+   Name "ShiplogPanelTopCenter"
+   Pos 616 794
+   Size 1 12
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelLeftCenter {
+   Name "ShiplogPanelLeftCenter"
+   Pos 599 811
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelRightCenter {
+   Name "ShiplogPanelRightCenter"
+   Pos 623 811
+   Size 12 1
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelBottomCenter {
+   Name "ShiplogPanelBottomCenter"
+   Pos 616 826
+   Size 1 4
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelRightTop {
+   Name "ShiplogPanelRightTop"
+   Pos 623 794
+   Size 12 12
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelCenter {
+   Name "ShiplogPanelCenter"
+   Pos 616 811
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ShiplogPanelCenterFocus {
+   Name "ShiplogPanelCenterFocus"
+   Pos 616 772
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass ButtonClose {
+   Name "ButtonClose"
+   Pos 514 749
+   Size 38 17
+   Flags 0
+  }
+  ImageSetDefClass ButtonClosePushed {
+   Name "ButtonClosePushed"
+   Pos 514 711
+   Size 38 17
+   Flags 0
+  }
+  ImageSetDefClass ButtonCloseHighlight {
+   Name "ButtonCloseHighlight"
+   Pos 514 730
+   Size 38 17
+   Flags 0
+  }
+  ImageSetDefClass WindowColor {
+   Name "WindowColor"
+   Pos 643 696
+   Size 4 4
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

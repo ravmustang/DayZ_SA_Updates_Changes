@@ -1,0 +1,104 @@
+PanelWidgetClass DropzoneX {
+ visible 0
+ clipchildren 0
+ ignorepointer 1
+ color 1 1 1 0
+ size 1 1
+ halign center_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ priority 10
+ scriptclass ""
+ style dashed
+ {
+  ScrollWidgetClass Scroller {
+   visible 1
+   clipchildren 1
+   ignorepointer 0
+   size 0.99 1
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   scriptclass ""
+   style blank
+   "Ignore invisible" 0
+   "Scrollbar V" 1
+   {
+    FrameWidgetClass ScrollFrame {
+     clipchildren 0
+     ignorepointer 1
+     position 0.02 0
+     size 0.96 1
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 10
+     scriptclass ""
+     {
+      PanelWidgetClass ScrollBar0 {
+       visible 0
+       clipchildren 0
+       ignorepointer 0
+       color 0.2745 0.2745 0.2745 0.2353
+       size 0.02 1
+       halign right_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       priority 999
+       style rover_sim_colorable
+      }
+      PanelWidgetClass Scroller0 {
+       visible 0
+       clipchildren 0
+       inheritalpha 1
+       ignorepointer 0
+       color 0.1961 0.1961 0.1961 1
+       position 0 20
+       size 0.02 32
+       halign right_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       priority 999
+       style rover_sim_colorable
+      }
+     }
+    }
+    PanelWidgetClass DropzoneXa {
+     visible 0
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 10
+     style dashed
+    }
+    WrapSpacerWidgetClass Content {
+     clipchildren 0
+     ignorepointer 0
+     position 0.001 0
+     size 0.97 1
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     scriptclass ""
+     style Colorable
+     "Size To Content V" 1
+    }
+   }
+  }
+ }
+}

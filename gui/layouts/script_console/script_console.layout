@@ -1,0 +1,769 @@
+FrameWidgetClass FrameWidget {
+ color 0 0 0 1
+ position 0 0
+ size 1 1
+ hexactpos 0
+ vexactpos 0
+ hexactsize 0
+ vexactsize 0
+ priority 999
+ {
+  WindowWidgetClass MenuWindow {
+   visible 1
+   disabled 0
+   inheritalpha 0
+   color 0 0 0 0.502
+   position 0 0
+   size 1 1
+   halign center_ref
+   valign center_ref
+   style Colorable
+   {
+    WindowWidgetClass TabsWindowWidget1 {
+     visible 1
+     clipchildren 1
+     inheritalpha 0
+     color 0 0 0 0.498
+     size 0.99 40
+     halign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style Colorable
+     {
+      ButtonWidgetClass OutputButtonWidget {
+       position 0.48174 8
+       size 0.1 0.625
+       hexactpos 0
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       userID 0
+       style Default
+       text "Prints"
+       text_proportion 0.8
+       switch once
+      }
+      ButtonWidgetClass ItemsButtonWidget {
+       position 0.12 8
+       size 0.1 0.625
+       hexactpos 0
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       userID 0
+       style Default
+       text "Items"
+       text_proportion 0.8
+       switch once
+      }
+      ButtonWidgetClass ConfigsButtonWidget {
+       position 0.24 8
+       size 0.1 0.625
+       hexactpos 0
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       userID 0
+       style Default
+       text "Configs"
+       text_proportion 0.8
+       switch once
+      }
+      ButtonWidgetClass EnScriptButtonWidget {
+       position 0.36174 8
+       size 0.1 0.625
+       hexactpos 0
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       userID 0
+       style Default
+       text "EnfScript"
+       text_proportion 0.8
+       switch once
+      }
+      ButtonWidgetClass GeneralButtonWidget {
+       position 0 8
+       size 0.1 0.625
+       hexactpos 0
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       userID 0
+       style Default
+       text "General"
+       text_proportion 0.8
+       switch once
+      }
+     }
+    }
+    PanelWidgetClass ItemsPanel {
+     visible 0
+     inheritalpha 1
+     position 0.008 0.05556
+     size 0.984 0.87778
+     style rover_sim_black
+     {
+      TextListboxWidgetClass ObjectsList {
+       visible 1
+       position 0.00813 0.07595
+       size 0.28659 0.91139
+       colums ""
+       lines 30
+      }
+      ButtonWidgetClass ButtonSpawnInInv {
+       position 0.8224 0.882
+       size 0.1577 20
+       vexactsize 1
+       style Default
+       text "Spawn In Inventory"
+       text_proportion 0.8
+      }
+      ButtonWidgetClass ButtonSpawnInGround {
+       position 0.82237 0.84
+       size 0.1577 20
+       vexactsize 1
+       style Default
+       text "Spawn On Ground"
+       text_proportion 0.8
+      }
+      EditBoxWidgetClass ObjectFilter {
+       inheritalpha 1
+       color 1 1 1 1
+       position 0.01 0.01
+       size 0.27846 0.05063
+       hexactsize 0
+       vexactsize 0
+       priority 1
+       style Default
+       text "object name"
+       "exact text" 1
+       font "gui/fonts/system"
+       "text color" 1 1 1 1
+      }
+      TextListboxWidgetClass PresetList {
+       position 0.38 0.09
+       size 0.54471 0.36709
+       lines 12
+      }
+      TextWidgetClass TextWidget1 {
+       inheritalpha 0
+       color 1 1 1 1
+       position 0.38 0.04
+       size 0.17073 0.03797
+       halign left
+       text "PRESETS"
+       "exact text" 1
+       "text halign" left
+       "text valign" center
+      }
+      ButtonWidgetClass NewPresetButton {
+       position 0.62602 0.46835
+       size 0.0732 20
+       vexactsize 1
+       style Default
+       text "New"
+       text_proportion 0.8
+      }
+      ButtonWidgetClass SetDefaultPresetButton {
+       position 0.71545 0.46835
+       size 0.0732 20
+       vexactsize 1
+       style Default
+       text "Default"
+       text_proportion 0.8
+      }
+      ButtonWidgetClass RenamePresetButton {
+       position 0.89431 0.46835
+       size 0.0732 20
+       vexactsize 1
+       style Default
+       text "Rename"
+       text_proportion 0.8
+      }
+      ButtonWidgetClass DeletePresetButton {
+       position 0.80488 0.46835
+       size 0.0732 20
+       vexactsize 1
+       style Default
+       text "Delete"
+       text_proportion 0.8
+      }
+      ButtonWidgetClass AddToPresetButton {
+       position 0.30081 0.64557
+       size 0.06118 0.05063
+       style Default
+       text ">>"
+       font "gui/fonts/system"
+      }
+      ButtonWidgetClass RemoveFromPresetButton {
+       position 0.30081 0.70886
+       size 0.06118 0.05063
+       style Default
+       text "<<"
+       font "gui/fonts/system"
+      }
+      TextListboxWidgetClass PresetItemsList {
+       position 0.38 0.59
+       size 0.31707 0.35443
+       lines 12
+      }
+      TextWidgetClass TextWidget2 {
+       inheritalpha 0
+       color 1 1 1 1
+       position 0.38 0.54
+       size 0.25 20
+       halign left
+       vexactsize 1
+       text "ITEMS IN PRESETS"
+       "exact text" 1
+       "text halign" left
+       "text valign" center
+      }
+      ButtonWidgetClass ItemMoveUpButton {
+       disabled 0
+       position 0.7 0.59
+       size 0.0732 20
+       vexactsize 1
+       style Default
+       text "Up"
+      }
+      ButtonWidgetClass ItemMoveDownButton {
+       disabled 0
+       position 0.7 0.65
+       size 0.0732 20
+       vexactsize 1
+       style Default
+       text "Down"
+      }
+      TextWidgetClass DamageLabel {
+       position 0.79 0.59
+       size 0.07317 0.05063
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Health:"
+       "exact text" 1
+       "text valign" center
+      }
+      EditBoxWidgetClass DamageValue {
+       position 0.87 0.59
+       size 32 32
+       valign top
+       hexactpos 0
+       vexactpos 0
+       hexactsize 1
+       vexactsize 1
+       text ""
+      }
+      TextWidgetClass QuantityLabel {
+       position 0.79 0.65
+       size 0.07317 0.05063
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Quantity:"
+       "exact text" 1
+       "text valign" center
+      }
+      EditBoxWidgetClass QuantityValue {
+       position 0.87 0.65
+       size 48 32
+       valign top
+       hexactpos 0
+       vexactpos 0
+       hexactsize 1
+       vexactsize 1
+       text ""
+      }
+      TextWidgetClass SelectedObject {
+       inheritalpha 0
+       color 1 1 1 1
+       position 0.78 0.8
+       size 0.2 20
+       halign left
+       hexactpos 0
+       vexactpos 0
+       vexactsize 1
+       draggable 0
+       "exact text" 1
+       "text halign" right
+       "text valign" center
+      }
+      EditBoxWidgetClass SpawnDistance {
+       inheritalpha 1
+       color 1 1 1 1
+       position 0.75 0.84
+       size 0.03401 0.05063
+       halign left
+       hexactsize 0
+       vexactsize 0
+       priority 1
+       style Default
+       text "0"
+       "text color" 1 1 1 1
+      }
+      TextWidgetClass DistanceLabel {
+       inheritalpha 0
+       color 1 1 1 1
+       position 0.79 0.85
+       size 0.02278 0.03797
+       halign left
+       style Normal
+       text "m"
+       "exact text" 1
+       "text halign" left
+       "text valign" center
+      }
+      ButtonWidgetClass ItemNameCopy {
+       position 0.30171 0.46988
+       size 0.2 20
+       vexactsize 1
+       style Default
+       text "Copy To Clipboard"
+       text_proportion 0.8
+      }
+      ButtonWidgetClass SpawnAsAttachment {
+       position 0.8224 0.9265
+       size 0.1577 20
+       vexactsize 1
+       style Default
+       text "Spawn As Attachment"
+       text_proportion 0.8
+      }
+     }
+    }
+    ButtonWidgetClass CloseConsoleButtonWidget {
+     visible 1
+     position 0.01552 0.0117
+     size 0.22 20
+     halign right_ref
+     valign bottom_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 1
+     userID 0
+     style Default
+     text "Close"
+     switch once
+    }
+    PanelWidgetClass ConfigsPanel {
+     visible 0
+     inheritalpha 1
+     position 0 0.05556
+     size 1.28 0.87778
+     style rover_sim_black
+     {
+      EditBoxWidgetClass ObjectConfigFilter {
+       inheritalpha 1
+       color 1 1 1 1
+       position 0.00855 0.01518
+       size 0.27846 0.05063
+       hexactsize 0
+       vexactsize 0
+       priority 1
+       style Default
+       text ""
+       font "gui/fonts/system"
+       "text color" 1 1 1 1
+      }
+      TextListboxWidgetClass ConfigVariables {
+       position 0.13187 0.0761
+       size 0.6467 0.9114
+       hexactsize 0
+       draggable 0
+       "next left" ""
+       "title visible" 0
+       colums ""
+       lines 25
+       font "gui/fonts/MetronBook12"
+      }
+      TextListboxWidgetClass ConfigHierarchy {
+       position 11 0.076
+       size 0.1173 0.91139
+       hexactpos 1
+       vexactpos 0
+       hexactsize 0
+       "title visible" 0
+       colums ""
+       lines 25
+       font "gui/fonts/MetronBook12"
+      }
+     }
+    }
+    PanelWidgetClass EnScriptPanel {
+     visible 0
+     inheritalpha 1
+     position 0 0.05556
+     size 1.28 0.87778
+     style blank
+     {
+      ButtonWidgetClass ButtonWidget0 {
+       position 0.00741 0.00699
+       size 0.098 0.051
+       valign bottom_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Editor
+       text "Run"
+       text_proportion 0.8
+       font "gui/fonts/Metron"
+      }
+      PanelWidgetClass PanelWidget0 {
+       position 0.007 0.017
+       size 0.753 0.914
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad
+       {
+        MultilineEditBoxWidgetClass MultilineEditBoxWidget0 {
+         position 0 0
+         size 0.99 0.99
+         halign center_ref
+         valign center_ref
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style DayZNormal
+         text "Print(\"Hello World\");"
+         font "gui/fonts/Metron16"
+         "exact text" 1
+         lines 20
+        }
+       }
+      }
+     }
+    }
+    PanelWidgetClass GeneralPanel {
+     visible 1
+     inheritalpha 1
+     position 0 0.05
+     size 1 0.88
+     halign center_ref
+     vexactpos 0
+     style rover_sim_black
+     {
+      TextListboxWidgetClass DiagToggle {
+       visible 0
+       clipchildren 0
+       position 0.26 0
+       size 0.25 0.45
+       halign right_ref
+       hexactpos 0
+       hexactsize 0
+       "title visible" 1
+       colums "DEBUG DIALOGS"
+       lines 15
+       {
+        ButtonWidgetClass DiagToggleButton {
+         position 0 -0.08
+         size 1 0.08
+         halign right_ref
+         valign bottom_ref
+         hexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Editor
+         text "TOGGLE"
+         font "gui/fonts/Metron"
+        }
+       }
+      }
+      TextListboxWidgetClass DiagDrawmode {
+       visible 0
+       clipchildren 0
+       size 0.25 0.45
+       halign right_ref
+       hexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Default
+       "title visible" 1
+       colums "DRAW MODE"
+       lines 15
+       {
+        ButtonWidgetClass DiagDrawButton {
+         position 0 -0.08
+         size 1 0.08
+         halign right_ref
+         valign bottom_ref
+         hexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Editor
+         text "DRAW"
+         font "gui/fonts/Metron"
+        }
+       }
+      }
+      TextListboxWidgetClass PositionsList {
+       position 0 0
+       size 0.2 0.55
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       "title visible" 1
+       colums "POSITIONS"
+       lines 15
+      }
+      EditBoxWidgetClass TeleportX {
+       inheritalpha 1
+       color 1 1 1 1
+       position 0.02 0.56
+       size 0.13 0.03
+       halign left
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       priority 1
+       style Default
+       text "0"
+       "exact text" 1
+       font "gui/fonts/Metron"
+       "text color" 1 1 1 1
+      }
+      EditBoxWidgetClass TeleportY {
+       inheritalpha 1
+       color 1 1 1 1
+       position 0.02 0.59
+       size 0.13 0.03
+       halign left
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       priority 1
+       style Default
+       text "0"
+       "exact text" 1
+       font "gui/fonts/Metron"
+       "text color" 1 1 1 1
+      }
+      TextWidgetClass TeleportPosLabelX {
+       visible 1
+       position 0 0.56
+       size 0.01 0.03
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Normal
+       text "X:"
+       font "gui/fonts/Metron"
+       "exact text" 1
+       "text valign" center
+      }
+      ButtonWidgetClass ButtonTeleport {
+       visible 1
+       position 0 0.62
+       size 0.15 0.03
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Editor
+       text "TELEPORT"
+       font "gui/fonts/Metron"
+      }
+      TextWidgetClass PlayerPosLabel {
+       position -0.00134 0.66305
+       size 0.3 0.03
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Normal
+       text "Current Pos:"
+       font "gui/fonts/Metron"
+       "exact text" 1
+       "text valign" center
+      }
+      PanelWidgetClass DebugOptions {
+       size 0.24 0.227
+       valign bottom_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad
+       {
+        CheckBoxWidgetClass cbx_LogsEnabled {
+         position 0 30
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Script Logs Enabled"
+        }
+        TextWidgetClass txt_dbo_title {
+         ignorepointer 0
+         position 0 0
+         size 1 0.171
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Debug Options"
+         "exact text" 1
+        }
+       }
+      }
+      PanelWidgetClass HudDebug {
+       visible 1
+       position 0.26 0
+       size 0.24 0.26
+       valign bottom_ref
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad
+       {
+        CheckBoxWidgetClass cbx_CharacterStats {
+         position 0 30
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Character Stats"
+        }
+        TextWidgetClass txt_Title {
+         ignorepointer 0
+         position 0 0
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Hud Debug"
+         "exact text" 1
+        }
+        CheckBoxWidgetClass cbx_CharacterModifiers {
+         position 0 50
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Character Modifiers"
+        }
+        CheckBoxWidgetClass cbx_CharacterDebug {
+         position 0 90
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Debug"
+        }
+        CheckBoxWidgetClass cbx_FreeCamCross {
+         position 0 110
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Free camera crosshair"
+         checked 1
+        }
+        CheckBoxWidgetClass cbx_CharacterAgents {
+         position 0 70
+         size 1 20
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         text "Character Agents"
+        }
+       }
+      }
+      TextWidgetClass TeleportPosLabelZ {
+       position 0 0.59
+       size 0.01 0.03
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Normal
+       text "Z:"
+       font "gui/fonts/Metron"
+       "exact text" 1
+       "text valign" center
+      }
+      ButtonWidgetClass Button_CopyPos {
+       visible 1
+       position -0.00134 0.69305
+       size 0.15 0.03
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style Editor
+       text "COPY POS"
+       font "gui/fonts/Metron"
+      }
+     }
+    }
+    PanelWidgetClass OutputPanel {
+     visible 0
+     clipchildren 1
+     inheritalpha 1
+     position 0.008 0.05556
+     size 0.984 0.87778
+     style rover_sim_black
+     {
+      TextListboxWidgetClass TextListbox {
+       position 0 0.01266
+       size 0.98374 0.89873
+       style Default
+       "next down" ""
+       "title visible" 0
+       lines 50
+      }
+      CheckBoxWidgetClass CheckBoxAutoScroll {
+       position 0.00813 0.92405
+       size 0.15 0.04
+       text "Auto Scroll"
+       checked 1
+      }
+      ButtonWidgetClass ButtonClear {
+       position 0.9187 0.93671
+       size 0.06504 0.05063
+       style Default
+       text "CLEAR"
+      }
+     }
+    }
+    ButtonWidgetClass SelectedRowCopy {
+     visible 1
+     position 0.24465 0.0117
+     size 0.22 20
+     halign right_ref
+     valign bottom_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 1
+     userID 0
+     style Default
+     text "Copy to clipboard"
+     switch normal
+    }
+   }
+  }
+ }
+}

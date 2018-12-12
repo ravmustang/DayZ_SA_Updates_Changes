@@ -1,0 +1,30 @@
+PanelWidgetClass GestureItemCard {
+ clipchildren 0
+ position 0 0
+ size 276 50
+ halign center_ref
+ valign center_ref
+ hexactpos 0
+ vexactpos 0
+ hexactsize 1
+ vexactsize 1
+ style blank
+ {
+  TextWidgetClass RadialText {
+   clipchildren 0
+   position 0 0
+   size 230 30
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   text "Item Name"
+   font "gui/fonts/sdf_MetronBook24"
+   "exact text" 0
+   "text halign" center
+   "text valign" center
+  }
+ }
+}

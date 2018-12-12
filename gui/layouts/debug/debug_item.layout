@@ -1,0 +1,222 @@
+FrameWidgetClass FrameWidget0 {
+ clipchildren 0
+ inheritalpha 0
+ color 1 0.7176 0 1
+ position 40 56
+ size 399 872
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ draggable 1
+ {
+  TextListboxWidgetClass w_Agents {
+   position 32 120
+   size 336 72
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   fixaspect fixwidth
+   priority 10
+   style Editor
+   "title visible" 1
+   colums "Name"
+   lines 10
+  }
+  ItemPreviewWidgetClass w_ItemPreview {
+   color 0.3333 1 0.498 1
+   position -12 -39
+   size 121 126
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+  }
+  TextWidgetClass TextWidget0 {
+   position 112 -16
+   size 184 24
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   style Bold
+   text "Item Debug"
+   "text offset" 35 0
+   "exact text" 1
+  }
+  TextWidgetClass TextWidget1 {
+   position 32 96
+   size 336 27
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   style Normal
+   text "Agent List"
+   "exact text" 1
+  }
+  TextWidgetClass TextWidget2 {
+   position 32 200
+   size 336 27
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   style Normal
+   text "Number Variables(developer)"
+   "exact text" 1
+  }
+  TextWidgetClass w_ClassName {
+   position 112 48
+   size 280 24
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   style Normal
+   "exact text" 1
+  }
+  TextListboxWidgetClass w_Floats {
+   position 32 224
+   size 336 72
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   fixaspect fixwidth
+   priority 10
+   style Editor
+   "title visible" 1
+   colums "Name;50;Value;50;"
+   lines 10
+  }
+  TextWidgetClass TextWidget3 {
+   position 112 32
+   size 152 16
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   style Bold
+   text "Classname"
+   "exact text" 1
+  }
+  TextListboxWidgetClass w_FloatsProper {
+   position 32 432
+   size 336 272
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   fixaspect fixwidth
+   priority 10
+   style Editor
+   "title visible" 1
+   colums "Name;22;ValueServer;39;ValueClient;39;"
+   lines 10
+  }
+  TextWidgetClass TextWidget4 {
+   position 32 408
+   size 336 27
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   text "Variables Final"
+   "exact text" 1
+  }
+  WindowWidgetClass WindowWidget0 {
+   color 1 0.6667 0 0.1961
+   position 0 -16
+   size 400 728
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+  }
+  WindowWidgetClass WindowWidget2 {
+   color 0.4353 0.4353 0.4353 1
+   position 32 96
+   size 336 24
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+  }
+  WindowWidgetClass WindowWidget3 {
+   color 0.4353 0.4353 0.4353 1
+   position 32 200
+   size 336 24
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+  }
+  WindowWidgetClass WindowWidget4 {
+   color 0.1216 0.0784 0 1
+   position 0 -16
+   size 400 96
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+  }
+  WindowWidgetClass WindowWidget5 {
+   color 0.4353 0.4353 0.4353 1
+   position 32 304
+   size 336 24
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+  }
+  TextListboxWidgetClass w_Strings {
+   position 32 328
+   size 336 72
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   fixaspect fixwidth
+   priority 10
+   style Editor
+   "title visible" 1
+   colums "Name;35;Value;65;"
+   lines 10
+  }
+  TextWidgetClass TextWidget5 {
+   position 32 304
+   size 336 27
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 10
+   text "String Variables(developer)"
+   "exact text" 1
+  }
+  WindowWidgetClass WindowWidget1 {
+   color 0.4353 0.4353 0.4353 1
+   position 32 408
+   size 336 24
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Colorable
+  }
+ }
+}

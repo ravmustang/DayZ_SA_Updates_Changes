@@ -1,0 +1,236 @@
+ButtonWidgetClass server_browser_list_entry_root {
+ ignorepointer 0
+ color 0 0 0 0
+ position 0 0
+ size 1 30
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 1
+ style Colorable
+ "no focus" 0
+ "next right" "sort_button"
+ "next up" ""
+ "next down" ""
+ font "gui/fonts/sdf_MetronLight24"
+ {
+  GridSpacerWidgetClass basic_info {
+   ignorepointer 1
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   "no focus" 1
+   Padding 0
+   Margin 0
+   "Size To Content H" 1
+   "Size To Content V" 1
+   Columns 8
+   Rows 1
+   {
+    FrameWidgetClass favorite_button {
+     disabled 0
+     ignorepointer 1
+     position 0 0
+     size 30 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      ImageWidgetClass favorite_image {
+       visible 1
+       ignorepointer 1
+       size 20 20
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       image0 "set:dayz_gui image:icon_favourite_off"
+       mode additive
+       "src alpha" 1
+      }
+      ImageWidgetClass unfavorite_image {
+       visible 0
+       ignorepointer 1
+       size 20 20
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       image0 "set:dayz_gui image:icon_favourite_on"
+       mode additive
+       "src alpha" 1
+      }
+     }
+    }
+    FrameWidgetClass lock {
+     visible 1
+     disabled 0
+     ignorepointer 1
+     position 0 0
+     size 30 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      ImageWidgetClass lock_icon {
+       visible 0
+       ignorepointer 1
+       size 20 20
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       image0 "set:dayz_gui image:icon_locked_sb"
+       mode additive
+       "src alpha" 1
+      }
+     }
+    }
+    FrameWidgetClass server_name_panel {
+     ignorepointer 1
+     position 0 0
+     size 1 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     {
+      TextWidgetClass server_name {
+       ignorepointer 1
+       position 50 0
+       size 0.85 0.55
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       text "DayZ Rain DE 1-5 (Experimental/Unstable)"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "exact text size" 18
+       "text valign" center
+      }
+     }
+    }
+    FrameWidgetClass server_time_panel {
+     visible 0
+     ignorepointer 1
+     position 0 0
+     size 30 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      ImageWidgetClass server_time {
+       ignorepointer 1
+       size 23 24
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       image0 "set:dayz_gui image:icon_sun_accel"
+       mode additive
+       "src alpha" 1
+       filter 1
+      }
+     }
+    }
+    FrameWidgetClass server_ping_panel {
+     visible 0
+     ignorepointer 1
+     size 90 30
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      TextWidgetClass server_ping {
+       ignorepointer 1
+       size 90 0.55
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       text "1000"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "exact text size" 18
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    FrameWidgetClass server_population_panel {
+     visible 1
+     ignorepointer 1
+     size 180 30
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      TextWidgetClass server_population {
+       ignorepointer 1
+       size 180 0.55
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       text "Medium(30)"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "exact text size" 18
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    FrameWidgetClass server_slots_panel {
+     visible 1
+     ignorepointer 1
+     size 70 30
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      TextWidgetClass server_slots {
+       ignorepointer 1
+       size 70 0.55
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       text "120"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "exact text size" 18
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+   }
+  }
+ }
+}

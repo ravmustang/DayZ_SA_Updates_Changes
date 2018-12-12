@@ -1,0 +1,294 @@
+ImageSetClass {
+ Name "gui_back_icon"
+ RefSize 2048 2048
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{8E3502EAD256EE84}Gui/imagesets/GUI_back_alpha_icon.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass fill {
+   Name "fill"
+   Pos 1236 1098
+   Size 480 480
+   Flags 0
+  }
+  ImageSetDefClass TopLeft {
+   Name "TopLeft"
+   Pos 3 3
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass Top1 {
+   Name "Top1"
+   Pos 279 7
+   Size 248 16
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass TopRight {
+   Name "TopRight"
+   Pos 996 3
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass Left1 {
+   Name "Left1"
+   Pos 7 120
+   Size 20 303
+   Flags ISVerticalTile
+  }
+  ImageSetDefClass Center {
+   Name "Center"
+   Pos 121 155
+   Size 10 10
+   Flags 0
+  }
+  ImageSetDefClass Right1 {
+   Name "Right1"
+   Pos 987 68
+   Size 16 232
+   Flags ISVerticalTile
+  }
+  ImageSetDefClass BottomLeft {
+   Name "BottomLeft"
+   Pos 4 996
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass Bottom1 {
+   Name "Bottom1"
+   Pos 143 1001
+   Size 257 16
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass BottomRight {
+   Name "BottomRight"
+   Pos 1005 1005
+   Size 16 16
+   Flags 0
+  }
+  ImageSetDefClass Bottom2 {
+   Name "Bottom2"
+   Pos 459 1001
+   Size 257 16
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass CenterFill {
+   Name "CenterFill"
+   Pos 1299 256
+   Size 300 300
+   Flags 0
+  }
+  ImageSetDefClass Top1Fill {
+   Name "Top1Fill"
+   Pos 1573 12
+   Size 248 16
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass Bottom2Fill {
+   Name "Bottom2Fill"
+   Pos 1517 866
+   Size 257 16
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass Bottom1Fill {
+   Name "Bottom1Fill"
+   Pos 1107 926
+   Size 257 21
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass CornersFill {
+   Name "CornersFill"
+   Pos 1406 67
+   Size 10 10
+   Flags 0
+  }
+  ImageSetDefClass SideFill_simple {
+   Name "SideFill_simple"
+   Pos 1107 52
+   Size 16 232
+   Flags ISVerticalTile
+  }
+  ImageSetDefClass TopFill_simple {
+   Name "TopFill_simple"
+   Pos 1289 12
+   Size 232 16
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass black_A93_horizontal {
+   Name "black_A93_horizontal"
+   Pos 0 1025
+   Size 16 4
+   Flags ISHorizontalTile
+  }
+  ImageSetDefClass black_A93_vertical {
+   Name "black_A93_vertical"
+   Pos 0 1029
+   Size 4 16
+   Flags 0
+  }
+  ImageSetDefClass black_A93_center {
+   Name "black_A93_center"
+   Pos 4 1029
+   Size 24 24
+   Flags 0
+  }
+  ImageSetDefClass Backdrop_black_vertical {
+   Name "Backdrop_black_vertical"
+   Pos 83 22
+   Size 24 100
+   Flags 0
+  }
+  ImageSetDefClass Backdrop_black_horizontal {
+   Name "Backdrop_black_horizontal"
+   Pos 150 193
+   Size 100 24
+   Flags 0
+  }
+  ImageSetDefClass Backdrop_white_vertical {
+   Name "Backdrop_white_vertical"
+   Pos 1116 395
+   Size 25 100
+   Flags 0
+  }
+  ImageSetDefClass Fill_A227_center {
+   Name "Fill_A227_center"
+   Pos 108 1028
+   Size 24 24
+   Flags 0
+  }
+  ImageSetDefClass Fill_A227_vertical {
+   Name "Fill_A227_vertical"
+   Pos 104 1028
+   Size 4 16
+   Flags ISVerticalTile
+  }
+  ImageSetDefClass Fill_A227_horizontal {
+   Name "Fill_A227_horizontal"
+   Pos 104 1024
+   Size 16 4
+   Flags ISHorizontalTile
+  }
+ }
+ Groups {
+  ImageSetGroupClass Line_darkFill {
+   Name "Line_darkFill"
+   Images {
+    ImageSetDefClass line_bottom {
+     Name "line_bottom"
+     Pos 202 1027
+     Size 1 2
+     Flags 0
+    }
+    ImageSetDefClass line_bottom_right {
+     Name "line_bottom_right"
+     Pos 203 1027
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass line_bottom_left {
+     Name "line_bottom_left"
+     Pos 200 1027
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass line_left {
+     Name "line_left"
+     Pos 200 1026
+     Size 2 1
+     Flags 0
+    }
+    ImageSetDefClass line_right {
+     Name "line_right"
+     Pos 203 1026
+     Size 2 1
+     Flags 0
+    }
+    ImageSetDefClass line_top {
+     Name "line_top"
+     Pos 202 1024
+     Size 1 2
+     Flags 0
+    }
+    ImageSetDefClass line_top_right {
+     Name "line_top_right"
+     Pos 203 1024
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass line_top_left {
+     Name "line_top_left"
+     Pos 200 1024
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass line_center {
+     Name "line_center"
+     Pos 202 1026
+     Size 1 1
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass dashed {
+   Name "dashed"
+   Images {
+    ImageSetDefClass dashedLeftTop {
+     Name "dashedLeftTop"
+     Pos 206 1024
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass dashedLeft {
+     Name "dashedLeft"
+     Pos 206 1026
+     Size 2 6
+     Flags ISVerticalTile
+    }
+    ImageSetDefClass dashedLeftBottom {
+     Name "dashedLeftBottom"
+     Pos 206 1032
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass dashedTop {
+     Name "dashedTop"
+     Pos 208 1024
+     Size 6 2
+     Flags ISHorizontalTile
+    }
+    ImageSetDefClass dashedCenter {
+     Name "dashedCenter"
+     Pos 210 1028
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass dashedBottom {
+     Name "dashedBottom"
+     Pos 208 1032
+     Size 6 2
+     Flags ISHorizontalTile
+    }
+    ImageSetDefClass dashedRightTop {
+     Name "dashedRightTop"
+     Pos 214 1024
+     Size 2 2
+     Flags 0
+    }
+    ImageSetDefClass dashedRight {
+     Name "dashedRight"
+     Pos 214 1026
+     Size 2 6
+     Flags ISVerticalTile
+    }
+    ImageSetDefClass dashedRightBottom {
+     Name "dashedRightBottom"
+     Pos 214 1032
+     Size 2 2
+     Flags 0
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,200 @@
+FrameWidgetClass HudDebugFrameWidget {
+ position 0 -1
+ size 1 1
+ halign right_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ {
+  WindowWidgetClass wdw_CharacterStats {
+   visible 1
+   position 0 51
+   size 232 218
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_black_2
+   "title visible" 0
+   {
+    TextWidgetClass txt_CharStats_Title {
+     disabled 0
+     position 7 4
+     size 0.9 22
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style Normal
+     text "Character Stats"
+     font "gui/fonts/MetronBook22"
+     "exact text" 1
+     "text valign" center
+    }
+    TextListboxWidgetClass txl_CharStats_Values {
+     disabled 1
+     position 13 30
+     size 208 177
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     colums "text;75;text2;25;"
+     lines 0
+     font "gui/fonts/MetronBook16"
+    }
+   }
+  }
+  WindowWidgetClass wdw_CharacterModifiers {
+   position 0 0.4
+   size 260 500
+   halign right_ref
+   hexactpos 1
+   vexactpos 0
+   hexactsize 1
+   vexactsize 1
+   scriptclass ""
+   style rover_sim_black_2
+   "title visible" 0
+   {
+    TextWidgetClass txt_CharModifiers_Title {
+     disabled 0
+     inheritalpha 0
+     ignorepointer 0
+     keepsafezone 0
+     position 8 5
+     size 0.9 22
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     text "Character Modifiers"
+     font "gui/fonts/MetronBook22"
+     "exact text" 1
+     "text valign" center
+    }
+    PanelWidgetClass pnl_CharModifiers_Values {
+     disabled 1
+     position 13 30
+     size 235 22
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     scriptclass "AutoHeightSpacer"
+     {
+      ScriptParamsClass {
+       AlignChilds 1
+       MinHeight 20
+      }
+     }
+    }
+   }
+  }
+  WindowWidgetClass wdw_CharacterDebug {
+   clipchildren 1
+   position 0 0
+   size 704 36
+   halign right_ref
+   hexactpos 1
+   vexactpos 0
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_black_2
+   {
+    TextWidgetClass txt_PlayerPos {
+     position 21 8
+     size 170 19
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Pos:"
+     "exact text" 1
+     "text valign" center
+    }
+    TextWidgetClass txt_Clipboard {
+     position 204 8
+     size 495 19
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     text "Clipboard:"
+     "exact text" 1
+     "text valign" center
+    }
+   }
+  }
+  PanelWidgetClass wdw_Crosshair {
+   visible 0
+   size 1 0.03
+   halign center_ref
+   valign center_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 0
+   {
+    ImageWidgetClass img_crosshair {
+     inheritalpha 1
+     position 0 0
+     size 0.01 0.01
+     halign center_ref
+     valign center_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     fixaspect inside
+     image0 "set:ccgui_enforce image:MapDroid"
+     mode blend
+     "src alpha" 1
+     stretch 1
+    }
+   }
+  }
+  WindowWidgetClass wdw_CharacterAgents {
+   visible 1
+   position 280 51
+   size 232 218
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_black_2
+   "title visible" 0
+   {
+    TextWidgetClass txt_CharAgents_Title {
+     disabled 0
+     position 8 4
+     size 0.9 22
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style Normal
+     text "Character Agents"
+     font "gui/fonts/MetronBook22"
+     "exact text" 1
+     "text valign" center
+    }
+    TextListboxWidgetClass txl_CharAgents_Values {
+     disabled 1
+     position 13 30
+     size 208 177
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     colums "text;52;text2;48;"
+     lines 0
+     font "gui/fonts/MetronBook16"
+    }
+   }
+  }
+ }
+}

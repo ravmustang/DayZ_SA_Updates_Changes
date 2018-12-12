@@ -1,0 +1,1654 @@
+PanelWidgetClass rootFrame {
+ color 1 1 1 0.502
+ size 1 1
+ halign center_ref
+ valign center_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ priority 951
+ style rover_sim_black
+ {
+  ImageWidgetClass XboxControlsImage {
+   visible 1
+   inheritalpha 0
+   ignorepointer 0
+   position 0 0.03
+   size 0.792 0.554
+   halign center_ref
+   valign center_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 0
+   fixaspect fixwidth
+   priority 1
+   imageTexture "{1D599221D74CCBEF}Gui/textures/controller_xboxone.edds"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
+   "flip u" 0
+   filter 1
+   nocache 0
+   {
+    PanelWidgetClass button_marker_X {
+     visible 1
+     position 0.687 0.2676
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_UP {
+     visible 1
+     position 0.3626 0.4328
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_R {
+     visible 1
+     position 0.63 0.4855
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_A {
+     visible 1
+     position 0.757 0.3663
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_LEFT {
+     visible 1
+     position 0.308 0.505
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_DOWN {
+     visible 1
+     position 0.3626 0.5742
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_RIGHT {
+     visible 1
+     position 0.4156 0.505
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_Y {
+     visible 1
+     position 0.7572 0.175
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_B {
+     visible 1
+     position 0.82687 0.27343
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_START {
+     visible 1
+     position 0.569 0.2311
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_BACK {
+     visible 1
+     position 0.4218 0.2311
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_L {
+     visible 1
+     position 0.237 0.2685
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_LTilt {
+     visible 1
+     position 0.1902 0.2685
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_RS {
+     visible 1
+     position 0.6904 0.0149
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_RT {
+     visible 1
+     position 0.7841 0.0478
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_LS {
+     visible 1
+     position 0.3008 0.0149
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_LT {
+     visible 1
+     position 0.2054 0.0478
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass button_marker_XBOX {
+     visible 1
+     position 0.495 0.0995
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+   }
+  }
+  FrameWidgetClass InfoTextRight {
+   position 80 150
+   size 300 900
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 1
+   {
+    GridSpacerWidgetClass PanelWidget0 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget0 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget1 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.1
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget1 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget2 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.2
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget2 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget3 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.3
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget3 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget4 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.4
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget4 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget5 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.5
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget5 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget6 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.6
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget6 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget7 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.7
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget7 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget8 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.8
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget8 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget9 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.9
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget9 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass InfoTextLeft {
+   position 80 150
+   size 300 900
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 1
+   {
+    GridSpacerWidgetClass PanelWidget10 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget10 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget11 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.1
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget11 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget12 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.2
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget12 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget13 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.3
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget13 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget14 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.4
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget14 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget15 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.5
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget15 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget16 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.6
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget16 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget17 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.7
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget17 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget18 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.8
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget18 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+    GridSpacerWidgetClass PanelWidget19 {
+     visible 0
+     clipchildren 1
+     color 0 0 0 0.8627
+     position 0 0.9
+     size 300 80
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     style Colorable
+     Padding 0
+     Margin 10
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 1
+     Rows 1
+     {
+      MultilineTextWidgetClass TextWidget19 {
+       visible 1
+       size 280 60
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "Lorem Ipsum is simply dummy text of the printing and typesetting "
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 24
+       "size to text h" 0
+       "size to text v" 1
+       "text halign" center
+       "text valign" center
+       wrap 1
+      }
+     }
+    }
+   }
+  }
+  PanelWidgetClass Tabber {
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 1
+   scriptclass "TabberUI"
+   {
+    SpacerWidgetClass TabControls {
+     visible 1
+     clipchildren 0
+     ignorepointer 1
+     position 80 80
+     size 1100 60
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     Padding 0
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     {
+      SpacerWidgetClass TabBar {
+       clipchildren 1
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        ImageWidgetClass Tabs_Background {
+         visible 1
+         ignorepointer 1
+         color 1 1 1 0.5098
+         position 0 0
+         size 1 1
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+         mode blend
+         "src alpha" 1
+         "no wrap" 0
+         stretch 1
+        }
+        GridSpacerWidgetClass Tab_Control_Container {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         Padding 0
+         Margin 0
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 10
+         Rows 1
+         {
+          PanelWidgetClass Tab_Control_0 {
+           visible 1
+           clipchildren 1
+           size 250 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_0_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "#xbox_control_mapping_info_screen_movement"
+             font "gui/fonts/sdf_MetronLight72"
+             "italic text" 0
+             "bold text" 0
+             "exact text" 0
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_0_Background {
+             visible 1
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position 0 0
+             size 1100 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+          PanelWidgetClass Tab_Control_1 {
+           visible 1
+           clipchildren 1
+           position 250 0
+           size 450 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_1_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "#xbox_control_mapping_info_screen_weapons_and_actions"
+             font "gui/fonts/sdf_MetronLight72"
+             "italic text" 0
+             "bold text" 0
+             "exact text" 0
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_1_Background {
+             visible 0
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position -250 0
+             size 1100 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+          PanelWidgetClass Tab_Control_2 {
+           visible 1
+           clipchildren 1
+           position 700 0
+           size 230 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_2_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "#xbox_control_mapping_info_screen_inventory"
+             font "gui/fonts/sdf_MetronLight72"
+             "italic text" 0
+             "bold text" 0
+             "exact text" 0
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_2_Background {
+             visible 0
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position -700 0
+             size 1100 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+          PanelWidgetClass Tab_Control_3 {
+           visible 1
+           clipchildren 1
+           position 930 0
+           size 170 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_3_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "#xbox_control_mapping_info_screen_menus"
+             font "gui/fonts/sdf_MetronLight72"
+             "italic text" 0
+             "bold text" 0
+             "exact text" 0
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_3_Background {
+             visible 0
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position -930 0
+             size 1100 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      FrameWidgetClass XboxControls {
+       visible 1
+       clipchildren 0
+       ignorepointer 1
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       {
+        ImageWidgetClass XboxTabLeftControl {
+         visible 1
+         clipchildren 1
+         ignorepointer 1
+         position -45 0
+         size 38 40
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:xbox_buttons image:LB"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+        }
+        ImageWidgetClass XboxTabRightControl {
+         visible 1
+         clipchildren 1
+         ignorepointer 1
+         position -45 0
+         size 38 40
+         halign right_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:xbox_buttons image:RB"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+        }
+       }
+      }
+     }
+    }
+    PanelWidgetClass Tab_0 {
+     visible 1
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     {
+      CanvasWidgetClass CanvasWidget_0 {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       scaled 1
+       priority 500
+      }
+     }
+    }
+    PanelWidgetClass Tab_1 {
+     visible 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     {
+      CanvasWidgetClass CanvasWidget_1 {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       scaled 1
+       priority 500
+      }
+     }
+    }
+    PanelWidgetClass Tab_2 {
+     visible 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     {
+      CanvasWidgetClass CanvasWidget_2 {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       scaled 1
+       priority 500
+      }
+     }
+    }
+    PanelWidgetClass Tab_3 {
+     visible 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     {
+      CanvasWidgetClass CanvasWidget_3 {
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+      }
+     }
+    }
+   }
+  }
+  ImageWidgetClass vignette {
+   visible 1
+   ignorepointer 0
+   color 0 0 0 0.7843
+   position 0 0
+   size 1.6 0.9
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   fixaspect outside
+   imageTexture "{E6B3EF816E067499}Gui/textures/inventory_bgvignette.edds"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
+   filter 0
+   nocache 1
+  }
+  TextWidgetClass OptionsTextWidget {
+   ignorepointer 1
+   position 80 80
+   size 0.3 50
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   priority 1
+   style Normal
+   text "#STR_rootFrame_OptionsTextWidget0"
+   font "gui/fonts/sdf_MetronLight72"
+   "text color" 0.8157 0.1255 0.7843 1
+   "exact text" 0
+   "text halign" right
+   "text valign" center
+  }
+  PanelWidgetClass toolbar_bg {
+   visible 1
+   inheritalpha 0
+   color 1 1 1 0.4706
+   size 1 0.1
+   halign center_ref
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 3
+   style ToolbarWidget
+   {
+    WrapSpacerWidgetClass ConsoleToolbar {
+     clipchildren 1
+     position 0.05 0.1
+     size 0.45 0.45
+     halign right_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     priority 100
+     Padding 8
+     Margin 0
+     "Size To Content V" 1
+     content_halign right
+     content_valign center
+     {
+      GridSpacerWidgetClass Back {
+       size 220 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass BackIcon {
+         clipchildren 0
+         inheritalpha 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:B"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass BackText {
+         position 40 0
+         size 60 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "Back"
+         font "gui/fonts/sdf_MetronBook24"
+         "text valign" center
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,425 @@
+FrameWidgetClass sound_tab_root {
+ position 0 0
+ size 1 1
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ {
+  ScrollWidgetClass sound_settings_scroll {
+   ignorepointer 1
+   color 1 1 1 0
+   position 0 0
+   size 600 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 0
+   "Scrollbar V" 1
+   {
+    GridSpacerWidgetClass sound_settings_root {
+     visible 1
+     ignorepointer 1
+     color 0 0 0 0
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 3
+     "no focus" 1
+     Padding 8
+     Margin 8
+     "Size To Content H" 1
+     "Size To Content V" 1
+     Columns 1
+     Rows 2
+     {
+      WrapSpacerWidgetClass volume_settings_root {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 473
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        PanelWidgetClass volume_settings_header {
+         visible 1
+         ignorepointer 1
+         color 0 0 0 0.9608
+         position 0 0
+         size 1 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style rover_sim_colorable
+         {
+          TextWidgetClass volume_text {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 1 22
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "SOUND"
+           font "gui/fonts/sdf_MetronLight72"
+           "exact text" 0
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
+        GridSpacerWidgetClass volume_settings_content {
+         ignorepointer 1
+         color 0 0 0 0.8627
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         style Colorable
+         "no focus" 1
+         Padding 4
+         Margin 8
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 1
+         Rows 1
+         {
+          ButtonWidgetClass master_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "music_button"
+           "next down" "effects_button"
+           {
+            GridSpacerWidgetClass master_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass master_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass master_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#STR_sound_tab_root_sound_settings_scroll_sound_settings_root_volume_settings_root_volume_settings_content_master_button_master_setting_master_setting_panel_master_button_label0"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass master_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass master_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass effects_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "master_button"
+           "next down" "voip_button"
+           {
+            GridSpacerWidgetClass effects_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass effects_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass effects_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#STR_sound_tab_root_sound_settings_scroll_sound_settings_root_volume_settings_root_volume_settings_content_effects_button_effects_setting_effects_setting_panel_effects_button_label0"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass effects_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass effects_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass voip_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "effects_button"
+           "next down" "music_button"
+           {
+            GridSpacerWidgetClass voip_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass voip_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass voip_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#STR_sound_tab_root_sound_settings_scroll_sound_settings_root_volume_settings_root_volume_settings_content_voip_button_voip_setting_voip_setting_panel_voip_button_label0"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass voip_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass voip_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass music_button {
+           visible 0
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "voip_button"
+           "next down" "master_button"
+           {
+            GridSpacerWidgetClass music_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass music_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass music_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#STR_sound_tab_root_sound_settings_scroll_sound_settings_root_volume_settings_root_volume_settings_content_music_button_music_setting_music_setting_panel_music_button_label0"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass music_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass music_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

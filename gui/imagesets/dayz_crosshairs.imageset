@@ -1,0 +1,50 @@
+ImageSetClass {
+ Name "dayz_crosshairs"
+ RefSize 1024 1024
+ Textures {
+  ImageSetTextureClass {
+   mpix 3
+   path "{D04B1074A5317A0E}Gui/imagesets/dayz_crosshairs.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass dot_4x4 {
+   Name "dot_4x4"
+   Pos 6 7
+   Size 4 4
+   Flags 0
+  }
+  ImageSetDefClass imperfect {
+   Name "imperfect"
+   Pos 55 4
+   Size 128 256
+   Flags 0
+  }
+  ImageSetDefClass dot_8x8 {
+   Name "dot_8x8"
+   Pos 4 20
+   Size 8 8
+   Flags 0
+  }
+  ImageSetDefClass cross_32x32 {
+   Name "cross_32x32"
+   Pos 0 40
+   Size 32 32
+   Flags 0
+  }
+  ImageSetDefClass cross_128x128 {
+   Name "cross_128x128"
+   Pos 224 0
+   Size 128 128
+   Flags 0
+  }
+  ImageSetDefClass crossT_128x128 {
+   Name "crossT_128x128"
+   Pos 353 0
+   Size 128 128
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

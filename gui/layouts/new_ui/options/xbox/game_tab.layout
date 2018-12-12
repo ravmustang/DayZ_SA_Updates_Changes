@@ -1,0 +1,806 @@
+FrameWidgetClass game_tab_root {
+ ignorepointer 1
+ position 0 0
+ size 1 1
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ {
+  ScrollWidgetClass game_settings_scroll {
+   ignorepointer 1
+   color 1 1 1 0
+   position 0 0
+   size 600 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 0
+   "no focus" 1
+   "Scrollbar V" 1
+   {
+    GridSpacerWidgetClass game_settings_root {
+     visible 1
+     ignorepointer 1
+     color 0 0 0 0
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 3
+     "no focus" 1
+     Padding 8
+     Margin 8
+     "Size To Content H" 1
+     "Size To Content V" 1
+     Columns 1
+     Rows 2
+     {
+      WrapSpacerWidgetClass camera_settings_root {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 473
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        PanelWidgetClass camera_settings_header {
+         visible 1
+         ignorepointer 1
+         color 0 0 0 0.9608
+         position 0 0
+         size 1 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style rover_sim_colorable
+         {
+          TextWidgetClass camera_text {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 1 22
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "CAMERA"
+           font "gui/fonts/sdf_MetronLight72"
+           "exact text" 0
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
+        GridSpacerWidgetClass camera_settings_content {
+         ignorepointer 1
+         color 0 0 0 0.8627
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         style Colorable
+         "no focus" 1
+         Padding 4
+         Margin 8
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 1
+         Rows 1
+         {
+          ButtonWidgetClass fov_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           userID 42
+           style Colorable
+           "no focus" 0
+           "next up" "player_button"
+           "next down" "brightness_button"
+           {
+            GridSpacerWidgetClass fov_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass fov_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass fov_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_xbox_fow"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass fov_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass fov_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+             "no focus" 1
+            }
+           }
+          }
+          ButtonWidgetClass brightness_button {
+           visible 0
+           ignorepointer 0
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           userID 42
+           style Colorable
+           "no focus" 0
+           "next up" "fov_button"
+           "next down" "hud_button"
+           {
+            GridSpacerWidgetClass brightness_setting {
+             ignorepointer 0
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass brightness_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass brightness_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#STR_game_tab_root_game_settings_scroll_game_settings_root_camera_settings_root_camera_settings_content_brightness_button_brightness_setting_brightness_setting_panel_brightness_button_label0"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass brightness_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass brightness_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+             "no focus" 1
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      WrapSpacerWidgetClass hud_settings_root {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 473
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        PanelWidgetClass hud_settings_header {
+         visible 1
+         ignorepointer 1
+         color 0 0 0 0.9608
+         position 0 0
+         size 1 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style rover_sim_colorable
+         {
+          TextWidgetClass hud_text {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 1 22
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "HUD"
+           font "gui/fonts/sdf_MetronLight72"
+           "exact text" 0
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
+        GridSpacerWidgetClass hud_settings_content {
+         ignorepointer 1
+         color 0 0 0 0.8627
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         style Colorable
+         "no focus" 1
+         Padding 4
+         Margin 8
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 1
+         {
+          ButtonWidgetClass hud_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "brightness_button"
+           "next down" "crosshair_button"
+           {
+            GridSpacerWidgetClass hud_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             "next down" "crosshair_button"
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass hud_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass hud_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_xbox_show_hud"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass hud_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass hud_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+             "no focus" 1
+            }
+           }
+          }
+          ButtonWidgetClass crosshair_button {
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "no focus" 0
+           "next up" "hud_button"
+           "next down" "game_button"
+           {
+            GridSpacerWidgetClass crosshair_setting {
+             ignorepointer 1
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass crosshair_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass crosshair_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_xbox_show_crosshair"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass crosshair_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass crosshair_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+             "no focus" 1
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      WrapSpacerWidgetClass chat_settings_root {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 473
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        PanelWidgetClass chat_settings_header {
+         visible 1
+         ignorepointer 1
+         color 0 0 0 0.9608
+         position 0 0
+         size 1 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style rover_sim_colorable
+         {
+          TextWidgetClass chat_text {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 1 22
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "CHAT"
+           font "gui/fonts/sdf_MetronLight72"
+           "exact text" 0
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
+        GridSpacerWidgetClass chat_settings_content {
+         ignorepointer 1
+         color 0 0 0 0.8627
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         style Colorable
+         "no focus" 1
+         Padding 4
+         Margin 8
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 1
+         {
+          ButtonWidgetClass game_button {
+           ignorepointer 1
+           color 0 0 0 0
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           "next up" "crosshair_button"
+           "next down" "admin_button"
+           {
+            GridSpacerWidgetClass game_setting {
+             ignorepointer 0
+             color 0 0 0 0
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass game_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass game_setting_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_xbox_game_messages"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass game_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass game_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass admin_button {
+           ignorepointer 1
+           color 0 0 0 0
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           "next up" "game_button"
+           "next down" "player_button"
+           {
+            GridSpacerWidgetClass admin_setting {
+             ignorepointer 0
+             color 0 0 0 0
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass admin_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass admin_setting_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_xbox_admin_mes"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass admin_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass admin_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+          ButtonWidgetClass player_button {
+           ignorepointer 1
+           color 0 0 0 0
+           position 0 0
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           "next up" "admin_button"
+           "next down" "fov_button"
+           {
+            GridSpacerWidgetClass player_setting {
+             ignorepointer 0
+             color 0 0 0 0
+             position 0 0
+             size 1 30
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass player_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass player_setting_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_xbox_player_messages"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass player_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass player_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             position 0 0
+             size 1 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

@@ -1,0 +1,754 @@
+FrameWidgetClass settings_menu_root {
+ size 1 1
+ halign center_ref
+ valign center_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ priority 951
+ {
+  FrameWidgetClass Tabber {
+   ignorepointer 1
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 1
+   scriptclass "TabberUI"
+   {
+    SpacerWidgetClass TabControls {
+     visible 1
+     clipchildren 0
+     ignorepointer 1
+     position 80 80
+     size 550 60
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     "no focus" 1
+     Padding 0
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     {
+      SpacerWidgetClass TabBar {
+       clipchildren 1
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        ImageWidgetClass Tabs_Background {
+         visible 1
+         ignorepointer 1
+         color 1 1 1 0.5098
+         position 0 0
+         size 1 1
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+         mode blend
+         "src alpha" 1
+         "no wrap" 0
+         stretch 1
+        }
+        GridSpacerWidgetClass Tab_Control_Container {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         priority 1
+         "no focus" 1
+         Padding 0
+         Margin 0
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 10
+         Rows 1
+         {
+          PanelWidgetClass Tab_Control_0 {
+           visible 1
+           clipchildren 1
+           size 160 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "no focus" 1
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_0_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "GAME"
+             font "gui/fonts/sdf_MetronLight72"
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_0_Background {
+             visible 1
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position 0 0
+             size 550 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+          PanelWidgetClass Tab_Control_1 {
+           visible 1
+           clipchildren 1
+           position 0 0
+           size 170 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "no focus" 1
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_1_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "SOUND"
+             font "gui/fonts/sdf_MetronLight72"
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_1_Background {
+             visible 0
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position -160 0
+             size 550 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+          PanelWidgetClass Tab_Control_2 {
+           visible 1
+           clipchildren 1
+           position 0 0
+           size 220 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           priority 200
+           userID 0
+           style blank
+           "no focus" 1
+           "next down" "XComboBoxWidget1"
+           {
+            TextWidgetClass Tab_Control_2_Title {
+             ignorepointer 1
+             position 0 0
+             size 1 0.48
+             halign center_ref
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             priority 250
+             text "CONTROLS"
+             font "gui/fonts/sdf_MetronLight72"
+             "text halign" center
+             "text valign" center
+            }
+            ImageWidgetClass Tab_Control_2_Background {
+             visible 0
+             disabled 0
+             inheritalpha 0
+             ignorepointer 1
+             color 1 1 1 0.7843
+             position -330 0
+             size 550 1
+             hexactpos 1
+             vexactpos 1
+             hexactsize 1
+             vexactsize 0
+             draggable 0
+             imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
+             mode blend
+             "src alpha" 1
+             "no wrap" 0
+             stretch 1
+             "flip u" 0
+             "flip v" 0
+             filter 1
+             nocache 0
+            }
+           }
+          }
+         }
+        }
+       }
+      }
+      FrameWidgetClass XboxControls {
+       visible 0
+       clipchildren 0
+       ignorepointer 1
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       {
+        ImageWidgetClass XboxTabLeftControl {
+         visible 1
+         clipchildren 1
+         ignorepointer 1
+         position -45 0
+         size 38 40
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:xbox_buttons image:LB"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+        }
+        ImageWidgetClass XboxTabRightControl {
+         visible 1
+         clipchildren 1
+         ignorepointer 1
+         position -45 0
+         size 38 40
+         halign right_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:xbox_buttons image:RB"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+        }
+       }
+      }
+     }
+    }
+    FrameWidgetClass Tab_0 {
+     visible 1
+     ignorepointer 1
+     position 80 160
+     size 1760 800
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+    }
+    FrameWidgetClass Tab_1 {
+     visible 0
+     ignorepointer 1
+     position 80 160
+     size 1760 800
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+    }
+    FrameWidgetClass Tab_2 {
+     visible 0
+     ignorepointer 1
+     position 80 160
+     size 1760 800
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+    }
+    FrameWidgetClass Tab_3 {
+     visible 0
+     ignorepointer 1
+     position 80 160
+     size 1760 800
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+    }
+   }
+  }
+  TextWidgetClass SettingsTextWidget {
+   ignorepointer 1
+   position 0.05 80
+   size 0.3 50
+   halign right_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   priority 1
+   style Normal
+   text "OPTIONS"
+   font "gui/fonts/sdf_MetronLight72"
+   "text color" 0.8157 0.1255 0.7843 1
+   "exact text" 0
+   "text halign" right
+   "text valign" center
+  }
+  ImageWidgetClass vignette {
+   visible 1
+   color 0 0 0 0.7843
+   position 0 0
+   size 1.6 0.9
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   fixaspect outside
+   imageTexture "{E6B3EF816E067499}Gui/textures/inventory_bgvignette.edds"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
+   filter 0
+   nocache 1
+  }
+  PanelWidgetClass toolbar_bg {
+   visible 1
+   inheritalpha 0
+   color 1 1 1 0.4706
+   position 0 0
+   size 1 0.1
+   halign center_ref
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 3
+   style ToolbarWidget
+   {
+    WrapSpacerWidgetClass ConsoleToolbar {
+     visible 1
+     clipchildren 0
+     position 0.05 0.1
+     size 0.45 0.45
+     halign right_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     priority 100
+     "no focus" 1
+     Padding 8
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     content_halign right
+     content_valign center
+     {
+      GridSpacerWidgetClass Toggle {
+       visible 0
+       clipchildren 0
+       size 120 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       priority 3
+       "no focus" 1
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass ToggleIcon {
+         clipchildren 0
+         inheritalpha 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:A"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass ToggleText {
+         clipchildren 0
+         position 40 0
+         size 88 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Toggle_ToggleText0"
+         font "gui/fonts/sdf_MetronLight24"
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      GridSpacerWidgetClass Apply {
+       visible 0
+       clipchildren 0
+       size 193 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       priority 2
+       "no focus" 1
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass ApplyIcon {
+         clipchildren 0
+         inheritalpha 0
+         position 0 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:X"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass ApplyText {
+         clipchildren 0
+         position 40 0
+         size 80 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Apply_ApplyText0"
+         font "gui/fonts/sdf_MetronLight24"
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      GridSpacerWidgetClass Reset {
+       visible 0
+       clipchildren 0
+       size 159 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       priority 1
+       "no focus" 1
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass ResetIcon {
+         clipchildren 0
+         inheritalpha 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:Y"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass ResetText {
+         clipchildren 0
+         position 40 0
+         size 80 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Reset_ResetText0"
+         font "gui/fonts/sdf_MetronLight24"
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      GridSpacerWidgetClass Back {
+       clipchildren 0
+       size 86 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       "no focus" 1
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass BackIcon {
+         clipchildren 0
+         inheritalpha 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:B"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass BackText {
+         clipchildren 0
+         position 40 0
+         size 52 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Back_BackText0"
+         font "gui/fonts/sdf_MetronLight24"
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  GridSpacerWidgetClass settings_details {
+   visible 0
+   clipchildren 1
+   ignorepointer 1
+   color 0 0 0 0.8627
+   position 720 160
+   size 600 200
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   "no focus" 1
+   Padding 8
+   Margin 16
+   "Size To Content V" 1
+   Columns 1
+   Rows 2
+   {
+    TextWidgetClass details_label {
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 1 36
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     font "gui/fonts/sdf_MetronLight72"
+     text_proportion 0.9
+    }
+    RichTextWidgetClass details_content {
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 1
+     "exact text size" 22
+     "size to text h" 0
+     "size to text v" 1
+     wrap 1
+     "condense whitespace" 1
+    }
+   }
+  }
+  WrapSpacerWidgetClass Licensing {
+   clipchildren 0
+   position 0.05 0.062
+   size 0.45 30
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 1
+   priority 5
+   Padding 8
+   Margin 0
+   "Size To Content H" 1
+   "Size To Content V" 1
+   content_valign center
+   {
+    TextWidgetClass version {
+     visible 1
+     clipchildren 0
+     ignorepointer 1
+     position 80 60
+     size 1 0.5
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 2
+     text "#main_menu_version"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 0
+     "text valign" center
+    }
+    TextWidgetClass copyright {
+     visible 1
+     clipchildren 0
+     position 80 40
+     size 1 0.5
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 2
+     text "#copyright_disclamer"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 0
+     "text valign" center
+    }
+   }
+  }
+ }
+}

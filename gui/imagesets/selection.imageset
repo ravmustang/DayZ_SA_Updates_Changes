@@ -1,0 +1,26 @@
+ImageSetClass {
+ Name "selection"
+ RefSize 200 200
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{57CDFDC623217149}Gui/imagesets/selection.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass gradient {
+   Name "gradient"
+   Pos 8 106
+   Size 85 85
+   Flags 0
+  }
+  ImageSetDefClass outline {
+   Name "outline"
+   Pos 6 6
+   Size 89 89
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}

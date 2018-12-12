@@ -1,0 +1,1988 @@
+FrameWidgetClass main_menu_root {
+ visible 1
+ ignorepointer 1
+ position 0 0
+ size 1 1
+ halign center_ref
+ valign center_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ priority 951
+ {
+  FrameWidgetClass news_feed_root {
+   visible 0
+   disabled 0
+   ignorepointer 1
+   position 0.05 320
+   size 480 630
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   {
+    PanelWidgetClass news_feed_header {
+     visible 1
+     ignorepointer 1
+     color 0 0 0 0.9608
+     position 0 0
+     size 480 36
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style DayZDefaultPanelTop
+     {
+      ButtonWidgetClass news_feed_close {
+       visible 0
+       color 1 1 1 0
+       position 6 0
+       size 36 36
+       halign right_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        ImageWidgetClass news_feed_close_screenshot {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         image0 "set:dayz_gui image:icon_x"
+         mode blend
+         "src alpha" 1
+         "no wrap" 0
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+        }
+       }
+      }
+      TextWidgetClass news_feed_text {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 480 26
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Normal
+       text "#layout_main_menu_main_news_header"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    PanelWidgetClass news_feed_content {
+     ignorepointer 1
+     color 0 0 0 0.8627
+     position 0 36
+     size 480 594
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style DayZDefaultPanelBottom
+     "no focus" 1
+     {
+      ButtonWidgetClass news_main {
+       ignorepointer 0
+       position 0 5
+       size 460 310
+       halign center_ref
+       hexactpos 0
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       "next left" "play"
+       "next right" "play"
+       "next up" "feedback_tracker"
+       "next down" "news_sec_1"
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        FrameWidgetClass news_main_image_frame {
+         clipchildren 0
+         ignorepointer 1
+         size 1.6 0.9
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         fixaspect inside
+         {
+          ImageWidgetClass news_main_image {
+           ignorepointer 1
+           position 0 0
+           size 1.6 0.9
+           halign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           fixaspect inside
+           image0 "set:main_menu_newsfeed image:image_1_2"
+           mode blend
+           "src alpha" 1
+           "no wrap" 1
+           stretch 1
+           filter 1
+          }
+         }
+        }
+        TextWidgetClass news_main_text {
+         clipchildren 0
+         ignorepointer 1
+         position 0 264
+         size 1 23
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style Normal
+         text "#layout_main_menu_main_news_text"
+         font "gui/fonts/sdf_MetronLight24"
+         "text offset" 5 0
+         "exact text" 0
+         "exact text size" 24
+         "text valign" center
+        }
+        TextWidgetClass news_main_text_1 {
+         clipchildren 0
+         ignorepointer 1
+         position 0 290
+         size 1 18
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style Normal
+         text "#layout_main_menu_main_text"
+         font "gui/fonts/sdf_MetronLight24"
+         "text offset" 5 0
+         "exact text" 0
+         "exact text size" 20
+         "text valign" center
+        }
+       }
+      }
+      ButtonWidgetClass news_sec_1 {
+       clipchildren 0
+       ignorepointer 0
+       position 10 320
+       size 205 225
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       "next left" "play"
+       "next right" "news_sec_2"
+       "next up" "news_main"
+       "next down" "feedback_tracker"
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        FrameWidgetClass news_sec_1_image_frame {
+         ignorepointer 1
+         position 0 0
+         size 1 205
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         fixaspect inside
+         {
+          ImageWidgetClass news_sec_1_image {
+           ignorepointer 1
+           size 1 1
+           halign center_ref
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           fixaspect outside
+           image0 "set:main_menu_newsfeed image:image_2"
+           mode blend
+           "src alpha" 1
+           "no wrap" 1
+           stretch 1
+           filter 1
+          }
+         }
+        }
+        TextWidgetClass news_sec_1_text {
+         clipchildren 0
+         ignorepointer 1
+         size 1 18
+         halign center_ref
+         valign bottom_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style Normal
+         text "#layout_main_menu_main_news_sec1_text"
+         font "gui/fonts/sdf_MetronLight24"
+         "text offset" 5 0
+         "exact text" 0
+         "exact text size" 18
+         "text valign" center
+        }
+       }
+      }
+      ButtonWidgetClass news_sec_2 {
+       clipchildren 0
+       ignorepointer 0
+       position 10 320
+       size 205 225
+       halign right_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       "next left" "news_sec_2"
+       "next right" "play"
+       "next up" "news_main"
+       "next down" "twitter"
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        FrameWidgetClass news_sec_2_image_frame {
+         ignorepointer 1
+         size 1 205
+         halign right_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         fixaspect inside
+         {
+          ImageWidgetClass news_sec_2_image {
+           ignorepointer 1
+           position 0 0
+           size 1 1
+           halign center_ref
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           fixaspect outside
+           image0 "set:main_menu_newsfeed image:image_3"
+           mode blend
+           "src alpha" 1
+           "no wrap" 1
+           stretch 1
+           filter 1
+          }
+         }
+        }
+        TextWidgetClass news_sec_2_text {
+         clipchildren 0
+         ignorepointer 1
+         size 1 18
+         halign center_ref
+         valign bottom_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style Normal
+         text "#layout_main_menu_main_news_sec1_text"
+         font "gui/fonts/sdf_MetronLight24"
+         "text offset" 5 0
+         "exact text" 0
+         "exact text size" 18
+         "text valign" center
+        }
+       }
+      }
+      PanelWidgetClass news_links {
+       ignorepointer 1
+       position 0 5
+       size 470 36
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       {
+        ButtonWidgetClass feedback_tracker {
+         ignorepointer 0
+         position 0 0
+         size 101 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         style Empty
+         "next left" "play"
+         "next right" "dayz_forums"
+         "next up" "news_sec_1"
+         "next down" "news_sec_1"
+         font "gui/fonts/sdf_MetronLight24"
+         {
+          TextWidgetClass feedback_tracker_text {
+           clipchildren 0
+           ignorepointer 1
+           position 36 0
+           size 65 0.35
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           userID 150
+           text "#layout_main_menu_feedback"
+           font "gui/fonts/sdf_MetronLight24"
+           "exact text" 0
+           "text valign" center
+          }
+          ImageWidgetClass feedback_tracker_image {
+           clipchildren 0
+           ignorepointer 1
+           position 5 -4
+           size 26 26
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           fixaspect fixwidth
+           image0 "set:dayz_gui image:icon_feedback"
+           mode blend
+           "src alpha" 1
+           stretch 0
+          }
+         }
+        }
+        ButtonWidgetClass dayz_forums {
+         ignorepointer 0
+         position 101 0
+         size 113 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         style Empty
+         "next left" "feedback_tracker"
+         "next right" "twitter"
+         "next up" "news_sec_1"
+         "next down" "news_sec_1"
+         font "gui/fonts/sdf_MetronLight24"
+         {
+          TextWidgetClass dayz_forums_text {
+           clipchildren 0
+           ignorepointer 1
+           keepsafezone 0
+           position 36 0
+           size 77 0.35
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           userID 151
+           text "#layout_main_menu_forums"
+           font "gui/fonts/sdf_MetronLight24"
+           "exact text" 0
+           "text valign" center
+          }
+          ImageWidgetClass dayz_forums_image {
+           clipchildren 0
+           ignorepointer 1
+           position 5 2
+           size 26 26
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           fixaspect fixwidth
+           image0 "set:dayz_gui image:icon_forums"
+           mode blend
+           "src alpha" 1
+          }
+         }
+        }
+        ButtonWidgetClass twitter {
+         ignorepointer 0
+         position 214 0
+         size 130 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         style Empty
+         "next left" "dayz_forums"
+         "next right" "youtube"
+         "next up" "news_sec_2"
+         "next down" "news_sec_2"
+         font "gui/fonts/sdf_MetronLight24"
+         {
+          TextWidgetClass twitter_text {
+           clipchildren 0
+           ignorepointer 1
+           position 36 0
+           size 94 0.35
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           userID 152
+           text "@DayZ"
+           font "gui/fonts/sdf_MetronLight24"
+           "exact text" 0
+           "text valign" center
+          }
+          ImageWidgetClass twitter_image {
+           clipchildren 0
+           ignorepointer 1
+           position 5 0
+           size 26 26
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           fixaspect fixwidth
+           image0 "set:dayz_gui image:icon_twitter"
+           mode blend
+           "src alpha" 1
+          }
+         }
+        }
+        ButtonWidgetClass youtube {
+         ignorepointer 0
+         position 344 0
+         size 126 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         style Empty
+         "next left" "twitter"
+         "next right" "play"
+         "next up" "news_sec_2"
+         "next down" "news_sec_2"
+         font "gui/fonts/sdf_MetronLight24"
+         {
+          TextWidgetClass youtube_text {
+           clipchildren 0
+           ignorepointer 1
+           position 36 0
+           size 90 0.35
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 0
+           userID 153
+           text "#layout_main_menu_youtube"
+           font "gui/fonts/sdf_MetronLight24"
+           "exact text" 0
+           "text valign" center
+          }
+          ImageWidgetClass youtube_image {
+           clipchildren 0
+           ignorepointer 1
+           position 5 0
+           size 26 26
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 1
+           vexactsize 1
+           fixaspect fixwidth
+           image0 "set:dayz_gui image:icon_youtube"
+           mode blend
+           "src alpha" 1
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass news_feed_root_xbox {
+   visible 0
+   ignorepointer 1
+   position 0.05 320
+   size 480 630
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   {
+    PanelWidgetClass news_feed_header0 {
+     visible 1
+     ignorepointer 1
+     color 0 0 0 0.9608
+     position 0 0
+     size 480 36
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style DayZDefaultPanelTop
+     {
+      ButtonWidgetClass news_feed_close0 {
+       visible 0
+       color 1 1 1 0
+       position 6 0
+       size 36 36
+       halign right_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        ImageWidgetClass news_feed_close_screenshot0 {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         image0 "set:dayz_gui image:icon_x"
+         mode blend
+         "src alpha" 1
+         "no wrap" 0
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+        }
+       }
+      }
+      TextWidgetClass news_feed_text0 {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 480 26
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Normal
+       text "#layout_xbox_maing_header_newsfeed"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    PanelWidgetClass news_feed_content0 {
+     ignorepointer 1
+     color 0 0 0 0.8627
+     position 0 36
+     size 480 594
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style DayZDefaultPanelBottom
+     "no focus" 1
+     {
+      ButtonWidgetClass news_main0 {
+       ignorepointer 0
+       position 0 5
+       size 460 310
+       halign center_ref
+       hexactpos 0
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       "next left" "play"
+       "next right" "play"
+       "next up" "feedback_tracker"
+       "next down" "news_sec_1"
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        FrameWidgetClass news_main_image_frame0 {
+         clipchildren 0
+         ignorepointer 1
+         position 0 0
+         size 1.6 0.9
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         fixaspect inside
+         {
+          ImageWidgetClass news_main_image0 {
+           clipchildren 1
+           ignorepointer 1
+           position 0 0
+           size 1.6 0.9
+           halign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           fixaspect inside
+           image0 "set:main_menu_newsfeed image:image_1_2"
+           mode blend
+           "src alpha" 1
+           "no wrap" 1
+           stretch 1
+           filter 1
+          }
+         }
+        }
+        WrapSpacerWidgetClass Content {
+         position 0 268
+         size 1 326
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         Padding 0
+         Margin 0
+         "Size To Content V" 1
+         {
+          TextWidgetClass news_main_textTitle0 {
+           clipchildren 0
+           ignorepointer 1
+           color 1 0 0 1
+           position 0 268.87997
+           size 1 30
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_main_text_title_0"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 0
+           "exact text size" 24
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_0 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 295.92899
+           size 1 55
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_main_news_1"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+          TextWidgetClass news_main_textTitle1 {
+           clipchildren 0
+           ignorepointer 1
+           color 0.6196 0.6196 0.6196 1
+           position -1 348.43201
+           size 1 25
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_main_text_title_1"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 1
+           "exact text size" 18
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_2 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 370.314
+           size 1 65
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_main_news_2"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+          TextWidgetClass news_main_textTitle3 {
+           clipchildren 0
+           ignorepointer 1
+           color 0.6196 0.6196 0.6196 1
+           position 0 411.44
+           size 1 25
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_main_text_title_2"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 1
+           "exact text size" 18
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_3 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 434.32199
+           size 1 53
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_main_news_3"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass news_feed_root_xbox_trial {
+   visible 0
+   ignorepointer 1
+   position 0.05 320
+   size 480 630
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   {
+    PanelWidgetClass news_feed_header1 {
+     visible 1
+     ignorepointer 1
+     color 0 0 0 0.9608
+     position 0 0
+     size 480 36
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style DayZDefaultPanelTop
+     {
+      ButtonWidgetClass news_feed_close1 {
+       visible 0
+       color 1 1 1 0
+       position 6 0
+       size 36 36
+       halign right_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        ImageWidgetClass news_feed_close_screenshot1 {
+         ignorepointer 1
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         image0 "set:dayz_gui image:icon_x"
+         mode blend
+         "src alpha" 1
+         "no wrap" 0
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+        }
+       }
+      }
+      TextWidgetClass news_feed_text1 {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 480 26
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Normal
+       text "#layout_xbox_trial_main_header_newsfeed_text1"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 0
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    PanelWidgetClass news_feed_content1 {
+     ignorepointer 1
+     color 0 0 0 0.8627
+     position 0 36
+     size 480 594
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style DayZDefaultPanelBottom
+     "no focus" 1
+     {
+      ButtonWidgetClass news_main1 {
+       ignorepointer 0
+       position 0 5
+       size 460 310
+       halign center_ref
+       hexactpos 0
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       "next left" "play"
+       "next right" "play"
+       "next up" "feedback_tracker"
+       "next down" "news_sec_1"
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        FrameWidgetClass news_main_image_frame1 {
+         clipchildren 0
+         ignorepointer 1
+         position 0 0
+         size 1.6 0.9
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         fixaspect inside
+         {
+          ImageWidgetClass news_main_image1 {
+           clipchildren 1
+           ignorepointer 1
+           position 0 0
+           size 1.6 0.9
+           halign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           fixaspect inside
+           image0 "set:main_menu_newsfeed image:image_1_2"
+           mode blend
+           "src alpha" 1
+           "no wrap" 1
+           stretch 1
+           filter 1
+          }
+         }
+        }
+        WrapSpacerWidgetClass Content0 {
+         position 0 268
+         size 1 326
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         Padding 0
+         Margin 0
+         "Size To Content V" 1
+         {
+          TextWidgetClass news_main_textTitle4 {
+           clipchildren 0
+           ignorepointer 1
+           color 1 0 0 1
+           position 0 268.87997
+           size 1 23
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_trial_main_text_title_4"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 0
+           "exact text size" 24
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_5 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 295.92899
+           size 1 55
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_trial_main_text_5"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+          TextWidgetClass news_main_textTitle5 {
+           clipchildren 0
+           ignorepointer 1
+           color 0.6196 0.6196 0.6196 1
+           position -1 348.43201
+           size 1 20
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_trial_main_text_title_5"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 1
+           "exact text size" 18
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_6 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 370.314
+           size 1 45
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_trial_main_text_6"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+          TextWidgetClass news_main_textTitle6 {
+           clipchildren 0
+           ignorepointer 1
+           color 0.6196 0.6196 0.6196 1
+           position 0 411.44
+           size 1 20
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_trial_main_text_title_6"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 1
+           "exact text size" 18
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_7 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 434.32199
+           size 1 60
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_trial_main_text_7"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+          TextWidgetClass news_main_textTitle7 {
+           clipchildren 0
+           ignorepointer 1
+           color 0.6196 0.6196 0.6196 1
+           position 0 488.44
+           size 1 20
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_xbox_trial_main_text_title_7"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 5 0
+           "exact text" 1
+           "exact text size" 18
+           "text valign" center
+          }
+          MultilineTextWidgetClass news_main_text_8 {
+           clipchildren 0
+           ignorepointer 1
+           position 0 510.32199
+           size 1 80
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style DayZNormal
+           text "#layout_xbox_trial_main_text_8"
+           font "gui/fonts/sdf_MetronLight24"
+           "text offset" 20 0
+           "exact text" 1
+           "exact text size" 15
+           wrap 1
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  FrameWidgetClass character_stats_root {
+   visible 0
+   ignorepointer 1
+   position 0.05 320
+   size 480 380
+   halign right_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   {
+    PanelWidgetClass character_stats_header {
+     ignorepointer 1
+     color 0 0 0 0.9608
+     position 0 0
+     size 1 36
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style DayZDefaultPanelTop
+     {
+      ButtonWidgetClass character_stats_close {
+       position 6 0
+       size 36 36
+       halign right_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Empty
+       font "gui/fonts/sdf_MetronLight24"
+       {
+        ImageWidgetClass character_stats_close_image {
+         ignorepointer 1
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         image0 "set:dayz_gui image:icon_x"
+         mode additive
+         "src alpha" 1
+        }
+       }
+      }
+      TextWidgetClass character_stats_text {
+       ignorepointer 1
+       size 480 26
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       style Normal
+       text "#layout_main_menu_char_stats"
+       font "gui/fonts/sdf_MetronBook72"
+       "exact text" 0
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    PanelWidgetClass character_stats_content {
+     ignorepointer 1
+     color 0 0 0 0.8627
+     position 0 36
+     size 1 344
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style DayZDefaultPanelBottom
+    }
+   }
+  }
+  WrapSpacerWidgetClass play_panel_root {
+   visible 1
+   ignorepointer 1
+   position 0.05 130
+   size 0.2 400
+   halign right_ref
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   priority 3
+   Padding 10
+   Margin 0
+   "Size To Content H" 1
+   content_halign center
+   content_valign bottom
+   {
+    WrapSpacerWidgetClass bottom {
+     color 0 0 0 0.7843
+     position 0 0
+     size 1 84
+     halign center_ref
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style DayZDefaultPanel
+     "no focus" 0
+     "next left" "news_main"
+     "next right" "news_main"
+     "next up" ""
+     "next down" "exit_button"
+     Padding 0
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     {
+      ButtonWidgetClass play {
+       color 0.7843 0 0 1
+       position 0 0
+       size 1 84
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       style DayZDefaultButtonAll
+       "no focus" 0
+       "next left" "news_main"
+       "next right" "news_main"
+       "next up" ""
+       "next down" "play_video"
+       text "#main_menu_play"
+       text_proportion 0.8
+       font "gui/fonts/sdf_MetronLight72"
+       switch normal
+      }
+     }
+    }
+    WrapSpacerWidgetClass top {
+     ignorepointer 1
+     color 0 0 0 0.7843
+     position 0 0
+     size 1 48
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style DayZDefaultPanel
+     "no focus" 1
+     Padding 0
+     Margin 0
+     "Size To Content V" 1
+     {
+      ButtonWidgetClass play_video {
+       visible 0
+       color 0.0392 0.0392 0.0392 1
+       position 0 0
+       size 1 38
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       style DayZDefaultButtonTop
+       "no focus" 0
+       "next left" "news_main"
+       "next right" "news_main"
+       "next up" "play"
+       "next down" "tutorials"
+       text "#menu_introductionVideo"
+       text_proportion 0.55
+       font "gui/fonts/sdf_MetronLight24"
+       switch normal
+      }
+      ButtonWidgetClass tutorials {
+       visible 0
+       color 0.0392 0.0392 0.0392 1
+       position 0 0
+       size 1 38
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       style DayZDefaultButtonSides
+       "no focus" 0
+       "next left" "news_main"
+       "next right" "news_main"
+       "next up" "play_video"
+       "next down" "customize_character"
+       text "#menu_tutorials"
+       text_proportion 0.55
+       font "gui/fonts/sdf_MetronLight24"
+       switch normal
+      }
+      PanelWidgetClass character {
+       visible 1
+       ignorepointer 0
+       position 0 0
+       size 1 38
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       style blank
+       {
+        ButtonWidgetClass prev_character {
+         visible 1
+         color 1 1 1 0
+         size 38 38
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         fixaspect fixwidth
+         priority 1
+         style Empty
+         "no focus" 0
+         font "gui/fonts/sdf_MetronLight24"
+         {
+          ImageWidgetClass prev_character_image {
+           inheritalpha 0
+           ignorepointer 1
+           size 0.75 1
+           halign center_ref
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           image0 "set:dayz_gui image:arrow_left"
+           mode blend
+           "src alpha" 1
+          }
+         }
+        }
+        ButtonWidgetClass next_character {
+         visible 1
+         color 1 1 1 0
+         size 38 38
+         halign right_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         fixaspect fixwidth
+         priority 1
+         style Empty
+         "no focus" 0
+         font "gui/fonts/sdf_MetronLight24"
+         {
+          ImageWidgetClass next_character_image {
+           ignorepointer 1
+           size 0.75 1
+           halign center_ref
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           image0 "set:dayz_gui image:arrow_right"
+           mode blend
+           "src alpha" 1
+          }
+         }
+        }
+        TextWidgetClass character_name_text {
+         inheritalpha 1
+         ignorepointer 1
+         size 1 0.55
+         halign center_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         font "gui/fonts/sdf_MetronLight24"
+         "exact text" 0
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      ButtonWidgetClass customize_character {
+       visible 1
+       color 0.0392 0.0392 0.0392 1
+       position 0 0
+       size 1 38
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       style DayZDefaultButtonSides
+       "no focus" 0
+       "next left" "news_main"
+       "next right" "news_main"
+       "next up" "tutorials"
+       "next down" "options"
+       text "#layout_main_menu_customize_char"
+       text_proportion 0.55
+       font "gui/fonts/sdf_MetronLight24"
+       switch normal
+      }
+      ButtonWidgetClass choose_server {
+       color 0.0392 0.0392 0.0392 1
+       position 0 0
+       size 1 38
+       halign center_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       style DayZDefaultButtonBottom
+       "no focus" 0
+       "next left" "news_main"
+       "next right" "news_main"
+       "next up" "customize_character"
+       "next down" "play"
+       text "#main_menu_change_server"
+       text_proportion 0.55
+       font "gui/fonts/sdf_MetronLight24"
+       switch normal
+      }
+     }
+    }
+   }
+  }
+  PanelWidgetClass character_name_xbox_background {
+   visible 0
+   color 0 0 0 0.7843
+   position 0.05 80
+   size 360 38
+   halign right_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 5
+   style rover_sim_colorable
+   {
+    TextWidgetClass character_name_xbox {
+     visible 1
+     inheritalpha 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     halign right_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 3
+     text "#STR_main_menu_root_character_name_xbox_background_character_name_xbox0"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 0
+     text_proportion 0.55
+     "text halign" center
+     "text valign" center
+    }
+   }
+  }
+  FrameWidgetClass settings_panel_root {
+   ignorepointer 1
+   position 0.05 80
+   size 260 40
+   halign right_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   {
+    ButtonWidgetClass stat_button {
+     visible 0
+     color 1 1 1 0
+     position 0.75 0
+     size 0.25 0.25
+     halign right_ref
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     fixaspect inside
+     style Empty
+     "no focus" 1
+     "next up" "play"
+     "next down" "customize_character"
+     font "gui/fonts/sdf_MetronLight24"
+     switch normal
+     {
+      ImageWidgetClass stat_button_image {
+       ignorepointer 1
+       size 0.8 0.8
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       image0 "set:dayz_gui image:icon_forums"
+       mode blend
+       "src alpha" 1
+      }
+     }
+    }
+    ButtonWidgetClass message_button {
+     visible 0
+     color 1 1 1 0
+     position 0.5 0
+     size 0.25 0.25
+     halign right_ref
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     fixaspect inside
+     style Empty
+     "no focus" 1
+     "next up" "play"
+     "next down" "customize_character"
+     font "gui/fonts/sdf_MetronLight24"
+     switch normal
+     {
+      ImageWidgetClass message_button_image {
+       ignorepointer 1
+       size 0.9 0.9
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       image0 "set:dayz_gui image:icon_feedback"
+       mode blend
+       "src alpha" 1
+      }
+     }
+    }
+    ButtonWidgetClass settings_button {
+     color 1 1 1 0
+     position 0.25 0
+     size 0.25 0.25
+     halign right_ref
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     fixaspect inside
+     style Empty
+     "no focus" 0
+     "next left" "news_main"
+     "next right" "exit_button"
+     "next up" "play"
+     "next down" "customize_character"
+     font "gui/fonts/sdf_MetronLight24"
+     switch normal
+     {
+      ImageWidgetClass settings_button_image {
+       ignorepointer 1
+       size 1.5 1.5
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       image0 "set:ccgui_enforce image:HudRepair"
+       mode blend
+       "src alpha" 1
+      }
+     }
+    }
+    ButtonWidgetClass exit_button {
+     color 1 1 1 0
+     size 0.25 0.25
+     halign right_ref
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     fixaspect inside
+     style Empty
+     "no focus" 0
+     "next left" "settings_button"
+     "next right" "play"
+     "next up" "play"
+     "next down" "customize_character"
+     font "gui/fonts/sdf_MetronLight24"
+     switch normal
+     {
+      ImageWidgetClass exit_button_image {
+       ignorepointer 1
+       size 1 1
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       image0 "set:ccgui_enforce image:IconHealth"
+       mode blend
+       "src alpha" 1
+       rotation 0 0 45
+      }
+     }
+    }
+   }
+  }
+  ImageWidgetClass dayz_logo {
+   visible 1
+   ignorepointer 1
+   position 0.05 80
+   size 480 225
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   image0 "set:dayz_gui image:DayZLogo"
+   mode additive
+   "src alpha" 1
+   stretch 0
+  }
+  ButtonWidgetClass news_feed_open {
+   visible 0
+   color 0 0 0 0.8627
+   position 0 340
+   size 36 36
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   style DayZDefaultButtonNoBorder
+   font "gui/fonts/sdf_MetronLight24"
+   {
+    ImageWidgetClass news_feed_open_image {
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     image0 "set:dayz_gui image:icon_collapse"
+     mode blend
+     "src alpha" 1
+     "no wrap" 0
+     stretch 0
+     "flip u" 0
+     "flip v" 0
+     filter 1
+     rotation 0 0 270
+    }
+   }
+  }
+  ButtonWidgetClass character_stats_open {
+   visible 0
+   color 0 0 0 0.8627
+   position 0 340
+   size 36 36
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   style DayZDefaultButtonNoBorder
+   font "gui/fonts/sdf_MetronLight24"
+   {
+    ImageWidgetClass character_stats_open_image {
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     image0 "set:dayz_gui image:icon_collapse"
+     mode blend
+     "src alpha" 1
+     "no wrap" 0
+     stretch 0
+     "flip u" 0
+     "flip v" 0
+     filter 1
+     rotation 0 0 90
+    }
+   }
+  }
+  FrameWidgetClass character_rotation_frame {
+   size 0.3 1
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 2
+  }
+  WrapSpacerWidgetClass Licensing {
+   clipchildren 0
+   position 0.05 0.062
+   size 0.45 30
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 1
+   priority 5
+   Padding 8
+   Margin 0
+   "Size To Content H" 1
+   "Size To Content V" 1
+   content_valign center
+   {
+    TextWidgetClass version {
+     visible 1
+     clipchildren 0
+     ignorepointer 1
+     position 80 60
+     size 1 0.5
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 2
+     text "#main_menu_version"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 0
+     "text valign" center
+    }
+    TextWidgetClass copyright {
+     visible 1
+     clipchildren 0
+     position 80 40
+     size 1 0.5
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 2
+     text "#copyright_disclamer"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 0
+     "text valign" center
+    }
+   }
+  }
+  PanelWidgetClass toolbar_bg {
+   visible 0
+   inheritalpha 0
+   color 1 1 1 0.4706
+   position 0 0
+   size 1 0.1
+   halign center_ref
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 3
+   style ToolbarWidget
+   {
+    WrapSpacerWidgetClass ConsoleToolbar {
+     visible 1
+     clipchildren 1
+     position 0.05 0.1
+     size 0.45 0.45
+     halign right_ref
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     priority 100
+     "no focus" 1
+     Padding 8
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     content_halign right
+     content_valign center
+     {
+      GridSpacerWidgetClass Select {
+       size 120 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       priority 3
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass SelectIcon {
+         clipchildren 0
+         inheritalpha 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:A"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass SelectText {
+         position 40 0
+         size 80 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "#layout_xbox_main_menu_toolbar_select"
+         font "gui/fonts/sdf_MetronLight24"
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+      GridSpacerWidgetClass Back {
+       size 86 1
+       halign right_ref
+       valign bottom_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       Padding 4
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 1
+       {
+        ImageWidgetClass BackIcon {
+         clipchildren 0
+         inheritalpha 0
+         size 36 36
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         scaled 1
+         image0 "set:xbox_buttons image:B"
+         mode blend
+         "src alpha" 1
+         "no wrap" 1
+         stretch 0
+         "flip u" 0
+         "flip v" 0
+         filter 1
+         nocache 0
+        }
+        TextWidgetClass BackText {
+         position 40 0
+         size 52 22
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "#layout_xbox_main_menu_toolbar_back"
+         font "gui/fonts/sdf_MetronLight24"
+         "text halign" center
+         "text valign" center
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+  PanelWidgetClass last_server_info {
+   visible 0
+   ignorepointer 1
+   color 0 0 0 1
+   position 0.26 130
+   size 400 90
+   halign right_ref
+   valign bottom_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 3
+   style rover_sim_colorable
+   "no focus" 1
+   {
+    TextWidgetClass last_server_info_label {
+     visible 1
+     inheritalpha 1
+     position 0 0
+     size 1 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     text "#layout_main_menu_last_server"
+     font "gui/fonts/sdf_MetronLight24"
+     "text offset" 10 0
+     "exact text" 1
+     "exact text size" 22
+     "size to text h" 0
+     "size to text v" 1
+     "text valign" center
+    }
+    TextWidgetClass last_server_info_ip {
+     visible 1
+     inheritalpha 1
+     position 0 30
+     size 1 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     font "gui/fonts/sdf_MetronLight24"
+     "text offset" 10 0
+     "exact text" 1
+     "exact text size" 22
+     "size to text h" 0
+     "size to text v" 1
+     "text valign" center
+    }
+    TextWidgetClass last_server_info_port {
+     visible 1
+     inheritalpha 1
+     position 0 60
+     size 1 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     font "gui/fonts/sdf_MetronLight24"
+     "text offset" 10 0
+     "exact text" 1
+     "exact text size" 22
+     "size to text h" 0
+     "size to text v" 1
+     "text valign" center
+    }
+   }
+  }
+  ImageWidgetClass vignette {
+   visible 1
+   ignorepointer 0
+   color 0 0 0 0.7843
+   size 1.6 0.9
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   fixaspect outside
+   priority 1
+   imageTexture "{E6B3EF816E067499}Gui/textures/inventory_bgvignette.edds"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
+   filter 0
+   nocache 1
+  }
+ }
+}

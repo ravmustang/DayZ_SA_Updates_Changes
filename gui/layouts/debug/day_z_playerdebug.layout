@@ -1,0 +1,623 @@
+FrameWidgetClass FrameWidget {
+ ignorepointer 1
+ position 0 0
+ size 1 1
+ priority 995
+ {
+  FrameWidgetClass PlayerDebugMainWnd {
+   visible 1
+   clipchildren 0
+   color 1 1 1 1
+   position 0 0
+   size 0.25 1
+   halign right_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 0
+   vexactsize 0
+   priority 50
+   {
+    ImageWidgetClass Background {
+     color 0 0 0 0.9882
+     position 0 0
+     size 1 1
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     imageTexture "{68AE58E5E99FB598}Enfusion/Gui/textures/left_pane_full_ca.edds"
+     mode blend
+     "src alpha" 1
+     stretch 1
+     {
+      EditBoxWidgetClass PlayerStatusV {
+       position 0.011 0.021
+       size 0.97693 0.01432
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Test"
+       font "gui/fonts/etelkatextpro"
+      }
+      TextWidgetClass PlayerStatusT {
+       position 0.008 0.002
+       size 0.97486 0.018
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Player Status"
+       font "gui/fonts/etelkatextpro"
+      }
+      ButtonWidgetClass Card0Button {
+       position 0.043 0.042
+       size 0.271 0.024
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Actions"
+      }
+      ButtonWidgetClass Card1Button {
+       position 0.321 0.042
+       size 0.367 0.024
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Weapons"
+      }
+      ButtonWidgetClass Card2Button {
+       position 0.69531 0.04191
+       size 0.26089 0.024
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       text "Ctrl"
+      }
+     }
+    }
+    FrameWidgetClass Card0 {
+     visible 0
+     clipchildren 0
+     color 0.1098 0.1098 1 1
+     position 0.02 0.06731
+     size 0.96 0.92269
+     halign left
+     valign top
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     priority 50
+     {
+      PanelWidgetClass Actions {
+       position 0.01654 0.00414
+       size 0.9767 0.73523
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad_dark
+       {
+        TextListboxWidgetClass ActionsSelector {
+         position 0.011 0.15219
+         size 0.977 0.73388
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         font "gui/fonts/etelkatextpro14"
+        }
+        TextWidgetClass ActionsText {
+         position 0.011 0.069
+         size 0.775 0.033
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Actions"
+        }
+        ButtonWidgetClass ActionsStart {
+         color 0.5765 0.5765 0.5765 1
+         position 0.02804 0.89102
+         size 0.1429 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Start"
+        }
+        ButtonWidgetClass ActionsCancel {
+         position 0.80184 0.89102
+         size 0.1851 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Cancel"
+        }
+        ButtonWidgetClass ActionsEnd {
+         color 0.5765 0.5765 0.5765 1
+         position 0.17646 0.89102
+         size 0.12134 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "End"
+        }
+        ButtonWidgetClass ActionsOTA {
+         color 0.5765 0.5765 0.5765 1
+         position 0.4426 0.89102
+         size 0.2219 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Action"
+        }
+        ButtonWidgetClass ActionsOTL {
+         color 0.5765 0.5765 0.5765 1
+         position 0.66498 0.89102
+         size 0.1283 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Loop"
+        }
+        ButtonWidgetClass ActionsEnd2 {
+         color 0.5765 0.5765 0.5765 1
+         position 0.30378 0.89102
+         size 0.1429 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "End2"
+        }
+        TextWidgetClass ActionStateV {
+         position 0.26101 0.93183
+         size 0.7101 0.025
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Test"
+        }
+        TextWidgetClass ActionStateT {
+         position 0.02901 0.9319
+         size 0.222 0.025
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "State:"
+        }
+        TextWidgetClass ActionGlobalStatus {
+         position 0.009 0.017
+         size 0.773 0.025
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Test"
+         font "gui/fonts/etelkatextpro14"
+        }
+        TextWidgetClass ActionEventV {
+         position 0.26344 0.96751
+         size 0.7039 0.025
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Test"
+        }
+        TextWidgetClass ActionEventT {
+         position 0.02901 0.9669
+         size 0.222 0.025
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Event:"
+        }
+        ButtonWidgetClass ActionsGroupLA {
+         color 0.5765 0.5765 0.5765 1
+         position 0.02804 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "LA"
+        }
+        ButtonWidgetClass ActionsGroupOA {
+         color 0.5765 0.5765 0.5765 1
+         position 0.14469 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "OA"
+        }
+        ButtonWidgetClass ActionsGroupFLA {
+         color 0.5765 0.5765 0.5765 1
+         position 0.26551 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "FLA"
+        }
+        ButtonWidgetClass ActionsGroupFOA {
+         color 0.5765 0.5765 0.5765 1
+         position 0.38216 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "FOA"
+        }
+        ButtonWidgetClass ActionsGroupLG {
+         color 0.5765 0.5765 0.5765 1
+         position 0.50297 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "LG"
+        }
+        ButtonWidgetClass ActionsGroupOG {
+         color 0.5765 0.5765 0.5765 1
+         position 0.61962 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "OG"
+        }
+        ButtonWidgetClass ActionsGroupFLG {
+         color 0.5765 0.5765 0.5765 1
+         position 0.74044 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "FLG"
+        }
+        ButtonWidgetClass ActionsGroupFOG {
+         color 0.5765 0.5765 0.5765 1
+         position 0.85709 0.12087
+         size 0.10541 0.0255
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         text "FOG"
+        }
+       }
+      }
+      PanelWidgetClass PlayerSync {
+       position 0.01962 0.74555
+       size 0.96858 0.091
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad_dark
+       {
+        TextWidgetClass PlayerSyncCap {
+         position 0.011 0.077
+         size 0.969 0.177
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Player Sync"
+         font "gui/fonts/etelkatextpro"
+        }
+        ButtonWidgetClass PlayerSyncCreate {
+         color 0.5765 0.5765 0.5765 1
+         position 0.021 0.299
+         size 0.469 0.16006
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Create Player Shadow"
+         font "gui/fonts/etelkatextpro"
+        }
+        ButtonWidgetClass PlayerSyncDelete {
+         color 0.5765 0.5765 0.5765 1
+         position 0.518 0.299
+         size 0.459 0.16006
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Delete Player Shadow"
+         font "gui/fonts/etelkatextpro"
+        }
+        ButtonWidgetClass PlayerServerWalk {
+         color 0.5765 0.5765 0.5765 1
+         position 0.021 0.47802
+         size 0.469 0.16006
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Server Walk"
+         font "gui/fonts/etelkatextpro"
+        }
+       }
+      }
+      PanelWidgetClass ItemAccess {
+       position 0.017 0.846
+       size 0.97323 0.147
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad_dark
+       {
+        TextWidgetClass ItemAccessTxt {
+         position 0.007 0.048
+         size 0.98167 0.11
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Item Accessor"
+         font "gui/fonts/etelkatextpro"
+        }
+        TextWidgetClass ItemAccessClass {
+         position 0.007 0.187
+         size 0.98167 0.10357
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Item Class"
+         font "gui/fonts/etelkatextpro"
+        }
+        TextWidgetClass ItemAccessSClass {
+         position 0.007 0.30447
+         size 0.98167 0.10357
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Item S Class"
+         font "gui/fonts/etelkatextpro"
+        }
+        TextWidgetClass ItemAccessInst {
+         position 0.007 0.41561
+         size 0.98167 0.10357
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Item Inst"
+         font "gui/fonts/etelkatextpro"
+        }
+       }
+      }
+     }
+    }
+    FrameWidgetClass Card1 {
+     visible 1
+     clipchildren 0
+     color 0.1098 0.1098 1 1
+     position 0.02 0.06717
+     size 0.96 0.92283
+     halign left
+     valign top
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     priority 50
+     {
+      PanelWidgetClass Weapons {
+       position 0.01654 0.00472
+       size 0.9767 0.73466
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad_dark
+       {
+        TextListboxWidgetClass WeapActionSelector {
+         position 0.011 0.00662
+         size 0.977 0.63366
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         style Default
+         font "gui/fonts/etelkatextpro14"
+        }
+        ButtonWidgetClass WeapActionStart {
+         color 0.5765 0.5765 0.5765 1
+         position 0.02804 0.65194
+         size 0.55248 0.02709
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Start"
+        }
+        TextWidgetClass WeapActionRunning {
+         position 0.02766 0.68554
+         size 0.94581 0.03012
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Actions"
+        }
+        TextWidgetClass WeapActionEvents {
+         position 0.02968 0.72007
+         size 0.94581 0.03012
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Actions"
+        }
+        EditBoxWidgetClass WeapInitStateI {
+         position 0.035 0.765
+         size 0.208 0.03
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "0"
+        }
+        ButtonWidgetClass WeapInitStateB {
+         color 0.5765 0.5765 0.5765 1
+         position 0.25306 0.76598
+         size 0.71585 0.02816
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Set Init State"
+        }
+        ButtonWidgetClass WeapChange {
+         color 0.5765 0.5765 0.5765 1
+         position 0.02306 0.81857
+         size 0.94585 0.02816
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Weapon Change (Show)"
+        }
+        TextWidgetClass TextWidget0 {
+         position 0.02294 0.85044
+         size 0.94575 0.02136
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "weapon change takes selected item from Developer Console"
+         font "gui/fonts/Metron12"
+        }
+        EditBoxWidgetClass WeaponChangeSlotH {
+         position 0.3186 0.92293
+         size 0.208 0.03
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "0"
+        }
+        EditBoxWidgetClass WeaponChangeSlotS {
+         position 0.31734 0.96167
+         size 0.208 0.03
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "0"
+        }
+        ButtonWidgetClass WeapHide {
+         color 0.5765 0.5765 0.5765 1
+         position 0.02306 0.88115
+         size 0.94585 0.02816
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Weapon Hide (change to empty hands)"
+        }
+        TextWidgetClass TextWidget1 {
+         position 18.0655 677.12897
+         size 114.737 21.1424
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "Hide Slot:"
+        }
+        TextWidgetClass TextWidget2 {
+         position 18.0655 703.17297
+         size 114.737 21.1424
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "Show Slot:"
+        }
+       }
+      }
+     }
+    }
+    FrameWidgetClass Card2 {
+     visible 0
+     clipchildren 0
+     color 0.1098 0.1098 1 1
+     position 0.02 0.06717
+     size 0.96 0.92283
+     halign left
+     valign top
+     hexactpos 0
+     vexactpos 0
+     hexactsize 0
+     vexactsize 0
+     priority 50
+     {
+      PanelWidgetClass Controls {
+       position 0.01654 0.00472
+       size 0.9767 0.73466
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 0
+       style editor_quad_dark
+       {
+        XComboBoxWidgetClass StanceV {
+         position 0.247 0.005
+         size 0.75 0.034
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         items "Unset;Erc;Crouch;Prone;ErcRaised;CrouchRaised;ProneRaised"
+        }
+        TextWidgetClass StanceT {
+         position 0.011 0.00791
+         size 0.227 0.02498
+         hexactpos 0
+         vexactpos 0
+         hexactsize 0
+         vexactsize 0
+         text "Stance:"
+        }
+       }
+      }
+     }
+    }
+   }
+  }
+ }
+}

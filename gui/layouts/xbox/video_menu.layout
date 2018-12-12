@@ -1,0 +1,162 @@
+PanelWidgetClass rootFrame {
+ ignorepointer 1
+ color 0 0 0 1
+ size 1 1
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 0
+ priority 952
+ style rover_sim_colorable
+ "no focus" 1
+ {
+  VideoWidgetClass video {
+   visible 1
+   ignorepointer 1
+   size 1.6 0.9
+   halign center_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   fixaspect inside
+   priority 10
+   "src alpha" 0
+   "no wrap" 1
+   stretch 1
+  }
+  WrapSpacerWidgetClass ConsoleToolbar {
+   visible 1
+   clipchildren 1
+   position 80 30
+   size 529.43604 36
+   halign right_ref
+   valign bottom_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 100
+   "no focus" 1
+   Padding 8
+   Margin 0
+   "Size To Content H" 1
+   "Size To Content V" 1
+   content_halign right
+   content_valign center
+   {
+    GridSpacerWidgetClass Back {
+     size 86 1
+     halign right_ref
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 0
+     Padding 4
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 2
+     Rows 1
+     {
+      ImageWidgetClass BackIcon {
+       clipchildren 0
+       inheritalpha 0
+       size 36 36
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       scaled 1
+       image0 "set:xbox_buttons image:B"
+       mode blend
+       "src alpha" 1
+       "no wrap" 1
+       stretch 0
+       "flip u" 0
+       "flip v" 0
+       filter 1
+       nocache 0
+      }
+      TextWidgetClass BackText {
+       position 40 0
+       size 56 22
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "#STR_rootFrame_ConsoleToolbar_Back_BackText0"
+       font "gui/fonts/sdf_MetronLight24"
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    GridSpacerWidgetClass PauseVideo {
+     visible 0
+     clipchildren 0
+     size 193 1
+     halign right_ref
+     valign bottom_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 0
+     priority 2
+     "no focus" 1
+     Padding 4
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     content_halign center
+     content_valign center
+     Columns 2
+     Rows 1
+     {
+      ImageWidgetClass PauseVideoIcon {
+       clipchildren 0
+       inheritalpha 0
+       position 0 0
+       size 36 36
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       scaled 1
+       image0 "set:xbox_buttons image:X"
+       mode blend
+       "src alpha" 1
+       "no wrap" 1
+       stretch 0
+       "flip u" 0
+       "flip v" 0
+       filter 1
+       nocache 0
+      }
+      TextWidgetClass PauseVideoText {
+       clipchildren 0
+       position 40 0
+       size 80 22
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       text "#STR_rootFrame_ConsoleToolbar_PauseVideo_PauseVideoText0"
+       font "gui/fonts/sdf_MetronLight24"
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+   }
+  }
+ }
+}

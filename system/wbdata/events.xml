@@ -1,0 +1,22 @@
+<events>
+	<event name = "OnDeath"/>
+	<event name = "AddDamageSphere">
+		<arg type = "float" default = "1.0"/>
+		<arg type = "float" default = "0.5"/>
+		<arg type = "string" default = "&quot;&quot;"/>
+	</event>
+	<event name = "AddNoise">
+		<arg type = "string" default = "&quot;&quot;"/>
+		<arg type = "string" default = "&quot;&quot;"/>
+	</event>
+	<event name = "AIAnimationEvent">
+		<arg type = "string" default = "&quot;&quot;"/>
+	</event>
+	<event name = "PlaySound">
+		<arg type = "string" default = "&quot;&quot;"/>
+	</event>
+	<event name = "Step">
+		<arg type = "string" default = "&quot;left&quot;"/>
+		<arg type = "string" default = "&quot;run&quot;"/>
+	</event>
+</events>

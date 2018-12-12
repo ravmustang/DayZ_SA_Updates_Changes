@@ -1,0 +1,164 @@
+ImageSetClass {
+ Name "playstation_buttons"
+ RefSize 256 256
+ Textures {
+  ImageSetTextureClass {
+   mpix 1
+   path "{1AA48F19AA1F2384}Gui/imagesets/playstation_buttons.edds"
+  }
+ }
+ Images {
+  ImageSetDefClass touch_pad {
+   Name "touch_pad"
+   Pos 2 9
+   Size 54 38
+   Flags 0
+  }
+  ImageSetDefClass options {
+   Name "options"
+   Pos 58 6
+   Size 42 40
+   Flags 0
+  }
+  ImageSetDefClass share {
+   Name "share"
+   Pos 109 6
+   Size 32 39
+   Flags 0
+  }
+  ImageSetDefClass L3 {
+   Name "L3"
+   Pos 153 8
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass R3 {
+   Name "R3"
+   Pos 205 8
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass L_up {
+   Name "L_up"
+   Pos 153 57
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass L_down {
+   Name "L_down"
+   Pos 153 107
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass L_right {
+   Name "L_right"
+   Pos 153 156
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass L_left {
+   Name "L_left"
+   Pos 153 206
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass R_up {
+   Name "R_up"
+   Pos 205 57
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass R_down {
+   Name "R_down"
+   Pos 205 107
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass R_right {
+   Name "R_right"
+   Pos 205 156
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass R_left {
+   Name "R_left"
+   Pos 205 206
+   Size 42 42
+   Flags 0
+  }
+  ImageSetDefClass R1 {
+   Name "R1"
+   Pos 9 60
+   Size 44 32
+   Flags 0
+  }
+  ImageSetDefClass L1 {
+   Name "L1"
+   Pos 8 112
+   Size 44 32
+   Flags 0
+  }
+  ImageSetDefClass R2 {
+   Name "R2"
+   Pos 9 154
+   Size 40 46
+   Flags 0
+  }
+  ImageSetDefClass L2 {
+   Name "L2"
+   Pos 10 206
+   Size 40 46
+   Flags 0
+  }
+  ImageSetDefClass cross {
+   Name "cross"
+   Pos 60 60
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass triangle {
+   Name "triangle"
+   Pos 60 109
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass circle {
+   Name "circle"
+   Pos 60 158
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass square {
+   Name "square"
+   Pos 60 208
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass DPAD_up {
+   Name "DPAD_up"
+   Pos 101 56
+   Size 44 44
+   Flags 0
+  }
+  ImageSetDefClass DPAD_down {
+   Name "DPAD_down"
+   Pos 101 106
+   Size 44 44
+   Flags 0
+  }
+  ImageSetDefClass DPAD_right {
+   Name "DPAD_right"
+   Pos 101 155
+   Size 44 44
+   Flags 0
+  }
+  ImageSetDefClass DPAD_left {
+   Name "DPAD_left"
+   Pos 101 205
+   Size 44 44
+   Flags 0
+  }
+ }
+ Groups {
+ }
+}
