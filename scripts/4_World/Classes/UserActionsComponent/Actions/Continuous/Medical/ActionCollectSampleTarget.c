@@ -36,7 +36,7 @@ class ActionCollectSampleTarget : ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#collect_sample";
+		return "#collect_persons_sample";
 	}
 
 	override void OnEndServer( ActionData action_data )
@@ -44,10 +44,16 @@ class ActionCollectSampleTarget : ActionContinuousBase
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		Param1<float> nacdata;
 		Class.CastTo(nacdata,  action_data.m_ActionComponent.GetACData() );
-		float delta = (nacdata.param1 / UATimeSpent.COLLECT_SAMPLE);
-
-		ActionCollectBloodTargetLambda lambda = new ActionCollectBloodTargetLambda(action_data.m_MainItem, "BloodSyringe", action_data.m_Player, m_SpecialtyWeight, ntarget, delta);
-		action_data.m_Player.ServerReplaceItemInHandsWithNew(lambda);
+		
+		float delta = 0;
+		if(nacdata)
+			delta = (nacdata.param1 / UATimeSpent.COLLECT_SAMPLE);
+		
+		if(delta > 0)
+		{
+			ActionCollectBloodTargetLambda lambda = new ActionCollectBloodTargetLambda(action_data.m_MainItem, "BloodSyringe", action_data.m_Player, m_SpecialtyWeight, ntarget, delta);
+			action_data.m_Player.ServerReplaceItemInHandsWithNew(lambda);
+		}
 	}
 };
 

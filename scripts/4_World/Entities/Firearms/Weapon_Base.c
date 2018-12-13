@@ -209,12 +209,12 @@ class Weapon_Base extends Weapon
 			SelectionMagazineHide();
 	}
 
-	override void OnStoreLoad (ParamsReadContext ctx)
+	override void OnStoreLoad (ParamsReadContext ctx, int version)
 	{
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 		if (m_fsm)
 		{
-			m_fsm.OnStoreLoad(ctx);
+			m_fsm.OnStoreLoad(ctx, version);
 		}
 		else
 		{

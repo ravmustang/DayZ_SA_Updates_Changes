@@ -211,6 +211,10 @@ class LOD
 		
 		return NULL;
 	}
+	
+	proto native int GetPropertyCount();
+	proto native string GetPropertyName(int index);
+	proto native string GetPropertyValue(int index);
 }
 
 class Plant extends Object
@@ -566,6 +570,8 @@ class Mission
 		return NULL;
 	}
 	
+	bool IsPlayerDisconnecting(Man player);
+	
 	UIScriptedMenu	CreateScriptedMenu( int id ) 
 	{ 
 		return NULL;
@@ -634,11 +640,17 @@ class MenuData: Managed
 	proto native int 	GetLastPlayedCharacter();
 	proto native Man 	CreateCharacterPerson(int index);
 	
+	proto void 			GetLastServerAddress(int index, out string address);
+	proto native int 	GetLastServerPort(int index);
+	
 	proto void 			GetCharacterName(int index, out string name);
 	proto native void 	SetCharacterName(int index, string newName);
+	// save character is set as last played character 
+	proto native void 	SaveCharacter(bool localPlayer, bool verified);
+	proto native void 	SaveDefaultCharacter(Man character);
 	
-	proto native void 	SaveCharacters();
-	proto native void 	LoadCharacters();
+	proto native void 	SaveCharactersLocal();
+	proto native void 	LoadCharactersLocal();
 	proto native void 	ClearCharacters();
 	
 	//proto native void	GetCharacterStringList(int characterID, string name, out TStringArray values);
@@ -881,7 +893,7 @@ proto native Hive GetHive();
 // -------------------------------------------------------------------------
 class UAInput
 {
-	proto native int Hash();	// return input hash
+	proto native int NameHash();	// return input hash
 
 	proto native int BindingCount();	// return binding count
 	proto native int Binding( int iIndex );	// return binding at index
@@ -896,6 +908,10 @@ class UAInput
 	proto native void SelectAlternative( int iIndex );		// select binding alternative by index
 	proto native int AlternativeCount();					// get currently assigned alternative count
 	proto native int AlternativeIndex();					// get currently selected alternative index
+
+
+	proto native int BindKeyCount(); // binded key count (for selected alternative)
+	proto native int GetBindKey( int iIndex ); // binded key at index (for selected alternative)
 
 	proto native float LocalValue();
 
@@ -914,6 +930,8 @@ class UAInput
 	proto native bool IsReleaseLimit();		// if limited to RELEASE
 	proto native bool IsHoldLimit();		// if limited to HOLD
 	proto native bool IsDoubleClickLimit();	// if limited to DOUBLE CLICK
+
+	proto native bool HasSorting( int iIndex );		// has sorting group index?
 
 	proto native bool IsLocked();			// determine if locked (not active ATM)
 	proto native void Lock();				// lock (until unlock called or exclusion is selected)
@@ -935,6 +953,9 @@ class UAInputAPI
 	proto native UAInput GetInputByName( string sInputName );
 
 	proto native string GetButtonName( int iHash );	// get localized name for any button hash
+
+	proto native int ModificatorCount();	// modificator count
+	proto native string GetModificatorName( int index );	// modificator name
 	
 	// for options only mapping, do not call normally as it is not performance wise!
 	proto native int DeterminePressedButton();	// recently pressed key, mouse button or pad button (returns zero if nothing pressed)
@@ -963,6 +984,9 @@ class UAInputAPI
 	proto native void PresetSelect( int index ); // select specific preset
 	proto native int PresetCount(); // count of presets
 	proto native string PresetName( int index ); // name of selected preset
+
+	proto native int SortingCount();				// sorting group count
+	proto native string SortingName( int index );	// sorting group name
 
 	proto native void Export();	// export XML (user) configuration
 };

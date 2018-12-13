@@ -243,7 +243,7 @@ class RecipeBase
 
 				if( use_soft_skills ) 
 				{
-					value_delta = player.m_SoftSkillsManager.AddSpecialtyBonus(value_delta, m_Specialty);
+					value_delta = player.GetSoftSkillsManager().AddSpecialtyBonus(value_delta, m_Specialty);
 				}
 				
 				if( !resIb.IsMagazine() )//is not a magazine
@@ -275,7 +275,7 @@ class RecipeBase
 				value_delta = m_ResultSetHealth[i];
 				if( use_soft_skills ) 
 				{
-					value_delta = player.m_SoftSkillsManager.AddSpecialtyBonus(value_delta, m_Specialty);
+					value_delta = player.GetSoftSkillsManager().AddSpecialtyBonus(value_delta, m_Specialty);
 				}
 				res.SetHealth("","",value_delta);
 			}
@@ -351,8 +351,8 @@ class RecipeBase
 					float health_delta = m_IngredientAddHealth[i];
 					if( use_soft_skills ) 
 					{
-						if(health_delta <0) health_delta = player.m_SoftSkillsManager.SubtractSpecialtyBonus(health_delta, m_Specialty);
-						else 				health_delta = player.m_SoftSkillsManager.AddSpecialtyBonus(health_delta, m_Specialty);
+						if(health_delta <0) health_delta = player.GetSoftSkillsManager().SubtractSpecialtyBonus(health_delta, m_Specialty);
+						else 				health_delta = player.GetSoftSkillsManager().AddSpecialtyBonus(health_delta, m_Specialty);
 					}
 					ingredient.AddHealth("","",health_delta);
 				}
@@ -367,8 +367,8 @@ class RecipeBase
 					
 					if(	use_soft_skills )
 					{
-						if(quantity_delta <0) quantity_delta = player.m_SoftSkillsManager.SubtractSpecialtyBonus(quantity_delta, m_Specialty);
-						else 				quantity_delta = player.m_SoftSkillsManager.AddSpecialtyBonus(quantity_delta, m_Specialty);
+						if(quantity_delta <0) quantity_delta = player.GetSoftSkillsManager().SubtractSpecialtyBonus(quantity_delta, m_Specialty);
+						else 				quantity_delta = player.GetSoftSkillsManager().AddSpecialtyBonus(quantity_delta, m_Specialty);
 					}
 						
 					if( !ingredient.IsMagazine() )
@@ -533,7 +533,7 @@ class RecipeBase
 
 	void ApplySoftSkillsSpecialty(PlayerBase player)
 	{
-		player.GetSoftSkillManager().AddSpecialty(m_Specialty);
+		player.GetSoftSkillsManager().AddSpecialty(m_Specialty);
 	}	
 	
 	bool CanDo(ItemBase ingredients[], PlayerBase player)

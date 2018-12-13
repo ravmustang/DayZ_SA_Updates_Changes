@@ -31,7 +31,7 @@ class ActionUnlockDoors: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#unlock_door";
+		return "#unlock";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

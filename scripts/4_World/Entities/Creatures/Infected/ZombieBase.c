@@ -11,6 +11,8 @@ class ZombieBase extends DayZInfected
 	protected int m_MindState = -1;
 	protected float m_MovementSpeed = -1;
 	
+	protected vector m_DefaultHitPosition;
+	
 	protected ref AbstractWave				m_LastSoundVoiceAW;
 	protected ref InfectedSoundEventHandler	m_InfectedSoundEventHandler;
 
@@ -26,6 +28,9 @@ class ZombieBase extends DayZInfected
 		
 		RegisterNetSyncVariableInt("m_MindState", -1, 4);
 		RegisterNetSyncVariableFloat("m_MovementSpeed", -1, 3);
+		
+		//! sets default hit position and cache it here (mainly for impact particles)
+		m_DefaultHitPosition = SetDefaultHitPosition(GetDayZInfectedType().GetDefaultHitPositionComponent());
 
 		//! client only
 		if( !GetGame().IsMultiplayer() || GetGame().IsClient() )
@@ -101,6 +106,16 @@ class ZombieBase extends DayZInfected
 	override string GetDefaultHitComponent()
 	{
 		return GetDayZInfectedType().GetDefaultHitComponent();
+	}
+
+	override vector GetDefaultHitPosition()
+	{
+		return m_DefaultHitPosition;
+	}
+	
+	protected vector SetDefaultHitPosition(string pSelection)
+	{
+		return GetSelectionPosition(pSelection);
 	}
 
 	//-------------------------------------------------------------
@@ -220,7 +235,7 @@ class ZombieBase extends DayZInfected
 		{
 			vector impulse = 80 * m_TransportHitVelocity;
 			impulse[1] = 80 * 1.5;
-			Print("Impulse: " + impulse.ToString());
+			//Print("Impulse: " + impulse.ToString());
 			
 			dBodyApplyImpulse(this, impulse);
 		}
@@ -467,6 +482,7 @@ class ZombieBase extends DayZInfected
 				{
 					bool playerInBlockStance = false;
 					vector targetPos = m_ActualTarget.GetPosition();
+					vector hitPosWS = targetPos;
 
 					PlayerBase playerTarget = PlayerBase.Cast(m_ActualTarget);
 					if( playerTarget )
@@ -482,20 +498,23 @@ class ZombieBase extends DayZInfected
 							//! infected is playing heavy attack - decrease the dmg to light
 							if( m_ActualAttackType.m_IsHeavy != 0 )
 							{
-								DamageSystem.CloseCombatDamageName(this, m_ActualTarget, m_ActualTarget.GetHitComponentForAI(), "MeleeZombie", targetPos);
+								hitPosWS = m_ActualTarget.ModelToWorld(m_ActualTarget.GetDefaultHitPosition()); //! override hit pos by pos defined in type
+								DamageSystem.CloseCombatDamageName(this, m_ActualTarget, m_ActualTarget.GetHitComponentForAI(), "MeleeZombie", hitPosWS);
 							}
 							else
 							{
-								//! infected is playing light attach - do not send damage, play animation instead
+								//! infected is playing light attack - do not send damage, play animation instead
 								if( GetGame().IsServer() && m_ActualTarget )
 								{
-									m_ActualTarget.EEHitBy(null, 0, EntityAI.Cast(this), -1, m_ActualTarget.GetDefaultHitComponent(), "Dummy_Light", vector.Zero);
+									hitPosWS = m_ActualTarget.GetDefaultHitPosition(); //! override hit pos by pos defined in type
+									m_ActualTarget.EEHitBy(null, 0, EntityAI.Cast(this), -1, m_ActualTarget.GetDefaultHitComponent(), "Dummy_Light", hitPosWS);
 								}
 							}
 						}
 						else
 						{
-							DamageSystem.CloseCombatDamageName(this, m_ActualTarget, m_ActualTarget.GetHitComponentForAI(), m_ActualAttackType.m_AmmoType, targetPos);
+							hitPosWS = m_ActualTarget.ModelToWorld(m_ActualTarget.GetDefaultHitPosition()); //! override hit pos by pos defined in type
+							DamageSystem.CloseCombatDamageName(this, m_ActualTarget, m_ActualTarget.GetHitComponentForAI(), m_ActualAttackType.m_AmmoType, hitPosWS);
 						}
 					}
 				}
@@ -658,6 +677,12 @@ class ZombieBase extends DayZInfected
 		
 	bool HandleDamageHit(int pCurrentCommandID)
 	{
+		if( pCurrentCommandID == DayZInfectedConstants.COMMANDID_HIT )
+		{
+			m_DamageHitToProcess = false;
+			return true;
+		}
+		
 		if( m_DamageHitToProcess )
 		{
 			StartCommand_Hit(m_DamageHitHeavy, m_DamageHitType, m_DamageHitDirection);
@@ -666,7 +691,7 @@ class ZombieBase extends DayZInfected
 			return true;
 		}
 
-		return pCurrentCommandID == DayZInfectedConstants.COMMANDID_HIT;
+		return false;
 	}
 
 	//! selects animation type and direction based on damage system data

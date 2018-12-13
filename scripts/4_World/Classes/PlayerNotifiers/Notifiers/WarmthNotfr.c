@@ -1,9 +1,9 @@
 class WarmthNotfr: NotifierBase
 {
-	private const float 	DEC_TRESHOLD_LOW 			= -0.001;
+	private const float 	DEC_TRESHOLD_LOW 			= 0;
 	private const float 	DEC_TRESHOLD_MED 			= -0.2;
 	private const float 	DEC_TRESHOLD_HIGH			= -0.3;
-	private const float 	INC_TRESHOLD_LOW 			= 0.001;
+	private const float 	INC_TRESHOLD_LOW 			= 0;
 	private const float 	INC_TRESHOLD_MED 			= 0.2;
 	private const float 	INC_TRESHOLD_HIGH			= 0.3;
 		

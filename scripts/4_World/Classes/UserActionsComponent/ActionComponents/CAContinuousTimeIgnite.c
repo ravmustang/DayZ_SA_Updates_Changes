@@ -31,7 +31,7 @@ class CAContinuousTimeIgnite : CAContinuousBase
 		
 		m_IgniteFireplaceAction = ActionIgniteFireplace.Cast( m_Action );
 		
-		m_AdjustedTimeToComplete = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_DefaultTimeToComplete, m_Action.GetSpecialtyWeight(), true);
+		m_AdjustedTimeToComplete = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( m_DefaultTimeToComplete, m_Action.GetSpecialtyWeight(), true);
 	}
 	
 	override int Execute( ActionData action_data )

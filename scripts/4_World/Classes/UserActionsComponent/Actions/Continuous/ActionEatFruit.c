@@ -2,7 +2,7 @@ class ActionEatFruitCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousQuantityEdible(UAQuantityConsumed.EAT_NORMAL,UATimeSpent.DEFAULT);
+		m_ActionData.m_ActionComponent = new CAContinuousQuantityEdible(UAQuantityConsumed.EAT_SMALL,UATimeSpent.DEFAULT);
 	}
 };
 
@@ -19,7 +19,7 @@ class ActionEatFruit: ActionEat
 	{
 		return AT_EAT_FRUIT;
 	}
-			
+		
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
 		Edible_Base food_item = Edible_Base.Cast( item );

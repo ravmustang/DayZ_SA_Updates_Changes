@@ -57,6 +57,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	void ServerBrowserTab( Widget parent, ServerBrowserMenuNew menu, TabType type )
 	{
+		Construct(parent, menu, type);
+	}
+	
+	protected void Construct( Widget parent, ServerBrowserMenuNew menu, TabType type )
+	{
 		#ifdef PLATFORM_CONSOLE
 			m_Root					= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/xbox/server_browser_tab.layout", parent );
 		#else
@@ -448,10 +453,17 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_FiltersChanged.Show( true );
 	}
 	
+	void ResetFilters()
+	{
+		m_Filters.ResetFilters();
+		ApplyFilters();
+	}
+	
 	void ApplyFilters()
 	{
 		m_Filters.SaveFilters();
 		m_FiltersChanged.Show( false );
+		m_CurrentFilterInput = m_Filters.GetFilterOptions();		
 		RefreshList();
 	}
 	
@@ -470,7 +482,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_EntryWidgets.Clear();
 		
 		#ifdef PLATFORM_WINDOWS
-		if( !m_CurrentFilterInput )
+		//if( !m_CurrentFilterInput )
 		#endif
 			m_CurrentFilterInput = m_Filters.GetFilterOptions();
 		
@@ -530,7 +542,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	}
 	
 	void OnLoadServersAsyncPC( ref GetServersResult result_list, EBiosError error, string response )
-	{
+	{		
 		if( result_list )
 		{
 			if( result_list.m_Results.Count() > 0 )
@@ -540,6 +552,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 					if( PassFilter( result ) )
 					{
 						ref ServerBrowserEntry entry = new ServerBrowserEntry( null, m_TotalLoadedServers, this );
+						
 						entry.FillInfo( result );
 						entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
 						m_EntryWidgets.Insert( result.m_Id, entry );
@@ -659,6 +672,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			{
 				if( PassFilter( result ) )
 				{
+					Print("ServerBrowserEntry -> LoadEntries");
 					ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
 					entry.FillInfo( result );
 					entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
@@ -700,11 +714,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 			m_Menu.SetRefreshing( TabType.NONE );
 		}
-	}
-	
-	void Update( float timeslice )
-	{
-		//m_ServerList.Update();
 	}
 	
 	void Connect( ServerBrowserEntry server )
@@ -942,6 +951,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				}
 			}
 		}
+		
+		
 	}
 	
 	void Sort( array<ref GetServersResultRow> entries, int low, int high )
@@ -1102,18 +1113,25 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			button.SetTextColor( ARGB( 255, 255, 0, 0 ) );
 		}
 		
-		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
-		TextWidget text2	= TextWidget.Cast(w.FindWidget( w.GetName() + "_text_1" ) );
-		ImageWidget image	= ImageWidget.Cast( w.FindWidget( w.GetName() + "_image" ) );
+		TextWidget text1	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
+		TextWidget text3	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
+		ImageWidget image	= ImageWidget.Cast( w.FindAnyWidget( w.GetName() + "_image" ) );
 		
-		if( text )
+		if( text1 )
 		{
-			text.SetColor( ARGB( 255, 255, 0, 0 ) );
+			text1.SetColor( ARGB( 255, 255, 0, 0 ) );
 		}
 		
 		if( text2 )
 		{
 			text2.SetColor( ARGB( 255, 255, 0, 0 ) );
+		}
+		
+		if( text3 )
+		{
+			text3.SetColor( ARGB( 255, 255, 0, 0 ) );
+			w.SetAlpha(1);
 		}
 		
 		if( image )
@@ -1130,18 +1148,25 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
 		}
 		
-		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
-		TextWidget text2	= TextWidget.Cast(w.FindWidget( w.GetName() + "_text_1" ) );
-		ImageWidget image	= ImageWidget.Cast( w.FindWidget( w.GetName() + "_image" ) );
+		TextWidget text1	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
+		TextWidget text3	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
+		ImageWidget image	= ImageWidget.Cast( w.FindAnyWidget( w.GetName() + "_image" ) );
 		
-		if( text )
+		if( text1 )
 		{
-			text.SetColor( ARGB( 255, 255, 255, 255 ) );
+			text1.SetColor( ARGB( 255, 255, 255, 255 ) );
 		}
 		
 		if( text2 )
 		{
 			text2.SetColor( ARGB( 255, 255, 255, 255 ) );
+		}
+		
+		if( text3 )
+		{
+			text3.SetColor( ARGB( 255, 255, 255, 255 ) );
+			w.SetAlpha(0);
 		}
 		
 		if( image )

@@ -49,6 +49,8 @@ class HandStartAction extends HandStateBase
 	{
 		super.OnExit(e);
 	}
+	
+	override bool IsIdle () { return false; }
 };
 
 

@@ -18,7 +18,7 @@ class SymptomBase
 	SymptomManager m_Manager;
 	bool m_SyncToClient = false;
 	float m_Duration;
-	bool m_QuitAnimOnSymptomDestroy = true;
+	bool m_AnimPlayRequested;
 
 	SymptomCB m_AnimCallback;
 	
@@ -30,10 +30,6 @@ class SymptomBase
 	
 	void ~SymptomBase()
 	{
-		if( m_QuitAnimOnSymptomDestroy && m_AnimCallback ) 
-		{
-			m_AnimCallback.Cancel();
-		}
 		OnDestructed();
 	}
 
@@ -54,6 +50,16 @@ class SymptomBase
 	{
 		
 		
+	}
+	
+	bool CanBeInterupted()
+	{
+		if(m_AnimPlayRequested) 
+		{
+			//Print("--------- preventing interrupt ---------");
+			return false;
+		}
+		return true;
 	}
 	
 	bool IsClientOnly()
@@ -204,25 +210,18 @@ class SymptomBase
 		CheckDestroy();
 	}
 	
-	void PlayAnimation(int animation, int stance_mask, float running_time = -1, bool destroy_on_finish = true)
+	void PlayAnimationFB(int animation, int stance_mask, float running_time = -1, bool destroy_on_finish = true)
 	{
-		DayZPlayerSyncJunctures.SendPlayerSymptomAnim(m_Player, animation, GetUID() , stance_mask, running_time );
-		/*
-		m_AnimCallback = GetPlayer().StartCommand_Action(animation, SymptomCB, DayZPlayerConstants.STANCEMASK_CROUCH);
-		m_AnimCallback.Init(this, running_time);
-		*/
+		DayZPlayerSyncJunctures.SendPlayerSymptomFB(m_Player, animation, GetType() , stance_mask, running_time );
+		m_AnimPlayRequested = true;
 	}
-	/*
-	void PlaySound(string sound, bool destroy_on_finish = true)
-	{
-		//m_SoundObject = GetGame().CreateSoundOnObject(GetPlayer(), sound, 0, false);
-		m_SoundObject = GetPlayer().PlaySound( sound, 0);
-		
-		PrintString("sample length:" + m_SoundObject.GetSoundLength().ToString() );
-		m_PlayedSound = true;
-	}
-	*/
 	
+	void PlayAnimationADD(int type, bool destroy_on_finish = true)
+	{
+		DayZPlayerSyncJunctures.SendPlayerSymptomADD(m_Player, type, GetType());
+		m_AnimPlayRequested = true;
+	}
+		
 	void PlaySound(EPlayerSoundEventID id, bool destroy_on_finish = true)
 	{
 		GetPlayer().RequestSoundEvent(id);
@@ -253,10 +252,16 @@ class SymptomBase
 			RequestDestroy();	
 		}
 	}
+	
 	void CheckDestroy()
 	{
 		CheckSoundFinished();
 		if (m_DestroyRequested) Destroy();
+	}
+	
+	SmptAnimMetaBase SpawnAnimMetaObject()
+	{
+		return null;
 	}
 	
 
@@ -272,10 +277,23 @@ class SymptomBase
 	}
 	
 	//!gets called upon animation Symptom exit
-	void OnAnimationFinish()
+	void AnimationFinish()
 	{
+		//Print("*********** OnAnimationFinish ************");
 		if( m_DestroyOnAnimFinish ) RequestDestroy();
+		OnAnimationFinish();
 	}
+	
+	void AnimationPlayFailed()
+	{
+		OnAnimationPlayFailed();
+		AnimationFinish();
+	}
+	
+	protected void OnAnimationFinish();
+	protected void OnAnimationPlayFailed();
+
+	
 	//!this is just for the Symptom parameters set-up and is called even if the Symptom doesn't execute, don't put any gameplay code in here
 	void OnInit(){}
 	

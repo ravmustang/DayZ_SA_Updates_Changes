@@ -18,7 +18,7 @@ class ActionAttachMetalWire: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#attach_metal_wire";
+		return "#attach";
 	}
 	
 	override ActionData CreateActionData()

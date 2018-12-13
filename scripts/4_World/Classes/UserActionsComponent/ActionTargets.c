@@ -256,11 +256,13 @@ class ActionTargets
 		if ( object && (object.IsBuilding() || object.IsTransport() || object.IsStaticTransmitter()) ) return false;
 		if ( object && (object.IsTree() || object.IsBush())) return false;
 		if ( object && (object.IsInherited(BaseBuildingBase) || object.IsInherited(FenceKit) || object.IsInherited(WatchtowerKit)) ) return false; // base building objects
+		if ( object && object.IsInherited(PlantBase) ) return false;
+		if ( object && object.IsInherited(GardenPlot) ) return false; // TO DO: Add GardenBase here
 
 		if ( object )
 		{
 			//! quick distance check
-			if (vector.DistanceSq(m_Player.GetPosition(), object.GetPosition()) > c_MaxTargetDistance * c_MaxTargetDistance)
+			if (vector.DistanceSq(m_Player.GetPosition(), object.GetPosition()) > c_MaxActionDistance * c_MaxActionDistance)
 				return true;
 
 			// use CE_CENTER mem point for obstruction check
@@ -428,7 +430,7 @@ class ActionTargets
 					m_VicinityObjects.Remove(object);
 					numObstructed++;
 				}
-			}		
+			}
 		}
 	}
 
@@ -599,8 +601,9 @@ class ActionTargets
 		for ( int it = 0; it < shapesArr.Count(); ++it )
 		{
 			Debug.RemoveShape( shapesArr[it] );
-			shapesArr.Remove(it);
 		}
+		
+		shapesArr.Clear();
 	}
 #endif
 	
@@ -628,6 +631,7 @@ class ActionTargets
 	//! searching properties
 	private const float c_RayDistance = 5.0;
 	private const float c_MaxTargetDistance = 3.0;
+	private const float c_MaxActionDistance = UAMaxDistances.DEFAULT;
 	private const float c_ConeAngle = 30.0;
 	private const float c_ConeHeightMin = -0.5;
 	private const float c_ConeHeightMax = 2.0;

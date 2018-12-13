@@ -48,6 +48,9 @@ class HandAnimatedSwapping extends HandStateBase
 
 	ref HandStartHidingAnimated m_Hide;
 	ref HandSwappingAnimated_Show m_Show;
+	
+	ref InventoryLocation m_ilOldEntity;
+	ref InventoryLocation m_ilNewEntity;
 
 	void HandAnimatedSwapping (Man player = NULL, HandStateBase parent = NULL)
 	{
@@ -80,6 +83,17 @@ class HandAnimatedSwapping extends HandStateBase
 
 			m_Hide.m_ActionType = es.m_AnimationID;
 			m_Show.m_ActionType = es.m_Animation2ID;
+			
+			if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+			{
+				m_ilOldEntity = new InventoryLocation;
+				m_OldEntity.GetInventory().GetCurrentInventoryLocation(m_ilOldEntity);
+				m_ilNewEntity = new InventoryLocation;
+				m_NewEntity.GetInventory().GetCurrentInventoryLocation(m_ilNewEntity);
+			
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_OldEntity, m_ilOldEntity, 3000);
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_NewEntity, m_ilNewEntity, 3000);
+			}
 		}
 
 		super.OnEntry(e); // @NOTE: super at the end (prevent override from submachine start)
@@ -87,6 +101,15 @@ class HandAnimatedSwapping extends HandStateBase
 
 	override void OnAbort (HandEventBase e)
 	{
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_OldEntity, m_ilOldEntity);
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_NewEntity, m_ilNewEntity);
+			
+			m_ilOldEntity = null;
+			m_ilNewEntity = null;
+		}
+		
 		m_OldEntity = null;
 		m_NewEntity = null;
 
@@ -95,6 +118,15 @@ class HandAnimatedSwapping extends HandStateBase
 
 	override void OnExit (HandEventBase e)
 	{
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_OldEntity, m_ilOldEntity);
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_NewEntity, m_ilNewEntity);
+			
+			m_ilOldEntity = null;
+			m_ilNewEntity = null;
+		}
+		
 		m_OldEntity = null;
 		m_NewEntity = null;
 

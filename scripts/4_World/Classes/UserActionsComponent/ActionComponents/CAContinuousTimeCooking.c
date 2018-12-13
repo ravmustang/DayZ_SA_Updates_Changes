@@ -40,8 +40,8 @@ class CAContinuousTimeCooking : CAContinuousBase
 		m_TimeElapsed = m_ItemToCook.GetFoodStage().GetCookingTime();
 		
 		//SoftSkill implementation to hasten Cooking
-		m_AdjustedCookingUpdateTime = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_CookingUpdateTime, m_Action.GetSpecialtyWeight(), true);
-		m_AdjustedTimeToCook = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_TimeToCook, m_Action.GetSpecialtyWeight(), true);
+		m_AdjustedCookingUpdateTime = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( m_CookingUpdateTime, m_Action.GetSpecialtyWeight(), true);
+		m_AdjustedTimeToCook = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( m_TimeToCook, m_Action.GetSpecialtyWeight(), true);
 	}
 	
 	override int Execute( ActionData action_data )
@@ -69,7 +69,7 @@ class CAContinuousTimeCooking : CAContinuousBase
 					
 					if ( GetGame().IsServer() )
 					{
-						action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_Action.GetSpecialtyWeight() );
+						action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_Action.GetSpecialtyWeight() );
 					}
 				}
 				

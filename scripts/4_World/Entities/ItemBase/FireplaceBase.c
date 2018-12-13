@@ -202,6 +202,7 @@ class FireplaceBase extends ItemBase
 		RegisterNetSyncVariableBool( "m_HasAshes" );
 		RegisterNetSyncVariableBool( "m_IsOven" );
 		RegisterNetSyncVariableInt( "m_FireState", FireplaceFireState.NO_FIRE, FireplaceFireState.COUNT );
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
 	override void EEInit()
@@ -209,14 +210,14 @@ class FireplaceBase extends ItemBase
 		super.EEInit();
 		
 		//refresh visual on init
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
+		RefreshFireplaceVisuals();
 	}	
 	
 	override void OnItemLocationChanged( EntityAI old_owner, EntityAI new_owner ) 
 	{
 		super.OnItemLocationChanged( old_owner, new_owner );
 		
-		//refresh visuals after location change
+		//refresh physics after location change (with delay)
 		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplacePhysics );
 	}	
 	
@@ -245,9 +246,9 @@ class FireplaceBase extends ItemBase
 		ctx.Write( IsBurning() );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 
 		//Load ashes state
 		bool has_ashes = false;
@@ -288,7 +289,7 @@ class FireplaceBase extends ItemBase
 			if ( GetGame().IsMultiplayer() )
 			{
 				//Refresh visuals (on server)
-				GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
+				RefreshFireplaceVisuals();
 			}
 		}
 	}
@@ -298,8 +299,13 @@ class FireplaceBase extends ItemBase
 		super.OnVariablesSynchronized();
 
 		//Refresh client particles and audio
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireParticlesAndSounds, false );
+		RefreshFireplaceVisuals();
+		RefreshFireParticlesAndSounds( false );
+				
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
 	}
 	
 	//================================================================
@@ -473,7 +479,7 @@ class FireplaceBase extends ItemBase
 			SetAnimationPhase( ANIMATION_TRIPOD, 1 );
 		}
 		
-		//refresh physics
+		//refresh physics (with delay)
 		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplacePhysics );
 	}
 
@@ -501,7 +507,7 @@ class FireplaceBase extends ItemBase
 		}		
 	}
 	
-	protected void RefreshFireParticlesAndSounds( bool force_refresh = false )
+	protected void RefreshFireParticlesAndSounds( bool force_refresh )
 	{
 		FireplaceFireState fire_state = GetFireState();
 		
@@ -979,7 +985,7 @@ class FireplaceBase extends ItemBase
 		}
 		
 		//refresh visual
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( RefreshFireplaceVisuals );
+		RefreshFireplaceVisuals();
 
 		return m_ItemToConsume;
 	}
@@ -2063,5 +2069,33 @@ class FireplaceBase extends ItemBase
 	bool CanExtinguishFire()
 	{
 		return IsBurning();
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		PlayerBase player_base = PlayerBase.Cast( player );
+		vector position = player_base.GetLocalProjectionPosition();
+		vector orientation = player_base.GetLocalProjectionOrientation();
+		
+		if ( GetGame().IsMultiplayer()  &&  GetGame().IsServer() || !GetGame().IsMultiplayer() )
+		{
+			//remove grass
+			Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , position );
+			cc_object.SetOrientation ( orientation );
+			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( GetGame().ObjectDelete, 1000, false, cc_object );
+		}
+		
+		SetIsPlaceSound( true );
+	}
+	
+	override string GetPlaceSoundset()
+	{
+		return "placeFireplace_SoundSet";
 	}
 }

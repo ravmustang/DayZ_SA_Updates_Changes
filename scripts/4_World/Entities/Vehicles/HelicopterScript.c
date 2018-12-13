@@ -5,12 +5,6 @@ class HelicopterScript extends HelicopterAuto
 {
 	void HelicopterScript()
 	{
-		Init();
-	}
-	
-	override void Init()
-	{
-		super.Init();
 		SetEventMask(EntityEvent.POSTSIMULATE);
 	}
 

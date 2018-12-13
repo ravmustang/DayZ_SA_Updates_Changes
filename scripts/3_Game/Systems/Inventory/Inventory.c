@@ -253,7 +253,7 @@ class GameInventory
 	 * @brief	test if the entity contained in inv_loc.m_item can be added to ground/attachment/cargo/hands/...
 	 * @return true if can be added, false otherwise
 	 **/
-	static proto native bool LocationTestAddEntity (notnull InventoryLocation inv_loc, bool do_resevation_check, bool do_item_check, bool do_occupancy_test, bool do_script_check);
+	static proto native bool LocationTestAddEntity (notnull InventoryLocation inv_loc, bool do_resevation_check, bool do_item_check, bool do_lock_check, bool do_occupancy_test, bool do_script_check);
 	/**
 	 * @fn		LocationCanRemoveEntity
 	 * @brief	queries if the entity contained in inv_loc.m_item can be removed from ground/attachment/cargo/hands/...
@@ -340,10 +340,6 @@ class GameInventory
 				InventoryLocation src1, src2, dst1, dst2;
 				if (GameInventory.MakeSrcAndDstForSwap(item1, item2, src1, src2, dst1, dst2))
 				{
-					dst1.Copy(src1);
-					dst1.CopyLocationFrom(src2);
-					dst2.Copy(src2);
-					dst2.CopyLocationFrom(src1);
 					syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand Swap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString() + "dst2=" + dst2.DumpToString());
 
 					LocationSwap(src1, src2, dst1, dst2);
@@ -355,7 +351,29 @@ class GameInventory
 
 			case InventoryCommandType.FORCESWAP:
 			{
-				Error("[syncinv] ForceSwap TODO");
+				Error("[syncinv] I.ForceSwap TODO");
+				/*EntityAI item1, item2;
+				ctx.Read(item1);
+				ctx.Read(item2);
+				InventoryLocation user_dst2 = new InventoryLocation;
+				user_dst2.ReadFromContext(ctx);
+				
+				if (!item1 || !item2 || !(user_dst2 && user_dst2.IsValid()))
+				{
+					Error("[syncinv] ServerInventoryCommand (cmd=FORCESWAP) dropped, item not in bubble");
+					break; // not in bubble
+				}
+
+				InventoryLocation src1, src2, dst1;
+				if (GameInventory.MakeSrcAndDstForForceSwap(item1, item2, src1, src2, dst1, user_dst2))
+				{
+					syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand Swap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString() + "dst2=" + dst2.DumpToString());
+
+					LocationSwap(src1, src2, dst1, user_dst2);
+				}
+				else
+					Error("ServerInventoryCommand MakeSrcAndDstForSwap - no inv loc");
+*/
 				break;
 			}
 		}
@@ -494,7 +512,7 @@ class GameInventory
 	void Init () { }
 
 	/// db load hooks
-	void OnStoreLoad (ParamsReadContext ctx) { }
+	void OnStoreLoad (ParamsReadContext ctx, int version) { }
 	void OnAfterStoreLoad () { }
 	/// db store hook
 	void OnStoreSave (ParamsWriteContext ctx) { }
@@ -843,12 +861,34 @@ class GameInventory
 		return false;
 	}
 
+	/// helper function for ForceSwap
+	static bool MakeSrcAndDstForForceSwap (notnull EntityAI item1, notnull EntityAI item2, out ref InventoryLocation src1, out ref InventoryLocation src2, out ref InventoryLocation dst1, notnull InventoryLocation dst2)
+	{
+		if (src1 == null)
+			src1 = new InventoryLocation;
+		if (src2 == null)
+			src2 = new InventoryLocation;
+		if (item1.GetInventory().GetCurrentInventoryLocation(src1) && item2.GetInventory().GetCurrentInventoryLocation(src2))
+		{
+			// src1 -> dst_of(src2)
+			if (dst1 == null)
+				dst1 = new InventoryLocation;
+			dst1.Copy(src1);
+			dst1.CopyLocationFrom(src2);
+
+			// src2 -> dst2 from user
+			return true;
+		}
+
+		return false;
+	}
+
 	bool SwapEntities (InventoryMode mode, notnull EntityAI item1, notnull EntityAI item2)
 	{
 		InventoryLocation src1, src2, dst1, dst2;
 		if (GameInventory.MakeSrcAndDstForSwap(item1, item2, src1, src2, dst1, dst2))
 		{
-			Print("[inv] I::Swap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString() + "dst2=" + dst2.DumpToString());
+			Print("[inv] I::Swap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + src1.DumpToString() + " --> dst1=" + dst1.DumpToString() +  " src2=" + src2.DumpToString() + "--> dst2=" + dst2.DumpToString());
 
 			switch (mode)
 			{
@@ -872,7 +912,35 @@ class GameInventory
 		return false;
 	}
 
-	bool ForceSwapEntities (InventoryMode mode, notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst) { return false; }
+	bool ForceSwapEntities (InventoryMode mode, notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
+	{
+		Error("I::ForceSwap TODO");
+		return false;
+		/*InventoryLocation src1, src2, dst1;
+		if (GameInventory.MakeSrcAndDstForForceSwap(item1, item2, src1, src2, dst1, item2_dst))
+		{
+			Print("[inv] I::ForceSwap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + src1.DumpToString() + " --> dst1=" + dst1.DumpToString() +  " src2=" + src2.DumpToString() + " --> item2_dst=" + item2_dst.DumpToString());
+
+			switch (mode)
+			{
+				case InventoryMode.PREDICTIVE:
+					InventoryInputUserData.SendInputUserDataForceSwap(item1, item2, item2_dst);
+					return LocationForceSwap(src1, src2, dst1, item2_dst);
+
+				case InventoryMode.JUNCTURE:
+					InventoryInputUserData.SendInputUserDataForceSwap(item1, item2, item2_dst);
+					return true;
+
+				case InventoryMode.LOCAL:
+					return LocationSwap(src1, src2, dst1, item2_dst2);
+
+				default:
+					Error("ForceSwapEntities - HandEvent - Invalid mode");
+			}
+		}
+		else
+			Error("ForceSwapEntities - MakeSrcAndDstForForceSwap - no inv loc");*/
+	}
 
 	static void SetGroundPosByOwner (EntityAI owner, notnull EntityAI item, out InventoryLocation ground)
 	{

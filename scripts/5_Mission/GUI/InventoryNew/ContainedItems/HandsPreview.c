@@ -82,7 +82,7 @@ class HandsPreview: LayoutHolder
 		}
 		else
 		{
-			header.SetName( "HANDS EMPTY" );
+			header.SetName( "#str_widget_textwidget00" );
 		}
 	}
 

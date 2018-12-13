@@ -46,11 +46,11 @@ class ActionFillObject: ActionContinuousBase
 	{
 		if( m_ActionState == FILLED )
 		{
-			return "#empty_the_object";
+			return "#empty";
 		}
 		else
 		{
-			return "#fill_the_object";
+			return "#fill";
 		}
 	}
 
@@ -84,7 +84,7 @@ class ActionFillObject: ActionContinuousBase
 		if ( Class.CastTo(hesco,action_data.m_Target.GetObject()) )
 		{
 			const float ITEM_DAMAGE = 0.05;
-			action_data.m_MainItem.DecreaseHealth ( "", "", action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() )*100 );
+			action_data.m_MainItem.DecreaseHealth ( "", "", action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() )*100 );
 			
 			if ( hesco.GetState() == HescoBox.UNFOLDED )
 			{
@@ -96,7 +96,7 @@ class ActionFillObject: ActionContinuousBase
 			}
 		}
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 	override void OnFinishProgressClient( ActionData action_data )

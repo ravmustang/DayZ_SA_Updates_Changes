@@ -19,7 +19,7 @@ class ActionFoldObject: ActionInteractBase
 
 	override string GetText()
 	{
-		return "#fold_the_object";
+		return "#fold";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -46,6 +46,6 @@ class ActionFoldObject: ActionInteractBase
 			hesco.Fold();
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

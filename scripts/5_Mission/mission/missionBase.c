@@ -232,6 +232,9 @@ class MissionBase extends Mission
 		case MENU_TUTORIAL:
 			menu = new TutorialsMenu;
 			break;
+		case MENU_CREDITS:
+			menu = new CreditsMenu;
+			break;
 		}
 
 		if (menu)

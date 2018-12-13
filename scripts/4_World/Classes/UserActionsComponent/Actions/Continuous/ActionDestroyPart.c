@@ -11,9 +11,9 @@ class ActionDestroyPart: ActionContinuousBase
 	void ActionDestroyPart()
 	{
 		m_CallbackClass = ActionDestroyPartCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CRAFTING;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DISASSEMBLE;
 		m_FullBody = true;
-		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;		
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;		
 		
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
@@ -58,14 +58,8 @@ class ActionDestroyPart: ActionContinuousBase
 			Construction construction = base_building.GetConstruction();		
 			ConstructionPart construction_part = construction.GetConstructionPartToDestroy( part_name );
 			
-			if ( construction_part && base_building.IsFacingFront( player ) )
+			if ( construction_part && base_building.IsFacingFront( player, construction_part.GetPartName() ) )
 			{
-				//if part is base but more attachments are present
-				if ( construction_part.IsBase() && base_building.HasAttachmentsBesidesBase() )
-				{
-					return false;
-				}
-				
 				ConstructionActionData construction_action_data = player.GetConstructionActionData();
 				construction_action_data.SetTargetPart( construction_part );
 				
@@ -86,12 +80,12 @@ class ActionDestroyPart: ActionContinuousBase
 		if ( construction.CanDestroyPart( construction_part.GetPartName() ) )
 		{
 			//build
-			construction.DestroyPart( construction_part.GetPartName() );
+			construction.DestroyPart( construction_part.GetPartName(), GetType() );
 			
 			//add damage to tool
-			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DESTROY );
+			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DESTROY, false );
 		}
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }

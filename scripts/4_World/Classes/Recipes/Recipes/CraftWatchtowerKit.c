@@ -2,7 +2,7 @@ class CraftWatchtowerKit extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#STR_CraftWatchtowerKit0";
+		m_Name = "#craft_watchtower_kit";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 0.5;//animation length in relative time units
 		m_Specialty = -0.02;// value > 0 for roughness, value < 0 for precision

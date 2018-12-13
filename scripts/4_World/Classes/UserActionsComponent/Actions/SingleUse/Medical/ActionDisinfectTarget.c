@@ -46,7 +46,7 @@ class ActionDisinfectTarget: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#disinfect";
+		return "#disinfect_person";
 	}
 
 	override void OnEndServer( ActionData action_data )
@@ -54,7 +54,7 @@ class ActionDisinfectTarget: ActionSingleUseBase
 		//Print(action_data.m_Player.GetSoftSkillManager());
 		//RemoveModifiers(target, item); ?
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0 ) 
 		{
 			action_data.m_MainItem.SetQuantity(0);

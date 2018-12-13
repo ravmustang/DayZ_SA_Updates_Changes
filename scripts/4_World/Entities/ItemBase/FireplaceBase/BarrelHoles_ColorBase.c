@@ -5,6 +5,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 	const string ANIMATION_CLOSED			= "LidOn";
 	
 	protected bool m_IsOpened 				= false;
+	protected bool m_IsOpenedClient			= false;
 	
 	void BarrelHoles_ColorBase()
 	{
@@ -19,7 +20,6 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		//synchronized variables
 		RegisterNetSyncVariableBool( "m_IsOpened" );
-		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
 	override void EEInit()
@@ -27,17 +27,40 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		super.EEInit();
 		
 		//hide in inventory
-		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
+		//GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
 	}
-	
-	/*override bool IsHeavyBehaviour()
-	{
-		return true;
-	}*/
 	
 	override bool IsBarrelWithHoles()
 	{
 		return true;
+	}
+
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+		
+		if ( !IsBeingPlaced() )
+		{
+			//refresh if opened/closed state changed
+			if ( m_IsOpenedClient != m_IsOpened )
+			{
+				m_IsOpenedClient = m_IsOpened;
+				
+				//Refresh particles and sounds
+				RefreshFireParticlesAndSounds( true );
+			}
+			
+			//sound sync
+			if ( IsOpened() && IsSoundSynchRemote() )
+			{
+				SoundBarrelOpenPlay();
+			}
+			
+			if ( !IsOpened() && IsSoundSynchRemote() )
+			{
+				SoundBarrelClosePlay();
+			}
+		}
 	}
 	
 	//ATTACHMENTS
@@ -206,6 +229,10 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		{
 			return false;
 		}
+		else if ( !IsOpened() )
+		{
+			return false;
+		}
 		
 		return true;
 	}
@@ -224,7 +251,59 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		return true;
 	}
+	
+	//INVENTORY DISPLAY CONDITIONS
+	override bool CanDisplayCargo()
+	{
+		//super
+		if( !super.CanDisplayCargo() )
+		{
+			return false;
+		}
+		//
 		
+		return IsOpened();
+	}
+	
+	override bool CanDisplayAttachmentSlot( string slot_name )
+	{
+		//super
+		if( !super.CanDisplayAttachmentSlot( slot_name ) )
+		{
+			return false;
+		}
+		//
+		
+		if ( slot_name == "CookingEquipment" )
+		{
+			return !IsOpened();
+		}
+		
+		return true;
+	}
+
+	override bool CanDisplayAttachmentCategory( string category_name )
+	{
+		//super
+		if( !super.CanDisplayAttachmentCategory( category_name ) )
+		{
+			return false;
+		}
+		//
+		
+		if ( category_name == "CookingEquipment" )
+		{
+			return !IsOpened();
+		}			
+		else
+		{
+			return IsOpened();
+		}
+		
+		return true;
+	}	
+	// ---	
+
 	//ACTIONS
 	bool IsOpened()
 	{
@@ -237,22 +316,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		
 		Synchronize();
 	}
-	
-	override void OnVariablesSynchronized()
-	{
-		super.OnVariablesSynchronized();
-		
-		if ( IsOpened() && IsSoundSynchRemote() )
-		{
-			SoundBarrelOpenPlay();
-		}
-		
-		if ( !IsOpened() && IsSoundSynchRemote() )
-		{
-			SoundBarrelClosePlay();
-		}
-	}
-	
+
 	void SoundBarrelOpenPlay()
 	{
 		EffectSound sound =	SEffectManager.PlaySound( "barrel_open_SoundSet", GetPosition() );
@@ -268,11 +332,8 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		//set open state
 		SetOpenState( true );
 		
-		//refresh
-		RefreshFireParticlesAndSounds( true );
-		
 		//show in inventory
-		GetInventory().UnlockInventory(HIDE_INV_FROM_SCRIPT);
+		//GetInventory().UnlockInventory(HIDE_INV_FROM_SCRIPT);
 		
 		SoundSynchRemote();
 	}
@@ -292,11 +353,8 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		//set open state
 		SetOpenState( false );
 		
-		//refresh
-		RefreshFireParticlesAndSounds( true );
-		
 		//hide in inventory
-		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
+		//GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
 		
 		SoundSynchRemote();
 	}
@@ -326,7 +384,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 	
 	override bool CanBeIgnitedBy( EntityAI igniter = NULL )
 	{
-		if ( HasAnyKindling() && !IsBurning() && IsOpened() )
+		if ( HasAnyKindling() && !IsBurning() && IsOpened() && !GetHierarchyParent() )
 		{
 			return true;
 		}
@@ -396,5 +454,14 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		}
 		
 		return true;	
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override string GetPlaceSoundset()
+	{
+		return "placeBarrel_SoundSet";
 	}
 }

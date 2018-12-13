@@ -10,7 +10,7 @@ class FeverBlurSymptom extends SymptomBase
 	
 	
 	const int BLUR_STRENGTH_MIN = 0.1;
-	const int BLUR_STRENGTH_MAX = 1;
+	const int BLUR_STRENGTH_MAX = 0.3;
 	
 	const int BLUR_DURATION_TIME_MIN = 3;
 	const int BLUR_DURATION_TIME_MAX = 5;
@@ -35,45 +35,6 @@ class FeverBlurSymptom extends SymptomBase
 		int i = 1 + 1;
 	}
 
-	/*
-	override void OnUpdateClient(PlayerBase player, float deltatime)
-	{
-
-		if( Math.RandomFloat01() < 0.003 && !m_EffectEnabled )
-		{
-			m_EffectEnabled = true;
-			m_BlurDuration = Math.RandomFloat(BLUR_DURATION_TIME_MIN, BLUR_DURATION_TIME_MAX);
-			m_BlurStrength = Math.RandomFloat(0.1, 1);
-			m_Value = 0;
-		}
-		
-		if( m_EffectEnabled )
-		{
-			if(!m_ReachedMid)
-			{
-				m_Value += deltatime;
-			}
-			else
-			{
-				m_Value -= deltatime;
-			}
-			
-			if(m_Value >= m_BlurDuration)
-			{
-				m_ReachedMid = true;
-			}
-			
-			if( m_ReachedMid && m_Value<= 0)
-			{
-				m_EffectEnabled = false;
-				m_ReachedMid = false;	
-			}
-			float value = m_Value / m_BlurDuration * m_BlurStrength;
-			
-			PPEffects.SetBlurDrunk(value);
-		}
-	}
-	*/
 	
 	override void OnUpdateClient(PlayerBase player, float deltatime)
 	{

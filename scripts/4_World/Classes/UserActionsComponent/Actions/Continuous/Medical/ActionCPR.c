@@ -54,7 +54,8 @@ class ActionCPR: ActionContinuousBase
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
 		PlayerBase other_player = PlayerBase.Cast(target.GetObject());
-		return other_player.IsUnconscious();
+		bool holds_heavy_item = item && item.IsHeavyBehaviour();
+		return other_player.IsUnconscious() && !holds_heavy_item;
 	}
 	
 	override void OnFinishProgressClient(ActionData action_data)
@@ -66,7 +67,7 @@ class ActionCPR: ActionContinuousBase
 	{
 		PlayerBase other_player = PlayerBase.Cast(action_data.m_Target.GetObject());
 		other_player.GiveShock(5);
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}
 	

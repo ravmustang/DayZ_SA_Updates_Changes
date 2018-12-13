@@ -214,8 +214,8 @@ class EmoteManager
 						m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END);
 					}
 				}
-				//TODO rework with new input controller; registered KeyCode.KC_PERIOD as m_HIC.IsSingleUse() for some reason
-				else
+				//HACK find a better solution
+				else if (m_CurrentGestureID != ID_EMOTE_SUICIDE || (m_CurrentGestureID == ID_EMOTE_SUICIDE && m_Callback.GetState() < 3))
 				{
 					EndCallback();
 				}
@@ -737,6 +737,7 @@ class EmoteManager
 				
 				case ID_EMOTE_CAMPFIRE :
 					CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_CAMPFIRE,DayZPlayerConstants.STANCEMASK_CROUCH,true);
+					HideItemInHands();
 				break;
 				
 				case ID_EMOTE_SITA :
@@ -977,6 +978,18 @@ class EmoteManager
 		if (GetGame().IsServer())
 		{
 			m_Player.SetHealth(0);
+		}
+		
+		EntityAI itemInHands = m_Player.GetHumanInventory().GetEntityInHands();
+		if( itemInHands )
+		{
+			if( m_Player.CanDropEntity(itemInHands) )
+			{
+				vector transform[4];
+				itemInHands.GetTransform(transform);
+				m_Player.PredictiveDropEntity(itemInHands);
+				itemInHands.SetTransform(transform);
+			}
 		}
 	}
 	
@@ -1245,19 +1258,20 @@ class EmoteManager
 	
 	bool InterruptGesture()
 	{
-		//TODO connect to consoles once new inputs are in place
-		#ifndef PLATFORM_CONSOLE
-		for( int idx = 0; idx < m_InterruptInputs.Count(); idx++ )
+		if ( GetUApi() )
 		{
-			string inputName = m_InterruptInputs[idx];
-			UAInput inp = GetUApi().GetInputByName(inputName);
-			
-			if( inp.LocalPress() )
+			for( int idx = 0; idx < m_InterruptInputs.Count(); idx++ )
 			{
-				return true;
+				string inputName = m_InterruptInputs[idx];
+				
+					UAInput inp = GetUApi().GetInputByName(inputName);
+					
+					if( inp && inp.LocalPress() )
+					{
+						return true;
+					}
 			}
 		}
-		#endif
 		return false;
 	}
 	

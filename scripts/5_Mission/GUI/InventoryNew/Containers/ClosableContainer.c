@@ -3,10 +3,12 @@ class ClosableContainer extends Container
 	protected bool m_Closed;
 	protected EntityAI m_Entity;
 
-	void ClosableContainer( LayoutHolder parent )
+	void ClosableContainer( LayoutHolder parent, int sort = -1 )
 	{
 		m_Body = new array<ref LayoutHolder>;
 		m_Body.Insert( new ClosableHeader( this, "CloseButtonOnMouseButtonDown" ) );
+		if( sort > -1 )
+			m_MainWidget.SetSort( sort + 2 );
 	}
 
 	void Open()

@@ -61,6 +61,6 @@ class ActionUseRangefinder : ActionContinuousBase
 			SendMessageToClient(action_data.m_Player,message);
 		}*/
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }

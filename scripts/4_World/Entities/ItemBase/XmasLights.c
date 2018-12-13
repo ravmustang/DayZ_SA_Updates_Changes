@@ -98,4 +98,9 @@ class XmasLights extends Inventory_Base
 		item.SetAnimationPhase( "Cord_plugged", 1);
 		item.SetAnimationPhase( "Cord_folded", 1);
 	}
+	
+	// --------------------------------------------------
+	// Advanced placement
+	//---------------------------------------------------
+	
 }

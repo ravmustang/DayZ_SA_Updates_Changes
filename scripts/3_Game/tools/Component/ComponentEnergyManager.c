@@ -17,7 +17,7 @@ Every EntityAI object which uses this API gains these functions:
 
 class ComponentEnergyManager : Component
 {
-	protected static bool 			m_DebugPlugs = true; // Use this to toggle visualisation of plug connections
+	protected static bool 			m_DebugPlugs = false; // Use this to toggle visualisation of plug connections
 	protected 		Shape			m_DebugPlugArrow;
 	
 	protected 		bool			m_IsSwichedOn;
@@ -1132,8 +1132,9 @@ class ComponentEnergyManager : Component
 	// Called when this device is UNPLUGGED from the energy source
 	void OnIsUnplugged( EntityAI last_energy_source ) 
 	{
-		m_ThisEntityAI.OnIsUnplugged( last_energy_source );
+		UpdateCanWork();
 		
+		m_ThisEntityAI.OnIsUnplugged( last_energy_source );
 		SynchPlug(last_energy_source, false);
 	}
 

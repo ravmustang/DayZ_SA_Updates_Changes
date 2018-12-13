@@ -171,6 +171,12 @@ class KeybindingsMenu extends UIScriptedMenu
 		{
 			group.Apply();
 		}
+		
+		#ifdef WIP_INPUTS
+			// save input configuration
+			GetUApi().Export();
+			Print(" ----- Export -----");
+		#endif			
 	}
 	
 	void Back()
@@ -239,5 +245,79 @@ class KeybindingsMenu extends UIScriptedMenu
 			version = "#main_menu_version" + " " + version;
 		#endif
 		m_Version.SetText( version );
+	}
+	
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		if( w && IsFocusable( w ) )
+		{
+			ColorRed( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		if( w && IsFocusable( w ) )
+		{
+			ColorWhite( w, enterW );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocus( Widget w, int x, int y )
+	{
+		if( w && IsFocusable( w ) )
+		{
+			ColorRed( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocusLost( Widget w, int x, int y )
+	{
+		if( w && IsFocusable( w ) )
+		{
+			ColorWhite( w, null );
+			return true;
+		}
+		return false;
+	}
+	
+	bool IsFocusable( Widget w )
+	{
+		if( w )
+		{
+			return ( w == m_Apply || w == m_Back || w == m_Reset );
+		}
+		return false;
+	}
+	
+	//Coloring functions (Until WidgetStyles are useful)
+	void ColorRed( Widget w )
+	{
+		SetFocus( w );
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_Apply )
+		{
+			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+		}
+	}
+	
+	void ColorWhite( Widget w, Widget enterW )
+	{
+		#ifdef PLATFORM_WINDOWS
+		SetFocus( null );
+		#endif
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button && button != m_Apply )
+		{
+			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+		}
 	}
 }

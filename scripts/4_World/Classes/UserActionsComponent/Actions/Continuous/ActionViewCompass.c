@@ -3,6 +3,21 @@ class ActionRaiseAndViewCB : ActionContinuousBaseCB
 	override void CreateActionComponent()
 	{
 		m_ActionData.m_ActionComponent = new CAContinuousTime( -1.0 );
+		//EnableStateChangeCallback();
+	}
+
+	override void OnStateChange(int pOldState, int pCurrentState)
+	{
+		Print("pOldState = " + pOldState);
+		Print("pCurrentState = " + pCurrentState);
+		
+		if (pOldState != STATE_LOOP_LOOP)
+			return;
+		
+		if (m_ActionData.m_Action && ActionViewOptics.Cast(m_ActionData.m_Action))
+		{
+			//ActionViewOptics.Cast(m_ActionData.m_Action).ExitOptics( ItemOptics.Cast(m_ActionData.m_MainItem), m_ActionData.m_Player );
+		}
 	}
 };
 
@@ -28,7 +43,7 @@ class ActionViewCompass : ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#use_compass";
+		return "#use_compas";
 	}
 	
 	override bool HasProgress()

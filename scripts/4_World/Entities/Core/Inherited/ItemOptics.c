@@ -2,6 +2,8 @@ class ItemOptics extends InventoryItemSuper
 {
 	bool 				m_data_set;
 	bool 				m_allowsDOF;
+	bool 				m_reddot_displayed
+	bool 				m_isNVOptic = false;
 	int 				m_reddot_index;
 	float 				m_blur_float;
 	string 				m_optic_sight_texture;
@@ -14,7 +16,7 @@ class ItemOptics extends InventoryItemSuper
 		m_mask_array = new array<float>;
 		m_lens_array = new array<float>;
 		InitReddotData();
-		InitOpticsPPInfo();;
+		InitOpticsPPInfo();
 	}
 	/**@fn		EnterOptics
 	 * @brief	switches to optics mode if possible
@@ -120,6 +122,26 @@ class ItemOptics extends InventoryItemSuper
 		ShowReddot(false);
 	}
 	
+	bool IsWorking()
+	{
+		ComponentEnergyManager eem = GetCompEM();
+		if (GetCompEM() && GetCompEM().CanWork())
+			return true;
+		return false;
+	}
+	
+	void UpdateOpticsReddotVisibility()
+	{
+		if (IsWorking() && !m_reddot_displayed)
+		{
+			ShowReddot(true);
+		}
+		else if (!IsWorking() && m_reddot_displayed)
+		{
+			ShowReddot(false);
+		}
+	}
+	
 	override void OnWasAttached( EntityAI parent, int slot_id )
 	{
 		super.OnWasAttached(parent, slot_id);
@@ -198,12 +220,16 @@ class ItemOptics extends InventoryItemSuper
 			SetObjectTexture(m_reddot_index, "");
 			SetObjectMaterial(m_reddot_index, "");
 		}
+		m_reddot_displayed = state;
 	}
 	
 	void InitOpticsPPInfo()
 	{
 		m_allowsDOF = InitDOFAvailability();
 		InitOpticsPP(m_mask_array, m_lens_array, m_blur_float);
+		
+		//NV prototype
+		m_isNVOptic = ConfigGetBool("NVOptic");
 	}
 	
 	//! optics with more than 1x zoom do not allow DOF changes
@@ -237,6 +263,11 @@ class ItemOptics extends InventoryItemSuper
 	bool AllowsDOF()
 	{
 		return m_allowsDOF;
+	}
+	
+	bool IsNVOptic()
+	{
+		return m_isNVOptic;
 	}
 	
 	ref array<float> GetOpticsPPMask()

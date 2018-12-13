@@ -1,0 +1,3 @@
+class Nail extends ItemBase
+{
+}

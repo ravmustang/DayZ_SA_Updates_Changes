@@ -37,11 +37,13 @@ class ActionDisinfectPlant: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#disinfect_plant";
+		return "#apply";
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
 	{
+		return false; // Plant infestation was temporarily disabled.
+		
 		PlantBase plant;
 		if ( Class.CastTo(plant,  target.GetObject() ) && !item.IsDamageDestroyed() )
 		{			
@@ -63,9 +65,11 @@ class ActionDisinfectPlant: ActionContinuousBase
 		if ( Class.CastTo(plant, action_data.m_Target.GetObject()) )
 		{
 			Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
-			SendMessageToClient(action_data.m_Player,plant.StopInfestation( nacdata.param1 ));
+			if(nacdata)
+			{
+				SendMessageToClient(action_data.m_Player,plant.StopInfestation( nacdata.param1 ));
+				action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+			}
 		}
-
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

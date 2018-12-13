@@ -290,15 +290,14 @@ class AnimatedActionBase : ActionBase
 	
 	override void Interrupt( ActionData action_data )
 	{
-		/*if( GetGame().IsServer() )
+		if ( action_data.m_Callback )
 		{
-			OnInterruptServer(action_data);
+			action_data.m_Callback.Cancel();
 		}
 		else
 		{
-			OnInterruptClient(action_data);
-		}*/
-		action_data.m_State = UA_INTERRUPT;
+			End( action_data );
+		}
 	}
 	
 	void OnJumpStart()
@@ -347,7 +346,6 @@ class AnimatedActionBase : ActionBase
 						Do(action_data, UA_CANCEL);
 					}
 					break;
-					
 				/*case UA_REPEAT:
 					if ( CanContinue(action_data) )
 					{

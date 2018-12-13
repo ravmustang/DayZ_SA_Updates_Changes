@@ -29,7 +29,7 @@ class ActionForceConsume: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#force_feed";
+		return "#feed";
 	}
 	
 	override void OnEndServer( ActionData action_data )

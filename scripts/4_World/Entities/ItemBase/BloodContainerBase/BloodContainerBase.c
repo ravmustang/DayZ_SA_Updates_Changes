@@ -30,9 +30,9 @@ class BloodContainerBase extends ItemBase
 		ctx.Write( m_IsBloodTypeVisible );
 	}
 
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 
 		bool is_blood_type_visible = false;
 		ctx.Read( is_blood_type_visible );

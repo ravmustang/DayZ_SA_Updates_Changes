@@ -42,12 +42,12 @@ class ActionSewTarget: ActionContinuousBase
 	override void OnEndServer( ActionData action_data )
 	{			
 		const float ITEM_DAMAGE = 10;
-		float delta = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() );
+		float delta = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() );
 		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		
 		ntarget.m_ModifiersManager.DeactivateModifier(eModifiers.MDF_BLEEDING);
 		action_data.m_MainItem.AddHealth("GlobalHealth","Health",-delta);
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

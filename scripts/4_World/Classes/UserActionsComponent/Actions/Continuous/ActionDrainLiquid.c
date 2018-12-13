@@ -40,12 +40,6 @@ class ActionDrainLiquid: ActionContinuousBase
 		return AT_DRAIN_LIQUID;
 	}
 	
-	//?
-	override bool Consumable()
-	{
-		return true;
-	}
-	
 	override string GetText()
 	{
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
@@ -74,7 +68,7 @@ class ActionDrainLiquid: ActionContinuousBase
 	
 	override void OnFinishProgressServer( ActionData action_data )
 	{
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 };

@@ -5,13 +5,15 @@ class PowerGenerator extends ItemBase
 	private static float		m_FuelToEnergyRatio; // Conversion ratio of 1 ml of fuel to X Energy
 	private int					m_FuelPercentage;
 	
-	static const string			START_SOUND = "powerGeneratorTurnOn";
-	static const string			LOOP_SOUND = "powerGeneratorLoop";
-	static const string			STOP_SOUND = "powerGeneratorTurnOff";
+	static const string			START_SOUND = "powerGeneratorTurnOn_SoundSet";
+	static const string			LOOP_SOUND = "powerGeneratorLoop_SoundSet";
+	static const string			STOP_SOUND = "powerGeneratorTurnOff_SoundSet";
 	static const string 		SPARKPLUG_ATTACH_SOUND = "sparkplug_attach_SoundSet";
 	static const string 		SPARKPLUG_DETACH_SOUND = "sparkplug_detach_SoundSet";
 	
-	SoundOnVehicle 				m_SoundLoopEntity;
+	protected EffectSound 		m_EngineLoop;
+	protected EffectSound 		m_EngineStart;
+	protected EffectSound 		m_EngineStop;
 	ref Timer 					m_SoundLoopStartTimer;
 	ref protected Effect 		m_Smoke;
 	
@@ -22,8 +24,9 @@ class PowerGenerator extends ItemBase
 	{
 		SetEventMask(EntityEvent.INIT); // Enable EOnInit event
 		
-		m_FuelPercentage = 100;
+		m_FuelPercentage = 50;
 		RegisterNetSyncVariableInt("m_FuelPercentage");
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 
 	override void EOnInit( IEntity other, int extra)
@@ -48,13 +51,16 @@ class PowerGenerator extends ItemBase
 	{
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
-			m_SoundLoopEntity = PlaySoundLoop(LOOP_SOUND, 50);
-			
-			// Particle
-			vector local_pos = "0.3 0.21 0.4";
-			vector local_ori = "270 0 0";
-			m_Smoke = new EffGeneratorSmoke();
-			SEffectManager.PlayOnObject(m_Smoke, this, local_pos, local_ori);
+			if ( GetCompEM().IsWorking() )
+			{
+				PlaySoundSetLoop( m_EngineLoop, LOOP_SOUND, 0, 0 );
+				
+				// Particle
+				vector local_pos = "0.3 0.21 0.4";
+				vector local_ori = "270 0 0";
+				m_Smoke = new EffGeneratorSmoke();
+				SEffectManager.PlayOnObject(m_Smoke, this, local_pos, local_ori);
+			}
 		}
 	}
 	
@@ -96,7 +102,6 @@ class PowerGenerator extends ItemBase
 		m_FuelTankCapacity = GetGame().ConfigGetFloat ("CfgVehicles " + GetType() + " fuelTankCapacity");
 		m_FuelToEnergyRatio = GetCompEM().GetEnergyMax() / m_FuelTankCapacity; // Conversion ratio of 1 ml of fuel to X Energy
 		m_SparkPlug = NULL;
-		m_SoundLoopEntity = NULL;
 		
 		UpdateFuelMeter();
 	}
@@ -106,10 +111,10 @@ class PowerGenerator extends ItemBase
 	{
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
-			PlaySound(START_SOUND, 50);
+			PlaySoundSet( m_EngineStart, START_SOUND, 0, 0 );
 			
 			if (!m_SoundLoopStartTimer)
-				m_SoundLoopStartTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+				m_SoundLoopStartTimer = new Timer( CALL_CATEGORY_SYSTEM );
 			
 			if ( !m_SoundLoopStartTimer.IsRunning() ) // Makes sure the timer is NOT running already
 			{
@@ -136,9 +141,8 @@ class PowerGenerator extends ItemBase
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
 			// Sound
-			PlaySound(STOP_SOUND, 50);
-			GetGame().ObjectDelete(m_SoundLoopEntity);
-			m_SoundLoopEntity = NULL;
+			PlaySoundSet( m_EngineStop, STOP_SOUND, 0, 0 );
+			StopSoundSet(m_EngineLoop);
 			
 			// particle
 			if (m_Smoke)
@@ -293,7 +297,28 @@ class PowerGenerator extends ItemBase
 	override void OnVariablesSynchronized()
 	{
 		super.OnVariablesSynchronized();
-		
+				
 		UpdateFuelMeter();
+		
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override string GetPlaceSoundset()
+	{
+		return "placePowerGenerator_SoundSet";
 	}
 }

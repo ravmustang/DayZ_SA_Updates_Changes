@@ -1,3 +1,9 @@
+enum AnimType 
+{
+	FULL_BODY = 1,
+	ADDITIVE,
+}
+
 enum SymptomIDs {
 
 	SYMPTOM_COUGH = 1,
@@ -10,6 +16,8 @@ enum SymptomIDs {
 	SYMPTOM_FEVERBLUR,
 	SYMPTOM_LAUGHTER,
 	SYMPTOM_UNCONSCIOUS,
+	SYMPTOM_FREEZE,
+	SYMPTOM_HOT,
 };
 
 enum SymptomTypes 
@@ -37,11 +45,6 @@ class SymptomManager
 	ref array<ref Param> m_SymptomQueueServerDbgSecondary;
 	//ref array<string> m_SymptomQueueSecondaryServerDbg;
 
-	int m_AnimID;
-	int m_SymptomUID;
-	int m_StanceMask;
-	float m_Duration;
-	bool m_IsAnimSet;
 	int m_ActiveSymptomIndexPrimary = -1;
 	int m_CurrentCommandID;
 	
@@ -50,17 +53,20 @@ class SymptomManager
 	bool m_ShowDebug = false;
 	bool m_ShowDebug2 = false;
 	
+	ref SmptAnimMetaBase m_AnimMeta;
+	
 	void Init()
 	{
 		RegisterSymptom(new CoughSymptom);
 		RegisterSymptom(new VomitSymptom);
 		RegisterSymptom(new BlindnessSymptom);
-		RegisterSymptom(new BulletHitSymptom);
 		RegisterSymptom(new SneezeSymptom);
 		RegisterSymptom(new FeverBlurSymptom);
 		RegisterSymptom(new BloodLoss);
 		RegisterSymptom(new LaughterSymptom);
-		
+		RegisterSymptom(new FreezeSymptom);
+		RegisterSymptom(new HotSymptom);
+		//RegisterSymptom(new BulletHitSymptom);
 	}
 
 	void AutoactivateSymptoms()
@@ -82,7 +88,6 @@ class SymptomManager
 		m_SymptomQueueServerDbg = new array<ref Param>;
 		m_SymptomQueueServerDbgPrimary = new array<ref Param>;
 		m_SymptomQueueServerDbgSecondary = new array<ref Param>;
-		//m_SymptomQueueSecondaryServerDbg = new array<ref Param>;
 		m_AvailableSymptoms = new map<int, ref SymptomBase>;
 		m_Player = player;
 		Init();
@@ -117,23 +122,6 @@ class SymptomManager
 		return m_Player;
 	}
 	
-	//! Removes all  Symptoms of a given type
-	/*
-	void RemoveSecondarySymptomsByType( int type )
-	{
-		for(int i = 0; i < m_SymptomQueueSecondary.Count(); i++)
-		{
-			int current_type = m_SymptomQueueSecondary.Get(i).GetType();
-			
-			if( current_type == type )
-			{
-				m_SymptomQueueSecondary.Get(i).Destroy();
-				i--;
-			}
-		}
-	}
-	*/
-	
 	void RegisterSymptom(SymptomBase Symptom)
 	{
 		Symptom.Init(this, m_Player,0);
@@ -147,14 +135,14 @@ class SymptomManager
 		
 		m_AvailableSymptoms.Insert(id, Symptom);
 		//PrintString("inserting id: "+ToString(id));
-		
-	
 	}
 
-	void OnAnimationFinished(int SYMPTOM_uid)
+	void OnAnimationFinished(eAnimFinishType type = eAnimFinishType.SUCCESS)
 	{
-		SymptomBase Symptom = GetSymptomByUID(SYMPTOM_uid);
-		if( Symptom ) Symptom.OnAnimationFinish();
+		if( m_AnimMeta )
+		{
+			m_AnimMeta.AnimFinished(type);
+		}
 	}
 	
 	int CreateUniqueID()
@@ -180,6 +168,11 @@ class SymptomManager
 	{
 		return m_AvailableSymptoms.Get(symptom_id).GetName();
 	}
+	
+	SmptAnimMetaBase SpawnAnimMetaObject(int symptom_id)
+	{
+		return m_AvailableSymptoms.Get(symptom_id).SpawnAnimMetaObject();
+	}
 		
 	//! Exits a specific Symptom with a given UID
 	void RequestSymptomExit(int SYMPTOM_uid)
@@ -201,7 +194,7 @@ class SymptomManager
 		return m_CurrentCommandID;
 	}
 	
-	void OnScheduledTick(float deltatime, int pCurrentCommandID)
+	void OnTick(float deltatime, int pCurrentCommandID, HumanMovementState movement_state)
 	{
 		m_CurrentCommandID = pCurrentCommandID;
 		if(m_ActiveSymptomIndexPrimary == -1)
@@ -210,10 +203,33 @@ class SymptomManager
 		}
 		
 		UpdateActiveSymptoms(deltatime);
-		if(m_IsAnimSet) 
+		
+		if( m_AnimMeta )
 		{
-			PlayAnimation();
+			if( m_AnimMeta.IsDestroyReqested() )
+			{
+				m_AnimMeta = null;
+			}
 		}
+		
+		if( m_AnimMeta )
+		{
+			
+			//anim requested
+			if( !m_AnimMeta.IsPlaying() )
+			{
+
+				if( !m_AnimMeta.PlayRequest() )
+				{
+					OnAnimationFinished(eAnimFinishType.FAILURE);
+				}
+			}
+			else
+			{
+				m_AnimMeta.Update(movement_state);
+			}
+		}
+		
 		#ifdef DEVELOPER
 		if( GetGame().IsMultiplayer() && GetGame().IsServer() ) return;//must be here !!!
 		if ( DiagMenu.GetBool(DiagMenuIDs.DM_PLAYER_SYMPTOMS_SHOW) )
@@ -237,32 +253,24 @@ class SymptomManager
 
 	void SetAnimation(ParamsReadContext ctx)
 	{
-		m_IsAnimSet = true;
-		DayZPlayerSyncJunctures.ReadPlayerSymptomAnimParams(ctx, m_AnimID, m_SymptomUID, m_StanceMask, m_Duration);
-	}
-	
-	
-	void PlayAnimation()
-	{
-		HumanCommandActionCallback callback = GetPlayer().GetCommand_Action();
-		if (!callback)
+		if(m_AnimMeta)
 		{
-			callback = GetPlayer().GetCommandModifier_Action();
+			// animation meta already exists
+			// pass
 		}
-		if( callback )
+		else
 		{
-			callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_INTERRUPT);
+			int state_type;
+			if(ctx.Read(state_type))
+			{
+				m_AnimMeta = SpawnAnimMetaObject(state_type);
+				if(m_AnimMeta)
+				{
+					m_AnimMeta.Init(ctx, this, m_Player);
+				}
+			}
 		}
-		
-	
-		SymptomCB	anim_callback = SymptomCB.Cast(GetPlayer().StartCommand_Action(m_AnimID, SymptomCB, m_StanceMask));
-		anim_callback.Init(m_SymptomUID, m_Duration, GetPlayer());
-		m_IsAnimSet = false;
-
 	}
-	
-	
-	
 	
 	void UpdateActiveSymptoms(float deltatime)
 	{	
@@ -367,7 +375,7 @@ class SymptomManager
 		SymptomBase Symptom;
 		for(int i = 0; i < m_SymptomQueuePrimary.Count(); i++)
 		{
-			if( ComparePriority( GetSymptomPriority(symptom_id), m_SymptomQueuePrimary.Get(i).GetPriority() ) == 1 )
+			if( m_SymptomQueuePrimary.Get(i).CanBeInterupted() && ComparePriority( GetSymptomPriority(symptom_id), m_SymptomQueuePrimary.Get(i).GetPriority() ) == 1 )
 			{
 				Symptom = SpawnSymptom( symptom_id, uid );
 				m_SymptomQueuePrimary.InsertAt(Symptom,i);
@@ -414,13 +422,6 @@ class SymptomManager
 		}
 	}
 	
-/*
-	SymptomBase GetCurrentPrimaryActiveSymptom()
-	{
-		if(m_SymptomQueuePrimary.Count() > 0 ) return m_SymptomQueuePrimary.Get(0);
-		else return NULL;
-	}	
-	*/
 	SymptomBase GetCurrentPrimaryActiveSymptom()
 	{
 		if( GetGame().IsServer() || !GetGame().IsMultiplayer() )
@@ -642,10 +643,9 @@ class SymptomManager
 		}
 
 		ctx.Write( m_SaveQueue );
-
 	}
 
-	void OnStoreLoad( ParamsReadContext ctx )
+	void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		ref array<int> m_SaveQueue;
 		

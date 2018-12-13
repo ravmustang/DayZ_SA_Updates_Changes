@@ -53,7 +53,11 @@ class SalmonellaMdfr: ModifierBase
 		if( Math.RandomFloat01() < chance_of_vomit )
 		{
 			SymptomBase symptom = player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_VOMIT);
-			symptom.SetDuration(5);
+			
+			if( symptom )
+			{
+				symptom.SetDuration(5);
+			}
 		}
 	}
 };

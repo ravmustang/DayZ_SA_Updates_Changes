@@ -8,7 +8,6 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 	protected int										m_CurrentSettingAlternateKeyIndex = -1;
 	
 	protected ref DropdownPrefab						m_KBDropdown;
-	protected ref DropdownPrefab						m_ConsoleDropdown;
 	
 	void KeybindingsGroup( int index, Input input, Widget parent, KeybindingsMenu menu )
 	{
@@ -19,7 +18,7 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		input.GetActionGroupName( index, group_name );
 		
 		m_Root	= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_group.layout", parent );
-		Widget subgroup	= m_Root.FindAnyWidget( "group_root" );
+		Widget subgroup	= m_Root.FindAnyWidget( "group_content" );
 		
 		for( int i = 0; i < 1; i++ )
 		{
@@ -36,16 +35,13 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 	void InitPresets( int index, Widget parent, Input input )
 	{
 		Widget kb_root = parent.FindAnyWidget( "keyboard_dropown" );
-		Widget console_root = parent.FindAnyWidget( "controller_dropown" );
 		
 		string profile_text;
 		input.GetProfileName( input.GetCurrentProfile(), profile_text );
 		
 		m_KBDropdown		= new DropdownPrefab( kb_root, profile_text );
-		m_ConsoleDropdown	= new DropdownPrefab( console_root, "" );
 		
 		m_KBDropdown.m_OnSelectItem.Insert( OnSelectKBPreset );
-		m_ConsoleDropdown.m_OnSelectItem.Insert( OnSelectConsolePreset );
 		
 		for( int i = 0; i < input.GetProfilesCount(); i++ )
 		{
@@ -68,7 +64,6 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 	{
 		string profile_text;
 		GetGame().GetInput().GetProfileName( index, profile_text );
-		m_ConsoleDropdown.SetText( profile_text );
 		GetGame().GetInput().SetProfile( index );
 		ReloadProfiles();
 	}
@@ -278,7 +273,6 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		if( !ButtonWidget.Cast( w ) )
 		{
 			m_KBDropdown.Close();
-			m_ConsoleDropdown.Close();
 		}
 		return false;
 	}

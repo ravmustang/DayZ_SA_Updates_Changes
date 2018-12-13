@@ -84,7 +84,7 @@ class CAContinuousQuantityLiquidTransfer : CAContinuousBase
 		{
 			if ( m_SpentQuantity_total < m_ItemQuantity )
 			{
-				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);
+				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);
 				m_SpentQuantity += m_AdjustedQuantityUsedPerSecond * action_data.m_Player.GetDeltaT();
 				m_TimeElpased += action_data.m_Player.GetDeltaT();
 				

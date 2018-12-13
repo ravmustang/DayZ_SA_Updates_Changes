@@ -52,7 +52,7 @@ class PlayerAgentPool
 		}
 	}
 	
-	void OnStoreLoad(ParamsReadContext ctx)
+	void OnStoreLoad(ParamsReadContext ctx, int version)
 	{
 		//Debug.Log("PlayerAgentPool OnStoreLoad called", "Agents");
 		int count;
@@ -120,9 +120,9 @@ class PlayerAgentPool
 		else return 0;
 	}
 	
-	int GetTotalAgentCount()
+	float GetTotalAgentCount()
 	{
-		int agent_count;
+		float agent_count;
 		for(int i = 0; i < m_VirusPool.Count(); i++)
 		{
 			agent_count += m_VirusPool.GetElement(i);

@@ -1,14 +1,14 @@
 class TabberUI extends ScriptedWidgetEventHandler
 {
-	protected bool		m_FirstInit = true;
-	protected Widget	m_Root;
+	protected bool					m_FirstInit = true;
+	protected Widget				m_Root;
 	
-	protected ref map<int, Widget> m_TabControls;
-	protected ref map<int, Widget> m_Tabs;
+	protected ref map<int, Widget>	m_TabControls;
+	protected ref map<int, Widget>	m_Tabs;
 	
-	protected int m_SelectedIndex;
+	protected int					m_SelectedIndex;
 	
-	ref ScriptInvoker		m_OnTabSwitch = new ScriptInvoker();
+	ref ScriptInvoker				m_OnTabSwitch = new ScriptInvoker();
 
 	void OnWidgetScriptInit( Widget w )
 	{
@@ -133,9 +133,15 @@ class TabberUI extends ScriptedWidgetEventHandler
 		
 	}
 	
+	
 	Widget GetTab( int index )
 	{
 		return m_Tabs.Get( index );
+	}
+	
+	int GetTabCount()
+	{
+		return m_Tabs.Count();
 	}
 	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
@@ -250,6 +256,12 @@ class TabberUI extends ScriptedWidgetEventHandler
 			m_SelectedIndex = next_index;
 			m_OnTabSwitch.Invoke( m_SelectedIndex );
 		}
+		
+		if( m_FirstInit )
+		{
+			AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
+			m_FirstInit = false;
+		}
 	}
 	
 	void PreviousTab()
@@ -270,6 +282,12 @@ class TabberUI extends ScriptedWidgetEventHandler
 			
 			m_SelectedIndex = next_index;
 			m_OnTabSwitch.Invoke( m_SelectedIndex );
+		}
+		
+		if( m_FirstInit )
+		{
+			AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
+			m_FirstInit = false;
 		}
 	}
 	

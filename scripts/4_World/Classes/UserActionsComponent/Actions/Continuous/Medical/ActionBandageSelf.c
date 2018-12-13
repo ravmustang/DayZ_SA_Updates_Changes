@@ -14,7 +14,6 @@ class ActionBandageSelf: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BANDAGE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-		
 		m_MessageStartFail = "There's nothing to bandage.";
 		m_MessageStart = "I have started bandaging myself";
 		m_MessageSuccess = "I have bandaged myself.";
@@ -41,7 +40,7 @@ class ActionBandageSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#bandage";
+		return "#treat_wound";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -61,6 +60,6 @@ class ActionBandageSelf: ActionContinuousBase
 			action_data.m_MainItem.AddQuantity(-1,true);
 		}
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

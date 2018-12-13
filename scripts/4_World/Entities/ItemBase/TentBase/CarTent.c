@@ -20,26 +20,6 @@ class CarTent extends TentBase
 		super.OnItemLocationChanged(old_owner, new_owner);
 	}
 	
-	override void OnPlacementComplete( Man player )
-	{		
-		super.OnPlacementComplete( player );
-	}
-
-	override string GetDeploySoundset()
-	{
-		return "placeCarTent_SoundSet";
-	}
-	
-	override string GetLoopDeploySoundset()
-	{
-		return "cartent_deploy_SoundSet";
-	}
-	
-	override bool IsDeployable()
-	{
-		return true;
-	}
-	
 	override string GetSoundOpen()
 	{
 		return "CarTent_Door_Open_SoundSet";
@@ -48,5 +28,34 @@ class CarTent extends TentBase
 	override string GetSoundClose()
 	{
 		return "CarTent_Door_Close_SoundSet";
+	}
+	
+	override bool HasClutterCutter()
+	{
+		return false;
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+	}
+
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetDeploySoundset()
+	{
+		return "placeCarTent_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "cartent_deploy_SoundSet";
 	}
 };

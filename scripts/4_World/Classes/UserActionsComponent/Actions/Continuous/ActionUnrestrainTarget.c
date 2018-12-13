@@ -132,7 +132,7 @@ class ActionUnrestrainTarget: ActionContinuousBase
 		
 		MiscGameplayFunctions.TransformRestrainItem(restraining_item, unrestraining_tool, player_source, player_target);
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 	

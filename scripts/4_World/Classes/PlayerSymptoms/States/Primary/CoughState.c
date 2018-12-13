@@ -4,7 +4,7 @@ class CoughSymptom extends SymptomBase
 	override void OnInit()
 	{
 		m_SymptomType = SymptomTypes.PRIMARY;
-		m_Priority = 0;
+		m_Priority = 100;
 		m_ID = SymptomIDs.SYMPTOM_COUGH;
 		m_DestroyOnAnimFinish = true;
 		m_SyncToClient = false;
@@ -20,10 +20,27 @@ class CoughSymptom extends SymptomBase
 	{
 	}
 	
+	override void OnAnimationPlayFailed()
+	{
+		
+	}
+	
+	override SmptAnimMetaBase SpawnAnimMetaObject()
+	{
+		return new SmptAnimMetaADD();
+	}
+	
 	//!gets called once on an Symptom which is being activated
 	override void OnGetActivatedServer(PlayerBase player)
 	{
-		PlaySound( EPlayerSoundEventID.SYMPTOM_COUGH );
+		if( m_Manager.GetCurrentCommandID() == DayZPlayerConstants.COMMANDID_MOVE )
+		{
+			PlayAnimationADD(1);
+		}
+		else
+		{
+			PlaySound(EPlayerSoundEventID.SYMPTOM_COUGH);
+		}
 		player.SpreadAgents();
 	}
 

@@ -43,9 +43,9 @@ class FireplaceIndoor extends FireplaceBase
 		ctx.Write( m_SmokePosZ );
 	}
 
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx );
+		super.OnStoreLoad( ctx, version );
 
 		//fire point name
 		ctx.Read( m_FirePointIndex );
@@ -371,7 +371,7 @@ class FireplaceIndoor extends FireplaceBase
 	
 	override bool CanBeIgnitedBy( EntityAI igniter = NULL )
 	{
-		if ( HasAnyKindling() )
+		if ( HasAnyKindling() && !GetHierarchyParent() )
 		{
 			return true;
 		}

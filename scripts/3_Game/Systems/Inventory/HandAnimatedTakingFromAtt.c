@@ -51,6 +51,8 @@ class HandAnimatedTakingFromAtt extends HandStateBase
 
 	ref HandTakingAnimated_Hide m_Hide;
 	ref HandTakingAnimated_Show m_Show;
+	
+	ref InventoryLocation m_ilEntity;
 
 	void HandAnimatedTakingFromAtt (Man player = NULL, HandStateBase parent = NULL)
 	{
@@ -79,20 +81,29 @@ class HandAnimatedTakingFromAtt extends HandStateBase
 
 		m_Hide.m_ActionType = e.GetAnimationID();
 		m_Show.m_ActionType = e.GetAnimationID();
+		
+		m_ilEntity = new InventoryLocation;
+		m_ilEntity.SetHands(e.m_Player, m_Entity);
+		
+		e.m_Player.GetHumanInventory().AddInventoryReservation(m_Entity, m_ilEntity, 3000);
 
 		super.OnEntry(e); // @NOTE: super at the end (prevent override from submachine start)
 	}
 
 	override void OnAbort (HandEventBase e)
 	{
+		e.m_Player.GetHumanInventory().ClearInventoryReservation(m_Entity, m_ilEntity);
 		m_Entity = null;
+		m_ilEntity = null;
 
 		super.OnAbort(e);
 	}
 
 	override void OnExit (HandEventBase e)
 	{
+		e.m_Player.GetHumanInventory().ClearInventoryReservation(m_Entity, m_ilEntity);
 		m_Entity = null;
+		m_ilEntity = null;
 
 		super.OnExit(e);
 	}

@@ -34,7 +34,6 @@ class ActionRestrainTarget: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_RESTRAINTARGET;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
-		m_Sound = "action_handcuff_0";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -66,6 +65,11 @@ class ActionRestrainTarget: ActionContinuousBase
 				return false;
 			}
 		}
+		if( GetGame().IsServer() )
+		{
+			return !GetGame().GetMission().IsPlayerDisconnecting(target_player);
+			
+		}
 		return true;
 	}
 		
@@ -88,10 +92,16 @@ class ActionRestrainTarget: ActionContinuousBase
 			SurrenderDataRestrain sdr = new SurrenderDataRestrain;
 			target_player.EndSurrenderRequest(sdr);
 		}
+		/*
+		if( target_player.IsMapOpen() )
+		{
+			target_player.CloseMap();
+		}
+		*/
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )
-	{	
+	{
 		PlayerBase target_player = PlayerBase.Cast(action_data.m_Target.GetObject());
 		PlayerBase source_player = PlayerBase.Cast(action_data.m_Player);
 	
@@ -123,24 +133,21 @@ class ActionRestrainTarget: ActionContinuousBase
 		else
 		{
 			Print("Restraining player with empty hands");
-			RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player, item_in_hands_target);
+			RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player);
 			source_player.LocalReplaceItemInHandsWithNewElsewhere(lambda);
 		}		
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };
-
 
 class RestrainTargetPlayerLambda : ReplaceItemWithNewLambdaBase
 {
 	PlayerBase m_TargetPlayer;
-	EntityAI m_TargetItem;
 
-	void RestrainTargetPlayerLambda (EntityAI old_item, string new_item_type, PlayerBase player, EntityAI targetItem)
+	void RestrainTargetPlayerLambda (EntityAI old_item, string new_item_type, PlayerBase player)
 	{
 		m_TargetPlayer = player;
-		m_TargetItem = targetItem;
 		
 		InventoryLocation targetHnd = new InventoryLocation;
 		targetHnd.SetHands(m_TargetPlayer, null);

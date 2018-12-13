@@ -17,6 +17,8 @@ class ActionUncoverHeadSelf: ActionContinuousBase
 		m_MessageFail = "I have moved and removing sack was canceled.";
 		m_MessageCancel = "I stopped removing the sack.";
 		//m_Animation = "INJECTEPIPENS";
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_COVERHEAD_SELF;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
 	
 	override void CreateConditionComponents()  
@@ -50,7 +52,15 @@ class ActionUncoverHeadSelf: ActionContinuousBase
 
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		action_data.m_Player.GetInventory().CreateInInventory("BurlapSack");
+		EntityAI entity = action_data.m_Player.GetInventory().CreateInInventory("BurlapSack");
+		if( !entity )
+		{
+			vector m4[4];
+			action_data.m_Player.GetTransformWS(m4);
+			InventoryLocation target_gnd = new InventoryLocation;
+			target_gnd.SetGround(null, m4);
+			GameInventory.LocationCreateEntity(target_gnd, "BurlapSack");
+		}
 		
 		EntityAI attachment;
 		Class.CastTo(attachment, action_data.m_Player.GetInventory().FindAttachment(InventorySlots.HEADGEAR));
@@ -59,7 +69,7 @@ class ActionUncoverHeadSelf: ActionContinuousBase
 			attachment.Delete();
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 
 

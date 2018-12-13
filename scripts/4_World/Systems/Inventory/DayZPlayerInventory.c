@@ -28,7 +28,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 
 		// events
 		HandEventBase _fin_ = new HandEventHumanCommandActionFinished;
-		//HandEventBase _abt_ = new HandEventHumanCommandActionAborted;
+		HandEventBase _abt_ = new HandEventHumanCommandActionAborted;
 		HandEventBase __T__ = new HandEventTake;
 		HandEventBase __M__ = new HandEventMoveTo;
 		HandEventBase __W__ = new HandEventSwap;
@@ -38,15 +38,21 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		// setup transitions
 		m_FSM.AddTransition(new HandTransition( m_Empty   , __T__,    m_Taking, NULL, new HandSelectAnimationOfTakeToHandsEvent(GetManOwner())));
 		m_FSM.AddTransition(new HandTransition( m_Taking  , _fin_,  m_Equipped, null, null));
+			m_Taking.AddTransition(new HandTransition(  m_Taking.m_Hide, _abt_,   m_Empty));
+			m_Taking.AddTransition(new HandTransition(  m_Taking.m_Show, _abt_,   m_Equipped));
 
 		m_FSM.AddTransition(new HandTransition( m_Equipped, __M__,  m_MovingTo, NULL, new HandSelectAnimationOfMoveFromHandsEvent(GetManOwner())));
 		m_FSM.AddTransition(new HandTransition( m_MovingTo, _fin_,  m_Empty   , null, null));
+			m_MovingTo.AddTransition(new HandTransition(  m_MovingTo.m_Hide, _abt_,   m_Equipped));
+			m_MovingTo.AddTransition(new HandTransition(  m_MovingTo.m_Show, _abt_,   m_Empty));
 
 		m_FSM.AddTransition(new HandTransition( m_Equipped, __W__,  m_Swapping, NULL, new HandSelectAnimationOfSwapInHandsEvent(GetManOwner())));
 		m_FSM.AddTransition(new HandTransition( m_Swapping, _fin_,  m_Equipped, null, null));
+		m_FSM.AddTransition(new HandTransition( m_Swapping, _abt_,  m_Equipped, null, null));
 
 		m_FSM.AddTransition(new HandTransition( m_Equipped, __F__, m_FSwapping, NULL, new HandSelectAnimationOfForceSwapInHandsEvent(GetManOwner())));
 		m_FSM.AddTransition(new HandTransition(m_FSwapping, _fin_,  m_Equipped, null, null));
+		m_FSM.AddTransition(new HandTransition(m_FSwapping, _abt_,  m_Equipped, null, null));
 
 		super.Init(); // initialize ordinary human fsm (no anims)
 	}
@@ -170,7 +176,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 
 			//hndDebugSpam("[hndfsm] HCW: playing A=" + typename.EnumToString(WeaponActions, hcw.GetRunningAction()) + " AT=" + WeaponActionTypeToString(hcw.GetRunningAction(), hcw.GetRunningActionType()) + " fini=" + hcw.IsActionFinished());
 
-			//if (!weapon.IsIdle())
+			if ( !m_FSM.GetCurrentState().IsIdle() || !m_FSM.IsRunning() )
 			{
 				while (true)
 				{
@@ -201,7 +207,10 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 					}
 					else
 					{
-						//hndDebugPrint("[hndfsm] Hand-Weapon event: ABORT! notifying running state=" + m_FSM.GetCurrentState());
+						hndDebugPrint("[hndfsm] Hand-Weapon event: ABORT! notifying running state=" + m_FSM.GetCurrentState());
+						HandEventBase abt_event = new HandEventHumanCommandActionAborted(GetManOwner());
+						SyncHandEventToRemote(abt_event);						
+						ProcessHandAbortEvent(abt_event);
 						//m_FSM.ProcessHandAbortEvent(new WeaponEventHumanCommandActionAborted(GetManOwner()));
 					}
 				}
@@ -467,7 +476,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 
 			case InventoryCommandType.FORCESWAP:
 			{
-				Error("[syncinv] ForceSwap TODO");
+				Error("[syncinv] DZPI.ForceSwap TODO");
 				break;
 			}
 
@@ -493,15 +502,22 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			}
 		}
 
-		if (!handling_juncture && !remote && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
-		{
-			syncDebugPrint("[syncinv] HandleInputData forwarding to remotes cmd=" + typename.EnumToString(InventoryCommandType, type));
-			GetDayZPlayerOwner().StoreInputForRemotes(ctx); // @NOTE: needs to be called _after_ the operation
-		}
+		StoreInputForRemotes(handling_juncture, remote, ctx);
 
 		return true;
 	}
 	
+	bool StoreInputForRemotes (bool handling_juncture, bool remote, ParamsReadContext ctx)
+	{
+		if (!handling_juncture && !remote && GetDayZPlayerOwner().GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER)
+		{
+			syncDebugPrint("[syncinv] StoreInputForRemotes forwarding to remotes");
+			GetDayZPlayerOwner().StoreInputForRemotes(ctx); // @NOTE: needs to be called _after_ the operation
+			return true;
+		}
+		return false;
+	}
+
 	override bool TakeToDst (InventoryMode mode, notnull InventoryLocation src, notnull InventoryLocation dst)
 	{
 		switch (mode)
@@ -602,8 +618,8 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		if (e)
 		{
 			hndDebugSpam("[hndfsm] recv event from remote: created event=" + e);
-			m_FSM.ProcessEvent(e);
-			/*if (e.GetEventID() == WeaponEventID.HUMANCOMMAND_ACTION_ABORTED)
+			//m_FSM.ProcessEvent(e);
+			if (e.GetEventID() == WeaponEventID.HUMANCOMMAND_ACTION_ABORTED)
 			{
 				ProcessEventResult aa;
 				m_FSM.ProcessAbortEvent(e, aa);
@@ -611,7 +627,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			else
 			{
 				m_FSM.ProcessEvent(e);
-			}*/
+			}
 
 			return true;
 		}
@@ -643,6 +659,11 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			p.m_Bot.ProcessEvent(new BotEventOnItemInHandsChanged(p));
 		}
 #endif
+	}
+	
+	bool IsProcessing()
+	{
+		return !m_FSM.GetCurrentState().IsIdle();
 	}
 
 };

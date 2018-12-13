@@ -46,12 +46,15 @@ class ActionStartEngine: ActionContinuousBase
 		if( vehCommand )
 		{
 			Transport trans = vehCommand.GetTransport();
-
+			
 			if ( trans )
 			{
 				Car car;
 				if ( Class.CastTo(car, trans) && !car.EngineIsOn() )
 				{
+					if ( car.GetHealthLevel("Engine") >= STATE_RUINED )
+						return false;
+					
 					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
 						return true;
 				}

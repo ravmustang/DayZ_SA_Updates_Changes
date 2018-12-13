@@ -124,9 +124,6 @@ class BleedingSourcesManagerRemote extends BleedingSourcesManagerBase
 	
 	void DisplayDebug()
 	{	
-		
-
-		
 		m_ShowingDiag = true;
 		
 		DbgUI.BeginCleanupScope();

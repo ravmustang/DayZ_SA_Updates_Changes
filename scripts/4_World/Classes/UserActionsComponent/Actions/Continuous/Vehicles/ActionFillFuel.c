@@ -40,7 +40,7 @@ class ActionFillFuel: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#refill_car";
+		return "#refuel";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

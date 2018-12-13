@@ -18,7 +18,7 @@ class ActionAttachToCharger: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#attach_battery_to_charger";
+		return "#attach";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

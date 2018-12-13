@@ -17,6 +17,8 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	protected ref array<int>				m_CustomBind;
 	protected ref array<int>				m_CustomAlternateBind;
 	
+	protected ref Timer						m_EntryTimer = new Timer( CALL_CATEGORY_GUI );
+	
 	void KeybindingElement( int key_index, Widget parent, KeybindingsGroup group )
 	{
 		m_Root					= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_option.layout", parent );
@@ -61,7 +63,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 		m_IsAlternateEdited		= false;
 		m_CustomBind			= null;
 		m_CustomAlternateBind	= null;
-		
+
 		if( input.IsLimited() )
 		{
 			if( input.IsPressLimit() )
@@ -93,7 +95,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 		
 		GetGame().GetInput().GetActionDesc( m_ElementIndex, option_text );
 		m_ElementName.SetText( option_text );
-		
+
 		if( input.AlternativeCount() > 0 )
 		{
 			input.SelectAlternative( 0 );
@@ -164,7 +166,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 		}
 		else if( custom_binds.Count() > 0 )
 		{
-			if( custom_binds.Get( 0 ) > 0 )
+			if( custom_binds.Get( 0 ) != 0 )
 				output = GetUApi().GetButtonName( custom_binds.Get( 0 ) );
 		}
 		
@@ -208,11 +210,11 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	{
 		if( w == m_PrimaryBindButton )
 		{
-			StartEnteringKeybind();
+			m_EntryTimer.Run( 0.01, this, "StartEnteringKeybind" );
 		}
 		if( w == m_AlternativeBindButton )
 		{
-			StartEnteringAlternateKeybind();
+			m_EntryTimer.Run( 0.01, this, "StartEnteringAlternateKeybind" );
 		}
 		return false;
 	}

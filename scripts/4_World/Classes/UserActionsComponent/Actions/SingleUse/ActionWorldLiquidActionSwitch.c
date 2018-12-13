@@ -1,7 +1,7 @@
 //can be eventually extended to allow switching for multiple action types?
 class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 {
-	string 	m_switch_to;
+	bool 	m_switch_to;
 	void ActionWorldLiquidActionSwitch()
 	{
 	}
@@ -19,7 +19,10 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 	
 	override string GetText()
 	{
-		return "#switch_to" + " " + m_switch_to;
+		//return "#switch_to" + " " + m_switch_to;
+		if (m_switch_to)
+			return  "#switch_to_liquid_drain";
+		return "switch_to_liquid_pour";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -31,7 +34,7 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 			{
 				if ( Liquid.CanFillContainer( target_item, item.GetLiquidType() ) )
 				{
-					m_switch_to = "#liquid_drain";
+					m_switch_to = 0;//"#liquid_drain";
 					return true;
 				}
 				else
@@ -44,7 +47,7 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 			{
 				if ( Liquid.CanFillContainer( item, target_item.GetLiquidType() ) )
 				{
-					m_switch_to = "#liquid_pour";
+					m_switch_to = 1;//"#liquid_pour";
 					return true;
 				}
 				else

@@ -14,9 +14,9 @@ class ActionUnmountBarbedWire: ActionContinuousBase
 	void ActionUnmountBarbedWire()
 	{
 		m_CallbackClass = ActionUnmountBarbedWireCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CRAFTING;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
-		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		
 		m_DamageAmount = 2;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
@@ -82,6 +82,6 @@ class ActionUnmountBarbedWire: ActionContinuousBase
 		//unmount and refresh parent
 		barbed_wire.SetMountedState( false );
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }

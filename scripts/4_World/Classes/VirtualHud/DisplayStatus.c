@@ -3,7 +3,8 @@ enum DSLevels
 	NORMAL = 0,//no bit, default
 	WARNING = 1,//first bit
 	CRITICAL = 2,//second bit
-	BLINKING = 3//first + second bit
+	BLINKING = 3,//first + second bit
+	EXTRA = 4,//third bit
 }
 
 enum DSLevelsTemp
@@ -43,14 +44,14 @@ class VirtualHud
 		RegisterElement(new BadgeSick);// size 2
 		RegisterElement(new BadgePoisoned);// size 2
 		RegisterElement(new BadgeFracture);// size 2
-		RegisterElement(new TendencyHealth);// size 5
-		RegisterElement(new TendencyBlood);// size 5
+		RegisterElement(new TendencyHealth);// size 6
+		RegisterElement(new TendencyBlood);// size 6
 		RegisterElement(new TendencyTemperature);// size 6
-		RegisterElement(new TendencyHunger);// size 5
-		// sum 31/32
-		RegisterElement(new TendencyThirst);// size 5
-		RegisterElement(new TendencyBacteria);// size 5
-		// sum 10/32
+		// sum 28/32
+		RegisterElement(new TendencyHunger);// size 6
+		RegisterElement(new TendencyThirst);// size 6
+		RegisterElement(new TendencyBacteria);// size 6
+		// sum 18/32
 
 		RegisterElement(new ElementStance);// size 0(client only)
 

@@ -40,7 +40,17 @@ class ActionAttach: ActionSingleUseBase
 		ref InventoryLocation il = new InventoryLocation;
 		if (!GetGame().IsMultiplayer() || GetGame().IsClient())
 		{
-			EntityAI target_entity = EntityAI.Cast( target.GetObject() );
+			EntityAI target_entity;
+			
+			if ( target.IsProxy() )
+			{
+				target_entity = EntityAI.Cast( target.GetParent() );
+			}
+			else
+			{
+				target_entity = EntityAI.Cast( target.GetObject() );
+			}
+			
 			if(!target_entity.GetInventory().FindFirstFreeLocationForNewEntity( item.GetType(), FindInventoryLocationType.ATTACHMENT, il ))
 				return false;
 		}
@@ -79,7 +89,17 @@ class ActionAttach: ActionSingleUseBase
 			return;
 		
 		AttachActionData action_data_a = AttachActionData.Cast(action_data);
-		EntityAI target_EAI = EntityAI.Cast( action_data_a.m_Target.GetObject() ); // cast to ItemBase
+		EntityAI target_EAI;
+			
+		if ( action_data.m_Target.IsProxy() )
+		{
+			target_EAI = EntityAI.Cast( action_data_a.m_Target.GetParent() ); // cast to ItemBase
+		}
+		else
+		{
+			target_EAI = EntityAI.Cast( action_data_a.m_Target.GetObject() ); // cast to ItemBase
+		}
+		
 		if (target_EAI && action_data_a.m_MainItem)
 		{
 			action_data_a.m_Player.PredictiveTakeEntityToTargetAttachmentEx(target_EAI, action_data_a.m_MainItem,action_data_a.m_AttSlot);
@@ -89,7 +109,18 @@ class ActionAttach: ActionSingleUseBase
 	override void OnExecuteClient( ActionData action_data )
 	{
 		AttachActionData action_data_a = AttachActionData.Cast(action_data);
-		EntityAI target_EAI = EntityAI.Cast( action_data_a.m_Target.GetObject() ); // cast to ItemBase
+		
+		EntityAI target_EAI;
+			
+		if ( action_data.m_Target.IsProxy() )
+		{
+			target_EAI = EntityAI.Cast( action_data_a.m_Target.GetParent() ); // cast to ItemBase
+		}
+		else
+		{
+			target_EAI = EntityAI.Cast( action_data_a.m_Target.GetObject() ); // cast to ItemBase
+		}
+		
 		if (target_EAI && action_data_a.m_MainItem)
 		{
 			action_data_a.m_Player.PredictiveTakeEntityToTargetAttachmentEx(target_EAI, action_data_a.m_MainItem, action_data_a.m_AttSlot);

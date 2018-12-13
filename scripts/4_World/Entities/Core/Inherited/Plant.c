@@ -53,11 +53,11 @@ class TreeHard extends PlantSuper
 	{
 		if ( item && item.KindOf("Knife") )
 		{
-			return 10;
+			return 3;
 		}
 		else if ( item && item.KindOf("Axe") )
 		{
-			return 5;
+			return 2;
 		}
 		else
 		{
@@ -114,11 +114,11 @@ class TreeSoft extends PlantSuper
 	{
 		if ( item && item.KindOf("Knife") )
 		{
-			return 10;
+			return 2;
 		}
 		else if ( item && item.KindOf("Axe") )
 		{
-			return 5;
+			return 2;
 		}
 		else
 		{
@@ -176,11 +176,11 @@ class BushHard extends PlantSuper
 	{
 		if ( item && item.KindOf("Knife") )
 		{
-			return 10;
+			return 2;
 		}
 		else if ( item && item.KindOf("Axe") )
 		{
-			return 5;
+			return 1;
 		}
 		else
 		{
@@ -237,11 +237,11 @@ class BushSoft extends PlantSuper
 	{
 		if ( item && item.KindOf("Knife") )
 		{
-			return 10;
+			return 1;
 		}
 		else if ( item && item.KindOf("Axe") )
 		{
-			return 5;
+			return 1;
 		}
 		else
 		{

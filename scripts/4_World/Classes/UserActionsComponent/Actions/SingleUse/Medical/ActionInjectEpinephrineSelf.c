@@ -1,10 +1,5 @@
 class ActionInjectEpinephrineSelf: ActionInjectSelf
 {
-	void ActionInjectEpinephrineSelf()
-	{
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_MORPHINE;
-	}
-	
 	override int GetType()
 	{
 		return AT_INJECT_EPINEPHRINE_S;

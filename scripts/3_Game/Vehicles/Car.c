@@ -64,6 +64,7 @@ class Car extends Transport
 	//!	Returns the current speed of the vehicle in km/h.
 	proto native float GetSpeedometer();
 
+
 //-----------------------------------------------------------------------------
 // fluids
 
@@ -78,7 +79,7 @@ class Car extends Transport
 		Returns fraction value (in range <0, 1>)
 		of the current state of the specified vehicle's fluid.
 
-		\param fluid the specified fluid type
+		\param[in] fluid the specified fluid type
 	*/
 	proto native float GetFluidFraction( CarFluid fluid );
 
@@ -90,6 +91,16 @@ class Car extends Transport
 
 	//! Adds to the specified fluid the specified amount.
 	proto native void Fill( CarFluid fluid, float amount );
+
+	/*!
+		Is called every time when the specified vehicle's fluid level
+		changes eg. when car is consuming fuel.
+
+		\param[in] fluid fluid identifier, \see CarFluid
+		\param[in] newValue new fluid level
+		\param[in] oldValue previous fluid level before change
+	*/
+	void OnFluidChanged( CarFluid fluid, float newValue, float oldValue ) {}
 //-----------------------------------------------------------------------------
 
 
@@ -111,19 +122,105 @@ class Car extends Transport
 	//! Starts the engine.
 	proto native void EngineStart();
 
+	/*!
+		Is called every time the game wants to start the engine.
+
+		\return true if the engine can start, false otherwise.
+	*/
+	bool OnBeforeEngineStart()
+	{
+		// engine can start by default
+		return true;
+	}
+
+	//! Is called every time the engine starts.
+	void OnEngineStart() {}
+
 	//! Stops the engine.
 	proto native void EngineStop();
 
+	//! Is called every time the engine stops.
+	void OnEngineStop() {}
 //-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// gearbox
 
 	//! Returns total number of gears.
 	proto native int GetGearsCount();
+
+	/*!
+		Is called every time when the game wants to change
+		vehicle's current gear level.
+
+		\param[in] newGear new gear level
+		\param[in] oldGear previous gear level before gear shift
+		\return new gear level that will be applied.
+	*/
+	//int OnBeforeGearChange( int newGear, int oldGear )
+	//{
+	//	// by default, you can't switch between reverse
+	//	// and positive gears and vice versa while the vehicle is moving
+	//	if ( GetSpeedometer() > 0.1 )
+	//	{
+	//		bool newG = ( newGear < CarGear.NEUTRAL );
+	//		bool oldG = ( oldGear < CarGear.NEUTRAL );
+	//		if ( newG != oldG )
+	//			return oldGear;
+	//	}
+	//
+	//	return newGear;
+	//}
+//-----------------------------------------------------------------------------
+
+
+//-----------------------------------------------------------------------------
+// lights
 
 	//! Returns true when lights are on, false otherwise.
 	proto native bool IsLightsOn();
 
 	//! Toggles the vehicle's lights state (on / off).
 	proto native void SwitchLights();
+
+	/*!
+		Is called every time the game wants to switch the lights.
+
+		\param[in] toOn true when lights should be switched on, false otherwise
+		\return true when lights can be switched, false otherwise.
+	*/
+	bool OnBeforeSwitchLights( bool toOn )
+	{
+		// lights can be always switched by default
+		return true;
+	}
+//-----------------------------------------------------------------------------
+
+
+	/*!
+		Is called every time when vehicle collides with other object.
+
+		\param[in] zoneName configured vehicle's zone that was hit
+		\param[in] localPos position where the vehicle was hit in vehicle's space
+		\param[in] other object with which the vehicle is colliding
+		\param[in] data contact properties
+	*/
+	void OnContact( string zoneName, vector localPos, IEntity other, Contact data ) {}
+
+	/*!
+		Is called every sound simulation step.
+		In this callback, user can modify behaviour of sound controllers.
+
+		\param[in] ctrl sound controller identifier, \see CarSoundCtrl
+		\param[in] oldValue already computed value by the game code
+		\return new value of the specified sound controller.
+	*/
+	float OnSound( CarSoundCtrl ctrl, float oldValue )
+	{
+		// just use the computed value by the game code
+		return oldValue;
+	}
 };
 
 

@@ -53,7 +53,7 @@ class CAContinuousDisinfectPlant : CAContinuousQuantity
 			if ( m_SpentQuantity < m_ItemQuantity  &&  m_SpentQuantity < m_PlantNeededSpraying )
 			{
 				m_SpentQuantity += m_QuantityUsedPerSecond * action_data.m_Player.GetDeltaT();
-				float transfered_spray = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_SpentQuantity, m_Action.GetSpecialtyWeight(), true );
+				float transfered_spray = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_SpentQuantity, m_Action.GetSpecialtyWeight(), true );
 				
 				if ( m_Action ) 
 				{

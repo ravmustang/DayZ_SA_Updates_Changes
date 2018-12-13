@@ -1,3 +1,13 @@
+enum ConstructionMaterialType
+{
+	MATERIAL_NONE	= 0,
+	MATERIAL_LOG	= 1,
+	MATERIAL_WOOD	= 2,
+	MATERIAL_STAIRS	= 3,
+	MATERIAL_METAL	= 4,
+	MATERIAL_WIRE	= 5
+}
+
 class Construction
 {
 	protected ref map<string, ref ConstructionPart> m_ConstructionParts;	//string - part name; int - 0-not constructed, 1-constructed
@@ -58,41 +68,60 @@ class Construction
 	}
 	
 	//BuildPart
-	void BuildPart( string part_name, bool take_materials )
+	void BuildPart( string part_name, int action_id )
 	{
-		//remove materials
-		if ( take_materials )
+		if ( GetGame().IsServer() )
 		{
-			TakeMaterials( part_name );
-		}
+			//add part to constructed parts
+			AddToConstructedParts( part_name );
 
-		//add part to constructed parts
-		AddToConstructedParts( part_name );
-		
-		//destroy build collision check trigger
-		DestroyCollisionTrigger();
+			//on action
+			TakeMaterials( part_name );
+
+			//destroy build collision check trigger
+			DestroyCollisionTrigger();
+		}
 		
 		//call event
-		GetParent().OnPartBuilt( part_name );
+		GetParent().OnPartBuiltServer( part_name, action_id );
 	}
 	
 	//DismantlePart
-	void DismantlePart( string part_name, bool receive_materials )
+	void DismantlePart( string part_name, int action_id )
 	{
-		//receive materials
-		ReceiveMaterials( part_name, receive_materials );
-		
-		//add part to constructed parts
-		RemoveFromConstructedParts( part_name );
+		if ( GetGame().IsServer() )
+		{
+			//add part to constructed parts
+			RemoveFromConstructedParts( part_name );
+
+			//receive materials
+			ReceiveMaterials( part_name );
 			
+			//drop non-usable materials
+			DropNonUsableMaterials( part_name );
+		}
+		
 		//call event
-		GetParent().OnPartDismantled( part_name );
+		GetParent().OnPartDismantledServer( part_name, action_id );
 	}
 	
 	//DestroyPart
-	void DestroyPart( string part_name )
+	void DestroyPart( string part_name, int action_id )
 	{
-		DismantlePart( part_name, false );
+		if ( GetGame().IsServer() )
+		{
+			//add part to constructed parts
+			RemoveFromConstructedParts( part_name );
+			
+			//destroy attached materials (if locked)
+			DestroyMaterials( part_name );
+			
+			//drop non-usable materials
+			DropNonUsableMaterials( part_name );			
+		}
+		
+		//call event
+		GetParent().OnPartDestroyedServer( part_name, action_id );
 	}	
 	
 	//============================================
@@ -468,15 +497,17 @@ class Construction
 	}
 	
 	//receive materials when dismantling
-	protected void ReceiveMaterials( string part_name, bool receive_materials )
+	protected void ReceiveMaterials( string part_name )
 	{
-		string main_part_name = GetConstructionPart( part_name ).GetMainPartName();
+		ConstructionPart construction_part = GetConstructionPart( part_name );
+		string main_part_name = construction_part.GetMainPartName();
 		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "Materials";
 		
 		if ( GetGame().ConfigIsExisting( cfg_path ) )
 		{
 			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
 			
+			//1. client update
 			GetGame().RemoteObjectTreeDelete(GetParent());
 			
 			for ( int i = 0; i < child_count; i++ )
@@ -510,76 +541,181 @@ class Construction
 						attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
 						GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
 						
-						if ( receive_materials )		//drop attachment if true
+						//detach if base
+						if ( construction_part.IsBase() )
 						{
-							//detach
-							if ( GetGame().IsMultiplayer() )
-							{
-								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
-							}
-							else
-							{
-								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
-							}
-						}
-						else
-						{
-							GetGame().ObjectDelete( attachment );		//delete object if not
+							GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
+							// restore network for dropped attachment (@NOTE: won't be restored by 2. as it's not in hierarchy anymore) 
+							GetGame().RemoteObjectTreeCreate( attachment );
 						}
 					}
 				}
 				else
 				{
-					if ( receive_materials )
+					if ( attachment )
 					{
-						if ( attachment )
+						float att_quantity = attachment.GetQuantity();
+						float att_max_quantity = attachment.GetQuantityMax();
+						float att_quantity_diff = att_max_quantity - att_quantity; 
+						if ( quantity > att_quantity_diff )
 						{
-							float att_quantity = attachment.GetQuantity();
-							float att_max_quantity = attachment.GetQuantityMax();
-							float att_quantity_diff = att_max_quantity - att_quantity; 
-							if ( quantity > att_quantity_diff )
+							while ( quantity > 0 )
 							{
-								while ( quantity > 0 )
+								//create material on ground if quantity exceeds max quantity
+								ItemBase received_material = ItemBase.Cast( GetGame().CreateObject( attachment.GetType(), GetParent().GetPosition() ) );
+								if ( quantity > att_max_quantity )
 								{
-									//create material on ground if quantity exceeds max quantity
-									ItemBase received_material = ItemBase.Cast( GetGame().CreateObject( attachment.GetType(), GetParent().GetPosition() ) );
-									if ( quantity > att_max_quantity )
-									{
-										received_material.SetQuantity( att_max_quantity );
-									}
-									else
-									{
-										received_material.SetQuantity( quantity );
-									}
-									
-									quantity -= att_max_quantity;
+									received_material.SetQuantity( att_max_quantity );
 								}
-							}
-							else
-							{
-								attachment.AddQuantity( quantity );
+								else
+								{
+									received_material.SetQuantity( quantity );
+								}
+								
+								quantity -= att_max_quantity;
 							}
 						}
-						//material slot is empty, create a new material
 						else
 						{
-							//attach item
-							slot_id = InventorySlots.GetSlotIdFromString( slot_name );
-							InventoryLocation attLoc = new InventoryLocation;
-							attLoc.SetAttachment(GetParent(), null, slot_id);
-							attachment = GetParent().GetInventory().LocationCreateLocalEntity(attLoc, type); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
-							if ( quantity > 0 ) 					//object was deleted or the quantity is ignored
-							{
-								attachment.SetQuantity( quantity );
-							}
+							attachment.AddQuantity( quantity );
+						}
+					}
+					//material slot is empty, create a new material
+					else
+					{
+						//attach item
+						slot_id = InventorySlots.GetSlotIdFromString( slot_name );
+						InventoryLocation attLoc = new InventoryLocation;
+						attLoc.SetAttachment(GetParent(), null, slot_id);
+						attachment = ItemBase.Cast( GetParent().GetInventory().LocationCreateLocalEntity( attLoc, type ) ); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
+						if ( attachment && quantity > 0 ) 					//object was deleted or the quantity is ignored
+						{
+							attachment.SetQuantity( quantity );
 						}
 					}
 				}
 			}
 			
+			//2. client update
+			GetGame().RemoteObjectTreeCreate( GetParent() );	
+		}
+	}
+	
+	//destroy lockable materials when destroying
+	protected void DestroyMaterials( string part_name )
+	{
+		string main_part_name = GetConstructionPart( part_name ).GetMainPartName();
+		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "Materials";
+		
+		if ( GetGame().ConfigIsExisting( cfg_path ) )
+		{
+			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
+			
+			//1. client update
+			GetGame().RemoteObjectTreeDelete(GetParent());
+			
+			for ( int i = 0; i < child_count; i++ )
+			{
+				string child_name;
+				GetGame().ConfigGetChildName( cfg_path, i, child_name );
+				
+				//get type, quantity from material
+				string config_path;
+				string type;
+				string slot_name;
+				config_path = cfg_path + " " + child_name + " " + "type";
+				GetGame().ConfigGetText( config_path, type );
+				config_path = cfg_path + " " + child_name + " " + "slot_name";
+				GetGame().ConfigGetText( config_path, slot_name );
+				config_path = cfg_path + " " + child_name + " " + "quantity";
+				float quantity = GetGame().ConfigGetFloat( config_path );
+				config_path = cfg_path + " " + child_name + " " + "lockable";
+				bool lockable = GetGame().ConfigGetInt( config_path );
+				
+				//get material
+				ItemBase attachment = ItemBase.Cast( GetParent().FindAttachmentBySlotName( slot_name ) );
+				
+				//material still attached
+				if ( lockable )			//if lockable 
+				{
+					if ( attachment )
+					{
+						InventoryLocation inventory_location = new InventoryLocation;
+						attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
+						GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
+						
+						GetGame().ObjectDelete( attachment );		//delete object
+					}
+				}
+			}
+			
+			//2. client update
 			GetGame().RemoteObjectTreeCreate(GetParent());	
 		}
-	}	
+	}
+	
+	//drop materials when dismantling part that will prevent other parts to be built
+	protected void DropNonUsableMaterials( string part_name )
+	{
+		ConstructionPart construction_part = GetConstructionPart( part_name );
+		
+		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " " + "Construction" + " " + construction_part.GetMainPartName() + " " + construction_part.GetPartName() + " " + "platform_support";
+		string platform_support;
+		
+		if ( GetGame().ConfigIsExisting( cfg_path ) )
+		{		
+			GetGame().ConfigGetText( cfg_path, platform_support );
+		}
+		
+		if ( platform_support.Length() > 0 )
+		{
+			//1. client update
+			GetGame().RemoteObjectTreeDelete( GetParent() );
+
+			string at_cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "GUIInventoryAttachmentsProps";
+			
+			if ( GetGame().ConfigIsExisting( at_cfg_path ) )
+			{
+				int	child_count = GetGame().ConfigGetChildrenCount( at_cfg_path );
+				
+				for ( int i = 0; i < child_count; i++ )
+				{
+					string child_name;
+					GetGame().ConfigGetChildName( at_cfg_path, i, child_name );
+					child_name.ToLower();
+					
+					if ( child_name.Contains( platform_support ) )
+					{
+						ref array<string> attachment_slots = new array<string>;
+						GetGame().ConfigGetTextArray( at_cfg_path + " " + child_name + " " + "attachmentSlots", attachment_slots );
+						
+						for ( int j = 0; j < attachment_slots.Count(); ++j )
+						{
+							//get material
+							ItemBase attachment = ItemBase.Cast( GetParent().FindAttachmentBySlotName( attachment_slots.Get( j ) ) );
+							
+							//material still attached
+							if ( attachment )
+							{
+								InventoryLocation inventory_location = new InventoryLocation;
+								attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
+								GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
+								
+								//detach if base
+								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
+								
+								//restore network for dropped attachment (@NOTE: won't be restored by 2. as it's not in hierarchy anymore) 
+								GetGame().RemoteObjectTreeCreate( attachment );
+							}
+						}
+					}
+				}
+			}
+
+			//2. client update
+			GetGame().RemoteObjectTreeCreate( GetParent() );
+		}
+	}
 	
 	//============================================
 	// Construction tools
@@ -630,6 +766,18 @@ class Construction
 		return false;
 	}
 	
+	ConstructionMaterialType GetMaterialType( string part_name )
+	{
+		ConstructionPart construction_part = GetConstructionPart( part_name );
+		string part_cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + construction_part.GetMainPartName() + " " + construction_part.GetPartName() + " " + "material_type";
+		if ( GetGame().ConfigIsExisting( part_cfg_path ) )
+		{
+			return GetGame().ConfigGetInt( part_cfg_path );
+		}
+		
+		return ConstructionMaterialType.MATERIAL_NONE;
+	}
+	
 	//============================================
 	// Collision check
 	//============================================
@@ -641,47 +789,43 @@ class Construction
 		if ( construction_part )
 		{
 			vector center;
-			vector absolute_ofset 	= "0 0.01 0"; 	//we need to lift BBox even more, because it colliddes with house floors due to various reasons (probably geometry or float imperfections)
-			vector orientation 		= GetParent().GetOrientation();
+			float absolute_ofset = 0.05; 	//we need to lift BBox even more, because it colliddes with house floors due to various reasons (probably geometry or float imperfections)
 			vector edge_length;
-			vector min_max_local[2];				//data used for creating trigger
-			vector min_max_world[2];				//data used for creating BBox
+			vector min_max[2];				//data used for creating trigger
 			ref array<Object> excluded_objects = new array<Object>;
 			ref array<Object> collided_objects = new array<Object>;
 			
-			//get min_max and center from config and memory points
-			GetCollisionBoxData( part_name, center, min_max_local );
-			
-			//set BBox data
-			min_max_world[0] = GetParent().ModelToWorld( min_max_local[0] );
-			min_max_world[1] = GetParent().ModelToWorld( min_max_local[1] );
-						
-			center = center + absolute_ofset;
-			edge_length = GetCollisionBoxSize( min_max_world );
-			
 			excluded_objects.Insert( GetParent() );
 			
+			//get min_max and center from config and memory points
+			GetCollisionBoxData( part_name, min_max );
+			
+			center = GetBoxCenter( min_max );
+			center = GetParent().ModelToWorld( center );		//convert to world coordinates
+			edge_length = GetCollisionBoxSize( min_max );
+			
 			//Create trigger
-			CreateCollisionTrigger( part_name, min_max_local );
+			//CreateCollisionTrigger( part_name, min_max, center );
 			
 			//check collision on box trigger and collision box
-			if ( IsTriggerColliding() || GetGame().IsBoxColliding( center, orientation, edge_length, excluded_objects, collided_objects ) )
+			//IsTrigger colliding was turned off (for now) for easier way to build something with other players around
+			if ( /* IsTriggerColliding() || */ GetGame().IsBoxColliding( Vector( center[0], center[1] + absolute_ofset, center[2] ), GetParent().GetOrientation(), edge_length, excluded_objects, collided_objects ) )
 			{	
 				//Debug
-				//DrawDebugCollisionBox( min_max_world, ARGB( 255, 255, 0, 0 ) );
+				//DrawDebugCollisionBox( min_max, ARGB( 255, 255, 0, 0 ) );
 				//
 				
 				return true;	
 			}
 			
 			//Debug
-			//DrawDebugCollisionBox( min_max_world, ARGB( 255, 255, 255, 255 ) );
+			//DrawDebugCollisionBox( min_max, ARGB( 255, 255, 255, 255 ) );
 			//
 		}
 		return false;
 	}
 
-	protected vector GetCollisionBoxSize( vector min_max[2] )
+	vector GetCollisionBoxSize( vector min_max[2] )
 	{
 		vector box_size = Vector( 0, 0, 0 );
 		
@@ -692,7 +836,8 @@ class Construction
 		return box_size;
 	}
 	
-	protected void GetCollisionBoxData( string part_name, out vector center, out vector min_max[2] )
+	//returns collision box data from construction config and model p3d
+	protected void GetCollisionBoxData( string part_name, out vector min_max[2] )
 	{
 		string main_part_name = GetConstructionPart( part_name ).GetMainPartName();
 		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "collision_data";
@@ -709,20 +854,31 @@ class Construction
 			{
 				min_max[1] = GetParent().GetMemoryPointPos( collision_data[1] );
 			}
-			
-			center = GetBoxCenter( min_max );
 		}
 	}
 	
-	protected vector GetBoxCenter( vector min_max[2] )
+	//returns center point of box defined by min/max values
+	vector GetBoxCenter( vector min_max[2] )
 	{
 		vector center;
 		
 		center[0] = ( min_max[1][0] - min_max[0][0] ) / 2;
 		center[1] = ( min_max[1][1] - min_max[0][1] ) / 2;
 		center[2] = ( min_max[1][2] - min_max[0][2] ) / 2;
+		center = Vector( min_max[1][0] - center[0], min_max[1][1] - center[1], min_max[1][2] - center[2] ); //offset to box center
 		
 		return center;
+	}
+	
+	void GetTriggerExtents( vector min_max[2], out vector extents[2] )
+	{
+		vector egde_length = GetCollisionBoxSize( min_max );
+		extents[0][0] = -egde_length[0] / 2;		//min
+		extents[0][1] = -egde_length[1] / 2;
+		extents[0][2] = -egde_length[2] / 2;
+		extents[1][0] = egde_length[0] / 2;			//max
+		extents[1][1] = egde_length[1] / 2;
+		extents[1][2] = egde_length[2] / 2;
 	}
 	
 	//Debug
@@ -730,7 +886,11 @@ class Construction
 	{
 		DestroyDebugCollisionBox();
 		
+		vector mat[4];
+		GetParent().GetTransform( mat );
+		
 		m_CollisionBox = Debug.DrawBox( min_max[0], min_max[1], color );
+		m_CollisionBox.SetMatrix( mat );
 	}
 	
 	protected void DestroyDebugCollisionBox()
@@ -742,11 +902,11 @@ class Construction
 		}		
 	}
 	
-	void CreateCollisionTrigger( string part_name, vector min_max[2] )
+	void CreateCollisionTrigger( string part_name, vector min_max[2], vector center )
 	{
 		if ( m_ConstructionBoxTrigger )
 		{
-			if ( m_ConstructionBoxTrigger.GetPartName() == part_name )
+			if ( m_ConstructionBoxTrigger.GetPartName() == part_name )		//already created
 			{
 				return;
 			}
@@ -756,22 +916,19 @@ class Construction
 			}
 		}	
 		
-		//calculate proper collision trigger position
-		float center_offset_x = ( min_max[1][0] - min_max[0][0] ) / 2;
-		float center_offset_y = ( min_max[1][1] - min_max[0][1] ) / 2;
-		float center_offset_z = ( min_max[1][2] - min_max[0][2] ) / 2;
-		vector trigger_center = GetBoxCenter( min_max );
-		vector trigger_center_offset = Vector( trigger_center[0] - center_offset_x, trigger_center[1] - center_offset_y, trigger_center[2] - center_offset_z );
-		vector trigger_center_world = GetParent().ModelToWorld( trigger_center_offset );
+		//get proper trigger extents (min<max)
+		vector extents[2];
+		GetTriggerExtents( min_max, extents );
 		
 		//create trigger
-		m_ConstructionBoxTrigger = ConstructionBoxTrigger.Cast( GetGame().CreateObject( "ConstructionBoxTrigger", trigger_center_world, true ) );
-		m_ConstructionBoxTrigger.SetPosition( trigger_center_world );
+		m_ConstructionBoxTrigger = ConstructionBoxTrigger.Cast( GetGame().CreateObject( "ConstructionBoxTrigger", center, false, false, false ) );
+		m_ConstructionBoxTrigger.SetPosition( center );
 		m_ConstructionBoxTrigger.SetOrientation( GetParent().GetOrientation() );	
-		m_ConstructionBoxTrigger.SetExtents( min_max[0], min_max[1] );
+		m_ConstructionBoxTrigger.SetExtents( extents[0], extents[1] );
 		
 		m_ConstructionBoxTrigger.SetPartName( part_name );
 	}
+	//
 	
 	void DestroyCollisionTrigger()
 	{

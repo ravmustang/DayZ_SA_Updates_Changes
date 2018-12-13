@@ -168,7 +168,7 @@ class MainMenu extends UIScriptedMenu
 			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
 		#endif
 		#ifdef PLATFORM_WINDOWS
-			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( true );
+			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
 			layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
 			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
 		#endif
@@ -222,7 +222,7 @@ class MainMenu extends UIScriptedMenu
 			}
 			else if ( w == m_MessageButton )
 			{
-				OpenMessages();
+				OpenCredits();
 				return true;
 			}
 			else if ( w == m_SettingsButton )
@@ -284,10 +284,14 @@ class MainMenu extends UIScriptedMenu
 		#ifdef PLATFORM_WINDOWS
 		if( w == m_Play )
 		{
-			string ip;
-			int port;
-			if( g_Game.GetLastVisitedServer( ip, port ) )
+			string ip = "";
+			int port = 0;
+			 
+			if(!m_ScenePC.GetIntroCharacter().IsDefaultCharacter())
 			{
+				int charID = m_ScenePC.GetIntroCharacter().GetCharacterID();
+				m_ScenePC.GetIntroCharacter().GetLastPlayedServer(charID,ip,port);
+
 				m_LastPlayedTooltipIP.SetText( "#main_menu_IP" + " " + ip );
 				m_LastPlayedTooltipPort.SetText( "#main_menu_port" + " " + port.ToString() );
 				m_LastPlayedTooltipTimer.FadeIn( m_LastPlayedTooltip, 0.3, true );
@@ -366,11 +370,16 @@ class MainMenu extends UIScriptedMenu
 					name += "...";
 				}
 			}
+			m_PlayerName.SetText( name );
 		#else
-			name = g_Game.GetPlayerGameName();
+		if( m_ScenePC )
+		{
+			OnChangeCharacter();
+			//name = m_ScenePC.GetIntroCharacter().GetCharacterName();
+		}
 		#endif
 		
-		m_PlayerName.SetText( name );
+		
 		
 		string version;
 		GetGame().GetVersion( version );
@@ -418,6 +427,15 @@ class MainMenu extends UIScriptedMenu
 				Exit();
 			#endif
 		}
+		
+		if ( GetGame().GetInput().GetActionDown(UAUICtrlY, false) )
+		{
+			BiosUserManager user_manager = GetGame().GetUserManager();
+			if( user_manager )
+			{
+				user_manager.PickUserAsync();
+			}
+		}
 	}
 	
 	void Play()
@@ -430,7 +448,7 @@ class MainMenu extends UIScriptedMenu
 				m_ScenePC.GetIntroCharacter().SaveCharacterSetup();
 			}
 			
-			m_ScenePC.GetIntroCharacter().SaveCharName();
+			//m_ScenePC.GetIntroCharacter().SaveCharName();
 		}
 
 		#ifdef PLATFORM_CONSOLE
@@ -457,16 +475,12 @@ class MainMenu extends UIScriptedMenu
 			return;
 		#endif
 		
-		if( m_ScenePC && m_ScenePC.GetIntroCharacter() )
+		/*if( m_ScenePC && m_ScenePC.GetIntroCharacter() )
 		{
 			m_ScenePC.GetIntroCharacter().SaveCharName();
-		}
+		}*/
 		
-		#ifdef NEW_UI
-			EnterScriptedMenu(MENU_SERVER_BROWSER);
-		#else
-			g_Game.GetUIManager().EnterServerBrowser(this);
-		#endif
+		EnterScriptedMenu(MENU_SERVER_BROWSER);
 		
 		//saves demounit for further use
 		if (m_ScenePC && m_ScenePC.GetIntroCharacter() && m_ScenePC.GetIntroCharacter().GetCharacterObj().GetInventory().FindAttachment(InventorySlots.BODY) && m_ScenePC.GetIntroCharacter().GetCharacterID() == -1)
@@ -484,11 +498,13 @@ class MainMenu extends UIScriptedMenu
 	{
 		if ( m_ScenePC && m_ScenePC.GetIntroCharacter() )
 		{
-			m_ScenePC.GetIntroCharacter().SaveCharName();
-			m_ScenePC.GetIntroCharacter().CreateNewCharacterById( m_ScenePC.GetIntroCharacter().GetNextCharacterID() );
-			
-			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_ScenePC.SceneCharacterSetPos, 250 );
-			m_PlayerName.SetText( g_Game.GetPlayerGameName() );
+			int charID = m_ScenePC.GetIntroCharacter().GetNextCharacterID();
+			//m_ScenePC.GetIntroCharacter().SaveCharName();
+			if( charID != m_ScenePC.GetIntroCharacter().GetCharacterID())
+			{
+				m_ScenePC.GetIntroCharacter().SetCharacterID(charID);
+				OnChangeCharacter();
+			}
 		}
 	}
 	
@@ -496,13 +512,42 @@ class MainMenu extends UIScriptedMenu
 	{
 		if ( m_ScenePC && m_ScenePC.GetIntroCharacter() )
 		{
-			m_ScenePC.GetIntroCharacter().SaveCharName();
-			m_ScenePC.GetIntroCharacter().CreateNewCharacterById( m_ScenePC.GetIntroCharacter().GetPrevCharacterID() );
-			
-			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater( m_ScenePC.SceneCharacterSetPos, 250 );
-			m_PlayerName.SetText( g_Game.GetPlayerGameName() );
+			//m_ScenePC.GetIntroCharacter().SaveCharName();
+			int charID = m_ScenePC.GetIntroCharacter().GetPrevCharacterID();
+			if( charID != m_ScenePC.GetIntroCharacter().GetCharacterID())
+			{
+				m_ScenePC.GetIntroCharacter().SetCharacterID(charID);
+				OnChangeCharacter();
+			}
 		}
 	}
+	
+	void OnChangeCharacter()
+	{
+		if ( m_ScenePC && m_ScenePC.GetIntroCharacter() )
+		{
+			int charID = m_ScenePC.GetIntroCharacter().GetCharacterID();
+			m_ScenePC.GetIntroCharacter().CreateNewCharacterById( charID );
+			m_PlayerName.SetText( m_ScenePC.GetIntroCharacter().GetCharacterNameById( charID ) );
+			if( m_ScenePC.GetIntroCharacter().IsDefaultCharacter() )
+			{
+				m_CustomizeCharacter.SetText("#layout_main_menu_customize_char");
+			}
+			else
+			{
+				m_CustomizeCharacter.SetText("#layout_main_menu_rename");
+			}
+			if (m_ScenePC.GetIntroCharacter().GetCharacterObj() )
+			{
+				if ( m_ScenePC.GetIntroCharacter().GetCharacterObj().IsMale() )
+					m_ScenePC.GetIntroCharacter().SetCharacterGender(ECharGender.Male);
+				else
+					m_ScenePC.GetIntroCharacter().SetCharacterGender(ECharGender.Female);
+			}
+		}
+	}
+	
+	
 	
 	void OpenStats()
 	{
@@ -553,6 +598,11 @@ class MainMenu extends UIScriptedMenu
 		EnterScriptedMenu(MENU_TUTORIAL);
 	}
 	
+	void OpenCredits()
+	{
+		EnterScriptedMenu(MENU_CREDITS);
+	}
+	
 	void Exit()
 	{
 		GetGame().GetUIManager().ShowDialog("#main_menu_exit", "#main_menu_exit_desc", IDC_MAIN_QUIT, DBT_YESNO, DBB_YES, DMT_QUESTION, this);
@@ -574,24 +624,21 @@ class MainMenu extends UIScriptedMenu
 	
 	void ConnectLastSession()
 	{
-		string ip;
-		int port;
-		
-		if( TryConnectLastSession( ip, port ) )
+		string ip = "";
+		int port = 0;
+			 
+		if(!m_ScenePC.GetIntroCharacter().IsDefaultCharacter())
 		{
-			g_Game.ConnectFromServerBrowser( ip, port );
+			int charID = m_ScenePC.GetIntroCharacter().GetCharacterID();
+			m_ScenePC.GetIntroCharacter().GetLastPlayedServer(charID,ip,port);
+		}
+		if( ip.Length() > 0 )
+		{
+			g_Game.ConnectFromServerBrowser( ip, port, "" );
 		}
 		else
 		{
-			#ifdef NEW_UI
-				EnterScriptedMenu(MENU_SERVER_BROWSER);
-			#else
-				#ifdef PLATFORM_CONSOLE
-					EnterScriptedMenu(MENU_SERVER_BROWSER);
-				#else
-					g_Game.GetUIManager().EnterServerBrowser(this);
-				#endif
-			#endif
+			EnterScriptedMenu(MENU_SERVER_BROWSER);
 		}
 	}
 	

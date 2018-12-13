@@ -25,6 +25,8 @@ class ItemBase extends InventoryItem
 	int 	m_ItemBehaviour = -1; // -1 = not specified; 0 = heavy item; 1= onehanded item; 2 = twohanded item
 	bool	m_IsBeingPlaced;
 	bool	m_IsHologram;
+	bool	m_IsPlaceSound;
+	bool	m_IsDeploySound;
 	bool	m_IsTakeable;
 	bool	m_IsSoundSynchRemote;
 	string	m_SoundAttType;
@@ -99,6 +101,8 @@ class ItemBase extends InventoryItem
 		m_VarQuantity = GetQuantityInit();//should be by the CE, this is just a precaution
 		m_IsBeingPlaced = false;
 		m_IsHologram = false;
+		m_IsPlaceSound = false;
+		m_IsDeploySound = false;
 		m_IsTakeable = true;
 		m_IsSoundSynchRemote = false;
 		m_HeatIsolation = GetHeatIsolation();
@@ -220,7 +224,7 @@ class ItemBase extends InventoryItem
 		m_OverheatingShots++;
 		
 		if (!m_CheckOverheating)
-				m_CheckOverheating = new Timer( CALL_CATEGORY_GAMEPLAY );
+				m_CheckOverheating = new Timer( CALL_CATEGORY_SYSTEM );
 		
 		m_CheckOverheating.Stop();
 		m_CheckOverheating.Run(m_OverheatingDecayInterval, this, "OnOverheatingDecay");
@@ -302,7 +306,6 @@ class ItemBase extends InventoryItem
 		OP.SetParticleParams(particle_id, parent, local_pos, local_ori);
 		
 		m_OverheatingParticles.Insert(OP);
-		Print(m_OverheatingParticles);
 	}
 	
 	float GetOverheatingCoef()
@@ -318,8 +321,6 @@ class ItemBase extends InventoryItem
 		if (m_OverheatingParticles)
 		{
 			float overheat_coef = GetOverheatingCoef();
-			Print(m_OverheatingParticles);
-			Print(overheat_coef);
 			int count = m_OverheatingParticles.Count();
 			
 			for (int i = count; i > 0; --i)
@@ -331,15 +332,7 @@ class ItemBase extends InventoryItem
 				float overheat_min = OP.GetOverheatingLimitMin();
 				float overheat_max = OP.GetOverheatingLimitMax();
 				
-				if (false  ||  overheat_coef >= overheat_min  &&  overheat_coef < overheat_max)
-				{
-					/*if (!p)
-					{
-						p = Particle.Play(OP.GetParticleID(), OP.GetParticleParent(), OP.GetParticlePos(), OP.GetParticleOri());
-						OP.RegisterParticle(p);
-					}*/
-				}
-				else
+				if (overheat_coef < overheat_min  &&  overheat_coef >= overheat_max)
 				{
 					if (p)
 					{
@@ -489,6 +482,32 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
+	//! Locks this item in it's current attachment slot of its parent. This makes the "locked" icon visible in inventory over this item.
+	void LockToParent()
+	{
+		EntityAI parent = GetHierarchyParent();
+		
+		if (parent)
+		{
+			InventoryLocation inventory_location_to_lock = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( inventory_location_to_lock );
+			parent.GetInventory().SetSlotLock( inventory_location_to_lock.GetSlot(), true );
+		}
+	}
+	
+	//! Unlocks this item from its attachment slot of its parent.
+	void UnlockFromParent()
+	{
+		EntityAI parent = GetHierarchyParent();
+		
+		if (parent)
+		{
+			InventoryLocation inventory_location_to_unlock = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( inventory_location_to_unlock );
+			parent.GetInventory().SetSlotLock( inventory_location_to_unlock.GetSlot(), false );
+		}
+	}
+	
 	void CombineItemsClient(ItemBase entity2, bool use_stack_max = false )
 	{
 		/*
@@ -557,6 +576,11 @@ class ItemBase extends InventoryItem
 	bool IsHologram()
 	{
 		return m_IsHologram;
+	}
+	
+	bool CanMakeGardenplot()
+	{
+		return false;
 	}
 	
 	void SetIsHologram( bool is_hologram )
@@ -2063,9 +2087,9 @@ class ItemBase extends InventoryItem
 
 
 	//----------------------------------------------------------------
-	override void OnStoreLoad(ParamsReadContext ctx)
+	override void OnStoreLoad(ParamsReadContext ctx, int version)
 	{   
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 		PlayerBase player;
 		if( Class.CastTo(player, GetHierarchyRootPlayer()) )
 		{
@@ -2756,7 +2780,6 @@ class ItemBase extends InventoryItem
 	// ------------------------------------------------------------
 	override bool CanPutInCargo( EntityAI parent )
 	{
-		
 		if ( parent )
 		{
 			if ( parent.IsInherited(DayZInfected) )
@@ -2764,7 +2787,7 @@ class ItemBase extends InventoryItem
 
 			if ( !parent.IsRuined() )
 				return true;
-		};
+		}
 		
 		return true;
 	}	
@@ -2861,21 +2884,30 @@ class ItemBase extends InventoryItem
 	override bool IsHeavyBehaviour()
 	{
 		if (m_ItemBehaviour == 0)
+		{	
 			return true;
+		}
+		
 		return false;
 	}
 	
 	override bool IsOneHandedBehaviour()
 	{
 		if (m_ItemBehaviour == 1)
-			return true;
+		{
+			return true;	
+		}
+		
 		return false;
 	}
 	
 	override bool IsTwoHandedBehaviour()
 	{
 		if (m_ItemBehaviour == 2)
+		{
 			return true;
+		}
+			
 		return false;
 	}
 	
@@ -2971,7 +3003,7 @@ class ItemBase extends InventoryItem
 	}
 	
 	//----------------------------------------------------------------
-	//SOUNDS
+	//SOUNDS FOR ADVANCED PLACEMNT
 	//----------------------------------------------------------------
 	
 	void SoundSynchRemoteReset()
@@ -2998,13 +3030,63 @@ class ItemBase extends InventoryItem
 		
 	}
 	
+	string GetPlaceSoundset()
+	{
+		
+	}
+	
 	string GetLoopDeploySoundset()
 	{
 		
 	}
+	
+	void SetIsPlaceSound( bool is_place_sound )
+	{
+		m_IsPlaceSound = is_place_sound;
+	}
+	
+	bool IsPlaceSound()
+	{
+		return m_IsPlaceSound;
+	}
+	
+	void SetIsDeploySound( bool is_deploy_sound )
+	{
+		m_IsDeploySound = is_deploy_sound;
+	}
+	
+	bool IsDeploySound()
+	{
+		return m_IsDeploySound;
+	}
+	
+	void PlayDeploySound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{		
+			EffectSound sound =	SEffectManager.PlaySound( GetDeploySoundset(), GetPosition() );
+			sound.SetSoundAutodestroy( true );
+			
+			SetIsDeploySound( false );
+		}
+	}
+	
+	void PlayPlaceSound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{		
+			EffectSound sound =	SEffectManager.PlaySound( GetPlaceSoundset(), GetPosition() );
+			sound.SetSoundAutodestroy( true );
+				
+			SetIsPlaceSound( false );
+		}
+	}
+	
+	bool CanPlayDeployLoopSound()
+	{		
+		return IsBeingPlaced() && IsSoundSynchRemote();
+	}
 }
-
-
 
 EntityAI SpawnItemOnLocation (string object_name, notnull InventoryLocation loc, bool full_quantity)
 {

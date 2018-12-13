@@ -14,9 +14,9 @@ class ActionMountBarbedWire: ActionContinuousBase
 	void ActionMountBarbedWire()
 	{
 		m_CallbackClass = ActionMountBarbedWireCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CRAFTING;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
-		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		
 		m_DamageAmount = 2;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
@@ -35,7 +35,7 @@ class ActionMountBarbedWire: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#mount_barbed_wire";
+		return "#mount";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -76,6 +76,6 @@ class ActionMountBarbedWire: ActionContinuousBase
 		//mount and refresh parent
 		barbed_wire.SetMountedState( true );
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }

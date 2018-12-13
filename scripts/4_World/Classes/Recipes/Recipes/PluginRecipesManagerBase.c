@@ -153,8 +153,9 @@ class PluginRecipesManagerBase extends PluginBase
 		RegisterRecipe(new CraftBoneBait);
 		RegisterRecipe(new SplitStones);
 		RegisterRecipe(new UpgradeTorchWithLard);
-		RegisterRecipe(new LightItemOnFire);
+		//RegisterRecipe(new LightItemOnFire);
 		RegisterRecipe(new CraftFenceKit);
 		RegisterRecipe(new CraftWatchtowerKit);
+		RegisterRecipe(new CraftWoodenPlank);
 	}
 };

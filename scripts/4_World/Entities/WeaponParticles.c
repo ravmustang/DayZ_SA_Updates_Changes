@@ -153,15 +153,10 @@ class WeaponParticlesBase // This class represents every particle effect you see
 	//======================================
 	//			  PLAY PARTICLES
 	//======================================
-	
+	// It is important to know that this block of script is called for weapons and muzzle attachments alike.
+	// Thus weapon == muzzle_owner when this is called for a weapon, and weapon != muzzle_owner when this is called for a suppressor.
 	void OnActivate(ItemBase weapon, string ammoType, ItemBase muzzle_owner, ItemBase suppressor, string config_to_search)
 	{
-		float wetness = muzzle_owner.GetWet();
-		Print(wetness);
-		
-		float rain = GetGame().GetWeather().GetRain().GetActual();
-		Print(rain);
-		
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
 		{
 			// Handle effect's parameters

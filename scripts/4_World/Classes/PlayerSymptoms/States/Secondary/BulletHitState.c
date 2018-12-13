@@ -1,3 +1,4 @@
+/*
 class BulletHitSymptom extends SymptomBase
 {
 	float m_HitDuration;
@@ -55,3 +56,4 @@ class BulletHitSymptom extends SymptomBase
 	}
 	
 }
+*/

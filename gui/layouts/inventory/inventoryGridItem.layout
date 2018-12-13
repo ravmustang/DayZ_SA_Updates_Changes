@@ -128,7 +128,10 @@ PanelWidgetClass GridCell {
            fixaspect inside
            priority 500
            style Light
-           "exact text" 1
+           font "gui/fonts/sdf_MetronBook24"
+           "exact text" 0
+           "size to text h" 0
+           "size to text v" 0
            "text halign" center
            "text valign" center
           }

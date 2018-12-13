@@ -250,7 +250,7 @@ class SwapOldAndNewMagazine extends WeaponStateBase
 		wpnDebugPrint("[wpnfsm] SwapOldAndNewMagazine, aborting, old magazine already stored");
 		m_weapon.SelectionMagazineHide();
 
-		if (DayZPlayerUtils.HandleDropMagazine(e.m_player, m_newMagazine))
+		if (m_newMagazine && DayZPlayerUtils.HandleDropMagazine(e.m_player, m_newMagazine))
 			wpnDebugPrint("[wpnfsm] SwapOldAndNewMagazine, ok - aborting, new magazine dropped to ground");
 		else
 			Error("[wpnfsm] SwapOldAndNewMagazine, error - cannot abort removal from wpn (of new mag)");

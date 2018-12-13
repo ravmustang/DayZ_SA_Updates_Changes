@@ -35,7 +35,7 @@ const int AT_FORCE_CONSUME = 107;
 const int AT_WATER = 108;
 const int AT_RESTRAIN_T = 109;
 const int AT_DESTROY_COMBINATION_LOCK = 110;
-//const int AT_MINE_TREE_WATCHTOWER = 111; <--- free to use (removed)
+const int AT_LIGHT_ITEM_ON_FIRE = 111;
 const int AT_BANDAGE_S = 112;
 const int AT_BANDAGE_T = 113;
 const int AT_DRINK_DISINFECTANT = 114;
@@ -161,6 +161,10 @@ const int AT_VIEW_OPTICS = 236;
 const int AT_VIEW_BINOCULARS = 237;
 const int AT_EMPTY_COOKING_POT = 238;
 const int AT_FOLD_BASEBUILDING_OBJECT = 239;
+const int AT_GAG_TARGET = 240;
+const int AT_GAG_SELF = 241;
+const int AT_UNGAG_TARGET = 242;
+const int AT_UNGAG_SELF = 243;
 
 //SingleUse Actions
 const int AT_OPEN = 501;
@@ -196,7 +200,7 @@ const int AT_ATTACH_METAL_WIRE = 532;
 const int AT_BUILD_PART_SWITCH = 533;
 const int AT_DISINFECT_PLANT_BIT = 534;
 const int AT_READ_PAPER = 535;
-//const int AT_TURN_ON_TORCH = 536; // Free ID.
+const int AT_TAKE_MATERIAL_TO_HANDS_SWITCH = 536;
 const int AT_TURN_ON_ENERGY_BASE = 537;
 const int AT_CLOSE = 538;
 const int AT_TURN_ON_HEATPACK = 539;
@@ -233,7 +237,7 @@ const int AT_HANDCUFF_T = 571;
 const int AT_VEH_ENGINE_STOP = 572;
 const int AT_DETACH = 573;
 const int AT_UNFOLD_MAP = 574;
-//const int AT_MINE_TREE_ACTION_SWITCH = 575; <--- free to use (removed)
+const int AT_ATTACH_TO_CONSTRUCTION = 575;
 const int AT_DROP_ITEM = 576;
 const int AT_ATTACH_SELECTION = 577;
 const int AT_ATTACH_ON_PROXY = 578;
@@ -291,6 +295,7 @@ const int AT_ANIMATE_SEATS = 1048;
 const int AT_FENCE_OPEN = 1049;
 const int AT_FENCE_CLOSE = 1050;
 const int AT_NEXT_COMBINATION_LOCK_DIAL_ON_TARGET = 1051;
+const int AT_TAKE_MATERIAL_TO_HANDS = 1052;
 
 //weapons
 const int AT_WPN_ATTACH_MAGAZINE = 1501;

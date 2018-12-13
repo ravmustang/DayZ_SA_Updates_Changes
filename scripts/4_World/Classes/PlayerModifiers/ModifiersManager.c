@@ -161,7 +161,7 @@ class ModifiersManager
 
 	}
 	
-	void OnStoreLoad( ParamsReadContext ctx )
+	void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		int modifier_count;
 		ctx.Read(modifier_count);

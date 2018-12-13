@@ -18,6 +18,9 @@ class CGame
 	{
 		m_ParamCache = new array<ref Param>;
 		m_ParamCache.Insert(NULL);
+		
+		// actual script version - increase by one when you make changes
+		StorageVersion(100);
 	}
 	
 	private void ~CGame();
@@ -310,6 +313,22 @@ class CGame
 	\note Works only on server
 	*/
 	proto native void		ClearReconnectCache();
+
+
+	/**
+  	\brief Set actual storage version - for next save
+	*/
+	proto native void StorageVersion( int iVersion );
+
+	/**
+  	\brief Returns actual storage version - loading
+	*/
+	proto native int		LoadVersion();
+
+	/**
+  	\brief Returns actual storage version - saving
+	*/
+	proto native int		SaveVersion();
 
 	/**
   	\brief Returns current daytime on server
@@ -935,12 +954,15 @@ class CGame
 	
 	void UpdatePathgraphRegionByObject(Object object)
 	{
-		vector pos = object.GetPosition();
-		vector min_max[2];
-		float radius = object.ClippingInfo ( min_max );
-		vector min = Vector ( pos[0] - radius, pos[1], pos[2] - radius );
-		vector max = Vector ( pos[0] + radius, pos[1], pos[2] + radius );
-		UpdatePathgraphRegion( min, max );
+		if ( object )
+		{
+			vector pos = object.GetPosition();
+			vector min_max[2];
+			float radius = object.ClippingInfo ( min_max );
+			vector min = Vector ( pos[0] - radius, pos[1], pos[2] - radius );
+			vector max = Vector ( pos[0] + radius, pos[1], pos[2] + radius );
+			UpdatePathgraphRegion( min, max );
+		}
 	}
 	
 	/**

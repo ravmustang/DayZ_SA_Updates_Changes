@@ -29,15 +29,15 @@ class GridContainer: LayoutHolder
 			#ifdef PLATFORM_WINDOWS
 			#ifndef PLATFORM_CONSOLE
 			CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
-			if (grid)
+			if(grid)
 			{
 				
 				Entity entity = grid.FindEntityInCargoOn( m_NumberRow, i );
-				if ( entity )
+				if( entity )
 				{
 					Icon icon = m_ParentContainer.GetIcon( entity.GetID() );
 					
-					if ( icon )
+					if( icon )
 					{
 						icon.SetActive( false );
 					}
@@ -64,14 +64,14 @@ class GridContainer: LayoutHolder
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
-		if (grid)
+		if(grid)
 		{
 			Entity focused_item_new = grid.FindEntityInCargoOn( m_NumberRow, m_NumberColumnFocused );
-			if ( focused_item_new )
+			if( focused_item_new )
 			{
 				Icon icon = m_ParentContainer.GetIcon( focused_item_new.GetID() );
 				
-				if ( icon )
+				if( icon )
 				{
 					icon.SetActive( true );
 				}			
@@ -90,14 +90,14 @@ class GridContainer: LayoutHolder
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
-		if (grid)
+		if(grid)
 		{
 			Entity focused_item_new = grid.FindEntityInCargoOn( row, column );
-			if ( focused_item_new )
+			if( focused_item_new )
 			{
 				Icon icon = m_ParentContainer.GetIcon( focused_item_new.GetID() );
 				
-				if ( icon )
+				if( icon )
 				{
 					width = icon.m_sizeX;
 					height = icon.m_sizeY;
@@ -117,14 +117,14 @@ class GridContainer: LayoutHolder
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		CargoGrid grid = CargoGrid.Cast(m_Entity.GetInventory().GetCargo());
-		if (grid)
+		if(grid)
 		{
 			Entity focused_item_new = grid.FindEntityInCargoOn( row, column );
-			if ( focused_item_new )
+			if( focused_item_new )
 			{
 				Icon icon = m_ParentContainer.GetIcon( focused_item_new.GetID() );
 				
-				if ( icon )
+				if( icon )
 				{
 					x = icon.m_posX;
 					y = icon.m_posY;
@@ -162,15 +162,23 @@ class GridContainer: LayoutHolder
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, null );
 		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
+			ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 0, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 0, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 0, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 0, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 0, null, m_ParentContainer );
 		}
 	}
 	
@@ -178,15 +186,23 @@ class GridContainer: LayoutHolder
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 1, null );
 		}		
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 1, null, m_ParentContainer );
 		}
 	}
 	
@@ -194,15 +210,23 @@ class GridContainer: LayoutHolder
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, null );
 		}		
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
+			ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 2, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 2, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 2, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 2, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 2, null, m_ParentContainer );
 		}
 	}
 	
@@ -210,239 +234,407 @@ class GridContainer: LayoutHolder
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
 		{
-			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 3, null );
 		}		
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 3, null, m_ParentContainer );
 		}
 	}
 	
 	void ColumnOnDraggingOver4( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
+		{
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 4, null );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 4, null, m_ParentContainer );
 		}
 	}
 	
 	void ColumnOnDraggingOver5( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
+		{
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 5, null );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 5, null, m_ParentContainer );
 		}
 	}
 	
 	void ColumnOnDraggingOver6( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
+		{
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 6, null );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 6, null, m_ParentContainer );
 		}
 	}
 	
 	void ColumnOnDraggingOver7( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
+		{
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 7, null );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 7, null, m_ParentContainer );
 		}
 	}
 	
 	void ColumnOnDraggingOver8( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
+		{
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 8, null );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 8, null, m_ParentContainer );
 		}
 	}
 	
 	void ColumnOnDraggingOver9( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
+		{
+			ContainerWithCargo.Cast( m_Parent.m_Parent ).DraggingOverGrid( w, m_NumberRow, 9, null );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, null, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
-			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, NULL );
+			( HandsContainer.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, null );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, null, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DraggingOverGrid( w, m_NumberRow, 9, null, m_ParentContainer );
 		}
 	}
 	
 	void Column0( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 0, m_ParentContainer );
 		}
 	}
 	
 	void Column1( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 1, m_ParentContainer );
 		}
 	}
 	
 	void Column2( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 2, m_ParentContainer );
 		}
 	}
 	
 	void Column3( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 3, m_ParentContainer );
 		}
 	}
 	
 	void Column4( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 4, m_ParentContainer );
 		}
 	}
 	
 	void Column5( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 5, m_ParentContainer );
 		}
 	}
 	
 	void Column6( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 6, m_ParentContainer );
 		}
 	}
 	
 	void Column7( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 7, m_ParentContainer );
 		}
 	}
 	
 	void Column8( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 8, m_ParentContainer );
 		}
 	}
 	
 	void Column9( Widget w )
 	{
 		if( m_Parent.m_Parent.IsInherited( ContainerWithCargo ) )
-		( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
+		{
+			( ContainerWithCargo.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
+		}
 		else if( m_Parent.m_Parent.IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
+			( ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9, m_ParentContainer );
 		}
-		else if ( m_Parent.m_Parent.IsInherited( HandsContainer ) )
+		else if( m_Parent.m_Parent.IsInherited( HandsContainer ) )
 		{
 			( HandsContainer.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9 );
+		}
+		else if( m_Parent.m_Parent.IsInherited( AttachmentCategoriesRow ) )
+		{
+			( AttachmentCategoriesRow.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9, m_ParentContainer );
+		}
+		else if( m_Parent.m_Parent.IsInherited( ContainerWithElectricManager ) )
+		{
+			( ContainerWithElectricManager.Cast( m_Parent.m_Parent ) ).DropReceived( w, m_NumberRow, 9, m_ParentContainer );
 		}
 	}
 	

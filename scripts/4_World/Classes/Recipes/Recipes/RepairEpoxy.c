@@ -2,7 +2,7 @@ class RepairEpoxy extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#repair_epoxy";
+		m_Name = "#repair";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 1;//animation length in relative time units
 		m_Specialty = 0.03;// value > 0 for roughness, value < 0 for precision

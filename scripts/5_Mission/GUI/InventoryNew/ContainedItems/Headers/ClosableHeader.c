@@ -1,6 +1,7 @@
 class ClosableHeader: Header
 {
 	protected float		m_SquareSize;
+	protected int		m_DefaultSort;
 	
 	void ClosableHeader( LayoutHolder parent, string function_name )
 	{
@@ -28,7 +29,8 @@ class ClosableHeader: Header
 		{
 			ItemPreviewWidget item_preview_drag = ItemPreviewWidget.Cast( GetMainWidget().FindAnyWidget( "Drag_Render" ) );
 			item_preview_drag.SetFlags(WidgetFlags.EXACTPOS );
-			item_preview_drag.GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().AddChild(GetMainWidget());
+			m_DefaultSort = GetRootWidget().GetSort();
+			item_preview_drag.GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().GetParent().AddChild( GetRootWidget() );
 			if( item_preview_drag && m_Entity )
 			{
 				item_preview_drag.SetItem( m_Entity );
@@ -37,7 +39,7 @@ class ClosableHeader: Header
 			
 			ItemManager.GetInstance().SetIsDragging( true );
 			
-			parent.HideContent();
+			parent.HideContent( true );
 			
 			GetMainWidget().FindAnyWidget( "PanelWidget" ).Show( false );
 			if( item_preview_drag )
@@ -54,13 +56,14 @@ class ClosableHeader: Header
 	void OnDropHeader( Widget w )
 	{
 		ClosableContainer parent = ClosableContainer.Cast( m_Parent );
-		parent.GetMainWidget().AddChild( GetMainWidget() );
+		parent.GetMainWidget().AddChild( GetRootWidget() );
+		GetRootWidget().SetSort( 0 );
 		if( parent )
 		{
 			GetMainWidget().FindAnyWidget( "PanelWidget" ).Show( true );
 			GetMainWidget().FindAnyWidget( "Drag_Render" ).Show( false );
 			
-			parent.ShowContent();
+			parent.ShowContent( true );
 			
 			ItemManager.GetInstance().SetIsDragging( false );
 			ItemManager.GetInstance().HideDropzones();

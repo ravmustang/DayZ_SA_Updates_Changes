@@ -9,9 +9,9 @@ class Land_Radio_PanelBig extends StaticTransmitter
 		ctx.Write( GetTunedFrequencyIndex() );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx );
+		super.OnStoreLoad( ctx, version );
 		
 		//load and set tuned frequency
 		int tuned_frequency_idx;
@@ -29,10 +29,12 @@ class Land_Radio_PanelBig extends StaticTransmitter
 	{
 		SetNextChannel();
 		
+		/*
 		if ( player )
 		{
 			DisplayRadioInfo( GetTunedFrequency().ToString(), player );
 		}
+		*/
 	}
 
 	//--- POWER EVENTS

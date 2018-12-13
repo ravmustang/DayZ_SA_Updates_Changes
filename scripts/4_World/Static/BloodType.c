@@ -86,45 +86,61 @@ class BloodTypes
 			return false;
 		}
 	}
-	static string GetBloodTypeName(int bloodtype)
+	static string GetBloodTypeName(int bloodtype, out string type, out bool positive )
 	{
 		string bloodTypeName;
 		switch ( bloodtype )
 		{
 			case LIQUID_BLOOD_0_P: 
 				bloodTypeName = "0+";
+				type = "0";
+				positive = true;
 			break;
 			
 			case LIQUID_BLOOD_0_N:
 				bloodTypeName = "0-";
+				type = "0";
+				positive = false;
 			break;
 			
 			case LIQUID_BLOOD_A_P:
 				bloodTypeName = "A+";
+				type = "A";
+				positive = true;
 			break;
 			
 			case LIQUID_BLOOD_A_N: 
 				bloodTypeName = "A-";
+				type = "A";
+				positive = false;
 			break;
 			
 			case LIQUID_BLOOD_B_P: 
 				bloodTypeName = "B+";
+				type = "B";
+				positive = true;
 			break;
 			
 			case LIQUID_BLOOD_B_N:
 				bloodTypeName = "B-";
+				type = "B";
+				positive = false;
 			break;
 			
 			case LIQUID_BLOOD_AB_P:
 				bloodTypeName = "AB+";
+				type = "AB";
+				positive = true;
 			break;
 			
 			case LIQUID_BLOOD_AB_N:
 				bloodTypeName = "AB-";
+				type = "AB";
+				positive = false;
 			break;
 			
 			default: 
-				bloodTypeName = "bad value";
+				bloodTypeName = "";
 			break;
 		}
 		

@@ -152,11 +152,6 @@ class ActionBase
 		return true;
 	}
 
-	bool Consumable()
-	{
-		return false;
-	}
-	
 	int GetActionCategory()
 	{
 		return AC_UNCATEGORIZED;

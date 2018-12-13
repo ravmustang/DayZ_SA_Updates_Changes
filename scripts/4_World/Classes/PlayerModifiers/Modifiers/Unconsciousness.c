@@ -1,5 +1,7 @@
 class UnconsciousnessMdfr: ModifierBase
 {
+	const int UNCONSIOUSS_COOLDOWN_TIME = 60;//in s
+	
 	override void Init()
 	{
 		m_TrackActivatedTime = false;
@@ -10,7 +12,7 @@ class UnconsciousnessMdfr: ModifierBase
 
 	override bool ActivateCondition(PlayerBase player)
 	{
-		if( player.GetHealth("","Shock") <=  PlayerConstants.UNCONSCIOUS_THRESHOLD )
+		if( player.GetHealth("","Shock") <=  PlayerConstants.UNCONSCIOUS_THRESHOLD && GetGame().GetTime() > player.m_UnconsciousEndTime + (UNCONSIOUSS_COOLDOWN_TIME * 1000))
 		{
 			return true;
 		}
@@ -24,6 +26,7 @@ class UnconsciousnessMdfr: ModifierBase
 	
 	override void OnDeactivate(PlayerBase player)
 	{
+		player.m_UnconsciousEndTime = GetGame().GetTime();
 		DayZPlayerSyncJunctures.SendPlayerUnconsciousness(player, false);
 	}
 	

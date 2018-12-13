@@ -7,7 +7,7 @@ class ReplaceItemWithNewLambdaBase
 	string m_NewItemType;
 	protected ref InventoryLocation m_OldLocation;
 	protected ref InventoryLocation m_NewLocation;
-	private bool m_RemoveFromLocationPassed = false;
+	protected bool m_RemoveFromLocationPassed = false;
 	private bool m_RemoveNetworkObjectInfoPassed = false;
 
 	void ReplaceItemWithNewLambdaBase (EntityAI old_item, string new_item_type)

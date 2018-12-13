@@ -25,9 +25,14 @@ class Trap_SmallFish extends TrapSpawnBase
 		return true;
 	}*/
 	
-	override string GetDeploySoundset()
+	override void OnVariablesSynchronized()
 	{
-		return "fishtrap_deploy_SoundSet";
+		super.OnVariablesSynchronized();
+				
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
 	}
 	
 	// ITEM CANNOT BE TAKEN WHEN CONTAINS CARGO
@@ -78,10 +83,15 @@ class Trap_SmallFish extends TrapSpawnBase
 class SmallFishTrap extends Trap_SmallFish 
 {
 	ref RainProcurementManager m_RainProcurement;
-
-	// ----------------------------------------------------------------------------------------
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
 	override void OnPlacementComplete( Man player )
 	{
+		super.OnPlacementComplete( player );
+		
 		// fill the bottle when placed in water
 		vector position = this.GetPosition();
 
@@ -96,6 +106,23 @@ class SmallFishTrap extends Trap_SmallFish
 			m_RainProcurement = new RainProcurementManager( this );
 			m_RainProcurement.InitRainProcurement();
 		}
+		
+		SetIsPlaceSound( true );
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetDeploySoundset()
+	{
+		return "placeSmallFishTrap_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "fishtrap_deploy_SoundSet";
 	}
 	
 	// ----------------------------------------------------------------------------------------

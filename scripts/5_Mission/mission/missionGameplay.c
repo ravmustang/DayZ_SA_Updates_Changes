@@ -66,7 +66,7 @@ class MissionGameplay extends MissionBase
 	#ifndef NO_GUI
 		if (g_Game.GetUIManager() && g_Game.GetUIManager().ScreenFadeVisible())
 		{
-			GetGame().SetEVUser(0);
+			g_Game.SetEVValue(0);
 			g_Game.GetUIManager().ScreenFadeOut(0);
 		}
 	#endif
@@ -240,6 +240,7 @@ class MissionGameplay extends MissionBase
 		InventoryMenu inventory = InventoryMenu.Cast( m_UIManager.FindMenu(MENU_INVENTORY) );
 		MapMenu map_menu = MapMenu.Cast( m_UIManager.FindMenu(MENU_MAP) );
 		GesturesMenu gestures_menu = GesturesMenu.Cast(m_UIManager.FindMenu(MENU_GESTURES));
+		RadialQuickbarMenu quickbar_menu = RadialQuickbarMenu.Cast(m_UIManager.FindMenu(MENU_RADIAL_QUICKBAR));
 		//m_InventoryMenu = inventory;
 		InspectMenuNew inspect = InspectMenuNew.Cast( m_UIManager.FindMenu(MENU_INSPECT) );
 		Input input = GetGame().GetInput();
@@ -352,6 +353,7 @@ class MissionGameplay extends MissionBase
 			//close radial quickbar menu
 			if ( GetGame().GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
 			{
+				PlayerControlDisable();
 				RadialQuickbarMenu.CloseMenu();
 				RadialQuickbarMenu.SetItemToAssign( NULL );
 			}
@@ -377,7 +379,7 @@ class MissionGameplay extends MissionBase
 		}
 		
 		//if(GetUApi().GetInputByName("UADropitem").LocalPress())
-		if(input.GetActionDown(UADropitem, false))
+		/*if(input.GetActionDown(UADropitem, false))
 		{
 			//drops item
 			if (playerPB && playerPB.GetItemInHands() && !GetUIManager().GetMenu())
@@ -385,7 +387,7 @@ class MissionGameplay extends MissionBase
 				ActionManagerClient manager = ActionManagerClient.Cast(playerPB.GetActionManager());
 				manager.ActionDropItemStart(playerPB.GetItemInHands(),null);
 			}
-		}
+		}*/
 
 		if (player && m_LifeState == EPlayerStates.ALIVE && !player.IsUnconscious() )
 		{
@@ -407,7 +409,7 @@ class MissionGameplay extends MissionBase
 		
 			if( input.GetActionDown(UAGear, false ) )
 			{
-				if( !inventory )
+				if( !inventory && playerPB.CanManipulateInventory() )
 				{
 					ShowInventory();
 				}
@@ -548,9 +550,9 @@ class MissionGameplay extends MissionBase
 				{
 					if(input.GetActionDown(UAUIBack, false))
 					{
-						if( ItemManager.GetInstance().GetSelectedItem() == NULL )
+						if( !ItemManager.GetInstance().GetSelectedItem() )
 						{
-							HideInventory();
+							//HideInventory();
 						}
 					}
 				}
@@ -583,6 +585,11 @@ class MissionGameplay extends MissionBase
 				else if(menu == gestures_menu && !m_ControlDisabled)
 				{
 					PlayerMouseControlDisable();
+					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
+				}
+				else if(menu == quickbar_menu && !m_ControlDisabled)
+				{
+					PlayerMouseControlDisableQuickslot();
 					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
 				}
 				
@@ -745,9 +752,20 @@ class MissionGameplay extends MissionBase
 		m_ControlDisabled = true;
 	}
 	
+	void PlayerMouseControlDisableQuickslot()
+	{
+		//Print("Disabling Mouse Controls Quickslot");
+#ifdef WIP_INPUTS
+			GetUApi().ActivateExclude("radialmenu");
+			GetUApi().ActivateExclude("inventory");
+			GetUApi().ActivateGroup("infantry");
+#endif
+		m_ControlDisabled = true;
+	}
+	
 	void PlayerMouseControlDisable()
 	{
-		//Print("Disabling Controls");
+		//Print("Disabling Mouse Controls");
 #ifdef WIP_INPUTS
 			GetUApi().ActivateExclude("radialmenu");
 			GetUApi().ActivateGroup("infantry");
@@ -922,7 +940,7 @@ class MissionGameplay extends MissionBase
 	
 	override void Pause()
 	{
-		if ( IsPaused() )
+		if ( IsPaused() || ( GetGame().GetUIManager().GetMenu() && GetGame().GetUIManager().GetMenu().GetID() == MENU_INGAME ) )
 			return;
 
 		if ( g_Game.IsClient() && g_Game.IsPlayerSpawning() )
@@ -936,7 +954,8 @@ class MissionGameplay extends MissionBase
 	
 	override void Continue()
 	{
-		if ( !IsPaused() )
+		int menu_id = GetGame().GetUIManager().GetMenu().GetID();
+		if ( !IsPaused() || ( menu_id != MENU_INGAME && menu_id != MENU_LOGOUT ) )
 		{
 			return;
 		}

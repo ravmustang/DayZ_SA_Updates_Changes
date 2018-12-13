@@ -1,12 +1,9 @@
 class OffroadHatchback extends CarScript
 {
-	override void Init()
+	
+	void OffroadHatchback()
 	{
-		super.Init();
-		m_dmgContactCoef = 0.095;
-		//m_enginePtcPos = "0 0.95 1.25";
-		//m_coolantPtcPos = "0.30 0.95 1.60";
-		//m_exhaustPtcPos = "-0.63 0.58 -1.98";
+		m_dmgContactCoef = 0.075;
 	}
 
 	override int GetAnimInstance()
@@ -32,9 +29,16 @@ class OffroadHatchback extends CarScript
 
 	}
 
+/*
 	override void EEItemAttached ( EntityAI item, string slot_name ) 
 	{
-/*
+		//not working properly 
+		if ( item.GetType() == "HatchbackWheel_Ruined" )
+		{
+			dBodyActive( this, ActiveState.ACTIVE);
+			dBodyApplyImpulseAt( this, vector.Up * 2, item.GetPosition() );
+		}
+
 		if ( GetGame().IsServer() )
 		{
 			if ( slot_name == "CarRadiator" )
@@ -43,10 +47,9 @@ class OffroadHatchback extends CarScript
 				//Leak( CarFluid.COOLANT, GetFluidFraction(CarFluid.COOLANT)*GetFluidCapacity(CarFluid.COOLANT) );
 			}
 		}
-*/
 	}
 
-	override void EEItemDetached(EntityAI item, string slot_name)
+		override void EEItemDetached(EntityAI item, string slot_name)
 	{
 		if ( GetGame().IsServer() )
 		{
@@ -59,14 +62,38 @@ class OffroadHatchback extends CarScript
 			}
 		}
 	}
+*/
 
 	override bool CanReleaseAttachment( EntityAI attachment )
 	{
-		CarDoor carDoor;
-		string attSlot = "";
+		string attType = attachment.GetType();
 
-		attSlot = attachment.GetType();
-		switch( attSlot )
+		if ( GetSpeedometer() > 1 )
+			return false;
+
+		if ( !GetGame().IsServer() || !GetGame().IsMultiplayer() )
+		{
+			for( int i =0; i < CrewSize(); i++ )
+			{
+				Human crew = CrewMember( i );
+				if ( !crew )
+					continue;
+
+				PlayerBase player;
+				if ( Class.CastTo(player, crew ) )
+					return false;
+			}
+		}
+		
+		if ( EngineIsOn() || GetCarDoorsState("NivaHood") == CarDoorState.DOORS_CLOSED )
+		{
+			if ( attType == "CarRadiator" || attType == "CarBattery" || attType == "SparkPlug" )
+				return false;
+		}
+
+		CarDoor carDoor;
+
+		switch( attType )
 		{
 			case "HatchbackDoors_Driver":
 				if ( GetCarDoorsState("NivaDriverDoors") != CarDoorState.DOORS_OPEN )

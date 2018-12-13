@@ -26,7 +26,10 @@ class ActionToggleFishing: ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "#start_or_end_fishing";
+		/*
+		TODO: insert if/else for #stop_fishing / #start_fishing
+		*/
+		return "TODO";
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )

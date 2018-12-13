@@ -10,7 +10,6 @@ WrapSpacerWidgetClass closable_container_root {
  vexactpos 1
  hexactsize 0
  vexactsize 1
- priority 8
  userID -1
  scriptclass ""
  style Colorable

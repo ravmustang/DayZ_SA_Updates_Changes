@@ -37,14 +37,14 @@ class Trap_FishNet extends TrapSpawnBase
 		return true;
 	}*/
 	
-	override bool IsDeployable()
+	override void OnVariablesSynchronized()
 	{
-		return true;
-	}
-	
-	override string GetDeploySoundset()
-	{
-		return "fishnet_deploy_SoundSet";
+		super.OnVariablesSynchronized();
+				
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
 	}
 	
 	// ITEM CANNOT BE TAKEN WHEN CONTAINS CARGO
@@ -90,6 +90,32 @@ class Trap_FishNet extends TrapSpawnBase
 		{
 			return false;
 		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+		
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetDeploySoundset()
+	{
+		return "placeFishNetTrap_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "fishnet_deploy_SoundSet";
 	}
 }
 

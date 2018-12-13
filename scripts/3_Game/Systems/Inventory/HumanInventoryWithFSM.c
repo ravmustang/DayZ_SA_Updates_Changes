@@ -84,19 +84,36 @@ class HumanInventoryWithFSM : HumanInventory
 			return false;
 		}
 	}
-
-	override void OnStoreLoad (ParamsReadContext ctx)
+	
+	bool ProcessHandAbortEvent (HandEventBase e)
 	{
-		super.OnStoreLoad(ctx);
+		//SyncRemote(e);
+		ProcessEventResult aa;
+		m_FSM.ProcessAbortEvent(e, aa);
+		if (aa == ProcessEventResult.FSM_OK)
+		{
+			hndDebugSpam("[hndfsm] Processed event e=" + e.ToString());
+			return true;
+		}
+		else
+		{
+			//hndDebugPrint("FSM refused to process event (no transition): src=" + GetCurrentState().ToString() + " event=" + e.ToString());
+			return false;
+		}
+	}
+
+	override void OnStoreLoad (ParamsReadContext ctx, int version)
+	{
+		super.OnStoreLoad(ctx, version);
     //@TODO
-		//m_FSM.OnStoreLoad(ctx);
+		//m_FSM.OnStoreLoad(ctx, version);
 	}
 	
 	override void OnStoreSave (ParamsWriteContext ctx)
 	{
 		super.OnStoreSave(ctx);
     //@TODO
-		//m_FSM.OnStoreSave(ctx);
+		//m_FSM.OnStoreSave(ctx, version);
 	}
 
 	/**@fn			GetCurrentStateID

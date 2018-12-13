@@ -24,6 +24,8 @@ enum eStaminaState
 	ZONE1_DOWN,
 	ZONE2_UP,
 	ZONE2_DOWN,
+	//count bellow, add above
+	COUNT
 }
 
 

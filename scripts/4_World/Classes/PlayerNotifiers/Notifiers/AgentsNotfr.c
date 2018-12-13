@@ -1,16 +1,17 @@
 class AgentsNotfr: NotifierBase
 {
 
-	private const float 	DEC_TRESHOLD_LOW 	= -0.5;
-	private const float 	DEC_TRESHOLD_MED 	= -1;
-	private const float 	DEC_TRESHOLD_HIGH	= -2;
-	private const float 	INC_TRESHOLD_LOW 	= 0.5;
-	private const float 	INC_TRESHOLD_MED 	= 1;
-	private const float 	INC_TRESHOLD_HIGH	= 2;
+	private const float 	DEC_TRESHOLD_LOW 	= 0;
+	private const float 	DEC_TRESHOLD_MED 	= -0.5;
+	private const float 	DEC_TRESHOLD_HIGH	= -1;
+	private const float 	INC_TRESHOLD_LOW 	= 0;
+	private const float 	INC_TRESHOLD_MED 	= 0.5;
+	private const float 	INC_TRESHOLD_HIGH	= 1;
 	
 	void AgentsNotfr(NotifiersManager manager)
 	{
 		SetActive(true);
+		m_TendencyBufferSize = 3;//for best results, this should be somewhat aligned with modifier frequency
 	}
 
 	override int GetNotifierType()
@@ -33,7 +34,7 @@ class AgentsNotfr: NotifierBase
 	
 	override float GetObservedValue()
 	{
-		int count = m_Player.GetTotalAgentCount();
+		float count = m_Player.GetTotalAgentCount();
 		//Debug.Log( "GetObservedValue:" + count.ToString(),"Tendency");
 		return count;
 	}

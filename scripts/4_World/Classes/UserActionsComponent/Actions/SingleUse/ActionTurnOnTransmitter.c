@@ -38,7 +38,7 @@ class ActionTurnOnTransmitter: ActionTurnOnWhileInHands
 				{
 					TransmitterBase transmitter = TransmitterBase.Cast( item );
 					
-					transmitter.DisplayRadioInfo( "OFF", player );
+					//transmitter.DisplayRadioInfo( "OFF", player );
 				}
 				
 				return true;

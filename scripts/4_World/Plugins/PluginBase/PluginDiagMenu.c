@@ -665,7 +665,7 @@ class PluginDiagMenu extends PluginBase
 			if(!m_SoftSkillsDebug)	
 			{
 				Class.CastTo(player, GetGame().GetPlayer());
-				player.GetSoftSkillManager().CreateDebugWindow( true );
+				player.GetSoftSkillsManager().CreateDebugWindow( true );
 				SoftSkillsShowDebugRPC(true);
 				m_SoftSkillsDebug = true;
 			}
@@ -675,7 +675,7 @@ class PluginDiagMenu extends PluginBase
 			if(m_SoftSkillsDebug)	
 			{
 				Class.CastTo(player, GetGame().GetPlayer());
-				player.GetSoftSkillManager().CreateDebugWindow( false );
+				player.GetSoftSkillsManager().CreateDebugWindow( false );
 				SoftSkillsShowDebugRPC(false);
 				m_SoftSkillsDebug = false;
 			}
@@ -1313,7 +1313,7 @@ class PluginDiagMenu extends PluginBase
 
 			case ERPCs.RPC_SOFT_SKILLS_TOGGLE_STATE:
 				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
-				player.GetSoftSkillManager().SetSoftSkillsState(CachedObjectsParams.PARAM1_BOOL.param1);
+				player.GetSoftSkillsManager().SetSoftSkillsState(CachedObjectsParams.PARAM1_BOOL.param1);
 			break;
 
 			case ERPCs.RPC_SOFT_SKILLS_DEBUG_WINDOW:
@@ -1322,12 +1322,12 @@ class PluginDiagMenu extends PluginBase
 				
 				if( show )
 				{
-					player.GetSoftSkillManager().StartSynchTimer();
+					player.GetSoftSkillsManager().StartSynchTimer();
 				}
 				else
 				{
-					player.GetSoftSkillManager().StopSynchTimer();
-					player.GetSoftSkillManager().ResetDebugWindow();
+					player.GetSoftSkillsManager().StopSynchTimer();
+					player.GetSoftSkillsManager().ResetDebugWindow();
 				}
 				
 			break;
@@ -1346,13 +1346,13 @@ class PluginDiagMenu extends PluginBase
 
 			case ERPCs.RPC_SOFT_SKILLS_TOGGLE_MODEL:
 				ctx.Read(CachedObjectsParams.PARAM1_BOOL);
-				player.GetSoftSkillManager().SetLinearState(CachedObjectsParams.PARAM1_BOOL.param1) ;
+				player.GetSoftSkillsManager().SetLinearState(CachedObjectsParams.PARAM1_BOOL.param1) ;
 			break;
 
 			case ERPCs.RPC_SOFT_SKILLS_SET_SPECIALTY:
 				ctx.Read( CachedObjectsParams.PARAM1_FLOAT );
 				float specialty = CachedObjectsParams.PARAM1_FLOAT.param1;
-				SoftSkillsManager soft_skill_manager = player.GetSoftSkillManager();
+				SoftSkillsManager soft_skill_manager = player.GetSoftSkillsManager();
 				soft_skill_manager.SetSpecialtyLevel( specialty );
 				soft_skill_manager.SynchSpecialtyLevel();
 				player.GetStatSpecialty().Set( specialty );

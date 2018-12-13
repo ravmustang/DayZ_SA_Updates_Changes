@@ -2,7 +2,7 @@ class DisinfectItem extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#STR_DisinfectItem0";
+		m_Name = "#disinfect";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 1;//animation length in relative time units
 		m_Specialty = -0.01;// value > 0 for roughness, value < 0 for precision
@@ -58,6 +58,11 @@ class DisinfectItem extends RecipeBase
 
 	override bool CanDo(ItemBase ingredients[], PlayerBase player)//final check for recipe's validity
 	{
+		ItemBase item = ingredients[1];
+		
+		if (item.IsInherited(PlantBase) )
+			return false;
+		
 		int liquid_type = ingredients[0].GetLiquidType();
 		return (liquid_type & LIQUID_DISINFECTANT);
 	}

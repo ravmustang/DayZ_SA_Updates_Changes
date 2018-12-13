@@ -1,5 +1,15 @@
 class BurlapSackCover extends ClothingBase
 {
+	void ~BurlapSackCover()
+	{
+		PlayerBase player;
+		Class.CastTo(player, GetHierarchyRootPlayer());
+		if( GetGame() && player )
+		{
+			OnRemovedFromHead(player);
+		}
+		
+	}
 	override void OnWasAttached(EntityAI parent, int slot_id)
 	{
 		PlayerBase player;
@@ -27,23 +37,10 @@ class BurlapSackCover extends ClothingBase
 
 	override void OnWasDetached(EntityAI parent, int slot_id)
 	{
-		PlayerBase player;
-		Class.CastTo(player, parent.GetHierarchyRootPlayer());
-		if ( (GetGame().IsClient() || !GetGame().IsMultiplayer()) && player && player.IsControlledPlayer() && slot_id == InventorySlots.HEADGEAR )
+		if ( GetGame().IsServer() )
 		{
-			PPEffects.Init();
-			PPEffects.DisableBurlapSackBlindness();
-			GetGame().GetSoundScene().SetSoundVolume(g_Game.m_volume_sound,1);
-			GetGame().GetSoundScene().SetSpeechExVolume(g_Game.m_volume_speechEX,1);
-			GetGame().GetSoundScene().SetMusicVolume(g_Game.m_volume_music,1);
-			GetGame().GetSoundScene().SetVOIPVolume(g_Game.m_volume_VOIP,1);
-			GetGame().GetSoundScene().SetRadioVolume(g_Game.m_volume_radio,1);
-			//GetGame().GetWorld().SetAperture(0);
-			player.SetInventorySoftLock(false);
-		}
-		// should change item to non-attachable one
-		if (GetGame().IsServer() && player && slot_id == InventorySlots.HEADGEAR)
-		{
+			PlayerBase player;
+			Class.CastTo(player, parent.GetHierarchyRootPlayer());
 			MiscGameplayFunctions.TurnItemIntoItem(ItemBase.Cast( this ), "BurlapSack", player);
 		}
 	}
@@ -60,6 +57,30 @@ class BurlapSackCover extends ClothingBase
 
 	override bool CanDetachAttachment( EntityAI parent )
 	{
-		return false;
+		PlayerBase player;
+		Class.CastTo(player, GetHierarchyRootPlayer());
+		return (player && !player.IsAlive());
+	}
+	
+	void OnRemovedFromHead(PlayerBase player)
+	{
+		if (  player.IsControlledPlayer() )
+		{
+			PPEffects.Init();
+			PPEffects.DisableBurlapSackBlindness();
+			GetGame().GetSoundScene().SetSoundVolume(g_Game.m_volume_sound,1);
+			GetGame().GetSoundScene().SetSpeechExVolume(g_Game.m_volume_speechEX,1);
+			GetGame().GetSoundScene().SetMusicVolume(g_Game.m_volume_music,1);
+			GetGame().GetSoundScene().SetVOIPVolume(g_Game.m_volume_VOIP,1);
+			GetGame().GetSoundScene().SetRadioVolume(g_Game.m_volume_radio,1);
+			//GetGame().GetWorld().SetAperture(0);
+			player.SetInventorySoftLock(false);
+		}
+		/*
+		if ( GetGame().IsServer() )
+		{
+			MiscGameplayFunctions.TurnItemIntoItem(ItemBase.Cast( this ), "BurlapSack", player);
+		}
+		*/
 	}
 }

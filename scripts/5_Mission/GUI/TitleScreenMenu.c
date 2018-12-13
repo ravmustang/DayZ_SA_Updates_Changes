@@ -48,11 +48,13 @@ class TitleScreenMenu extends UIScriptedMenu
 	
 	override void Update(float timeslice)
 	{
-		#ifdef PLATFORM_WINDOWS
-			if( GetGame().GetInput().GetActionDown( UAUISelect, false ) )
-			{
+		if( GetGame().GetInput().GetActionDown( UAUISelect, false ) )
+		{
+			#ifdef PLATFORM_WINDOWS
 				EnterScriptedMenu(MENU_MAIN);
-			}
-		#endif
+			#else
+				g_Game.GamepadCheck();
+			#endif
+		}
 	}
 }

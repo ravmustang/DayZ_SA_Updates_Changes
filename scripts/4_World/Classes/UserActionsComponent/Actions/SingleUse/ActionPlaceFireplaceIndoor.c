@@ -18,7 +18,7 @@ class ActionPlaceFireplaceIndoor: ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "#place_fireplace";
+		return "#place_object";
 	}
 	
 	override void CreateConditionComponents()  
@@ -66,7 +66,7 @@ class ActionPlaceFireplaceIndoor: ActionSingleUseBase
 		action_data.m_Player.ServerReplaceItemInHandsWithNewElsewhere( lambda );
 
 		//add to soft skills
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }
 

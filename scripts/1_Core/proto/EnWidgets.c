@@ -84,6 +84,16 @@ enum WidgetFlags
 };
 
 //------------------------------------------
+enum WidgetAlignment
+{
+	WA_LEFT			= 0,
+	WA_RIGHT		= 1,
+	WA_CENTER		= 2,
+	WA_TOP			= 0,
+	WA_BOTTOM		= 1,
+}
+
+//------------------------------------------
 class Widget: Managed
 {
 	proto void ~Widget();
@@ -380,11 +390,19 @@ class SpacerBaseWidget extends UIWidget
 	proto native void AddChildAfter(Widget child,Widget after, bool immedUpdate = true);
 }
 
-class GridSpacerWidget extends SpacerBaseWidget
+class SpacerWidget extends SpacerBaseWidget
+{
+	proto native WidgetAlignment GetContentAlignmentH();
+	proto native void SetContentAlignmentH(WidgetAlignment alignment);
+	proto native WidgetAlignment GetContentAlignmentV();
+	proto native void SetContentAlignmentV(WidgetAlignment alignment);
+}
+
+class GridSpacerWidget extends SpacerWidget
 {
 }
 
-class WrapSpacerWidget extends SpacerBaseWidget
+class WrapSpacerWidget extends SpacerWidget
 {
 }
 

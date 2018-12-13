@@ -20,8 +20,8 @@ class BatteryCharger extends ItemBase
 	static protected const string SWITCH_LIGHT_GLOW		= "dz\\gear\\camping\\data\\battery_charger_light_switch_on.rvmat";
 	static protected const string DEFAULT_MATERIAL 		= "dz\\gear\\camping\\data\\battery_charger.rvmat";
 	
-	protected const string 	ATTACHED_CLIPS_STATES[] 		= {SEL_CLIPS_CAR, SEL_CLIPS_TRUCK}; // TO DO: If it's required by design, add helicopter battery here and regieter its selection names.
-	protected const int 	ATTACHED_CLIPS_STATES_COUNT		= 2;
+	protected const string 	ATTACHED_CLIPS_STATES[] 		= {SEL_CLIPS_CAR, SEL_CLIPS_TRUCK}; // TO DO: If it's required by design, add helicopter battery here and register its selection names.
+	protected const int 	ATTACHED_CLIPS_STATES_COUNT		= 2; // Reffers to this ^ array
 	
 	
 	
@@ -35,21 +35,17 @@ class BatteryCharger extends ItemBase
 	void BatteryCharger()
 	{
 		m_ChargeEnergyPerSecond = GetGame().ConfigGetFloat ("CfgVehicles " + GetType() + " ChargeEnergyPerSecond");
-		m_UpdateStatusLightsTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+		m_UpdateStatusLightsTimer = new Timer( CALL_CATEGORY_SYSTEM );
 		SwitchLightOff();
 		RegisterNetSyncVariableInt("m_BatteryEnergy0To100");
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
 	/*override bool IsHeavyBehaviour()
 	{
 		return true;
 	}*/
-	
-	override bool IsDeployable()
-	{
-		return true;
-	}
-	
+
 	override void OnWork( float consumed_energy )
 	{
 		// Charging functionality
@@ -342,6 +338,20 @@ class BatteryCharger extends ItemBase
 		ShowSelection(SEL_CLIPS_FOLDED);
 	}
 	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+				
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
+	}
+		
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
 	override void OnPlacementStarted( Man player )
 	{	
 		super.OnPlacementStarted( player );
@@ -365,5 +375,22 @@ class BatteryCharger extends ItemBase
 		{
 			player_PB.GetHologramLocal().SetSelectionToRefresh( array_of_selections );
 		}
+	}
+	
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetPlaceSoundset()
+	{
+		return "placeBatteryCharger_SoundSet";
 	}
 }

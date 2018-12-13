@@ -48,6 +48,6 @@ class ActionTestBloodTarget: ActionContinuousBase
 		module_lifespan.UpdateBloodType( ntraget, blood_type );
 		
 		action_data.m_MainItem.Delete();
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

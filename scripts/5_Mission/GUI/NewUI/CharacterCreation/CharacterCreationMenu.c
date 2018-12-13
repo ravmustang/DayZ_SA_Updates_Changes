@@ -10,11 +10,11 @@ class CharacterCreationMenu extends UIScriptedMenu
 	protected EditBoxWidget					m_PlayerName;
 	protected TextWidget					m_Version;
 	
-	protected ref OptionSelectorMultistate	m_GenderSelector;
-	protected ref OptionSelectorMultistate	m_SkinSelector;
-	protected ref OptionSelectorMultistate	m_TopSelector;
-	protected ref OptionSelectorMultistate	m_BottomSelector;
-	protected ref OptionSelectorMultistate	m_ShoesSelector;
+	protected ref OptionSelectorMultistateCharacterMenu	m_GenderSelector;
+	protected ref OptionSelectorMultistateCharacterMenu	m_SkinSelector;
+	protected ref OptionSelectorMultistateCharacterMenu	m_TopSelector;
+	protected ref OptionSelectorMultistateCharacterMenu	m_BottomSelector;
+	protected ref OptionSelectorMultistateCharacterMenu	m_ShoesSelector;
 	
 	void CharacterCreationMenu()
 	{
@@ -47,21 +47,21 @@ class CharacterCreationMenu extends UIScriptedMenu
 		#endif
 		m_Version.SetText( version );
 		
-		m_GenderSelector = new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_gender_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharGenderList() );
+		m_GenderSelector = new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_gender_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharGenderList() );
 		if ( m_Scene.GetIntroCharacter().IsCharacterFemale() )
 		{
 			m_GenderSelector.SetValue( "Female" );
-			m_SkinSelector = new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Female ) );
+			m_SkinSelector = new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Female ) );
 		}
 		else
 		{
 			m_GenderSelector.SetValue( "Male" );
-			m_SkinSelector = new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Male ) );
+			m_SkinSelector = new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Male ) );
 		}
 		
-		m_TopSelector		= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_top_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShirtsList() );
-		m_BottomSelector	= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_bottom_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharPantsList() );
-		m_ShoesSelector		= new OptionSelectorMultistate( layoutRoot.FindAnyWidget( "character_shoes_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShoesList() );
+		m_TopSelector		= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_top_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShirtsList() );
+		m_BottomSelector	= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_bottom_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharPantsList() );
+		m_ShoesSelector		= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_shoes_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShoesList() );
 		
 		if( m_Scene && m_Scene.GetIntroCharacter() )
 		{
@@ -100,6 +100,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 		#endif
 		
 		SetCharacter();
+		CheckNewOptions();
 		
 		return layoutRoot;
 	}
@@ -116,10 +117,19 @@ class CharacterCreationMenu extends UIScriptedMenu
 	//Button Events
 	void Apply()
 	{
-		g_Game.SetPlayerGameName( m_PlayerName.GetText() );
+		//g_Game.SetPlayerGameName( m_PlayerName.GetText() );
 		m_Scene.GetIntroCharacter().SaveCharacterSetup();
-		m_Scene.GetIntroCharacter().SaveCharName();
-		m_Scene.GetIntroCharacter().SaveDefaultCharacter();
+		if ( m_Scene.GetIntroCharacter().IsDefaultCharacter() )
+		{
+			m_Scene.GetIntroCharacter().SaveDefaultCharacter();
+			m_Scene.GetIntroCharacter().SetToDefaultCharacter();
+		}
+		string name = m_PlayerName.GetText();
+		if( name == "" )
+			name = DEFAULT_CHARACTER_NAME;
+		
+		m_Scene.GetIntroCharacter().SaveCharName(m_PlayerName.GetText());
+		
 		
 		//SaveCharacters
 		
@@ -133,9 +143,9 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	void SetCharacter()
 	{
-		if (m_Scene.GetIntroCharacter())
+		if (m_Scene.GetIntroCharacter().IsDefaultCharacter())
 		{
-			m_PlayerName.SetText( g_Game.GetPlayerGameName() );
+			m_PlayerName.SetText( m_Scene.GetIntroCharacter().GetCharacterName() );
 			
 			m_Scene.GetIntroCharacter().SetAttachment( m_TopSelector.GetStringValue(), InventorySlots.BODY );
 			m_Scene.GetIntroCharacter().SetAttachment( m_BottomSelector.GetStringValue(), InventorySlots.LEGS );
@@ -163,9 +173,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	void RandomizeCharacter()
 	{
-		g_Game.SetNewCharacter(true);
-		
-		m_Scene.GetIntroCharacter().SetCharacterID( -1 );
+		m_Scene.GetIntroCharacter().SetToDefaultCharacter();
 		
 		// make random selection
 		m_Scene.GetIntroCharacter().SetCharacterGender( Math.RandomInt(0, 2) );
@@ -212,7 +220,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 	{
 		m_Scene.GetIntroCharacter().CreateNewCharacterByName( m_SkinSelector.GetStringValue() );
 		
-		layoutRoot.FindAnyWidget( "character_root" ).Show( g_Game.IsNewCharacter() );
+		layoutRoot.FindAnyWidget( "character_root" ).Show( m_Scene.GetIntroCharacter().IsDefaultCharacter() );
 	}
 	
 	void TopChanged()
@@ -325,11 +333,12 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	void CheckNewOptions()
 	{
-		layoutRoot.FindAnyWidget( "character_gender_button" ).Show( g_Game.IsNewCharacter() );
-		layoutRoot.FindAnyWidget( "character_head_button" ).Show( g_Game.IsNewCharacter() );
-		layoutRoot.FindAnyWidget( "character_top_button" ).Show( g_Game.IsNewCharacter() );
-		layoutRoot.FindAnyWidget( "character_bottom_button" ).Show( g_Game.IsNewCharacter() );
-		layoutRoot.FindAnyWidget( "character_shoes_button" ).Show( g_Game.IsNewCharacter() );
+		bool show_widgets = m_Scene.GetIntroCharacter().IsDefaultCharacter();
+		layoutRoot.FindAnyWidget( "character_gender_button" ).Show( show_widgets );
+		layoutRoot.FindAnyWidget( "character_head_button" ).Show( show_widgets );
+		layoutRoot.FindAnyWidget( "character_top_button" ).Show( show_widgets );
+		layoutRoot.FindAnyWidget( "character_bottom_button" ).Show( show_widgets );
+		layoutRoot.FindAnyWidget( "character_shoes_button" ).Show( show_widgets );
 	}
 	
 	override void OnShow()
@@ -359,7 +368,9 @@ class CharacterCreationMenu extends UIScriptedMenu
 				}
 			}
 		#else
-			g_Game.GetPlayerNameShort( 14, name );
+			name = m_Scene.GetIntroCharacter().GetCharacterName();
+			if( name == "" )
+				name = DEFAULT_CHARACTER_NAME;
 		#endif
 		
 		m_PlayerName.SetText( name );

@@ -3,15 +3,20 @@ class CollapsibleContainer: Container
 	protected ref CollapsibleHeader	m_CollapsibleHeader;
 	protected bool m_Hidden;
 
-	void CollapsibleContainer( LayoutHolder parent )
+	void CollapsibleContainer( LayoutHolder parent, int sort = -1 )
 	{
 		m_MainWidget.Show( true );
 
+		if( sort > -1 )
+			m_MainWidget.SetSort( sort + 2 );
+		
 		m_Body = new array<ref LayoutHolder>;
 		m_CollapsibleHeader = new CollapsibleHeader( this, "CollapseButtonOnMouseButtonDown" );
 		m_Body.Insert( m_CollapsibleHeader );
 		m_OpenedContainers.Insert( m_CollapsibleHeader );
 		m_MainWidget = m_MainWidget.FindAnyWidget( "body" );
+		WidgetEventHandler.GetInstance().RegisterOnChildAdd( m_MainWidget, this, "OnChildAdd" );
+		WidgetEventHandler.GetInstance().RegisterOnChildRemove( m_MainWidget, this, "OnChildRemove" );
 	}
 	
 	override void SetLayoutName()
@@ -184,5 +189,19 @@ class CollapsibleContainer: Container
 		w.FindAnyWidget("closed").Show(m_Hidden);
 
 		this.UpdateCollapseButtons();
+	}
+	
+	override bool OnChildRemove( Widget w, Widget child )
+	{
+		if( w == GetMainWidget() )
+			GetMainWidget().Update();
+		return true;
+	}
+	
+	override bool OnChildAdd( Widget w, Widget child )
+	{
+		if( w == GetMainWidget() )
+			GetMainWidget().Update();
+		return true;
 	}
 }

@@ -29,7 +29,7 @@ class ActionTurnOffTransmitterOnGround: ActionInteractBase
 			if ( target_entity.HasEnergyManager() && target_entity.GetCompEM().CanSwitchOff() && selection == "power_panel" )
 			{
 				AdvancedCommunication transmitter = AdvancedCommunication.Cast( target_object );
-				transmitter.DisplayRadioInfo( "ON", player );
+				//transmitter.DisplayRadioInfo( "ON", player );
 				
 				return true;
 			}

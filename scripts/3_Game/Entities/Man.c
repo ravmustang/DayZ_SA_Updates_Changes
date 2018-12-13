@@ -28,6 +28,7 @@ class Man extends EntityAI
 
 	override bool IsMan() { return true; }
 	override bool IsHealthVisible() { return false; }
+	bool IsUnconscious();
 
 	int GetPlayerState ()
 	{
@@ -122,6 +123,14 @@ class Man extends EntityAI
 
 	protected void TakeEntityToHandsImpl (InventoryMode mode, EntityAI item)
 	{
+		if (!GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{
+			InventoryLocation il = new InventoryLocation;
+			il.SetHands(this,item);
+			GetInventory().AddInventoryReservation(item,il,3000);
+		}
+		
+		
 		syncDebugPrint("[inv] " + GetSimulationTimeStamp() + " Man@" + this + "::Take2Hands(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item);
 		EntityAI itemInHands = GetHumanInventory().GetEntityInHands();
 		if (itemInHands == null)
@@ -373,8 +382,6 @@ class Man extends EntityAI
 	{
 		return SwapEntitiesImpl(InventoryMode.JUNCTURE, item1, item2);
 	}
-	
-	bool IsUnconscious();
 
 	bool PredictiveSwapEntities (notnull EntityAI item1, notnull EntityAI item2)
 	{
@@ -406,20 +413,62 @@ class Man extends EntityAI
 	{
 		bool code;
 		syncDebugPrint("[inv] " + GetSimulationTimeStamp() + " Man@" + this + "::SwapImpl(" + typename.EnumToString(InventoryMode, mode) + ") item1=" + item1 + " item2=" + item2);
-		if (GameInventory.CanSwapEntities(item1, item2))
-			code = GetHumanInventory().SwapEntities(mode, item1, item2);
-		else
-		{
-			InventoryLocation item2_dst = new InventoryLocation;
-			if (GameInventory.CanForceSwapEntities(item1, item2, item2_dst))
-				code = GetHumanInventory().ForceSwapEntities(mode, item1, item2, item2_dst);
-		}
+		if (!GameInventory.CanSwapEntities(item1, item2))
+			Error("[inv] (Man@" + this + ") SwapEntitiesImpl - cannot swap items!");
+
+		code = GetHumanInventory().SwapEntities(mode, item1, item2);
+
 		UpdateInventoryMenu();
-    if (!code)
-      syncDebugPrint("[inv] (" + GetSimulationTimeStamp() + " Man@" + this + ") SwapEntitiesImpl - cannot swap or forceswap");
+		if (!code)
+			syncDebugPrint("[inv] (" + GetSimulationTimeStamp() + " Man@" + this + ") SwapEntitiesImpl - cannot swap or forceswap");
 		return code;
 	}
 	///@} swap juncture
+
+	///@{ ForceSwap juncture
+	bool JunctureForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
+	{
+		return ForceSwapEntitiesImpl(InventoryMode.JUNCTURE, item1, item2, item2_dst);
+	}
+
+	bool PredictiveForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
+	{
+		if (!ScriptInputUserData.CanStoreInputUserData())
+		{
+			Print("[inv] " + GetSimulationTimeStamp() + " Man@" + this + " ::PredictiveForceSwapEntities input data not sent yet, cannot allow another input action");
+			return false;
+		}
+
+		bool need_j1 = NeedInventoryJunctureFromServer(item1, item1.GetHierarchyParent(), item2.GetHierarchyParent());
+		bool need_j2 = NeedInventoryJunctureFromServer(item2, item2.GetHierarchyParent(), item1.GetHierarchyParent());
+		if (need_j1 || need_j2)
+			return ForceSwapEntitiesImpl(InventoryMode.JUNCTURE, item1, item2, item2_dst);
+		else
+			return ForceSwapEntitiesImpl(InventoryMode.PREDICTIVE, item1, item2, item2_dst);
+	}
+
+	bool LocalForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
+	{
+		return ForceSwapEntitiesImpl(InventoryMode.LOCAL, item1, item2, item2_dst);
+	}
+
+	bool ServerForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
+	{
+		return ForceSwapEntitiesImpl(InventoryMode.SERVER, item1, item2, item2_dst);
+	}
+
+	protected bool ForceSwapEntitiesImpl (InventoryMode mode, notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
+	{
+		bool code = false;
+		syncDebugPrint("[inv] " + GetSimulationTimeStamp() + " Man@" + this + "::ForceSwapImpl(" + typename.EnumToString(InventoryMode, mode) + ") item1=" + item1 + " item2=" + item2);
+    	code = GetHumanInventory().ForceSwapEntities(mode, item1, item2, item2_dst);
+
+		UpdateInventoryMenu();
+		if (!code)
+			syncDebugPrint("[inv] (" + GetSimulationTimeStamp() + " Man@" + this + ") ForceSwapEntitiesImpl - cannot Forceswap");
+		return code;
+	}
+	///@} ForceSwap juncture
 
 	///@{ to target inv juncture
 	bool JunctureTakeEntityToTargetInventory (notnull EntityAI target, FindInventoryLocationType flags, notnull EntityAI item)

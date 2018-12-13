@@ -38,7 +38,7 @@ class OptionSelectorBase extends ScriptedWidgetEventHandler
 		{
 			Darken( w, x, y );
 			if( m_ParentClass )
-				m_ParentClass.OnFocus( m_Root.GetParent(), -1, y );
+				m_ParentClass.OnFocus( m_Root.GetParent(), -1, m_SelectorType );
 			return true;
 		}
 		return false;
@@ -63,7 +63,7 @@ class OptionSelectorBase extends ScriptedWidgetEventHandler
 		{
 			Darken( w, x, y );
 			if( m_ParentClass )
-				m_ParentClass.OnFocus( m_Root.GetParent(), -1, y );
+				m_ParentClass.OnFocus( m_Root.GetParent(), -1, m_SelectorType );
 			return true;
 		}
 		return false;

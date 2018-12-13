@@ -29,7 +29,7 @@ class ActionForceConsumeSingle: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#give_one";
+		return "#feed";
 	}
 		
 	override void OnEndServer( ActionData action_data )

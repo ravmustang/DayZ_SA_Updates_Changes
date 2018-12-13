@@ -16,14 +16,16 @@ class WeaponDryFire extends WeaponStartAction
 		m_dtAccumulator += dt;
 		DayZPlayer p;
 		Class.CastTo(p, m_weapon.GetHierarchyParent());
+		if (p)
+		{
+			HumanInputController hic = p.GetInputController();
 
-		HumanInputController hic = p.GetInputController();
-
-		int muzzleIndex = m_weapon.GetCurrentMuzzle();
-		float reloadTime = m_weapon.GetReloadTime(muzzleIndex);
-		if ( hic.IsUseButton() && m_dtAccumulator >= reloadTime)
-			if (m_weapon.CanProcessWeaponEvents())
-				m_weapon.ProcessWeaponEvent(new WeaponEventDryFireTimeout(p));
+			int muzzleIndex = m_weapon.GetCurrentMuzzle();
+			float reloadTime = m_weapon.GetReloadTime(muzzleIndex);
+			if ( hic.IsUseButton() && m_dtAccumulator >= reloadTime)
+				if (m_weapon.CanProcessWeaponEvents())
+					m_weapon.ProcessWeaponEvent(new WeaponEventDryFireTimeout(p));
+		}
 	}
 
 	override void OnExit (WeaponEventBase e)

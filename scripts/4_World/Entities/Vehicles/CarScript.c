@@ -17,12 +17,19 @@ class CarScript extends Car
 	protected float m_CoolantAmmount;
 	protected float m_OilAmmount;
 	protected float m_BrakeAmmount;
-	
+
+	//!
+	protected float m_dmgContactCoef;
+	protected float m_enviroCoef;
+
 	//!
 	protected float m_EngineHealth;
 	protected float m_RadiatorHealth;
 	protected float m_FuelTankHealth;
+	protected float m_BatteryHealth;
+	protected float m_PlugHealth;
 
+	//! Particles
 	protected ref EffVehicleSmoke m_coolantFx;
 	protected ref EffVehicleSmoke m_engineFx;
 	protected ref EffVehicleSmoke m_exhaustFx;
@@ -36,17 +43,12 @@ class CarScript extends Car
 	protected vector m_enginePtcPos;
 	protected vector m_coolantPtcPos;
 	
-	protected float m_dmgContactCoef;
-	protected float m_enviroCoef;
-
+	//!Sounds
+	protected bool m_PlayCrashSoundLight;
+	protected bool m_PlayCrashSoundHeavy;
+	
 	void CarScript()
 	{
-		Init();
-	}
-
-	override void Init()
-	{
-		super.Init();
 		SetEventMask(/*EntityEvent.CONTACT |*/ EntityEvent.POSTSIMULATE);
 
 		m_Time = 0;
@@ -55,6 +57,8 @@ class CarScript extends Car
 		m_EngineHealth = 1;
 		m_FuelTankHealth = 1;
 		m_RadiatorHealth = -1;
+		m_BatteryHealth = -1;
+		m_PlugHealth = -1;
 
 		m_enginePtcFx = -1;
 		m_coolantPtcFx = -1;
@@ -63,12 +67,15 @@ class CarScript extends Car
 		m_dmgContactCoef = 0;
 		m_enviroCoef = 0;
 
-		//proto native vector GetMemoryPointPos(string memoryPointName);
- 		//proto native bool MemoryPointExists(string memoryPoint);
-
+		m_PlayCrashSoundLight = false;
+		m_PlayCrashSoundHeavy = false;
+		
+		RegisterNetSyncVariableBool("m_PlayCrashSoundLight");
+		RegisterNetSyncVariableBool("m_PlayCrashSoundHeavy");
+		
 		if 	( MemoryPointExists("ptcExhaust_end") )
 		{
-			Print( "CarScript Init " + GetType() );
+			//Print( "CarScript Init " + GetType() );
 			m_exhaustPtcPos = GetMemoryPointPos("ptcExhaust_end");
 			if ( MemoryPointExists("ptcExhaust_start") )
 			{
@@ -100,8 +107,9 @@ class CarScript extends Car
 		if 	( MemoryPointExists("ptcCoolantPos") )
 			m_coolantPtcPos = GetMemoryPointPos("ptcCoolantPos");
 		else
-			m_coolantPtcPos = "0 0 0";		
+			m_coolantPtcPos = "0 0 0";	
 	}
+
 /*
 	here we should handle the damage dealt in OnContact event, but maybe we will react even in that event 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
@@ -128,52 +136,172 @@ class CarScript extends Car
 		}
 	}
 */
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+				
+		if ( GetCrashHeavySound() )
+			PlayCrashHeavySound();
+		else if ( GetCrashLightSound() )
+			PlayCrashLightSound();
+	}
+	
+	override void EEItemAttached ( EntityAI item, string slot_name ) 
+	{
+		if ( GetGame().IsServer() )
+		{
+			if ( slot_name == "Reflector_1_1" )
+				SetHealth( "Reflector_1_1", "Health", item.GetHealth() );
+
+			if ( slot_name == "Reflector_2_1" )
+				SetHealth( "Reflector_2_1", "Health", item.GetHealth() );
+
+			if ( slot_name == "CarBattery" )
+				m_BatteryHealth = item.GetHealth01();
+					
+			if ( slot_name == "TruckBattery" )
+				m_BatteryHealth = item.GetHealth01();
+
+			if ( slot_name == "SparkPlug" )
+				m_PlugHealth = item.GetHealth01();
+			
+			if ( slot_name == "GlowPlug" )
+				m_PlugHealth = item.GetHealth01();
+		}
+	}
+
+	override void EEItemDetached(EntityAI item, string slot_name)
+	{
+		if ( GetGame().IsServer() )
+		{
+			//int slot_id = InventorySlots.GetSlotIdFromString(slot_name);
+			if ( IsLightsOn() )
+			{
+				if ( slot_name == "CarBattery" || slot_name == "TruckBattery" )
+					SwitchLights();
+
+				if ( slot_name == "Reflector_1_1" )
+				{
+					SetHealth( "Reflector_1_1", "Health", 0 );
+				
+					item = FindAttachmentBySlotName( "Reflector_2_1" );
+					if ( !item || GetHealth01("Reflector_2_1", "") <= 0 )
+						SwitchLights();
+				}
+
+				if ( slot_name == "Reflector_2_1" )
+				{
+					SetHealth( "Reflector_2_1", "Health", 0 );
+
+					item = FindAttachmentBySlotName( "Reflector_1_1" );
+					if ( !item || GetHealth01("Reflector_1_1", "") <= 0 )
+						SwitchLights();
+				}
+			}
+
+			if ( EngineIsOn() )
+			{
+				//EngineBelt
+				if ( slot_name == "GlowPlug" || slot_name == "SparkPlug" || slot_name == "CarBattery" || slot_name == "TruckBattery" )
+					EngineStop();
+			}
+			
+			if ( slot_name == "CarBattery" )
+				m_BatteryHealth = -1;
+					
+			if ( slot_name == "TruckBattery" )
+				m_BatteryHealth = -1;
+
+			if ( slot_name == "SparkPlug" )
+				m_PlugHealth = -1;
+			
+			if ( slot_name == "GlowPlug" )
+				m_PlugHealth = -1;
+
+			if ( slot_name == "CarRadiator" )
+			{
+				LeakAll( CarFluid.COOLANT );
+				SetHealth( "Radiator", "Health", 0);
+			}
+		}
+	}
 
 	override void EOnPostSimulate(IEntity other, float timeSlice)
 	{
 		m_Time += timeSlice;
+
 		//! move it to constants.c const float CAR_UPDATE_INTERVAL = 1.0
 		if ( m_Time >= CARS_FLUIDS_TICK )
 		{
-			CarPartsHealthCheck();
 			m_Time = 0;
 
+			CarPartsHealthCheck();
+
+			//First of all check if the car should stop the engine
+			if ( GetGame().IsServer() && EngineIsOn() )
+			{
+				if ( GetFluidFraction(CarFluid.FUEL) <= 0 || m_EngineHealth <= 0 )
+					EngineStop();
+
+				CheckVitalItem( IsVitalCarBattery(), "CarBattery" );
+				CheckVitalItem( IsVitalTruckBattery(), "TruckBattery" );
+				CheckVitalItem( IsVitalSparkPlug(), "SparkPlug" );
+				CheckVitalItem( IsVitalGlowPlug(), "GlowPlug" );
+				// engine belt is not needed right now
+				//CheckVitalItem( IsVitalEngineBelt(), "EngineBelt" );
+			}
+
 			//! actions runned when the engine on
-			if ( EngineIsOn()  )
+			if ( EngineIsOn() )
 			{
 				if ( GetGame().IsServer() )
 				{
+					float dmg;
+
+					float test1 = EngineGetRPM();
+					float test2 = EngineGetRPMRedline();
+					
+					if ( EngineGetRPM() >= EngineGetRPMRedline() )
+					{
+						if ( EngineGetRPM() > EngineGetRPMMax() )
+							AddHealth( "Engine", "Health", -GetMaxHealth("Engine", "")); //CAR_RPM_DMG
+							
+						dmg = EngineGetRPM() * 0.001 * Math.RandomFloat( 0.02, 1.0 );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
+						//AddHealth( "Engine", "Health", -dmg); //CAR_RPM_DMG
+						ProcessDirectDamage( 3, null, "Engine", "EnviroDmg", "0 0 0", dmg );
+					}
+
 					//! leaking of coolant from radiator when damaged
 					if ( IsVitalRadiator() )
 					{
 						if ( GetFluidFraction(CarFluid.COOLANT) > 0 && m_RadiatorHealth < 0.5 ) //CARS_LEAK_THRESHOLD
 							LeakFluid( CarFluid.COOLANT );
 					}
-		
+
 					if ( GetFluidFraction(CarFluid.FUEL) > 0 && m_FuelTankHealth < 0.5 )
 						LeakFluid( CarFluid.FUEL );
-					
+
 					if ( GetFluidFraction(CarFluid.BRAKE) > 0 && m_EngineHealth < 0.5 )
 						LeakFluid( CarFluid.BRAKE );
-					
+
 					if ( GetFluidFraction(CarFluid.OIL) > 0 && m_EngineHealth < 0.5 )
 						LeakFluid( CarFluid.OIL );
-					
+
 					if ( m_EngineHealth < 0.25 )
 						LeakFluid( CarFluid.OIL );
-
-					float dmg;
+/*Commented out till indicator of Oil in HUD will be ready
 					if ( GetFluidFraction( CarFluid.OIL ) < 1 )
 					{
-						dmg = ( 1 - GetFluidFraction( CarFluid.OIL ) ) * Math.RandomFloat( 0.02, 10.00 );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
+						dmg = Math.Lerp( 0.02, 10, 1 - GetFluidFraction( CarFluid.OIL ) );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
 						AddHealth( "Engine", "Health", -dmg);
 					}
-					
+*/
 					if ( IsVitalRadiator() )
 					{
 						if ( GetFluidFraction( CarFluid.COOLANT ) < 0.5 && GetFluidFraction( CarFluid.COOLANT ) >= 0 )
 						{
-							dmg = ( 1 - GetFluidFraction(CarFluid.COOLANT) ) * Math.RandomFloat( 0.02, 10.00 );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
+							dmg = ( 1 - GetFluidFraction(CarFluid.COOLANT) ) * Math.RandomFloat( 0.02, 10.00 );  //CARS_DMG_TICK_MIN_COOLANT; //CARS_DMG_TICK_MAX_COOLANT
 							AddHealth( "Engine", "Health", -dmg );
 						}
 					}
@@ -200,11 +328,30 @@ class CarScript extends Car
 							m_coolantFx = new EffCoolantSteam();
 							m_coolantPtcFx = SEffectManager.PlayOnObject( m_coolantFx, this, m_coolantPtcPos );
 						}
-	
+
 						if ( GetFluidFraction( CarFluid.COOLANT ) > 0 )
 							m_coolantFx.SetParticleStateLight();
 						else
 							m_coolantFx.SetParticleStateHeavy();
+/*
+						Particle ptc;
+						if ( GetCarDoorsState("NivaHood") == CarDoorState.DOORS_CLOSED )
+						{
+							if ( Class.CastTo(ptc, m_coolantFx.GetParticle() ) )
+							{
+								ptc.SetParameter( -1, EmitorParam.AIR_RESISTANCE, 55 );
+								ptc.SetParameter( -1, EmitorParam.SIZE, 0.05 );
+							}
+						}
+						else
+						{
+							if ( Class.CastTo(ptc, m_coolantFx.GetParticle() ) )
+							{
+								ptc.SetParameter( -1, EmitorParam.AIR_RESISTANCE, 2 );
+								ptc.SetParameter( -1, EmitorParam.SIZE, 0.5 );
+							}
+						}
+*/
 					}
 					else
 					{
@@ -230,7 +377,7 @@ class CarScript extends Car
 		//FX only on Client and in Single
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
-			if ( m_EngineHealth <= 0 )
+			if ( IsDamageDestroyed() )
 			{
 				if ( !SEffectManager.IsEffectExist( m_enginePtcFx ) )
 				{
@@ -243,10 +390,8 @@ class CarScript extends Car
 		}
 	}
 
-	void OnContact( string zoneName, vector localPos, IEntity other, Contact data )
+	override void OnContact( string zoneName, vector localPos, IEntity other, Contact data )
 	{
-
-		//Print(zoneName);
 
 		if ( zoneName == "" )
 		{
@@ -277,16 +422,15 @@ class CarScript extends Car
 					{					
 						if ( dmg > dmgMin )
 						{
-							//Print( GetType() + " >>> " + " SmallHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos);
+							//Print( GetType() + " >>> " + " smlHit >>> " + "zoneName: "  + zoneName + " >>> - " + dmg.ToString() + " HP >>> in " + GetSpeedometer() + " km/h");
 							AddHealth( zoneName, "Health", -dmg);
+							//m_PlayCrashSoundLight = true;
+							SynchCrashLightSound( true );
 						}
 					}
 					else
 					{
-						
-						//Print( GetType() + " >>> " + " BIGHit " + zoneName + " >>> " + dmg.ToString() + " >>> " + localPos );
-						//Print( dmg );
-
+						//Print( GetType() + " >>> " + " BIGHit >>> " + "zoneName: " + zoneName + " >>> - " + dmg.ToString() + " HP >>> in " + GetSpeedometer() + " km/h" );
 						for( int i =0; i < CrewSize(); i++ )
 						{
 							Human crew = CrewMember( i );
@@ -312,8 +456,9 @@ class CarScript extends Car
 							}
 						}
 
+						//m_PlayCrashSoundHeavy = true;
+						SynchCrashHeavySound( true );
 						ProcessDirectDamage( 3, null, zoneName, "EnviroDmg", "0 0 0", dmg );
-
 					}
 				}
 			break;
@@ -324,8 +469,17 @@ class CarScript extends Car
 		Gets called every sound simulation step.
 		In this callback, user can modify behaviour of sound controllers
 	*/
-	float OnSound( CarSoundCtrl ctrl, float oldValue )
+	override float OnSound( CarSoundCtrl ctrl, float oldValue )
 	{
+		if ( GetGame().IsServer() )
+		{
+			if ( GetCrashLightSound() )
+				m_PlayCrashSoundLight = false;
+		
+			if ( GetCrashHeavySound() )
+				m_PlayCrashSoundHeavy = false;
+		}
+		
 		switch ( ctrl )
 		{
 			// in this controller the higher returned value the more muted sounds inside the car
@@ -349,7 +503,7 @@ class CarScript extends Car
 
 		This callback is called on both server and client.
 	*/
-	void OnFluidChanged( CarFluid fluid, float newValue, float oldValue )
+	override void OnFluidChanged( CarFluid fluid, float newValue, float oldValue )
 	{
 		switch ( fluid )
 		{
@@ -377,62 +531,118 @@ class CarScript extends Car
 
 		\return true if the engine can start, false otherwise.
 	*/
-
-	bool OnBeforeEngineStart()
+	override bool OnBeforeEngineStart()
 	{
 		// todo :: check if the battery is plugged-in
 		//         check if we have enough power to start the engine
 /*
-		if ( GetHealth01("engine", "") <= 0 )
+		if (  GetFluidFraction( CarFluid.FUEL ) <= 0 )
 		{
-			if ( !m_EngineSmoke )
-			{
-				Print("Smoke");
-				EffVehicleSmoke engSmk = new EffEngineSmoke();
-				SEffectManager.PlayOnObject(engSmk, this, "0 0.95 1.25" );
-				// Particle is now playing on oject 'this'
-	
-	
-	
-	
-				// Set particle to light smoke (this is default state after play)
-				//engSmk.SetParticleStateLight();
-	
-				// Set particle to heavy smoke
-				engSmk.SetParticleStateHeavy();
-	
-				// If needed, you can set the particle to anything you want.
-				//engSmk.SetParticleState( int state );
-				return true;
-			}
+			if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+				SEffectManager.PlaySound("offroad_engine_failed_start_fuel_SoundSet", GetPosition() );
 
-			EffVehicleSmoke exhkSmk = new EffExhaustSmoke();
-			SEffectManager.PlayOnObject(exhkSmk, this, "0.670 0.57 -2.05" );
-			exhkSmk.SetParticleStateLight();
-
+			return false;
 		}
-*/
-		//if ( GetFluidFraction(CarFluid.FUEL) <= 0 )
-		//	return false;
+		
+		EntityAI item = null;
+		//---------------
+		if ( IsVitalCarBattery() )
+		{
+			item = FindAttachmentBySlotName("CarBattery");
 
+			if ( !item || (item && item.IsRuined() ) )
+			{
+				if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+					SEffectManager.PlaySound("offroad_engine_failed_start_battery_SoundSet", GetPosition() );
+				return false;
+			}
+		}
+
+		//---------------
+		item = null;
+		if ( IsVitalTruckBattery() )
+		{
+			item = FindAttachmentBySlotName("TruckBattery");
+
+			if ( !item || ( item && item.IsRuined() ) )
+			{
+				if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+					SEffectManager.PlaySound("offroad_engine_failed_start_battery_SoundSet", GetPosition() );
+				return false;
+			}
+		}
+
+		//---------------
+		item = null;
+		if ( IsVitalSparkPlug() )
+		{
+			item = FindAttachmentBySlotName("SparkPlug");
+
+			if ( !item || ( item && item.IsRuined() ) )
+			{
+				if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+					SEffectManager.PlaySound("offroad_engine_failed_start_sparkplugs_SoundSet", GetPosition() );
+				return false;
+			}
+		}
+	
+		//---------------
+		item = null;
+		if ( IsVitalGlowPlug() )
+		{
+			item = FindAttachmentBySlotName("GlowPlug");
+
+			if ( !item || ( item && item.IsRuined() ) )
+			{
+				if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+					SEffectManager.PlaySound("offroad_engine_failed_start_sparkplugs_SoundSet", GetPosition() );
+				return false;
+			}
+		}
+		
+
+		//TODO:: make it proper when the belt will be ready
+		//item = null;
+		//m_BeltCon = true;
+		
+		//if ( IsVitalEngineBelt() )
+		//{
+			//item = FindAttachmentBySlotName("EngineBelt");
+
+			//if ( !item || (item && item.IsRuined() ) )
+			//{
+				//if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+					//SEffectManager.PlaySound("", GetPosition() );
+				//return false;
+			//}
+		//}
+
+*/
 		return true;
 	}
 
 	//! Gets called everytime the engine starts.
-	void OnEngineStart()
+	override void OnEngineStart()
 	{
 	}
 
 	//! Gets called everytime the engine stops.
-	void OnEngineStop()
+	override void OnEngineStop()
 	{
+/*
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{		
+			EffectSound sound =	SEffectManager.PlaySound("offroad_engine_stop_fuel_SoundSet", GetPosition() );
+			sound.SetSoundAutodestroy( true );
+		}
+*/
 	}
 
 	/*!
 		Gets called everytime the game wants to switch the lights.
 		\return true when lights can be switched, false otherwise.
 	*/
-	bool OnBeforeSwitchLights( bool toOn )
+	override bool OnBeforeSwitchLights( bool toOn )
 	{
 		if ( toOn )
 		{
@@ -440,13 +650,51 @@ class CarScript extends Car
 			//         check if we have enough power to turn on the lights
 
 			// this is the case from off -> on
-			return true;
+			
+			EntityAI battery = null;
+			
+			EntityAI item1 = null;
+			EntityAI item2 = null;
+			
+			
+			if ( IsVitalCarBattery() ) battery = FindAttachmentBySlotName("CarBattery");
+			if ( IsVitalTruckBattery() ) battery = FindAttachmentBySlotName("TruckBattery");
+				
+			if ( !battery || battery.IsRuined() )
+				return false;
+			
+			item1 = FindAttachmentBySlotName("Reflector_1_1");
+			item2 = FindAttachmentBySlotName("Reflector_2_1");
+			
+			if ( !item1 && !item2 )
+				return false;
+			else if ( item1 && item1.IsRuined() && item2 && item2.IsRuined() )
+				return false;
+
+/* 
+			//Should be redundand with the check above (for the headlights)
+			if ( GetHealthLevel( "Reflector_1_1" ) >= STATE_RUINED && GetHealthLevel( "Reflector_2_1" ) >= STATE_RUINED )
+				return false;
+*/
 		}
 
 		// this is the case on -> off
 		return true;
 	}
-	
+
+	protected void CheckVitalItem( bool isVital, string itemName )
+	{
+		if ( !isVital )
+			return;
+
+		EntityAI item = FindAttachmentBySlotName(itemName);
+
+		if ( !item )
+			EngineStop();
+		else if ( item.IsRuined() )
+			EngineStop();
+	}
+
 	protected void LeakFluid(CarFluid fluid)
 	{
 		float ammount = 0;
@@ -459,7 +707,7 @@ class CarScript extends Car
 			break;
 			
 			case CarFluid.OIL:
-				ammount =  10 * m_EngineHealth;//CARS_LEAK_OIL
+				ammount =  ( 1 - m_EngineHealth ) * Math.RandomFloat(0.02, 1.0);//CARS_LEAK_OIL_MIN; CARS_LEAK_OIL_MAX
 				Leak(fluid, ammount);
 			break;
 			
@@ -486,8 +734,48 @@ class CarScript extends Car
 			}
 			
 			m_EngineHealth = GetHealth01("Engine", "");
-			
+
 			m_FuelTankHealth = GetHealth01("FuelTank", "");
+		}
+	}
+	
+	bool GetCrashLightSound()
+	{
+		return m_PlayCrashSoundLight;
+	}
+	
+	void SynchCrashLightSound( bool play )
+	{
+		m_PlayCrashSoundLight = play;
+		SetSynchDirty();
+	}
+
+	void PlayCrashLightSound()
+	{
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{		
+			EffectSound sound =	SEffectManager.PlaySound("offroad_hit_light_SoundSet", GetPosition() );
+			sound.SetSoundAutodestroy( true );
+		}
+	}
+
+	bool GetCrashHeavySound()
+	{
+		return m_PlayCrashSoundHeavy;
+	}
+
+	void SynchCrashHeavySound( bool play )
+	{
+		m_PlayCrashSoundHeavy = play;
+		SetSynchDirty();
+	}
+	
+	void PlayCrashHeavySound()
+	{
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{		
+			EffectSound sound =	SEffectManager.PlaySound("offroad_hit_heavy_SoundSet", GetPosition() );
+			sound.SetSoundAutodestroy( true );
 		}
 	}
 	

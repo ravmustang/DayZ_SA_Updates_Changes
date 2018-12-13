@@ -26,6 +26,12 @@ class CraftFireplace extends RecipeBase
 		//ingredient 1
 		InsertIngredient(0,"WoodenStick");//you can insert multiple ingredients this way
 		InsertIngredient(0,"Firewood");//you can insert multiple ingredients this way
+		InsertIngredient(0,"Rag");//you can insert multiple ingredients this way
+		InsertIngredient(0,"BandageDressing");//you can insert multiple ingredients this way
+		InsertIngredient(0,"Paper");//you can insert multiple ingredients this way
+		InsertIngredient(0,"ItemBook");//you can insert multiple ingredients this way
+		InsertIngredient(0,"Bark_Birch");//you can insert multiple ingredients this way
+		InsertIngredient(0,"Bark_Oak");//you can insert multiple ingredients this way
 		
 		m_IngredientAddHealth[0] = 0;// 0 = do nothing
 		m_IngredientSetHealth[0] = -1; // -1 = do nothing
@@ -63,48 +69,68 @@ class CraftFireplace extends RecipeBase
 
 	override bool CanDo(ItemBase ingredients[], PlayerBase player)//final check for recipe's validity
 	{
+		ItemBase ingredient1 = ingredients[0];
+		ItemBase ingredient2 = ingredients[1];
+		
+		if ( ingredient1.Type() == ingredient2.Type() )
+		{
+			if ( ingredient1.GetQuantity() <= 0 )
+			{
+				return false;
+			}
+		}
+		
 		return true;
 	}
 
-	override void Do(ItemBase ingredients[], PlayerBase player,array<ItemBase> results, float specialty_weight)//gets called upon recipe's completion
+	override void Do( ItemBase ingredients[], PlayerBase player, array<ItemBase> results, float specialty_weight )//gets called upon recipe's completion
 	{
-		ItemBase result;
-		Class.CastTo(result,  results.Get( 0 ) );
-		
-		//Ingredient 1
+		ItemBase result = ItemBase.Cast( results.Get( 0 ) );
 		ItemBase ingredient1 = ingredients[0];
-		if ( ingredient1.IsInherited( ItemBook ) || ingredient1.IsInherited( Paper ) || ingredient1.IsInherited( BandageDressing ) )
-		{
-			player.ServerTakeEntityToTargetAttachment(result, ingredient1);
-		}
-		else
-		{
-			string ingredient1_classname = ingredient1.GetType();
-			ItemBase attachment1;
-			Class.CastTo(attachment1,  result.GetInventory().CreateAttachment( ingredient1_classname ) );
-			attachment1.SetQuantity( 1 );
-			//set quantity to ingredient
-			ItemBase ingredient_item1;
-			Class.CastTo(ingredient_item1,  ingredient1 );
-			ingredient_item1.AddQuantity( -1 );
-		}
-		
-		//Ingredient 2
 		ItemBase ingredient2 = ingredients[1];
-		if ( ingredient2.IsInherited( ItemBook ) || ingredient2.IsInherited( Paper ) || ingredient2.IsInherited( BandageDressing ) )
+		
+		//Ingredient 1 == Ingredient 2
+		if ( ingredient1.Type() == ingredient2.Type() )
 		{
-			player.ServerTakeEntityToTargetAttachment(result, ingredient2);
+			string ingredient_classname = ingredient1.GetType();
+			ItemBase attachment = ItemBase.Cast( result.GetInventory().CreateAttachment( ingredient_classname ) );
+			attachment.SetQuantity( 2 );
+
+			//set quantity to both ingredients
+			ingredient1.AddQuantity( -1 );
+			ingredient2.AddQuantity( -1 );
 		}
 		else
 		{
-			string ingredient2_classname = ingredient2.GetType();
-			ItemBase attachment2;
-			Class.CastTo(attachment2,  result.GetInventory().CreateAttachment( ingredient2_classname ) );
-			attachment2.SetQuantity( 1 );
-			//set quantity to ingredient
-			ItemBase ingredient_item2;
-			Class.CastTo(ingredient_item2,  ingredient2 );
-			ingredient_item2.AddQuantity( -1 );
+			//Ingredient 1
+			if ( ingredient1.GetQuantity() <= 0 )
+			{
+				player.ServerTakeEntityToTargetAttachment( result, ingredient1 );	//TODO add client sync
+			}
+			else
+			{
+				string ingredient1_classname = ingredient1.GetType();
+				ItemBase attachment1 = ItemBase.Cast( result.GetInventory().CreateAttachment( ingredient1_classname ) );
+				attachment1.SetQuantity( 1 );
+				
+				//set quantity to ingredient
+				ingredient1.AddQuantity( -1 );
+			}
+			
+			//Ingredient 2
+			if ( ingredient2.GetQuantity() == 0 )
+			{
+				player.ServerTakeEntityToTargetAttachment( result, ingredient2 );	//TODO add client sync
+			}
+			else
+			{
+				string ingredient2_classname = ingredient2.GetType();
+				ItemBase attachment2 = ItemBase.Cast( result.GetInventory().CreateAttachment( ingredient2_classname ) );
+				attachment2.SetQuantity( 1 );
+				
+				//set quantity to ingredient
+				ingredient2.AddQuantity( -1 );
+			}			
 		}
 	}
 };

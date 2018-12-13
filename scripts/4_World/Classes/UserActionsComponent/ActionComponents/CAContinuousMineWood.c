@@ -37,7 +37,7 @@ class CAContinuousMineWood : CAContinuousBase
 			Print("material = " + m_MaterialAndQuantityMap.GetKey(i) + "; quantity = " + m_MaterialAndQuantityMap.GetElement(i));
 		}
 
-		m_AdjustedTimeBetweenMaterialDrops = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_TimeBetweenMaterialDrops, m_Action.GetSpecialtyWeight(), true );		
+		m_AdjustedTimeBetweenMaterialDrops = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( m_TimeBetweenMaterialDrops, m_Action.GetSpecialtyWeight(), true );		
 		m_TimeToComplete = m_AmountOfDrops * m_AdjustedTimeBetweenMaterialDrops;
 	}
 	
@@ -78,7 +78,15 @@ class CAContinuousMineWood : CAContinuousBase
 						SetACData(m_SpentUnits);	
 					}
 					if ( targetObject.IsTree() )
+					{
 						ItemBase wooden_logs = ItemBase.Cast(GetGame().CreateObject("WoodenLog",action_data.m_Player.GetPosition(), false));
+						
+						//Spawn additional log with high specialty
+						if ( action_data.m_Player.GetSoftSkillsManager().GetSpecialtyLevel() > 0.5 )
+						{
+							ItemBase.Cast(GetGame().CreateObject("WoodenLog",action_data.m_Player.GetPosition(), false));
+						}
+					}						
 					
 					targetObject.OnTreeCutDown( action_data.m_MainItem );
 					OnCompletePogress(action_data);
@@ -124,7 +132,7 @@ class CAContinuousMineWood : CAContinuousBase
 			//m_AmountOfMaterialPerDrop = Math.Max(1,ntarget.GetAmountOfMaterialPerDrop(action_data.m_MainItem));
 			ntarget.GetMaterialAndQuantityMap(action_data.m_MainItem,m_MaterialAndQuantityMap);
 			m_DamageToMiningItemEachDrop = ntarget.GetDamageToMiningItemEachDrop(action_data.m_MainItem);
-			m_AdjustedDamageToMiningItemEachDrop = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_DamageToMiningItemEachDrop, m_Action.GetSpecialtyWeight(), true );
+			m_AdjustedDamageToMiningItemEachDrop = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( m_DamageToMiningItemEachDrop, m_Action.GetSpecialtyWeight(), true );
 			return true;
 		}
 		return false;
@@ -141,7 +149,7 @@ class CAContinuousMineWood : CAContinuousBase
 			if (material != "")
 			{
 				increment = m_MaterialAndQuantityMap.GetElement(i);
-				adjusted_increment = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( increment, m_Action.GetSpecialtyWeight(), true, 0 );
+				adjusted_increment = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( increment, m_Action.GetSpecialtyWeight(), true, 0 );
 				adjusted_increment = Math.Round( adjusted_increment );
 				if ( !m_MinedItem[i] )
 				{
@@ -153,7 +161,7 @@ class CAContinuousMineWood : CAContinuousBase
 					if ( (m_MinedItem[i].GetQuantity() + increment) >= m_MinedItem[i].GetQuantityMax() )
 					{
 						increment -= m_MinedItem[i].GetQuantityMax() - m_MinedItem[i].GetQuantity();
-						adjusted_increment = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( increment, m_Action.GetSpecialtyWeight(), true, 0 );
+						adjusted_increment = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( increment, m_Action.GetSpecialtyWeight(), true, 0 );
 						adjusted_increment = Math.Round( adjusted_increment );
 						m_MinedItem[i].SetQuantityMax();
 						m_MinedItem[i] = ItemBase.Cast(GetGame().CreateObject(material,action_data.m_Player.GetPosition(), false));

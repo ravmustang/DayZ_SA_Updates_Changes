@@ -3,12 +3,13 @@ class ContainerWithCargo: ClosableContainer
 	ref IconsContainer m_IconsContainer;
 	protected ref UICargoGrid m_CargoGrid;
 
-	void ContainerWithCargo( Container parent )
+	void ContainerWithCargo( Container parent, int sort = -1 )
 	{
 		m_Parent = parent;
 
 		m_IconsContainer = new IconsContainer( this );
 		this.Insert( m_IconsContainer );
+		m_IconsContainer.GetRootWidget().SetSort( 1 );
 	}
 
 	EntityAI GetFocusedItem()
@@ -190,10 +191,6 @@ class ContainerWithCargo: ClosableContainer
 						if( GameInventory.CanSwapEntities( item_in_hands, prev_item ) )
 						{
 							player.PredictiveSwapEntities( item_in_hands, prev_item );
-						}
-						else
-						{
-							player.PredictiveSwapEntities( prev_item, item_in_hands);
 						}
 					}
 					else

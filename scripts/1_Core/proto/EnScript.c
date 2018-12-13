@@ -402,7 +402,7 @@ class array<Class T>
 
 		if ( remove_index >= 0 )
 		{
-			Remove(remove_index);
+			RemoveOrdered(remove_index);
 		}
 	}
 

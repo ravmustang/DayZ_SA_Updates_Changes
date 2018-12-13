@@ -45,7 +45,7 @@ class ActionDisinfectSelf: ActionSingleUseBase
 	{
 		//RemoveModifiers(target, item); ?
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0 ) 
 		{
 			action_data.m_MainItem.SetQuantity(0);

@@ -53,7 +53,7 @@ class ActionMineTree: ActionContinuousBase
 	
 	override void OnFinishProgressServer( ActionData action_data )
 	{			
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		// TODO switch WoodenPlank item for logs, once those are ready
 		//ItemBase wooden_logs = ItemBase.Cast(GetGame().CreateObject("WoodenPlank",action_data.m_Player.GetPosition(), false));
 		//wooden_logs.SetQuantity(1);

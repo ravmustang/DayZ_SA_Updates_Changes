@@ -167,7 +167,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background0 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -198,8 +198,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -284,7 +285,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -293,8 +294,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor0 {
@@ -520,7 +523,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background1 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -551,8 +554,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -638,7 +642,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -647,8 +651,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor1 {
@@ -870,7 +876,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background2 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -901,8 +907,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -988,7 +995,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -997,8 +1004,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor2 {
@@ -1221,7 +1230,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background3 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -1252,8 +1261,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -1339,7 +1349,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -1348,8 +1358,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor3 {
@@ -1571,7 +1583,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background4 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -1602,8 +1614,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -1689,7 +1702,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -1698,8 +1711,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor4 {
@@ -1921,7 +1936,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background5 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -1952,8 +1967,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -2039,7 +2055,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -2048,8 +2064,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor5 {
@@ -2271,7 +2289,7 @@ PanelWidgetClass height_wrapper {
               ImageWidgetClass Background6 {
                visible 1
                ignorepointer 1
-               color 0 0 0 0.5882
+               color 0 0 0 0.7843
                size 29 29
                halign center_ref
                valign center_ref
@@ -2302,8 +2320,9 @@ PanelWidgetClass height_wrapper {
                priority 500
                style Light
                text "99"
+               font "gui/fonts/sdf_MetronBook24"
                "text color" 1 1 1 0.7843
-               "exact text" 1
+               "exact text" 0
                "text halign" center
                "text valign" center
               }
@@ -2389,7 +2408,7 @@ PanelWidgetClass height_wrapper {
        visible 0
        clipchildren 1
        ignorepointer 0
-       color 0.7451 0.7451 0.7451 0.2941
+       color 0.6667 0.6667 0.6667 0.7843
        position 0 0
        size 1 1
        hexactpos 0
@@ -2398,8 +2417,10 @@ PanelWidgetClass height_wrapper {
        vexactsize 0
        draggable 0
        image0 "set:dayz_inventory image:missing"
-       mode blend
+       mode additive
        "src alpha" 1
+       "no wrap" 1
+       stretch 1
        filter 1
       }
       PanelWidgetClass Cursor6 {

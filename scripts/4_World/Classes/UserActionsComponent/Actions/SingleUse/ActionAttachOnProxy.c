@@ -1,4 +1,4 @@
-class ActionAttachOnProxy: ActionSingleUseBase
+class ActionAttachOnProxy: ActionAttach
 {
 	void ActionAttachOnProxy()
 	{
@@ -9,6 +9,8 @@ class ActionAttachOnProxy: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTParent(10);
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ATTACHITEM;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
 	
 	override int GetType()
@@ -20,52 +22,25 @@ class ActionAttachOnProxy: ActionSingleUseBase
 	{
 		return "#attach";
 	}
-	
+		
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
-	{
+	{	
 		Object targetObject = target.GetObject();
 		Object targetParent = target.GetParent();
-	
-		if ( targetObject && targetParent )
+		EntityAI target_entity = EntityAI.Cast( targetParent );
+		EntityAI item_entity = EntityAI.Cast( item );
+		
+		if ( targetParent )
 		{
-			TentBase tent = TentBase.Cast( targetParent );
-			
-			if ( tent.CanAttach( item ) )
+			if ( target_entity && item_entity )
 			{
-				//return true;
-				//Temporary disabled
-				return false;
-			}
+				if ( target_entity.GetInventory() && target_entity.GetInventory().CanAddAttachment( item_entity ) )
+				{
+					return true;
+				}
+			}	
 		}
 		
 		return false;
-	}
-		
-	override void OnExecuteServer( ActionData action_data )
-	{		
-		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetParent() );
-		EntityAI item_entity = EntityAI.Cast( action_data.m_MainItem );
-		
-		//find inventory location for attachment
-		InventoryLocation target_location = new InventoryLocation;
-		
-		if( target_entity.GetInventory().FindFirstFreeLocationForNewEntity( item_entity.GetType(), FindInventoryLocationType.ATTACHMENT, target_location ) )
-		{
-			action_data.m_Player.PredictiveTakeEntityToTargetAttachmentEx( target_entity, item_entity, target_location.GetSlot() );
-		}
-	}
-	
-	override void OnExecuteClient( ActionData action_data )
-	{
-		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetParent() );
-		EntityAI item_entity = EntityAI.Cast( action_data.m_MainItem );
-		
-		//find inventory location for attachment
-		InventoryLocation target_location = new InventoryLocation;
-		
-		if( target_entity.GetInventory().FindFirstFreeLocationForNewEntity( item_entity.GetType(), FindInventoryLocationType.ATTACHMENT, target_location ) )
-		{
-			action_data.m_Player.PredictiveTakeEntityToTargetAttachmentEx( target_entity, item_entity, target_location.GetSlot() );
-		}
 	}
 }

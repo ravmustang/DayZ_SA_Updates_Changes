@@ -303,11 +303,11 @@ class ItemManager
 		delete m_ToolTipTimer;
 	}
 	
-	static int GetItemHealthColor( EntityAI item )
+	static int GetItemHealthColor( EntityAI item, string zone = "" )
 	{
 		if( item )
 		{
-			switch ( item.GetHealthLevel() )
+			switch ( item.GetHealthLevel( zone ) )
 			{
 				case -1 :
 					break;
@@ -382,11 +382,11 @@ class ItemManager
 			{
 				if ( item && item.IsInherited( ItemBase ) )
 				{
-					int color = ColorManager.GetInstance().GetItemColor( ItemBase.Cast( item ) ); // !!!!!
+					int color = ColorManager.GetInstance().GetItemColor( ItemBase.Cast( item ) );
 
 					if ( color )
 					{
-						Widget color_widget = item_w.FindAnyWidget("Color");
+						Widget color_widget = item_w.FindAnyWidget( "Color" );
 						if( color != -1 )
 						{
 							color_widget.SetColor( color );

@@ -9,7 +9,6 @@ PanelWidgetClass closable_header_root {
  hexactsize 0
  vexactsize 1
  fixaspect inside
- priority 1
  draggable 1
  scriptclass ""
  style blank
@@ -69,7 +68,7 @@ PanelWidgetClass closable_header_root {
      vexactsize 1
      fixaspect fixwidth
      priority 500
-     image0 "set:dayz_gui image:battery_full"
+     image0 "set:dayz_gui image:battery"
      mode additive
      "src alpha" 1
      "no wrap" 1
@@ -87,7 +86,7 @@ PanelWidgetClass closable_header_root {
        hexactsize 0
        vexactsize 0
        priority 500
-       image0 "set:dayz_gui image:battery_full"
+       image0 "set:dayz_gui image:battery"
        mode blend
        "src alpha" 1
       }

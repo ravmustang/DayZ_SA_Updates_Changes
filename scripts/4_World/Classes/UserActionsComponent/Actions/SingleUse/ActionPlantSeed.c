@@ -28,7 +28,7 @@ class ActionPlantSeed: ActionSingleUseBase
 
 	override bool HasTarget()
 	{
-		return false;
+		return true;
 	}
 
 	override string GetText()
@@ -60,7 +60,7 @@ class ActionPlantSeed: ActionSingleUseBase
 	
 	override void OnExecuteClient( ActionData action_data )
 	{
-		Process(action_data);
+		//Process(action_data);
 	}
 
 	void Process( ActionData action_data )
@@ -73,9 +73,15 @@ class ActionPlantSeed: ActionSingleUseBase
 			string selection = targetObject.GetActionComponentName(action_data.m_Target.GetComponentIndex());
 			Slot slot = garden_base.GetSlotBySelection( selection );
 			int slot_ID = slot.GetSlotId();
-			action_data.m_Player.PredictiveTakeEntityToTargetAttachmentEx(garden_base, action_data.m_MainItem, slot_ID );
+			
+			ItemBase seed_IB = ItemBase.Cast( action_data.m_MainItem );
+			
+			seed_IB.SplitIntoStackMax( garden_base, slot_ID, action_data.m_Player );
+			
+			
+			//action_data.m_Player.PredictiveTakeEntityToTargetAttachmentEx(garden_base, , slot_ID );
 		}
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

@@ -55,6 +55,7 @@ class AdvancedCommunication extends EntityAI
 	}
 
 	//HUD
+	/*
 	protected Hud GetHud( PlayerBase player )
 	{
 		if ( !player ) 
@@ -64,7 +65,7 @@ class AdvancedCommunication extends EntityAI
 		
 		return player.m_Hud;
 	}
-	
+
 	void DisplayRadioInfo( string message, PlayerBase player )
 	{
 		Hud hud;
@@ -79,6 +80,7 @@ class AdvancedCommunication extends EntityAI
 			hud.ShowWalkieTalkie( 3 );
 		}
 	}
+	*/
 	
 	//control transmitter via user actions
 	void TurnOnTransmitter()

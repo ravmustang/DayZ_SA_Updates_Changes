@@ -7,7 +7,7 @@ ImageSetClass {
    path "{534691EE0479871C}Gui/imagesets/dayz_gui.edds"
   }
   ImageSetTextureClass {
-   mpix 8
+   mpix 7
    path "{C139E49FD0ECAF9E}Gui/imagesets/dayz_gui@2x.edds"
   }
  }
@@ -340,7 +340,7 @@ ImageSetClass {
    Name "circle"
    Pos 77 278
    Size 36 36
-   Flags 0
+   Flags 3
   }
   ImageSetDefClass quantity_full {
    Name "quantity_full"
@@ -362,50 +362,50 @@ ImageSetClass {
   }
   ImageSetDefClass icon_expand {
    Name "icon_expand"
-   Pos 926 488
-   Size 64 64
+   Pos 779 265
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_collapse {
    Name "icon_collapse"
-   Pos 734 552
-   Size 64 64
+   Pos 717 286
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_favourite_on {
    Name "icon_favourite_on"
-   Pos 862 552
-   Size 64 64
+   Pos 758 286
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_favourite_off {
    Name "icon_favourite_off"
-   Pos 798 552
-   Size 64 64
+   Pos 738 286
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_locked_sb {
    Name "icon_locked_sb"
-   Pos 926 552
-   Size 64 64
+   Pos 779 286
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_moon {
    Name "icon_moon"
-   Pos 862 488
-   Size 64 64
+   Pos 758 265
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_sun {
    Name "icon_sun"
-   Pos 734 488
-   Size 64 64
+   Pos 717 265
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_player {
    Name "icon_player"
-   Pos 798 488
-   Size 64 64
+   Pos 738 265
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass area_0 {
@@ -434,14 +434,14 @@ ImageSetClass {
   }
   ImageSetDefClass icon_sun_accel {
    Name "icon_sun_accel"
-   Pos 670 488
-   Size 64 64
+   Pos 696 265
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_moon_accel {
    Name "icon_moon_accel"
-   Pos 670 552
-   Size 64 64
+   Pos 696 286
+   Size 20 20
    Flags 0
   }
   ImageSetDefClass icon_refresh {
@@ -458,26 +458,26 @@ ImageSetClass {
   }
   ImageSetDefClass left_mouse {
    Name "left_mouse"
-   Pos 258 929
-   Size 70 70
-   Flags 0
+   Pos 638 461
+   Size 38 38
+   Flags 3
   }
   ImageSetDefClass right_mouse {
    Name "right_mouse"
-   Pos 168 890
-   Size 80 113
-   Flags 0
+   Pos 716 461
+   Size 38 38
+   Flags 3
   }
   ImageSetDefClass continuous_action_mouse {
    Name "continuous_action_mouse"
-   Pos 344 890
-   Size 128 128
+   Pos 781 438
+   Size 64 64
    Flags 0
   }
   ImageSetDefClass continuous_action_mouse_half {
    Name "continuous_action_mouse_half"
-   Pos 881 786
-   Size 128 128
+   Pos 852 438
+   Size 64 64
    Flags 0
   }
   ImageSetDefClass cursor {
@@ -494,9 +494,9 @@ ImageSetClass {
   }
   ImageSetDefClass middle_mouse {
    Name "middle_mouse"
-   Pos 92 929
-   Size 70 70
-   Flags 0
+   Pos 677 461
+   Size 38 38
+   Flags 3
   }
   ImageSetDefClass key_icon {
    Name "key_icon"
@@ -506,15 +506,15 @@ ImageSetClass {
   }
   ImageSetDefClass icon_hammer {
    Name "icon_hammer"
-   Pos 354 429
-   Size 48 48
-   Flags 0
+   Pos 678 506
+   Size 38 38
+   Flags 3
   }
   ImageSetDefClass icon_needle {
    Name "icon_needle"
-   Pos 406 430
-   Size 48 48
-   Flags 0
+   Pos 639 506
+   Size 38 38
+   Flags 3
   }
   ImageSetDefClass icon_arrow {
    Name "icon_arrow"
@@ -530,14 +530,14 @@ ImageSetClass {
   }
   ImageSetDefClass icon_engine_alert {
    Name "icon_engine_alert"
-   Pos 459 430
-   Size 48 48
-   Flags 0
+   Pos 397 519
+   Size 38 38
+   Flags 3
   }
   ImageSetDefClass continuous_action_mouse_part {
    Name "continuous_action_mouse_part"
-   Pos 824 623
-   Size 128 128
+   Pos 923 438
+   Size 64 64
    Flags 0
   }
   ImageSetDefClass icon_bullet {
@@ -606,76 +606,298 @@ ImageSetClass {
    Size 444 208
    Flags 0
   }
+  ImageSetDefClass alpha_0 {
+   Name "alpha_0"
+   Pos 0 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_16 {
+   Name "alpha_16"
+   Pos 63 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_32 {
+   Name "alpha_32"
+   Pos 127 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_48 {
+   Name "alpha_48"
+   Pos 191 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_64 {
+   Name "alpha_64"
+   Pos 255 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_80 {
+   Name "alpha_80"
+   Pos 319 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_96 {
+   Name "alpha_96"
+   Pos 383 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_112 {
+   Name "alpha_112"
+   Pos 447 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_128 {
+   Name "alpha_128"
+   Pos 511 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_144 {
+   Name "alpha_144"
+   Pos 575 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_160 {
+   Name "alpha_160"
+   Pos 639 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_176 {
+   Name "alpha_176"
+   Pos 705 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_192 {
+   Name "alpha_192"
+   Pos 767 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_208 {
+   Name "alpha_208"
+   Pos 831 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_224 {
+   Name "alpha_224"
+   Pos 895 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_240 {
+   Name "alpha_240"
+   Pos 959 249
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass alpha_256 {
+   Name "alpha_256"
+   Pos 1023 249
+   Size 1 1
+   Flags 0
+  }
  }
  Groups {
   ImageSetGroupClass UI {
    Name "UI"
    Images {
-    ImageSetDefClass iconHealth {
-     Name "iconHealth"
-     Pos 250 375
-     Size 50 50
-     Flags 0
+    ImageSetDefClass iconHealth0 {
+     Name "iconHealth0"
+     Pos 980 199
+     Size 38 38
+     Flags 3
     }
-    ImageSetDefClass iconBlood {
-     Name "iconBlood"
-     Pos 300 375
-     Size 50 50
-     Flags 0
+    ImageSetDefClass iconBlood0 {
+     Name "iconBlood0"
+     Pos 941 199
+     Size 38 38
+     Flags 3
     }
-    ImageSetDefClass iconHunger {
-     Name "iconHunger"
-     Pos 400 375
-     Size 50 50
-     Flags 0
+    ImageSetDefClass iconHungry0 {
+     Name "iconHungry0"
+     Pos 861 199
+     Size 38 38
+     Flags 3
     }
-    ImageSetDefClass iconTemperature {
-     Name "iconTemperature"
-     Pos 350 375
-     Size 50 50
-     Flags 0
+    ImageSetDefClass iconTemperature0 {
+     Name "iconTemperature0"
+     Pos 824 199
+     Size 38 38
+     Flags 3
     }
-    ImageSetDefClass iconThirsty {
-     Name "iconThirsty"
-     Pos 450 375
-     Size 50 50
-     Flags 0
+    ImageSetDefClass iconThirsty0 {
+     Name "iconThirsty0"
+     Pos 902 199
+     Size 38 38
+     Flags 3
     }
-    ImageSetDefClass iconArrowUp {
-     Name "iconArrowUp"
-     Pos 501 375
-     Size 24 16
-     Flags 0
+    ImageSetDefClass iconHealth1 {
+     Name "iconHealth1"
+     Pos 980 159
+     Size 38 38
+     Flags 3
     }
-    ImageSetDefClass iconStomach {
-     Name "iconStomach"
-     Pos 0 375
-     Size 50 50
-     Flags 0
+    ImageSetDefClass iconBlood1 {
+     Name "iconBlood1"
+     Pos 941 159
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHungry1 {
+     Name "iconHungry1"
+     Pos 861 159
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconTemperature1 {
+     Name "iconTemperature1"
+     Pos 824 159
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconThirsty1 {
+     Name "iconThirsty1"
+     Pos 902 159
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHealth2 {
+     Name "iconHealth2"
+     Pos 980 119
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBlood2 {
+     Name "iconBlood2"
+     Pos 941 119
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHungry2 {
+     Name "iconHungry2"
+     Pos 861 119
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconTemperature2 {
+     Name "iconTemperature2"
+     Pos 824 119
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconThirsty2 {
+     Name "iconThirsty2"
+     Pos 902 119
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHealth3 {
+     Name "iconHealth3"
+     Pos 980 79
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBlood3 {
+     Name "iconBlood3"
+     Pos 941 79
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHungry3 {
+     Name "iconHungry3"
+     Pos 861 79
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconTemperature3 {
+     Name "iconTemperature3"
+     Pos 824 79
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconThirsty3 {
+     Name "iconThirsty3"
+     Pos 902 79
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHealth4 {
+     Name "iconHealth4"
+     Pos 980 39
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBlood4 {
+     Name "iconBlood4"
+     Pos 941 39
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconHungry4 {
+     Name "iconHungry4"
+     Pos 861 39
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconTemperature4 {
+     Name "iconTemperature4"
+     Pos 824 39
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconThirsty4 {
+     Name "iconThirsty4"
+     Pos 902 39
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconArrowUp1 {
+     Name "iconArrowUp1"
+     Pos 836 351
+     Size 22 9
+     Flags 3
+    }
+    ImageSetDefClass iconStomach0 {
+     Name "iconStomach0"
+     Pos 655 122
+     Size 52 38
+     Flags 3
     }
     ImageSetDefClass iconDrops {
      Name "iconDrops"
-     Pos 100 375
-     Size 50 50
-     Flags 0
+     Pos 747 200
+     Size 38 38
+     Flags 3
     }
     ImageSetDefClass iconPill {
      Name "iconPill"
-     Pos 50 375
-     Size 50 50
-     Flags 0
+     Pos 612 200
+     Size 38 38
+     Flags 3
     }
     ImageSetDefClass iconSkull {
      Name "iconSkull"
-     Pos 150 375
-     Size 50 50
-     Flags 0
+     Pos 573 200
+     Size 38 38
+     Flags 3
     }
     ImageSetDefClass iconBone {
      Name "iconBone"
-     Pos 200 375
-     Size 50 50
-     Flags 0
+     Pos 708 161
+     Size 38 38
+     Flags 3
     }
     ImageSetDefClass stance_walk {
      Name "stance_walk"
@@ -725,40 +947,28 @@ ImageSetClass {
      Size 25 5
      Flags 0
     }
-    ImageSetDefClass fuel_full {
-     Name "fuel_full"
-     Pos 0 425
-     Size 50 50
+    ImageSetDefClass fuel {
+     Name "fuel"
+     Pos 446 480
+     Size 38 38
      Flags 0
     }
-    ImageSetDefClass fuel_empty {
-     Name "fuel_empty"
-     Pos 150 425
-     Size 50 50
+    ImageSetDefClass oil {
+     Name "oil"
+     Pos 441 519
+     Size 50 38
      Flags 0
     }
-    ImageSetDefClass liquid_full {
-     Name "liquid_full"
-     Pos 50 425
-     Size 50 50
+    ImageSetDefClass liquid {
+     Name "liquid"
+     Pos 397 441
+     Size 38 38
      Flags 0
     }
-    ImageSetDefClass liquid_empty {
-     Name "liquid_empty"
-     Pos 200 425
-     Size 50 50
-     Flags 0
-    }
-    ImageSetDefClass battery_full {
-     Name "battery_full"
-     Pos 100 425
-     Size 50 50
-     Flags 0
-    }
-    ImageSetDefClass battery_empty {
-     Name "battery_empty"
-     Pos 250 425
-     Size 50 50
+    ImageSetDefClass battery {
+     Name "battery"
+     Pos 397 480
+     Size 38 38
      Flags 0
     }
     ImageSetDefClass stance_car {
@@ -767,22 +977,22 @@ ImageSetClass {
      Size 50 50
      Flags 0
     }
-    ImageSetDefClass rpm {
-     Name "rpm"
-     Pos 0 474
-     Size 285 254
+    ImageSetDefClass small_circle {
+     Name "small_circle"
+     Pos 499 491
+     Size 70 57
      Flags 0
     }
-    ImageSetDefClass speed {
-     Name "speed"
-     Pos 325 548
-     Size 247 182
+    ImageSetDefClass large_circle {
+     Name "large_circle"
+     Pos 189 385
+     Size 197 165
      Flags 0
     }
-    ImageSetDefClass rpm_pointer {
-     Name "rpm_pointer"
-     Pos 625 615
-     Size 8 110
+    ImageSetDefClass large_pointer {
+     Name "large_pointer"
+     Pos 610 492
+     Size 18 111
      Flags 0
     }
     ImageSetDefClass grid {
@@ -817,8 +1027,152 @@ ImageSetClass {
     }
     ImageSetDefClass iconBacteria {
      Name "iconBacteria"
-     Pos 300 425
-     Size 50 50
+     Pos 786 200
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconStomach1 {
+     Name "iconStomach1"
+     Pos 655 161
+     Size 52 38
+     Flags 3
+    }
+    ImageSetDefClass iconStomach2 {
+     Name "iconStomach2"
+     Pos 655 200
+     Size 52 38
+     Flags 3
+    }
+    ImageSetDefClass iconShock {
+     Name "iconShock"
+     Pos 534 200
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBleeding {
+     Name "iconBleeding"
+     Pos 529 152
+     Size 44 44
+     Flags 3
+    }
+    ImageSetDefClass iconArrowUp2 {
+     Name "iconArrowUp2"
+     Pos 798 351
+     Size 22 14
+     Flags 3
+    }
+    ImageSetDefClass iconArrowUp3 {
+     Name "iconArrowUp3"
+     Pos 760 351
+     Size 22 19
+     Flags 3
+    }
+    ImageSetDefClass iconBlood0+ {
+     Name "iconBlood0+"
+     Pos 869 341
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBlood0- {
+     Name "iconBlood0-"
+     Pos 869 380
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBloodA+ {
+     Name "iconBloodA+"
+     Pos 908 341
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBloodA- {
+     Name "iconBloodA-"
+     Pos 908 380
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBloodB+ {
+     Name "iconBloodB+"
+     Pos 947 341
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBloodB- {
+     Name "iconBloodB-"
+     Pos 947 380
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBloodAB+ {
+     Name "iconBloodAB+"
+     Pos 986 341
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass iconBloodAB- {
+     Name "iconBloodAB-"
+     Pos 986 380
+     Size 38 38
+     Flags 3
+    }
+    ImageSetDefClass specialization_arrow {
+     Name "specialization_arrow"
+     Pos 723 516
+     Size 17 11
+     Flags 3
+    }
+    ImageSetDefClass small_pointer {
+     Name "small_pointer"
+     Pos 583 500
+     Size 13 40
+     Flags 0
+    }
+    ImageSetDefClass large_circle_half {
+     Name "large_circle_half"
+     Pos 804 519
+     Size 197 165
+     Flags 0
+    }
+    ImageSetDefClass iconArrowUp {
+     Name "iconArrowUp"
+     Pos 730 499
+     Size 22 14
+     Flags 0
+    }
+    ImageSetDefClass inv_header_1 {
+     Name "inv_header_1"
+     Pos 81 610
+     Size 521 48
+     Flags 0
+    }
+    ImageSetDefClass inv_header_2 {
+     Name "inv_header_2"
+     Pos 81 662
+     Size 521 48
+     Flags 0
+    }
+    ImageSetDefClass inv_header_3 {
+     Name "inv_header_3"
+     Pos 81 714
+     Size 521 48
+     Flags 0
+    }
+    ImageSetDefClass exit {
+     Name "exit"
+     Pos 776 41
+     Size 37 37
+     Flags 0
+    }
+    ImageSetDefClass settings {
+     Name "settings"
+     Pos 726 41
+     Size 37 37
+     Flags 0
+    }
+    ImageSetDefClass credits {
+     Name "credits"
+     Pos 667 43
+     Size 45 33
      Flags 0
     }
    }

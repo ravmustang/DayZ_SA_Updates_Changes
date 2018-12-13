@@ -326,6 +326,7 @@ class HandsContainer: Container
 	
 	bool to_reselect;
 	EntityAI item_to_be_swap;
+	EntityAI prev_item;
 	override void Select()
 	{
 		Man player = GetGame().GetPlayer();
@@ -360,9 +361,9 @@ class HandsContainer: Container
 				}
 			}
 		}
-		else if( m_Cargo )
+		else if( m_Cargo && m_Cargo.GetFocusedItem() )
 		{
-			EntityAI prev_item = EntityAI.Cast( m_Cargo.GetFocusedItem().GetObject() );
+			prev_item = EntityAI.Cast( m_Cargo.GetFocusedItem().GetObject() );
 			if ( prev_item && prev_item.GetInventory().CanRemoveEntity() )
 			{
 				if( item_in_hands )
@@ -370,10 +371,6 @@ class HandsContainer: Container
 					if( GameInventory.CanSwapEntities( item_in_hands, prev_item ) )
 					{
 						player.PredictiveSwapEntities( item_in_hands, prev_item );
-					}
-					else
-					{
-						player.PredictiveSwapEntities( prev_item, item_in_hands);
 					}
 				}
 				else
@@ -386,6 +383,27 @@ class HandsContainer: Container
 				m_Cargo.PrepareCursorReactivation();
 			}
 		}
+		else if( m_Atts && m_Atts.GetFocusedEntity() )
+		{
+			prev_item = m_Atts.GetFocusedEntity();
+			if ( prev_item && prev_item.GetInventory().CanRemoveEntity() )
+			{
+				if( item_in_hands )
+				{
+					if( GameInventory.CanSwapEntities( item_in_hands, prev_item ) )
+					{
+						player.PredictiveSwapEntities( item_in_hands, prev_item );
+					}
+				}
+				else
+				{
+					if( player.GetHumanInventory().CanAddEntityInHands( prev_item ) )
+					{
+						player.PredictiveTakeEntityToHands( prev_item );
+					}
+				}
+			}
+		}
 	}
 	
 	EntityAI GetItemPreviewItem( Widget w )
@@ -393,18 +411,21 @@ class HandsContainer: Container
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
 		if( !ipw )
 		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			string name = w.GetName();
+			name.Replace( "PanelWidget", "Render" );
+			ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
 		}
+		
 		if( !ipw )
 		{
-		  ipw = ItemPreviewWidget.Cast( w );
+			ipw = ItemPreviewWidget.Cast( w );
 		}
-		if( !ipw.IsInherited( ItemPreviewWidget ) )
+		
+		if( !ipw )
 		{
-			return NULL;
+			return null;
 		}
+		
 		return ipw.GetItem();
 	}
 
@@ -612,7 +633,7 @@ class HandsContainer: Container
 			if( m_am_entity2.GetSlotsCountCorrect() > 0 )
 			{
 				m_Atts = new Attachments( this, m_am_entity2 );
-				m_Atts.InitAttachmentGrid();
+				m_Atts.InitAttachmentGrid( 1 );
 
 			}
 
@@ -673,7 +694,7 @@ class HandsContainer: Container
 			if( m_am_entity2.GetSlotsCountCorrect() > 0 )
 			{
 				m_Atts = new Attachments( this, m_am_entity2 );
-				m_Atts.InitAttachmentGrid();
+				m_Atts.InitAttachmentGrid( 1 );
 
 			}
 			this.Refresh();
@@ -1164,7 +1185,7 @@ class HandsContainer: Container
 		if( entity.GetSlotsCountCorrect() > 0 )
 		{
 			m_Atts = new Attachments( this, entity );
-			m_Atts.InitAttachmentGrid();
+			m_Atts.InitAttachmentGrid( 1 );
 		}
 		
 		if( entity.GetInventory().GetCargo() )
@@ -1228,6 +1249,7 @@ class HandsContainer: Container
 			m_Cargo.UpdateInterval();
 		}
 		
+		ElectricityIcon();
 		m_CollapsibleHeader.UpdateInterval();
 	}
 
@@ -1317,6 +1339,29 @@ class HandsContainer: Container
 	int GetCargoHeight()
 	{
 		return m_Cargo.GetCargoHeight();
+	}
+	
+	void ElectricityIcon()
+	{
+		EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
+		if( item_in_hands && item_in_hands.GetCompEM() )
+		{
+			if( GetMainWidget().FindAnyWidget( "electricity" ) )
+			{
+				bool show_electricity_icon = item_in_hands.GetCompEM().HasElectricityIcon();
+				GetMainWidget().FindAnyWidget( "electricity" ).Show( show_electricity_icon );
+			}
+			
+			if( GetMainWidget().FindAnyWidget( "electricity_can_work" ) )
+			{
+				bool show_electricity_can_work_icon = item_in_hands.GetCompEM().CanWork() && !item_in_hands.IsRuined();
+				GetMainWidget().FindAnyWidget( "electricity_can_work" ).Show( show_electricity_can_work_icon );
+			}
+		}
+		else
+		{
+			GetMainWidget().FindAnyWidget( "electricity" ).Show( false );
+		}
 	}
 
 	void LoadDefaultState()

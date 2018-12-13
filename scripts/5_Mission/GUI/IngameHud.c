@@ -13,7 +13,8 @@ class IngameHud extends Hud
 	protected ref map<int,string>				m_BadgesWidgetNames;
 	protected ref map<int,bool>					m_BadgesWidgetDisplay;
 	protected ref map<int,ImageWidget>			m_BadgesWidgets;  // [key] ImageWidget
-
+	protected bool								m_AnyBadgeVisible;
+	
 	protected ref map<int,string>				m_VehicleGearTable;
 
 	protected Widget							m_HudPanelWidget;
@@ -21,27 +22,29 @@ class IngameHud extends Hud
 	protected ref InventoryQuickbar				m_Quickbar;
 	
 	protected Widget							m_VehiclePanel;
-	protected Widget							m_VehiclePanelRPMPointer;
 	
-	protected ImageWidget						m_VehiclePanelBatteryIcon;
-	protected ImageWidget						m_VehiclePanelLiquidIcon;
-	protected ImageWidget						m_VehiclePanelFuelIcon;
-	protected ImageWidget						m_VehiclePanelFuel2Icon;
-	protected ProgressBarWidget					m_VehiclePanelBatteryMeter;
-	protected ProgressBarWidget					m_VehiclePanelLiquidMeter;
-	protected ProgressBarWidget					m_VehiclePanelFuelMeter;
-	protected ProgressBarWidget					m_VehiclePanelFuel2Meter;
+	protected ImageWidget						m_VehicleRPMPointer;
+	protected ImageWidget						m_VehicleSpeedPointer;
+	protected ImageWidget						m_VehicleTemperaturePointer;
+	protected ImageWidget						m_VehicleFuelPointer;
 	
-	protected TextWidget						m_VehiclePanelRPMValue;
-	protected TextWidget						m_VehiclePanelSpeedValue;
-	protected TextWidget						m_VehiclePanelCurrentGearValue;
-	protected TextWidget						m_VehiclePanelNextGearValue;
-	protected TextWidget						m_VehiclePanelPrevGearValue;
-	protected ImageWidget						m_VehiclePanelEngineHealth;
+	protected TextWidget						m_VehicleSpeedValue;
+	
+	protected TextWidget						m_VehicleCurrentGearValue;
+	protected TextWidget						m_VehicleNextGearValue;
+	protected TextWidget						m_VehiclePrevGearValue;
+	
+	protected ImageWidget						m_VehicleBatteryLight;
+	protected ImageWidget						m_VehicleEngineLight;
+	protected ImageWidget						m_VehicleOilLight;
+	
 	protected bool								m_InVehicleAsDriver;
 	protected CarScript							m_CurrentVehicle;
 	
 	protected Widget							m_Notifiers;
+	protected TextWidget						m_BloodType;
+	protected TextWidget						m_BloodPosType;
+	protected Widget							m_BadgeNotifierDivider;
 	protected Widget							m_Badges;
 	protected ref Timer							m_HideTimer;
 	protected ref WidgetFadeTimer				m_FadeTimerCrosshair;
@@ -99,7 +102,6 @@ class IngameHud extends Hud
 	protected ImageWidget						m_ActionIcon;
 	protected TextWidget						m_ActionButtonText;
 
-	protected TextWidget						m_BloodType;
 	protected Widget							m_ActionIconFrame;
 	protected Widget							m_ActionMultipleItemsFrame;
 	
@@ -182,25 +184,26 @@ class IngameHud extends Hud
 		m_Presence						= m_HudPanelWidget.FindAnyWidget("PresencePanel");
 		m_Badges						= hud_panel_widget.FindAnyWidget("BadgesPanel");
 		m_Notifiers						= m_HudPanelWidget.FindAnyWidget("NotifiersPanel");
+		m_BadgeNotifierDivider			= m_HudPanelWidget.FindAnyWidget("BadgeNotifierDivider");
+		m_BloodType						= TextWidget.Cast( m_HudPanelWidget.FindAnyWidget("BloodType") );
+		m_BloodPosType					= TextWidget.Cast( m_HudPanelWidget.FindAnyWidget("BloodPosType") );
 		
 		m_VehiclePanel					= m_HudPanelWidget.FindAnyWidget("VehiclePanel");
-		m_VehiclePanelRPMPointer		= m_VehiclePanel.FindAnyWidget("RpmPointer");
-		m_VehiclePanelRPMValue			= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("RpmLabel") );
-		m_VehiclePanelSpeedValue		= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("SpeedValue") );
-		m_VehiclePanelCurrentGearValue	= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Current") );
-		m_VehiclePanelNextGearValue		= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Next") );
-		m_VehiclePanelPrevGearValue		= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Prev") );
 		
-		m_VehiclePanelBatteryIcon		= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconBattery") );
-		m_VehiclePanelLiquidIcon		= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconLiquid") );
-		m_VehiclePanelFuelIcon			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconFuel") );
-		m_VehiclePanelFuel2Icon			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("IconFuel0") );
-		m_VehiclePanelBatteryMeter		= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("BatteryMeter") );
-		m_VehiclePanelLiquidMeter		= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("LiquidMeter") );
-		m_VehiclePanelFuelMeter			= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("FuelMeter") );
-		m_VehiclePanelFuel2Meter		= ProgressBarWidget.Cast( m_VehiclePanel.FindAnyWidget("FuelMeter0") );
+		m_VehicleRPMPointer				= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("RPMPointer") );
+		m_VehicleSpeedPointer			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("SpeedPointer") );
+		m_VehicleSpeedValue				= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("SpeedValue") );
 		
-		m_VehiclePanelEngineHealth		= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("CheckEngineIcon") );
+		m_VehicleCurrentGearValue		= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Current") );
+		m_VehicleNextGearValue			= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Next") );
+		m_VehiclePrevGearValue			= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("Prev") );
+		
+		m_VehicleBatteryLight			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("BatteryLight") );
+		m_VehicleEngineLight			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("EngineLight") );
+		m_VehicleOilLight				= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("OilLight") );
+		
+		m_VehicleTemperaturePointer		= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("TemperaturePointer") );
+		m_VehicleFuelPointer			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("FuelPointer") );
 		
 		//Class.CastTo(m_Zeroing, m_HudPanelWidget.FindAnyWidget("Zeroing"));
 		//Class.CastTo(m_WeaponMode, m_HudPanelWidget.FindAnyWidget("WeaponMode"));
@@ -216,7 +219,6 @@ class IngameHud extends Hud
 		m_StanceCar						= m_HudPanelWidget.FindAnyWidget("StanceCar");
 		m_StancePanel					= m_HudPanelWidget.FindAnyWidget("StancePanel");
 		m_ActionTarget					= m_HudPanelWidget.FindAnyWidget("ActionTargetsCursorWidget");
-		Class.CastTo(m_BloodType, m_HudPanelWidget.FindAnyWidget("BloodType") );
 		
 		// state notifiers
 		m_StatesWidgetNames.Clear();
@@ -235,9 +237,7 @@ class IngameHud extends Hud
 		#endif
 
 			m_Notifiers.Show( true );
-			// m_Notifiers.SetAlpha( 0 );
 			m_Badges.Show( true );
-			// m_Badges.SetAlpha( 0 );
 
 			int i = 0;
 			int key = 0;
@@ -249,6 +249,11 @@ class IngameHud extends Hud
 				Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + widget_name ) ) );
 				m_StatesWidgets.Set( key, w );
 				w.Show( true );
+				for ( int y = 0; y < 5; y++ )
+				{
+					Print( "Loading: " +  "set:dayz_gui image:icon" + widget_name + y );
+					w.LoadImageFile( y, "set:dayz_gui image:icon" + widget_name + y );
+				}
 				// clear all arrows
 				for ( int x = 1; x < 4; x++ )
 				{
@@ -257,6 +262,8 @@ class IngameHud extends Hud
 					Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( widget_name + "ArrowDown" + x.ToString() ) ) );
 					w.Show( false );
 				}
+			
+				
 			}
 
 			// badges
@@ -268,6 +275,8 @@ class IngameHud extends Hud
 			m_BadgesWidgetNames.Set( NTFKEY_SICK, "Pill" );
 			m_BadgesWidgetNames.Set( NTFKEY_WETNESS, "Wetness" );
 			m_BadgesWidgetNames.Set( NTFKEY_FEVERISH, "Skull" );
+			m_BadgesWidgetNames.Set( NTFKEY_BLEEDISH, "Bleeding" );
+			m_BadgesWidgetNames.Set( NTFKEY_LIVES, "Shock" );
 			// NTFKEY_SICK
 			// NTFKEY_BLEEDISH
 			// NTFKEY_FRACTURE
@@ -295,20 +304,6 @@ class IngameHud extends Hud
 			m_PresenceLevel2.Show( false );
 			m_PresenceLevel3.Show( false );
 			m_PresenceLevel4.Show( false );
-		
-		/*
-		else
-		{
-			m_StaminaBackground.Show( false );
-			m_Stamina.Show( false );
-			m_Presence.Show( false );
-			m_StanceProne.Show( false );
-			m_StanceStand.Show( false );
-			m_StanceCrouch.Show( false );
-			m_Badges.Show( false );
-			m_Notifiers.Show( false );
-		}
-		*/
 		
 //		#ifndef NO_GUI
 //		m_zeroing_and_weaponmode_timer.Run(0.1, this, "RefreshZeroingAndWeaponMode", NULL, true );
@@ -455,59 +450,14 @@ class IngameHud extends Hud
 	{
 		ImageWidget w;
 		Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
-		w.Show( true );
-
-		// --- tendency status
-		//1 - white (fine) - also default
-		//2 - yellow (attention)
-		//3 - red (alert)
-		//4 - red blinking (critical)
-		//5 - turquoise
-		//6 - blue
-		//7 - blue blinking (critical)
-		float alpha = w.GetAlpha();
-
-		switch( status )
+		if( key == NTFKEY_FEVERISH )
 		{
-			case 1:
-				w.SetColor( ARGB( alpha * 255, 255, 255, 255 ) );	//white
-				m_TendencyStatusCritical.Remove( w );		//remove from blinking group
-				break;
-			case 2:
-				w.SetColor( ARGB( alpha * 255, 255, 255, 0 ) );		//yellow
-				m_TendencyStatusCritical.Remove( w );		//remove from blinking group
-				break;
-			case 3:
-				w.SetColor( ARGB( alpha * 255, 255, 0, 0 ) );		//red
-				m_TendencyStatusCritical.Remove( w );		//remove from blinking group
-				break;
-			case 4:
-				if ( !m_TendencyStatusCritical.Contains( w ) )
-				{
-					m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 255, 0, 0 ) );	//add to blinking group
-				}
-				break;
-			case 5:
-				w.SetColor( ARGB( alpha * 255, 0, 206, 209 ) );		//turquoise
-				m_TendencyStatusCritical.Remove( w );		//remove from blinking group
-				break;
-			case 6:
-				w.SetColor( ARGB( alpha * 255, 30, 144, 255 ) );	//blue
-				m_TendencyStatusCritical.Remove( w );		//remove from blinking group
-				break;
-			case 7:													//blue blinking
-				if ( !m_TendencyStatusCritical.Contains( w ) )
-				{
-					m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 30, 144, 255 ) );	//add to blinking group
-				}
-				break;				
-			default:
-				w.SetColor( ARGB( alpha * 255, 255, 255, 255 ) );	//white
-				m_TendencyStatusCritical.Remove( w );		//remove from blinking group
-				break;
+			DisplayTendencyTemp( key, tendency, status );
 		}
-		// ---
-		
+		else
+		{
+			DisplayTendencyNormal( key, tendency, status );
+		}
 		// tendency arrows
 		string arrow_name = "ArrowUp";
 		if ( tendency < 0 )
@@ -523,19 +473,98 @@ class IngameHud extends Hud
 			Class.CastTo(w,  m_Notifiers.FindAnyWidget( String(  m_StatesWidgetNames.Get( key ) + "ArrowDown" + x.ToString() ) ) );
 			w.Show( false );
 		}
-
-		for ( int i = 1; i < ( tendency + 1) ; i++ )
+		
+		if( tendency > 0 )
 		{
-			string widget_name = m_StatesWidgetNames.Get( key ) + arrow_name + i.ToString() ;
+			string widget_name = m_StatesWidgetNames.Get( key ) + arrow_name + Math.Clamp( tendency, 1, 3 );
 			Class.CastTo(w,  m_Notifiers.FindAnyWidget( widget_name ) );
 			w.Show( true );
+		}
+	}
+	
+	void DisplayTendencyNormal( int key, int tendency, int status )
+	{
+		ImageWidget w;
+		Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
+		w.SetImage( Math.Clamp( status - 1, 0, 4 ) );
+		float alpha = w.GetAlpha();
+		
+		switch( status )
+		{
+			case 3:
+				w.SetColor( ARGB( alpha * 255, 220, 220, 0 ) );		//yellow
+				m_TendencyStatusCritical.Remove( w );				//remove from blinking group
+				break;
+			case 4:
+				w.SetColor( ARGB( alpha * 255, 220, 0, 0 ) );		//red
+				m_TendencyStatusCritical.Remove( w );				//remove from blinking group
+				break;
+			case 5:
+				if ( !m_TendencyStatusCritical.Contains( w ) )
+				{
+					m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 220, 0, 0 ) );	//add to blinking group
+				}
+				break;
+			default:
+				w.SetColor( ARGB( alpha * 255, 220, 220, 220 ) );	//white
+				m_TendencyStatusCritical.Remove( w );				//remove from blinking group
+				break;
+		}
+	}
+	
+	void DisplayTendencyTemp( int key, int tendency, int status )
+	{
+		ImageWidget w;
+		Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
+		float alpha = w.GetAlpha();
+		switch( status )
+		{
+			case 2:
+				w.SetColor( ARGB( alpha * 255, 220, 220, 0 ) );		//WARNING_PLUS
+				m_TendencyStatusCritical.Remove( w );
+				w.SetImage( 1 );
+				break;
+			case 3:
+				w.SetColor( ARGB( alpha * 255, 220, 0, 0 ) );		//CRITICAL_PLUS
+				m_TendencyStatusCritical.Remove( w );
+				w.SetImage( 0 );
+				break;
+			case 4:
+				if ( !m_TendencyStatusCritical.Contains( w ) )		//BLINKING_PLUS
+				{
+					m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 220, 0, 0 ) );
+				}
+				w.SetImage( 0 );
+				break;
+			case 5:
+				w.SetColor( ARGB( alpha * 255, 0, 206, 209 ) );		//WARNING_MINUS
+				m_TendencyStatusCritical.Remove( w );
+				w.SetImage( 3 );
+				break;
+			case 6:
+				w.SetColor( ARGB( alpha * 255, 30, 144, 220 ) );	//CRITICAL_MINUS
+				m_TendencyStatusCritical.Remove( w );
+				w.SetImage( 4 );
+				break;
+			case 7:													//BLINKING_MINUS
+				if ( !m_TendencyStatusCritical.Contains( w ) )
+				{
+					m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 30, 144, 220 ) );
+				}
+				w.SetImage( 4 );
+				break;				
+			default:
+				w.SetColor( ARGB( alpha * 255, 220, 220, 220 ) );	//DEFAULT
+				m_TendencyStatusCritical.Remove( w );
+				w.SetImage( 2 );
+				break;
 		}
 	}
 	
 	override void DisplayBadge( int key, bool show )
 	{
 		m_BadgesWidgetDisplay.Set( key, show );
-
+		m_AnyBadgeVisible = false;
 		int x = 0;
 		for ( int i = 0; i < m_BadgesWidgetDisplay.Count(); i++ )
 		{
@@ -550,6 +579,7 @@ class IngameHud extends Hud
 					badge_widget.SetPos ( x*0.2, 0.0, true);
 					badge_widget.Show( true );
 					x = x + 1;
+					m_AnyBadgeVisible = true;
 				}
 				else
 				{
@@ -557,6 +587,16 @@ class IngameHud extends Hud
 				}
 			}
 		}
+		m_BadgeNotifierDivider.Show( m_AnyBadgeVisible );
+	}
+	
+	// state 0 = empty
+	// state 1 = digesting
+	// state 2 = full
+	void SetStomachState( int state )
+	{
+		ImageWidget stomach = ImageWidget.Cast( m_Badges.FindAnyWidget( "Stomach" ) );
+		stomach.LoadImageFile( 0, "set:dayz_gui image:iconStomach" + state );
 	}
 	
 	override void SetStamina( int value , int range )
@@ -810,12 +850,12 @@ class IngameHud extends Hud
 					
 					if( !m_VehicleHasOil )
 					{
-						m_VehiclePanel.FindAnyWidget( "Battery" ).Show( false );
+						m_VehicleBatteryLight.Show( false );
 					}
 					
 					if( !m_VehicleHasCoolant )
 					{
-						m_VehiclePanel.FindAnyWidget( "Liquid" ).Show( false );
+						m_VehicleOilLight.Show( false );
 					}
 					
 					m_HudPanelWidget.FindAnyWidget("PlayerPanel").Show( false );
@@ -836,6 +876,7 @@ class IngameHud extends Hud
 		
 		m_VehiclePanel.Show( false );
 		
+		m_InVehicleAsDriver	= false;
 		m_CurrentVehicle = null;
 		m_VehicleGearCount = -1;
 	}
@@ -844,10 +885,13 @@ class IngameHud extends Hud
 	{
 		if ( m_CurrentVehicle )
 		{
-			float rpm_value = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMRedline() ) ;
+			float rpm_value = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMMax() ) ;
+			float rpm_value_red = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMRedline() ) ;
+			float speed_value = ( m_CurrentVehicle.GetSpeedometer() / 200 );
 			
-			m_VehiclePanelRPMPointer.SetRotation( 0, 0, rpm_value * 100 - 20, true );
-			m_VehiclePanelSpeedValue.SetText( Math.Floor( m_CurrentVehicle.GetSpeedometer() ).ToString() );
+			m_VehicleRPMPointer.SetRotation( 0, 0, rpm_value * 290 - 130, true );
+			m_VehicleSpeedPointer.SetRotation( 0, 0, speed_value * 260 - 130, true );
+			m_VehicleSpeedValue.SetText( Math.Floor( m_CurrentVehicle.GetSpeedometer() ).ToString() );
 
 			int engaged_gear = m_CurrentVehicle.GetController().GetGear();
 			int prev_gear = engaged_gear - 1;
@@ -863,48 +907,50 @@ class IngameHud extends Hud
 				next_gear = CarGear.NEUTRAL;
 			}
 			
-			int health = m_CurrentVehicle.GetHealthLevel();
+			int health = m_CurrentVehicle.GetHealthLevel( "Engine" );
 			int color;
-			if( m_CurrentVehicle.EngineIsOn() && health > 0 && health < 4 )
+			if( rpm_value_red > 1 )
 			{
-				m_VehiclePanelEngineHealth.Show( true );
-				color = ItemManager.GetItemHealthColor( m_CurrentVehicle );
-				
-				m_VehiclePanelEngineHealth.SetColor( color );
-				m_VehiclePanelEngineHealth.SetAlpha( 1 );
-			}
-			else if( health > 3 )
-			{
-				if( m_TimeSinceLastEngineLightChange > 0.7 )
+				if( m_TimeSinceLastEngineLightChange > 0.35 )
 				{
-					m_VehiclePanelEngineHealth.Show( !m_VehiclePanelEngineHealth.IsVisible() );
-					color = ItemManager.GetItemHealthColor( m_CurrentVehicle );
-					m_VehiclePanelEngineHealth.SetColor( color );
-					m_VehiclePanelEngineHealth.SetAlpha( 1 );
+					m_VehicleEngineLight.Show( !m_VehicleEngineLight.IsVisible() );
+					m_VehicleEngineLight.SetColor( Colors.COLOR_RUINED );
+					m_VehicleEngineLight.SetAlpha( 1 );
 					m_TimeSinceLastEngineLightChange = 0;
 				}
 				m_TimeSinceLastEngineLightChange += timeslice;
 			}
+			else if( health > 1 && health < 5 )
+			{
+				m_VehicleEngineLight.Show( true );
+				color = ItemManager.GetItemHealthColor( m_CurrentVehicle, "Engine" );
+				
+				m_VehicleEngineLight.SetColor( color );
+				m_VehicleEngineLight.SetAlpha( 1 );
+			}
 			else
 			{
-				m_VehiclePanelEngineHealth.Show( false );
+				m_VehicleEngineLight.Show( false );
 			}
 			
-			m_VehiclePanelCurrentGearValue.SetText( m_VehicleGearTable.Get( engaged_gear ) );
+			m_VehicleCurrentGearValue.SetText( m_VehicleGearTable.Get( engaged_gear ) );
 			
 			if( next_gear > m_VehicleGearCount )
 			{
-				m_VehiclePanelNextGearValue.Show( false );
+				m_VehicleNextGearValue.Show( false );
 			}
 			else
 			{
-				m_VehiclePanelNextGearValue.Show( true );
+				m_VehicleNextGearValue.Show( true );
 			}
 			
 			
-			m_VehiclePanelNextGearValue.SetText( m_VehicleGearTable.Get( next_gear ) );
-			m_VehiclePanelPrevGearValue.SetText( m_VehicleGearTable.Get( prev_gear ) );
+			m_VehicleNextGearValue.SetText( m_VehicleGearTable.Get( next_gear ) );
+			m_VehiclePrevGearValue.SetText( m_VehicleGearTable.Get( prev_gear ) );
 			
+			m_VehicleFuelPointer.SetRotation( 0, 0, m_CurrentVehicle.GetFluidFraction( CarFluid.FUEL ) * 260 - 130, true );
+			m_VehicleTemperaturePointer.SetRotation( 0, 0, m_CurrentVehicle.GetFluidFraction( CarFluid.COOLANT ) * 260 - 130, true );
+			/*
 			if( !m_VehicleHasOil )
 			{
 				m_VehiclePanelBatteryMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.OIL ) );
@@ -921,10 +967,12 @@ class IngameHud extends Hud
 				m_VehiclePanelFuelIcon.SetAlpha( 1 );
 			}
 			
-			m_VehiclePanelFuelMeter.SetCurrent( m_CurrentVehicle.GetFluidFraction( CarFluid.FUEL ) );
+			
+			m_VehiclePanelFuelMeter.SetCurrent(  );
 			color = ItemManager.ColorFromFloat( m_CurrentVehicle.GetFluidFraction( CarFluid.FUEL ) );
 			m_VehiclePanelFuelIcon.SetColor( color );
 			m_VehiclePanelFuelIcon.SetAlpha( 1 );
+			*/
 		}
 	}
 	
@@ -1031,9 +1079,11 @@ class IngameHud extends Hud
 	void ToggleHud( bool show, bool ignore_state = false )
 	{
 		//You can add more widgets to toggle here
-		SetLeftStatsVisibility( show );
+		SetLeftStatsVisibility( show && !m_InVehicleAsDriver );
 		m_Badges.Show( show );
 		m_Notifiers.Show( show );
+		m_BadgeNotifierDivider.Show( show && m_AnyBadgeVisible );
+		m_VehiclePanel.Show( show && m_InVehicleAsDriver );
 		
 		if( !ignore_state )
 		{
@@ -1065,10 +1115,10 @@ class IngameHud extends Hud
 	{
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 
-		if ( player && player.GetSoftSkillManager() )
+		if ( player && player.GetSoftSkillsManager() )
 		{
 			m_SpecializationPanel.Show( visible );
-			float x = player.GetSoftSkillManager().GetSpecialtyLevel() / 2;
+			float x = player.GetSoftSkillsManager().GetSpecialtyLevel() / 2;
 			float y = -0.75;
 			m_SpecializationIcon.SetPos( x, y, true );	
 		}
@@ -1125,18 +1175,23 @@ class IngameHud extends Hud
 		
 		if( player )
 		{
-			string blood_name = BloodTypes.GetBloodTypeName( player.GetBloodType() );
+			string blood_name;
+			bool positive;
+			BloodTypes.GetBloodTypeName( player.GetBloodType(), blood_name, positive );
 			bool blood_type_visible = player.HasBloodTypeVisible();
 			
 			if( blood_type_visible )
 			{
-				m_BloodType.Show( blood_type_visible );
-				m_BloodType.SetText( blood_name );	
+				m_BloodType.SetText( blood_name );
+				if( positive )
+					m_BloodPosType.SetText( "+" );
+				else
+					m_BloodPosType.SetText( "-" );
 			}
 			else
 			{
-				m_BloodType.Show( blood_type_visible );
 				m_BloodType.SetText( "" );
+				m_BloodPosType.SetText( "" );
 			}
 		}
 	}

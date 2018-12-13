@@ -67,7 +67,9 @@ class ActionConstructor
 		actions.Insert(new ActionTurnOnWeaponFlashlight);
 		actions.Insert(new ActionTurnOffWeaponFlashlight);
 		actions.Insert(new ActionNextCombinationLockDial);
-
+		actions.Insert(new ActionAttachToConstruction);
+		actions.Insert(new ActionTakeMaterialToHandsSwitch);
+		
 		//actions.Insert(new ActionLoadMagazineToWeapon);
 		//actions.Insert(new ActionLoadBulletToWeapon);
 		actions.Insert(new ActionClapBearTrapWithThisItem);
@@ -148,6 +150,7 @@ class ActionConstructor
 		actions.Insert(new ActionTuneFrequency);
 		actions.Insert(new ActionTuneRadioStation);
 		actions.Insert(new ActionIgniteFireplaceByAir);
+		actions.Insert(new ActionLightItemOnFire);
 		actions.Insert(new ActionExtinguishFireplaceByLiquid);
 		actions.Insert(new ActionExtinguishFireplaceByExtinguisher);
 		actions.Insert(new ActionBurnSewSelf);
@@ -208,6 +211,10 @@ class ActionConstructor
 		actions.Insert(new ActionFillCoolant);
 		actions.Insert(new ActionFillOil);
 		actions.Insert(new ActionDestroyCombinationLock);
+		actions.Insert(new ActionGagSelf);
+		actions.Insert(new ActionGagTarget);
+		actions.Insert(new ActionUngagSelf);
+		actions.Insert(new ActionUngagTarget);
 		
 		// Interact actions
 		actions.Insert(new ActionPullOutPlug);
@@ -233,7 +240,6 @@ class ActionConstructor
 		actions.Insert(new ActionPackTent);
 		actions.Insert(new ActionOpenBarrel);
 		actions.Insert(new ActionCloseBarrel);
-		actions.Insert(new ActionCoverPlantedSeed);
 		actions.Insert(new ActionOpenBarrelHoles);
 		actions.Insert(new ActionCloseBarrelHoles);
 		actions.Insert(new ActionTakeFireplaceIndoor);
@@ -260,6 +266,7 @@ class ActionConstructor
 		actions.Insert(new ActionOpenFence);
 		actions.Insert(new ActionCloseFence);
 		actions.Insert(new ActionNextCombinationLockDialOnTarget);
+		actions.Insert(new ActionTakeMaterialToHands);
 		
 		//vehicle actions
 		actions.Insert(new ActionSwitchLights);

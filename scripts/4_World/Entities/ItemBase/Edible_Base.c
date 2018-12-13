@@ -74,9 +74,9 @@ class Edible_Base extends ItemBase
 		ctx.Write( GetFoodStage().GetMaterialIndex() );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 		
 		//Food stage name 
 		FoodStageType stage_type = FoodStageType.RAW;

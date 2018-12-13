@@ -25,26 +25,29 @@ class WeaponUnjamming_Start extends WeaponStartAction
 
 		DayZPlayer p;
 		Class.CastTo(p, m_weapon.GetHierarchyParent());
-		HumanInputController hic = p.GetInputController();
-		HumanCommandWeapons hcw = p.GetCommandModifier_Weapons();
+		if(p)
+		{
+			HumanInputController hic = p.GetInputController();
+			HumanCommandWeapons hcw = p.GetCommandModifier_Weapons();
 
-		if (m_dtAccumulator >= m_jamTime)
-		{
-			wpnDebugPrint("[wpnfsm] Unjammed!");
-			hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_END);
-			m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingTimeout(p));
-			return; // unjammed successfuly
-		}
+			if (m_dtAccumulator >= m_jamTime)
+			{
+				wpnDebugPrint("[wpnfsm] Unjammed!");
+				hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_END);
+				m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingTimeout(p));
+				return; // unjammed successfuly
+			}
 
-		if (hic.IsReloadOrMechanismContinuousUse())
-		{
-			wpnDebugPrint("[wpnfsm] Unjamming...");
-		}
-		else
-		{
-			wpnDebugPrint("[wpnfsm] Unjamming failed, weapon still jammed");
-			hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_INTERRUPT);
-			m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingFailedTimeout(p));
+			if (hic.IsReloadOrMechanismContinuousUse())
+			{
+				wpnDebugPrint("[wpnfsm] Unjamming...");
+			}
+			else
+			{
+				wpnDebugPrint("[wpnfsm] Unjamming failed, weapon still jammed");
+				hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_INTERRUPT);
+				m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingFailedTimeout(p));
+			}
 		}
 	}
 

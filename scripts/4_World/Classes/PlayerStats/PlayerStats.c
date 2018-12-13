@@ -127,11 +127,11 @@ class PlayerStats
 		}
 	}
 
-	void LoadStats ( ParamsReadContext ctx )
+	void LoadStats ( ParamsReadContext ctx, int version )
 	{
 		for ( int i = 0; i < m_PlayerStats.Count(); i++ )
 		{
-			m_PlayerStats.Get(i).OnStoreLoad(ctx);
+			m_PlayerStats.Get(i).OnStoreLoad(ctx, version);
 		}
 	}
 

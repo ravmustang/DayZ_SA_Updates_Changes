@@ -23,7 +23,7 @@ class ActionInsertSparkplug: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#insert_sparkplug";
+		return "#attach";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

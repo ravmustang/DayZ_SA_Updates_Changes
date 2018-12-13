@@ -375,8 +375,10 @@ class DayZPlayerType
 	{
 		m_HitComponentsForAI = new array<ref DayZAIHitComponent>;
 
-		//! registers default hit compoent for the entity
+		//! registers default hit compoent for entity
 		m_DefaultHitComponent = "dmgZone_torso";
+		//! registers default hit position for entity
+		m_DefaultHitPositionComponent = "Pelvis";
 
 		//! register hit components that are selected by probability
 		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_head", 5);
@@ -402,6 +404,11 @@ class DayZPlayerType
 	string GetDefaultHitComponent()
 	{
 		return m_DefaultHitComponent;
+	}
+	
+	string GetDefaultHitPositionComponent()
+	{
+		return m_DefaultHitPositionComponent;
 	}
 	
 	private void DayZPlayerType()
@@ -466,6 +473,7 @@ class DayZPlayerType
 	//! Melee hit components (AI targeting)	
 	protected ref array<ref DayZAIHitComponent> m_HitComponentsForAI;
 	protected string m_DefaultHitComponent;
+	protected string m_DefaultHitPositionComponent;
 	
 	ref array<ref AnimSoundEvent> m_animSoundEventsAttack;
 }
@@ -1056,5 +1064,11 @@ class DayZPlayer extends Human
 	
 	void OnInputForRemote (ParamsReadContext ctx) { }
 	void OnInputFromServer (ParamsReadContext ctx) { }
+	
+	//! ---------------- speaking anim -------------------------
+	
+	//! Check if player is using VoN to speak and return max amplitude from current samples
+	proto native	float	IsPlayerSpeaking();
+	
 }
 

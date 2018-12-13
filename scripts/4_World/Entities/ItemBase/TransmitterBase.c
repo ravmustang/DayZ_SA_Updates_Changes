@@ -15,9 +15,9 @@ class TransmitterBase extends ItemTransmitter
 		ctx.Write( GetTunedFrequencyIndex() );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx );
+		super.OnStoreLoad( ctx, version );
 		
 		//load and set tuned frequency
 		int tuned_frequency_idx;
@@ -35,13 +35,16 @@ class TransmitterBase extends ItemTransmitter
 	{
 		SetNextChannel();
 		
+		/*
 		if ( player )
 		{
 			DisplayRadioInfo( GetTunedFrequency().ToString(), player );
 		}
+		*/
 	}
 	
 	//--- HUD
+	/*
 	protected Hud GetHud( PlayerBase player )
 	{
 		if ( !player ) 
@@ -66,6 +69,7 @@ class TransmitterBase extends ItemTransmitter
 			hud.ShowWalkieTalkie( 3 );
 		}
 	}
+	*/
 	
 	//--- POWER EVENTS
 	override void OnSwitchOn()

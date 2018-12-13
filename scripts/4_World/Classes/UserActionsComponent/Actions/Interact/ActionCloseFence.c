@@ -21,7 +21,7 @@ class ActionCloseFence: ActionInteractBase
 
 	override string GetText()
 	{
-		return "#close_fence";
+		return "#close";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

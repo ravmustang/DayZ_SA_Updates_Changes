@@ -1,23 +1,28 @@
 class PortableGasStove extends ItemBase
 {
-	private const string FLAME_BUTANE_ON 			= "dz\\gear\\cooking\\data\\flame_butane_ca.paa";
-	private const string FLAME_BUTANE_OFF 			= "";
+	protected const string FLAME_BUTANE_ON 			= "dz\\gear\\cooking\\data\\flame_butane_ca.paa";
+	protected const string FLAME_BUTANE_OFF 		= "";
 	typename ATTACHMENT_COOKING_POT 				= Pot;
 	
 	//cooking
-	private const float PARAM_COOKING_TEMP_THRESHOLD		= 100;		//temperature threshold for starting coooking process (degree Celsius)
-	private const float PARAM_COOKING_EQUIP_TEMP_INCREASE	= 10;		//how much will temperature increase when attached on burning fireplace (degree Celsius)
-	private const float PARAM_COOKING_EQUIP_MAX_TEMP		= 250;		//maximum temperature of attached cooking equipment (degree Celsius)
-	private const float PARAM_COOKING_TIME_INC_COEF			= 0.5;		//cooking time increase coeficient, can be used when balancing how fast a food can be cooked
+	protected const float PARAM_COOKING_TEMP_THRESHOLD			= 100;		//temperature threshold for starting coooking process (degree Celsius)
+	protected const float PARAM_COOKING_EQUIP_TEMP_INCREASE		= 10;		//how much will temperature increase when attached on burning fireplace (degree Celsius)
+	protected const float PARAM_COOKING_EQUIP_MAX_TEMP			= 250;		//maximum temperature of attached cooking equipment (degree Celsius)
+	protected const float PARAM_COOKING_TIME_INC_COEF			= 0.5;		//cooking time increase coeficient, can be used when balancing how fast a food can be cooked
 	
 	//
 	ref Cooking m_CookingProcess;
 	ItemBase m_CookingEquipment;
 	
 	//sound
-	protected SoundOnVehicle m_SoundGasFlameLoop;
-	const string SOUND_BURNING_GAS 	= "gasFlame";
-
+	const string SOUND_BURNING 		= "portablegasstove_burn_SoundSet";
+	const string SOUND_TURN_ON		= "portablegasstove_turn_on_SoundSet";
+	const string SOUND_TURN_OFF		= "portablegasstove_turn_off_SoundSet";
+	
+	protected EffectSound m_SoundBurningLoop;
+	protected EffectSound m_SoundTurnOn;
+	protected EffectSound m_SoundTurnOff;
+	
 	//cooking equipment
 	ItemBase GetCookingEquipment()
 	{
@@ -69,12 +74,28 @@ class PortableGasStove extends ItemBase
 	}
 	
 	//--- POWER EVENTS
+	override void OnSwitchOn()
+	{
+		super.OnSwitchOn();
+		
+		//sound (client only)
+		SoundTurnOn();
+	}
+
+	override void OnSwitchOff()
+	{
+		super.OnSwitchOff();
+		
+		//sound (client only)
+		SoundTurnOff();
+	}
+	
 	override void OnWorkStart()
 	{
 		//refresh visual
 		SetObjectTexture( 0, FLAME_BUTANE_ON );
 		
-		//play sound
+		//sound (client only)
 		SoundBurningStart();
 	}
 
@@ -86,7 +107,7 @@ class PortableGasStove extends ItemBase
 		//stop steam particle
 		RemoveCookingAudioVisuals();
 		
-		//stop sound
+		//sound (client only)
 		SoundBurningStop();
 	}
 	
@@ -140,24 +161,26 @@ class PortableGasStove extends ItemBase
 	//================================================================
 	// SOUNDS
 	//================================================================
-	//Gas burning
 	protected void SoundBurningStart()
 	{
-		if ( !m_SoundGasFlameLoop && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
-		{
-			m_SoundGasFlameLoop = PlaySoundLoop( SOUND_BURNING_GAS, 50 );
-		}
+		PlaySoundSetLoop( m_SoundBurningLoop, SOUND_BURNING, 0.1, 0.3 );
 	}
 	
 	protected void SoundBurningStop()
 	{
-		if ( m_SoundGasFlameLoop && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
-		{
-			GetGame().ObjectDelete( m_SoundGasFlameLoop );
-			m_SoundGasFlameLoop = NULL;			
-		}
+		StopSoundSet( m_SoundBurningLoop );
+	}	
+
+	protected void SoundTurnOn()
+	{
+		PlaySoundSet( m_SoundTurnOn, SOUND_TURN_ON, 0.1, 0.1 );
 	}
 	
+	protected void SoundTurnOff()
+	{
+		PlaySoundSet( m_SoundTurnOff, SOUND_TURN_OFF, 0.1, 0.1 );
+	}		
+		
 	//================================================================
 	// CONDITIONS
 	//================================================================

@@ -39,14 +39,14 @@ class TripwireTrap : TrapBase
 		return true;
 	}*/
 
-	override bool IsDeployable()
+	override void OnVariablesSynchronized()
 	{
-		return true;
-	}
-	
-	override string GetDeploySoundset()
-	{
-		return "tripwire_deploy_SoundSet";
+		super.OnVariablesSynchronized();
+				
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
 	}
 	
 	override void CreateTrigger()
@@ -163,6 +163,32 @@ class TripwireTrap : TrapBase
 				}
 			}
 		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+			
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetDeploySoundset()
+	{
+		return "placeTripwireTrap_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "tripwire_deploy_SoundSet";
 	}
 }
 

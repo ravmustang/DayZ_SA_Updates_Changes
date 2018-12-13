@@ -2,7 +2,7 @@ class CleanWeapon extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#STR_CleanWeapon0";
+		m_Name = "#repair";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 1.5;//animation length in relative time units
 		m_Specialty = -0.02;// value > 0 for roughness, value < 0 for precision

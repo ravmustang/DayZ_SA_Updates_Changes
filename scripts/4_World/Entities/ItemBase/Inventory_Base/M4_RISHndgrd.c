@@ -1,7 +1,18 @@
 class M4_RISHndgrd extends Inventory_Base
 {
-	override bool CanDetachAttachment( EntityAI attachment )
+	override bool CanDetachAttachment (EntityAI parent)
 	{
-		return false;
+		if ( Weapon_Base.Cast(parent) && parent.FindAttachmentBySlotName("weaponFlashlight")/*.IsKindOf("UniversalLight")*/ )
+		{
+			return false;
+		}
+		return true;
 	}
+	
+	/*override bool CanReleaseAttachment( EntityAI attachment )
+	{
+		if ( FindAttachmentBySlotName("weaponHandguardM4").IsKindOf("M4_RISHndgrd")
+		
+		return false;
+	}*/
 }

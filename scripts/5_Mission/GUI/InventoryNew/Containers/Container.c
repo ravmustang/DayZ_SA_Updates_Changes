@@ -10,6 +10,7 @@ class Container extends LayoutHolder
 	
 	int										m_FocusedRow = 0;
 	int										m_FocusedColumn = 0;
+	bool									m_ForcedHide;
 
 	void Container( LayoutHolder parent )
 	{
@@ -69,7 +70,10 @@ class Container extends LayoutHolder
 	
 	void Select()
 	{
-		GetFocusedContainer().Select();
+		if( GetFocusedContainer() )
+		{
+			GetFocusedContainer().Select();
+		}
 	}
 	
 	void SelectItem()
@@ -487,19 +491,29 @@ class Container extends LayoutHolder
 		UpdateSpacer();
 	}
 
-	void HideContent()
+	void HideContent( bool force_hide = false )
 	{
+		if( !m_ForcedHide )
+			m_ForcedHide = force_hide;
 		for( int i = 1; i < m_Body.Count(); i++ )
 		{
-			m_Body.Get( i ).OnHide();
+			if( m_Body.Get( i ) )
+				m_Body.Get( i ).OnHide();
 		}
 	}
 	
-	void ShowContent()
+	void ShowContent( bool force_show = false )
 	{
-		for( int i = 1; i < m_Body.Count(); i++ )
+		if( force_show )
+			m_ForcedHide = false;
+		
+		if( !m_ForcedHide )
 		{
-			m_Body.Get( i ).OnShow();
+			for( int i = 1; i < m_Body.Count(); i++ )
+			{
+				if( m_Body.Get( i ) )
+					m_Body.Get( i ).OnShow();
+			}
 		}
 	}
 }

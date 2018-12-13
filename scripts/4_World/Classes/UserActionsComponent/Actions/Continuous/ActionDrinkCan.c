@@ -13,6 +13,6 @@ class ActionDrinkCan: ActionDrink
 	
 	override string GetText()
 	{
-		return "#drink_the_can";
+		return "#drink";
 	}
 };

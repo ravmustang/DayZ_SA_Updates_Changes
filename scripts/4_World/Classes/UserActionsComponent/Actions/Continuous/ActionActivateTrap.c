@@ -31,7 +31,7 @@ class ActionActivateTrap: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#activate_the_trap";
+		return "#activate";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

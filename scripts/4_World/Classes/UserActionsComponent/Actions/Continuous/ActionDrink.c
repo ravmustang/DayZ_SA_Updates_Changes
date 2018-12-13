@@ -1,10 +1,8 @@
 class ActionDrinkCB : ActionContinuousBaseCB
 {
-	private const float QUANTITY_USED_PER_SEC2 = 50;
-	
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousQuantityEdible(QUANTITY_USED_PER_SEC2,UATimeSpent.DEFAULT);
+		m_ActionData.m_ActionComponent = new CAContinuousQuantityEdible(UAQuantityConsumed.DRINK,UATimeSpent.DEFAULT);
 	}
 };
 

@@ -237,7 +237,9 @@ class InspectMenuNew extends UIScriptedMenu
 			
 			if( blood_container.GetBloodTypeVisible() )
 			{
-				string blood_type_name = BloodTypes.GetBloodTypeName(blood_container.GetLiquidType());
+				string type;
+				bool pos;
+				string blood_type_name = BloodTypes.GetBloodTypeName(blood_container.GetLiquidType(), type, pos);
 				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_blood: " + blood_type_name, Colors.COLOR_LIQUID);
 			}
 			else
@@ -408,7 +410,7 @@ class InspectMenuNew extends UIScriptedMenu
 					}
 					else
 					{
-						WidgetTrySetText( root_widget, "ItemQuantityWidget", item_quantity.ToString() + " " + "#inv_inspect_piece", Colors.COLOR_DEFAULT );
+						WidgetTrySetText( root_widget, "ItemQuantityWidget", item_quantity.ToString() + " " + "#inv_inspect_pieces", Colors.COLOR_DEFAULT );
 					}		
 				}
 				else if( item.ConfigGetString("stackedUnit") == "percentage" )

@@ -16,7 +16,6 @@ WrapSpacerWidgetClass collapsible_container_root {
   WrapSpacerWidgetClass body {
    visible 1
    clipchildren 0
-   color 1 1 1 0
    position 0 0
    size 1 0
    halign center_ref
@@ -26,7 +25,7 @@ WrapSpacerWidgetClass collapsible_container_root {
    vexactsize 1
    priority 90
    scriptclass ""
-   style Outline
+   style Empty
    "Size To Content V" 1
   }
  }

@@ -67,7 +67,9 @@ class BloodTest extends RecipeBase
 	{
 		ItemBase ingredient2;
 		Class.CastTo(ingredient2, ingredients[1]);
-		string blood_type_name = BloodTypes.GetBloodTypeName(ingredient2.GetLiquidType());
+		string type;
+		bool positive
+		string blood_type_name = BloodTypes.GetBloodTypeName(ingredient2.GetLiquidType(), type, positive);
 		string message = "#blood_type_result " + blood_type_name;
 		PlayerBase pb_Player;
 		Class.CastTo(pb_Player, player);

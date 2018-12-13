@@ -24,7 +24,7 @@ class ActionTakeFireplaceIndoor: ActionInteractBase
 		Object target_object = target.GetObject();
 		
 		//empty hands	--interact action base condition
-		if ( target_object )
+		if ( target_object && target_object.IsFireplace() )
 		{
 			FireplaceIndoor fireplace_indoor = FireplaceIndoor.Cast( target_object );
 	

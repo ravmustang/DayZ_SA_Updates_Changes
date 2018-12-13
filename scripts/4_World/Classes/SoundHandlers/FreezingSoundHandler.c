@@ -1,3 +1,4 @@
+/*
 class FreezingSoundHandlerBase extends SoundHandlerBase
 {
 	override void Init()
@@ -15,10 +16,10 @@ class FreezingSoundHandlerClient extends FreezingSoundHandlerBase
 	const float SOUND_INTERVALS_LIGHT_MIN = 5;	const float SOUND_INTERVALS_LIGHT_MAX = 20;
 	float m_SoundTime;
 	EffectSound m_Sound;
-	
+	ref HumanMovementState	hms = new HumanMovementState();
 	override void Update()
 	{
-		if( m_Player.GetMixedSoundStates() & eMixedSoundStates.FREEZING )
+		if( m_Player.GetShakeLevel() > 0 )
 		{
 			ProcessSound();
 		}
@@ -26,7 +27,13 @@ class FreezingSoundHandlerClient extends FreezingSoundHandlerBase
 	
 	void ProcessSound()
 	{
-		if( GetGame().GetTime() > m_SoundTime)
+		m_Player.GetMovementState(hms);
+		if (hms.m_iMovement == DayZPlayerConstants.MOVEMENTIDX_IDLE)
+		{
+			//return;
+		}
+		
+		if( GetGame().GetTime() > m_SoundTime )
 		{
 			float offset_time = Math.RandomFloatInclusive(SOUND_INTERVALS_LIGHT_MIN, SOUND_INTERVALS_LIGHT_MAX) * 1000;
 			m_SoundTime = GetGame().GetTime() + offset_time;
@@ -48,4 +55,4 @@ class FreezingSoundHandlerClient extends FreezingSoundHandlerBase
 class FreezingSoundHandlerServer extends HungerSoundHandlerBase
 {
 	
-}
+}*/

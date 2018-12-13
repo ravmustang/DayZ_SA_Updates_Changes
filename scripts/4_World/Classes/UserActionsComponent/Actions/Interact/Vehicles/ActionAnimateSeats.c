@@ -40,14 +40,14 @@ class ActionAnimateSeats: ActionAnimateCarSelection
 					
 					if ( m_AnimSource == "SeatDriver" )
 					{
-						if ( car.GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+						if ( car.GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED || transport.CrewMember( DayZPlayerConstants.VEHICLESEAT_DRIVER ) )
 							return false;
 
 					}
 					
 					if ( m_AnimSource == "SeatCoDriver" )
 					{
-						if ( car.GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+						if ( car.GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED || transport.CrewMember( DayZPlayerConstants.VEHICLESEAT_CODRIVER )  )
 							return false;
 					}
 

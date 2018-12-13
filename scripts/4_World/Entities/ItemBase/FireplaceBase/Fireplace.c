@@ -12,11 +12,6 @@ class Fireplace extends FireplaceBase
 		PARTICLE_STEAM_END		= ParticleList.CAMP_STEAM_2END;
 	}
 	
-	/*override bool IsTwoHandedBehaviour()
-	{
-		return true;
-	}*/
-	
 	override bool IsBaseFireplace()
 	{
 		return true;
@@ -292,7 +287,7 @@ class Fireplace extends FireplaceBase
 	
 	override bool CanBeIgnitedBy( EntityAI igniter = NULL )
 	{
-		if ( HasAnyKindling() && !IsBurning() )
+		if ( HasAnyKindling() && !IsBurning() && !GetHierarchyParent() )
 		{
 			return true;
 		}
@@ -324,7 +319,7 @@ class Fireplace extends FireplaceBase
 		//remove grass
 		Object cc_object = GetGame().CreateObject ( OBJECT_CLUTTER_CUTTER , GetPosition() );
 		cc_object.SetOrientation ( GetOrientation() );
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( DestroyClutterCutter, 0.2, false, cc_object );
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( DestroyClutterCutter, 200, false, cc_object );
 		
 		//start fire
 		StartFire(); 
@@ -363,4 +358,13 @@ class Fireplace extends FireplaceBase
 		
 		return true;	
 	}	
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override string GetPlaceSoundset()
+	{
+		return "placeFireplace_SoundSet";
+	}
 }

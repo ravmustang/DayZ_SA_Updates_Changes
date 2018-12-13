@@ -450,31 +450,31 @@ ImageSetClass {
    Name "weaponmuzzleak"
    Pos 1592 692
    Size 64 32
-   Flags 0
+   Flags 3
   }
   ImageSetDefClass weaponmuzzlemp5 {
    Name "weaponmuzzlemp5"
    Pos 1592 642
    Size 64 32
-   Flags 0
+   Flags 3
   }
   ImageSetDefClass bayonet {
    Name "bayonet"
    Pos 1592 737
    Size 90 47
-   Flags 0
+   Flags 3
   }
   ImageSetDefClass bayonetak {
    Name "bayonetak"
    Pos 1592 784
    Size 144 48
-   Flags 0
+   Flags 3
   }
   ImageSetDefClass bayonetmosin {
    Name "bayonetmosin"
    Pos 1592 836
    Size 144 48
-   Flags 0
+   Flags 3
   }
   ImageSetDefClass christmaslights {
    Name "christmaslights"
@@ -509,6 +509,30 @@ ImageSetClass {
   ImageSetDefClass magazine3 {
    Name "magazine3"
    Pos 1182 233
+   Size 197 197
+   Flags 0
+  }
+  ImageSetDefClass metalwire {
+   Name "metalwire"
+   Pos 197 1415
+   Size 197 197
+   Flags 0
+  }
+  ImageSetDefClass woodenlog {
+   Name "woodenlog"
+   Pos 394 1415
+   Size 197 197
+   Flags 0
+  }
+  ImageSetDefClass barbedwiredown {
+   Name "barbedwiredown"
+   Pos 197 1612
+   Size 197 197
+   Flags 0
+  }
+  ImageSetDefClass barbedwireup {
+   Name "barbedwireup"
+   Pos 591 1612
    Size 197 197
    Flags 0
   }

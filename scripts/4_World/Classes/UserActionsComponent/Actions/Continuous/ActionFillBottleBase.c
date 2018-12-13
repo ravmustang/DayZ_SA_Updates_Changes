@@ -1,13 +1,12 @@
 class ActionFillBottleBaseCB : ActionContinuousBaseCB
 {
-	private const float QUANTITY_FILLED_PER_SEC = 200;
 	private int m_liquid_type;
 	
 	override void CreateActionComponent()
 	{
 		m_liquid_type = ActionFillBottleBase.Cast( m_ActionData.m_Action ).GetLiquidType( m_ActionData.m_Player, m_ActionData.m_Target, m_ActionData.m_MainItem );
 		
-		m_ActionData.m_ActionComponent = new CAContinuousFill(QUANTITY_FILLED_PER_SEC, m_liquid_type);
+		m_ActionData.m_ActionComponent = new CAContinuousFill(UAQuantityConsumed.FILL_LIQUID, m_liquid_type);
 	}
 };
 
@@ -41,17 +40,12 @@ class ActionFillBottleBase: ActionContinuousBase
 		return AT_FILL_BOTTLE;
 	}
 
-	override bool Consumable()
-	{
-		return true;
-	}
-
 	override string GetText()
 	{
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		ItemBase item = player.GetItemInHands();
 
-		return "#fill" + " " + item.GetDisplayName().Substring(0,(item.GetDisplayName().Length() ));
+		return "#fill";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

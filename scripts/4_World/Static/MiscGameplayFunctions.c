@@ -104,6 +104,48 @@ class DropEquipAndDestroyRootLambda : ReplaceItemWithNewLambdaBase
 	}
 }
 
+/**@class		MoveEquipToExistingItemAndDestroyOldRootLambda
+ * @brief		this one is a also bit special: it moves all items to already existing item and destroys the ex-root of the hierarchy
+ **/
+class MoveEquipToExistingItemAndDestroyOldRootLambda : ReplaceItemWithNewLambdaBase
+{
+	PlayerBase m_Player;
+	EntityAI m_NewItem;
+
+	void MoveEquipToExistingItemAndDestroyOldRootLambda (EntityAI old_item, string new_item_type, PlayerBase player, EntityAI new_item)
+	{
+		m_Player = player;
+		m_NewItem = new_item;
+		if (new_item_type != string.Empty)
+			Error("MoveEquipAndDestroyRootLambda expects new_item_type to be empty");
+	}
+	
+	override protected void RemoveNetworkObjectInfo ()
+	{
+		super.RemoveNetworkObjectInfo();
+		GetGame().RemoteObjectTreeDelete(m_NewItem);
+	}
+	override protected void UndoRemoveNetworkObjectInfo ()
+	{
+		super.UndoRemoveNetworkObjectInfo();
+		GetGame().RemoteObjectTreeCreate(m_NewItem);
+	}
+	
+	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
+	{
+		// @NOTE: new_item is NULL, this lambda does not create new entity
+		super.CopyOldPropertiesToNew(old_item, new_item);
+		
+		MiscGameplayFunctions.TransferInventory(old_item, m_NewItem, m_Player);		
+	}
+	
+	override protected void CreateNetworkObjectInfo (EntityAI new_item)
+	{
+		super.CreateNetworkObjectInfo(new_item);
+		GetGame().RemoteObjectTreeCreate(m_NewItem);
+	}
+};
+
 enum TransferInventoryResult
 {
 	Ok, DroppedSome
@@ -501,7 +543,7 @@ class MiscGameplayFunctions
 class DestroyItemInCorpsesHandsAndCreateNewOnGndLambda : ReplaceAndDestroyLambda
 {
 	// @NOTE m_Player == target player - i.e. restrained one
-	void DestroyItemInCorpsesHandsAndCreateNewOnGnd (EntityAI old_item, string new_item_type, PlayerBase player, bool destroy = false)
+	void DestroyItemInCorpsesHandsAndCreateNewOnGndLambda (EntityAI old_item, string new_item_type, PlayerBase player, bool destroy = false)
 	{
 		InventoryLocation gnd = new InventoryLocation;
 		vector mtx[4];

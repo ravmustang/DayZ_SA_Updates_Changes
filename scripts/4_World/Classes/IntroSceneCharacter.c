@@ -23,9 +23,18 @@ class IntroSceneCharacter extends Managed
 	
 	void IntroSceneCharacter()
 	{
-		m_CharacterId = -1;
+		m_CharacterId = DEFAULT_CHARACTER_MENU_ID;
 	}
 	
+	bool IsDefaultCharacter()
+	{
+		return m_CharacterId == DEFAULT_CHARACTER_MENU_ID;
+	}
+	
+	void SetToDefaultCharacter()
+	{
+		m_CharacterId = DEFAULT_CHARACTER_MENU_ID;
+	}
 	//==============================================
 	// SetcharacterID
 	//==============================================
@@ -136,7 +145,7 @@ class IntroSceneCharacter extends Managed
 		
 		if ( m_CharacterId + 1 < count )
 		{
-			return m_CharacterId++; 
+			return m_CharacterId + 1;
 		}
 		else
 		{
@@ -189,9 +198,9 @@ class IntroSceneCharacter extends Managed
 	//==============================================
 	void CreateNewCharacterById( int character_id )
 	{
-		if ( character_id == -1 )
+		if ( character_id == DEFAULT_CHARACTER_MENU_ID )
 		{
-			CreateNewCharacterRandom();
+			CreateDefaultCharacter();
 		}
 		else
 		{
@@ -209,6 +218,31 @@ class IntroSceneCharacter extends Managed
 		CreateNewCharacter();
 	}
 	
+	void CreateDefaultCharacter()
+	{
+		CharacterUnload();
+		m_CharacterObj = PlayerBase.Cast( m_CharacterDta.CreateCharacterPerson( -1 ) );
+		if(m_CharacterObj)
+		{
+			m_CharacterObj.PlaceOnSurface();
+			m_CharacterObj.SetPosition(m_CharacterPos);
+			m_CharacterObj.SetOrientation(m_CharacterRot);
+			
+			m_CharacterObj.SetLastShavedSeconds(m_LastShavedSeconds);
+		}
+		else
+		{
+			CreateNewCharacterRandom();
+			m_CharacterDta.SaveDefaultCharacter( m_CharacterObj );
+			m_CharacterDta.SetCharacterName(DEFAULT_CHARACTER_MENU_ID, DEFAULT_CHARACTER_NAME);
+		}
+	}
+	
+	void GetLastPlayedServer(int characterID, out string address, out int port)
+	{
+		m_CharacterDta.GetLastServerAddress(characterID,address);
+		port = m_CharacterDta.GetLastServerPort(characterID);
+	}
 	//==============================================
 	// CreateNewCharacter
 	//==============================================
@@ -240,8 +274,6 @@ class IntroSceneCharacter extends Managed
 		
 		//Create New Random Character
 		SetupPlayerName( true );
-		
-		g_Game.SetNewCharacter(true);
 	}
 	
 	//==============================================
@@ -251,7 +283,7 @@ class IntroSceneCharacter extends Managed
 	{
 		m_CharacterDta = g_Game.GetMenuData();
 		m_CharacterDta.ClearCharacters();
-		m_CharacterDta.LoadCharacters();
+		m_CharacterDta.LoadCharactersLocal();
 		m_CharacterPos = char_pos;
 		m_CharacterRot = char_rot;
 		
@@ -286,7 +318,15 @@ class IntroSceneCharacter extends Managed
 			}
 		}
 		
-		CharacterLoad(m_CharacterId, m_CharacterPos, m_CharacterRot);
+		CreateNewCharacterById(m_CharacterId/*, m_CharacterPos, m_CharacterRot*/);
+		
+		if (GetCharacterObj() )
+		{
+			if ( GetCharacterObj().IsMale() )
+				SetCharacterGender(ECharGender.Male);
+			else
+				SetCharacterGender(ECharGender.Female);
+		}
 	}
 	
 	//-------------------------
@@ -320,7 +360,6 @@ class IntroSceneCharacter extends Managed
 		
 		if ( m_CharacterObj )
 		{
-			g_Game.SetNewCharacter(false);
 			
 			m_CharacterObj.PlaceOnSurface();
 			m_CharacterObj.SetPosition(char_pos);
@@ -377,18 +416,27 @@ class IntroSceneCharacter extends Managed
 		}
 	}
 	
+	string GetCharacterNameById(int char_id )
+	{
+		string character_name;
+		 m_CharacterDta.GetCharacterName(char_id, character_name);
+		return character_name:
+	}
+	
+	string GetCharacterName()
+	{
+		string character_name;
+		 m_CharacterDta.GetCharacterName(m_CharacterId, character_name);
+		return character_name:
+	}
+	
 	//==============================================
 	// SaveCharName
 	//==============================================
-	void SaveCharName()
+	void SaveCharName( string name )
 	{
-		//TODO cleanup, spaghetti stuff
-		g_Game.InitCharacterMenuDataInfo( m_CharacterDta.GetCharactersCount() );
-		
-		if ( !g_Game.IsNewCharacter() && m_CharacterId > -1 )
-		{
-			m_CharacterDta.SetCharacterName(m_CharacterId, g_Game.GetPlayerGameName());
-		}
+		m_CharacterDta.SetCharacterName(m_CharacterId, name);
+		m_CharacterDta.SaveCharactersLocal();
 	}
 	
 	//==============================================
@@ -435,7 +483,9 @@ class IntroSceneCharacter extends Managed
 	{
 		if (m_CharacterObj)
 		{
-			g_Game.SetProfileString("defaultCharacter", m_CharacterObj.GetType());
+			m_CharacterDta.SaveDefaultCharacter(m_CharacterObj);
+			
+			/*g_Game.SetProfileString("defaultCharacter", m_CharacterObj.GetType());
 			
 			InventoryItem item = NULL;
 			TStringArray inventory = new TStringArray;
@@ -450,7 +500,7 @@ class IntroSceneCharacter extends Managed
 			}
 			
 			g_Game.SetProfileStringList("defaultInventory", inventory);
-			g_Game.SaveProfile();
+			g_Game.SaveProfile();*/
 		}
 	}
 	

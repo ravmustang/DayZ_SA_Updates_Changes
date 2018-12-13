@@ -75,13 +75,13 @@ class VicinitySlotsContainer: Container
 		{
 			m_FocusedColumn++;
 			if( m_FocusedColumn == ITEMS_IN_ROW )
-			m_FocusedColumn = 0;
+				m_FocusedColumn = 0;
 		}
 		else if( direction == Direction.LEFT )
 		{
 			m_FocusedColumn--;
 			if( m_FocusedColumn < 0 )
-			m_FocusedColumn = ITEMS_IN_ROW - 1;
+				m_FocusedColumn = ITEMS_IN_ROW - 1;
 		}
 		else if( direction == Direction.UP )
 		{
@@ -192,11 +192,6 @@ class VicinitySlotsContainer: Container
 		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
 		ItemBase ent = ItemBase.Cast( ipw.GetItem() );
 		
-		if( ent && !ent.IsInherited( Magazine ))
-		{
-			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, ent );
-		}
-		
 		ItemBase item_in_hands = ItemBase.Cast(	GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
 		
 		Icon hands_icon = ItemManager.GetInstance().GetHandsPreview().GetIcon();
@@ -204,6 +199,10 @@ class VicinitySlotsContainer: Container
 		if( item_in_hands && ent && hands_icon )
 		{
 			hands_icon.CombineItems( item_in_hands, ent );
+		}
+		else if( ent && !ent.IsInherited( Magazine ))
+		{
+			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, ent );
 		}
 	}
 	
@@ -315,11 +314,6 @@ class VicinitySlotsContainer: Container
 		string name = w.GetName();
 		name.Replace( "PanelWidget", "Col" );
 		w.FindAnyWidget( name ).Show(false);
-		/*name.Replace( "Col", "Render" );
-		ItemPreviewWidget ipw = w.FindAnyWidget( name );
-		ipw.SetItem( NULL );
-		ipw.Show(false);
-		Print(name);*/
 	}
 	
 	Widget widgett;
@@ -372,10 +366,7 @@ class VicinitySlotsContainer: Container
 			WidgetEventHandler.GetInstance().RegisterOnMouseLeave( item_preview.GetParent(),  this, "MouseLeave" );
 			WidgetEventHandler.GetInstance().RegisterOnMouseButtonUp( item_preview.GetParent(),  this, "MouseClick" );
 			WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( item_preview.GetParent(),  this, "MouseButtonDown" );
-			//WidgetEventHandler.GetInstance().RegisterOnController( item_preview.GetParent(),  this, "OnController" );
-					//SetFocus( item_preview.GetParent() );
-					//Print(item_preview.GetParent());
-					widgett = item_preview.GetParent();
+			widgett = item_preview.GetParent();
 
 			ref map<int, ref Container> showed_items = ( VicinityContainer.Cast( m_Parent ) ).m_ShowedItemsIDs;
 			ClosableContainer conta;
@@ -398,7 +389,7 @@ class VicinitySlotsContainer: Container
 				name.Replace( "RadialIcon", "RadialIconClosed" );
 				item_preview.FindAnyWidget( name ).Show( false );		
 			}
-			Widget item_w = item_preview;//.GetParent();
+			Widget item_w = item_preview;
 			if ( item_w )
 			{
 				int has_quantity = HasItemQuantity( item );
@@ -462,32 +453,10 @@ class VicinitySlotsContainer: Container
 			item_preview.Show(false);
 			item_preview.SetItem( null );
 			item_preview.GetParent().Show(false);
-			TextWidget tw1 = TextWidget.Cast( m_Container.Get( x / ITEMS_IN_ROW ).GetMainWidget().FindAnyWidget( "ItemSize" + x % ITEMS_IN_ROW ) );
+			TextWidget tw1 = TextWidget.Cast( m_Container.Get( f ).GetMainWidget().FindAnyWidget( "Icon" + c ).FindAnyWidget( "ItemSize" + c ) );
 			tw1.SetText( "" );
 		}
 	}
-	
-	/*override bool OnController( Widget w, int control, int value )
-	{
-		super.OnController( w, control, value );
-
-		//switch controls
-		//m_UsingMouse = false;
-
-		//B button
-		if ( control == ControlID.CID_LEFT )
-		{
-			SetActive(false);
-			return true;
-		}
-		return false;
-	}*/
-	
-	/*void OnController()
-	{
-		Print("OnController");
-	}*/
-		
 	
 	void DoubleClick(Widget w, int x, int y, int button)
 	{

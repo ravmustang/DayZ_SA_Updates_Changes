@@ -120,7 +120,7 @@
         <Style Name="Stamina" Font="gui/fonts/MetronBook" ImageSet="dayz_gui" Color="4294967295">
             <State Name="Disabled">
                 <Item Name="BarBottom" Image="" />
-                <Item Name="BarCenter" Image="progress_empty" />
+                <Item Name="BarCenter" Image="alpha_64" />
                 <Item Name="BarLeft" Image="" />
                 <Item Name="BarLeftBottom" Image="" />
                 <Item Name="BarLeftTop" Image="" />
@@ -128,19 +128,19 @@
                 <Item Name="BarRightBottom" Image="" />
                 <Item Name="BarRightTop" Image="" />
                 <Item Name="BarTop" Image="" />
-                <Item Name="Bottom" Image="dashedBottom" />
-                <Item Name="Center" Image="dashedCenter" />
-                <Item Name="Left" Image="dashedLeft" />
-                <Item Name="LeftBottom" Image="dashedLeftBottom" />
-                <Item Name="LeftTop" Image="dashedLeftTop" />
-                <Item Name="Right" Image="dashedRight" />
-                <Item Name="RightBottom" Image="dashedRightBottom" />
-                <Item Name="RightTop" Image="dashedRightTop" />
-                <Item Name="Top" Image="dashedTop" />
+                <Item Name="Bottom" Image="alpha_64" />
+                <Item Name="Center" Image="alpha_64" />
+                <Item Name="Left" Image="alpha_64" />
+                <Item Name="LeftBottom" Image="alpha_64" />
+                <Item Name="LeftTop" Image="alpha_64" />
+                <Item Name="Right" Image="alpha_64" />
+                <Item Name="RightBottom" Image="alpha_64" />
+                <Item Name="RightTop" Image="alpha_64" />
+                <Item Name="Top" Image="alpha_64" />
             </State>
             <State Name="Normal">
                 <Item Name="BarBottom" Image="" />
-                <Item Name="BarCenter" Image="progress_full" />
+                <Item Name="BarCenter" Image="alpha_256" />
                 <Item Name="BarLeft" Image="" />
                 <Item Name="BarLeftBottom" Image="" />
                 <Item Name="BarLeftTop" Image="" />
@@ -149,7 +149,7 @@
                 <Item Name="BarRightTop" Image="" />
                 <Item Name="BarTop" Image="" />
                 <Item Name="Bottom" Image="" />
-                <Item Name="Center" Image="progress_empty" />
+                <Item Name="Center" Image="alpha_64" />
                 <Item Name="Left" Image="" />
                 <Item Name="LeftBottom" Image="" />
                 <Item Name="LeftTop" Image="" />
@@ -171,7 +171,7 @@
                 <Item Name="BarRightTop" Image="" />
                 <Item Name="BarTop" Image="" />
                 <Item Name="Bottom" Image="" />
-                <Item Name="Center" Image="quantity_full" />
+                <Item Name="Center" Image="alpha_256" />
                 <Item Name="Left" Image="" />
                 <Item Name="LeftBottom" Image="" />
                 <Item Name="LeftTop" Image="" />
@@ -182,7 +182,7 @@
             </State>
             <State Name="Normal">
                 <Item Name="BarBottom" Image="" />
-                <Item Name="BarCenter" Image="quantity_empty" />
+                <Item Name="BarCenter" Image="alpha_256" />
                 <Item Name="BarLeft" Image="" />
                 <Item Name="BarLeftBottom" Image="" />
                 <Item Name="BarLeftTop" Image="" />
@@ -191,7 +191,7 @@
                 <Item Name="BarRightTop" Image="" />
                 <Item Name="BarTop" Image="" />
                 <Item Name="Bottom" Image="" />
-                <Item Name="Center" Image="quantity_full" />
+                <Item Name="Center" Image="alpha_64" />
                 <Item Name="Left" Image="" />
                 <Item Name="LeftBottom" Image="" />
                 <Item Name="LeftTop" Image="" />
@@ -1874,7 +1874,7 @@
         <Style Name="DayZDefaultButton" Font="gui/fonts/sdf_MetronBook24" ImageSet="dayz_gui" Color="4294967295">
             <State Name="Disabled">
                 <Item Name="Bottom" Image="" />
-                <Item Name="Center" Image="area_7" />
+                <Item Name="Center" Image="button_alpha" />
                 <Item Name="Left" Image="" />
                 <Item Name="LeftBottom" Image="" />
                 <Item Name="LeftTop" Image="" />
@@ -2329,15 +2329,15 @@
         </Style>
         <Style Name="DayZDefaultButtonAll" Font="gui/fonts/AmorSerifPro-Bold" ImageSet="dayz_gui" Color="0">
             <State Name="Disabled">
-                <Item Name="Bottom" Image="area_7" />
-                <Item Name="Center" Image="area_7" />
-                <Item Name="Left" Image="area_7" />
-                <Item Name="LeftBottom" Image="area_7" />
-                <Item Name="LeftTop" Image="area_7" />
-                <Item Name="Right" Image="area_7" />
-                <Item Name="RightBottom" Image="area_7" />
-                <Item Name="RightTop" Image="area_7" />
-                <Item Name="Top" Image="area_7" />
+                <Item Name="Bottom" Image="alpha_12.5p" />
+                <Item Name="Center" Image="alpha_12.5p" />
+                <Item Name="Left" Image="alpha_12.5p" />
+                <Item Name="LeftBottom" Image="alpha_12.5p" />
+                <Item Name="LeftTop" Image="alpha_12.5p" />
+                <Item Name="Right" Image="alpha_12.5p" />
+                <Item Name="RightBottom" Image="alpha_12.5p" />
+                <Item Name="RightTop" Image="alpha_12.5p" />
+                <Item Name="Top" Image="alpha_12.5p" />
             </State>
             <State Name="Focus">
                 <Item Name="Bottom" Image="DayZDefaultPanelBottom" />

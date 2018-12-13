@@ -1,5 +1,6 @@
 class InGameMenuXbox extends UIScriptedMenu
 {
+#ifdef PLATFORM_CONSOLE
 	protected ref PlayerListScriptedWidget	m_ServerInfoPanel;
 	
 	protected Widget						m_OnlineMenu;
@@ -127,6 +128,7 @@ class InGameMenuXbox extends UIScriptedMenu
 					{
 						mute_text.SetText( "#xbox_ingame_menu_mute" );
 					}
+					mute_text.Update();
 				}
 				
 				if( m_ServerInfoPanel.IsGloballyMuted( uid ) )
@@ -412,7 +414,7 @@ class InGameMenuXbox extends UIScriptedMenu
 				}
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUIFastEquipOrSplit, false ) )
+			if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
 			{
 				bool muted;
 				ScriptInputUserData ctx;
@@ -446,7 +448,7 @@ class InGameMenuXbox extends UIScriptedMenu
 				}
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAQuickReload, false ) )
+			if( GetGame().GetInput().GetActionDown( UAUICtrlY, false ) )
 			{
 				if( m_ServerInfoPanel )
 				{
@@ -456,11 +458,6 @@ class InGameMenuXbox extends UIScriptedMenu
 					return;
 				OnlineServices.ShowUserProfile( uid );
 			}
-		}
-		
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
-		{
-			//g_Game.CancelQueueTime();
 		}
 	}
 
@@ -644,4 +641,5 @@ class InGameMenuXbox extends UIScriptedMenu
 			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
 		}
 	}
+#endif
 }

@@ -566,6 +566,7 @@ FrameWidgetClass game_tab_root {
            vexactpos 1
            hexactsize 0
            vexactsize 1
+           style Colorable
            "next up" "crosshair_button"
            "next down" "admin_button"
            {
@@ -594,7 +595,7 @@ FrameWidgetClass game_tab_root {
                hexactsize 0
                vexactsize 0
                {
-                TextWidgetClass game_setting_label {
+                TextWidgetClass game_button_label {
                  ignorepointer 1
                  size 1 0.55
                  valign center_ref
@@ -645,6 +646,7 @@ FrameWidgetClass game_tab_root {
            vexactpos 1
            hexactsize 0
            vexactsize 1
+           style Colorable
            "next up" "game_button"
            "next down" "player_button"
            {
@@ -673,7 +675,7 @@ FrameWidgetClass game_tab_root {
                hexactsize 0
                vexactsize 0
                {
-                TextWidgetClass admin_setting_label {
+                TextWidgetClass admin_button_label {
                  ignorepointer 1
                  size 1 0.55
                  valign center_ref
@@ -724,6 +726,7 @@ FrameWidgetClass game_tab_root {
            vexactpos 1
            hexactsize 0
            vexactsize 1
+           style Colorable
            "next up" "admin_button"
            "next down" "fov_button"
            {
@@ -752,7 +755,7 @@ FrameWidgetClass game_tab_root {
                hexactsize 0
                vexactsize 0
                {
-                TextWidgetClass player_setting_label {
+                TextWidgetClass player_button_label {
                  ignorepointer 1
                  size 1 0.55
                  valign center_ref

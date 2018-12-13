@@ -49,7 +49,7 @@ class ActionFertilizeSlot: ActionContinuousBase
 		{
 			string selection = garden_base.GetActionComponentName(target.GetComponentIndex());
 			
-			if ( garden_base.IsCorrectFertilizer( item, selection ) && garden_base.NeedsFertilization( selection ) )
+			if ( garden_base.NeedsFertilization( selection ) )
 			{
 				if ( item.GetQuantity() > 0 )
 				{

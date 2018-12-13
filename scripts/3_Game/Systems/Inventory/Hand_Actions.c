@@ -228,7 +228,7 @@ class HandActionForceSwap extends HandActionBase
 		Man player = e.m_Player;
 		EntityAI itemToHands = e.m_Entity;
 		EntityAI itemInHands = player.GetHumanInventory().GetEntityInHands();
-		//hndDebugPrint("[hndfsm] action=forceswap + I2H=" + itemToHands + "IH=" + itemInHands);
+		hndDebugPrint("[hndfsm] action=forceswap + I2H=" + itemToHands + "IH=" + itemInHands);
 
 		HandEventForceSwap es = HandEventForceSwap.Cast(e);
 		if (es)
@@ -247,9 +247,10 @@ class HandActionForceSwap extends HandActionBase
 		InventoryLocation dst1 = new InventoryLocation;
 		if (itemToHands.GetInventory().GetCurrentInventoryLocation(src1) && itemInHands.GetInventory().GetCurrentInventoryLocation(src2))
 		{
-			hndDebugPrint("[hndfsm] FSwap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString());
 			dst1.Copy(src1);
 			dst1.CopyLocationFrom(src2);
+			
+			hndDebugPrint("[hndfsm] FSwap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString());
 
 			GameInventory.LocationSwap(src1, src2, dst1, itemInHandsDst);
 

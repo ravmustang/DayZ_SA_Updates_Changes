@@ -17,6 +17,8 @@ class Land_Radio_PanelPAS extends PASBroadcaster
 	//--- POWER EVENTS
 	override void OnSwitchOn()
 	{
+		super.OnSwitchOn();
+		
 		if ( !GetCompEM().CanWork() )
 		{
 			GetCompEM().SwitchOff();
@@ -28,12 +30,16 @@ class Land_Radio_PanelPAS extends PASBroadcaster
 	
 	override void OnSwitchOff()
 	{
+		super.OnSwitchOff();
+		
 		//sound
 		SoundTurnOff();
 	}	
 	
 	override void OnWorkStart()
 	{
+		super.OnWorkStart();
+		
 		//turn off device
 		SwitchOn ( true ); // start send/receive voice
 		
@@ -43,6 +49,8 @@ class Land_Radio_PanelPAS extends PASBroadcaster
 	
 	override void OnWorkStop()
 	{
+		super.OnWorkStop();
+		
 		//turn off device
 		SwitchOn ( false ); // stop send/receive voice
 		

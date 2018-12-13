@@ -116,7 +116,7 @@ class AreaDamageTrigger extends Trigger
 			EntityAI victim;
 			Class.CastTo(victim, obj);
 			// start main timer
-			m_LoopTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+			m_LoopTimer = new Timer( CALL_CATEGORY_SYSTEM );
 			
 			// Run timer for non-deferred AreaDamageTypes only
 			if ( m_AreaDamageType == AreaDamageType.REGULAR || m_AreaDamageType == AreaDamageType.REGULAR_RAYCASTED || m_AreaDamageType == AreaDamageType.ONETIME || m_AreaDamageType == AreaDamageType.ONETIME_RAYCASTED)
@@ -129,7 +129,7 @@ class AreaDamageTrigger extends Trigger
 			if ( m_AreaDamageType == AreaDamageType.REGULAR_DEFERRED || m_AreaDamageType == AreaDamageType.REGULAR_RAYCASTED_DEFERRED || m_AreaDamageType == AreaDamageType.ONETIME_DEFERRED || m_AreaDamageType == AreaDamageType.ONETIME_RAYCASTED_DEFERRED )
 			{
 				PreDamageActions();
-				m_DeferTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+				m_DeferTimer = new Timer( CALL_CATEGORY_SYSTEM );
 				m_DeferTimer.Run( m_DeferredInterval, this, "LoopTimer", new Param1<EntityAI>(victim), m_Looping );
 			}
 		}
@@ -160,7 +160,7 @@ class AreaDamageTrigger extends Trigger
 		return hitzone;
 	}
 	
-	protected string GetRaycastedHitZone(ManBase victim, array<string> raycast_sources_str)
+	protected string GetRaycastedHitZone(EntityAI victim, array<string> raycast_sources_str)
 	{
 		
 		// Vertical raycast start positions:    Center,      North East,    North West,    South East,  South West
@@ -233,18 +233,20 @@ class AreaDamageTrigger extends Trigger
 	protected void SnapOnObject( EntityAI victim )
 	{
 		string hitzone;
-		ManBase victim_MB;
-		Class.CastTo(victim_MB, victim);
-		
-		if ( !m_Raycasted )
-			{ hitzone = GetRandomHitZone(m_HitZones); }
-		else
-			{ hitzone = GetRaycastedHitZone( victim_MB, m_RaycastSources ); }
-		
-		if ( victim_MB.IsInherited(Man) )
+
+		if (victim)
 		{
-			victim_MB.ProcessDirectDamage(m_DamageType, this, hitzone, m_AmmoName, "0 0 0", 1);
-			PostDamageActions();
+			if ( !m_Raycasted )
+				{ hitzone = GetRandomHitZone(m_HitZones); }
+			else
+				{ hitzone = GetRaycastedHitZone( victim, m_RaycastSources ); }
+			
+			//! TODO: should be configurable while creating area damage - array of types
+			if ( victim.IsInherited(Man) )
+			{
+				victim.ProcessDirectDamage(m_DamageType, this, hitzone, m_AmmoName, "0.5 0.5 0.5", 1);
+				PostDamageActions();
+			}
 		}
 	}
 	

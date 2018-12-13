@@ -16,6 +16,8 @@ class ActionCoverHeadSelf: ActionContinuousBase
 		m_MessageSuccess = "I have put sack on.";
 		m_MessageFail = "I have moved and putting sack on was canceled.";
 		m_MessageCancel = "I stopped putting sack on.";
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_COVERHEAD_SELF;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		//m_Animation = "INJECTEPIPENS";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
@@ -56,7 +58,7 @@ class ActionCoverHeadSelf: ActionContinuousBase
 		action_data.m_Player.GetInventory().CreateInInventory("BurlapSackCover");
 		action_data.m_MainItem.TransferModifiers(action_data.m_Player);
 		action_data.m_MainItem.Delete();
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 
 

@@ -78,6 +78,15 @@ class MissionServer extends MissionBase
 		return true;
 	}	
 	
+	override bool IsPlayerDisconnecting(Man player)
+	{
+		if(m_LogoutPlayers)
+		{
+			return m_LogoutPlayers.Contains(PlayerBase.Cast(player));
+		}
+		return false;
+	}
+	
 	void UpdatePlayersStats()
 	{
 		PluginLifespan module_lifespan;

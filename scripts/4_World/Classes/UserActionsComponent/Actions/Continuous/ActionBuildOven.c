@@ -72,7 +72,7 @@ class ActionBuildOven: ActionContinuousBase
 			fireplace_target.SetOvenState( true );
 			
 			//add specialty to soft skills
-			action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		}
 		else
 		{

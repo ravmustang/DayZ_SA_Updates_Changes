@@ -5,7 +5,7 @@ class LightItemOnFire extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#STR_LightItemOnFire0";
+		m_Name = "#ignite";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 1;//animation length in relative time units
 		m_Specialty = -0.01;// value > 0 for roughness, value < 0 for precision
@@ -153,7 +153,5 @@ class LightItemOnFire extends RecipeBase
 			item_source.OnIgnitedTargetFailed(item_target);
 			item_target.OnIgnitedThisFailed(item_source);
 		}
-		
-		player.GetSoftSkillManager().AddSpecialty( UASoftSkillsWeight.ROUGH_LOW );
 	}
 };

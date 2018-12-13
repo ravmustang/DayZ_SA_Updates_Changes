@@ -21,7 +21,7 @@ class ActionAttachWheels: ActionAttach
 		
 	override string GetText()
 	{
-		return "#attach_wheels";
+		return "#attach";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

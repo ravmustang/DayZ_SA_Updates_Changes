@@ -25,7 +25,7 @@ class HumanInventory : GameInventory
 	 * @param[in]	do_script_check		deny if script conditions fail
 	 * @return		true if item passed all tests
 	 **/
-	proto native bool TestAddEntityInHands (EntityAI e, bool do_resevation_check, bool do_item_check, bool do_occupancy_test, bool do_script_check);
+	proto native bool TestAddEntityInHands (EntityAI e, bool do_resevation_check, bool do_item_check, bool do_lock_check, bool do_occupancy_test, bool do_script_check);
 
 	/**@fn			CanRemoveEntityInHands
 	 * @return		true if entity can be removed from hands
@@ -310,7 +310,7 @@ class HumanInventory : GameInventory
 			}
 
 			if (!handled)
-				return super.SwapEntities(mode, item1, item2);
+				return super.ForceSwapEntities(mode, item1, item2, item2_dst);
 			return true;
 		}
 		Error("HumanInventory::ForceSwapEntities: No inventory location");

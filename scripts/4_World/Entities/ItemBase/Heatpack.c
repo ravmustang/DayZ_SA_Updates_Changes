@@ -8,11 +8,19 @@ class Heatpack : ItemBase
 		}
 	}
 	
+	override void OnWork( float consumed_energy )
+	{
+		if (GetGame().IsServer())
+		{
+			SetTemperature(60);
+		}
+	}
+	
 	override void OnWorkStop()
 	{
 		if (GetGame().IsServer())
 		{
-			SetTemperature(0);
+			SetHealth(0);
 		}
 	}
 };

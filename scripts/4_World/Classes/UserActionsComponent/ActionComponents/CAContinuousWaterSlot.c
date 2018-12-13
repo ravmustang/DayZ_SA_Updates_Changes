@@ -71,8 +71,8 @@ class CAContinuousWaterSlot : CAContinuousQuantity
 				
 				if ( GetGame().IsServer() )
 				{
-					float water = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_SpentQuantity, m_Action.GetSpecialtyWeight(), true );
-					m_Action.SendMessageToClient(action_data.m_Player, slot.GiveWater( action_data.m_MainItem, water ));
+					float water = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_SpentQuantity, m_Action.GetSpecialtyWeight(), true );
+					slot.GiveWater( water );
 					action_data.m_MainItem.AddQuantity(- m_SpentQuantity);
 				}
 				

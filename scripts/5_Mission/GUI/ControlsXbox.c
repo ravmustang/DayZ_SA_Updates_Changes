@@ -9,7 +9,7 @@ class JsonControlMappingInfo
 class ControlsXbox extends UIScriptedMenu
 {
 	protected ImageWidget 	m_ControlsLayoutImage;
-	protected const int 		TABS_COUNT = 4;
+	protected const int 	TABS_COUNT = 4;
 	protected ImageWidget 	m_tab_images[TABS_COUNT];
 	protected TabberUI		m_TabScript;
 	
@@ -47,7 +47,7 @@ class ControlsXbox extends UIScriptedMenu
 		CanvasWidget canvas_widget = CanvasWidget.Cast( layoutRoot.FindAnyWidget("CanvasWidget_" + index) );
 		control_mapping_info  = GetControlMappingInfo();
 		
-		for( int i = 0; i < 4; i++ )
+		for( int i = 0; i < m_TabScript.GetTabCount(); i++ )
 		{
 			tab_array.Insert( new array<ref JsonControlMappingInfo> );
 			for( int j = 0; j < 20; j++ )

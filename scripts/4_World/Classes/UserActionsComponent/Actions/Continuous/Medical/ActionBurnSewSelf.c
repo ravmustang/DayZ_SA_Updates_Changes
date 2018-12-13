@@ -38,7 +38,7 @@ class ActionBurnSewSelf: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#close_wounds";
+		return "#treat_wound";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -57,9 +57,9 @@ class ActionBurnSewSelf: ActionContinuousBase
 	{	
 		const float ITEM_DAMAGE = 0.05;
 		const float SHOCK_AMOUNT = 1000;
-		action_data.m_MainItem.DecreaseHealth ( "", "", action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() )*100 );
+		action_data.m_MainItem.DecreaseHealth ( "", "", action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() )*100 );
 		action_data.m_Player.m_ModifiersManager.DeactivateModifier(eModifiers.MDF_BLEEDING);		
-		//OlD_SHOCK//action_data.m_Player.GetStatShock().Add( action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( SHOCK_AMOUNT, this.GetSpecialtyWeight() ) );
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		//OlD_SHOCK//action_data.m_Player.GetStatShock().Add( action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( SHOCK_AMOUNT, this.GetSpecialtyWeight() ) );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

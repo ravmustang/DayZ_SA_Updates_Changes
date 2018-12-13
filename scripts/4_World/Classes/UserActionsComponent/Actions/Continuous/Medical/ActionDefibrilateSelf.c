@@ -66,7 +66,7 @@ class ActionDefibrilateSelf: ActionContinuousBase
 		{
 			defib.Discharge(action_data.m_Player);
 			
-			float regain_energy = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( defib.GetEnergyNeededToCharge(), this.GetSpecialtyWeight() );
+			float regain_energy = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( defib.GetEnergyNeededToCharge(), this.GetSpecialtyWeight() );
 			regain_energy = defib.GetEnergyNeededToCharge() - regain_energy;
 			
 			ItemBase battery;
@@ -85,6 +85,6 @@ class ActionDefibrilateSelf: ActionContinuousBase
 			action_data.m_Player.MessageImportant ( m_MessageStartFail );		
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

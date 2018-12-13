@@ -6,7 +6,6 @@ class UIPopupScriptSceneSettings extends UIPopupScript
 	private ButtonWidget	m_BtnCancel;
 	
 	private TextWidget		m_TxtWeatherTime;
-	private TextWidget		m_TxtAirTemperature;
 	
 	private SliderWidget 	m_SldStartTime;
 	private TextWidget		m_TxtStartTimeValue;
@@ -50,7 +49,6 @@ class UIPopupScriptSceneSettings extends UIPopupScript
 		m_BtnCancel			= ButtonWidget.Cast( wgt.FindAnyWidget("btn_ppp_st_cancel") );
 		
 		m_TxtWeatherTime	= TextWidget.Cast( wgt.FindAnyWidget("txt_ppp_st_w_time_value") );
-		m_TxtAirTemperature	= TextWidget.Cast( wgt.FindAnyWidget("txt_ppp_st_w_air_temp_value") );
 		
 		m_SldStartTime		= SliderWidget.Cast( wgt.FindAnyWidget("sld_ppp_st_start_time") );
 		m_TxtStartTimeValue	= TextWidget.Cast( wgt.FindAnyWidget("txt_ppp_st_start_time_value") );
@@ -249,7 +247,6 @@ class UIPopupScriptSceneSettings extends UIPopupScript
 	void OnUpdate()
 	{
 		m_TxtWeatherTime.SetText(GetGame().GetWeather().GetTime().ToString());
-		m_TxtAirTemperature.SetText(GetGame().GetWeather().GetAirTemperature().ToString());
 	}
 
 	//================================================

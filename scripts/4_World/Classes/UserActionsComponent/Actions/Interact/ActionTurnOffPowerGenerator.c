@@ -21,9 +21,8 @@ class ActionTurnOffPowerGenerator: ActionInteractBase
 	{
 		Object targetObject = target.GetObject();
 		ItemBase target_IB = ItemBase.Cast( targetObject );
-		string selection = targetObject.GetActionComponentName(target.GetComponentIndex());
 		
-		if ( target_IB.HasEnergyManager()  &&  target_IB.GetCompEM().CanSwitchOff()  &&  selection == "switch" )
+		if ( target_IB.HasEnergyManager()  &&  target_IB.GetCompEM().CanSwitchOff() )
 		{
 			return true;
 		}

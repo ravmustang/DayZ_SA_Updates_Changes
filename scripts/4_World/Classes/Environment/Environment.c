@@ -1,5 +1,7 @@
 class Environment
 {
+	const float RAIN_LIMIT_LOW		= 0.05;
+
 	const float WATER_LEVEL_HIGH	= 1.5;
 	const float WATER_LEVEL_MID 	= 1.2;
 	const float WATER_LEVEL_LOW 	= 0.5;
@@ -9,7 +11,7 @@ class Environment
 	protected float  				m_NightTemp;
 	
 	protected float					m_WetDryTick; //ticks passed since last clothing wetting or drying
-	protected float					m_ItemsWetness; //! keeps the wetness level across items in player's possesion
+	protected float					m_ItemsWetnessMax; //! keeps wetness of most wet item in player's possesion
 	protected float					m_BuildingRCCheckTimer; // keeps info about tick time
 
 	//player
@@ -170,7 +172,7 @@ class Environment
 					{
 						ProcessWetnessByWaterLevel(m_WaterLevel);
 					}
-					else if (m_Rain > 0.01 && !IsInsideBuilding() && !IsUnderRoof())
+					else if (IsRaining() && !IsInsideBuilding() && !IsUnderRoof())
 					{
 						ProcessWetnessByRain();
 					}
@@ -180,17 +182,17 @@ class Environment
 					}
 
 					//! setting of wetness/dryiness of player
-					if (m_ItemsWetness <= 0 && m_Player.GetStatWet().Get() == 1)
+					if (m_ItemsWetnessMax <= STATE_DAMP && m_Player.GetStatWet().Get() == 1)
 					{
 						m_Player.GetStatWet().Set(0);
 					}
-					else if (m_ItemsWetness > 0 && m_Player.GetStatWet().Get() == 0)
+					else if (m_ItemsWetnessMax > STATE_DAMP && m_Player.GetStatWet().Get() == 0)
 					{
 						m_Player.GetStatWet().Set(1);
 					}
 
 					m_WetDryTick = 0;
-					m_ItemsWetness = 0; //! reset item wetness counter;
+					m_ItemsWetnessMax = 0; //! reset item wetness counter;
 				}
 				
 				m_HeatSourceTemp = 0.0;
@@ -228,6 +230,11 @@ class Environment
 	protected bool IsInsideBuilding()
 	{
 		return m_IsInside;
+	}
+	
+	protected bool IsRaining()
+	{
+		return m_Rain > RAIN_LIMIT_LOW;
 	}
 	
 	//! Checks whether Player is sheltered
@@ -455,7 +462,7 @@ class Environment
 				wet_delta = 0.33;
 			}
 		}
-		else if ( m_Rain > 0.01 && !IsInsideBuilding() && !IsUnderRoof() )
+		else if ( IsRaining() && !IsInsideBuilding() && !IsUnderRoof() )
 		{
 			//! player is getting wet from rain
 			wet_delta = ENVIRO_WET_INCREMENT * ENVIRO_TICKS_TO_WETNESS_CALCULATION * (1+(ENVIRO_WIND_EFFECT*m_Wind)) * ( m_Rain );
@@ -603,7 +610,8 @@ class Environment
 		if (pItem && GetCurrentItemWetAbsorbency(pItem) > 0)
 		{
 			pItem.AddWet(GetWetDelta() * GetCurrentItemWetAbsorbency(pItem));
-			m_ItemsWetness += pItem.GetWet();
+			if (pItem.GetWet() > m_ItemsWetnessMax)
+				m_ItemsWetnessMax = pItem.GetWet();
 			//Print("processing wetness for " + pItem.GetDisplayName());
 	
 			if ( pItem.GetInventory().GetCargo() )
@@ -616,7 +624,6 @@ class Environment
 					if ( Class.CastTo(inItem, pItem.GetInventory().GetCargo().GetItem(i)) )
 					{
 						inItem.AddWet(GetWetDelta() * GetCurrentItemWetAbsorbency(inItem) * ENVIRO_WET_PASSTHROUGH_COEF);
-						m_ItemsWetness += inItem.GetWet();
 						//Print("processing wetness for (inside)" + inItem.GetDisplayName());
 					}
 				}
@@ -631,7 +638,8 @@ class Environment
 			if (pItem.GetWet() > pItem.GetWetMin())
 			{
 				pItem.AddWet(GetWetDelta());
-				m_ItemsWetness += pItem.GetWet();
+				if (pItem.GetWet() > m_ItemsWetnessMax)
+					m_ItemsWetnessMax = pItem.GetWet();
 				//Print("drying for " + pItem.GetDisplayName());
 			}
 	
@@ -647,7 +655,6 @@ class Environment
 						if (inItem.GetWet() > inItem.GetWetMin())
 						{
 							inItem.AddWet(GetWetDelta() * ENVIRO_WET_PASSTHROUGH_COEF);
-							m_ItemsWetness += inItem.GetWet();
 							//Print("drying for (inside)" + inItem.GetDisplayName());
 						}
 					}

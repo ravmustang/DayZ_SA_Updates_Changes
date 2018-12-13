@@ -1,6 +1,6 @@
 WindowWidgetClass TitleScreenLayout {
  clipchildren 0
- color 0.0824 0.0824 0.0824 0.9216
+ color 0.0824 0.0824 0.0824 0.7843
  position 0 0
  size 540 112.5
  halign center_ref
@@ -35,7 +35,7 @@ WindowWidgetClass TitleScreenLayout {
    vexactpos 1
    hexactsize 1
    vexactsize 1
-   text "#STR_TitleScreenLayout_Text0"xbox_buttons\\" name=\\"A\\" /> to continue."
+   text "#STR_TitleScreenLayout_Text0"
    font "gui/fonts/sdf_MetronLight24"
    "exact text" 0
    "exact text size" 22

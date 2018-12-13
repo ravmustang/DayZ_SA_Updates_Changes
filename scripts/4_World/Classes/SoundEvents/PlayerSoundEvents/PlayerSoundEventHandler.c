@@ -20,6 +20,7 @@ enum EPlayerSoundEventID
 	INJURED_MEDIUM,
 	INJURED_HIGH,
 	FREEZING,
+	HOT,
 	//--------------
 	// Count bellow, put enums above
 	//--------------
@@ -59,6 +60,7 @@ class PlayerSoundEventHandler extends SoundEventHandler
 		RegisterState(new InjuryMediumSoundEvent());
 		RegisterState(new InjuryHeavySoundEvent());
 		RegisterState(new FreezingSoundEvent());
+		RegisterState(new HotSoundEvent());
 	}
 	
 	void RegisterState(PlayerSoundEventBase state)
@@ -144,7 +146,6 @@ class PlayerSoundEventHandler extends SoundEventHandler
 
 			m_CurrentState.Stop();
 		}
-		
 		m_CurrentState = PlayerSoundEventBase.Cast(requested_state.ClassName().ToType().Spawn());
 		m_CurrentState.Init(m_Player);
 		m_CurrentState.Play();

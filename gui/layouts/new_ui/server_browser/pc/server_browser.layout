@@ -64,7 +64,7 @@ FrameWidgetClass ServerBrowserRoot {
          imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
          mode blend
          "src alpha" 1
-         "no wrap" 0
+         "no wrap" 1
          stretch 1
         }
         GridSpacerWidgetClass Tab_Control_Container {
@@ -130,7 +130,7 @@ FrameWidgetClass ServerBrowserRoot {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -186,7 +186,7 @@ FrameWidgetClass ServerBrowserRoot {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -242,7 +242,7 @@ FrameWidgetClass ServerBrowserRoot {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -360,12 +360,12 @@ FrameWidgetClass ServerBrowserRoot {
    visible 1
    ignorepointer 1
    position 0.05 130
-   size 0.2 230
+   size 400 230
    halign right_ref
    valign bottom_ref
    hexactpos 0
    vexactpos 1
-   hexactsize 0
+   hexactsize 1
    vexactsize 1
    priority 1
    Padding 10
@@ -416,7 +416,7 @@ FrameWidgetClass ServerBrowserRoot {
     }
     WrapSpacerWidgetClass top {
      ignorepointer 1
-     color 0 0 0 0.7843
+     color 0 0 0 0.4314
      position 0 0
      size 1 48
      hexactpos 1
@@ -469,6 +469,7 @@ FrameWidgetClass ServerBrowserRoot {
        switch normal
       }
       PanelWidgetClass character {
+       visible 1
        ignorepointer 0
        position 0 172
        size 1 38

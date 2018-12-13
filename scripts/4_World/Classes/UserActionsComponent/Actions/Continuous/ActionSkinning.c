@@ -156,7 +156,7 @@ class ActionSkinning: ActionContinuousBase
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
 		module_lifespan.UpdateBloodyHandsVisibility( action_data.m_Player, true );
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 
 	// Spawns an organ defined in the given config
@@ -187,7 +187,7 @@ class ActionSkinning: ActionContinuousBase
 		if (quant_min_max.Count() > 0)
 		{
 			float soft_skill_manipulated_value = ( quant_min_max.Get(0)+ quant_min_max.Get(1) ) / 2;
-			float min_quantity = player.GetSoftSkillManager().AddSpecialtyBonus( soft_skill_manipulated_value, this.GetSpecialtyWeight() );
+			float min_quantity = player.GetSoftSkillsManager().AddSpecialtyBonus( soft_skill_manipulated_value, this.GetSpecialtyWeight() );
 			item_quantity = Math.RandomFloat(min_quantity, quant_min_max.Get(1));
 		}
 		

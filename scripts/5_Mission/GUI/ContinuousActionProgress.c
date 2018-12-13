@@ -55,6 +55,13 @@ class ContinuousActionProgress extends ScriptedWidgetEventHandler
 
 	protected void Update()
 	{
+		//! don't show continuous action progressif it's disabled in profile
+		if(!g_Game.GetProfileOption(EDayZProfilesOptions.HUD))
+		{
+			m_Root.Show(false);
+			return;
+		};
+
 		if(m_Player && !m_Player.IsAlive()) // handle respawn
 		{
 			m_Player = null;
@@ -65,7 +72,7 @@ class ContinuousActionProgress extends ScriptedWidgetEventHandler
 
 		GetActions();
 
-		if(m_Action && m_Action.HasProgress() && m_ActionState != UA_NONE && !GetGame().IsInventoryOpen())
+		if(m_Action && m_Action.HasProgress() && m_ActionState != UA_NONE && GetGame().GetUIManager().GetMenu() == null)
 		{
 			if(m_ActionState == UA_INITIALIZE || m_ActionState == UA_AM_PENDING)
 			{

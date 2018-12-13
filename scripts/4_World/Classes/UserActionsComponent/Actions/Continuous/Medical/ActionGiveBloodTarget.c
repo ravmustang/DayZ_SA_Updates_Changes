@@ -37,7 +37,24 @@ class ActionGiveBloodTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#give_blood";
+		return "#give_blood_person";
+	}
+	
+	override ActionData CreateActionData()
+	{
+		ActionGiveBloodData action_data = new ActionGiveBloodData;
+		return action_data;
+	}
+	
+	override bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL )
+	{
+		if ( super.SetupAction(player, target, item, action_data, extra_data ) )
+		{
+			ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
+			action_data_b.m_ItemBloodType = action_data.m_MainItem.GetLiquidType();
+			return true;
+		}
+		return false;
 	}
 
 	override void OnEndAnimationLoopServer( ActionData action_data )
@@ -49,7 +66,7 @@ class ActionGiveBloodTarget: ActionContinuousBase
 			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, new SyringeLambda(action_data.m_MainItem, "Syringe", action_data.m_Player));
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 	override void OnEndServer(ActionData action_data)

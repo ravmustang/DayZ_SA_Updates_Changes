@@ -8,12 +8,8 @@ class CableReel extends ItemBase
 	void CableReel () 
 	{
 		m_ForceIntoHands = false;
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
-
-	/*override bool IsTwoHandedBehaviour()
-	{
-		return true;
-	}*/
 	
 	void ForceIntoHandsNow ( PlayerBase player ) 
 	{
@@ -106,7 +102,21 @@ class CableReel extends ItemBase
 	{
 		return true;
 	}
-
+	
+	override void OnVariablesSynchronized()
+	{
+		super.OnVariablesSynchronized();
+						
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
 	override void OnPlacementStarted( Man player )
 	{
 		super.OnPlacementStarted( player );
@@ -122,5 +132,17 @@ class CableReel extends ItemBase
 		{
 			player_PB.GetHologramLocal().SetSelectionToRefresh( array_of_selections );
 		}
+	}
+	
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override string GetPlaceSoundset()
+	{
+		return "placeCableReel_SoundSet";
 	}
 }

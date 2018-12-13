@@ -36,7 +36,7 @@ class ActionMeasureTemperatureTarget : ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#measure_temperature";
+		return "#measure_persons_temperature";
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )

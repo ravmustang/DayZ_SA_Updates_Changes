@@ -1,8 +1,7 @@
 class V3S_Chassis extends CarScript
 {
-	override void Init()
+	void V3S_Chassis()
 	{
-		super.Init();
 		m_dmgContactCoef = 0.018;
 		m_enginePtcPos = "0 1.346 2.205";
 	}

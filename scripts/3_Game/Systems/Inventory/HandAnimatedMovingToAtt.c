@@ -70,6 +70,8 @@ class HandAnimatedMovingToAtt extends HandStateBase
 
 	ref HandStartHidingAnimated m_Hide;
 	ref HandAnimatedMoveToDst_W4T m_Show;
+	
+	ref InventoryLocation m_ilEntity;
 
 	void HandAnimatedMovingToAtt (Man player = NULL, HandStateBase parent = NULL)
 	{
@@ -98,6 +100,12 @@ class HandAnimatedMovingToAtt extends HandStateBase
 			m_Show.m_Dst = ev_move.m_Dst;
 			m_Hide.m_ActionType = ev_move.GetAnimationID();
 			m_Show.m_ActionType = ev_move.GetAnimationID();
+			
+
+			if( GetGame().IsClient() || !GetGame().IsMultiplayer() )
+			{
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Entity, m_ilEntity, 3000);
+			}
 		}
 		
 		super.OnEntry(e); // @NOTE: super at the end (prevent override from submachine start)
@@ -105,15 +113,27 @@ class HandAnimatedMovingToAtt extends HandStateBase
 
 	override void OnAbort (HandEventBase e)
 	{
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_Entity, m_ilEntity);
+		}
+		
 		m_Entity = null;
+		m_ilEntity = null;
 
 		super.OnAbort(e);
 	}
 
 	override void OnExit (HandEventBase e)
 	{
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_Entity, m_ilEntity);
+		}
+		
 		m_Entity = null;
-
+		m_ilEntity = null;
+		
 		super.OnExit(e);
 	}
 };

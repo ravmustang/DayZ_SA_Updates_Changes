@@ -27,6 +27,8 @@ class TrapBase extends ItemBase
 	protected ref Timer m_Timer;
 	protected TrapTrigger m_TrapTrigger;
 
+	ref protected EffectSound 	m_DeployLoopSound;
+	
 	void TrapBase()
 	{
 		m_IsInProgress = false;
@@ -53,12 +55,28 @@ class TrapBase extends ItemBase
 		
 		RegisterNetSyncVariableBool("m_IsActive");
 		RegisterNetSyncVariableBool("m_IsInProgress");
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 	
 	//! this event is called all variables are synchronized on client
     override void OnVariablesSynchronized()
     {
         super.OnVariablesSynchronized();
+		
+		if ( IsDeploySound() )
+		{
+			PlayDeploySound();
+		}
+		
+		if ( CanPlayDeployLoopSound() )
+		{
+			PlayDeployLoopSound();
+		}
+					
+		if ( m_DeployLoopSound && !CanPlayDeployLoopSound() )
+		{
+			StopDeployLoopSound();
+		}
 		
 		if ( GetGame().IsMultiplayer() )
 		{
@@ -96,9 +114,9 @@ class TrapBase extends ItemBase
 	}
 	
 	//----------------------------------------------------------------
-	override void OnStoreLoad(ParamsReadContext ctx)
+	override void OnStoreLoad(ParamsReadContext ctx, int version)
 	{   
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 		
 		bool b_is_active = false;
 		ctx.Read( b_is_active );
@@ -276,6 +294,7 @@ class TrapBase extends ItemBase
 			Param1<EntityAI> p = new Param1<EntityAI>( victim );
 			GetGame().RPCSingleParam( this, ERPCs.RPC_TRAP_VICTIM, p, true );
 		}
+		
 	}	
 	
 	// On server -> client synchronization
@@ -422,7 +441,7 @@ class TrapBase extends ItemBase
 
 	void StartActivate( PlayerBase player )
 	{
-			m_Timer = new Timer( CALL_CATEGORY_GAMEPLAY );
+			m_Timer = new Timer( CALL_CATEGORY_SYSTEM );
 			HideSelection("safety_pin");
 			
 			if ( m_InitWaitTime > 0 )
@@ -492,8 +511,8 @@ class TrapBase extends ItemBase
 	void CreateTrigger()
 	{
 		m_TrapTrigger = TrapTrigger.Cast( g_Game.CreateObject( "TrapTrigger", this.GetPosition(), false ) );
-		vector mins = "-0.01 -0.5 -0.01";
-		vector maxs = "0.01 0.5 0.01";
+		vector mins = "-0.01 -0.05 -0.01";
+		vector maxs = "0.01 0.05 0.01";
 		m_TrapTrigger.SetOrientation( this.GetOrientation() );
 		m_TrapTrigger.SetExtents(mins, maxs);	
 		m_TrapTrigger.SetParentObject( this );
@@ -568,11 +587,6 @@ class TrapBase extends ItemBase
 		return IsTakeable();
 	}
 	
-	override void OnPlacementComplete( Man player )
-	{
-		SetupTrapPlayer( PlayerBase.Cast( player ), false );
-	}
-	
 	override bool CanBePlaced( Man player, vector position )
 	{
 		return IsPlaceableAtPosition( position );
@@ -581,5 +595,38 @@ class TrapBase extends ItemBase
 	override string CanBePlacedFailMessage( Man player, vector position )
 	{
 		return "Trap can't be placed on this surface type.";
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player )
+	{
+		super.OnPlacementComplete( player );
+		
+		if ( GetGame().IsServer() )
+		{
+			SetupTrapPlayer( PlayerBase.Cast( player ), false );
+		}	
+		
+		SetIsDeploySound( true );
+	}
+		
+	void PlayDeployLoopSound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() || !GetGame().IsMultiplayer() )
+		{		
+			m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+		}
+	}
+	
+	void StopDeployLoopSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() || !GetGame().IsMultiplayer() )
+		{	
+			m_DeployLoopSound.SoundStop();
+			delete m_DeployLoopSound;
+		}
 	}
 }

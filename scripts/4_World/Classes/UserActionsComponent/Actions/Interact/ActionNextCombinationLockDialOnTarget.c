@@ -17,7 +17,7 @@ class ActionNextCombinationLockDialOnTarget: ActionInteractBase
 
 	override string GetText()
 	{
-		return "#next_combination_lock_dial_on_target";
+		return "#next_combination_lock_dial";
 	}
 
 	override bool IsInstant()

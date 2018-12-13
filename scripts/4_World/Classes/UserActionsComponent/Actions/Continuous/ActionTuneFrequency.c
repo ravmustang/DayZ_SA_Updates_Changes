@@ -56,7 +56,7 @@ class ActionTuneFrequency: ActionContinuousBase
 			
 			if ( transmitter.GetCompEM().IsWorking() ) 
 			{
-				transmitter.DisplayRadioInfo( transmitter.GetTunedFrequency().ToString(), player );
+				//transmitter.DisplayRadioInfo( transmitter.GetTunedFrequency().ToString(), player );
 				
 				return true;
 			}

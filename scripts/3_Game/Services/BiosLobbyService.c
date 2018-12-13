@@ -41,6 +41,7 @@ class GetServersResultRow
 	bool	m_IsPasswordProtected;
 	string	m_CreatedAt;
 	string	m_UpdatedAt;
+	bool	m_IsExpanded;
 
 	//characters alive
 	string m_CharactersAlive;
@@ -53,6 +54,8 @@ class GetServersResultRow
   	int m_Disable3rdPerson;  //1 for disabled, ie. hardcore
 	//! time multiplier of environment
 	float m_EnvironmentTimeMul;
+	string m_ShardId;
+	bool		m_AllowedFilePatching;
 
 };
 
@@ -100,6 +103,8 @@ class GetServersResult
 	int								m_Page;
 	int								m_Pages;
 	ref GetServersResultRowArray	m_Results;
+
+	int m_NumServers;
 };
 
 //! GetServersInput the input structure of the GetServers operation
@@ -294,6 +299,12 @@ class GetServersInput
 	void SetAcceleratedTime( bool show )
 	{
 		m_SortBy += "A";
+		AddShow( show );
+	}
+
+	void SetAllowedFilePatching( bool show )
+	{
+		m_SortBy += "7";
 		AddShow( show );
 	}
 	

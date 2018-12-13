@@ -77,6 +77,7 @@ class HandEventBase
 			case HandEventID.REPLACED: return new HandEventReplaced(p, e);
 			case HandEventID.ANIMEVENT_CHANGE_HIDE: return HandAnimEventChanged(p, e);
 			case HandEventID.HUMANCOMMAND_ACTION_FINISHED : return HandEventHumanCommandActionFinished(p, e);
+			case HandEventID.HUMANCOMMAND_ACTION_ABORTED : return HandEventHumanCommandActionAborted(p, e);
 		}
 		Error("[hndfsm] HandEventFactory - unregistered hand event with id=" + id);
 		return null;
@@ -150,7 +151,7 @@ class HandEventTake extends HandEventBase
 			InventoryLocation dst = GetDst();
 			return TryAcquireInventoryJunctureFromServer(player, src, dst);
 		}
-		Error("HandEventTake. AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		Error("[hndfsm] HandEventTake. AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
 		return JunctureRequestResult.ERROR;
 	}
 };
@@ -188,7 +189,7 @@ class HandEventMoveTo extends HandEventBase
 			InventoryLocation dst = GetDst();
 			return TryAcquireInventoryJunctureFromServer(player, src, dst);
 		}
-		Error("HandEventMoveTo.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		Error("[hndfsm] HandEventMoveTo.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
 		return JunctureRequestResult.ERROR;
 	}
 };
@@ -221,7 +222,7 @@ class HandEventDrop extends HandEventBase
 			InventoryLocation dst = GetDst();
 			return TryAcquireInventoryJunctureFromServer(player, src, dst);
 		}
-		Error("HandEventDrop.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		Error("[hndfsm] HandEventDrop.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
 		return JunctureRequestResult.ERROR;
 	}
 };
@@ -285,21 +286,16 @@ class HandEventSwap extends HandEventBase
 			InventoryLocation src1, src2, dst1, dst2;
 			if (GameInventory.MakeSrcAndDstForSwap(item1, item2, src1, src2, dst1, dst2))
 			{
-				dst1.Copy(src1);
-				dst1.CopyLocationFrom(src2);
-				dst2.Copy(src2);
-				dst2.CopyLocationFrom(src1);
-
 				return TryAcquireTwoInventoryJuncturesFromServer(player, src1, src2, dst1, dst2);
 			}
 			else
 			{
-				Error("HandEventSwap.AcquireInventoryJunctureFromServer: GameInventory.MakeSrcAndDstForSwap failed");
+				Error("[hndfsm] HandEventSwap.AcquireInventoryJunctureFromServer: GameInventory.MakeSrcAndDstForSwap failed");
 				return JunctureRequestResult.ERROR;
 			}
 		}
 
-		Error("HandEventSwap.AcquireInventoryJunctureFromServer: one of items is null: item1=" + item1 + " or item2=" + item2);
+		Error("[hndfsm] HandEventSwap.AcquireInventoryJunctureFromServer: one of items is null: item1=" + item1 + " or item2=" + item2);
 		return JunctureRequestResult.ERROR;
 	}
 };
@@ -339,6 +335,30 @@ class HandEventForceSwap extends HandEventBase
 		}
 		return false;
 	}
+
+	override bool AcquireInventoryJunctureFromServer (notnull Man player)
+	{
+		EntityAI item1 = m_Entity;
+		EntityAI item2 = m_Player.GetHumanInventory().GetEntityInHands();
+		InventoryLocation user_dst2 = m_Dst;
+
+		if (item1 && item2 && user_dst2)
+		{
+			InventoryLocation src1, src2, dst1;
+			if (GameInventory.MakeSrcAndDstForForceSwap(item1, item2, src1, src2, dst1, user_dst2))
+			{
+				return TryAcquireTwoInventoryJuncturesFromServer(player, src1, src2, dst1, user_dst2);
+			}
+			else
+			{
+				Error("[hndfsm] HandEventForceSwap.AcquireInventoryJunctureFromServer: GameInventory.MakeSrcAndDstForForceSwap failed");
+				return JunctureRequestResult.ERROR;
+			}
+		}
+
+		Error("[hndfsm] HandEventForceSwap.AcquireInventoryJunctureFromServer: one of items is null: item1=" + item1 + " or item2=" + item2 + " or user_dst2=" + user_dst2);
+		return JunctureRequestResult.ERROR;
+	}
 };
 
 class HandEventDestroy extends HandEventBase
@@ -369,13 +389,13 @@ class HandEventDestroyAndReplaceWithNew extends HandEventBase
 	{
 		super.ReadFromContext(ctx);
 		ctx.Read(m_Type);
-		// @TODO: lambda?
+		Error("[hndfsm] HandEventDestroyAndReplaceWithNew - Cannot serialize lambda (read)");
 	}
 	override void WriteToContext (ParamsWriteContext ctx)
 	{
 		super.WriteToContext(ctx);
 		ctx.Write(m_Type);
-		// @TODO: lambda?
+		Error("[hndfsm] HandEventDestroyAndReplaceWithNew - Cannot serialize lambda (write)");
 	}
 	override bool IsSwapEvent () { return true; }
 	override bool IsServerSideOnly () { return true; }

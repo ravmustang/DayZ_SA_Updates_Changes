@@ -8,7 +8,6 @@ PanelWidgetClass hands_preview_root {
  vexactpos 1
  hexactsize 0
  vexactsize 1
- priority 8
  draggable 0
  scriptclass "AutoHeightSpacer"
  style Outline

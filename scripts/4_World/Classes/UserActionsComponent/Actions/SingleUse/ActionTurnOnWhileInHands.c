@@ -58,11 +58,29 @@ class ActionTurnOnWhileInHands: ActionSingleUseBase
 			if ( action_data.m_MainItem.GetCompEM().CanWork() )
 			{
 				action_data.m_MainItem.GetCompEM().SwitchOn();
-			} 
+			}
 			else
 			{
 				InformPlayers(action_data.m_Player,action_data.m_Target,UA_FAILED);
 			}
+		}
+	}
+	
+	override void OnStartClient( ActionData action_data )
+	{
+		if ( action_data.m_MainItem  &&  action_data.m_MainItem.IsInherited(Roadflare) )
+		{
+			Roadflare flare = Roadflare.Cast(action_data.m_MainItem);
+			flare.SetModelState( RoadflareModelStates.UNCAPPED_UNIGNITED );
+		}
+	}
+	
+	override void OnStartServer( ActionData action_data )
+	{
+		if ( action_data.m_MainItem  &&  action_data.m_MainItem.IsInherited(Roadflare) )
+		{
+			Roadflare flare = Roadflare.Cast(action_data.m_MainItem);
+			flare.SetModelState( RoadflareModelStates.UNCAPPED_UNIGNITED );
 		}
 	}
 };

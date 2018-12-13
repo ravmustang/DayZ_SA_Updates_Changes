@@ -18,7 +18,7 @@ class ActionPlaceFireplaceIntoBarrel: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#place_fireplace";
+		return "#place_object";
 	}
 	
 	override void CreateConditionComponents()  
@@ -47,17 +47,11 @@ class ActionPlaceFireplaceIntoBarrel: ActionSingleUseBase
 	override void OnExecuteServer( ActionData action_data )
 	{	
 		FireplaceBase fireplace_in_hands = FireplaceBase.Cast( action_data.m_MainItem );
-		
 		BarrelHoles_ColorBase fireplace_barrel = BarrelHoles_ColorBase.Cast( action_data.m_Target.GetObject() );
 		
-		//transfer all attachments to this object
-		int item_attachments_count = fireplace_in_hands.GetInventory().AttachmentCount();
-		for ( int j = 0; j < item_attachments_count; j++ )
-		{
-			EntityAI entity = fireplace_in_hands.GetInventory().GetAttachmentFromIndex( 0 );
-			fireplace_barrel.PredictiveTakeEntityAsAttachment( entity );
-		}
-		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		auto lambda = new MoveEquipToExistingItemAndDestroyOldRootLambda(fireplace_in_hands, "", action_data.m_Player, fireplace_barrel);
+		action_data.m_Player.ServerReplaceItemInHandsWithNewElsewhere(lambda);
+
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 }

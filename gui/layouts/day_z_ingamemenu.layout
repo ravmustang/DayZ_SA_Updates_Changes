@@ -79,12 +79,12 @@ FrameWidgetClass FrameWidget {
    visible 1
    ignorepointer 1
    position 0.05 130
-   size 0.2 400
+   size 400 400
    halign right_ref
    valign bottom_ref
    hexactpos 0
    vexactpos 1
-   hexactsize 0
+   hexactsize 1
    vexactsize 1
    priority 3
    Padding 10
@@ -128,7 +128,7 @@ FrameWidgetClass FrameWidget {
        vexactsize 1
        userID 114
        style DayZDefaultButtonAll
-       "no focus" 1
+       "no focus" 0
        "next left" ""
        "next right" ""
        "next up" "tutorials"
@@ -142,7 +142,7 @@ FrameWidgetClass FrameWidget {
     }
     WrapSpacerWidgetClass top {
      ignorepointer 1
-     color 0 0 0 0.7843
+     color 0 0 0 0.4314
      position 0 0
      size 1 48
      hexactpos 1

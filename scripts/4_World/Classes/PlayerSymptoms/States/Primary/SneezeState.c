@@ -4,7 +4,7 @@ class SneezeSymptom extends SymptomBase
 	override void OnInit()
 	{
 		m_SymptomType = SymptomTypes.PRIMARY;
-		m_Priority = 0;
+		m_Priority = 100;
 		m_ID = SymptomIDs.SYMPTOM_SNEEZE;
 		m_DestroyOnAnimFinish = true;
 		m_SyncToClient = false;
@@ -23,7 +23,15 @@ class SneezeSymptom extends SymptomBase
 	//!gets called once on an Symptom which is being activated
 	override void OnGetActivatedServer(PlayerBase player)
 	{
-		PlaySound(EPlayerSoundEventID.SYMPTOM_SNEEZE);
+		
+		if( m_Manager.GetCurrentCommandID() == DayZPlayerConstants.COMMANDID_MOVE )
+		{
+			PlayAnimationADD(0);
+		}
+		else
+		{
+			PlaySound(EPlayerSoundEventID.SYMPTOM_SNEEZE);
+		}
 		player.SpreadAgents();
 	}
 
@@ -32,6 +40,7 @@ class SneezeSymptom extends SymptomBase
 	{
 	}
 
+	
 	//!only gets called once on an active Symptom that is being deactivated
 	override void OnGetDeactivatedServer(PlayerBase player)
 	{
@@ -42,5 +51,10 @@ class SneezeSymptom extends SymptomBase
 	override void OnGetDeactivatedClient(PlayerBase player)
 	{
 		Debug.Log("OnGetDeactivated SneezeSymptom called", "PlayerSymptom");
+	}
+		
+	override SmptAnimMetaBase SpawnAnimMetaObject()
+	{
+		return new SmptAnimMetaADD();
 	}
 }

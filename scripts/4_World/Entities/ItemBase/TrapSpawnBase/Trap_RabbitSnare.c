@@ -49,15 +49,15 @@ class Trap_RabbitSnare extends TrapSpawnBase
 		return true;
 	}*/
 	
-	override bool IsDeployable()
+	override void OnVariablesSynchronized()
 	{
-		return true;
+		super.OnVariablesSynchronized();
+				
+		if ( IsPlaceSound() )
+		{
+			PlayPlaceSound();
+		}
 	}
-	
-	override string GetDeploySoundset()
-	{
-		return "rabbitsnare_deploy_SoundSet";
-	}	
 	
 	override void SetupTrap()
 	{
@@ -104,6 +104,32 @@ class Trap_RabbitSnare extends TrapSpawnBase
 			vector chatch_pos = obj.GetPosition() + forward_vec + side_vec;
 			obj.SetPosition( chatch_pos );
 		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+			
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetDeploySoundset()
+	{
+		return "placeRabbitSnareTrap_SoundSet";
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "rabbitsnare_deploy_SoundSet";
 	}
 }
 

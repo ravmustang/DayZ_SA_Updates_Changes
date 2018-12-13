@@ -55,6 +55,9 @@ class HandAnimatedForceSwapping extends HandStateBase
 
 	ref HandStartHidingAnimated m_Hide;
 	ref HandForceSwappingAnimated_Show m_Show;
+	
+	ref InventoryLocation m_ilOldEntity;
+	ref InventoryLocation m_ilNewEntity;
 
 	void HandAnimatedForceSwapping (Man player = NULL, HandStateBase parent = NULL)
 	{
@@ -89,6 +92,17 @@ class HandAnimatedForceSwapping extends HandStateBase
 			m_Show.m_NewEntity = m_NewEntity;
 			m_Show.m_Dst = efs.GetDst();
 			m_Show.m_ActionType = efs.m_Animation2ID;
+			
+			if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+			{
+				m_ilOldEntity = new InventoryLocation;
+				m_OldEntity.GetInventory().GetCurrentInventoryLocation(m_ilOldEntity);
+				m_ilNewEntity = new InventoryLocation;
+				m_NewEntity.GetInventory().GetCurrentInventoryLocation(m_ilNewEntity);
+			
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_OldEntity, m_ilOldEntity, 3000);
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_NewEntity, m_ilNewEntity, 3000);
+			}
 		}
 
 		super.OnEntry(e); // @NOTE: super at the end (prevent override from submachine start)
@@ -96,6 +110,15 @@ class HandAnimatedForceSwapping extends HandStateBase
 
 	override void OnAbort (HandEventBase e)
 	{
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_OldEntity, m_ilOldEntity);
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_NewEntity, m_ilNewEntity);
+			
+			m_ilOldEntity = null;
+			m_ilNewEntity = null;
+		}
+		
 		m_OldEntity = null;
 		m_NewEntity = null;
 
@@ -104,6 +127,15 @@ class HandAnimatedForceSwapping extends HandStateBase
 
 	override void OnExit (HandEventBase e)
 	{
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_OldEntity, m_ilOldEntity);
+			e.m_Player.GetHumanInventory().ClearInventoryReservation(m_NewEntity, m_ilNewEntity);
+			
+			m_ilOldEntity = null;
+			m_ilNewEntity = null;
+		}
+		
 		m_OldEntity = null;
 		m_NewEntity = null;
 

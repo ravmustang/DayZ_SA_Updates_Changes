@@ -767,8 +767,20 @@ class Object extends IEntity
 	//! EffectSound - plays soundset on this object and returns state of the sound (true - played, false - not played)
 	bool PlaySoundSet( out EffectSound sound, string sound_set, float fade_in, float fade_out, bool loop = false )
 	{
-		if ( !sound && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+		if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
 		{
+			if ( sound )
+			{
+				if ( loop )
+				{
+					return true;
+				}
+				else
+				{
+					StopSoundSet( sound );		//auto stop for non-looped sounds
+				}
+			}
+			
 			sound = SEffectManager.PlaySoundOnObject( sound_set, this, fade_in, fade_out, loop );
 			sound.SetSoundAutodestroy( true );
 			

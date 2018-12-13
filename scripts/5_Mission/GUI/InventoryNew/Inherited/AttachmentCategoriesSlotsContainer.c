@@ -44,72 +44,52 @@ class AttachmentCategoriesSlotsContainer: Container
 		return GetFocusedContainer() == last;
 	}
 	
+	EntityAI GetFocusedEntity()
+	{
+		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_ItemsCont.GetMainWidget().FindAnyWidget( "Render" + m_FocusedColumn ) );
+		return ipw.GetItem();
+	}
+	
 	override void MoveGridCursor( int direction )
 	{
-		/*
-		m_ItemsCont.MoveGridCursor( int direction );
 		ItemManager.GetInstance().HideTooltip();
 		UnfocusAll();
 		if( direction == Direction.UP )
 		{
-			m_FocusedRow--;
-			if( m_FocusedRow < 0 )
+			Container cnt = Container.Cast( m_Parent.GetParent() );
+			if( cnt )
 			{
-				m_FocusedRow  = m_Ics.Count() - 1;
-				Container cnt = Container.Cast( m_Parent.GetParent().GetParent() );
-				if( cnt )
-					{
-						cnt.SetPreviousActive();
-					}
-					else
-					{
-						cnt = Container.Cast( m_Parent );
-						cnt.SetPreviousActive();
-					}
-				return;
-				
+				cnt.SetPreviousActive();
 			}
-	
-			int max_row = m_Ics.Get( m_FocusedRow ).GetColumnCount() - 1;
-			if( max_row < m_FocusedColumn )
+			else
 			{
-				m_FocusedColumn = max_row;
+				cnt = Container.Cast( m_Parent );
+				cnt.SetPreviousActive();
 			}
+			return;
 		}
 	
 		if( direction == Direction.DOWN )
 		{
-			m_FocusedRow++;
-			if( m_FocusedRow == m_Ics.Count() )
+			cnt = Container.Cast( m_Parent.GetParent() );
+			if( cnt )
 			{
-				m_FocusedRow = 0 ;
-				cnt = Container.Cast( m_Parent.GetParent().GetParent() );
-				if( cnt )
-				{
-					cnt.SetNextActive();
-				}
-				else
-				{
-					cnt = Container.Cast( m_Parent );
-					cnt.SetNextActive();
-				}
-				return;
+				cnt.SetNextActive();
 			}
-	
-			max_row = m_Ics.Get( m_FocusedRow ).GetColumnCount() - 1;
-			if( max_row < m_FocusedColumn )
+			else
 			{
-				m_FocusedColumn = max_row;
+				cnt = Container.Cast( m_Parent );
+				cnt.SetNextActive();
 			}
+			return;
 		}
 	
 		if( direction == Direction.RIGHT )
 		{
 			m_FocusedColumn++;
-			if( m_FocusedColumn == m_Ics.Get( m_FocusedRow ).GetColumnCount() )
+			if( m_FocusedColumn == m_ItemsCont.GetColumnCount() )
 			{
 				m_FocusedColumn = 0;
-				
 			}
 		}
 	
@@ -118,21 +98,18 @@ class AttachmentCategoriesSlotsContainer: Container
 			m_FocusedColumn--;
 			if( m_FocusedColumn < 0 )
 			{
-				m_FocusedColumn = m_Ics.Get( m_FocusedRow ).GetColumnCount() - 1;
-				
+				m_FocusedColumn = m_ItemsCont.GetColumnCount();
 			}
 		}
-	
-		//Container cnt = Container.Cast( m_Body.Get( 1 ) );
-		m_Ics.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).Show( true );
+
+		m_ItemsCont.GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).Show( true );
 		
 		EntityAI focused_item = GetFocusedEntity();
 		if( focused_item )
 		{
 			float x, y;
-			m_Ics.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).GetScreenPos( x, y );
+			m_ItemsCont.GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).GetScreenPos( x, y );
 			ItemManager.GetInstance().PrepareTooltip( focused_item, x, y );
 		}
-		*/
 	}
 }

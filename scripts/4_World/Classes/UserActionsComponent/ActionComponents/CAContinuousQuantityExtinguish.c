@@ -39,7 +39,7 @@ class CAContinuousQuantityExtinguish : CAContinuousQuantityRepeat
 	{				
 		if ( GetGame().IsServer() )
 		{
-			action_data.m_Player.GetSoftSkillManager().AddSpecialty( UASoftSkillsWeight.ROUGH_MEDIUM );
+			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( UASoftSkillsWeight.ROUGH_MEDIUM );
 		}
 		
 		return super.Interrupt( action_data );

@@ -22,7 +22,7 @@ class CAContinuousFillPowerGenerator : CAContinuousFill
 		m_ItemQuantity = action_data.m_MainItem.GetQuantity();
 		EntityAI pg = EntityAI.Cast(action_data.m_Target.GetObject()); // get power generator
 		m_TargetUnits = pg.GetCompEM().GetEnergyMax() - pg.GetCompEM().GetEnergy();
-		m_AdjustedQuantityFilledPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityFilledPerSecond, m_Action.GetSpecialtyWeight(), true );
+		m_AdjustedQuantityFilledPerSecond = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_QuantityFilledPerSecond, m_Action.GetSpecialtyWeight(), true );
 	}
 	
 	override int Execute( ActionData action_data )

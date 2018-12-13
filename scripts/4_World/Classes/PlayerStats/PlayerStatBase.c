@@ -2,7 +2,7 @@ class PlayerStatBase
 {
 	EPlayerStats	m_Type;
 	void 	OnStoreSave( ParamsWriteContext ctx );
-	void 	OnStoreLoad( ParamsReadContext ctx );
+	void 	OnStoreLoad( ParamsReadContext ctx, int version );
 	void 	OnRPC(ParamsReadContext ctx);
 	float 	Get();
 	string 	GetLabel();
@@ -134,7 +134,7 @@ class PlayerStat<Class T> extends PlayerStatBase
 		ctx.Write(m_Value);
 	}
 
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		//string name;
 		

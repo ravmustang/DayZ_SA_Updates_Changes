@@ -42,19 +42,23 @@ enum ConsoleToolbarType
 
 class Inventory: LayoutHolder
 {
-	protected ref LeftArea			m_LeftArea;
-	protected ref RightArea			m_RightArea;
-	protected ref HandsArea			m_HandsArea;
-	protected ref PlayerPreview		m_PlayerPreview;
-	protected ref InventoryQuickbar	m_Quickbar;
+	protected ref LeftArea					m_LeftArea;
+	protected ref RightArea					m_RightArea;
+	protected ref HandsArea					m_HandsArea;
+	protected ref PlayerPreview				m_PlayerPreview;
+	protected ref InventoryQuickbar			m_Quickbar;
 	
-	protected Widget				m_QuickbarWidget;
-	protected Widget				m_ConsoleToolbar;
+	protected Widget						m_QuickbarWidget;
+	protected Widget						m_ConsoleToolbar;
 
-	protected ref ContextMenu m_context_menu;
+	protected ref ContextMenu				m_ContextMenu;
+	protected static ref map<string, int>	m_PlayerAttachmentsIndexes;
+	protected static ref map<int, string>	m_SlotIDs;
 	
 	void Inventory( LayoutHolder parent )
 	{
+		LoadPlayerAttachmentIndexes();
+		
 		m_ControllerRightStickTimer = new Timer();
 		new ItemManager( GetMainWidget() );
 		new ColorManager();
@@ -63,7 +67,7 @@ class Inventory: LayoutHolder
 		m_RightArea = new RightArea( this );
 		m_HandsArea = new HandsArea( this );
 		m_PlayerPreview = new PlayerPreview( this );
-
+		
 #ifdef PLATFORM_CONSOLE
 #else
 		m_QuickbarWidget = GetMainWidget().FindAnyWidget( "QuickbarGrid" );
@@ -102,6 +106,54 @@ class Inventory: LayoutHolder
 				m_ConsoleToolbar.Show( true );
 				UpdateConsoleToolbar();
 		#endif
+	}
+	
+	static int GetPlayerAttachmentIndex( string slot_name )
+	{
+		return m_PlayerAttachmentsIndexes[slot_name];
+	}
+	
+	static int GetPlayerAttachmentIndex( int slot_id )
+	{
+		return GetPlayerAttachmentIndex( m_SlotIDs[slot_id] );
+	}
+	
+	protected void LoadPlayerAttachmentIndexes()
+	{
+		m_PlayerAttachmentsIndexes	= new map<string, int>;
+		m_SlotIDs					= new map<int, string>;
+		
+		string data;
+		string slot_name;
+		int i;
+		
+		if( GetGame().GetProfileString( "INV_AttIndexes", data ) )
+		{
+			JsonFileLoader<map<string, int>>.JsonLoadData( data, m_PlayerAttachmentsIndexes );
+		}
+		
+		string config_path_ghosts_slots = "CfgVehicles SurvivorBase InventoryEquipment playerSlots";
+		ref array<string> player_ghosts_slots = new array<string>;
+		GetGame().ConfigGetTextArray( config_path_ghosts_slots, player_ghosts_slots );
+		
+		for( i = 0; i < player_ghosts_slots.Count(); i++ )
+		{
+			slot_name = player_ghosts_slots.Get( i );
+			slot_name.Replace( "Slot_", "" );
+			if( !m_PlayerAttachmentsIndexes.Contains( slot_name ) && InventorySlots.GetSlotIdFromString( slot_name ) != -1 )
+			{
+				m_PlayerAttachmentsIndexes.Insert( slot_name, m_PlayerAttachmentsIndexes.Count() );
+			}
+		}
+		
+		for( i = 0; i < m_PlayerAttachmentsIndexes.Count(); i++ )
+		{
+			slot_name = m_PlayerAttachmentsIndexes.GetKey( i );
+			m_SlotIDs.Insert( InventorySlots.GetSlotIdFromString( slot_name ), slot_name );
+		}
+		
+		data = JsonFileLoader<map<string, int>>.JsonMakeData( m_PlayerAttachmentsIndexes );
+		GetGame().SetProfileString( "INV_AttIndexes", data );
 	}
 
 	protected int GetProperControllerStickAngle( int angle )
@@ -145,7 +197,7 @@ class Inventory: LayoutHolder
 
 	bool Controller( Widget w, int control, int value )
 	{
-		//Print("control: "+ control +" value: "+value);
+		//Print( "control: " + control + " value: " + value );
 		
 		//Right stick
 		if ( control == ControlID.CID_RADIALMENU )
@@ -173,69 +225,50 @@ class Inventory: LayoutHolder
 		
 		if ( control == ControlID.CID_RIGHT && value == 1 )
 		{
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			m_RightArea.MoveGridCursor(Direction.RIGHT);
 			m_LeftArea.MoveGridCursor(Direction.RIGHT);
 			m_HandsArea.MoveGridCursor(Direction.RIGHT);
 		}
 		else if ( control == ControlID.CID_LEFT && value == 1 )
 		{
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			m_RightArea.MoveGridCursor(Direction.LEFT);
 			m_LeftArea.MoveGridCursor(Direction.LEFT);
 			m_HandsArea.MoveGridCursor(Direction.LEFT);
 		}
 		else if ( control == ControlID.CID_UP && value == 1 )
 		{
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			m_RightArea.MoveGridCursor(Direction.UP);
 			m_LeftArea.MoveGridCursor(Direction.UP);
 			m_HandsArea.MoveGridCursor(Direction.UP);
 		}
 		else if ( control == ControlID.CID_DOWN && value == 1 )
 		{
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			m_RightArea.MoveGridCursor(Direction.DOWN);
 			m_LeftArea.MoveGridCursor(Direction.DOWN);
 			m_HandsArea.MoveGridCursor(Direction.DOWN);
 		}
 		
 		UpdateConsoleToolbar();
-		
-		if( control == ControlID.CID_SELECT && value != 0 )
-		{
-			if( m_RightArea.IsActive() )
-			{
-				m_RightArea.Select();
-			}
-			if( m_LeftArea.IsActive() )
-			{
-				m_LeftArea.Select();
-			}
-			if( m_HandsArea.IsActive() )
-			{
-				m_HandsArea.Select();
-			}
-			ItemManager.GetInstance().SetItemMicromanagmentMode( false );
-			ItemManager.GetInstance().SetItemMoving( false );
-			UpdateConsoleToolbar();
-			return true;
-		}
-
-		if( control == ControlID.CID_BACK && value != 0 )
-		{
-			if( GetMainWidget().IsVisible() )
-			{
-				if( m_RightArea.IsActive() )
-				{
-					m_RightArea.Combine();
-					m_RightArea.UnfocusGrid();
-
-				}
-				if( m_LeftArea.IsActive() )
-				{
-					m_LeftArea.Combine();
-					m_LeftArea.UnfocusGrid();
-				}
-			}
-			return true;
-		}
 		return false;
 	}
 
@@ -519,7 +552,7 @@ class Inventory: LayoutHolder
 			}
 			if( m_LeftArea.IsActive() )
 			{
-				//m_LeftArea.ExpandCollapseContainer();
+				m_LeftArea.ExpandCollapseContainer();
 			}
 		}
 		
@@ -541,24 +574,24 @@ class Inventory: LayoutHolder
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUISelectItem, false ) )
+		if( GetGame().GetInput().GetActionUp( UAUISelectItem, false ) )
 		{
-			ItemManager.GetInstance().SetItemMicromanagmentMode( true );
-			
 			if( m_RightArea.IsActive() )
 			{
-				m_RightArea.SelectItem();
+				m_RightArea.Select();
 			}
 			if( m_LeftArea.IsActive() )
 			{
-				m_LeftArea.SelectItem();
+				m_LeftArea.Select();
 			}
 			if( m_HandsArea.IsActive() )
 			{
-				m_HandsArea.SelectItem();
+				m_HandsArea.Select();
 			}
+			ItemManager.GetInstance().SetItemMicromanagmentMode( false );
+			ItemManager.GetInstance().SetItemMoving( false );
+			ItemManager.GetInstance().SetSelectedItem( null, null, null );
 			UpdateConsoleToolbar();
-			ItemManager.GetInstance().HideTooltip();
 		}
 		
 		if( GetGame().GetInput().GetActionDown( UAUIFastTransferToVicinity, false ) )
@@ -575,7 +608,7 @@ class Inventory: LayoutHolder
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUIFastTransferItem, false ) )
+		if( GetGame().GetInput().GetActionUp( UAUIFastTransferItem, false ) )
 		{
 			if( ItemManager.GetInstance().IsMicromanagmentMode() )
 			{
@@ -600,6 +633,12 @@ class Inventory: LayoutHolder
 		if( GetGame().GetInput().GetActionDown( UAUINextUp, false ) )
 		{
 			ItemManager.GetInstance().HideTooltip();
+			
+			if( GetGame().GetInput().GetActionDown( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			if( !ItemManager.GetInstance().IsMicromanagmentMode() )
 			{
 				m_RightArea.UnfocusGrid();
@@ -627,6 +666,12 @@ class Inventory: LayoutHolder
 		if( GetGame().GetInput().GetActionDown( UAUINextDown, false ) )
 		{
 			ItemManager.GetInstance().HideTooltip();
+			
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			if( !ItemManager.GetInstance().IsMicromanagmentMode() )
 			{
 				m_RightArea.UnfocusGrid();
@@ -653,6 +698,12 @@ class Inventory: LayoutHolder
 		if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
 		{
 			ItemManager.GetInstance().HideTooltip();
+			
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			if( ItemManager.GetInstance().IsMicromanagmentMode() )
 			{
 				ItemManager.GetInstance().SetItemMoving( true );
@@ -699,6 +750,11 @@ class Inventory: LayoutHolder
 
 		if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
 		{
+			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			{
+				EnableMicromanagement();
+			}
+			
 			if( ItemManager.GetInstance().IsMicromanagmentMode() )
 			{
 				ItemManager.GetInstance().SetItemMoving( true );
@@ -745,6 +801,7 @@ class Inventory: LayoutHolder
 			}
 		}
 
+		MissionGameplay mission = MissionGameplay.Cast( GetGame().GetMission() );
 #ifdef PLATFORM_CONSOLE
 		//Open Quickbar radial menu
 		if( GetGame().GetInput().GetActionDown( UAUIQuickbarRadialInventoryOpen, false ) )
@@ -774,11 +831,58 @@ class Inventory: LayoutHolder
 			}
 		}
 #endif
+		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
+		{
+			if( GetMainWidget().IsVisible() )
+			{
+			#ifdef PLATFORM_CONSOLE
+				if( m_RightArea.IsActive() )
+				{
+					m_RightArea.Combine();
+					m_RightArea.UnfocusGrid();
+
+				}
+				if( m_LeftArea.IsActive() )
+				{
+					m_LeftArea.Combine();
+					m_LeftArea.UnfocusGrid();
+				}
+			#endif
+				mission.HideInventory();
+			}
+		}
 
 		m_LeftArea.UpdateInterval();
 		m_RightArea.UpdateInterval();
 		m_HandsArea.UpdateInterval();
 	}
+	
+	void EnableMicromanagement()
+	{
+		if( !ItemManager.GetInstance().IsMicromanagmentMode() )
+		{
+			ItemManager.GetInstance().SetItemMicromanagmentMode( true );
+			if( m_RightArea.IsActive() )
+			{
+				m_RightArea.SelectItem();
+			}
+			if( m_LeftArea.IsActive() )
+			{
+				m_LeftArea.SelectItem();
+			}
+			if( m_HandsArea.IsActive() )
+			{
+				m_HandsArea.SelectItem();
+			}
+			UpdateConsoleToolbar();
+			ItemManager.GetInstance().HideTooltip();
+		}
+	}
+	
+	void DisableMicromanagement()
+	{
+
+}
 
 	override void SetLayoutName()
 	{
@@ -889,7 +993,7 @@ class Inventory: LayoutHolder
 	
 	#ifdef PLATFORM_XBOX
 	string to_hands_swap = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_to_hands_swap" + "    ";
-	string drop = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#datz_context_menu_drop" + "    ";
+	string drop = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_drop" + "    ";
 	string equip = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_equip" + "    ";
 	string split = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_split" + "    ";
 	string to_inventory = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_to_inventory" + "    ";
@@ -1022,7 +1126,7 @@ class Inventory: LayoutHolder
 					context_text += combine;
 				}
 			}
-			else if( vicinity_container.IsContainerWithCargoActive()	)
+			else if( vicinity_container.IsContainerWithCargoActive() )
 			{
 				ContainerWithCargo iwc = ContainerWithCargo.Cast( vicinity_container.GetFocusedContainer() );
 				if( iwc.IsEmpty() )

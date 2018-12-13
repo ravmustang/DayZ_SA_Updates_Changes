@@ -1,7 +1,9 @@
 
 class ActionEnterLadder: ActionInteractBase
 {
+	private const string GEOM_LOD_NAME = "geometry";
 	private	const string MEM_LOD_NAME = "memory";	
+
 	void ActionEnterLadder()
 	{
 		m_MessageSuccess = "";
@@ -130,7 +132,20 @@ class ActionEnterLadder: ActionInteractBase
 		{
 			string compName 	= b.GetActionComponentName( action_data.m_Target.GetComponentIndex() );
 			int 	ladderIndex = HumanCommandLadder.DebugGetLadderIndex(compName);
-			
+
+			LOD geomLod = action_data.m_Target.GetObject().GetLODByName(GEOM_LOD_NAME);
+			string ladderType = "metal";
+
+			for (int i = 0; i < geomLod.GetPropertyCount(); ++i)
+			{
+				if (geomLod.GetPropertyName(i) == "laddertype")
+				{
+					ladderType = geomLod.GetPropertyValue(i);
+					break;
+				}
+			}
+
+			action_data.m_Player.SetClimbingLadderType(ladderType);
 			action_data.m_Player.StartCommand_Ladder(b, ladderIndex );
 		}
 

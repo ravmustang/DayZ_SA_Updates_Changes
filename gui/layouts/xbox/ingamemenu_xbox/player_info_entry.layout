@@ -1,6 +1,6 @@
 PanelWidgetClass player_info_entry_root {
  ignorepointer 1
- color 0.3137 0.3137 0.3137 0.8627
+ color 0 0 0 0.9412
  position 0 0
  size 1 42
  hexactpos 1
@@ -11,6 +11,7 @@ PanelWidgetClass player_info_entry_root {
  "no focus" 1
  {
   ButtonWidgetClass Button {
+   color 0.3529 0.3529 0.3529 1
    position 0 0
    size 1 1
    hexactpos 1

@@ -5,7 +5,6 @@ class ActionHandcuffTarget: ActionSingleUseBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_HANDCUFFTARGET;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
-		m_Sound = "action_handcuff_0";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -22,7 +21,7 @@ class ActionHandcuffTarget: ActionSingleUseBase
 		
 	override string GetText()
 	{
-		return "#handcuff";
+		return "#restrain";
 	}
 	
 	override void OnExecuteServer( ActionData action_data )
@@ -31,6 +30,6 @@ class ActionHandcuffTarget: ActionSingleUseBase
 		//ntarget.SetCaptive();
 		action_data.m_MainItem.Delete();
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

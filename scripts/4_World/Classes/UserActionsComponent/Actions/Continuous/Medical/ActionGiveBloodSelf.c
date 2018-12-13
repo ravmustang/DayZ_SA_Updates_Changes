@@ -78,7 +78,7 @@ class ActionGiveBloodSelf: ActionContinuousBase
 			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, lambda);
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 	
 	override void OnEndServer(ActionData action_data)
@@ -86,17 +86,24 @@ class ActionGiveBloodSelf: ActionContinuousBase
 		ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
 		
 		Param1<float> nacdata = Param1<float>.Cast( action_data_b.m_ActionComponent.GetACData() );
-		float delta = nacdata.param1;
+		float delta = 0;
 		
-		action_data_b.m_Player.AddHealth("","Blood",delta);
-		//action_data.m_Player.SetHealth("GlobalHealth", "Blood", action_data.m_Player.GetHealth("GlobalHealth", "Blood") );
-
-		int bloodtypetarget = action_data_b.m_Player.GetStatBloodType().Get();
-		bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);
-
-		if ( !bloodmatch )
+		if ( nacdata )
 		{
-			action_data_b.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+			delta = nacdata.param1;
+		}
+		if ( delta > 0 )
+		{
+			action_data_b.m_Player.AddHealth("","Blood",delta);
+			//action_data.m_Player.SetHealth("GlobalHealth", "Blood", action_data.m_Player.GetHealth("GlobalHealth", "Blood") );
+
+			int bloodtypetarget = action_data_b.m_Player.GetStatBloodType().Get();
+			bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);
+
+			if ( !bloodmatch )
+			{
+				action_data_b.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+			}
 		}
 		
 		if ( action_data_b.m_MainItem && action_data_b.m_MainItem.GetQuantity() <= 0.01 )

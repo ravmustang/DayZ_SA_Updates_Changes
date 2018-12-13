@@ -67,7 +67,7 @@ class MainMenuVideo extends UIScriptedMenu
 	
 	override void Update(float timeslice)
 	{
-		if( GetGame().GetInput().GetActionDown( UAUIFastEquipOrSplit, false ) )
+		if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
 		{
 			//PlayPauseVideo();
 		}

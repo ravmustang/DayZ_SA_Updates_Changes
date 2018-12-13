@@ -171,7 +171,7 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 	/**@fn		OnStoreLoad
 	 * @brief	load state of fsm
 	 **/
-	void OnStoreLoad (ParamsReadContext ctx)
+	void OnStoreLoad (ParamsReadContext ctx, int version)
 	{
 		int id = 0;
 		ctx.Read(id);

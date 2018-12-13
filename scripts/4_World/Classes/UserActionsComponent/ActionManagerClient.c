@@ -6,10 +6,13 @@ class ActionManagerClient: ActionManagerBase
 	protected bool								m_ActionPossible;
 	protected ref array<ref InventoryLocation>	m_ReservedInventoryLocations;
 	protected ref InventoryActionHandler		m_InventoryActionHandler;
+	protected ref InventoryLocation				m_HandInventoryLocationTest;
 
 	void ActionManagerClient(PlayerBase player)
 	{
 		//ActionManagerBase(player);
+		m_HandInventoryLocationTest = new InventoryLocation;
+		m_HandInventoryLocationTest.SetHands(player,null);
 		m_LastAcknowledgmentID = 1;
 		m_Targets	= new ActionTargets(player);
 		m_ReservedInventoryLocations = new array<ref InventoryLocation>;
@@ -86,19 +89,6 @@ class ActionManagerClient: ActionManagerBase
 #endif
 	}
 	
-	override void OnSyncJuncture(int pJunctureID, ParamsReadContext pCtx)
-	{
-		int AcknowledgmentID;
-		pCtx.Read(AcknowledgmentID);
-		if ( m_CurrentActionData && AcknowledgmentID == m_PendingActionAcknowledgmentID)
-		{
-			if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_ACCEPT)
-				m_CurrentActionData.m_State = UA_AM_ACCEPTED;
-			else if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_REJECT)
-				m_CurrentActionData.m_State = UA_AM_REJECTED;
-		}
-	}
-	
 	//--------------------------------------------------------
 	// Controls avaliability of contextual actions
 	//--------------------------------------------------------
@@ -148,6 +138,18 @@ class ActionManagerClient: ActionManagerBase
 		DisableInteractAction();
 	}
 */	
+	
+/*	override bool ActionPossibilityCheck(int pCurrentCommandID)
+	{
+		if ( super.ActionPossibilityCheck(pCurrentCommandID) )
+		{
+			m_HandInventoryLocationTest.SetHands(m_Player,m_Player.GetItemInHands());
+			if (!m_Player.GetHumanInventory().HasInventoryReservation(m_Player.GetItemInHands(),m_HandInventoryLocationTest))
+				return true;
+		}
+		
+		return false;
+	}*/
 	//--------------------------------------------------------
 	// Alows to set different action to current contextual one //jtomasik - pri injectu budu muset serveru poslat ID injectnute akce
 	//--------------------------------------------------------
@@ -242,11 +244,19 @@ class ActionManagerClient: ActionManagerBase
 		return item;
 	}
 	
+	protected bool HasHandInventoryReservation()
+	{
+		m_HandInventoryLocationTest.SetHands(m_Player,m_Player.GetItemInHands());
+		if (m_Player.GetHumanInventory().HasInventoryReservation(m_Player.GetItemInHands(),m_HandInventoryLocationTest))
+			return true;
+		return false;
+	}
+	
 	protected void FindContextualUserActions( int pCurrentCommandID )
 	{
 		RemoveActions();
 		
-		if (m_Player.IsRaised() || !ActionPossibilityCheck(pCurrentCommandID) )
+		if (m_Player.IsRaised() || !ActionPossibilityCheck(pCurrentCommandID) || HasHandInventoryReservation() )
 		{
 			m_SelectableActions.Clear();
 			return;
@@ -322,15 +332,16 @@ class ActionManagerClient: ActionManagerBase
 		ref TIntArray primary_action_ids = new TIntArray;
 		ActionBase picked_action;
 		
+		primary_action_ids.Insert(AT_WORLD_CRAFT);
+		if ( item )
+		{
+			item.GetContinuousActions(primary_action_ids);
+		}
+		
 		// Adding default continuous actions of player
 		if ( m_Player ) 
 		{
 			m_Player.GetContinuousActions(primary_action_ids);
-		}
-		
-		if ( item )
-		{
-			item.GetContinuousActions(primary_action_ids);
 		}
 
 		// Adding actions of item
@@ -354,16 +365,19 @@ class ActionManagerClient: ActionManagerBase
 	{
 		ref TIntArray secondary_action_ids = new TIntArray;
 		ActionBase picked_action;
-		// Adding default single use actions of player
-		if ( m_Player ) 
-		{
-			m_Player.GetSingleUseActions(secondary_action_ids);
-		}
+
+		secondary_action_ids.Insert(AT_WORLD_CRAFT_SWITCH);
 		// Adding actions of item
 		if ( item )
 		{
 			item.GetSingleUseActions(secondary_action_ids);
 		}
+		// Adding default single use actions of player
+		if ( m_Player ) 
+		{
+			m_Player.GetSingleUseActions(secondary_action_ids);
+		}
+		
 		// Looking for first possible single use action 
 		if ( secondary_action_ids  && secondary_action_ids.Count() > 0 )
 		{
@@ -391,11 +405,6 @@ class ActionManagerClient: ActionManagerBase
 		}
 		ref TIntArray tertiary_action_ids = new TIntArray;
 		ActionBase picked_action; 
-		// Adding default interact actions of player
-		if ( m_Player ) 
-		{
-			m_Player.GetInteractActions(tertiary_action_ids);	
-		}
 		
 		if (targetParent)
 		{
@@ -406,6 +415,12 @@ class ActionManagerClient: ActionManagerBase
 		if ( targetObject )
 		{
 			targetObject.GetInteractActions(tertiary_action_ids);
+		}
+		
+		// Adding default interact actions of player
+		if ( m_Player ) 
+		{
+			m_Player.GetInteractActions(tertiary_action_ids);	
 		}
 
 		// Looking for first possible interact action 
@@ -510,7 +525,7 @@ class ActionManagerClient: ActionManagerBase
 	
 	protected void ActionStart(ActionBase action, ActionTarget target, ItemBase item, Param extra_data = NULL )
 	{
-		if ( action ) 
+		if ( !m_CurrentActionData && action ) 
 		{	
 			if ( GetGame().IsMultiplayer() && !action.IsLocal() )
 			{
@@ -942,6 +957,12 @@ class ActionManagerClient: ActionManagerBase
 				return;
 			}
 		}
+	}
+	
+	override void Interrupt()
+	{
+		if(m_CurrentActionData)
+			m_Interrupted = true;
 	}
 	
 	private ref ActionTarget m_ForceTarget;

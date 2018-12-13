@@ -1,6 +1,6 @@
 WindowWidgetClass TextInputDialogRoot {
  clipchildren 0
- color 0.0824 0.0824 0.0824 0.9216
+ color 0.0824 0.0824 0.0824 0.7843
  position 0 0
  size 540 165
  halign center_ref
@@ -14,7 +14,7 @@ WindowWidgetClass TextInputDialogRoot {
  {
   ButtonWidgetClass ButtonLeave {
    visible 1
-   color 0.1569 0.1569 0.1569 1
+   color 1 0 0 1
    position 0 15
    size 90 40
    halign center_ref

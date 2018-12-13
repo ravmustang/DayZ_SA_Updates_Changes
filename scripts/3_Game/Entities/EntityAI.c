@@ -9,6 +9,7 @@ enum SurfaceAnimationBone
 class EntityAI extends Entity
 {
 	ref array<EntityAI> m_AttachmentsWithCargo;
+	ref array<EntityAI> m_AttachmentsWithAttachments;
 	
 	void EntityAI ()
 	{
@@ -28,7 +29,8 @@ class EntityAI extends Entity
 		// Item preview index
 		RegisterNetSyncVariableInt( "m_ViewIndex", 0, 99 );
 		
-		m_AttachmentsWithCargo = new array<EntityAI>;
+		m_AttachmentsWithCargo			= new array<EntityAI>;
+		m_AttachmentsWithAttachments	= new array<EntityAI>;
 	}
 	
 	void ~EntityAI()
@@ -225,6 +227,11 @@ class EntityAI extends Entity
 	{
 		return m_AttachmentsWithCargo;
 	}
+	
+	array<EntityAI> GetAttachmentsWithAttachments()
+	{
+		return m_AttachmentsWithAttachments;
+	}
 
 	int GetAgents() { return 0; }
 	void RemoveAgent(int agent_id);
@@ -270,7 +277,7 @@ class EntityAI extends Entity
 	//! Returns root of current hierarchy (for example: if this entity is in Backpack on gnd, returns Backpack)
 	proto native EntityAI GetHierarchyRoot();
 
-	//! Returns root of current hierarchy cast-ed to Man
+	//! Returns root of current hierarchy cast to Man
 	proto native Man GetHierarchyRootPlayer();
 	
 	//! Returns direct parent of current entity
@@ -343,13 +350,13 @@ class EntityAI extends Entity
 	
 	void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
-		if ( source )
+		if ( source ) 
 		{
 			Man killer = source.GetHierarchyRootPlayer();
 			
 			if( killer && killer.IsPlayer() )
 			{
-				if ( damageResult.GetDamage( "", "health" ) <= 0 )
+				if ( damageResult && damageResult.GetDamage( "", "health" ) <= 0 )
 				{
 					bool is_headshot = false;
 				
@@ -393,6 +400,12 @@ class EntityAI extends Entity
 		{
 			m_AttachmentsWithCargo.Insert( item );
 		}
+		
+		if( item.GetInventory().GetAttachmentSlotsCount() > 0 )
+		{
+			m_AttachmentsWithAttachments.Insert( item );
+		}
+		
 		//SwitchItemSelectionTexture(item, slot_name);
 	}
 	
@@ -424,6 +437,11 @@ class EntityAI extends Entity
 		if( m_AttachmentsWithCargo.Find( item ) > -1 )
 		{
 			m_AttachmentsWithCargo.RemoveItem( item );
+		}
+		
+		if( m_AttachmentsWithAttachments.Find( item ) > -1 )
+		{
+			m_AttachmentsWithAttachments.RemoveItem( item );
 		}
 		
 		//SwitchItemSelectionTexture(item, slot_name);
@@ -714,6 +732,39 @@ class EntityAI extends Entity
 		return true;
 	}
 
+	/**@fn		CanDisplayAttachmentSlot
+	 * @param	slot_name->name of the attachment slot that will or won't be displayed
+	 * @return	true if attachment icon can be displayed in UI (inventory)
+	 **/	
+	bool CanDisplayAttachmentSlot( string slot_name )
+	{
+		return true;
+	}
+
+	/**@fn		CanDisplayAttachmentCategory
+	 * @param	category_name->name of the attachment category that will or won't be displayed
+	 * @return	true if attachment icon can be displayed in UI (inventory)
+	 **/		
+	bool CanDisplayAttachmentCategory( string category_name )
+	{
+		return true;
+	}
+	
+	/**@fn		CanDisplayCargo
+	 * @return	true if cargo can be displayed in UI (inventory)
+	 **/		
+	bool CanDisplayCargo()
+	{
+		return true;
+	}	
+	
+	/**@fn		IgnoreOutOfReachCondition
+	 * @return	if true, attachment condition for out of reach (inventory) will be ignored
+	 **/		
+	bool IgnoreOutOfReachCondition()
+	{
+		return false;
+	}	
 
 	// !Called on CHILD when it's attached to parent.
 	void OnWasAttached( EntityAI parent, int slot_id ) { }
@@ -1070,10 +1121,10 @@ class EntityAI extends Entity
 	/**
 	\brief Called when data is loaded from game database (on server side).
 	@code
-	void OnStoreLoad(ParamsReadContext ctx)
+	void OnStoreLoad(ParamsReadContext ctx, int version)
 	{
 		// dont forget to propagate this call trough class hierarchy!
-		super.OnStoreLoad(ctx);
+		super.OnStoreLoad(ctx, version);
 
 		// read data loaded from game database (format and order of reading must be the same as writing!)
 		Param4<bool, int, float, string> p1 = new Param4<bool, int, float, string>(false, 0, 0, "");
@@ -1104,7 +1155,7 @@ class EntityAI extends Entity
 	}
 	@endcode
 	*/
-	void OnStoreLoad (ParamsReadContext ctx)
+	void OnStoreLoad (ParamsReadContext ctx, int version)
 	{
 		// Restoring of energy related states
 		if ( HasEnergyManager() )
@@ -1393,6 +1444,17 @@ class EntityAI extends Entity
 	{
 		//! returns Global so it is obvious you need to configure that properly on entity
 		return "";
+	}
+	
+	//! returns default hit position component name for the Entity (overriden by type if needed - used mainly as support for impact particles)
+	string GetDefaultHitPositionComponent()
+	{
+		return "";
+	}
+	
+	vector GetDefaultHitPosition()
+	{
+		return GetPosition();
 	}
 	
 	//! returns sound type of attachment (used for clothing and weapons on DayZPlayerImplement, paired with Anim*Type enum from DayZAnimEvents)

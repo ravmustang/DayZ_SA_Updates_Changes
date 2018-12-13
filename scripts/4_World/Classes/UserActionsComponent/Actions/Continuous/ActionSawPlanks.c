@@ -84,7 +84,7 @@ class ActionSawPlanks: ActionContinuousBase
 		ItemBase planks = ItemBase.Cast( GetGame().CreateObject("WoodenPlank", pos) );
 		const float NEW_PLANKS = 3;
 
-		planks.SetQuantity( Math.Round( action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( NEW_PLANKS, this.GetSpecialtyWeight() ) ), true );
+		planks.SetQuantity( Math.Round( action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( NEW_PLANKS, this.GetSpecialtyWeight() ) ), true );
 		
 		ItemBase item = action_data.m_MainItem;
 		
@@ -125,6 +125,6 @@ class ActionSawPlanks: ActionContinuousBase
 			}		
 		
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

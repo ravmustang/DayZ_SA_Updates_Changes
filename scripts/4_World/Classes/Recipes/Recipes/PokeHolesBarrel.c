@@ -72,11 +72,29 @@ class PokeHolesBarrel extends RecipeBase
 
 	override bool CanDo(ItemBase ingredients[], PlayerBase player)
 	{
-		return true;
+		//HACK: until server-> client syncing of "LocalDropEntity" gets sortet out
+		ItemBase parent = ingredients[0];
+		if (parent.IsEmpty())
+			return true;
+		return false;
+		//return true;
 	}
 
 	override void Do(ItemBase ingredients[], PlayerBase player,array<ItemBase> results, float specialty_weight)
 	{
+		ItemBase barrel_old = ingredients[0];
+		ItemBase barrel_new = results[0];
+		if (!barrel_old || !barrel_new)
+			return;
 		
+		//TransferItemsToNew(player, barrel_old, barrel_new);
+	}
+	
+	void TransferItemsToNew(PlayerBase player, ItemBase barrel_old, ItemBase barrel_new)
+	{
+		//TODO bugfix, only drops items now
+		MiscGameplayFunctions.TransferInventory(barrel_old,barrel_new,player);
+		//player.m_UpdateInventoryForced = true;
+		//player.SetSynchDirty();
 	}
 };

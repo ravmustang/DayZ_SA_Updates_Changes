@@ -14,12 +14,14 @@ class AreaDamageBase
 	int 					m_DamageType;
 	vector					m_ExtentMin;
 	vector 					m_ExtentMax;
+	vector 					m_AreaPosition;
 	
 	void AreaDamageBase(EntityAI parent)
 	{
 		m_ParentObject		= parent;
 		m_ExtentMin 		= Vector(0, 0, 0);
 		m_ExtentMax 		= Vector(0, 0, 0);
+		m_AreaPosition		= parent.GetPosition();
 		m_LoopInterval 		= 0.0;
 		m_DeferredInterval	= 0.0;
 		m_PlayerDamage		= 0.0;
@@ -67,10 +69,12 @@ class AreaDamageBase
 		{ m_DeferredInterval = time; }
     void SetParentObject( EntityAI obj )
 		{ m_ParentObject = obj };
-	
+    void SetAreaPosition( vector position )
+		{ m_AreaPosition = position };	
+		
 	void CreateDamageTrigger()
 	{
-		if(Class.CastTo(m_AreaDamageTrigger, g_Game.CreateObject( "AreaDamageTrigger", m_ParentObject.GetPosition(), false, false, false )))
+		if(Class.CastTo(m_AreaDamageTrigger, g_Game.CreateObject( "AreaDamageTrigger", m_AreaPosition, false, false, false )))
 		{
 			m_AreaDamageTrigger.SetOrientation( m_ParentObject.GetOrientation() );
 			m_AreaDamageTrigger.SetExtents( m_ExtentMin, m_ExtentMax );

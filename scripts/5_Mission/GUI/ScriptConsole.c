@@ -711,6 +711,60 @@ class ScriptConsole extends UIScriptedMenu
 		return false;
 	}
 	
+	override bool OnDoubleClick(Widget w, int x, int y, int button)
+	{
+		super.OnDoubleClick(w, x, y, button);
+
+		int i;
+		int objects_row_index;
+		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		
+		if ( w == m_ObjectsTextListbox )
+		{
+			//select item
+			m_PresetItemsTextListbox.SelectRow(-1);
+			HideItemButtons();
+			ShowItemTransferButtons();
+			m_SelectedObjectText.SetText( "Object : " + GetCurrentObjectName() );
+
+			m_SelectedObject = GetCurrentObjectName();
+			m_LastSelectedObject = m_SelectedObject;
+			m_SelectedObjectIsPreset = false;
+			
+			//spawn item
+			SaveProfileSpawnDistance();
+
+			objects_row_index = m_ObjectsTextListbox.GetSelectedRow();
+			
+			vector rayStart = GetGame().GetCurrentCameraPosition();
+			vector rayEnd = rayStart + GetGame().GetCurrentCameraDirection() * 1.5;		
+			vector hitPos;
+			vector hitNormal;
+			int hitComponentIndex;		
+			ref set<Object> hitObjects = new set<Object>;
+			DayZPhysics.RaycastRV(rayStart, rayEnd, hitPos, hitNormal, hitComponentIndex, hitObjects, NULL, player);
+					
+			Object target = NULL;
+			if( hitObjects.Count() )
+				target = hitObjects.Get(0);
+			
+			if ( m_SelectedObject != "" )
+			{
+				if ( button == 0 )
+				{
+					float distance = m_SpawnDistanceEditBox.GetText().ToFloat();
+					m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance );
+				}
+				else if ( button == 1 )
+				{
+					m_Developer.SpawnEntityInInventory(player, m_SelectedObject, 100, -1);
+				}
+			}
+		}
+
+		return false;
+	}	
+	
 	override bool OnChange(Widget w, int x, int y, bool finished)
 	{
 		super.OnChange(w, x, y, finished);

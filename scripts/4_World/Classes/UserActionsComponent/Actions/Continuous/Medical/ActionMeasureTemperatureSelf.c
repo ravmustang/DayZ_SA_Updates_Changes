@@ -60,6 +60,6 @@ class ActionMeasureTemperatureSelf: ActionContinuousBase
 			SendMessageToClient(action_data.m_Player, thermometer.GetTemperatureMessage(action_data.m_Player));
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

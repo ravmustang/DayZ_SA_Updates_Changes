@@ -41,7 +41,7 @@ class CAContinuousEmpty : CAContinuousBase
 			m_TargetUnits = action_data.m_MainItem.GetQuantity();
 		}
 		
-		m_AdjustedQuantityEmptiedPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityEmptiedPerSecond, m_Action.GetSpecialtyWeight(), true );
+		m_AdjustedQuantityEmptiedPerSecond = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_QuantityEmptiedPerSecond, m_Action.GetSpecialtyWeight(), true );
 	}
 	
 	override int Execute( ActionData action_data  )

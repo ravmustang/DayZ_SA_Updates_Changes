@@ -308,7 +308,7 @@ PanelWidgetClass Icon {
       ImageWidgetClass Background {
        visible 1
        ignorepointer 1
-       color 0 0 0 0.5882
+       color 0 0 0 0.7843
        size 29 29
        halign center_ref
        valign center_ref
@@ -320,6 +320,7 @@ PanelWidgetClass Icon {
        mode blend
        "src alpha" 1
        "no wrap" 1
+       stretch 1
        filter 1
        nocache 0
       }
@@ -337,7 +338,8 @@ PanelWidgetClass Icon {
        priority 500
        style Light
        text "99"
-       "exact text" 1
+       font "gui/fonts/sdf_MetronBook24"
+       "exact text" 0
        "text halign" center
        "text valign" center
       }
@@ -359,6 +361,8 @@ PanelWidgetClass Icon {
    image0 "set:dayz_gui image:icon_bullet"
    mode blend
    "src alpha" 1
+   "no wrap" 1
+   stretch 1
   }
   TextWidgetClass ItemSize {
    visible 0
@@ -376,7 +380,8 @@ PanelWidgetClass Icon {
    priority 500
    style Light
    text "9"
-   "exact text" 1
+   font "gui/fonts/sdf_MetronBook24"
+   "exact text" 0
    "text halign" center
    "text valign" center
   }

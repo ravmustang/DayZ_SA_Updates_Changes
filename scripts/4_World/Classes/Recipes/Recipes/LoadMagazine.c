@@ -2,7 +2,7 @@ class LoadMagazine extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#STR_LoadMagazine0";
+		m_Name = "#load_magazine";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 2;//animation length in relative time units
 		m_Specialty = 0;// value > 0 for roughness, value < 0 for precision

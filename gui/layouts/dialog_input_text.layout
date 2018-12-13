@@ -1,6 +1,6 @@
 WindowWidgetClass TextInputDialogRoot {
  clipchildren 0
- color 0.0824 0.0824 0.0824 0.9216
+ color 0.0824 0.0824 0.0824 0.7843
  position 0 0
  size 540 223.5
  halign center_ref
@@ -15,7 +15,7 @@ WindowWidgetClass TextInputDialogRoot {
  {
   ButtonWidgetClass ButtonOk {
    visible 1
-   color 0.1569 0.1569 0.1569 1
+   color 1 0 0 1
    position 14 14
    size 90 40
    halign right_ref
@@ -33,7 +33,7 @@ WindowWidgetClass TextInputDialogRoot {
   }
   ButtonWidgetClass ButtonCancel {
    visible 1
-   color 0.1569 0.1569 0.1569 1
+   color 1 0 0 1
    position 14 14
    size 90 40
    valign bottom_ref

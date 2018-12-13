@@ -1,5 +1,7 @@
 class ActionPlugTargetIntoThis: ActionSingleUseBase
 {
+	bool m_Retoggle;
+	
 	void ActionPlugTargetIntoThis()
 	{
 		m_MessageStartFail = "m_MessageStartFail";
@@ -8,6 +10,7 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 		m_MessageFail = "m_MessageFail";
 		m_MessageCancel = "m_MessageCancel";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
+		m_Retoggle = false;
 	}
 	
 	override void CreateConditionComponents()  
@@ -26,8 +29,35 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 		return "#connect_together";
 	}
 	
+	override bool Can( PlayerBase player, ActionTarget target, ItemBase item )
+	{				
+		if ( super.Can( player, target, item ) )
+		{		
+			if ( player.IsPlacingLocal() )
+			{				
+				m_Retoggle = true;
+				
+				player.GetHologramLocal().SetIsHidden( true );
+				player.GetHologramLocal().GetProjectionEntity().HideAllSelections();	
+			}
+		}
+		
+		if ( !super.Can( player, target, item ) )
+		{		
+			if ( m_Retoggle )
+			{				
+				m_Retoggle = false;
+				
+				player.GetHologramLocal().SetIsHidden( false );
+				player.GetHologramLocal().GetProjectionEntity().ShowAllSelections();	
+			}
+		}
+		
+		return super.Can( player, target, item );
+	}
+	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
-	{
+	{		
 		EntityAI target_EAI = EntityAI.Cast( target.GetObject() );
 		
 		if ( target_EAI.HasEnergyManager()  &&  item.HasEnergyManager() )
@@ -45,7 +75,7 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 						int action = cfg_actions.Get(i);
 						
 						if ( action == AT_PLUG_THIS_INTO_TARGET )
-						{
+						{						
 							return true;
 						}
 					}
@@ -75,6 +105,7 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 	override void OnExecuteClient( ActionData action_data )
 	{
 		action_data.m_Player.PlacingCancelLocal(); // Cance advanced placement without unplugging main object from power source
+		m_Retoggle = false;
 	}
 
 	void Process( ActionData action_data )

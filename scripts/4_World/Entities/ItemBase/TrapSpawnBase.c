@@ -29,6 +29,8 @@ class TrapSpawnBase extends ItemBase
 	ref multiMap<string, float>	m_CatchesGroundAnimal;	//array of catches that can be catched in trap - string key, float catch_chance, float minCatch, float maxCatch
 	string m_InfoSetup;
 
+	ref protected EffectSound 	m_DeployLoopSound;
+	
 	void TrapSpawnBase()
 	{
 		m_DefectRate = 10; 			//Added damage after trap activation
@@ -52,6 +54,8 @@ class TrapSpawnBase extends ItemBase
 		m_CatchesGroundAnimal = NULL;
 		
 		m_PrevTimer = NULL;
+		
+		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
 
 	void ~TrapSpawnBase()
@@ -59,6 +63,27 @@ class TrapSpawnBase extends ItemBase
 		// TODO: ak ma v sebe cargo treba ho rusit v destruktore????
 	}
 
+	//! this event is called all variables are synchronized on client
+    override void OnVariablesSynchronized()
+    {
+        super.OnVariablesSynchronized();
+		
+		if ( IsDeploySound() )
+		{
+			PlayDeploySound();
+		}
+		
+		if ( CanPlayDeployLoopSound() )
+		{
+			PlayDeployLoopSound();
+		}
+					
+		if ( m_DeployLoopSound && !CanPlayDeployLoopSound() )
+		{
+			StopDeployLoopSound();
+		}
+	}
+	
 	bool IsActive()
 	{
 		if ( m_IsActive && m_IsInProgress == false )
@@ -454,11 +479,6 @@ class TrapSpawnBase extends ItemBase
 
 		}
 	}
-	
-	override void OnPlacementComplete( Man player )
-	{
-		SetupTrapPlayer( PlayerBase.Cast( player ), false );
-	}
 
 	override bool CanBePlaced( Man player, vector position )
 	{
@@ -469,9 +489,37 @@ class TrapSpawnBase extends ItemBase
 	{
 		return "Trap can't be placed on this surface type.";
 	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player )
+	{
+		super.OnPlacementComplete( player );
+		
+		if ( GetGame().IsServer() )
+		{
+			SetupTrapPlayer( PlayerBase.Cast( player ), false );
+		}	
+		
+		SetIsDeploySound( true );
+	}
+	
+	void PlayDeployLoopSound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{		
+			m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+		}
+	}
+	
+	void StopDeployLoopSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{	
+			m_DeployLoopSound.SoundStop();
+			delete m_DeployLoopSound;
+		}
+	}
 }
-
-/*
-TODO:
-animation phases in params
-*/

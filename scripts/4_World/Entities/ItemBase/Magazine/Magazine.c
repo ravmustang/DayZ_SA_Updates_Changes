@@ -279,4 +279,15 @@ class Magazine : InventoryItemSuper
 			}
 		}
 	}
+	
+	override bool CanDetachAttachment (EntityAI parent)
+	{
+		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
+		if(player)
+		{
+			Weapon_Base wpn = Weapon_Base.Cast(parent);
+			return player.GetWeaponManager().CanDetachMagazine(wpn,this);
+		}
+		return false;
+	}
 };

@@ -11,6 +11,13 @@ class UndergroundStash extends ItemBase
 		this.SetOrientation( GetGame().GetSurfaceOrientation(pos[0], pos[2]) );
 	}
 	
+	override bool CanDisplayCargo()
+	{
+		super.CanDisplayCargo();
+		
+		return false;
+	}
+	
 	void PlaceOnGround()
 	{
 		vector pos = GetPosition();
@@ -22,7 +29,12 @@ class UndergroundStash extends ItemBase
 	ItemBase GetStashedItem()
 	{
 		ItemBase item;		
-		item = ItemBase.Cast( GetInventory().GetCargo().GetItem(0) );
+		
+		if ( GetInventory().GetCargo().GetItemCount() > 0 )
+		{
+			item = ItemBase.Cast( GetInventory().GetCargo().GetItem(0) );
+		}
+
 		Print("GetStashedItem()");
 		Print(item);
 		return item;
@@ -34,6 +46,11 @@ class UndergroundStash extends ItemBase
 		return false;
 	}
 	
+	override bool CanReleaseCargo(EntityAI cargo)
+	{
+		return false;
+	}
+	
 	override bool CanReceiveItemIntoHands (EntityAI item_to_hands)
 	{
 		return false;
@@ -41,10 +58,8 @@ class UndergroundStash extends ItemBase
 	
 	override bool CanPutIntoHands (EntityAI parent)
 	{
-		if( !super.CanPutIntoHands( parent ) )
-		{
-			return false;
-		}
+		super.CanPutIntoHands( parent );
+		
 		return false;
 	}
 }

@@ -180,7 +180,7 @@ class HandGuardHasRoomForItem extends HandGuardBase
 	{
 		if (e.GetDst())
 		{
-			if (!GameInventory.LocationTestAddEntity(e.GetDst(), false, true, true, true))
+			if (!GameInventory.LocationTestAddEntity(e.GetDst(), false, true, true, true, true))
 				Error("[hndfsm] HandGuardHasRoomForItem - no room at dst=" + e.GetDst().DumpToString());
 			return true;
 		}

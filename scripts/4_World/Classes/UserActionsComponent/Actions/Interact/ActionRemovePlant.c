@@ -22,6 +22,13 @@ class ActionRemovePlant: ActionInteractBase
 	{
 		return "#remove_plant";
 	}
+	
+	override void CreateConditionComponents()  
+	{	
+		
+		m_ConditionTarget = new CCTNone;
+		m_ConditionItem = new CCINone;
+	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
@@ -45,7 +52,9 @@ class ActionRemovePlant: ActionInteractBase
 		if ( targetObject != NULL && targetObject.IsInherited(PlantBase) )
 		{
 			PlantBase plant = PlantBase.Cast( targetObject );
-			m_MessageSuccess = plant.Remove( action_data.m_Player );
+			plant.RemovePlant();
+			
+			GetGame().ObjectDelete( plant );
 		}
 	}
 };

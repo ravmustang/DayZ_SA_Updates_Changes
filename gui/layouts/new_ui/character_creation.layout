@@ -577,13 +577,13 @@ FrameWidgetClass character_creation_root {
    visible 1
    ignorepointer 1
    position 0.05 130
-   size 0.2 230
+   size 400 0.12
    halign right_ref
    valign bottom_ref
    hexactpos 0
    vexactpos 1
-   hexactsize 0
-   vexactsize 1
+   hexactsize 1
+   vexactsize 0
    priority 3
    "Ignore invisible" 0
    Padding 10
@@ -638,7 +638,7 @@ FrameWidgetClass character_creation_root {
     }
     WrapSpacerWidgetClass top {
      ignorepointer 1
-     color 0 0 0 0.7843
+     color 0 0 0 0.4314
      position 0 0
      size 1 48
      hexactpos 1
@@ -759,7 +759,7 @@ FrameWidgetClass character_creation_root {
    {
     WrapSpacerWidgetClass ConsoleToolbar {
      visible 1
-     clipchildren 1
+     clipchildren 0
      position 0.05 0.1
      size 0.45 0.45
      halign right_ref
@@ -778,13 +778,13 @@ FrameWidgetClass character_creation_root {
       GridSpacerWidgetClass Select {
        visible 1
        clipchildren 0
-       size 110 1
+       size 110 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 3
        Padding 4
        Margin 0
@@ -818,7 +818,7 @@ FrameWidgetClass character_creation_root {
         TextWidgetClass SelectText {
          clipchildren 0
          position 40 0
-         size 70 22
+         size 70 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -826,6 +826,10 @@ FrameWidgetClass character_creation_root {
          vexactsize 1
          text "#layout_character_creation_toolbar_select"
          font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 30
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -834,13 +838,13 @@ FrameWidgetClass character_creation_root {
       GridSpacerWidgetClass Randomize {
        visible 1
        clipchildren 0
-       size 153 1
+       size 153 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 2
        Padding 4
        Margin 0
@@ -875,7 +879,7 @@ FrameWidgetClass character_creation_root {
         TextWidgetClass RandomizeText {
          clipchildren 0
          position 40 0
-         size 122 22
+         size 122 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -883,6 +887,10 @@ FrameWidgetClass character_creation_root {
          vexactsize 1
          text "#layout_character_creation_toolbar_randomize"
          font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 30
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -891,13 +899,13 @@ FrameWidgetClass character_creation_root {
       GridSpacerWidgetClass Reset {
        visible 1
        clipchildren 0
-       size 189 1
+       size 189 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 1
        Padding 4
        Margin 0
@@ -931,7 +939,7 @@ FrameWidgetClass character_creation_root {
         TextWidgetClass ResetText {
          clipchildren 0
          position 40 0
-         size 160 22
+         size 160 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -939,6 +947,10 @@ FrameWidgetClass character_creation_root {
          vexactsize 1
          text "#layout_character_creation_toolbar_new"
          font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 30
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -946,13 +958,13 @@ FrameWidgetClass character_creation_root {
       }
       GridSpacerWidgetClass Back {
        clipchildren 0
-       size 88 1
+       size 88 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        Padding 4
        Margin 0
        "Size To Content H" 1
@@ -985,7 +997,7 @@ FrameWidgetClass character_creation_root {
         TextWidgetClass BackText {
          clipchildren 0
          position 40 0
-         size 52 22
+         size 52 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -993,6 +1005,10 @@ FrameWidgetClass character_creation_root {
          vexactsize 1
          text "#layout_character_creation_toolbar_back"
          font "gui/fonts/sdf_MetronBook24"
+         "exact text" 1
+         "exact text size" 30
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }

@@ -9,17 +9,12 @@ class Transport extends EntityAI
 
 	void Transport()
 	{
-		Init();
-	}
-	
-	void Init()
-	{
 		m_SingleUseActions  = new TIntArray;
 		m_ContinuousActions = new TIntArray;
 		m_InteractActions   = new TIntArray;
 		SetUserActions();
 	}
-	
+
 	void SetUserActions()
 	{
 		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " ContinuousActions", m_ContinuousActions);

@@ -25,7 +25,7 @@ class ActionViewOptics : ActionContinuousBase
 	
 	override string GetText()
 	{
-		return "#use_optics";
+		return "#Look_Through";
 	}
 	
 	override bool HasProgress()

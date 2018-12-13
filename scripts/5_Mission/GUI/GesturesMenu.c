@@ -129,15 +129,7 @@ class GesturesMenu extends UIScriptedMenu
 		}
 		else
 		{
-#ifdef PLATFORM_XBOX
-		GetGestureItems( m_GestureItems, GestureCategories.CONSOLE_GESTURES );
-#else		
-#ifdef PLATFORM_PS4
-		GetGestureItems( m_GestureItems, GestureCategories.CONSOLE_GESTURES );
-#else
-		GetGestureItems( m_GestureItems, GestureCategories.CATEGORIES );
-#endif
-#endif
+			GetGestureItems( m_GestureItems, GestureCategories.CATEGORIES );
 		}		
 		CreateGestureContent();
 	}		
@@ -150,80 +142,65 @@ class GesturesMenu extends UIScriptedMenu
 		//All categories
 		if ( category == GestureCategories.CATEGORIES )
 		{
-			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_1, "Comms", 	GestureCategories.CATEGORIES ) );
-			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_2, "Taunts", 	GestureCategories.CATEGORIES ) );
-			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_3, "Misc.", 	GestureCategories.CATEGORIES ) );
-			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_4, "Regards", GestureCategories.CATEGORIES ) );
+			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_1, "#STR_USRACT_EMOTE_CATEGORY_COMMS", 	GestureCategories.CATEGORIES ) );
+			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_2, "#STR_USRACT_EMOTE_CATEGORY_TAUNTS", 	GestureCategories.CATEGORIES ) );
+			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_3, "#STR_USRACT_EMOTE_CATEGORY_MISC", 	GestureCategories.CATEGORIES ) );
+			gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_4, "#STR_USRACT_EMOTE_CATEGORY_REGARDS", 	GestureCategories.CATEGORIES ) );
 			//gesture_items.Insert( new GestureMenuItem( GestureCategories.CATEGORY_5, "Tactical?", 	GestureCategories.CATEGORIES ) );
 		}
 		//Category 1 - comms
 		else if ( category == GestureCategories.CATEGORY_1 )
 		{
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TIMEOUT,	"Timeout", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_POINTSELF, 	"Point at Self",GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_WATCHING, 	"Watching", 	GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_HOLD, 		"Stop", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LISTENING, 	"Listen", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SILENT, 	"Silent", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_POINT, 		"Point", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_MOVE, 		"Move", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_DOWN, 		"Down", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_COME, 		"Come", 		GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_NOD, 		"Nod Head", 	GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SHAKE, 		"Shake Head", 	GestureCategories.CATEGORY_1 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SHRUG, 		"Shrug", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TIMEOUT,	"#STR_USRACT_ID_EMOTE_TIMEOUT", 	GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_POINTSELF, 	"#STR_USRACT_ID_EMOTE_POINTSELF",	GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_WATCHING, 	"#STR_USRACT_ID_EMOTE_WATCHING", 	GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_HOLD, 		"#STR_USRACT_ID_EMOTE_HOLD", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LISTENING, 	"#STR_USRACT_ID_EMOTE_LISTENING", 	GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SILENT, 	"#STR_USRACT_ID_EMOTE_SILENT", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_POINT, 		"#STR_USRACT_ID_EMOTE_POINT", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_MOVE, 		"#STR_USRACT_ID_EMOTE_MOVE", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_DOWN, 		"#STR_USRACT_ID_EMOTE_DOWN", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_COME, 		"#STR_USRACT_ID_EMOTE_COME", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_NOD, 		"#STR_USRACT_ID_EMOTE_NOD", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SHAKE, 		"#STR_USRACT_ID_EMOTE_SHAKE", 		GestureCategories.CATEGORY_1 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SHRUG, 		"#STR_USRACT_ID_EMOTE_SHRUG", 		GestureCategories.CATEGORY_1 ) );
 		}
 		//Category 2 - taunt
 		else if ( category == GestureCategories.CATEGORY_2 )
 		{
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LOOKATME, 	"Look at Me", 	GestureCategories.CATEGORY_2 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNT, 		"Frig off", 	GestureCategories.CATEGORY_2 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTELBOW, "Taunt elbow", 	GestureCategories.CATEGORY_2 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THROAT, 	"Die", 			GestureCategories.CATEGORY_2 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTTHINK, "Think!", 		GestureCategories.CATEGORY_2 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_FACEPALM, 	"Facepalm", 	GestureCategories.CATEGORY_2 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THUMBDOWN, 	"Thumb Down", 	GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LOOKATME, 	"#STR_USRACT_ID_EMOTE_LOOKATME", 	GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNT, 		"#STR_USRACT_ID_EMOTE_TAUNT", 		GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTELBOW, "#STR_USRACT_ID_EMOTE_TAUNTELBOW", 	GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THROAT, 	"#STR_USRACT_ID_EMOTE_THROAT", 		GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTTHINK, "#STR_USRACT_ID_EMOTE_TAUNTTHINK", 	GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_FACEPALM, 	"#STR_USRACT_ID_EMOTE_FACEPALM", 	GestureCategories.CATEGORY_2 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THUMBDOWN, 	"#STR_USRACT_ID_EMOTE_THUMBDOWN", 	GestureCategories.CATEGORY_2 ) );
 		}
 		//Category 3 - misc
 		else if ( category == GestureCategories.CATEGORY_3 )
 		{
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_DANCE, 		"Dance", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LYINGDOWN, 	"Lie down", 	GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SOS, 		"Wave", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS, 		"RPS", 			GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SITA, 		"SIT_A", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SITB, 		"SIT_B", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SUICIDE, 	"Suicide", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_CAMPFIRE, 	"Camp?", 		GestureCategories.CATEGORY_3 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SURRENDER, 	"Surrender", 	GestureCategories.CATEGORY_3 ) );
-			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_R, 	"RPS-Rock", 	GestureCategories.CATEGORY_3 ) );
-			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_P, 	"RPS-Paper", 	GestureCategories.CATEGORY_3 ) );
-			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_S, 	"RPS-Scisors", 	GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_DANCE, 		"#STR_USRACT_ID_EMOTE_DANCE", 		GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_LYINGDOWN, 	"#STR_USRACT_ID_EMOTE_LYINGDOWN", 	GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SOS, 		"#STR_USRACT_ID_EMOTE_SOS", 		GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS, 		"#STR_USRACT_ID_EMOTE_RPS", 		GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SITA, 		"#STR_USRACT_ID_EMOTE_SITA", 		GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SITB, 		"#STR_USRACT_ID_EMOTE_SITB", 		GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SUICIDE, 	"#STR_USRACT_ID_EMOTE_SUICIDE", 	GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_CAMPFIRE, 	"#STR_USRACT_ID_EMOTE_CAMPFIRE", 	GestureCategories.CATEGORY_3 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SURRENDER, 	"#STR_USRACT_ID_EMOTE_SURRENDER", 	GestureCategories.CATEGORY_3 ) );
+			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_R, 	"#STR_USRACT_ID_EMOTE_RPS_R", 		GestureCategories.CATEGORY_3 ) );
+			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_P, 	"#STR_USRACT_ID_EMOTE_RPS_P", 		GestureCategories.CATEGORY_3 ) );
+			//gesture_items.Insert( new GestureMenuItem( ID_EMOTE_RPS_S, 	"#STR_USRACT_ID_EMOTE_RPS_S", 		GestureCategories.CATEGORY_3 ) );
 		}
 		//Category 4 - regards
 		else if ( category == GestureCategories.CATEGORY_4 )
 		{
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_GREETING, 	"Hello", 		GestureCategories.CATEGORY_4 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THUMB, 		"Thumbs up", 	GestureCategories.CATEGORY_4 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_HEART, 		"Heart", 		GestureCategories.CATEGORY_4 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_CLAP, 		"Clap", 		GestureCategories.CATEGORY_4 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTKISS, 	"Magnifique", 	GestureCategories.CATEGORY_4 ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SALUTE, 	"Salute", 		GestureCategories.CATEGORY_4 ) );
-		}
-		
-		//CONSOLE PLATFORM ONLY
-		//Only 1 category
-		if ( category == GestureCategories.CONSOLE_GESTURES )
-		{
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_GREETING, 	"Hello", 		GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_HEART, 		"Heart", 		GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SOS, 		"Wave", 		GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTKISS,	"Magnifique", 	GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SUICIDE, 	"Suicide", 		GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THROAT, 	"Die", 			GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNT, 		"Frig off", 	GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_DANCE, 		"Dance", 		GestureCategories.CONSOLE_GESTURES ) );
-			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THUMB, 		"Thumbs up", 	GestureCategories.CONSOLE_GESTURES ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_GREETING, 	"#STR_USRACT_ID_EMOTE_GREETING", 	GestureCategories.CATEGORY_4 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_THUMB, 		"#STR_USRACT_ID_EMOTE_THUMB", 		GestureCategories.CATEGORY_4 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_HEART, 		"#STR_USRACT_ID_EMOTE_HEART", 		GestureCategories.CATEGORY_4 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_CLAP, 		"#STR_USRACT_ID_EMOTE_CLAP", 		GestureCategories.CATEGORY_4 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_TAUNTKISS, 	"#STR_USRACT_ID_EMOTE_TAUNTKISS", 	GestureCategories.CATEGORY_4 ) );
+			gesture_items.Insert( new GestureMenuItem( ID_EMOTE_SALUTE, 	"#STR_USRACT_ID_EMOTE_SALUTE", 		GestureCategories.CATEGORY_4 ) );
 		}
 	}
 	

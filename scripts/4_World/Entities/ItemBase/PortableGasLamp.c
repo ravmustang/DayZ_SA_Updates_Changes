@@ -4,11 +4,31 @@ class PortableGasLamp extends ItemBase
 	private const string GAS_LIGHT_MATERIAL_OFF 	= "dz\\data\\data\\default.rvmat";
 
 	//sound
-	protected SoundOnVehicle m_SoundGasFlameLoop;
-	const string SOUND_BURNING_GAS 	= "gasFlame";
+	const string SOUND_BURNING 		= "portablegaslamp_burn_SoundSet";
+	const string SOUND_TURN_ON		= "portablegaslamp_turn_on_SoundSet";
+	const string SOUND_TURN_OFF		= "portablegaslamp_turn_off_SoundSet";
 	
+	protected EffectSound m_SoundBurningLoop;
+	protected EffectSound m_SoundTurnOn;
+	protected EffectSound m_SoundTurnOff;
 	
 	//--- POWER EVENTS
+	override void OnSwitchOn()
+	{
+		super.OnSwitchOn();
+		
+		//sound (client only)
+		SoundTurnOn();
+	}
+
+	override void OnSwitchOff()
+	{
+		super.OnSwitchOff();
+		
+		//sound (client only)
+		SoundTurnOff();
+	}
+	
 	override void OnWorkStart()
 	{
 		SetPilotLight( true );
@@ -16,7 +36,7 @@ class PortableGasLamp extends ItemBase
 		//refresh visual
 		SetObjectMaterial( 0, GAS_LIGHT_MATERIAL_ON );
 		
-		//sound
+		//sound (client only)
 		SoundBurningStart();
 	}
 
@@ -27,28 +47,30 @@ class PortableGasLamp extends ItemBase
 		//refresh visual
 		SetObjectMaterial( 0, GAS_LIGHT_MATERIAL_OFF );
 		
-		//sound
+		//sound (client only)
 		SoundBurningStop();
 	}
 	
 	//================================================================
 	// SOUNDS
 	//================================================================
-	//Gas burning
 	protected void SoundBurningStart()
 	{
-		if ( !m_SoundGasFlameLoop && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
-		{
-			m_SoundGasFlameLoop = PlaySoundLoop( SOUND_BURNING_GAS, 50 );
-		}
+		PlaySoundSetLoop( m_SoundBurningLoop, SOUND_BURNING, 0.1, 0.3 );
 	}
 	
 	protected void SoundBurningStop()
 	{
-		if ( m_SoundGasFlameLoop && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
-		{
-			GetGame().ObjectDelete( m_SoundGasFlameLoop );
-			m_SoundGasFlameLoop = NULL;			
-		}
+		StopSoundSet( m_SoundBurningLoop );
+	}	
+
+	protected void SoundTurnOn()
+	{
+		PlaySoundSet( m_SoundTurnOn, SOUND_TURN_ON, 0.1, 0.1 );
+	}
+	
+	protected void SoundTurnOff()
+	{
+		PlaySoundSet( m_SoundTurnOff, SOUND_TURN_OFF, 0.1, 0.1 );
 	}	
 }

@@ -372,6 +372,10 @@ class OptionsMenu extends UIScriptedMenu
 		{
 			SliderFocus();
 		}
+		if( x == -1 && y == 2 )
+		{
+			ToggleFocus();
+		}
 		return false;
 	}
 	
@@ -381,10 +385,6 @@ class OptionsMenu extends UIScriptedMenu
 		{
 			ColorWhite( w, null );
 			return true;
-		}
-		if( x == -1 && y == 2 )
-		{
-			ToggleFocus();
 		}
 		return false;
 	}
@@ -430,12 +430,12 @@ class OptionsMenu extends UIScriptedMenu
 			m_Tabber.NextTab();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUIFastEquipOrSplit, false ) )
+		if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
 		{
 			Apply();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAQuickReload, false ) )
+		if( GetGame().GetInput().GetActionDown( UAUICtrlY, false ) )
 		{
 			Reset();
 		}

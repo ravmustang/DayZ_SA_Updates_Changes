@@ -1,9 +1,9 @@
 class HungerNotfr: NotifierBase
 {
-	protected const float 	DEC_TRESHOLD_LOW 			= -0.01;
+	protected const float 	DEC_TRESHOLD_LOW 			= 0;
 	protected const float 	DEC_TRESHOLD_MED 			= -0.35;
 	protected const float 	DEC_TRESHOLD_HIGH			= -0.57;
-	protected const float 	INC_TRESHOLD_LOW 			= 0.01;
+	protected const float 	INC_TRESHOLD_LOW 			= 0;
 	protected const float 	INC_TRESHOLD_MED 			= 0.35;
 	protected const float 	INC_TRESHOLD_HIGH			= 0.57;
 	
@@ -22,7 +22,7 @@ class HungerNotfr: NotifierBase
 		int tendency = CalculateTendency(delta, INC_TRESHOLD_LOW, INC_TRESHOLD_MED, INC_TRESHOLD_HIGH, DEC_TRESHOLD_LOW, DEC_TRESHOLD_MED, DEC_TRESHOLD_HIGH);
 		//GetVirtualHud().SetStatus(eDisplayElements.DELM_TDCY_ENERGY,tendency);
 		
-		DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_ENERGY_WARNING, PlayerConstants.THRESHOLD_ENERGY_CRITICAL, PlayerConstants.THRESHOLD_ENERGY_EMPTY);
+		DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_ENERGY_WARNING, PlayerConstants.THRESHOLD_ENERGY_CRITICAL, PlayerConstants.THRESHOLD_ENERGY_BLINKING, PlayerConstants.THRESHOLD_ENERGY_EXTRA );
 
 		DisplayElementTendency dis_elm = DisplayElementTendency.Cast(GetVirtualHud().GetElement(eDisplayElements.DELM_TDCY_ENERGY));
 		

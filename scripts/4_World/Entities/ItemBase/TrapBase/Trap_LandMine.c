@@ -18,16 +18,6 @@ class LandMineTrap extends TrapBase
 		return true;
 	}*/
 	
-	override bool IsDeployable()
-	{
-		return true;
-	}
-	
-	override string GetDeploySoundset()
-	{
-		return "landmine_deploy_SoundSet";
-	}
-	
 	override void StartActivate( PlayerBase player )
 	{
 		super.StartActivate( player );
@@ -50,12 +40,6 @@ class LandMineTrap extends TrapBase
 		m_TimerLoop = NULL;
 	}
 	
-	override void OnPlacementComplete( Man player ) 
-	{
-		PlayerBase player_PB = PlayerBase.Cast( player );
-		StartActivate( player_PB );
-	}
-	
 	override bool CanExplodeInFire()
 	{
 		return true;
@@ -65,7 +49,7 @@ class LandMineTrap extends TrapBase
 	{
 		this.Explode();
 		
-		m_DeleteTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
+		m_DeleteTimer = new Timer( CALL_CATEGORY_SYSTEM );
 		m_DeleteTimer.Run( 2, this, "DeleteThis" );
 	}
 	
@@ -82,5 +66,30 @@ class LandMineTrap extends TrapBase
 		{
 			
 		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+		
+	override void OnPlacementComplete( Man player ) 
+	{
+		super.OnPlacementComplete( player );
+		
+		if ( GetGame().IsServer() )
+		{
+			PlayerBase player_PB = PlayerBase.Cast( player );
+			StartActivate( player_PB );
+		}		
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "landmine_deploy_SoundSet";
 	}
 }

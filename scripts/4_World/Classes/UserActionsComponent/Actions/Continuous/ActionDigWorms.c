@@ -68,6 +68,6 @@ class ActionDigWorms: ActionContinuousBase
 		ItemBase worms;
 		Class.CastTo(worms,  GetGame().CreateObject("Worm", action_data.m_Player.GetPosition()) );
 		worms.SetQuantity(10,false);
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

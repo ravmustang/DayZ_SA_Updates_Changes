@@ -1,7 +1,11 @@
 class MP5_RailHndgrd extends Inventory_Base
 {
-	override bool CanDetachAttachment( EntityAI attachment )
+	override bool CanDetachAttachment (EntityAI parent)
 	{
-		return false;
+		if ( Weapon_Base.Cast(parent) && parent.FindAttachmentBySlotName("weaponFlashlight")/*.IsKindOf("UniversalLight")*/ )
+		{
+			return false;
+		}
+		return true;
 	}
 }

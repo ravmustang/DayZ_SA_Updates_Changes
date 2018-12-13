@@ -70,9 +70,23 @@ class ActionGetOutTransport: ActionInteractBase
 					{
 						vehCommand.JumpOutVehicle();
 					}
+					//action_data.m_Player.GetItemAccessor().HideItemInHands(false);
+					//action_data.m_Player.GetItemAccessor().OnItemInHandsChanged();
 				}
 			}
 		}
+	}
+	
+	//TODO: quick'n'dirt hotfix, refactor!
+	override void End( ActionData action_data )
+	{
+		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(Unhide,500,false,(action_data.m_Player));
+		super.End( action_data );
+	}
+	
+	void Unhide(PlayerBase player)
+	{
+		player.GetItemAccessor().HideItemInHands(false);
 	}
 
 	override void OnUpdate(ActionData action_data)

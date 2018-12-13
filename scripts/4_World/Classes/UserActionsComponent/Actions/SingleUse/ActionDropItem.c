@@ -14,6 +14,11 @@ class ActionDropItemCB : ActionSingleUseBaseCB
 				if (( ( !GetGame().IsServer() && GetGame().IsMultiplayer() ) || (!GetGame().IsMultiplayer()) ) && m_ActionData && m_ActionData.m_Player)
 				{
 					m_ActionData.m_Player.PredictiveDropEntity(m_ActionData.m_Player.GetItemInHands());
+				
+					if ( m_ActionData.m_Player.IsPlacingLocal() )
+					{
+						m_ActionData.m_Player.TogglePlacingLocal();
+					}
 				}
 			break;
 		}

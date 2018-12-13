@@ -50,7 +50,7 @@ class CAContinuousWaterPlant : CAContinuousQuantity
 		{
 			if ( m_SpentQuantity < m_ItemQuantity  &&  m_SpentQuantity < m_PlantThirstyness )
 			{
-				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);		
+				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);		
 				m_SpentQuantity += m_QuantityUsedPerSecond * action_data.m_Player.GetDeltaT();
 				
 				if ( m_Action ) 
@@ -58,7 +58,7 @@ class CAContinuousWaterPlant : CAContinuousQuantity
 					PlantBase plant;
 					Class.CastTo(plant,  action_data.m_Target.GetObject() );
 					Slot slot = plant.GetSlot();
-					m_Action.SendMessageToClient(action_data.m_Player, slot.GiveWater( action_data.m_MainItem, m_SpentQuantity ));
+					slot.GiveWater( m_SpentQuantity );
 				}
 				return UA_PROCESSING;
 			}

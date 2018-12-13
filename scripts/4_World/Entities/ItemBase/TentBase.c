@@ -12,7 +12,7 @@ class TentBase extends ItemBase
 	protected ref array<string> m_ShowAnimationsWhenPitched;
 	protected ref array<string> m_ShowAnimationsWhenPacked;
 	protected Object			m_ClutterCutter;
-	ref protected EffectSound 	m_LoopDeploySound;
+	ref protected EffectSound 	m_DeployLoopSound;
 	
 	void TentBase()
 	{
@@ -41,15 +41,24 @@ class TentBase extends ItemBase
 		ctx.Write( m_State );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx )
+	override void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx );
+		super.OnStoreLoad( ctx, version );
 		
 		ctx.Read( m_State );
 		
 		if ( GetState() == PITCHED )
 		{
 			Pitch();
+						
+			if ( GetGame().IsServer() )
+			{
+				if ( !m_ClutterCutter && HasClutterCutter() )
+				{		
+					m_ClutterCutter = GetGame().CreateObject( GetClutterCutter(), GetPosition(), false );
+					m_ClutterCutter.SetOrientation( GetOrientation() );
+				}
+			}
 		}
 		else
 		{
@@ -85,82 +94,55 @@ class TentBase extends ItemBase
 	{
 		super.OnVariablesSynchronized();
 			
-		if ( GetState() == PITCHED )
-		{	
-			if ( IsManipulatedEntrance() && IsSoundSynchRemote() )
-			{						
-				if ( m_IsToggle )
-				{
-					SoundTentOpenPlay();
+		if ( IsDeploySound() )
+		{
+			PlayDeploySound();
+		}
+		else
+		{
+			if ( GetState() == PITCHED )
+			{	
+				if ( IsManipulatedEntrance() && IsSoundSynchRemote() )
+				{						
+					if ( m_IsToggle )
+					{
+						SoundTentOpenPlay();
+					}
+					else
+					{
+						SoundTentClosePlay();
+					}	
+				}
+				else if ( IsManipulatedWindow() && IsSoundSynchRemote() )
+				{						
+					if ( m_IsToggle )
+					{
+						SoundTentOpenWindowPlay();
+					}
+					else
+					{
+						SoundTentCloseWindowPlay();
+					}
 				}
 				else
 				{
-					SoundTentClosePlay();
-				}	
-			}
-			else if ( IsManipulatedWindow() && IsSoundSynchRemote() )
-			{						
-				if ( m_IsToggle )
-				{
-					SoundTentOpenWindowPlay();
-				}
-				else
-				{
-					SoundTentCloseWindowPlay();
+					Pitch();	
 				}
 			}
 			else
 			{
-				Pitch();	
-				PlayDeploySound();
-			}
+				Pack();
+			}		
 		}
-		else
+		
+		if ( CanPlayDeployLoopSound() )
 		{
-			Pack();
-		}		
-			
-		if ( IsBeingPlaced() && IsSoundSynchRemote() )
-		{
-			PlayLoopDeploySound();
+			PlayDeployLoopSound();
 		}
 					
-		if ( m_LoopDeploySound && !IsBeingPlaced() && !IsSoundSynchRemote() )
+		if ( m_DeployLoopSound && !CanPlayDeployLoopSound() )
 		{
-			StopLoopDeploySound();
-		}
-	}
-
-	void PlayLoopDeploySound()
-	{		
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{		
-			m_LoopDeploySound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
-			/*
-			SoundParams soundParams = new SoundParams( GetLoopDeploySoundset());
-			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-			SoundObject soundObject = soundBuilder.BuildSoundObject();
-			soundObject.SetPosition(GetGame().GetPlayer().GetPosition());
-			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
-			*/
-		}
-	}
-	
-	void PlayDeploySound()
-	{		
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{		
-			EffectSound sound =	SEffectManager.PlaySound( GetDeploySoundset(), GetPosition() );
-			sound.SetSoundAutodestroy( true );
-		}
-	}
-	
-	void StopLoopDeploySound()
-	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{	
-			m_LoopDeploySound.SoundStop();
-			delete m_LoopDeploySound;
+			StopDeployLoopSound();
 		}
 	}
 	
@@ -184,11 +166,6 @@ class TentBase extends ItemBase
 				RemoveProxyPhysics( proxy_selection_name );
 			}
 		}
-	}
-	
-	override bool IsDeployable()
-	{
-		return true;
 	}
 	
 	bool ConditionIntoInventory( EntityAI player )
@@ -274,12 +251,7 @@ class TentBase extends ItemBase
 			xlights.DetachFromObject( this );
 		}
 	}
-	
-	override void OnPlacementComplete( Man player )
-	{
-		Pitch( true );
-	}
-	
+		
 	int GetState()
 	{
 		return m_State;
@@ -534,25 +506,13 @@ class TentBase extends ItemBase
 		SoundSynchRemote();
 	}
 	
-	string GetSoundOpen()
-	{
-		return "";
-	}
+	string GetSoundOpen() {};
 	
-	string GetSoundClose()
-	{
-		return "";
-	}
+	string GetSoundClose() {};
 	
-	string GetSoundOpenWindow()
-	{
-		return "";
-	}
+	string GetSoundOpenWindow() {};
 	
-	string GetSoundCloseWindow()
-	{
-		return "";
-	}
+	string GetSoundCloseWindow() {};
 	
 	void SoundTentOpenPlay()
 	{
@@ -584,6 +544,9 @@ class TentBase extends ItemBase
 		
 		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().UpdatePathgraphRegionByObject, 100, false, this);
 	}
+
+	bool HasClutterCutter() {};	
+	string GetClutterCutter() {};
 	
 	void DestroyClutterCutter()
 	{
@@ -593,6 +556,44 @@ class TentBase extends ItemBase
 			{
 				GetGame().ObjectDelete( m_ClutterCutter );
 			}
+		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+		
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override void OnPlacementComplete( Man player )
+	{
+		super.OnPlacementComplete( player );
+		
+		if ( GetGame().IsServer() )
+		{
+			Pitch( true );
+		}
+		
+		SetIsDeploySound( true );
+	}
+	
+	void PlayDeployLoopSound()
+	{		
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{		
+			m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+		}
+	}
+	
+	void StopDeployLoopSound()
+	{
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{	
+			m_DeployLoopSound.SoundStop();
+			delete m_DeployLoopSound;
 		}
 	}
 };

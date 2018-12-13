@@ -43,7 +43,7 @@ class CAContinuousQuantity : CAContinuousBase
 		{
 			if ( m_SpentQuantity < m_ItemQuantity )
 			{
-				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);		
+				m_AdjustedQuantityUsedPerSecond = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_QuantityUsedPerSecond, m_Action.GetSpecialtyWeight(), true);		
 				m_SpentQuantity += m_AdjustedQuantityUsedPerSecond * action_data.m_Player.GetDeltaT();
 				return UA_PROCESSING;
 			}
@@ -86,7 +86,10 @@ class CAContinuousQuantity : CAContinuousBase
 				SetACData(m_SpentUnits);
 			}
 			
-			action_data.m_MainItem.AddQuantity(- m_SpentQuantity,false,false);
+			if (action_data.m_MainItem)
+			{
+				action_data.m_MainItem.AddQuantity(- m_SpentQuantity,false,false);
+			}
 		}
 	}
 };

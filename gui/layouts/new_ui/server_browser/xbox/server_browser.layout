@@ -64,7 +64,7 @@ FrameWidgetClass ServerBrowserRoot {
          imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
          mode blend
          "src alpha" 1
-         "no wrap" 0
+         "no wrap" 1
          stretch 1
         }
         GridSpacerWidgetClass Tab_Control_Container {
@@ -129,7 +129,7 @@ FrameWidgetClass ServerBrowserRoot {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -277,13 +277,13 @@ FrameWidgetClass ServerBrowserRoot {
      {
       GridSpacerWidgetClass Connect {
        clipchildren 0
-       size 120 1
+       size 120 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 3
        Padding 4
        Margin 0
@@ -316,8 +316,8 @@ FrameWidgetClass ServerBrowserRoot {
         }
         TextWidgetClass ConnectText {
          clipchildren 0
-         position 40 0
-         size 88 22
+         position 0 0
+         size 88 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -325,6 +325,10 @@ FrameWidgetClass ServerBrowserRoot {
          vexactsize 1
          text "#STR_ServerBrowserRoot_toolbar_bg_ConsoleToolbar_Connect_ConnectText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -333,13 +337,13 @@ FrameWidgetClass ServerBrowserRoot {
       GridSpacerWidgetClass Refresh {
        visible 1
        clipchildren 0
-       size 193 1
+       size 193 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 2
        Padding 4
        Margin 0
@@ -373,8 +377,8 @@ FrameWidgetClass ServerBrowserRoot {
         }
         TextWidgetClass RefreshText {
          clipchildren 0
-         position 40 0
-         size 168 22
+         position 0 0
+         size 168 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -382,6 +386,10 @@ FrameWidgetClass ServerBrowserRoot {
          vexactsize 1
          text "#STR_ServerBrowserRoot_toolbar_bg_ConsoleToolbar_Refresh_RefreshText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -390,13 +398,13 @@ FrameWidgetClass ServerBrowserRoot {
       GridSpacerWidgetClass Reset {
        visible 1
        clipchildren 0
-       size 159 1
+       size 159 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 1
        Padding 4
        Margin 0
@@ -429,8 +437,8 @@ FrameWidgetClass ServerBrowserRoot {
         }
         TextWidgetClass ResetText {
          clipchildren 0
-         position 40 0
-         size 132 22
+         position 0 0
+         size 132 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -438,6 +446,10 @@ FrameWidgetClass ServerBrowserRoot {
          vexactsize 1
          text "#STR_ServerBrowserRoot_toolbar_bg_ConsoleToolbar_Reset_ResetText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -445,13 +457,13 @@ FrameWidgetClass ServerBrowserRoot {
       }
       GridSpacerWidgetClass Back {
        clipchildren 0
-       size 86 1
+       size 86 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        Padding 4
        Margin 0
        "Size To Content H" 1
@@ -483,8 +495,8 @@ FrameWidgetClass ServerBrowserRoot {
         }
         TextWidgetClass BackText {
          clipchildren 0
-         position 40 0
-         size 52 22
+         position 0 0
+         size 52 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -492,6 +504,10 @@ FrameWidgetClass ServerBrowserRoot {
          vexactsize 1
          text "#STR_ServerBrowserRoot_toolbar_bg_ConsoleToolbar_Back_BackText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
@@ -501,13 +517,13 @@ FrameWidgetClass ServerBrowserRoot {
        visible 0
        clipchildren 0
        position -0.00002 0
-       size 193.5 1.10938
+       size 193.5 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 3
        Padding 4
        Margin 0
@@ -541,8 +557,8 @@ FrameWidgetClass ServerBrowserRoot {
         }
         TextWidgetClass SortText {
          clipchildren 0
-         position -132.5 -1.5
-         size 260.5 22
+         position 0 0
+         size 0 36
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -550,6 +566,10 @@ FrameWidgetClass ServerBrowserRoot {
          vexactsize 1
          text "#STR_ServerBrowserRoot_toolbar_bg_ConsoleToolbar_Sort_SortText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }

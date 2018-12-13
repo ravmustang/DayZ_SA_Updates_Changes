@@ -3,7 +3,7 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 	protected ref map<int, ref Widget> m_inventory_slots;
 	protected EntityAI m_Entity;
 
-	void AttachmentCategoriesContainer( LayoutHolder parent )
+	void AttachmentCategoriesContainer( LayoutHolder parent, int sort = -1 )
 	{
 		m_inventory_slots = new ref map<int, ref Widget>;
 	}
@@ -39,8 +39,24 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 			else
 			{
 				if( m_Body.Count() > 0 && !m_Hidden )
-					m_Body.Get( 0 ).OnShow();
-				ShowContent();
+				{
+					if( m_Body.Count() > 0 && !m_Hidden )
+						m_Body.Get( 0 ).OnShow();
+					for( int i = 1; i < m_Body.Count(); ++i )
+					{
+						LayoutHolder child = m_Body[i];
+						AttachmentCategoriesRow row = AttachmentCategoriesRow.Cast( child );
+						AttachmentCategoriesSlotsContainer slots = AttachmentCategoriesSlotsContainer.Cast( child );
+						if( slots || ( row && m_Entity.CanDisplayAttachmentCategory( row.GetCategoryIdentifier() ) ) )
+						{
+							child.OnShow();
+						}
+						else if( slots || row )
+						{
+							child.OnHide();
+						}
+					}
+				}
 				GetMainWidget().Show( true );
 			}
 	
@@ -176,7 +192,7 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 			string attachment_category = GetAttachmentCategory( config_path_attachment_categories, i );
 			string icon_name = GetIconName( config_path_attachment_categories, attachment_category );
 
-			if(items_cont)
+			if( items_cont )
 			{
 				int slot_number = i%7;
 				
@@ -207,7 +223,7 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 				AttachmentCategoriesRow ar;
 				if( m_Body.Count() < attachments_categories_count + 2 + attachments_categories_count/7 )
 				{
-					ar = new AttachmentCategoriesRow(this);
+					ar = new AttachmentCategoriesRow( this, -1 );
 				}
 				else
 				{
@@ -225,7 +241,8 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		{
 			if( entity.GetInventory().GetCargo() )
 			{
-				ContainerWithCargo iwc = new ContainerWithCargo( this );
+				ContainerWithCargo iwc = new ContainerWithCargo( this, -1 );
+				iwc.Get( 0 ).GetRootWidget().ClearFlags( WidgetFlags.DRAGGABLE );
 				iwc.SetEntity( entity );
 				
 				ref SlotsContainer items_cont2 = GetSlotsContainer(attachments_categories_count/7);
@@ -302,7 +319,7 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToTargetAttachment( m_Entity, iw.GetItem() );
 		}
-		else if ( m_Entity.GetInventory().CanAddEntityToInventory( iw.GetItem() ) && iw.GetItem().GetInventory().CanRemoveEntity() )
+		else if( m_Entity.GetInventory().CanAddEntityToInventory( iw.GetItem() ) && iw.GetItem().GetInventory().CanRemoveEntity() )
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToTargetInventory( m_Entity, FindInventoryLocationType.ANY, iw.GetItem() );
 		}

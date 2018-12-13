@@ -70,6 +70,7 @@ class ActionGetInTransport: ActionInteractBase
 		if( vehCommand )
 		{
 			vehCommand.SetVehicleType(m_transport.GetAnimInstance());
+			action_data.m_Player.GetItemAccessor().HideItemInHands(true);
 		}
 	}
 

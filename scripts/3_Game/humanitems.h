@@ -89,6 +89,9 @@ class HumanItemAccessor
 {
 	//! signalization from script to engine that item in hands changed
 	proto native void 	OnItemInHandsChanged();
+	
+	//! reset weapon anim override in case of premature death
+	proto native void 	ResetWeaponInHands();
 
 	//! hides item in hands visually
 	proto native void	HideItemInHands(bool pState);

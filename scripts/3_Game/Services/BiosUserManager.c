@@ -91,11 +91,12 @@ class BiosUserManager
 	*/
 	void OnUserPicked(BiosUser user, EBiosError error)
 	{
-		if( user || !OnlineServices.ErrorCaught( error ) )
+		if( !OnlineServices.ErrorCaught( error ) || user )
 		{
 			SelectUser( user );
 			if( GetGame().GetMission() )
 				GetGame().GetMission().Reset();
+			OnGameNameChanged( user );
 		}
 		g_Game.SelectUser();
 	}

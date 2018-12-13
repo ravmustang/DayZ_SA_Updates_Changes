@@ -48,6 +48,20 @@ class WeaponManager
 //----------------------------------------------------------------------------	
 // Weapon Action conditions
 //----------------------------------------------------------------------------	
+	bool CanFire(Weapon_Base wpn)
+	{
+		if( m_player.GetHumanInventory().GetEntityInHands() != wpn )
+			return false;
+		
+		if( m_player.IsLiftWeapon() || !m_player.IsRaised() || wpn.IsDamageDestroyed() || m_player.GetDayZPlayerInventory().IsProcessing()) 
+			return false;		
+		//IsFullRaised
+		
+		return true;
+		
+	}
+	
+	
 	bool CanAttachMagazine(Weapon_Base wpn, Magazine mag, bool reservationCheck = true )
 	{	
 		if ( !wpn || !mag )

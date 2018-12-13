@@ -486,6 +486,9 @@ class DayZGame extends CGame
 	float 	m_volume_VOIP;
 	float 	m_volume_radio;
 	
+	float 	m_PreviousEVValue;
+	float 	m_EVValue = 0;
+	
 	ref TIntArray demounit = new TIntArray;
 	
 	static ref ScriptInvoker Event_OnRPC = new ScriptInvoker();
@@ -879,7 +882,8 @@ class DayZGame extends CGame
 		/* NOTE: StoreLoginData must be called for game to continue !!! */
 		
 		// turn the lights off
-		GetGame().SetEVUser(-5);
+		SetEVValue(-5);
+		
 		// timer for spawning screen
 		GetGame().GetUserManager().GetUserDatabaseIdAsync();
 		
@@ -1459,11 +1463,22 @@ class DayZGame extends CGame
 		string uid = ip + ":" + port;
 		if( m_Visited )
 		{
-			if( m_Visited.Find( uid ) < 0 )
+			int pos = m_Visited.Find( uid );
+			 
+			if( pos < 0 )
 			{
 				if( m_Visited.Count() == MAX_VISITED )
 					m_Visited.Remove( 0 );
 				m_Visited.Insert( uid );
+			}
+			else
+			{
+				// if item is not saved as last server, move it
+				if( pos != ( m_Visited.Count() - 1 ))
+				{
+					m_Visited.Remove( pos );
+					m_Visited.Insert( uid );
+				}
 			}
 			GetGame().SetProfileStringList( "SB_Visited", m_Visited );
 			GetGame().SaveProfile();
@@ -1731,7 +1746,8 @@ class DayZGame extends CGame
 		#ifndef NO_GUI	
 			m_loading.Hide();
 			// turn the lights back on
-			GetGame().SetEVUser(0);	
+			SetEVValue(0);
+			
 		#endif
 	}
 	
@@ -1966,6 +1982,23 @@ class DayZGame extends CGame
 		
 		// if no ammo from the array matches with ammo passed, return false 
 		return false;
+	}
+	
+	void SetEVValue(float value)
+	{
+		m_PreviousEVValue = m_EVValue;
+		SetEVUser(value);
+		m_EVValue = value;
+	}
+	
+	float GetCurrentEVValue()
+	{
+		return m_EVValue;
+	}
+	
+	float GetPreviousEVValue()
+	{
+		return m_PreviousEVValue;
 	}
 };
 

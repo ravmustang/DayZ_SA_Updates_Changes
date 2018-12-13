@@ -41,7 +41,7 @@ class ActionConsumeSingle: ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "#take_one";
+		return "#eat";
 	}
 	
 	override void OnEndServer( ActionData action_data )

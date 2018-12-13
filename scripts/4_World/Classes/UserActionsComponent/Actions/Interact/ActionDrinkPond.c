@@ -19,7 +19,7 @@ class ActionDrinkPond: ActionInteractBase
 
 	override string GetText()
 	{
-		return "#take_a_sip";
+		return "#drink";
 	}
 	
 	override void CreateConditionComponents()  

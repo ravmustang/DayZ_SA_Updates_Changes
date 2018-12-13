@@ -52,6 +52,8 @@ class WeaponChambering_Cartridge extends WeaponStateBase
 	override void OnExit (WeaponEventBase e)
 	{
 		int mi = m_weapon.GetCurrentMuzzle();
+		if ( m_weapon.IsChamberFiredOut(mi) )
+			m_weapon.EjectCasing(mi);
 		if (m_weapon.LoadChamber(mi, m_damage, m_type))
 		{
 			wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, ok - loaded chamber");

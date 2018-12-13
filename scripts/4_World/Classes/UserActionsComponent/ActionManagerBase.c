@@ -50,6 +50,7 @@ class ActionManagerBase
 	ref TSelectableActionInfoArray	m_SelectableActions;
 	int                             m_SelectedActionIndex;
 	bool                            m_SelectableActionsHasChanged;
+	bool							m_Interrupted;
 		
 //Pending actions waiting for acknowledgment
 	protected int 					m_PendingActionAcknowledgmentID;
@@ -82,6 +83,7 @@ class ActionManagerBase
 			m_PendingActionAcknowledgmentID = -1;
 			
 			m_CurrentActionData = NULL;
+			m_Interrupted = false;
 		}
 	}
 	
@@ -98,6 +100,11 @@ class ActionManagerBase
 	{
 		if(m_CurrentActionData)
 		{
+			if(m_Interrupted)
+			{
+				LocalInterrupt();
+				m_Interrupted = false;
+			}
 			if(m_CurrentActionData.m_State != UA_AM_PENDING && m_CurrentActionData.m_State != UA_AM_REJECTED && m_CurrentActionData.m_State != UA_AM_ACCEPTED)
 			{
 				m_CurrentActionData.m_Action.OnUpdate(m_CurrentActionData);
@@ -107,6 +114,23 @@ class ActionManagerBase
 	
 	void OnSyncJuncture(int pJunctureID, ParamsReadContext pCtx)
 	{
+		int AcknowledgmentID;
+		switch (pJunctureID)
+		{
+			case DayZPlayerSyncJunctures.SJ_ACTION_ACK_ACCEPT:
+				pCtx.Read(AcknowledgmentID);
+				if (m_CurrentActionData && AcknowledgmentID == m_PendingActionAcknowledgmentID)
+					m_CurrentActionData.m_State = UA_AM_ACCEPTED;
+				break;
+			case DayZPlayerSyncJunctures.SJ_ACTION_ACK_REJECT:
+				pCtx.Read(AcknowledgmentID);
+				if (m_CurrentActionData && AcknowledgmentID == m_PendingActionAcknowledgmentID)
+					m_CurrentActionData.m_State = UA_AM_REJECTED;
+				break;
+			case DayZPlayerSyncJunctures.SJ_ACTION_INTERRUPT:
+				m_Interrupted = true;
+				break;
+		}
 	}
 		
 	ActionTarget FindActionTarget()
@@ -314,6 +338,15 @@ class ActionManagerBase
 	void OnSingleUse()
 	{
 	}
+	
+	void Interrupt()
+	{
+	}
+	protected void LocalInterrupt()
+	{
+		if (m_CurrentActionData && m_CurrentActionData.m_Action)
+			m_CurrentActionData.m_Action.Interrupt(m_CurrentActionData);
+	} 
 	
 	void OnInteractAction() //Interact
 	{

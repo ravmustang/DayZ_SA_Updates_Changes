@@ -174,7 +174,7 @@ class StaminaHandler
 		m_StaminaDepletion 	= 0;
 		m_Time 				= 0;
 		m_StaminaDepleted	= false;
-		m_CooldownTimer		= new Timer(CALL_CATEGORY_GAMEPLAY);
+		m_CooldownTimer		= new Timer(CALL_CATEGORY_SYSTEM);
 		m_IsInCooldown		= false;
 		m_Debug 			= false;
 

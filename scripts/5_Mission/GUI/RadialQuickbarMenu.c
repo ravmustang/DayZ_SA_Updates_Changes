@@ -332,7 +332,7 @@ class RadialQuickbarMenu extends UIScriptedMenu
 			
 			//Print("RadialQuickbarMenu->OnSelectionDeselect");
 		}
-	}	
+	}
 	
 	void OnControllerPressA( Widget w )
 	{
@@ -366,10 +366,10 @@ class RadialQuickbarMenu extends UIScriptedMenu
 							RefreshQuickbar();
 						}	
 					}
+					instance.m_SelectedItem = null;
 				}
 			}
 		}
-		
 		//Print("RadialQuickbarMenu->OnControllerPressA");
 	}
 	

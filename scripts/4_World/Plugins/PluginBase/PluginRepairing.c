@@ -51,7 +51,7 @@ class PluginRepairing extends PluginBase
 		
 		if ( cur_kit_quantity > HEALTH_UP_ONE_LVL )
 		{
-			kit_repair_cost_adjusted = player.GetSoftSkillManager().SubtractSpecialtyBonus( kit_repair_cost, specialty_weight );
+			kit_repair_cost_adjusted = player.GetSoftSkillsManager().SubtractSpecialtyBonus( kit_repair_cost, specialty_weight );
 			kit_repair_cost_adjusted = Math.Clamp( kit_repair_cost_adjusted, 0, 100 );
 			new_quantity = kit.GetQuantity() - kit_repair_cost_adjusted;
 			kit.SetQuantity( new_quantity );

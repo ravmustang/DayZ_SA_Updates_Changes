@@ -1,46 +1,52 @@
 FrameWidgetClass FrameWidget {
- size 0.9 0.9
+ position 0 0
+ size 0.9 0.87178
  halign center_ref
  valign center_ref
  hexactsize 0
  vexactsize 0
  fixaspect none
  {
-  EditBoxWidgetClass InputEditBoxWidget {
-   color 0 0 0 1
-   position 0 0.04
-   size 0.8 28
-   valign bottom_ref
-   hexactsize 0
-   vexactsize 1
-   priority 1
-   style Default
-   "limit visible" 1
-   "exact text" 0
-   font "gui/fonts/sdf_MetronLight24"
-  }
   PanelWidgetClass InputEditBoxWidget0 {
    visible 1
    color 0.1569 0.1569 0.1569 0.7843
-   position 0 0.04
-   size 0.8 28
+   position 0 40
+   size 0.4 28
+   halign center_ref
    valign bottom_ref
+   hexactpos 0
+   vexactpos 1
    hexactsize 0
    vexactsize 1
    style rover_sim_colorable
-  }
-  TextWidgetClass ChannelText {
-   visible 0
-   position 0.00787 0.01328
-   size 0.07554 0.03795
-   valign bottom_ref
-   hexactpos 0
-   vexactpos 0
-   hexactsize 0
-   vexactsize 0
-   text "#layout_chat_channel"
-   "exact text" 1
-   "text valign" center
+   {
+    EditBoxWidgetClass InputEditBoxWidget {
+     color 0 0 0 1
+     position 0 0
+     size 1 28
+     halign center_ref
+     valign center_ref
+     hexactsize 0
+     vexactsize 1
+     priority 1
+     style Default
+     "limit visible" 1
+     "exact text" 0
+     font "gui/fonts/sdf_MetronLight24"
+    }
+    TextWidgetClass ChannelText {
+     visible 0
+     size 1 1
+     valign center_ref
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     text "#layout_chat_channel"
+     "exact text" 1
+     "text valign" center
+    }
+   }
   }
  }
 }

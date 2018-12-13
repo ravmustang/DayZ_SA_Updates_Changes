@@ -7,9 +7,8 @@ class VomitSymptom extends SymptomBase
 		m_Priority = 100;
 		m_ID = SymptomIDs.SYMPTOM_VOMIT;
 		m_DestroyOnAnimFinish = true;
-		m_SyncToClient = true;
+		m_SyncToClient = false;
 		m_Duration = 5;
-		m_QuitAnimOnSymptomDestroy = true;
 	}
 	
 	//!gets called every frame
@@ -36,7 +35,7 @@ class VomitSymptom extends SymptomBase
 		player.GetStatStomachVolume().Set(0);
 		player.GetStatStomachWater().Set(0);
 		player.GetStatStomachEnergy().Set(0);
-		PlayAnimation(DayZPlayerConstants.CMD_ACTIONFB_VOMIT,DayZPlayerConstants.STANCEMASK_CROUCH, GetDuration() );
+		PlayAnimationFB(DayZPlayerConstants.CMD_ACTIONFB_VOMIT,DayZPlayerConstants.STANCEMASK_CROUCH, GetDuration() );
 	}
 
 	//!only gets called once on an active Symptom that is being deactivated
@@ -48,5 +47,10 @@ class VomitSymptom extends SymptomBase
 	override void OnGetDeactivatedClient(PlayerBase player)
 	{
 		Debug.Log("OnGetDeactivated VomitSymptom called", "PlayerSymptom");
+	}
+	
+	override SmptAnimMetaBase SpawnAnimMetaObject()
+	{
+		return new SmptAnimMetaFB();
 	}
 }

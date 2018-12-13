@@ -35,7 +35,7 @@ class ActionSplintTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#apply_splint";
+		return "#fix_persons_fracture";
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )
@@ -46,6 +46,6 @@ class ActionSplintTarget: ActionContinuousBase
 		//ntarget.m_NotifiersManager.DetachByType(eNotifiers.NTF_FRACTURE);
 		action_data.m_MainItem.Delete();
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

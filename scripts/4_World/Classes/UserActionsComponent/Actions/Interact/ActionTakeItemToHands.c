@@ -58,11 +58,12 @@ class ActionTakeItemToHands: ActionInteractBase
 	
 	override void OnStartServer( ActionData action_data )
 	{
-		vector rotation = vector.Zero;
+		//NOTE: removed until better solution is found
+		/*vector rotation = vector.Zero;
 		vector target_dir = action_data.m_Target.GetObject().GetPosition() - action_data.m_Player.GetPosition();
 		
 		rotation[0] = Math.Atan2(target_dir[0], target_dir[2]) * Math.RAD2DEG;
-		action_data.m_Player.SetOrientation(rotation);
+		action_data.m_Player.SetOrientation(rotation);*/
 	}
 	
 	override void OnExecuteServer( ActionData action_data )

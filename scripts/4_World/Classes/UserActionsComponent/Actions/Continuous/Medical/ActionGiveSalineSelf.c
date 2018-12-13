@@ -53,8 +53,8 @@ class ActionGiveSalineSelf: ActionContinuousBase
 		//action_data.m_Player.SetHealth("GlobalHealth", "Blood", action_data.m_Player.GetHealth("GlobalHealth", "Blood") + delta );
 		//action_data.m_Player.AddHealth("", "Blood", delta);
 		action_data.m_Player.GetModifiersManager().ActivateModifier(eModifiers.MDF_SALINE);
-			action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+
 		action_data.m_MainItem.Delete();
 	}
 };

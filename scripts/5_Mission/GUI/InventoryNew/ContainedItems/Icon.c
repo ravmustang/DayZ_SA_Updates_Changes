@@ -66,6 +66,9 @@ class Icon: LayoutHolder
 			{
 				ContainerWithCargo iwc = ContainerWithCargo.Cast( m_Parent.m_Parent );
 				ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent );
+				AttachmentCategoriesRow atcr = AttachmentCategoriesRow.Cast( m_Parent.m_Parent );
+				ContainerWithElectricManager iwem = ContainerWithElectricManager.Cast( m_Parent.m_Parent );
+				HandsContainer hands_container = HandsContainer.Cast( m_Parent.m_Parent );
 				if( iwc )
 				{
 					m_ParentWidget = iwc.GetLastRowWidget().FindAnyWidget("Icon9");
@@ -74,9 +77,16 @@ class Icon: LayoutHolder
 				{
 					m_ParentWidget = iwca.GetLastRowWidget().FindAnyWidget("Icon9");
 				}
-				else
+				else if( atcr )
 				{
-					HandsContainer hands_container = HandsContainer.Cast( m_Parent.m_Parent );
+					m_ParentWidget = atcr.GetLastRowWidget().FindAnyWidget("Icon9");
+				}
+				else if( iwem )
+				{
+					m_ParentWidget = iwem.GetLastRowWidget().FindAnyWidget("Icon9");
+				}
+				else if( hands_container )
+				{
 					m_ParentWidget = hands_container.GetLastRowWidget().FindAnyWidget("Icon9");
 				}
 			}
@@ -90,7 +100,7 @@ class Icon: LayoutHolder
 	{
 		InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu( MENU_INVENTORY ) );
 		ItemManager.GetInstance().HideTooltip();
-		if ( menu )
+		if( menu )
 		{
 			menu.RefreshQuickbar();
 		}
@@ -141,7 +151,7 @@ class Icon: LayoutHolder
 					player.PredictiveMoveItemFromHandsToInventory();
 				}
 				ItemManager.GetInstance().HideTooltip();
-				if ( menu )
+				if( menu )
 				{
 					menu.RefreshQuickbar();
 				}
@@ -153,7 +163,7 @@ class Icon: LayoutHolder
 			EntityAI item_root_owner = item.GetHierarchyRoot();
 			
 			
-			if ( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
+			if( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
 			{
 				player.PredictiveTakeEntityToHands( item );
 			}
@@ -169,7 +179,7 @@ class Icon: LayoutHolder
 				}
 				else if( player.GetInventory().CanForceSwapEntities( item, hands_item, i1 ) )
 				{
-					player.PredictiveSwapEntities( item, hands_item );
+					player.PredictiveForceSwapEntities( item, hands_item, i1);
 				}
 			}
 			else
@@ -179,18 +189,18 @@ class Icon: LayoutHolder
 				{
 					InventoryLocation i2 = new InventoryLocation;
 					found = player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, i2 );
-					if ( found )
+					if( found )
 					{
-						if ( i2.GetType() == FindInventoryLocationType.ATTACHMENT )
+						if( i2.GetType() == FindInventoryLocationType.ATTACHMENT )
 						{
-							if ( i2.GetParent() != player )
+							if( i2.GetParent() != player )
 								found = false;
 						}
 					}
 				}
-				if ( found )
+				if( found )
 				{
-					if (player.GetHumanInventory().CanAddEntityToInventory(item))
+					if(player.GetHumanInventory().CanAddEntityToInventory(item))
 						player.PredictiveTakeEntityToInventory(FindInventoryLocationType.ANY, item);
 				}
 				else
@@ -203,7 +213,7 @@ class Icon: LayoutHolder
 			}
 	
 			ItemManager.GetInstance().HideTooltip();
-			if ( menu )
+			if( menu )
 			{
 				menu.RefreshQuickbar();
 			}
@@ -374,7 +384,7 @@ class Icon: LayoutHolder
 		PlayerBase m_player = PlayerBase.Cast( GetGame().GetPlayer() );
 		EntityAI entity_in_hands = m_player.GetHumanInventory().GetEntityInHands();
 
-		if ( !entity1 || !entity2 ) return flags;
+		if( !entity1 || !entity2 ) return flags;
 
 		//Magazine swapmag1;
 		//Magazine swapmag2;
@@ -400,38 +410,38 @@ class Icon: LayoutHolder
 			}
 		}
 */
-		if ( entity1.IsInherited( ItemBase ) && entity2.IsInherited( ItemBase ) )
+		if( entity1.IsInherited( ItemBase ) && entity2.IsInherited( ItemBase ) )
 		{
 			ItemBase ent1 = ItemBase.Cast( entity1 );
-			if ( ent1.CanBeCombined( ItemBase.Cast( entity2 ) ) ) flags = flags | InventoryCombinationFlags.COMBINE_QUANTITY2;
+			if( ent1.CanBeCombined( ItemBase.Cast( entity2 ) ) ) flags = flags | InventoryCombinationFlags.COMBINE_QUANTITY2;
 		}
 
 		Weapon_Base wpn;
 		Magazine mag;
-		if ( Class.CastTo(wpn,  entity1 ) && Class.CastTo(mag,  entity2 ) )
+		if( Class.CastTo(wpn,  entity1 ) && Class.CastTo(mag,  entity2 ) )
 		{
 			/*int muzzleIndex = wpn.GetCurrentMuzzle();
-			if ( m_player.GetWeaponManager().CanLoadBullet(wpn, mag) )
+			if( m_player.GetWeaponManager().CanLoadBullet(wpn, mag) )
 			{
 				flags = flags | InventoryCombinationFlags.LOAD_CHAMBER;
 			}
-			else if ( m_player.GetWeaponManager().CanAttachMagazine(wpn, mag) )
+			else if( m_player.GetWeaponManager().CanAttachMagazine(wpn, mag) )
 			{
 				flags = flags | InventoryCombinationFlags.ATTACH_MAGAZINE;
 			}
-			else if ( m_player.GetWeaponManager().CanSwapMagazine(wpn, mag))
+			else if( m_player.GetWeaponManager().CanSwapMagazine(wpn, mag))
 			{
 				flags = flags | InventoryCombinationFlags.SWAP_MAGAZINE;
 			}*/
 		}
-		else if ( entity1.GetInventory().CanAddAttachment( entity2 ) )
+		else if( entity1.GetInventory().CanAddAttachment( entity2 ) )
 		{
-			if ( !entity1.IsInherited( ZombieBase ) && !entity1.IsInherited( Car ) && !entity2.IsInherited( ZombieBase ) && !entity2.IsInherited( Car ) )
+			if( !entity1.IsInherited( ZombieBase ) && !entity1.IsInherited( Car ) && !entity2.IsInherited( ZombieBase ) && !entity2.IsInherited( Car ) )
 			{
 				flags = flags | InventoryCombinationFlags.ADD_AS_ATTACHMENT;
 			}
 		}
-		if ( entity1.GetInventory().CanAddEntityInCargo( entity2 ) ) flags = flags | InventoryCombinationFlags.ADD_AS_CARGO;
+		if( entity1.GetInventory().CanAddEntityInCargo( entity2 ) ) flags = flags | InventoryCombinationFlags.ADD_AS_CARGO;
 
 		if( entity1 == m_player.GetHumanInventory().GetEntityInHands() || entity2 == m_player.GetHumanInventory().GetEntityInHands())
 		{
@@ -510,17 +520,17 @@ class Icon: LayoutHolder
 	void OnPerformCombination( int combinationFlags )
 	{
 		PlayerBase m_player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if ( m_am_entity1 == NULL || m_am_entity2 == NULL ) return;
+		if( m_am_entity1 == NULL || m_am_entity2 == NULL ) return;
 
-		if ( combinationFlags == InventoryCombinationFlags.NONE ) return;
+		if( combinationFlags == InventoryCombinationFlags.NONE ) return;
 
 		Weapon_Base wpn;
 		Magazine mag;
 
-		if ( combinationFlags & InventoryCombinationFlags.LOAD_CHAMBER )
+		if( combinationFlags & InventoryCombinationFlags.LOAD_CHAMBER )
 		{
 
-			if ( Class.CastTo(wpn,  m_am_entity1 ) && Class.CastTo(mag,  m_am_entity2 ) )
+			if( Class.CastTo(wpn,  m_am_entity1 ) && Class.CastTo(mag,  m_am_entity2 ) )
 			{
 				if( m_player.GetWeaponManager().CanLoadBullet(wpn, mag) )
 				{
@@ -531,9 +541,9 @@ class Icon: LayoutHolder
 			}
 		}
 
-/*		if (combinationFlags & InventoryCombinationFlags.ATTACH_MAGAZINE)
+/*		if(combinationFlags & InventoryCombinationFlags.ATTACH_MAGAZINE)
 		{
-			if ( Class.CastTo(wpn,  m_am_entity1 ) && Class.CastTo(mag,  m_am_entity2 ) )
+			if( Class.CastTo(wpn,  m_am_entity1 ) && Class.CastTo(mag,  m_am_entity2 ) )
 			{
 				if( m_player.GetWeaponManager().CanAttachMagazine(wpn, mag) )
 				{
@@ -542,17 +552,17 @@ class Icon: LayoutHolder
 			}
 			return;
 		}*/
-		if ( combinationFlags & InventoryCombinationFlags.ADD_AS_ATTACHMENT )
+		if( combinationFlags & InventoryCombinationFlags.ADD_AS_ATTACHMENT )
 		{
 			m_player.PredictiveTakeEntityToTargetAttachment(m_am_entity1, m_am_entity2);
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.ADD_AS_CARGO )
+		if( combinationFlags & InventoryCombinationFlags.ADD_AS_CARGO )
 		{
 			m_player.PredictiveTakeEntityToTargetCargo(m_am_entity1, m_am_entity2);
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.SWAP )
+		if( combinationFlags & InventoryCombinationFlags.SWAP )
 		{
 			if( !m_player.PredictiveSwapEntities( m_am_entity1, m_am_entity2 ) && m_player.GetHumanInventory().CanAddEntityInHands( m_am_entity2 ) )
 			{
@@ -561,7 +571,7 @@ class Icon: LayoutHolder
 //			GetDragGrid().GetContainer().HideExpandView(m_am_entity2);
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.TAKE_TO_HANDS )
+		if( combinationFlags & InventoryCombinationFlags.TAKE_TO_HANDS )
 		{
 			if( m_player.GetHumanInventory().CanAddEntityInHands( m_am_entity2 ) )
 			{
@@ -569,15 +579,15 @@ class Icon: LayoutHolder
 			}
 		}
 		/*
-		if (m_am_entity1.IsInherited(ItemBase) && m_am_entity2.IsInherited(ItemBase))
+		if(m_am_entity1.IsInherited(ItemBase) && m_am_entity2.IsInherited(ItemBase))
 		{
 			ItemBase entity1ItemBase = m_am_entity1;
-			if (combinationFlags & InventoryCombinationFlags.COMBINE_QUANTITY)
+			if(combinationFlags & InventoryCombinationFlags.COMBINE_QUANTITY)
 			{
 				entity1ItemBase.QuantityCombine(m_am_entity2);
 			}
 		}*/
-		if ( combinationFlags & InventoryCombinationFlags.PERFORM_ACTION )
+		if( combinationFlags & InventoryCombinationFlags.PERFORM_ACTION )
 		{
 
 			ActionManagerClient amc;
@@ -592,7 +602,7 @@ class Icon: LayoutHolder
 				amc.PerformActionFromInventory(ItemBase.Cast( m_am_entity2 ),ItemBase.Cast( m_am_entity1 ));
 			}
 		}
-		if ( combinationFlags & InventoryCombinationFlags.SET_ACTION )
+		if( combinationFlags & InventoryCombinationFlags.SET_ACTION )
 		{
 
 			ActionManagerClient amc2;
@@ -620,14 +630,14 @@ class Icon: LayoutHolder
 		cmenu.Hide();
 		cmenu.Clear();
 
-		if (m_am_entity1 == NULL) return;
+		if(m_am_entity1 == NULL) return;
 
 		// get actions
 		ref TSelectableActionInfoArray customActions = new TSelectableActionInfoArray;
 		ItemBase itemBase = ItemBase.Cast( item );
 		itemBase.GetRecipesActions(m_player, customActions);
 
-		if ( ItemBase.GetDebugActionsMask() & DebugActionType.GENERIC_ACTIONS )
+		if( ItemBase.GetDebugActionsMask() & DebugActionType.GENERIC_ACTIONS )
 		{
 			itemBase.GetDebugActions(customActions);
 		}
@@ -690,9 +700,9 @@ class Icon: LayoutHolder
 			return;
 		}
 
-		if ( entity1 == NULL || entity2 == NULL ) return;
+		if( entity1 == NULL || entity2 == NULL ) return;
 
-		if ( combinationFlags == InventoryCombinationFlags.NONE )
+		if( combinationFlags == InventoryCombinationFlags.NONE )
 		{
 			if( color_test )
 			{
@@ -702,47 +712,47 @@ class Icon: LayoutHolder
 			return;
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.ADD_AS_ATTACHMENT )
+		if( combinationFlags & InventoryCombinationFlags.ADD_AS_ATTACHMENT )
 		{
 			current_flag = InventoryCombinationFlags.ADD_AS_ATTACHMENT;
 			cmenu.Add( "#inv_context_add_as_attachment", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
-		if ( combinationFlags & InventoryCombinationFlags.LOAD_CHAMBER )
+		if( combinationFlags & InventoryCombinationFlags.LOAD_CHAMBER )
 		{
 			current_flag = InventoryCombinationFlags.LOAD_CHAMBER;
 			cmenu.Add( "#inv_context_load_chamber", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
-		if (combinationFlags & InventoryCombinationFlags.ATTACH_MAGAZINE)
+		if(combinationFlags & InventoryCombinationFlags.ATTACH_MAGAZINE)
 		{
 			current_flag = InventoryCombinationFlags.ATTACH_MAGAZINE;
 			cmenu.Add("#inv_context_attach_magazine", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.ADD_AS_CARGO )
+		if( combinationFlags & InventoryCombinationFlags.ADD_AS_CARGO )
 		{
 			current_flag = InventoryCombinationFlags.ADD_AS_CARGO;
 			cmenu.Add( "#inv_context_add_as_cargo", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.SWAP )
+		if( combinationFlags & InventoryCombinationFlags.SWAP )
 		{
 			current_flag = InventoryCombinationFlags.SWAP;
 			cmenu.Add( "#inv_context_swap", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.COMBINE_QUANTITY )
+		if( combinationFlags & InventoryCombinationFlags.COMBINE_QUANTITY )
 		{
 			current_flag = InventoryCombinationFlags.COMBINE_QUANTITY;
 			cmenu.Add( "#inv_context_combine", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if (combinationFlags & InventoryCombinationFlags.SET_ACTION)
+		if(combinationFlags & InventoryCombinationFlags.SET_ACTION)
 		{
 			current_flag = InventoryCombinationFlags.SET_ACTION;
 			cmenu.Add("#inv_context_attach_magazine", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 		
-		if (combinationFlags & InventoryCombinationFlags.PERFORM_ACTION)
+		if(combinationFlags & InventoryCombinationFlags.PERFORM_ACTION)
 		{
 			current_flag = InventoryCombinationFlags.PERFORM_ACTION;
 			cmenu.Add("Perform action", this, "OnPerformCombination", new Param1<int>( current_flag ) );
@@ -789,7 +799,7 @@ class Icon: LayoutHolder
 
 	void OnPerformRecipe(int id)
 	{
-		if ( m_am_entity1 == NULL || m_am_entity2 == NULL ) return;
+		if( m_am_entity1 == NULL || m_am_entity2 == NULL ) return;
 
 		Debug.Log("OnPerformRecipe called for id:"+id.ToString(),"recipes");
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
@@ -842,54 +852,54 @@ class Icon: LayoutHolder
 			return;
 		}
 
-		if ( entity1 == NULL || entity2 == NULL ) return;
+		if( entity1 == NULL || entity2 == NULL ) return;
 
-		if ( combinationFlags == InventoryCombinationFlags.NONE )
+		if( combinationFlags == InventoryCombinationFlags.NONE )
 		{
 			return;
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.ADD_AS_ATTACHMENT )
+		if( combinationFlags & InventoryCombinationFlags.ADD_AS_ATTACHMENT )
 		{
 			current_flag = InventoryCombinationFlags.ADD_AS_ATTACHMENT;
 			cmenu.Add( "#inv_context_add_as_attachment", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
-		if ( combinationFlags & InventoryCombinationFlags.LOAD_CHAMBER )
+		if( combinationFlags & InventoryCombinationFlags.LOAD_CHAMBER )
 		{
 			current_flag = InventoryCombinationFlags.LOAD_CHAMBER;
 			cmenu.Add( "#inv_context_load_chamber", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
-		if (combinationFlags & InventoryCombinationFlags.ATTACH_MAGAZINE)
+		if(combinationFlags & InventoryCombinationFlags.ATTACH_MAGAZINE)
 		{
 			current_flag = InventoryCombinationFlags.ATTACH_MAGAZINE;
 			cmenu.Add("#inv_context_attach_magazine", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.ADD_AS_CARGO )
+		if( combinationFlags & InventoryCombinationFlags.ADD_AS_CARGO )
 		{
 			current_flag = InventoryCombinationFlags.ADD_AS_CARGO;
 			cmenu.Add( "#inv_context_add_as_cargo", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.SWAP )
+		if( combinationFlags & InventoryCombinationFlags.SWAP )
 		{
 			current_flag = InventoryCombinationFlags.SWAP;
 			cmenu.Add( "#inv_context_swap", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if ( combinationFlags & InventoryCombinationFlags.COMBINE_QUANTITY )
+		if( combinationFlags & InventoryCombinationFlags.COMBINE_QUANTITY )
 		{
 			current_flag = InventoryCombinationFlags.COMBINE_QUANTITY;
 			cmenu.Add( "#inv_context_combine", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 
-		if (combinationFlags & InventoryCombinationFlags.SET_ACTION)
+		if(combinationFlags & InventoryCombinationFlags.SET_ACTION)
 		{
 			current_flag = InventoryCombinationFlags.SET_ACTION;
 			cmenu.Add("#inv_context_attach_magazine", this, "OnPerformCombination", new Param1<int>( current_flag ) );
 		}
 		
-		if (combinationFlags & InventoryCombinationFlags.PERFORM_ACTION)
+		if(combinationFlags & InventoryCombinationFlags.PERFORM_ACTION)
 		{
 			current_flag = InventoryCombinationFlags.PERFORM_ACTION;
 			cmenu.Add("Perform Action2", this, "OnPerformCombination", new Param1<int>( current_flag ) );
@@ -922,13 +932,13 @@ class Icon: LayoutHolder
 		InventoryLocation il = new InventoryLocation;
 		m_Obj.GetInventory().GetCurrentInventoryLocation( il );
 		bool draggable = !player.GetInventory().HasInventoryReservation( m_Obj, null ) && !player.GetInventory().IsInventoryLocked();
-		draggable = draggable && ( m_Obj.GetHierarchyRoot() && m_Obj.GetInventory().CanRemoveEntity() || !m_Obj.GetHierarchyRoot() && AttchmentsOutOfReach.IsAttachmentReachable( m_Obj, "", il.GetSlot() ) );
+		draggable = draggable && ( m_Obj.GetHierarchyRoot() && m_Obj.GetInventory().CanRemoveEntity() || !m_Obj.GetHierarchyRoot() && AttachmentsOutOfReach.IsAttachmentReachable( m_Obj, "", il.GetSlot() ) );
 				
 		ItemManager.GetInstance().SetWidgetDraggable( w, draggable );
 		
-		if ( button == MouseState.RIGHT )
+		if( button == MouseState.RIGHT )
 		{
-			if ( itemAtPos && itemAtPos.IsItemBase() )
+			if( itemAtPos && itemAtPos.IsItemBase() )
 			{
 				ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( GetMainWidget().FindAnyWidget( "Render" ) );
 				itemAtPos.OnRightClick();
@@ -936,7 +946,7 @@ class Icon: LayoutHolder
 				if( GetDayZGame().IsLeftCtrlDown() ) ShowActionMenu(itemAtPos);
 			}
 		}
-		else if ( button == MouseState.MIDDLE )
+		else if( button == MouseState.MIDDLE )
 		{
 			InspectItem( itemAtPos );
 		}
@@ -971,7 +981,7 @@ class Icon: LayoutHolder
 			return;
 		}
 
-		if ( ( ItemBase.Cast( receiver_entity ) ).CanBeCombined( ItemBase.Cast( w_entity ) ) )
+		if( ( ItemBase.Cast( receiver_entity ) ).CanBeCombined( ItemBase.Cast( w_entity ) ) )
 		{
 			( ItemBase.Cast( receiver_entity ) ).CombineItemsClient( ItemBase.Cast( w_entity ) );
 			SetQuantity( receiver_ipw.GetParent() );
@@ -1043,11 +1053,13 @@ class Icon: LayoutHolder
 		Weapon_Base wpn;
 		Magazine mag;
 
-		if ( Class.CastTo(wpn,  item_in_hands ) && Class.CastTo(mag,  w_entity ) && Class.CastTo(wpn,  mag.GetHierarchyParent() ) )
+		if( Class.CastTo(wpn,  item_in_hands ) && Class.CastTo(mag,  w_entity ) && Class.CastTo(wpn,  mag.GetHierarchyParent() ) )
 		{
 			return;
 		}
 
+		InventoryLocation il_fswap = new InventoryLocation;
+		
 		if( GameInventory.CanSwapEntities( receiver_entity, w_entity ) )
 		{
 			if( !player.GetInventory().HasInventoryReservation( item_in_hands, NULL ) )
@@ -1061,11 +1073,11 @@ class Icon: LayoutHolder
 				}
 			}
 		}
-		else
+		else if( player.GetInventory().CanForceSwapEntities( w_entity, receiver_entity, il_fswap ) )
 		{
 			if( m_HandsIcon && !player.GetInventory().HasInventoryReservation( item_in_hands, NULL ) )
 			{
-				GetGame().GetPlayer().PredictiveSwapEntities( w_entity, item_in_hands );
+				GetGame().GetPlayer().PredictiveForceSwapEntities( w_entity, receiver_entity, il_fswap );
 			}
 		}
 	}
@@ -1130,7 +1142,7 @@ class Icon: LayoutHolder
 		delete m_WhiteBackground;
 
 		InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu( MENU_INVENTORY ) );
-		if ( menu )
+		if( menu )
 		{
 			menu.RefreshQuickbar();
 		}
@@ -1286,7 +1298,7 @@ class Icon: LayoutHolder
 			SetTemperature();
 		}
 		Weapon_Base wpn = Weapon_Base.Cast( GetObject() );
-		if ( wpn )
+		if( wpn )
 		{
 			int mi = wpn.GetCurrentMuzzle();
 			GetMainWidget().FindAnyWidget( "AmmoIcon" ).Show( wpn.IsChamberFull( mi ) );
@@ -1346,20 +1358,20 @@ class Icon: LayoutHolder
 		TextWidget item_quantity = TextWidget.Cast( item_w.FindAnyWidget( "Quantity" ) );
 		ProgressBarWidget quantity_progress = ProgressBarWidget.Cast( item_w.FindAnyWidget( "QuantityBar" ) );
 		Widget quantity_stack = item_w.FindAnyWidget( "QuantityStackPanel" );
-		if ( has_quantity == QUANTITY_HIDDEN )
+		if( has_quantity == QUANTITY_HIDDEN )
 		{
 			quantity_panel.Show( false );
 		}
 		else
 		{
 			quantity_panel.Show( true );
-			if ( has_quantity == QUANTITY_COUNT )
+			if( has_quantity == QUANTITY_COUNT )
 			{
 				item_quantity.SetText( QuantityConversions.GetItemQuantityText( item ) );
 				quantity_stack.Show( true );
 				quantity_progress.Show( false );
 			}
-			else if ( has_quantity == QUANTITY_PROGRESS )
+			else if( has_quantity == QUANTITY_PROGRESS )
 			{
 
 				float progress_max = quantity_progress.GetMax();
@@ -1367,11 +1379,11 @@ class Icon: LayoutHolder
 				int count = item.ConfigGetInt( "count" );
 					float quantity = QuantityConversions.GetItemQuantity( InventoryItem.Cast( item ) );
 
-				if ( count > 0 )
+				if( count > 0 )
 				{
 					max = count;
 				}
-				if ( max > 0 )
+				if( max > 0 )
 				{
 
 					float value = Math.Round( ( quantity / max ) * 100 );
@@ -1404,7 +1416,7 @@ class Icon: LayoutHolder
 		item_preview.SetView( obj.GetViewIndex() );
 		
 		Widget item_w = item_preview.GetParent();
-		if ( item_w )
+		if( item_w )
 		{
 			SetQuantity( item_w );
 		}
@@ -1471,16 +1483,25 @@ class Icon: LayoutHolder
 			m_ParentWidget.GetParent().GetScreenSize( parent_x, parent_y );
 			ContainerWithCargo iwc = ContainerWithCargo.Cast( m_Parent.m_Parent );
 			ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( m_Parent.m_Parent );
+			AttachmentCategoriesRow atcr = AttachmentCategoriesRow.Cast( m_Parent.m_Parent );
+			ContainerWithElectricManager iwem = ContainerWithElectricManager.Cast( m_Parent.m_Parent );
 			HandsContainer hands_container = HandsContainer.Cast( m_Parent.m_Parent );
 			int cargo_height;
 			if( iwc )
 			{
 				cargo_height = iwc.GetCargoHeight();
 			}
-			else
-			if( iwca )
+			else if( iwca )
 			{
 				cargo_height = iwca.GetCargoHeight();
+			}
+			else if( atcr )
+			{
+				cargo_height = atcr.GetCargoHeight();
+			}
+			else if( iwem )
+			{
+				cargo_height = iwem.GetCargoHeight();
 			}
 			else
 			{

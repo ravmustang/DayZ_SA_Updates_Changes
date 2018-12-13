@@ -17,7 +17,6 @@ class ActionBandageTarget: ActionContinuousBase
 		m_MessageFail = "Player moved and bandaging was canceled.";
 		m_MessageCancel = "You stopped bandaging.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
-		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BANDAGETARGET;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -36,7 +35,7 @@ class ActionBandageTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#bandage_target";
+		return "#treat_persons_wound";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -58,6 +57,6 @@ class ActionBandageTarget: ActionContinuousBase
 			action_data.m_MainItem.AddQuantity(-1,true);
 		}
 
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

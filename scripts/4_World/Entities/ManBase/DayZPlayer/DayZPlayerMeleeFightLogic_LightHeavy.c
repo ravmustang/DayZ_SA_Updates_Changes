@@ -69,6 +69,12 @@ class DayZPlayerMeleeFightLogic_LightHeavy
 		if (pInputs.IsUseButtonDown() || (pInputs.IsImmediateAction() && isFireWeapon))
 		{
 			EntityAI target;
+			
+			//! do not perform attacks when blocking
+			if (m_IsInBlock)
+			{
+				return true;
+			}
 
 			//! if the item in hands cannot be used as melee weapon
 			if (isNotMeleeWeapon && !isFireWeapon)

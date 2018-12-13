@@ -2,7 +2,7 @@ class SawoffMosin extends RecipeBase
 {	
 	override void Init()
 	{
-		m_Name = "#STR_SawoffMosin0";
+		m_Name = "#STR_sawoffbarrel0";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 2;//animation length in relative time units
 		m_Specialty = 0.02;// value > 0 for roughness, value < 0 for precision

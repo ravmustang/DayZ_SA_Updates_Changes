@@ -109,6 +109,7 @@ class Input
 	@return actual action state as float, for regular two state buttons returns 0 or 1, for analog buttons/axes returns value in interval <0, 1> with consideration of defined deadzones
 	*/
 	proto native float	GetAction(int action, bool check_focus = true);
+	proto native float	GetAction_STR(string action, bool check_focus = true);
 		
 	/**  
 	\brief Returns true just in frame, when action was invoked (button was pressed)
@@ -117,6 +118,7 @@ class Input
 	@return true if action was invoked in that frame, false otherwise
 	*/
 	proto native bool	GetActionDown(int action, bool check_focus = true);
+	proto native bool	GetActionDown_STR(string action, bool check_focus = true);
 	
 	/**  
 	\brief Returns true just in frame, when release action happened (button was released)
@@ -126,6 +128,7 @@ class Input
 	@see GetActionDown()
 	*/
 	proto native bool	GetActionUp(int action, bool check_focus = true);
+	proto native bool	GetActionUp_STR(string action, bool check_focus = true);
 
 	/**  
 	\brief Returns true just in frame, when hold action invoked (button is hold)
@@ -135,6 +138,7 @@ class Input
 	@see GetActionHold()
 	*/
 	proto native bool	GetActionHold(int action, bool check_focus = true);
+	proto native bool	GetActionHold_STR(string action, bool check_focus = true);
 
 	/**  
 	\brief Returns true just in frame, when double click action invoked (button double clicked)
@@ -144,6 +148,7 @@ class Input
 	@see GetActionDbl()
 	*/
 	proto native bool	GetActionDbl(int action, bool check_focus = true);
+	proto native bool	GetActionDbl_STR(string action, bool check_focus = true);
 
 	proto native void	BlockInput(int key);
 	

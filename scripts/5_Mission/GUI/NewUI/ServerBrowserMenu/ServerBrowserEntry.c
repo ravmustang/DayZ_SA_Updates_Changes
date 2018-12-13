@@ -31,15 +31,15 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	void ServerBrowserEntry( Widget parent, int index, ServerBrowserTab tab )
 	{
+		m_Index++;
+		
 		#ifdef PLATFORM_CONSOLE
 			m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/xbox/server_browser_list_entry.layout", parent );
 		#else
-		#ifdef PLATFORM_WINDOWS
-			m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/pc/server_browser_list_entry.layout", parent );
-		#endif
+			m_Root				= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/pc/server_browser_list_entry_pages.layout", parent );
 		#endif
 		//m_Root.SetSort( index );
-		
+		m_Root.Enable( true );
 		m_Favorite				= m_Root.FindAnyWidget( "favorite_button" );
 		m_Expand				= m_Root.FindAnyWidget( "expand_button" );
 		m_ServerName			= TextWidget.Cast( m_Root.FindAnyWidget( "server_name" ) );
@@ -68,7 +68,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		float alpha = 0.1;
 		if( m_Index % 2 )
 		{
-			alpha = 0.2;
+			alpha = 0.3;
 		}
 		m_Root.SetAlpha( alpha );
 		m_Root.SetHandler( this );
@@ -82,6 +82,11 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	Widget GetRoot()
 	{
 		return m_Root;
+	}
+	
+	void Show(bool show)
+	{
+		m_Root.Show( show );
 	}
 	
 	override bool OnClick( Widget w, int x, int y, int button )
@@ -123,8 +128,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 				ToggleExpand();
 				return true;
 			}
-			else
-			if( w == m_Root )
+			else if( w == m_Root )
 			{
 				Select();
 				return true;
@@ -215,7 +219,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	{
 		m_ServerData = server_info;
 		
-		SetName( server_info.m_Name );
+		SetName( /*"("+ m_Index +") "+*/ server_info.m_Name );
 		SetPasswordLocked( server_info.m_IsPasswordProtected );
 		SetPopulation( server_info.m_CurrentNumberPlayers, server_info.m_MaxPlayers );
 		SetSlots( server_info.m_MaxPlayers );
@@ -223,7 +227,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		SetTime( server_info.m_TimeOfDay, server_info.m_EnvironmentTimeMul );
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
-			SetShard( server_info.m_Official );
+			SetShard( server_info.m_ShardId.ToInt() );
 			SetCharacterAlive( server_info.m_CharactersAlive );
 			SetFriends( server_info.m_SteamFriends );
 			SetMode( server_info.m_Disable3rdPerson );
@@ -246,21 +250,26 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	void SetPopulation( int population, int slots )
 	{
-		/*
-		string pop_text;
-		float pop_percentage = population / slots;
-		if( population == 0 )
-			pop_text	= "#server_browser_entry_empty";
-		else if( pop_percentage < 0.33 )
-			pop_text	= "#server_browser_entry_low" + population.ToString() + ")" ;
-		else if( pop_percentage < 0.66 )
-			pop_text	= "#server_browser_entry_medium" + population.ToString() + ")" ;
-		else if( pop_percentage != 1 )
-			pop_text	= "#server_browser_entry_high" + population.ToString() + ")" ;
-		else
-			pop_text	= "#server_browser_entry_full";
-		*/
-		m_ServerPopulation.SetText( population.ToString() );
+		
+		string pop_text	= "#server_browser_entry_empty";
+		
+		if ( slots > 0 )
+		{
+			float pop_percentage = population / slots;
+			if( population == 0 )
+				pop_text	= "#server_browser_entry_empty";
+			else if( pop_percentage < 0.33 )
+				pop_text	= "#server_browser_entry_low";
+			else if( pop_percentage < 0.66 )
+				pop_text	= "#server_browser_entry_medium";
+			else if( pop_percentage != 1 )
+				pop_text	= "#server_browser_entry_high";
+			else
+				pop_text	= "#server_browser_entry_full";
+		}
+		
+		//m_ServerPopulation.SetText( population.ToString() );
+		m_ServerPopulation.SetText( pop_text );
 	}
 	
 	void SetSlots( int slots )
@@ -426,10 +435,20 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	bool ToggleExpand()
 	{
-		m_IsExpanded = !m_IsExpanded;
+		return SetExpand(!m_IsExpanded);
+	}
+	
+	bool SetExpand(bool expand)
+	{
+		m_IsExpanded = expand;
 		m_Root.FindAnyWidget( "collapse_image" ).Show( m_IsExpanded );
 		m_Root.FindAnyWidget( "expand_image" ).Show( !m_IsExpanded );
 		m_Root.FindAnyWidget( "detailed_info" ).Show( m_IsExpanded );
+		
+		if ( m_ServerData )
+		{
+			m_ServerData.m_IsExpanded = m_IsExpanded;
+		}
 		
 		return m_IsExpanded;
 	}
@@ -444,7 +463,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 			}
 			m_Selected = true;
 			#ifdef PLATFROM_XBOX
-				m_Root.SetColor( 1, 0.3, 0.3, 0.3 ) );
+				m_Root.SetColor( ARGB( 1, 50, 50, 50 ) );
 			#endif
 		}
 	}
@@ -454,7 +473,13 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		if( m_Selected )
 		{
 			m_Selected = false;
-			m_Root.SetColor( ARGB( 0, 0, 0, 0 ) );
+			float alpha = 0.1;
+			if( m_Index % 2 )
+			{
+				alpha = 0.3;
+			}
+			m_Root.SetColor( ARGB( alpha, 50, 50, 50 ) );
+			
 			Lighten( m_Root, null, 0, 0 );
 		}
 	}

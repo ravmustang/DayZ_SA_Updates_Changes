@@ -19,7 +19,7 @@ class FirearmActionAttachMagazine : FirearmActionBase
 
 	override string GetText() //text game displays in HUD hint 
 	{
-		return "#attach_magazine";
+		return "#attach";
 	}
 	
 	/*string GetTargetDescription()

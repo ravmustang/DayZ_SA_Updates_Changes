@@ -38,11 +38,13 @@ class ActionDisinfectPlantBit: ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "#disinfect_plant_a_bit";
+		return "#apply";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
+		return false; // Plant infestation was temporarily disabled.
+		
 		Object targetObject = target.GetObject();
 		
 		if ( targetObject != NULL && targetObject.IsInherited(PlantBase) && !item.IsDamageDestroyed() )
@@ -73,6 +75,6 @@ class ActionDisinfectPlantBit: ActionSingleUseBase
 			SendMessageToClient(action_data.m_Player, plant.StopInfestation( nacdata.param1 ));
 		}
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

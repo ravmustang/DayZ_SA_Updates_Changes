@@ -27,11 +27,12 @@ class ActionBuildPartSwitch: ActionSingleUseBase
 		{
 			BaseBuildingBase base_building = BaseBuildingBase.Cast( targetObject );
 			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			construction_action_data.SetTarget( targetObject );
 			
 			string main_part_name = targetObject.GetActionComponentName( target.GetComponentIndex() );
 			construction_action_data.RefreshPartsToBuild( main_part_name, item );
 			
-			if ( construction_action_data.GetConstructionPartsCount() > 1 && base_building.IsFacingBack( player ) )
+			if ( construction_action_data.GetConstructionPartsCount() > 1 && base_building.IsFacingBack( player, main_part_name ) )
 			{
 				return true;
 			}
@@ -45,9 +46,7 @@ class ActionBuildPartSwitch: ActionSingleUseBase
 		super.Start( action_data );
 		
 		//set next index
-		BaseBuildingBase base_building = BaseBuildingBase.Cast( action_data.m_Target.GetObject() );
 		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
-		
 		construction_action_data.SetNextIndex();
 	}	
 		

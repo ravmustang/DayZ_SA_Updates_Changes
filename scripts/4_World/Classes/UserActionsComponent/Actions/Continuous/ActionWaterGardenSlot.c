@@ -46,6 +46,14 @@ class ActionWaterGardenSlot: ActionContinuousBase
 		if (item.GetQuantity() == 0)
 			return false;
 		
+		// Get the liquid
+		int liquid_type	= item.GetLiquidType();
+
+		if (liquid_type != LIQUID_WATER)
+		{
+			return false; //  Forbid watering of plants with gasoline and other fluids
+		}
+		
 		if ( targetObject.IsInherited(GardenBase) )
 		{
 			GardenBase garden_base = GardenBase.Cast( targetObject );
@@ -54,7 +62,7 @@ class ActionWaterGardenSlot: ActionContinuousBase
 			
 			Slot slot = garden_base.GetSlotBySelection( selection );
 		
-			if ( slot  &&  !slot.GetPlant()  &&  (slot.IsDigged() || slot.IsPlanted())  &&  slot.NeedsWater() ) // !slot.GetPlant() is here because we have separate user action for watering plants
+			if ( slot  &&  !slot.GetPlant()  &&  slot.CanBeWatered() )
 			{
 				return true;
 			}

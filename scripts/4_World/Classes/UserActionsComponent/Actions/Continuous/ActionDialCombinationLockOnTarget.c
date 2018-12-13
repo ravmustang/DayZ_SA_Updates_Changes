@@ -13,8 +13,8 @@ class ActionDialCombinationLockOnTarget: ActionContinuousBase
 	void ActionDialCombinationLockOnTarget()
 	{
 		m_CallbackClass = ActionDialCombinationLockOnTargetCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_TUNE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_TUNE;		
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM;		
 		m_MessageStartFail = "I have failed the tunning.";
 		m_MessageStart = "I have started the tunning.";
 		m_MessageFail = "I have failed the tunning.";
@@ -49,7 +49,7 @@ class ActionDialCombinationLockOnTarget: ActionContinuousBase
 			combination_lock_text = construction_action_data.GetDialNumberText();
 		}		
 
-		return "#dial_combination_lock_on_target" + " " + combination_lock_text;	
+		return "#dial_combination_lock" + " " + combination_lock_text;	
 	}
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )

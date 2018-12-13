@@ -5,13 +5,13 @@ class VicinityContainer: CollapsibleContainer
 	ref map<int, ref Container>			m_ShowedItemsIDs			= new ref map<int, ref Container>;
 	ref array<Object>					m_ShowedItemIcons			= new array<Object>;
 
-	void VicinityContainer( LayoutHolder parent )
+	void VicinityContainer( LayoutHolder parent, int sort = -1 )
 	{
 		m_VicinityIconsContainer = new VicinitySlotsContainer( this );
 		m_Body.Insert( m_VicinityIconsContainer );
 		RecomputeOpenedContainers();
 		Header h = Header.Cast( m_Body.Get(0) );
-		h.SetName("VICINITY");
+		h.SetName("#container_vicinity");
 		LoadDefaultState();
 	}
 	
@@ -148,10 +148,11 @@ class VicinityContainer: CollapsibleContainer
 		{
 			return;
 		}
-		if( GetFocusedContainer() && (GetFocusedContainer().IsInherited( ContainerWithCargo ) || GetFocusedContainer().IsInherited( ContainerWithCargoAndAttachments )) )
+		if( GetFocusedContainer() && ( GetFocusedContainer().IsInherited( ContainerWithElectricManager ) || GetFocusedContainer().IsInherited( ContainerWithCargo ) || GetFocusedContainer().IsInherited( ContainerWithCargoAndAttachments )) )
 		{
 			ContainerWithCargo iwc = ContainerWithCargo.Cast( GetFocusedContainer() );
 			ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( GetFocusedContainer() );
+			ContainerWithElectricManager iwem = ContainerWithElectricManager.Cast( GetFocusedContainer() );
 			if( iwc )
 			{
 				iwc.MoveGridCursor(direction);
@@ -160,135 +161,16 @@ class VicinityContainer: CollapsibleContainer
 			{
 				iwca.MoveGridCursor( direction );
 			}
+			else if ( iwem )
+			{
+				iwem.MoveGridCursor( direction );
+			}
 		}
-		else
+		else if( GetFocusedContainer() == m_VicinityIconsContainer )
 		{
 			m_VicinityIconsContainer.MoveGridCursor( direction );
 		}
 	}
-
-
-	/*bool IsActive()
-	{
-		for ( int i = 1; i < m_Body.Count(); i++ )
-		{
-			Container cont = m_Body[i];
-			if( cont.IsActive() )
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	void SetActive( bool active )
-	{
-		if( active )
-		{
-			m_VicinityIconsContainer.SetActive( true );
-			m_ActiveIndex = 1;
-		}
-		else
-		{
-			for ( int i = 1; i < m_Body.Count(); i++ )
-			{
-				Container cont = m_Body[i];
-				if( cont.IsActive() )
-				{
-					cont.SetActive( false );
-					m_ActiveIndex = 1;
-				}
-			}
-		}
-	}*/
-
-	/*int m_ActiveIndex = 1;
-	void SetNextActive()
-	{
-		Container active = m_Body[m_ActiveIndex];
-		if( !active.IsActive() )
-		{
-			return;
-		}
-		active.SetActive( false );
-		Container next;
-		if( ++m_ActiveIndex < m_Body.Count() )
-		{
-			next = m_Body[m_ActiveIndex];
-		}
-		while( next && !next.GetMainWidget().IsVisible() )
-		{
-			if( ++m_ActiveIndex < m_Body.Count() )
-			{
-				next = m_Body[m_ActiveIndex];
-			}
-		}
-		if( next )
-		{
-			next.SetActive( true );
-		}
-		else
-		{
-			m_ActiveIndex = 1;
-			Container first = m_Body[m_ActiveIndex];
-			first.SetActive( true );
-		}
-	}
-
-	void SetPreviousActive()
-	{
-		Container active = m_Body[m_ActiveIndex];
-		active.SetActive( false );
-		Container prev;
-		if( --m_ActiveIndex > 0 )
-		{
-			prev = m_Body[m_ActiveIndex];
-		}
-		while( prev && !prev.GetMainWidget().IsVisible() )
-		{
-			if( --m_ActiveIndex > 0 )
-			{
-				prev = m_Body[m_ActiveIndex];
-			}
-		}
-		if(prev)
-		{
-			prev.SetActive( true );
-		}
-		else
-		{
-			m_ActiveIndex = m_Body.Count() - 1;
-			Container first = m_Body[m_ActiveIndex];
-			first.SetActive( true );
-		}
-	}
-
-	*/
-	/*void LoadDefaultState()
-	{
-		m_Hidden = !ItemManager.GetInstance().GetDefaultHeaderOpenState( "VICINITY" );
-
-		if( m_Hidden )
-		{
-			OnHide();
-			Print(GetMainWidget().GetName());
-			/*for ( int i = 1; i < m_Body.Count(); i++ )
-			{
-				m_Body.Get( i ).OnHide();
-			}*/
-	/*	}
-		else
-		{
-			OnShow();
-			/*for ( i = 1; i < m_Body.Count(); i++ )
-			{
-				m_Body.Get( i ).OnShow();
-			}*/
-		/*}
-
-		//GetMainWidget().FindAnyWidget("opened").Show(!m_Hidden);
-		//GetMainWidget().FindAnyWidget("closed").Show(m_Hidden);
-	}*/
 
 	void TraverseShowedItems()
 	{
@@ -524,7 +406,7 @@ class VicinityContainer: CollapsibleContainer
 		if( !item.GetInventory().CanRemoveEntity() )
 			return;
 		
-		if( player.CanDropEntity( item ) )
+		if( player.CanDropEntity( item ) && !m_ShowedItems.Contains( item ) )
 		{
 			ItemBase item_base = ItemBase.Cast( item );
 			if( item_base )
@@ -555,6 +437,7 @@ class VicinityContainer: CollapsibleContainer
 
 	override void UpdateInterval()
 	{
+		//Print( GetMainWidget().GetName() );
 		// GetObjectsInVicinity
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		
@@ -586,15 +469,15 @@ class VicinityContainer: CollapsibleContainer
 		for( i = 0; i < objects.Count(); i++ )
 		{
 			Object obj = objects.Get( i );
-			bool showable_item = !objects.Get( i ).IsAnyInherited( { ScriptedEntity, Building, Camera, PlantSuper, PASReceiver, DayZAnimal, UndergroundStash, GardenBase } );
+			bool showable_item = !objects.Get( i ).IsAnyInherited( { ScriptedEntity, Building, Camera, PlantSuper, PASReceiver, DayZAnimal, UndergroundStash } );
 			if ( player.GetInventory().IsPlaceholderEntity(obj) )
 				continue; // noproxy: ignore body placeholder
 			if ( obj.GetParent() || ( EntityAI.Cast( obj ) && EntityAI.Cast( obj ).GetHierarchyParent() ) )
 				continue; // noproxy: ignore owned items
 
-			// Temporary solution for making GardenBase objects visible in vicinity
-			//if (!showable_item )
-				//showable_item = objects.Get( i ).IsAnyInherited( { GardenBase } );
+			// Temporary solution for making GardenPlot objects visible in vicinity
+			if (!showable_item )
+				showable_item = objects.Get( i ).IsAnyInherited( { GardenPlot } );
 
 			if( showable_item )
 			{
@@ -625,7 +508,7 @@ class VicinityContainer: CollapsibleContainer
 
 						if( GetGame().ConfigIsExisting( config ) )
 						{
-							AttachmentCategoriesContainer ac = new AttachmentCategoriesContainer( m_Parent );
+							AttachmentCategoriesContainer ac = new AttachmentCategoriesContainer( m_Parent, -1 );
 							ac.SetEntity( entity );
 							new_showed_items.Insert( entity, ac );
 							showed_items_IDs.Insert( entity.GetID(), ac);
@@ -638,14 +521,14 @@ class VicinityContainer: CollapsibleContainer
 								{
 									continue;
 								}
-								ZombieContainer zmb_cnt = new ZombieContainer( m_Parent );
+								ZombieContainer zmb_cnt = new ZombieContainer( m_Parent, -1 );
 								zmb_cnt.SetEntity( entity );
 								new_showed_items.Insert( entity, zmb_cnt );
 								showed_items_IDs.Insert( entity.GetID(), zmb_cnt );
 
 							} else
 							{
-								ContainerWithCargoAndAttachments iwca = new ContainerWithCargoAndAttachments( this );
+								ContainerWithCargoAndAttachments iwca = new ContainerWithCargoAndAttachments( this, -1 );
 								iwca.SetEntity( entity );
 								new_showed_items.Insert( entity, iwca );
 								showed_items_IDs.Insert( entity.GetID(), iwca );
@@ -654,7 +537,7 @@ class VicinityContainer: CollapsibleContainer
 						else if( entity.GetInventory().GetCargo() )
 						{
 							{
-								ContainerWithCargo iwc = new ContainerWithCargo( this );
+								ContainerWithCargo iwc = new ContainerWithCargo( this, -1 );
 								iwc.SetEntity( entity );
 								new_showed_items.Insert( entity, iwc );
 								showed_items_IDs.Insert( entity.GetID(), iwc );
@@ -665,7 +548,7 @@ class VicinityContainer: CollapsibleContainer
 						{
 							if( entity.HasEnergyManager() )
 							{
-								ContainerWithElectricManager iwem = new ContainerWithElectricManager( this );
+								ContainerWithElectricManager iwem = new ContainerWithElectricManager( this, -1 );
 								iwem.SetEntity( entity );
 								new_showed_items.Insert( entity, iwem );
 								showed_items_IDs.Insert( entity.GetID(), iwem );
@@ -687,7 +570,7 @@ class VicinityContainer: CollapsibleContainer
 									showed_items_IDs.Insert( entity.GetID(), plyr_cnt);
 								} else
 								{
-									ContainerWithCargoAndAttachments iwcas = new ContainerWithCargoAndAttachments( this );
+									ContainerWithCargoAndAttachments iwcas = new ContainerWithCargoAndAttachments( this, -1 );
 									iwcas.SetEntity( entity );
 									new_showed_items.Insert( entity, iwcas );
 									showed_items_IDs.Insert( entity.GetID(), iwcas );
@@ -743,19 +626,70 @@ class VicinityContainer: CollapsibleContainer
 	void ToggleContainer( Container conta )
 	{
 		Container cont = conta;
-
-		if( cont && cont.IsInherited( ClosableContainer ) )
+		ClosableContainer c;
+		if( cont )
 		{
-			ClosableContainer c = ClosableContainer.Cast( cont );
-			if( c.IsOpened() )
+			if( cont.IsInherited( ClosableContainer ) )
 			{
-				c.Close();
+				c = ClosableContainer.Cast( cont );
+				if( c.IsOpened() )
+				{
+					c.Close();
+				}
+				else
+				{
+					c.Open();
+				}
 			}
-			else
+			else if( cont.IsInherited( VicinitySlotsContainer ) )
 			{
-				c.Open();
+				VicinitySlotsContainer c2 = VicinitySlotsContainer.Cast( cont );
+				if( m_VicinityIconsContainer == c2 )
+				{
+					EntityAI e = c2.GetActiveItem();
+					c = ClosableContainer.Cast( m_ShowedItems.Get( e ) );
+					if( c )
+					{
+						if( c.IsOpened() )
+						{
+							c.Close();
+						}
+						else
+						{
+							c.Open();
+						}
+					}
+				}
 			}
 		}
+	}
+	
+	void ExpandCollapseContainer()
+	{
+		ToggleContainer( GetFocusedContainer() );
+	}
+	
+	override bool OnChildRemove( Widget w, Widget child )
+	{
+		w.Update();
+		float x, y;
+		w.GetScreenSize( x, y );
+		if( w == GetMainWidget() )
+		{
+			GetMainWidget().Update();
+			m_Parent.OnChildRemove( w, child );
+		}
+		return true;
+	}
+	
+	override bool OnChildAdd( Widget w, Widget child )
+	{
+		if( w == GetMainWidget() )
+		{
+			GetMainWidget().Update();
+			m_Parent.OnChildAdd( w, child );
+		}
+		return true;
 	}
 
 	override void CollapseButtonOnMouseButtonDown(Widget w)

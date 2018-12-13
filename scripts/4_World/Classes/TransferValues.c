@@ -9,6 +9,7 @@ class TransferValues extends Managed
 	const float VALUE_CHECK_INTERVAL	 	= 5;
 	const float SENSITIVTY_PERCENTAGE 		= 1;//how much the value needs to change up/down from previous update to trigger a new update(in percent)
 
+	const int BLOOD_THRESHOLD_LOW = 3000;
 	PlayerBase m_Player;
 	float m_TimeSinceLastTick = VALUE_CHECK_INTERVAL + 1;
 	
@@ -108,7 +109,7 @@ class TransferValues extends Managed
 	{
 		float blood_current = m_Player.GetHealth("","Blood");
 		//float blood_normalized = blood_current / m_BloodMaxValue;
-		float blood_normalized = Math.InverseLerp(PlayerConstants.BLOOD_THRESHOLD_FATAL, m_BloodMaxValue, blood_current);
+		float blood_normalized = Math.InverseLerp(BLOOD_THRESHOLD_LOW, m_BloodMaxValue, blood_current);
 		blood_normalized = Math.Clamp(blood_normalized,0,1);
 		float difference_normalized = blood_normalized - m_LastBloodUpdate;
 		float diff_abs = Math.AbsFloat(difference_normalized);

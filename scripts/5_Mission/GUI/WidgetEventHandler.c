@@ -17,6 +17,8 @@ class WidgetEventHandler: ScriptedWidgetEventHandler
 	protected ref map<Widget, ref Param> m_OnFocusLost;
 	protected ref map<Widget, ref Param> m_OnController;
 	protected ref map<Widget, ref Param> m_OnUpdate;
+	protected ref map<Widget, ref Param> m_OnChildAdd;
+	protected ref map<Widget, ref Param> m_OnChildRemove;
 
 	static WidgetEventHandler GetInstance()
 	{
@@ -41,6 +43,8 @@ class WidgetEventHandler: ScriptedWidgetEventHandler
 		m_OnFocusLost = new map<Widget, ref Param>;
 		m_OnController = new map<Widget, ref Param>;
 		m_OnUpdate = new map<Widget, ref Param>;
+		m_OnChildAdd = new map<Widget, ref Param>;
+		m_OnChildRemove = new map<Widget, ref Param>;
 	}
 	
 	void UnregisterWidget( Widget w )
@@ -61,6 +65,8 @@ class WidgetEventHandler: ScriptedWidgetEventHandler
 		m_OnFocusLost.Remove( w );
 		m_OnController.Remove( w );
 		m_OnUpdate.Remove( w );
+		m_OnChildAdd.Remove( w );
+		m_OnChildRemove.Remove( w );
 		w.SetHandler( NULL );
 	}
 
@@ -160,6 +166,21 @@ class WidgetEventHandler: ScriptedWidgetEventHandler
 		Param param = new Param2<Managed, string>( eventHandler, functionName );
 		m_OnFocusLost.Insert( w, param );
 	}
+	
+	void RegisterOnChildAdd(Widget w, Managed eventHandler, string functionName )
+	{
+		w.SetHandler( this );
+		Param param = new Param2<Managed, string>( eventHandler, functionName );
+		m_OnChildAdd.Insert( w, param );
+	}
+	
+	void RegisterOnChildRemove(Widget w, Managed eventHandler, string functionName )
+	{
+		w.SetHandler( this );
+		Param param = new Param2<Managed, string>( eventHandler, functionName );
+		m_OnChildRemove.Insert( w, param );
+	}
+	
 	override bool OnClick(Widget w, int x, int y, int button)
 	{
 		Param2<Managed, string> param = Param2<Managed, string>.Cast( m_OnClick.Get( w ) );
@@ -426,6 +447,44 @@ class WidgetEventHandler: ScriptedWidgetEventHandler
 		}
 
 		Param param2 = new Param3<int, int, int>( x, y, wheel );
+		GetGame().GameScript.CallFunctionParams( param.param1, param.param2, NULL, param2 );
+
+		return true;
+	}
+	
+	override bool OnChildAdd( Widget w, Widget child )
+	{
+		Param2<Managed, string> param = Param2<Managed, string>.Cast( m_OnChildAdd.Get( w ) );
+		if( param == NULL )
+		{
+			return false;
+		}
+
+		if( !param.param1 )
+		{
+			m_OnChildAdd.Remove( w );
+		}
+
+		Param param2 = new Param2<Widget, Widget>( w, child );
+		GetGame().GameScript.CallFunctionParams( param.param1, param.param2, NULL, param2 );
+
+		return true;
+	}
+	
+	override bool OnChildRemove( Widget w, Widget child )
+	{
+		Param2<Managed, string> param = Param2<Managed, string>.Cast( m_OnChildRemove.Get( w ) );
+		if( param == NULL )
+		{
+			return false;
+		}
+
+		if( !param.param1 )
+		{
+			m_OnChildRemove.Remove( w );
+		}
+
+		Param param2 = new Param2<Widget, Widget>( w, child );
 		GetGame().GameScript.CallFunctionParams( param.param1, param.param2, NULL, param2 );
 
 		return true;

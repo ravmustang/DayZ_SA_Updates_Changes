@@ -42,7 +42,7 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 	}
 	
 	//damage must be to "Blood" healthType
-	void ProcessHit(float damage, int component, string zone, string ammo, vector modelPos)
+	void ProcessHit(float damage, EntityAI source, int component, string zone, string ammo, vector modelPos)
 	{
 		float dmg_max = m_Player.GetMaxHealth(zone, "Blood");
 		float dmg = damage;
@@ -55,6 +55,15 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 		{
 			AttemptAddBleedingSource(component);
 			//Print("BLEEDING");
+		}
+		//hackerino for zombino:
+		else if (source.IsZombie())
+		{
+			int chance = Math.RandomInt(0,10); //10%
+			if (chance == 1)
+			{
+				AttemptAddBleedingSource(component);
+			}
 		}
 	}
 	
@@ -84,7 +93,7 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 		
 	}
 
-	void OnStoreLoad( ParamsReadContext ctx )
+	void OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		int active_bits;
 		ctx.Read(active_bits);

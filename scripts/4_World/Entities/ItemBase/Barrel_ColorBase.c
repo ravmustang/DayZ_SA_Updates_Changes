@@ -40,15 +40,22 @@ class Barrel_ColorBase : Container_Base
 	override void OnVariablesSynchronized()
 	{
 		super.OnVariablesSynchronized();
-		
-		if ( IsOpen() && IsSoundSynchRemote() )
+				
+		if ( IsPlaceSound() )
 		{
-			SoundBarrelOpenPlay();
+			PlayPlaceSound();
 		}
-		
-		if ( !IsOpen() && IsSoundSynchRemote() )
+		else
 		{
-			SoundBarrelClosePlay();
+			if ( IsOpen() && IsSoundSynchRemote() && !IsBeingPlaced() )
+			{
+				SoundBarrelOpenPlay();
+			}
+			
+			if ( !IsOpen() && IsSoundSynchRemote() && !IsBeingPlaced() )
+			{
+				SoundBarrelClosePlay();
+			}
 		}
 	}
 	
@@ -97,20 +104,6 @@ class Barrel_ColorBase : Container_Base
 		m_RainProcurement.StopRainProcurement();
 		GetInventory().LockInventory(HIDE_INV_FROM_SCRIPT);
 		SoundSynchRemote();
-	}
-
-	override void OnPlacementComplete( Man player )
-	{		
-		super.OnPlacementComplete( player );
-
-		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
-		{
-			SoundParams soundParams = new SoundParams("placeBarrel_SoundSet");
-			SoundObjectBuilder soundBuilder = new SoundObjectBuilder(soundParams);
-			SoundObject soundObject = soundBuilder.BuildSoundObject();
-			soundObject.SetPosition(GetPosition());
-			GetGame().GetSoundScene().Play3D(soundObject, soundBuilder);
-		}	
 	}
 	
 	void DetermineAction ( PlayerBase player )
@@ -457,15 +450,6 @@ class Barrel_ColorBase : Container_Base
 		}
 		return false;
 	}
-
-    override bool CanRemoveFromCargo(EntityAI cargo)
-	{
-		if ( IsOpened() )
-		{
-			return true;
-		}
-		return false;
-	}
 	
 	override bool CanReleaseCargo(EntityAI attachment)
 	{
@@ -474,6 +458,22 @@ class Barrel_ColorBase : Container_Base
 			return true;
 		}
 		return false;
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player )
+	{		
+		super.OnPlacementComplete( player );
+			
+		SetIsPlaceSound( true );
+	}
+	
+	override string GetPlaceSoundset()
+	{
+		return "placeBarrel_SoundSet";
 	}
 };
 

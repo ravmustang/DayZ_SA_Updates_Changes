@@ -51,13 +51,16 @@ class WeaponFireLast extends WeaponStateBase
 			DayZPlayer p;
 			Class.CastTo(p, m_weapon.GetHierarchyParent());
 		
-			HumanInputController hic = p.GetInputController();
+			if (p)
+			{
+				HumanInputController hic = p.GetInputController();
 
-			int muzzleIndex = m_weapon.GetCurrentMuzzle();
-			float reloadTime = m_weapon.GetReloadTime(muzzleIndex);
-			if ( hic.IsUseButton() && m_dtAccumulator >= reloadTime)
-				if (m_weapon.CanProcessWeaponEvents())
-					m_weapon.ProcessWeaponEvent(new WeaponEventReloadTimeout(p));
+				int muzzleIndex = m_weapon.GetCurrentMuzzle();
+				float reloadTime = m_weapon.GetReloadTime(muzzleIndex);
+				if ( hic.IsUseButton() && m_dtAccumulator >= reloadTime)
+					if (m_weapon.CanProcessWeaponEvents())
+						m_weapon.ProcessWeaponEvent(new WeaponEventReloadTimeout(p));
+			}
 		}
 	}
 

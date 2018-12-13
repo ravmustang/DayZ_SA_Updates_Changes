@@ -3,7 +3,6 @@ enum eMixedSoundStates
 {
 	HUNGRY = 1,
 	THIRSTY = 2,
-	FREEZING = 4,
 	//---------
-	COUNT;
+	COUNT = 4//! bits, must be 2x the size of previous element !
 }

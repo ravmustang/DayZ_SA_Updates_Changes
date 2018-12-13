@@ -1,21 +1,72 @@
 class ContainerWithElectricManager: ClosableContainer
 {
-// 	EntityAI m_Entity;
-	ref Attachments m_Atts;
 	
-	void ContainerWithElectricManager( Container parent )
+	ref Attachments m_Atts;
+	protected ref map<EntityAI, ref IconsContainer>		m_AttachmentCargoGrids;
+	protected ref map<EntityAI, ref UICargoGrid>		m_AttachmentCargos;
+	
+	void ContainerWithElectricManager( Container parent, int sort = -1 )
 	{
 		m_Parent = parent;
+		m_AttachmentCargoGrids	= new map<EntityAI, ref IconsContainer>;
+		m_AttachmentCargos		= new map<EntityAI, ref UICargoGrid>;
 	}
 
 	override void UpdateInterval()
 	{
 		if( m_Entity )
 		{
+			int i;
+			/*
+			array<EntityAI> cargo_attachments = m_Entity.GetAttachmentsWithCargo();
+			if( cargo_attachments && m_AttachmentCargoGrids )
+			{
+				for( i = 0; i < m_AttachmentCargoGrids.Count(); i++ )
+				{
+					EntityAI e			= m_AttachmentCargoGrids.GetKey( i );
+					
+					if( e )
+					{
+						if( cargo_attachments.Find( e ) == -1 )
+						{
+							IconsContainer old_cont = m_AttachmentCargoGrids.GetElement( i );
+							m_Body.RemoveItem( old_cont );
+							m_AttachmentCargoGrids.Remove( e );
+							m_AttachmentCargos.Remove( e );
+						}
+						else
+						{
+							m_AttachmentCargos.Get( e ).UpdateInterval();
+						}
+					}
+				}
+				
+				for( i = 0; i < cargo_attachments.Count(); i++ )
+				{
+					if( !m_AttachmentCargoGrids.Contains( cargo_attachments.Get( i ) ) )
+					{
+						ref IconsContainer cont = new IconsContainer( this );
+						cont.GetRootWidget().SetSort( i + 3 );
+						this.Insert( cont );
+						
+						ref UICargoGrid att_grid = new UICargoGrid( cargo_attachments.Get( i ), cont );
+						m_AttachmentCargos.Insert( cargo_attachments.Get( i ), att_grid );
+						att_grid.SetParent( this );
+						
+						m_AttachmentCargoGrids.Insert( cargo_attachments.Get( i ), cont );
+					}
+				}
+			}
+			*/
 			m_Atts.RefreshAtt();
 			RefreshSocketIcons();
 			ElectricityIcon();
 		}
+	}
+	
+	override void MoveGridCursor( int direction )
+	{
+		m_Atts.MoveGridCursor( direction );
 	}
 	
 	void ElectricityIcon()
@@ -333,8 +384,7 @@ class ContainerWithElectricManager: ClosableContainer
 		h.SetName( entity.GetDisplayName() );
 		h.SetItemPreview( m_Entity );
 		m_Atts = new Attachments( this, entity );
-		m_Atts.InitAttachmentGrid();
-		
+		m_Atts.InitAttachmentGrid( 1 );
 		//START - InitSocketGrid();
 			int count = m_Entity.GetCompEM().GetSocketsCount();
 
@@ -355,6 +405,156 @@ class ContainerWithElectricManager: ClosableContainer
 		( Container.Cast( m_Parent ) ).Insert( this );
 
 		m_Parent.m_Parent.Refresh();
+	}
+	
+		int GetCargoHeight()
+	{
+		int count;
+		foreach( UICargoGrid grid : m_AttachmentCargos )
+		{
+			count += grid.GetCargoHeight();
+		}
+		return count;
+	}
+	
+	Widget GetLastRowWidget()
+	{
+		if( m_AttachmentCargos.Count() > 0 )
+			return m_AttachmentCargos.GetElement( m_AttachmentCargos.Count() - 1 ).GetLastRowWidget();	
+		else
+			return null;
+	}
+	
+	bool DraggingOverGrid( Widget w,  int x, int y, Widget reciever, IconsContainer cargo )
+	{
+		if( w == NULL )
+		{
+			return false;
+		}
+		
+		EntityAI item = GetItemPreviewItem( w );
+		
+		if( !item )
+		{
+			return false;
+		}
+
+		int color;
+		int idx = 0;
+		int c_x, c_y;
+		
+		EntityAI target_entity;
+		CargoBase target_cargo;
+		
+		target_entity	= m_AttachmentCargoGrids.GetKeyByValue( cargo );
+		if( target_entity )
+		{
+			target_cargo 	= target_entity.GetInventory().GetCargo();
+		}
+		else
+			return false;
+		
+		if( target_cargo && target_entity )
+		{
+			c_x = target_cargo.GetHeight();
+			c_y = target_cargo.GetWidth();
+		}
+		else
+			return false;
+		
+		if( c_x > x && c_y > y && target_entity.GetInventory().CanAddEntityInCargoEx( item, idx, x, y ) )
+		{
+			color = ColorManager.GREEN_COLOR;
+		}
+		else
+		{
+			color = ColorManager.RED_COLOR;
+		}
+
+		if( w.FindAnyWidget("Color") )
+		{
+			w.FindAnyWidget("Color").SetColor( color );
+		}
+		else
+		{
+			string name = w.GetName();
+			name.Replace( "PanelWidget", "Col" );
+			if( w.FindAnyWidget( name ) )
+			{
+				w.FindAnyWidget( name ).SetColor( color );
+			}
+		}
+
+		return true;
+	}
+
+	void DropReceived( Widget w, int x, int y, IconsContainer cargo )
+	{
+		EntityAI item = GetItemPreviewItem( w );
+		if( !item )
+		{
+			return;
+		}
+
+		int idx = 0;
+		int c_x, c_y;
+		
+		EntityAI target_entity;
+		CargoBase target_cargo;
+		
+		target_entity	= m_AttachmentCargoGrids.GetKeyByValue( cargo );
+		if( target_entity )
+		{
+			target_cargo 	= target_entity.GetInventory().GetCargo();
+		}
+		else
+			return;
+		
+		if( target_cargo && target_entity )
+		{
+			c_x = target_cargo.GetHeight();
+			c_y = target_cargo.GetWidth();
+		}
+		else
+			return;
+		
+		if( c_x > x && c_y > y && target_entity.GetInventory().CanAddEntityInCargoEx( item, idx, x, y ) )
+		{
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+
+			TakeIntoCargo( player, target_entity, item, idx, x, y );
+
+			Icon icon = cargo.GetIcon( item.GetID() );
+			
+			if( icon )
+			{
+				//w.FindAnyWidget("Color").SetColor( ColorManager.BASE_COLOR );
+				icon.RefreshPos( x, y );
+				icon.Refresh();
+				Refresh();
+			}
+		}
+	}
+	
+	void TakeIntoCargo( notnull PlayerBase player, notnull EntityAI entity, notnull EntityAI item, int idx = -1, int row = 0, int col = 0 )
+	{
+		ItemBase item_base = ItemBase.Cast( item );
+		float stackable = item_base.ConfigGetFloat("varStackMax");
+		
+		if( !item.GetInventory().CanRemoveEntity() )
+			return;
+		
+		if( stackable == 0 || stackable >= item_base.GetQuantity() )
+		{
+			if( idx != -1 )
+				player.PredictiveTakeEntityToTargetCargoEx( entity, item, idx, row, col );
+			else
+				player.PredictiveTakeEntityToTargetAttachment(entity, item);
+		}
+		else if( stackable != 0 && stackable < item_base.GetQuantity() )
+		{
+			item_base.SplitIntoStackMaxCargoClient( entity, idx, row, col );
+		}
 	}
 
 	void ~ContainerWithElectricManager()

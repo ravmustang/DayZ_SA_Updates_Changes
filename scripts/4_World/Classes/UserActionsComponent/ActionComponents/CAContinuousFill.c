@@ -32,7 +32,7 @@ class CAContinuousFill : CAContinuousBase
 		
 		m_ItemQuantity = action_data.m_MainItem.GetQuantity();
 		m_TargetUnits = action_data.m_MainItem.GetQuantityMax() - action_data.m_MainItem.GetQuantity();	
-		m_AdjustedQuantityFilledPerSecond = action_data.m_Player.GetSoftSkillManager().AddSpecialtyBonus( m_QuantityFilledPerSecond, m_Action.GetSpecialtyWeight(), true );
+		m_AdjustedQuantityFilledPerSecond = action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( m_QuantityFilledPerSecond, m_Action.GetSpecialtyWeight(), true );
 	}
 	
 	override int Execute( ActionData action_data )
@@ -85,7 +85,7 @@ class CAContinuousFill : CAContinuousBase
 	{				
 		if ( GetGame().IsServer() )
 		{
-			action_data.m_Player.GetSoftSkillManager().AddSpecialty( UASoftSkillsWeight.PRECISE_LOW );
+			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( UASoftSkillsWeight.PRECISE_LOW );
 		}
 		
 		return super.Interrupt( action_data );

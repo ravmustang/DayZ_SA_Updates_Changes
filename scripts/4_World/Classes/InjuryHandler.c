@@ -6,13 +6,13 @@ class InjuryHandlerThresholds
 	const float RUINED = 0.2;
 };
 
-class InjuryHandlerValues
+class InjuryAnimValues
 {
-	const float PRISTINE = 0;
-	const float WORN = 0.3;
-	const float DAMAGED = 0.6;
-	const float BADLY_DAMAGED = 0.8;
-	const float RUINED = 1;
+	const float LVL0 = 0;
+	const float LVL1 = 0.3;
+	const float LVL2 = 0.6;
+	const float LVL3 = 0.8;
+	const float LVL4 = 1;
 };
 
 enum eInjuryHandlerLevels
@@ -24,7 +24,7 @@ enum eInjuryHandlerLevels
 	RUINED,
 }
 
-class InjuryHandler
+class InjuryAnimationHandler
 {
 
 	const float VALUE_CHECK_INTERVAL	 	= 5;
@@ -44,7 +44,7 @@ class InjuryHandler
 	private float m_InjuryAnimDamageValue = 0;
 	
 	
-	void InjuryHandler(PlayerBase player)
+	void InjuryAnimationHandler(PlayerBase player)
 	{
 		m_Player = player;
 		m_HealthMaxValue 	= m_Player.GetMaxHealth("", "Health");
@@ -74,23 +74,6 @@ class InjuryHandler
 		
 	}
 
-/*
-	void CheckValue()
-	{
-		float health_current = m_Player.GetHealth("","Health");
-		float health_normalized = Math.Clamp( (health_current / m_HealthMaxValue) * 2, 0, 1);
-		float difference_normalized = health_normalized - m_LastHealthUpdate;
-		float diff_abs = Math.AbsFloat(difference_normalized);
-		
-		if( diff_abs > ( SENSITIVTY_PERCENTAGE /100 ) )
-		{
-			SendValue(health_normalized);
-			m_LastHealthUpdate = health_normalized;
-		}
-		
-	}
-	*/
-	
 	void CheckValue(bool forceUpdate = false)
 	{
 		float health_current_normalized = m_Player.GetHealth("","Health") / m_HealthMaxValue;
@@ -103,7 +86,6 @@ class InjuryHandler
 			m_LastHealthUpdate = injury_level;
 			Synchronize(injury_level);
 		}
-		
 	}
 	
 	void Synchronize(eInjuryHandlerLevels level)
@@ -124,33 +106,6 @@ class InjuryHandler
 		m_InjuryAnimEnabled = enable;
 		m_InjuryAnimDamageValue = GetInjuryValue(level);
 	}
-	
-	/*
-	float GetInjuryLevel(float health)
-	{
-		if ( health  < InjuryHandlerThresholds.RUINED ) 
-		{
-			return InjuryHandlerLevels.RUINED;
-		}
-		
-		if ( health  < InjuryHandlerThresholds.BADLY_DAMAGED ) 
-		{
-			return InjuryHandlerLevels.BADLY_DAMAGED;
-		}
-		
-		if ( health  < InjuryHandlerThresholds.DAMAGED ) 			
-		{
-			return InjuryHandlerLevels.DAMAGED;
-		}
-		
-		if ( health  < InjuryHandlerThresholds.WORN ) 		
-		{
-			return InjuryHandlerLevels.WORN;
-		}
-		
-		return InjuryHandlerLevels.PRISTINE;
-	}
-	*/
 	
 	eInjuryHandlerLevels GetInjuryLevel(float health)
 	{
@@ -184,23 +139,23 @@ class InjuryHandler
 		{
 			case eInjuryHandlerLevels.RUINED:
 			{
-				return InjuryHandlerValues.RUINED;
+				return InjuryAnimValues.LVL4;
 			}
 			case eInjuryHandlerLevels.BADLY_DAMAGED:
 			{
-				return InjuryHandlerValues.BADLY_DAMAGED;
+				return InjuryAnimValues.LVL3;
 			}
 			case eInjuryHandlerLevels.DAMAGED:
 			{
-				return InjuryHandlerValues.DAMAGED;
+				return InjuryAnimValues.LVL2;
 			}
 			case eInjuryHandlerLevels.WORN:
 			{
-				return InjuryHandlerValues.WORN;
+				return InjuryAnimValues.LVL1;
 			}
 			case eInjuryHandlerLevels.PRISTINE:
 			{
-				return InjuryHandlerValues.PRISTINE;
+				return InjuryAnimValues.LVL0;
 			}
 			default:
 				Error("Undefined Injury level");

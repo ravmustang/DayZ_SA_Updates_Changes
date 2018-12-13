@@ -169,7 +169,7 @@ class ActionManagerServer: ActionManagerBase
 					//{
 					//	accepted = false;
 					//}
-					/*else*/ if( !Building.Cast(targetEntity))
+					if( !AdvancedCommunication.Cast(targetEntity) && !Building.Cast(targetEntity) )
 					{
 						//Lock target
 						if( !GetGame().AddActionJuncture(m_Player,targetEntity,10000) )
@@ -313,25 +313,11 @@ class ActionManagerServer: ActionManagerBase
 		}
 	}
 	
-	
-	override void OnSyncJuncture(int pJunctureID, ParamsReadContext pCtx)
+	override void Interrupt()
 	{
-		int AcknowledgmentID;
-		pCtx.Read(AcknowledgmentID);
-		
-		if ( m_CurrentActionData && AcknowledgmentID == m_PendingActionAcknowledgmentID)
-		{
-			if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_ACCEPT)
-				m_CurrentActionData.m_State = UA_AM_ACCEPTED;
-			else if (pJunctureID == DayZPlayerSyncJunctures.SJ_ACTION_ACK_REJECT)
-				m_CurrentActionData.m_State = UA_AM_REJECTED;
-		}
+		if ( m_CurrentActionData )
+			DayZPlayerSyncJunctures.SendActionInterrupt(m_Player);
 	}
-	
-	/*private void Interrupt()
-	{
-		DayZPlayerSyncJunctures.SendActionInterrupt(m_Player);
-	}*/
 	
 	override ActionReciveData GetReciveData()
 	{

@@ -50,7 +50,7 @@ class ActionBuryAshes: ActionContinuousBase
 
 	override string GetText()
 	{
-		return "#bury_ashes";
+		return "#bury";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -71,7 +71,7 @@ class ActionBuryAshes: ActionContinuousBase
 		GetGame().ObjectDelete( action_data.m_Target.GetObject() );
 
 		//add soft skill specialty
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( UASoftSkillsWeight.ROUGH_LOW );	
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( UASoftSkillsWeight.ROUGH_LOW );	
 	}
 	
 	override void OnEndServer( ActionData action_data  )

@@ -1,12 +1,12 @@
 class DisplayElementTendency extends DisplayElementBase
 {
-	protected int TENDENCY_MASK = 7;// 3 bits
-	protected int SERIOUSNESS_BIT_MASK = 3;// 2 bits
-	protected int SERIOUSNESS_BIT_OFFSET = 3;//3 bit offset
+	protected int TENDENCY_MASK = 7;// first x bits
+	protected int SERIOUSNESS_BIT_MASK = 7;// second x bits
+	protected int SERIOUSNESS_BIT_OFFSET = 3;//bit offset - points to where seriousness bit starts(TODO: get as log from mask)
 	
 	void DisplayElementTendency()
 	{
-		NUM_OF_BITS = 5;
+		NUM_OF_BITS = 6;//the overall num of bits this element occupies(can be calculated from masks, better leave it explicit)
 	}
 	
 	void SetSeriousnessLevel( DSLevels level )
@@ -25,10 +25,11 @@ class DisplayElementTendency extends DisplayElementBase
 		{
 			tendency = -(tendency - 3);
 		}
-		
-		//PrintString("ser:"+ seriousness.ToString());
-		//PrintString("tnd:"+ tendency.ToString());
-		//PrintString(this.ToString());
+		/*
+		PrintString(this.ToString());
+		PrintString("ser:"+ seriousness.ToString());
+		PrintString("tnd:"+ tendency.ToString());
+		*/
 		m_ModulePlayerStatus.DisplayTendency(m_Key, tendency, TranslateLevelToStatus(seriousness));
 	}
 	

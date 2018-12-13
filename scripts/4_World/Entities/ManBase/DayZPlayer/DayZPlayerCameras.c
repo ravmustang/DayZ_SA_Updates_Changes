@@ -24,8 +24,9 @@ class DayZPlayerCameras
 	
 	// some times for camera changes
 	static const float 	TIME_CAMERACHANGE_01 				= 0.1;
-	static const float 	TIME_CAMERACHANGE_015 				= 0.15;
 	static const float 	TIME_CAMERACHANGE_02 				= 0.2;
+	static const float 	TIME_CAMERACHANGE_03 				= 0.3;
+	
 
 	static ref map<int,float>								m_TransitionTimes = new map<int,float>;
 
@@ -104,15 +105,15 @@ class DayZPlayerCameras
 		RegisterTransitionTime(DAYZCAMERA_3RD_PRO, DAYZCAMERA_IRONSIGHTS, TIME_CAMERACHANGE_02, true);
 		
 		//! optics camera transitions
-		RegisterTransitionTime(DAYZCAMERA_IRONSIGHTS, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_01, true);
-		RegisterTransitionTime(DAYZCAMERA_3RD_ERC_RAISED, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_015, true);
-		RegisterTransitionTime(DAYZCAMERA_3RD_CRO_RAISED, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_015, true);
-		RegisterTransitionTime(DAYZCAMERA_3RD_PRO_RAISED, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_015, true);
+		RegisterTransitionTime(DAYZCAMERA_IRONSIGHTS, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_02, true);
+		RegisterTransitionTime(DAYZCAMERA_3RD_ERC_RAISED, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_03, true);
+		RegisterTransitionTime(DAYZCAMERA_3RD_CRO_RAISED, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_03, true);
+		RegisterTransitionTime(DAYZCAMERA_3RD_PRO_RAISED, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_03, true);
 		
-		RegisterTransitionTime(DAYZCAMERA_1ST, DAYZCAMERA_OPTICS, 0, true); 	//handheld optics only, instant transition is desired
-		RegisterTransitionTime(DAYZCAMERA_3RD_ERC, DAYZCAMERA_OPTICS, 0, true); //handheld optics only, instant transition is desired
-		RegisterTransitionTime(DAYZCAMERA_3RD_CRO, DAYZCAMERA_OPTICS, 0, true); //handheld optics only, instant transition is desired
-		RegisterTransitionTime(DAYZCAMERA_3RD_PRO, DAYZCAMERA_OPTICS, 0, true); //handheld optics only, instant transition is desired
+		RegisterTransitionTime(DAYZCAMERA_1ST, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_02, true); 	//handheld optics only
+		RegisterTransitionTime(DAYZCAMERA_3RD_ERC, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_02, true);	//handheld optics only
+		RegisterTransitionTime(DAYZCAMERA_3RD_CRO, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_02, true);	//handheld optics only
+		RegisterTransitionTime(DAYZCAMERA_3RD_PRO, DAYZCAMERA_OPTICS, TIME_CAMERACHANGE_02, true);	//handheld optics only
 		
 		//! register function to handle camera changes 
 		pType.RegisterCameraOnChangeFnStatic(DayZPlayerCameras, "OnCameraChange");

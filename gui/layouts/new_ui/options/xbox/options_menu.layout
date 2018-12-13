@@ -63,7 +63,7 @@ FrameWidgetClass settings_menu_root {
          imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
          mode blend
          "src alpha" 1
-         "no wrap" 0
+         "no wrap" 1
          stretch 1
         }
         GridSpacerWidgetClass Tab_Control_Container {
@@ -129,7 +129,7 @@ FrameWidgetClass settings_menu_root {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -185,7 +185,7 @@ FrameWidgetClass settings_menu_root {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -241,7 +241,7 @@ FrameWidgetClass settings_menu_root {
              imageTexture "{5A89D58DD2276E85}Gui/textures/SerratedBlack2.edds"
              mode blend
              "src alpha" 1
-             "no wrap" 0
+             "no wrap" 1
              stretch 1
              "flip u" 0
              "flip v" 0
@@ -411,7 +411,7 @@ FrameWidgetClass settings_menu_root {
      vexactsize 0
      priority 100
      "no focus" 1
-     Padding 8
+     Padding 4
      Margin 0
      "Size To Content H" 1
      "Size To Content V" 1
@@ -419,15 +419,15 @@ FrameWidgetClass settings_menu_root {
      content_valign center
      {
       GridSpacerWidgetClass Toggle {
-       visible 0
+       visible 1
        clipchildren 0
-       size 120 1
+       size 120 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 3
        "no focus" 1
        Padding 4
@@ -443,7 +443,6 @@ FrameWidgetClass settings_menu_root {
          clipchildren 0
          inheritalpha 0
          size 36 36
-         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 1
@@ -461,30 +460,32 @@ FrameWidgetClass settings_menu_root {
         }
         TextWidgetClass ToggleText {
          clipchildren 0
-         position 40 0
-         size 88 22
-         valign center_ref
+         size 88 36
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
          text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Toggle_ToggleText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
        }
       }
       GridSpacerWidgetClass Apply {
-       visible 0
+       visible 1
        clipchildren 0
-       size 193 1
+       size 193 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 2
        "no focus" 1
        Padding 4
@@ -499,9 +500,7 @@ FrameWidgetClass settings_menu_root {
         ImageWidgetClass ApplyIcon {
          clipchildren 0
          inheritalpha 0
-         position 0 0
          size 36 36
-         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 1
@@ -519,30 +518,32 @@ FrameWidgetClass settings_menu_root {
         }
         TextWidgetClass ApplyText {
          clipchildren 0
-         position 40 0
-         size 80 22
-         valign center_ref
+         size 80 36
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
          text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Apply_ApplyText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
        }
       }
       GridSpacerWidgetClass Reset {
-       visible 0
+       visible 1
        clipchildren 0
-       size 159 1
+       size 159 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        priority 1
        "no focus" 1
        Padding 4
@@ -558,7 +559,6 @@ FrameWidgetClass settings_menu_root {
          clipchildren 0
          inheritalpha 0
          size 36 36
-         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 1
@@ -576,29 +576,32 @@ FrameWidgetClass settings_menu_root {
         }
         TextWidgetClass ResetText {
          clipchildren 0
-         position 40 0
-         size 80 22
-         valign center_ref
+         size 80 36
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
          text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Reset_ResetText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }
        }
       }
       GridSpacerWidgetClass Back {
+       visible 1
        clipchildren 0
-       size 86 1
+       size 86 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
-       vexactsize 0
+       vexactsize 1
        "no focus" 1
        Padding 4
        Margin 0
@@ -613,7 +616,6 @@ FrameWidgetClass settings_menu_root {
          clipchildren 0
          inheritalpha 0
          size 36 36
-         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 1
@@ -631,15 +633,17 @@ FrameWidgetClass settings_menu_root {
         }
         TextWidgetClass BackText {
          clipchildren 0
-         position 40 0
-         size 52 22
-         valign center_ref
+         size 52 36
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
          text "#STR_settings_menu_root_toolbar_bg_ConsoleToolbar_Back_BackText0"
          font "gui/fonts/sdf_MetronLight24"
+         "exact text" 1
+         "exact text size" 22
+         "size to text h" 1
+         "size to text v" 0
          "text halign" center
          "text valign" center
         }

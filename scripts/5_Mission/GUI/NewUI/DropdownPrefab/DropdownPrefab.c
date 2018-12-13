@@ -104,6 +104,10 @@ class DropdownPrefab extends ScriptedWidgetEventHandler
 		if( index > -1 )
 		{
 			m_OnSelectItem.Invoke( index );
+			m_IsExpanded = false;
+			m_Scroller.Show( m_IsExpanded );
+			m_ImageExpand.Show( !m_IsExpanded );
+			m_ImageCollapse.Show( m_IsExpanded );
 			return true;
 		}
 		return false;

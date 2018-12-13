@@ -31,7 +31,7 @@ class CAContinuousTimeBuryAshes : CAContinuousBase
 		
 		m_BuryAshesAction = ActionBuryAshes.Cast( m_Action );
 		
-		m_TimeToComplete = action_data.m_Player.GetSoftSkillManager().SubtractSpecialtyBonus( m_DefaultTimeToComplete, m_Action.GetSpecialtyWeight(), true);
+		m_TimeToComplete = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( m_DefaultTimeToComplete, m_Action.GetSpecialtyWeight(), true);
 	}
 	
 	override int Execute( ActionData action_data )

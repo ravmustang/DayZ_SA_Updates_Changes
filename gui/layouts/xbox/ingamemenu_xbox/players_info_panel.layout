@@ -10,7 +10,7 @@ PanelWidgetClass players_info_panel_root {
  {
   PanelWidgetClass players_info_panel_header {
    visible 1
-   color 0.2745 0.2745 0.2745 0.7843
+   color 0 0 0 0.9412
    position 0 0
    size 1 42
    hexactpos 1
@@ -20,6 +20,7 @@ PanelWidgetClass players_info_panel_root {
    style rover_sim_colorable
    {
     TextWidgetClass header_text {
+     clipchildren 0
      position 10 0
      size 0.98 30
      valign center_ref

@@ -12,7 +12,7 @@
 
 class Chat
 {
-	const int LINE_COUNT = 8;
+	const int LINE_COUNT = 12;
 
 	protected Widget					m_RootWidget;
 	protected int						m_LineHeight;
@@ -121,7 +121,6 @@ class Chat
 		{
 			line = m_Lines.Get((m_LastLine + 1 + i) % LINE_COUNT);
 			line.m_RootWidget.SetPos(0, i * m_LineHeight);
-			
 			
 			float x = 0;
 			float y = 0;

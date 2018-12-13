@@ -1,5 +1,6 @@
 WindowWidgetClass LicenseDialogRoot {
  clipchildren 0
+ color 0.0824 0.0824 0.0824 0.7843
  position 0 0
  size 540 248.5
  halign center_ref
@@ -9,7 +10,7 @@ WindowWidgetClass LicenseDialogRoot {
  hexactsize 1
  vexactsize 1
  priority 4000
- style rover_sim_black_2
+ style Colorable
  {
   TextWidgetClass Caption {
    clipchildren 0
@@ -44,6 +45,7 @@ WindowWidgetClass LicenseDialogRoot {
   }
   ButtonWidgetClass bAgree {
    visible 1
+   color 1 0 0 1
    position 14 14
    size 120.5 40
    valign bottom_ref
@@ -52,13 +54,14 @@ WindowWidgetClass LicenseDialogRoot {
    hexactsize 1
    vexactsize 1
    userID 1
-   style Default
+   style EmptyHighlight
    text "#server_browser_agree"
    text_proportion 0.5
    font "gui/fonts/sdf_MetronBook24"
   }
   ButtonWidgetClass bDisagree {
    visible 1
+   color 1 0 0 1
    position 144.5 14
    size 120.5 40
    valign bottom_ref
@@ -67,13 +70,14 @@ WindowWidgetClass LicenseDialogRoot {
    hexactsize 1
    vexactsize 1
    userID 2
-   style Default
+   style EmptyHighlight
    text "#server_browser_disagree"
    text_proportion 0.5
    font "gui/fonts/sdf_MetronBook24"
   }
   ButtonWidgetClass bLicense {
    visible 1
+   color 1 0 0 1
    position 14 14
    size 120.5 40
    halign right_ref
@@ -83,7 +87,7 @@ WindowWidgetClass LicenseDialogRoot {
    hexactsize 1
    vexactsize 1
    userID 6
-   style Default
+   style EmptyHighlight
    text "#server_browser_license"
    text_proportion 0.5
    font "gui/fonts/sdf_MetronBook24"

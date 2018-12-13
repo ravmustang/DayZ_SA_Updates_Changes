@@ -26,13 +26,27 @@ class ComponentAnimalBleeding : Component
 		}	
 		
 		float animal_melee_multiplier = GetGame().ConfigGetFloat( "CfgAmmo " + ammo + " DamageApplied " + "additionAnimalMeleeMultiplier" );
+		
+		if ( animal_melee_multiplier == 0 )
+		{
+			return;
+		}
+		
 		float health_damage_inflicted = damage_result.GetDamage( zone_name, "Health");
 		float blood_damage_inflicted = damage_result.GetDamage( zone_name, "Blood");	
 		float wound_healt_damage = health_damage_inflicted * animal_melee_multiplier;
 		float wound_blood_damage = health_damage_inflicted * animal_melee_multiplier;
 		
-		m_ThisEntityAI.DecreaseHealth( zone_name, "Health", wound_healt_damage );
-		m_ThisEntityAI.DecreaseHealth( zone_name, "Blood", wound_blood_damage );
+		m_ThisEntityAI.DecreaseHealth( "", "Health", wound_healt_damage );
+		m_ThisEntityAI.DecreaseHealth( "", "Blood", wound_blood_damage );
+		
+		if ( zone_name != "" )
+		{
+			m_ThisEntityAI.DecreaseHealth( zone_name, "Health", wound_healt_damage );
+			m_ThisEntityAI.DecreaseHealth( zone_name, "Blood", wound_blood_damage );
+		}	
+		
+		//Print("Zone hit: " + zone_name );
 		
 		//Print("damage_result Health: " + damage_result.GetDamage( zone_name, "Health" ) );
 		//Print("damage_result Blood: " + damage_result.GetDamage( zone_name, "Blood" ) );
@@ -51,9 +65,9 @@ class ComponentAnimalBleeding : Component
 		float chance = Math.RandomFloat01();
 		//Print("chance: " + chance );
 		
-		//Print( "GetHealth Health @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Health" ));
-		//Print( "GetHealth Blood @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Blood" ));
-		//Print( "GetHealth Shock @: " + zone_name + " " + m_ThisEntityAI.GetHealth( zone_name, "Shock" ));
+		//Print( "GetHealth Health @: " + m_ThisEntityAI.GetHealth( zone_name, "Health" ));
+		//Print( "GetHealth Blood @: " + m_ThisEntityAI.GetHealth( zone_name, "Blood" ));
+		//Print( "GetHealth Shock @: " + m_ThisEntityAI.GetHealth( zone_name, "Shock" ));
 		
 		if ( can_bleed && chance <= bleed_treshold )
 		{

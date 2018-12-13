@@ -455,6 +455,7 @@ class RadialMenu : ScriptedWidgetEventHandler
 					if ( m_ControllerTilt >= CONTROLLER_TILT_TRESHOLD )
 					{
 						//Execute
+						//Print("RadialMenu->OnSelectionExecute");
 						GetGame().GameScript.CallFunction( m_RegisteredClass, "OnSelectionExecute", NULL, m_SelectedObject );
 					}				
 				}
@@ -522,14 +523,16 @@ class RadialMenu : ScriptedWidgetEventHandler
 		//A button
 		if ( control == ControlID.CID_SELECT )
 		{
+			//Print("RadialMenu->OnControllerPressA");
 			GetGame().GameScript.CallFunction( m_RegisteredClass, "OnControllerPressA", NULL, m_SelectedObject );
 			
 			return true;
-		}	
+		}
 
 		//B button
 		if ( control == ControlID.CID_BACK )
 		{
+			//Print("RadialMenu->OnControllerPressB");
 			GetGame().GameScript.CallFunction( m_RegisteredClass, "OnControllerPressB", NULL, m_SelectedObject );
 			
 			return true;

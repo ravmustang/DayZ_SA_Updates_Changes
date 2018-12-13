@@ -108,7 +108,7 @@ class CrossHairSelector extends ScriptedWidgetEventHandler
 		if(!m_Player) GetPlayer();
 		if(!m_AM) GetActionManager();
 		
-		if(m_Player && m_Player.IsPlayerSelected() && !GetGame().IsInventoryOpen())
+		if(m_Player && m_Player.IsPlayerSelected())
 		{
 			SelectCrossHair();
 		}
@@ -167,7 +167,7 @@ class CrossHairSelector extends ScriptedWidgetEventHandler
 			if ( actionState != UA_NONE )
 				ShowCrossHair(null);
 		}
-		else if ( m_Player.IsRaised() || m_Player.GetCommand_Melee() ) // Melee
+		else if ( m_Player.IsRaised() || m_Player.GetCommand_Melee() || GetGame().GetUIManager().GetMenu() != null )
 			ShowCrossHair(null);
 		else
 			ShowCrossHair(GetCrossHairByName("dot"));

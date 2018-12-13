@@ -38,7 +38,7 @@ class ActionGiveSalineTarget: ActionContinuousBase
 		
 	override string GetText()
 	{
-		return "#give_saline";
+		return "#give_saline_person";
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )
@@ -59,7 +59,7 @@ class ActionGiveSalineTarget: ActionContinuousBase
 		
 		ntarget.GetModifiersManager().ActivateModifier(eModifiers.MDF_SALINE);
 		
-		action_data.m_Player.GetSoftSkillManager().AddSpecialty( m_SpecialtyWeight );
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		
 		action_data.m_MainItem.Delete();
 	}

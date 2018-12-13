@@ -2,6 +2,8 @@ class ControlSchemeManager
 {	
 	static void SetControlScheme( EControlSchemeState state )
 	{
+		return;
+		
 		if ( GetUApi() )
 		{
 			GetUApi().DeactivateContext();

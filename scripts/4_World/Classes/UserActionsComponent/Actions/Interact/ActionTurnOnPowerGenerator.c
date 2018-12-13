@@ -23,9 +23,8 @@ class ActionTurnOnPowerGenerator: ActionInteractBase
 		PowerGenerator target_PG = PowerGenerator.Cast( targetObject );
 
 		float c_index = target.GetComponentIndex();		
-		string selection = targetObject.GetActionComponentName(c_index);
 		
-		if ( target_PG.HasEnergyManager()  &&  target_PG.GetCompEM().CanSwitchOn()  &&  selection == "switch"  &&  target_PG.HasSparkplug() )
+		if ( target_PG.HasEnergyManager()  &&  target_PG.GetCompEM().CanSwitchOn()  &&  target_PG.HasSparkplug() )
 		{
 			return true;
 		}

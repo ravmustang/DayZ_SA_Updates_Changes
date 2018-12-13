@@ -38,7 +38,7 @@ class DayZIntroSceneXbox: Managed
 		Print("DayZIntroSceneXbox Start");
 		
 		m_MenuData = g_Game.GetMenuData();
-		m_MenuData.LoadCharacters();
+		m_MenuData.LoadCharactersLocal();
 		
 		m_LastPlayedCharacterID = m_MenuData.GetLastPlayedCharacter();
 		m_CharacterPos = "0 0 0";
@@ -479,14 +479,14 @@ class DayZIntroSceneXbox: Managed
 		}
 	}
 	
-	void SaveCharName()
+	void SaveCharName( string name )
 	{
 		GetDayZGame().InitCharacterMenuDataInfo(m_MenuData.GetCharactersCount());
 		
-		if (!GetDayZGame().IsNewCharacter() && m_LastPlayedCharacterID > -1)
-		{
-			m_MenuData.SetCharacterName(m_LastPlayedCharacterID, GetDayZGame().GetPlayerGameName());			
-		}
+		//if (!GetDayZGame().IsNewCharacter() && m_LastPlayedCharacterID > -1)
+		//{
+			m_MenuData.SetCharacterName(m_LastPlayedCharacterID, name);			
+		//}
 	}
 	
 	// ------------------------------------------------------------

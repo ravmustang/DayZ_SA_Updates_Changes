@@ -66,9 +66,14 @@ class DisplayElementBase extends MessageReceiverBase
 	
 	int TranslateLevelToStatus(int level)
 	{
-		if( level == DSLevels.WARNING ) return 2;
-		if( level == DSLevels.CRITICAL ) return 3;
-		if( level == DSLevels.BLINKING ) return 4;
+		if( level == DSLevels.WARNING )
+			return 2;
+		if( level == DSLevels.CRITICAL )
+			return 3;
+		if( level == DSLevels.BLINKING )
+			return 4;
+		if( level == DSLevels.EXTRA )
+			return 5;
 		return 1;
 	}
 }

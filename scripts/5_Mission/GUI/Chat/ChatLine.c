@@ -1,38 +1,34 @@
 class ChatLine
 {
+	// Consts
 	const float FADE_TIMEOUT = 30;
 	const float FADE_OUT_DURATION = 3;
 	const float FADE_IN_DURATION = 0.5;
-	Widget							m_RootWidget;
 	
+	private const string RADIO_PREFIX = "(" + "#str_radio" + ") ";
+	private const string GAME_PREFIX = "(" + "#layout_chat_game" + ") ";
+	private const string ADMIN_PREFIX = "(" + "#STR_MP_MASTER" + ") ";
+	private const int 	 DEFAULT_COLOUR = ARGB(255, 255, 255, 255);
+	private const int 	 GAME_TEXT_COLOUR = ARGB(255, 255, 0, 0);
+	private const int 	 ADMIN_TEXT_COLOUR = ARGB(255, 255, 255, 0);
+	
+	// Widgets
+	Widget							m_RootWidget;
 	TextWidget						m_NameWidget;
 	TextWidget						m_TextWidget;
-	
-	Widget							m_CCSystemWidget;
-	Widget							m_CCAdminWidget;
-	Widget							m_CCDirectWidget;
-	Widget							m_CCMegaphoneWidget;
-	Widget							m_CCTransmitterWidget;
-	Widget							m_CCPublicAddressSystemWidget;
 	
 	private ref WidgetFadeTimer 	m_FadeTimer;
 	private ref Timer 				m_TimeoutTimer;
 
 	void ChatLine(Widget root_widget)
 	{
-		m_RootWidget					= GetGame().GetWorkspace().CreateWidgets("gui/layouts/day_z_chat_item.layout", root_widget);
+		m_RootWidget	= GetGame().GetWorkspace().CreateWidgets("gui/layouts/day_z_chat_item.layout", root_widget);
 	
-		m_NameWidget					= TextWidget.Cast( m_RootWidget.FindAnyWidget( "ChatItemSenderWidget" ) );
-		m_TextWidget					= TextWidget.Cast( m_RootWidget.FindAnyWidget( "ChatItemTextWidget" ) );
-		m_CCSystemWidget				= m_RootWidget.FindAnyWidget( "CCSystem" );
-		m_CCAdminWidget					= m_RootWidget.FindAnyWidget( "CCAdmin" );
-		m_CCDirectWidget				= m_RootWidget.FindAnyWidget( "CCDirect" );
-		m_CCMegaphoneWidget				= m_RootWidget.FindAnyWidget( "CCMegaphone" );
-		m_CCTransmitterWidget			= m_RootWidget.FindAnyWidget( "CCTransmitter" );
-		m_CCPublicAddressSystemWidget	= m_RootWidget.FindAnyWidget( "CCPublicAddressSystem" );
+		m_NameWidget	= TextWidget.Cast( m_RootWidget.FindAnyWidget( "ChatItemSenderWidget" ) );
+		m_TextWidget	= TextWidget.Cast( m_RootWidget.FindAnyWidget( "ChatItemTextWidget" ) );
 		
-		m_FadeTimer			= new WidgetFadeTimer;
-		m_TimeoutTimer		= new Timer(CALL_CATEGORY_GUI);
+		m_FadeTimer		= new WidgetFadeTimer;
+		m_TimeoutTimer	= new Timer(CALL_CATEGORY_GUI);
 	}
 
 	void ~ChatLine()
@@ -40,73 +36,84 @@ class ChatLine
 		delete m_TextWidget;
 	}
 
-	void Set(ChatMessageEventParams params)
+	void Set(ChatMessageEventParams params)	// Param 1 --> Channel, Param 2 --> sender name, Param 3 --> message, Param 4 ?? 
 	{
-		m_RootWidget.Show( true );
+		int channel; 
+		
+		m_NameWidget.SetText("");
+		m_TextWidget.SetText("");
+		
+		SetColour(DEFAULT_COLOUR);
+		m_RootWidget.Show(true);
+		
+		channel = params.param1; // 0 = Survior   1 = Game/System   2 = Admin 
+		
+		Print(channel);
+		/*
 		if (params.param2 != "")
 		{
-			m_NameWidget.SetText( params.param2 );
-			m_TextWidget.SetText( ": " + params.param3 );
+			m_NameWidget.SetText( params.param2 + " : "); 
 		}
-		else
-		{
-			m_NameWidget.SetText( "" );
-			m_TextWidget.SetText( params.param3 );
-		}
-
-		int channel =  params.param1;
+		
 		if( channel & CCSystem )
  		{
-			m_CCSystemWidget.Show( true );
+			if(params.param2 != "")
+			{
+				m_NameWidget.SetText(GAME_PREFIX + ": " );
+			} 
+			SetColour(GAME_TEXT_COLOUR);
  		}
-		else
+		else if( channel & CCAdmin )
 		{
-			m_CCSystemWidget.Show( false );
+			m_NameWidget.SetText(ADMIN_PREFIX + ": ");
+			SetColour(ADMIN_TEXT_COLOUR);			
 		}
-		if( channel & CCAdmin )
+		else if( channel & CCTransmitter )
 		{
-			m_CCAdminWidget.Show( true );
-		}
-		else
+			m_NameWidget.SetText(RADIO_PREFIX + params.param2 + " : ");
+		}		
+		*/
+		
+		if ( channel == CCSystem )
 		{
-			m_CCAdminWidget.Show( false );
+			// Game
+			if(params.param2 != "")
+			{
+				m_NameWidget.SetText(GAME_PREFIX + ": " );
+			} 
+			SetColour(GAME_TEXT_COLOUR);
 		}
-		if( channel & CCDirect )
+		else if ( channel == CCAdmin )
 		{
-			m_CCDirectWidget.Show( true );
+			// Admin
+			m_NameWidget.SetText(ADMIN_PREFIX + ": ");
+			SetColour(ADMIN_TEXT_COLOUR);			
 		}
-		else
+		else if ( channel == CCTransmitter )
 		{
-			m_CCDirectWidget.Show( false );
+			// Radio - Trasnmitter
+			m_NameWidget.SetText(RADIO_PREFIX + params.param2 + " : ");
 		}
-		if( channel & CCMegaphone )
+		else if ( channel == 0 || channel == CCDirect )
 		{
-			m_CCMegaphoneWidget.Show( true );
+			// Player
+			if(params.param2 != "")
+			{
+				m_NameWidget.SetText(params.param2 + " : ");
+			}
 		}
-		else
-		{
-			m_CCMegaphoneWidget.Show( false );
-		}
-		if( channel & CCTransmitter )
-		{
-			m_CCTransmitterWidget.Show( true );
-		}
-		else
-		{
-			m_CCTransmitterWidget.Show( false );
-		}
-		if( channel & CCPublicAddressSystem )
-		{
-			m_CCPublicAddressSystemWidget.Show( true );
-		}
-		else
-		{
-			m_CCPublicAddressSystemWidget.Show( false );
-		}
+		
+		
+		m_TextWidget.SetText(params.param3);
 		
 		m_FadeTimer.FadeIn(m_RootWidget, FADE_IN_DURATION);
-		
 		m_TimeoutTimer.Run(FADE_TIMEOUT, m_FadeTimer, "FadeOut", new Param2<Widget, float>(m_RootWidget, FADE_OUT_DURATION));
+	}
+	
+	private void SetColour(int colour)
+	{
+		m_NameWidget.SetColor(colour);
+		m_TextWidget.SetColor(colour);
 	}
 
 	void Clear()

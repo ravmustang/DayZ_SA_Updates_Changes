@@ -242,7 +242,6 @@ WeaponEventBase WeaponAnimEventFactory (WeaponEvents type, DayZPlayer p = NULL, 
 		case WeaponEvents.UNJAMMED: return new WeaponEventAnimUnjammed(p, m);
 		case WeaponEvents.HAMMER_UNCOCKED: return new WeaponEventAnimHammerUncocked(p, m);
 		case WeaponEvents.HAMMER_COCKED: return new WeaponEventAnimHammerCocked(p, m);
-		case WeaponEvents.LOADING_LOOP_START: return new WeaponEventAnimReloadingLoopStart(p, m);
 		//case WeaponEvents.: return new WeaponEventAnim(p, m);
 	}
 	return NULL;
@@ -365,15 +364,9 @@ class WeaponEventAnimHammerCocked extends WeaponEventAnimation
 	void WeaponEventAnimHammerCocked (DayZPlayer p = NULL, Magazine m = NULL) { m_type = WeaponEvents.HAMMER_COCKED; }
 };
 
-class WeaponEventAnimReloadingLoopStart extends WeaponEventAnimation
-{
-	void WeaponEventAnimReloadingLoopStart (DayZPlayer p = NULL, Magazine m = NULL) { m_type = WeaponEvents.LOADING_LOOP_START; }
-};
-
 /*
 class WeaponEventAnim extends WeaponEventAnimation
 {
 	void WeaponEventAnim (DayZPlayer p = NULL, Magazine m = NULL) { m_type = WeaponEvents.; }
 };
 */
-

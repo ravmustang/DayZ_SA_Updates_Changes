@@ -58,6 +58,10 @@ class InventoryMenu extends UIScriptedMenu
 		{
 			mission.MoveHudForInventory( true );
 		}
+		
+		ItemManager.GetInstance().SetItemMicromanagmentMode( false );
+		ItemManager.GetInstance().SetItemMoving( false );
+		ItemManager.GetInstance().SetSelectedItem( null, null, null );
 	}
 	
 	#ifdef PLATFORM_CONSOLE
@@ -98,5 +102,9 @@ class InventoryMenu extends UIScriptedMenu
 		{
 			mission.MoveHudForInventory( false );
 		}
+		
+		ItemManager.GetInstance().SetItemMicromanagmentMode( false );
+		ItemManager.GetInstance().SetItemMoving( false );
+		ItemManager.GetInstance().SetSelectedItem( null, null, null );
 	}
 }

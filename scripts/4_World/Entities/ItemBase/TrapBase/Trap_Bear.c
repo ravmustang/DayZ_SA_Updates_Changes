@@ -13,21 +13,6 @@ class BearTrap extends TrapBase
 		m_AnimationPhaseTriggered = "placing";
 	}
 	
-	/*override bool IsTwoHandedBehaviour()
-	{
-		return true;
-	}*/
-	
-	override bool IsDeployable()
-	{
-		return true;
-	}
-	
-	override string GetDeploySoundset()
-	{
-		return "beartrap_deploy_SoundSet";
-	}
-	
 	override void OnSteppedOn(EntityAI victim)
 	{
 		vector 	contact_pos;
@@ -133,21 +118,12 @@ class BearTrap extends TrapBase
 			PlaySoundBiteEmpty();
 		}
 	}
-	
-	override void OnPlacementComplete( Man player ) 
-	{
-		PlayerBase player_PB = PlayerBase.Cast( player );
-		StartActivate( player_PB );
-	}
-	
+		
 	void PlaySoundBiteLeg()
 	{
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
-			string snd = "bearTrap_bone_";
-			string rnd = Math.RandomInt(0,4).ToString();
-			snd = snd + rnd;
-			PlaySound(snd, 20);
+			SEffectManager.PlaySound("beartrapCloseDamage_SoundSet", this.GetPosition(), 0, 0, false);
 		}
 	}
 	
@@ -155,10 +131,7 @@ class BearTrap extends TrapBase
 	{
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
-			string snd = "bearTrap_empty_";
-			string rnd = Math.RandomInt(0,4).ToString();
-			snd = snd + rnd;
-			PlaySound(snd, 20);
+			SEffectManager.PlaySound("beartrapClose_SoundSet", this.GetPosition(), 0, 0, false);
 		}
 	}
 	
@@ -166,8 +139,7 @@ class BearTrap extends TrapBase
 	{
 		if ( GetGame().IsClient()  ||  !GetGame().IsMultiplayer() )
 		{
-			//PlaySound("bearTrap_open_0", 15);
-			SEffectManager.PlaySound("Fishing_puddle_SoundSet", this.GetPosition(), 0, 0, false);
+			SEffectManager.PlaySound("beartrapOpen_SoundSet", this.GetPosition(), 0, 0, false);
 		}
 	}
 	
@@ -177,5 +149,30 @@ class BearTrap extends TrapBase
 		{
 			PlaySoundOpen();
 		}
+	}
+	
+	//================================================================
+	// ADVANCED PLACEMENT
+	//================================================================
+	
+	override void OnPlacementComplete( Man player ) 
+	{
+		super.OnPlacementComplete( player );
+		
+		if ( GetGame().IsServer() )
+		{
+			PlayerBase player_PB = PlayerBase.Cast( player );
+			StartActivate( player_PB );
+		}	
+	}
+	
+	override bool IsDeployable()
+	{
+		return true;
+	}
+	
+	override string GetLoopDeploySoundset()
+	{
+		return "beartrap_deploy_SoundSet";
 	}
 }

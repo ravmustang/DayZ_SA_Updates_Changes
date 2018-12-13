@@ -3,20 +3,23 @@ class ATCCachedObject
 	protected Object 	m_CachedObject;
 	protected vector 	m_CursorWPos;
 	protected vector	m_ScreenPos;
+	protected int		m_CompIdx;
 	
 	void ATCCachedTarget()
 	{
 		m_CachedObject = null;
 		m_ScreenPos = vector.Zero;
+		m_CompIdx = -1;
 	}
 
 	//! cache object and its world pos
-	void Store(Object obj, vector pos)
+	void Store(Object obj, vector pos, int compIdx)
 	{
 		if(!m_CachedObject)
 		{
 			m_CachedObject = obj;
 			m_CursorWPos = pos;
+			m_CompIdx = compIdx;
 		}
 	}
 
@@ -27,6 +30,7 @@ class ATCCachedObject
 		{
 			m_CachedObject = null;
 			m_CursorWPos = vector.Zero;
+			m_CompIdx = -1;
 		}
 	}
 
@@ -38,6 +42,11 @@ class ATCCachedObject
 	vector GetCursorWorldPos()
 	{
 		return m_CursorWPos;
+	}
+	
+	int GetCursorCompIdx()
+	{
+		return m_CompIdx;
 	}
 };
 
@@ -58,11 +67,6 @@ class ActionTargetsCursor extends ObjectFollower
 	protected bool							m_FixedOnPosition;
 	protected bool 							m_Hidden;
 
-	// for KeyToUIElements conversion
-	ref TIntArray 							m_ActionIndices;
-	ref TIntArray 							m_Keys;
-	ref TStringArray						m_Actions;
-	
 	protected Widget						m_Container;
 	protected Widget 						m_ItemLeft;
 	ref AutoHeightSpacer					m_MainSpacer;
@@ -75,15 +79,13 @@ class ActionTargetsCursor extends ObjectFollower
 		m_Continuous = null;
 		m_AM = null;
 		
+		m_HealthEnabled = true;
+		m_QuantityEnabled = true;
+		
 		m_CachedObject = new ATCCachedObject;
 		m_Hidden = false;
 		
-		m_ActionIndices = new TIntArray;
-		m_Keys = new TIntArray;
-		m_Actions = new TStringArray;
-		
-		GetActionGroup(4); // 4 - "Interact"
-		KeysToUIElements.Init(); // Initialiaze of KeysToUIElements
+		//KeysToUIElements.Init(); // Initialiaze of KeysToUIElements
 	}
 	
 	// Controls appearance of the builded cursor
@@ -192,7 +194,8 @@ class ActionTargetsCursor extends ObjectFollower
 
 		PrepareCursorContent();
 		
-		if (forceRebuild)
+		//! Get OnScreenPos when forced or targeted component differs
+		if (forceRebuild || m_Target.GetComponentIndex() != m_CachedObject.GetCursorCompIdx())
 		{
 			GetOnScreenPosition(pos_x, pos_y);
 		}
@@ -215,10 +218,17 @@ class ActionTargetsCursor extends ObjectFollower
 	
 	override protected void Update()
 	{
+		//! don't show floating widget if it's disabled in profile
+		if(!g_Game.GetProfileOption(EDayZProfilesOptions.HUD))
+		{
+			m_Root.Show(false);
+			return;
+		};
+
 		// TODO: if we choose to have it configurable throught options or from server settings
 		// we need to change setting of these methods;
-		SetHealthVisibility(true);
-		SetQuantityVisibility(true);
+		//SetHealthVisibility(true);
+		//SetQuantityVisibility(true);
 		
 		if(m_Player && !m_Player.IsAlive()) // handle respawn
 		{
@@ -384,7 +394,7 @@ class ActionTargetsCursor extends ObjectFollower
 						}
 
 						//! cache current object and the widget world pos
-						m_CachedObject.Store(object, worldPos);
+						m_CachedObject.Store(object, worldPos, compIdx);
 					}
 					//! doors/handles
 					else if( !compName.Contains("ladder") && IsComponentInSelection( memSelections, compName ) )
@@ -433,7 +443,7 @@ class ActionTargetsCursor extends ObjectFollower
 						}
 						
 						//! cache current object and the widget world pos
-						m_CachedObject.Store(object, worldPos);
+						m_CachedObject.Store(object, worldPos, compIdx);
 					}
 					//! ladders handling
 					else if( compName.Contains("ladder") && IsComponentInSelection( memSelections, compName))
@@ -477,7 +487,7 @@ class ActionTargetsCursor extends ObjectFollower
 						}
 
 						//! cache current object and the widget world pos
-						m_CachedObject.Store(object, worldPos);
+						m_CachedObject.Store(object, worldPos, -1); //! do not store component index for ladders
 					}
 					else
 					{
@@ -519,20 +529,6 @@ class ActionTargetsCursor extends ObjectFollower
 	}
 
 	// getters
-
-	// selects Action Group like in OptionsMenu
-	protected void GetActionGroup(int group_index)
-	{
-		g_Game.GetInput().GetActionGroupItems(group_index, m_ActionIndices);
-		string desc;
-
-		for (int i = 0; i < m_ActionIndices.Count(); i++)
-		{
-			int action_index = m_ActionIndices.Get(i);
-			g_Game.GetInput().GetActionDesc(action_index, desc);
-			m_Actions.Insert(desc);
-		}
-	}
 
  	protected void GetPlayer()
 	{
@@ -585,7 +581,7 @@ class ActionTargetsCursor extends ObjectFollower
 		if (m_Target && m_Target.GetObject() && m_Target.GetObject().IsItemBase())
 		{
 			ItemBase item = ItemBase.Cast(m_Target.GetObject());
-			if( !item.IsTakeable() || m_Player.IsInVehicle() )
+			if( !item.IsTakeable() || (m_Player && m_Player.IsInVehicle()) )
 			{
 				m_Hidden = true;
 			}
@@ -606,10 +602,16 @@ class ActionTargetsCursor extends ObjectFollower
 	protected string GetItemDesc(ActionBase action)
 	{
 		string desc = "";
-		if(m_Target && m_Target.GetObject() && m_Target.GetObject().IsItemBase())
+		if(m_Target && m_Target.GetObject())
 		{
-			desc = m_Target.GetObject().GetDisplayName();
-			return desc;
+			if( m_Target.GetObject().IsItemBase() )
+			{
+				desc = m_Target.GetObject().GetDisplayName();
+			}
+			else if( !m_Target.GetObject().IsAlive() )
+			{
+				desc = m_Target.GetObject().GetDisplayName();
+			}
 		}
 		return desc;
 	}
@@ -622,10 +624,16 @@ class ActionTargetsCursor extends ObjectFollower
 		{
 			return health;
 		}
-		if(m_Target && m_Target.GetObject() && m_Target.GetObject().IsHealthVisible())
+		if(m_Target && m_Target.GetObject())
 		{
-			health = m_Target.GetObject().GetHealthLevel();
-			return health;
+			if( m_Target.GetObject().IsHealthVisible() )
+			{
+				health = m_Target.GetObject().GetHealthLevel();
+			}
+			else if( !m_Target.GetObject().IsAlive() )
+			{
+				health = m_Target.GetObject().GetHealthLevel();
+			}
 		}
 		
 		return health;
@@ -649,22 +657,56 @@ class ActionTargetsCursor extends ObjectFollower
 		}
 	}
 
+	//! returns number of item in cargo for targeted entity
 	protected void GetItemCargoCount(out int cargoCount)
 	{
+		CargoBase cargo = null;
 		EntityAI entity = null;
-		
+		PlayerBase player;
+
 		if( Class.CastTo(entity, m_Target.GetObject()) )
 		{
-			if(entity.GetInventory())
-			{
-				CargoBase cargo = entity.GetInventory().GetCargo();
-				if (cargo)
+			//! player specific way
+			if (entity.IsInherited(PlayerBase))
+			{					
+				if (Class.CastTo(player, entity))
 				{
-					cargoCount = cargo.GetItemCount();
+					int attCount = player.GetHumanInventory().AttachmentCount();
+
+					//! go thru the each attachment slot and check cargo count
+					for(int attIdx = 0; attIdx < attCount; attIdx++)
+					{
+						EntityAI attachment = player.GetInventory().GetAttachmentFromIndex(attIdx);
+						int attachmentSlot = attachment.GetInventory().GetSlotId(0);
+						if( attachment.GetInventory() )
+						{
+							cargo = attachment.GetInventory().GetCargo();
+							if( cargo )
+							{
+								cargoCount += cargo.GetItemCount();
+							}
+						}
+						
+					}
+					
 					return;
 				}
 			}
+			else
+			{
+				if(entity.GetInventory())
+				{
+					cargo = entity.GetInventory().GetCargo();
+	
+					if (cargo)
+					{
+						cargoCount = cargo.GetItemCount();
+						return;
+					}
+				}
+			}
 
+			//! default cargo count
 			cargoCount = 0;
 		}
 	}
@@ -824,11 +866,16 @@ class ActionTargetsCursor extends ObjectFollower
 					actionName.SetText(descText);
 				}
 				else
+				{
 					actionName.SetText(descText);
+				}
+
 				widget.Show(true);
 			}
 			else
+			{
 				widget.Show(false);
+			}
 		}
 		else
 		{
@@ -851,10 +898,7 @@ class ActionTargetsCursor extends ObjectFollower
 	
 	protected void SetInteractActionIcon(string actionWidget, string actionIconFrameWidget, string actionIconWidget, string actionIconTextWidget)
 	{
-		Param2<string, bool> key_data;
-		string group_name;
-		ref TIntArray group_items;
-
+		string keyName = string.Empty;
 		Widget widget, frameWidget;
 		ImageWidget iconWidget;
 		TextWidget textWidget;
@@ -864,47 +908,23 @@ class ActionTargetsCursor extends ObjectFollower
 		Class.CastTo(iconWidget, widget.FindAnyWidget(actionIconWidget));
 		Class.CastTo(textWidget, widget.FindAnyWidget(actionIconTextWidget));
 
-		g_Game.GetInput().GetActionGroupName( 4, group_name );
-		if ( group_name == "Interact" )
+		//! get name of key which is used for UAAction input 
+		UAInput i1 = GetUApi().GetInputByName("UAAction"); 
+		
+		i1.SelectAlternative(0); //! select first alternative (which is the primary bind)
+		for( int c = 0; c < i1.BindKeyCount(); c++ )
 		{
-			g_Game.GetInput().GetActionKeys(m_ActionIndices.Get(0), m_Keys);
-			string default_action = m_Actions.Get(0);
-			// get only the Default action which is first item in Interact Action Group
-			if ( default_action.Contains("Use default action") )
-			{
-				// get data about action key (1st from selection)
-					key_data = KeysToUIElements.GetKeyToUIElement( m_Keys.Get(0) );
-			}
+		  	int _hc = i1.GetBindKey(0);
+		  	keyName = GetUApi().GetButtonName(_hc);
 		}
-#ifdef DEVELOPER
-		else
-		{
-			//Print( "ActionTargetsCursor.c | SetInteractActionIcon | Bad options for group_name" );
-		}
-#endif
-
-		if ( key_data )
-		{
-			if ( key_data.param2 )
-			{
-				// uses image in floating widget
-				frameWidget.Show(false);
-				textWidget.Show(false);
-				iconWidget.LoadImageFile( 0, key_data.param1 );
-				iconWidget.Show(true);
-			}
-			else
-			{
-				// uses text in floating widget
-				iconWidget.Show(false);
-
-				textWidget.SetText( key_data.param1 );
+		
+		// uses text in floating widget
+		iconWidget.Show(false);
+		textWidget.SetText(keyName);
 #ifdef X1_TODO_TEMP_GUI
-				textWidget.SetText("X");
+		textWidget.SetText("X");
 #endif
-				//frameWidget.Show(true);
-				textWidget.Show(true);
-			}
-		}	
+		//frameWidget.Show(true);
+		textWidget.Show(true);
 	}
 }

@@ -3,8 +3,20 @@ const int MAX_FAVORITES = 50;
 #ifdef PLATFORM_CONSOLE
 const int SERVER_BROWSER_PAGE_SIZE = 50;
 #else
-const int SERVER_BROWSER_PAGE_SIZE = 1;
+const int SERVER_BROWSER_PAGE_SIZE = 5;
 #endif
+
+class DebugClass1
+{
+	string m_DebugString;
+	
+	
+}
+
+class DebugClass2 : Managed
+{
+	ref DebugClass1 m_Class1;
+}
 
 class ServerBrowserMenuNew extends UIScriptedMenu
 {
@@ -27,18 +39,14 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		#ifdef PLATFORM_CONSOLE
 			layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/xbox/server_browser.layout" );
+			m_OfficialTab	= new ServerBrowserTab( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
 		#else
-		#ifdef PLATFORM_WINDOWS
 			layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/pc/server_browser.layout" );
+			m_OfficialTab	= new ServerBrowserTabPage( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
+			m_CommunityTab	= new ServerBrowserTabPage( layoutRoot.FindAnyWidget( "Tab_1" ), this, TabType.COMMUNITY );
+			m_LANTab		= new ServerBrowserTabPage( layoutRoot.FindAnyWidget( "Tab_2" ), this, TabType.LAN );
 		#endif
-		#endif
-		
-		m_OfficialTab	= new ServerBrowserTab( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
-		#ifndef PLATFORM_CONSOLE
-			m_CommunityTab	= new ServerBrowserTab( layoutRoot.FindAnyWidget( "Tab_1" ), this, TabType.COMMUNITY );
-			m_LANTab		= new ServerBrowserTab( layoutRoot.FindAnyWidget( "Tab_2" ), this, TabType.LAN );
-		#endif
-		
+			
 		layoutRoot.FindAnyWidget( "Tabber" ).GetScript( m_Tabber );
 		
 		m_Play					= layoutRoot.FindAnyWidget( "play" );
@@ -47,6 +55,10 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		m_PlayerName			= TextWidget.Cast( layoutRoot.FindAnyWidget( "character_name_text" ) );
 		m_Version				= TextWidget.Cast( layoutRoot.FindAnyWidget( "version" ) );
 		
+		// TODO: Temporary Hide for 1.0
+		layoutRoot.FindAnyWidget( "customize_character" ).Show( false );
+		layoutRoot.FindAnyWidget( "character" ).Show( false );
+				
 		Refresh();
 		
 		string version;
@@ -141,6 +153,9 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	void SetRefreshing( bool refreshing )
 	{
 		m_IsRefreshing = refreshing;
+		
+		OnlineServices.m_ServersAsyncInvoker.Remove( OnLoadServersAsync );
+		OnlineServices.m_ServersAsyncInvoker.Insert( OnLoadServersAsync );
 	}
 
 	TabType IsRefreshing()
@@ -204,6 +219,9 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 			con_text.SetText( "#str_settings_menu_root_toolbar_bg_consoletoolbar_toggle_toggletext0" );
 			ref_text.SetText( "#server_browser_menu_refresh" );
 			res_text.SetText( "#server_browser_menu_reset_filters" );
+			con_text.Update();
+			ref_text.Update();
+			res_text.Update();
 		}
 		#endif
 	}
@@ -230,6 +248,8 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 			{
 				res_text.SetText( "#server_browser_menu_favorite" );
 			}
+			con_text.Update();
+			res_text.Update();
 		}
 		#endif
 	}
@@ -287,57 +307,58 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	
 	override void Update( float timeslice )
 	{
-		if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
+		if( !GetGame().GetUIManager().IsDialogVisible() )
 		{
-			m_Tabber.PreviousTab();
+			if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
+			{
+				m_Tabber.PreviousTab();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
+			{
+				m_Tabber.NextTab();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUISelect, false ) )
+			{
+				GetSelectedTab().PressA();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
+			{
+				GetSelectedTab().PressX();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUICtrlY, false ) )
+			{
+				GetSelectedTab().PressY();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUILeft, false ) )
+			{
+				GetSelectedTab().Left();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUIRight, false ) )
+			{
+				GetSelectedTab().Right();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUIUp, false ) )
+			{
+				GetSelectedTab().Up();
+			}
+			
+			if( GetGame().GetInput().GetActionDown( UAUIDown, false ) )
+			{
+				GetSelectedTab().Down();
+			}
+	
+			if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+			{
+				Back();
+			}
 		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
-		{
-			m_Tabber.NextTab();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUISelect, false ) )
-		{
-			GetSelectedTab().PressA();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUIFastEquipOrSplit, false ) )
-		{
-			GetSelectedTab().PressX();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAQuickReload, false ) )
-		{
-			GetSelectedTab().PressY();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUILeft, false ) )
-		{
-			GetSelectedTab().Left();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUIRight, false ) )
-		{
-			GetSelectedTab().Right();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUIUp, false ) )
-		{
-			GetSelectedTab().Up();
-		}
-		
-		if( GetGame().GetInput().GetActionDown( UAUIDown, false ) )
-		{
-			GetSelectedTab().Down();
-		}
-
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
-		{
-			Back();
-		}
-		
-		GetSelectedTab().Update( timeslice );
 		
 		super.Update( timeslice );
 	}
@@ -366,7 +387,10 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	void SelectServer( ServerBrowserEntry server )
 	{
 		if( m_SelectedServer )
+		{
 			m_SelectedServer.Deselect();
+		}
+		
 		m_SelectedServer = server;
 	}
 	
@@ -381,7 +405,19 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( m_SelectedServer )
 		{
-			g_Game.ConnectFromServerBrowser( m_SelectedServer.GetIP(), m_SelectedServer.GetPort(), "" );
+			string ip = m_SelectedServer.GetIP();
+			int port = m_SelectedServer.GetPort();
+			
+			#ifdef PLATFORM_WINDOWS			
+				// Hack - In new Serverborwser on PC has bad IP adress but ID is OK
+				array<string> ip_port = new array<string>();
+				m_SelectedServer.GetServerID().Split( ":", ip_port);
+				ip = ip_port[0];
+				port = ip_port[1].ToInt();
+			#endif
+			
+			//g_Game.ConnectFromServerBrowser( m_SelectedServer.GetIP(), m_SelectedServer.GetPort(), "" );
+			g_Game.ConnectFromServerBrowser( ip, port, "" );
 		}
 	}
 	

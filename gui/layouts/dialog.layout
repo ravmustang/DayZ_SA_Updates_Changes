@@ -2,7 +2,7 @@ WindowWidgetClass DialogBox {
  visible 1
  clipchildren 1
  inheritalpha 0
- color 0.0824 0.0824 0.0824 0.9216
+ color 0.0824 0.0824 0.0824 0.7843
  position 0 0
  size 540 160.5
  halign center_ref
@@ -31,7 +31,7 @@ WindowWidgetClass DialogBox {
     ButtonWidgetClass bYes {
      visible 1
      inheritalpha 0
-     color 0.1569 0.1569 0.1569 1
+     color 1 0 0 1
      position 14 14
      size 120.5 40
      valign bottom_ref
@@ -63,7 +63,7 @@ WindowWidgetClass DialogBox {
     ButtonWidgetClass bOK {
      visible 1
      inheritalpha 0
-     color 0.1569 0.1569 0.1569 1
+     color 1 0 0 1
      position 144.5 14
      size 120.5 40
      valign bottom_ref
@@ -95,7 +95,7 @@ WindowWidgetClass DialogBox {
     ButtonWidgetClass bNo {
      visible 1
      inheritalpha 0
-     color 0.1569 0.1569 0.1569 1
+     color 1 0 0 1
      position 275 14
      size 120.5 40
      valign bottom_ref
@@ -164,7 +164,7 @@ WindowWidgetClass DialogBox {
     ButtonWidgetClass bCancel {
      visible 1
      inheritalpha 0
-     color 0.1569 0.1569 0.1569 1
+     color 1 0 0 1
      position 405.5 14
      size 120.5 40
      valign bottom_ref

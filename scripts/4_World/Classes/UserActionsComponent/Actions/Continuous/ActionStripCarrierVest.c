@@ -20,9 +20,6 @@ class ActionStripCarrierVest: ActionContinuousBase
 		m_MessageSuccess = "I have unpacked the box.";
 		m_MessageFail = "I have moved and unpacking was canceled.";
 		m_MessageCancel = "I stopped unpacking.";
-		m_Sounds.Insert("bandage_0"); //sould be original sound effects?
-		m_Sounds.Insert("bandage_1");
-		m_Sounds.Insert("bandage_2");
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	

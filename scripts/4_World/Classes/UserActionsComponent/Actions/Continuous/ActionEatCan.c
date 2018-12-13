@@ -1,5 +1,19 @@
+class ActionEatCanCB : ActionContinuousBaseCB
+{
+	override void CreateActionComponent()
+	{
+		m_ActionData.m_ActionComponent = new CAContinuousQuantityEdible(UAQuantityConsumed.EAT_NORMAL,UATimeSpent.DEFAULT);
+	}
+};
+
+
 class ActionEatCan: ActionEat
 {
+	void ActionEatCan()
+	{
+		m_CallbackClass = ActionEatCanCB;
+	}
+
 	override int GetType()
 	{
 		return AT_EAT_CAN;
