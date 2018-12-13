@@ -1,39 +1,47 @@
 
 void main()
 {
+	//INIT WEATHER BEFORE ECONOMY INIT------------------------
+	Weather weather = g_Game.GetWeather();
 
+    weather.MissionWeather(false);    // false = use weather controller from Weather.c
+
+    weather.GetOvercast().Set( Math.RandomFloatInclusive(0.4, 0.6), 1, 0);
+    weather.GetRain().Set( 0, 0, 1);
+    weather.GetFog().Set( Math.RandomFloatInclusive(0.05, 0.1), 1, 0);
+
+	//INIT ECONOMY--------------------------------------
 	Hive ce = CreateHive();
 	if ( ce )
 		ce.InitOffline();
 
-	Weather weather = g_Game.GetWeather();
+	//DATE RESET AFTER ECONOMY INIT-------------------------
+	int year;
+	int month;
+	int day;
+	int hour;
+	int minute;
 
-	weather.GetOvercast().SetLimits( 0.0 , 1.0 );
-	weather.GetRain().SetLimits( 0.0 , 1.0 );
-	weather.GetFog().SetLimits( 0.0 , 0.25 );
+	GetGame().GetWorld().GetDate(year, month, day, hour, minute);
 
-	weather.GetOvercast().SetForecastChangeLimits( 0.5, 0.8 );
-	weather.GetRain().SetForecastChangeLimits( 0.1, 0.3 );
-	weather.GetFog().SetForecastChangeLimits( 0.05, 0.10 );
-
-	weather.GetOvercast().SetForecastTimeLimits( 3600 , 3600 );
-	weather.GetRain().SetForecastTimeLimits( 300 , 300 );
-	weather.GetFog().SetForecastTimeLimits( 3600 , 3600 );
-
-	weather.GetOvercast().Set( Math.RandomFloatInclusive(0.0, 0.3), 0, 0);
-	weather.GetRain().Set( Math.RandomFloatInclusive(0.0, 0.2), 0, 0);
-	weather.GetFog().Set( Math.RandomFloatInclusive(0.0, 0.1), 0, 0);
-	
-	weather.SetWindMaximumSpeed(30);
-	weather.SetWindFunctionParams(0.1, 1.0, 50);
+    if (((month <= 9) && (day < 20)) || ((month >= 10) && (day > 20)))
+    {
+        month = 9;
+        day = 20;
+		
+		GetGame().GetWorld().SetDate(year, month, day, hour, minute);
+	}
 }
 
 class CustomMission: MissionServer
 {	
 	void SetRandomHealth(EntityAI itemEnt)
 	{
-		int rndHlt = Math.RandomInt(40,100);
-		itemEnt.SetHealth("","",rndHlt);
+		if ( itemEnt )
+		{
+			int rndHlt = Math.RandomInt(55,100);
+			itemEnt.SetHealth("","",rndHlt);
+		}
 	}
 
 	override PlayerBase CreateCharacter(PlayerIdentity identity, vector pos, ParamsReadContext ctx, string characterName)
@@ -52,20 +60,51 @@ class CustomMission: MissionServer
 /*
 		player.RemoveAllItems();
 
-		EntityAI item = player.GetInventory().CreateInInventory(topsArray.GetRandomElement());
+		EntityAI item = player.GetInventory().CreateInInventory(topsMissionArray.GetRandomElement());
 		EntityAI item2 = player.GetInventory().CreateInInventory(pantsArray.GetRandomElement());
 		EntityAI item3 = player.GetInventory().CreateInInventory(shoesArray.GetRandomElement());
 */
+		EntityAI itemTop;
 		EntityAI itemEnt;
 		ItemBase itemBs;
+		float rand;
 		
-		itemEnt = player.GetInventory().CreateInInventory("Rag");
-		itemBs = ItemBase.Cast(itemEnt);
+		itemTop = player.FindAttachmentBySlotName("Body");
+		
+		if ( itemTop )
+		{
+			itemEnt = itemTop.GetInventory().CreateInInventory("Rag");
+			if ( Class.CastTo(itemBs, itemEnt ) )
 		itemBs.SetQuantity(4);
+
+			SetRandomHealth(itemEnt);
+			
+			itemEnt = itemTop.GetInventory().CreateInInventory("RoadFlare");
+			SetRandomHealth(itemEnt);
+		
+			itemEnt = itemTop.GetInventory().CreateInInventory("StoneKnife");
+			SetRandomHealth(itemEnt);
+		}
+
+		rand = Math.RandomFloatInclusive(0.0, 1.0);
+		if ( rand < 0.25 )
+			itemEnt = player.GetInventory().CreateInInventory("SodaCan_Cola");
+		else if ( rand > 0.75 )
+			itemEnt = player.GetInventory().CreateInInventory("SodaCan_Spite");
+		else
+			itemEnt = player.GetInventory().CreateInInventory("SodaCan_Pipsi");
+		
 		SetRandomHealth(itemEnt);
 
-		itemEnt = player.GetInventory().CreateInInventory("RoadFlare");
-		itemBs = ItemBase.Cast(itemEnt);
+		rand = Math.RandomFloatInclusive(0.0, 1.0);
+		if ( rand < 0.35 )
+			itemEnt = player.GetInventory().CreateInInventory("Apple");
+		else if ( rand > 0.65 )
+			itemEnt = player.GetInventory().CreateInInventory("Pear");
+		else
+			itemEnt = player.GetInventory().CreateInInventory("Plum");
+		
+		SetRandomHealth(itemEnt);
 	}
 };
   

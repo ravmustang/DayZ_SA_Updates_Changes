@@ -359,9 +359,9 @@
 		<cargo preset="mixArmy" />
     </type>
     <type name="NBCPantsGray">
-        <cargo preset="food" />
-        <cargo preset="tools" />
-        <cargo chance="0.10">
+        <cargo preset="foodVillage" />
+        <cargo preset="toolsMedic" />
+        <cargo chance="0.20">
             <item name="Mag_FNX45_15Rnd" chance="0.14" />
             <item name="Ammo_762x54" chance="0.14" />
             <item name="Ammo_762x39" chance="0.14" />
