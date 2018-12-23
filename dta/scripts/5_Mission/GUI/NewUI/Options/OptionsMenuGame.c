@@ -226,6 +226,8 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	{
 		m_LanguageOption.SetIndex( new_index );
 		m_Menu.OnChanged();
+
+		TextMapUpdateWidget( AT_OPTIONS_LANGUAGE );
 	}
 	
 	void UpdateFOVOption( float new_value )
@@ -290,24 +292,34 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 			m_Menu.OnFocus( w, x, y );
 		if( w )
 		{
-			Param2<string, string> p = m_TextMap.Get( w.GetUserID() );
-			if( p )
+			if ( TextMapUpdateWidget( w.GetUserID() ) ) 
 			{
-				m_DetailsRoot.Show( true );
-				m_DetailsLabel.SetText( p.param1 );
-				m_DetailsText.SetText( p.param2 );
-				
-				//float lines = m_DetailsText.GetContentHeight();
-				//m_DetailsText.SetSize( 1, lines );
-				
-				m_DetailsText.Update();
-				m_DetailsLabel.Update();
-				m_DetailsRoot.Update();
 				return true;
-			}
+			}		
 		}
 		m_DetailsRoot.Show( false );
 		return ( w != null );
+	}
+	
+	
+	bool TextMapUpdateWidget(int key)
+	{
+		Param2<string, string> p = m_TextMap.Get( key );
+		if( p )
+		{
+			m_DetailsRoot.Show( true );
+			m_DetailsLabel.SetText( p.param1 );
+			m_DetailsText.SetText( p.param2 );
+			
+			//float lines = m_DetailsText.GetContentHeight();
+			//m_DetailsText.SetSize( 1, lines );
+			
+			m_DetailsText.Update();
+			m_DetailsLabel.Update();
+			m_DetailsRoot.Update();
+			return true;
+		}
+		return false;
 	}
 	
 	void FillTextMap()

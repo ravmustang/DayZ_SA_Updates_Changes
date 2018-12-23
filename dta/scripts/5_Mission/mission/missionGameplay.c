@@ -207,12 +207,6 @@ class MissionGameplay extends MissionBase
 	{
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		
-		if ( player )
-		{
-			int player_last_shaved_seconds = player.GetLastShavedSeconds();
-			GetGame().SetProfileString( "lastShavedSeconds", player_last_shaved_seconds.ToString() );
-		}
-		
 		Print("OnMissionFinish");
 		GetUIManager().HideDialog();
 		DestroyAllMenus();

@@ -567,15 +567,14 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			}
 			else
 			{
-				m_LoadingText.SetText( "Finished loading " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+				m_LoadingText.SetText( "#server_browser_tab_finished_loading" + " " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 				m_Menu.SetRefreshing( TabType.NONE );
 			}
 			//m_ServerList.Update();
-
 		}
 		else
 		{
-			m_LoadingText.SetText( "Finished loading " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
+			m_LoadingText.SetText( "#server_browser_tab_finished_loading" + " " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 			m_Menu.SetRefreshing( TabType.NONE );
 		}
 	}

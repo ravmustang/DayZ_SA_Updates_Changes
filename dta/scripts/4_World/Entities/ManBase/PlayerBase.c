@@ -1207,6 +1207,11 @@ class PlayerBase extends ManBase
 				scene_editor.InitLoad();
 			}
 		}
+		
+		if ( GetGame().IsMultiplayer() || GetGame().IsServer() )
+		{
+			m_ModuleLifespan.SynchLifespanVisual( this, m_LifeSpanState, m_HasBloodyHandsVisible, m_HasBloodTypeVisible, m_BloodType );
+		}	
 	
 		if ( m_Hud )
 		{
@@ -3126,8 +3131,11 @@ class PlayerBase extends ManBase
 	{
 		super.OnVariablesSynchronized();
 		
-		if( m_ModuleLifespan )
+		if ( m_ModuleLifespan )
+		{
 			m_ModuleLifespan.SynchLifespanVisual( this, m_LifeSpanState, m_HasBloodyHandsVisible, m_HasBloodTypeVisible, m_BloodType );
+		}
+			
 		CheckSoundEvent();
 		if( GetBleedingManagerRemote() )
 		{
@@ -3957,7 +3965,8 @@ class PlayerBase extends ManBase
 
 	void OnStoreSaveLifespan( ParamsWriteContext ctx )
 	{		
-		ctx.Write( m_LastShavedSeconds );		
+		ctx.Write( m_LifeSpanState );	
+		ctx.Write( m_LastShavedSeconds );	
 		ctx.Write( m_HasBloodyHandsVisible );
 		ctx.Write( m_HasBloodTypeVisible );
 		ctx.Write( m_BloodType );
@@ -3965,6 +3974,10 @@ class PlayerBase extends ManBase
 
 	void OnStoreLoadLifespan( ParamsReadContext ctx )
 	{	
+		int lifespan_state = 0;
+		ctx.Read( lifespan_state );
+		m_LifeSpanState = lifespan_state;
+		
 		int last_shaved = 0;
 		ctx.Read( last_shaved );
 		m_LastShavedSeconds = last_shaved;

@@ -296,7 +296,6 @@ class WeatherPhenomenon
 					rainTimeDur = Math.RandomFloatInclusive( 90, 120 );
 				}
 				
-				SetLimits(rainMin, rainMax);
 				Set( Math.RandomFloatInclusive(rainMin, rainMax), rainTime, rainTimeDur );
 /*
 				if ( overcastNextChange < rainTime + rainTimeDur )

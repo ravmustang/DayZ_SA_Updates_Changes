@@ -212,7 +212,7 @@ class PluginLifespan extends PluginBase
 		if ( player != NULL )
 		{
 			// NEW STATS API
-			if ( GetGame().IsMultiplayer() )
+			if ( GetGame().IsMultiplayer() || GetGame().IsServer() )
 			{
 				float player_playtime = player.StatGet("playtime");
 			}
@@ -227,27 +227,6 @@ class PluginLifespan extends PluginBase
 			UpdateLifespanLevel( player, player_beard, force_update );
 		}
 	} 
-
-	void UpdateLifespanParam( PlayerBase player, string hours_survived, bool force_update )
-	{
-		if ( player != NULL )
-		{
-			ref TStringArray splitted = new TStringArray;
-			hours_survived.Split( ":", splitted );
-
-			if ( splitted.Count() > 1 )
-			{
-				int hours = splitted.Get(0).ToInt();
-				int minutes = splitted.Get(1).ToInt();
-				
-				float player_playtime = ((hours * 60.0) + minutes) * 60.0;
-				float player_beard = player_playtime - player.GetLastShavedSeconds();
-				player_beard = player_beard / 60.0;
-				
-				UpdateLifespanLevel( player, player_beard, force_update );
-			}
-		}
-	}
 
 	protected void UpdateLifespanLevel( PlayerBase player, float player_beard, bool force_update = false )
 	{
@@ -296,11 +275,6 @@ class PluginLifespan extends PluginBase
 					return level;
 				}
 			}
-			
-			if ( lifespan_levels.Count() > 0 )
-			{
-				return lifespan_levels.Get( 0 );
-			}
 		}
 		
 		return NULL;
@@ -322,26 +296,32 @@ class PluginLifespan extends PluginBase
 					
 					player.SetFaceTexture( level.GetTextureName() );
 					player.SetFaceMaterial( level.GetMaterialName() );
-					
+										
 					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_NONE);
 					//Print("LifeSpanState.BEARD_NONE");
 					break;
 				}
 				case LifeSpanState.BEARD_MEDIUM:
 				{
+					players_head.SetObjectTexture( 0, "");
+					players_head.SetObjectMaterial( 0, "");	
+					
 					player.SetFaceTexture( level.GetTextureName() );
 					player.SetFaceMaterial( level.GetMaterialName() );
-					
+										
 					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_MEDIUM);
 					//Print("LifeSpanState.BEARD_MEDIUM");
 					break;
 				}
 				
 				case LifeSpanState.BEARD_LARGE:
-				{			
+				{	
+					players_head.SetObjectTexture( 0, "");
+					players_head.SetObjectMaterial( 0, "");	
+							
 					player.SetFaceTexture( level.GetTextureName() );
 					player.SetFaceMaterial( level.GetMaterialName() );
-					
+										
 					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_LARGE);
 					//Print("LifeSpanState.BEARD_LARGE");
 					break;
@@ -351,6 +331,11 @@ class PluginLifespan extends PluginBase
 				{
 					players_head.SetObjectTexture( 0, level.GetTextureName() );
 					players_head.SetObjectMaterial( 0, level.GetMaterialName() );
+
+					LifespanLevel prev_level = GetLifespanLevel( player.GetPlayerClass(), LifeSpanState.BEARD_EXTRA );
+					
+					player.SetFaceTexture( prev_level.GetTextureName() );
+					player.SetFaceMaterial( prev_level.GetMaterialName() );
 					
 					player.SetLifeSpanStateVisible(LifeSpanState.BEARD_EXTRA);
 					//Print("LifeSpanState.BEARD_EXTRA");

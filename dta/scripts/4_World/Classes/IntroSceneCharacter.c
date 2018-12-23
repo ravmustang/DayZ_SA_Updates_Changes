@@ -6,9 +6,7 @@ class IntroSceneCharacter extends Managed
 	protected PlayerBase	m_CharacterObj;
 	protected vector		m_CharacterPos;
 	protected vector		m_CharacterRot;
-	
-	protected int m_LastShavedSeconds;
-	
+		
 	protected ref TStringArray 	m_CharGenderList				= new TStringArray;
 	protected ref TStringArray	m_CharShirtList					= new TStringArray;
 	protected ref TStringArray 	m_CharPantsList					= new TStringArray;
@@ -227,8 +225,6 @@ class IntroSceneCharacter extends Managed
 			m_CharacterObj.PlaceOnSurface();
 			m_CharacterObj.SetPosition(m_CharacterPos);
 			m_CharacterObj.SetOrientation(m_CharacterRot);
-			
-			m_CharacterObj.SetLastShavedSeconds(m_LastShavedSeconds);
 		}
 		else
 		{
@@ -258,18 +254,11 @@ class IntroSceneCharacter extends Managed
 		{
 			m_CharacterObj.PlaceOnSurface();
 			m_CharacterObj.SetOrientation(m_CharacterRot);
-			m_CharacterObj.SetLastShavedSeconds(m_LastShavedSeconds);
 			
 			// Select Random Cloths
 			SetAttachment(m_CharShirtList[m_CharShirtIndex], InventorySlots.BODY);
 			SetAttachment(m_CharPantsList[m_CharPantsIndex], InventorySlots.LEGS);
 			SetAttachment(m_CharShoesList[m_CharShoesIndex], InventorySlots.FEET);
-			
-			// NEW STATS API
-			string lvalue = "";
-			m_CharacterObj.StatGetCounter("playtime", lvalue);
-
-			PluginLifespan.GetInstance().UpdateLifespanParam( m_CharacterObj, lvalue, true );
 		}
 		
 		//Create New Random Character
@@ -363,9 +352,7 @@ class IntroSceneCharacter extends Managed
 			
 			m_CharacterObj.PlaceOnSurface();
 			m_CharacterObj.SetPosition(char_pos);
-			m_CharacterObj.SetOrientation(char_rot);
-			
-			m_CharacterObj.SetLastShavedSeconds(m_LastShavedSeconds);
+			m_CharacterObj.SetOrientation(char_rot);	
 		}	
 	}
 	

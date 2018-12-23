@@ -1,7 +1,6 @@
 class DayZIntroSceneXbox: Managed
 {
 	protected bool m_IsCharFemale;
-	protected int m_LastShavedSeconds;
 	protected int m_LastPlayedCharacterID;
 	
 	protected ref TStringArray 	m_genderList;
@@ -43,7 +42,6 @@ class DayZIntroSceneXbox: Managed
 		m_LastPlayedCharacterID = m_MenuData.GetLastPlayedCharacter();
 		m_CharacterPos = "0 0 0";
 		m_CharacterDir = "0 0 0";
-		m_LastShavedSeconds = 0;
 		
 		//g_Game.m_PlayerName = "Survivor"; //default
 		if( m_MenuData.GetCharactersCount() == 0 )
@@ -432,7 +430,6 @@ class DayZIntroSceneXbox: Managed
 			g_Game.SetNewCharacter(false);
 			m_SceneCharacter.PlaceOnSurface();
 			m_SceneCharacter.SetDirection(m_CharacterDir);
-			m_SceneCharacter.SetLastShavedSeconds(m_LastShavedSeconds);
 	
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
 		}
@@ -458,15 +455,6 @@ class DayZIntroSceneXbox: Managed
 		{
 			m_SceneCharacter.PlaceOnSurface();
 			m_SceneCharacter.SetDirection(m_CharacterDir);
-			m_SceneCharacter.SetLastShavedSeconds(m_LastShavedSeconds);
-
-			// NEW STATS API
-			string lvalue = "";
-			m_SceneCharacter.StatGetCounter("playtime", lvalue);
-
-			PluginLifespan module_lifespan;
-			Class.CastTo(module_lifespan, PluginLifespan.Cast( GetPlugin( PluginLifespan ) ));
-			module_lifespan.UpdateLifespanParam( m_SceneCharacter, lvalue, true );
 		}
 	}
 	
