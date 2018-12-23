@@ -2528,9 +2528,9 @@ class PlayerBase extends ManBase
 					
 					amc.ForceTarget(quickBarItem);
 				}
-				m_QuickBarHold = true;
 			}
 		}
+		m_QuickBarHold = true;
 	}
 	//---------------------------------------------------------
 	void OnQuickBarContinuousUseEnd(int slotClicked)
@@ -2550,6 +2550,7 @@ class PlayerBase extends ManBase
 				}
 			}
 		}
+		m_QuickBarHold = false;
 	}
 	
 	void SetActionEndInput()

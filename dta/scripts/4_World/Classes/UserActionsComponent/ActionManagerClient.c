@@ -527,6 +527,7 @@ class ActionManagerClient: ActionManagerBase
 	{
 		if ( !m_CurrentActionData && action ) 
 		{	
+			m_Interrupted = false;
 			if ( GetGame().IsMultiplayer() && !action.IsLocal() )
 			{
 				if (!ScriptInputUserData.CanStoreInputUserData())

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //DeRap: Produced from mikero's Dos Tools Dll version 5.69
-//'now' is Sun Dec 23 08:40:17 2018 : 'file' last modified on Wed Dec 19 14:51:28 2018
+//'now' is Sun Dec 23 08:49:31 2018 : 'file' last modified on Fri Dec 21 13:20:16 2018
 //http://dev-heaven.net/projects/list_files/mikero-pbodll
 ////////////////////////////////////////////////////////////////////
 
@@ -57,7 +57,7 @@ enum {
 	destructbuilding = 1
 };
 
-//Class C:\Program Files (x86)\Steam\steamapps\common\DayZServer\dta last\bin\config.bin{
+//Class E:\Documents\GitHub\DayZ_SA_Scripts_Original\dta\bin\config.bin{
 battleyeLicenceUrl = "BattlEye\EULA.txt";
 class CfgMods
 {

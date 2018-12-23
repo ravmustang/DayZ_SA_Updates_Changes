@@ -98,8 +98,6 @@ class EmoteManager
 		m_InterruptInputs.Insert("UAMoveBack");
 		m_InterruptInputs.Insert("UATurnLeft");
 		m_InterruptInputs.Insert("UATurnRight");
-		m_InterruptInputs.Insert("UAMoveUp");
-		m_InterruptInputs.Insert("UAMoveDown");
 		m_InterruptInputs.Insert("UAMoveLeft");
 		m_InterruptInputs.Insert("UAMoveRight");
 		m_InterruptInputs.Insert("UAEvasiveForward");

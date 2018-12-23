@@ -1501,11 +1501,18 @@ class DayZPlayerImplement extends DayZPlayer
 			
 			if (GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_CLIENT)
 			{
+				//backpack
 				if (Clothing.CastTo(clothes,FindAttachmentBySlotName("Back")))
 				{
 					clothes.SetInvisible(false);
 				}
+				//top
 				if (Clothing.CastTo(clothes,FindAttachmentBySlotName("Body")))
+				{
+					clothes.SetInvisible(false);
+				}
+				//vest
+				if (Clothing.CastTo(clothes,FindAttachmentBySlotName("Vest")))
 				{
 					clothes.SetInvisible(false);
 				}

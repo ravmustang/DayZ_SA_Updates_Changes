@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////
 //DeRap: Produced from mikero's Dos Tools Dll version 5.69
-//'now' is Sun Dec 23 08:40:43 2018 : 'file' last modified on Wed Dec 19 11:23:17 2018
+//'now' is Sun Dec 23 08:49:35 2018 : 'file' last modified on Fri Dec 21 13:09:33 2018
 //http://dev-heaven.net/projects/list_files/mikero-pbodll
 ////////////////////////////////////////////////////////////////////
 
 #define _ARMA_
 
-//Class C:\Program Files (x86)\Steam\steamapps\common\DayZServer\dta last\scripts\config.bin{
+//Class E:\Documents\GitHub\DayZ_SA_Scripts_Original\dta\scripts\config.bin{
 class CfgPatches
 {
 	class DZ_Scripts

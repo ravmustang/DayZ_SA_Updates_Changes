@@ -142,6 +142,8 @@ class ActionManagerServer: ActionManagerBase
 			return;
 		}
 		
+		m_Interrupted = false;
+		
 		ActionBase picked_action;
 		bool accepted = false;
 		bool is_target_free = true;
