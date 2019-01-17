@@ -133,7 +133,12 @@ class Magazine : InventoryItemSuper
 	
 	float GetChanceToJam()
 	{
-		return m_ChanceToJam[GetHealthLevel()];
+		int level = GetHealthLevel();
+
+		if (level >= 0 && level < m_ChanceToJam.Count())
+			return m_ChanceToJam[level];
+		else
+			return 0.0;
 	}
 	/*
 	override void SplitItem()

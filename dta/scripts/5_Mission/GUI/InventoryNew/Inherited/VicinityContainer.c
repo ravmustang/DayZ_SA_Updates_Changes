@@ -449,7 +449,7 @@ class VicinityContainer: CollapsibleContainer
 		ref array<Object> objects = new array<Object>;
 		ref array<Object> objects_in_cone = new array<Object>;
 		ref array<CargoBase> proxyCargos = new array<CargoBase>;
-		GetGame().GetObjectsAtPosition3D( pos, 1.0, objects, proxyCargos );
+		GetGame().GetObjectsAtPosition3D( pos, GameInventory.c_MaxItemDistanceRadius, objects, proxyCargos );
 		objects_in_cone = ActionTargets.GetVicinityObjects();
 
 		for ( int i = 0; i < objects_in_cone.Count(); i++ )

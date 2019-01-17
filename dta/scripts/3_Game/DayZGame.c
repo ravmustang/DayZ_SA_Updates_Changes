@@ -1132,11 +1132,18 @@ class DayZGame extends CGame
 		if (text_widget)
 		{
 			#ifdef PLATFORM_XBOX
-					text_widget.SetText("#dayz_game_press" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "#dayz_game_to_start");
+				BiosUserManager user_manager = GetGame().GetUserManager();
+				if( user_manager )
+				{
+					if( user_manager.GetSelectedUser() )
+						text_widget.SetText("#dayz_game_press" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "#dayz_game_to_start");
+					else
+						text_widget.SetText("#dayz_game_press" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "to log in");
+				}
 			#endif
 					
 			#ifdef PLATFORM_PS4
-					text_widget.SetText("Press <image set=\"playstation_buttons\" name=\"cross\" /> to start the game");
+				text_widget.SetText("Press <image set=\"playstation_buttons\" name=\"cross\" /> to start the game");
 			#endif
 		}
 	}

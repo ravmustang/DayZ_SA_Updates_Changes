@@ -350,13 +350,15 @@ class EntityAI extends Entity
 	
 	void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
+		Print("EEHitByRemote: damageType: "+ damageType +"; source: "+ source +"; component: "+ component +"; dmgZone: "+ dmgZone +"; ammo: "+ ammo +"; modelPos: "+ modelPos);
+		
 		if ( source ) 
 		{
 			Man killer = source.GetHierarchyRootPlayer();
 			
 			if( killer && killer.IsPlayer() )
-			{
-				if ( damageResult && damageResult.GetDamage( "", "health" ) <= 0 )
+			{				
+				if ( GetHealth() <= 0 )
 				{
 					bool is_headshot = false;
 				
@@ -373,7 +375,10 @@ class EntityAI extends Entity
 	}
 	
 	// called only on the client who caused the hit
-	void EEHitByRemote(int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos) { }
+	void EEHitByRemote(int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
+	{
+		
+	}
 	
 	// !Called on PARENT when a child is attached to it.
 	void EEItemAttached(EntityAI item, string slot_name)

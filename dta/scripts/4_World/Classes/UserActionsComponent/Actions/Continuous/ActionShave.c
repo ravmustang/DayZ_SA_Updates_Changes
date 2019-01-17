@@ -54,10 +54,22 @@ class ActionShave: ActionContinuousBase
 	{
 		return "#shave_myself";
 	}
+	
+	override bool IsShaveSelf()
+	{
+		return true;
+	}
 
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		action_data.m_Player.ShavePlayer();
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		super.OnFinishProgressClient( action_data );
+		
+		AnalyticsManager.OnActionFinishedShaveSelf();
 	}
 };

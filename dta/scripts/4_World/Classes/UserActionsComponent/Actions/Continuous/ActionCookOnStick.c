@@ -82,4 +82,11 @@ class ActionCookOnStick: ActionContinuousBase
 		
 		return false;
 	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		super.OnFinishProgressClient( action_data );
+		
+		Print("OnFinishProgressClient Coock on stick");
+	}
 };

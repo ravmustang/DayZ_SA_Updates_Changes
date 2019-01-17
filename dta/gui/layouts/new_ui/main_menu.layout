@@ -1843,65 +1843,6 @@ FrameWidgetClass main_menu_root {
         }
        }
       }
-      GridSpacerWidgetClass Back {
-       visible 1
-       clipchildren 0
-       size 0 30
-       halign right_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 1
-       vexactsize 1
-       Padding 4
-       Margin 0
-       "Size To Content H" 1
-       "Size To Content V" 1
-       content_halign center
-       content_valign center
-       Columns 2
-       Rows 1
-       {
-        ImageWidgetClass BackIcon {
-         clipchildren 0
-         inheritalpha 0
-         size 36 36
-         valign center_ref
-         hexactpos 1
-         vexactpos 1
-         hexactsize 1
-         vexactsize 1
-         scaled 1
-         image0 "set:xbox_buttons image:B"
-         mode blend
-         "src alpha" 1
-         "no wrap" 1
-         stretch 0
-         "flip u" 0
-         "flip v" 0
-         filter 1
-         nocache 0
-        }
-        TextWidgetClass BackText {
-         clipchildren 0
-         position 0 0
-         size 52 36
-         valign center_ref
-         hexactpos 1
-         vexactpos 1
-         hexactsize 1
-         vexactsize 1
-         text "#layout_xbox_main_menu_toolbar_back"
-         font "gui/fonts/sdf_MetronLight24"
-         "exact text" 1
-         "exact text size" 22
-         "size to text h" 1
-         "size to text v" 0
-         "text halign" center
-         "text valign" center
-        }
-       }
-      }
       GridSpacerWidgetClass ChooseAccount {
        visible 1
        clipchildren 0

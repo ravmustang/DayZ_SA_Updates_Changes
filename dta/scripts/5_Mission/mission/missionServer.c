@@ -217,7 +217,7 @@ class MissionServer extends MissionBase
 			
 			identity = discoParams.param1;
 			Class.CastTo(player, discoParams.param2);			
-			int discTime = discoParams.param3;
+			int logoutTime = discoParams.param3;
 			bool authFailed = discoParams.param4;
 
 			if (!player)
@@ -226,8 +226,7 @@ class MissionServer extends MissionBase
 				return;
 			}
 						
-			InvokeOnDisconnect(player);
-			OnClientDisconnectedEvent(identity, player, discTime, authFailed);	
+			OnClientDisconnectedEvent(identity, player, logoutTime, authFailed);	
 			break;
 			
 		case LogoutCancelEventTypeID:
@@ -247,7 +246,6 @@ class MissionServer extends MissionBase
 				Print("[Logout]: Player cancelled"); 
 			}
 			m_LogoutPlayers.Remove(player);
-			
 			break;
 		}
 	}
@@ -400,7 +398,7 @@ class MissionServer extends MissionBase
 	{
 	}	
 	
-	void OnClientDisconnectedEvent(PlayerIdentity identity, PlayerBase player, int queueTime, bool authFailed)
+	void OnClientDisconnectedEvent(PlayerIdentity identity, PlayerBase player, int logoutTime, bool authFailed)
 	{
 		bool disconnectNow = true;
 		
@@ -412,13 +410,13 @@ class MissionServer extends MissionBase
 			{	
 				if (!m_LogoutPlayers.Contains(player))
 				{
-					Print("[Logout]: New player " + identity.GetId() + " with logout time " + queueTime.ToString());
+					Print("[Logout]: New player " + identity.GetId() + " with logout time " + logoutTime.ToString());
 					
 					// inform client about logout time
-					GetGame().SendLogoutTime(player, queueTime);
+					GetGame().SendLogoutTime(player, logoutTime);
 			
 					// wait for some time before logout and save
-					LogoutInfo params = new LogoutInfo(GetGame().GetTime() + queueTime * 1000, identity.GetId());
+					LogoutInfo params = new LogoutInfo(GetGame().GetTime() + logoutTime * 1000, identity.GetId());
 					m_LogoutPlayers.Insert(player, params);
 					
 					// allow reconnecting to old char
@@ -450,6 +448,10 @@ class MissionServer extends MissionBase
 			Print("[Logout]: Skipping player " + uid + ", already removed");
 			return;
 		}
+		
+		// now player can't cancel logout anymore, so call everything needed upon disconnect
+		InvokeOnDisconnect(player);
+		
 		Print("[Logout]: Player " + uid + " finished");
 
 		if (GetHive())

@@ -32,4 +32,9 @@ class ActionHandcuffTarget: ActionSingleUseBase
 
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
+	
+	override void OnExecuteClient( ActionData action_data )
+	{	
+		AnalyticsManager.OnActionRestrain();
+	}
 };

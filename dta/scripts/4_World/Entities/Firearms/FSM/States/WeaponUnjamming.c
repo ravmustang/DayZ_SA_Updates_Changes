@@ -38,16 +38,21 @@ class WeaponUnjamming_Start extends WeaponStartAction
 				return; // unjammed successfuly
 			}
 
+			
 			if (hic.IsReloadOrMechanismContinuousUse())
 			{
 				wpnDebugPrint("[wpnfsm] Unjamming...");
 			}
+			#ifndef PLATFORM_CONSOLE
+			#ifndef SERVER_FOR_CONSOLE
 			else
 			{
 				wpnDebugPrint("[wpnfsm] Unjamming failed, weapon still jammed");
 				hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_INTERRUPT);
 				m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingFailedTimeout(p));
 			}
+			#endif
+			#endif
 		}
 	}
 

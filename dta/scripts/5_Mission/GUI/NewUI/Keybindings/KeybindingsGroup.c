@@ -107,6 +107,11 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		}
 	}
 	
+	bool IsEnteringKeyBind()
+	{
+		return ( m_CurrentSettingKeyIndex != -1 || m_CurrentSettingAlternateKeyIndex != -1 );
+	}
+	
 	void ClearKeybind( int key_index )
 	{
 		m_Menu.ClearKeybind( key_index );

@@ -2,6 +2,7 @@ class ClientData
 {
 	static ref ScriptInvoker SyncEvent_OnPlayerListUpdate = new ScriptInvoker();
 	static ref ScriptInvoker SyncEvent_OnEntityKilled = new ScriptInvoker();
+	static ref ScriptInvoker SyncEvent_OnPlayerIgnitedFireplace = new ScriptInvoker();
 	
 	static ref SyncPlayerList		m_PlayerList;
 	
@@ -44,5 +45,10 @@ class ClientData
 	static void SyncEvent_OnEntityKilled( SyncEntityKillInfo entity_killed_data )
 	{
 		SyncEvent_OnEntityKilled.Invoke(entity_killed_data.m_EntityVictim, entity_killed_data.m_EntityKiller, entity_killed_data.m_EntitySource, entity_killed_data.m_IsHeadShot );
+	}
+	
+	static void SyncEvent_OnPlayerIgnitedFireplace( EFireIgniteType igante_type )
+	{
+		SyncEvent_OnPlayerIgnitedFireplace.Invoke(igante_type);
 	}
 }

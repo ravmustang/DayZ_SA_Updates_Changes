@@ -15,6 +15,7 @@ class Light extends ItemBase
 	
 	void OnDeleteThis()
 	{
+		SetPilotLight(false);
 		GetGame().ObjectDelete(this);
 	}
 }

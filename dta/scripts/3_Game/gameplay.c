@@ -357,7 +357,7 @@ typedef Param2<PlayerIdentity, Man> ClientRespawnEventParams;
 typedef Param2<PlayerIdentity, Man> ClientReadyEventParams;
 //! PlayerIdentity, Man
 typedef Param2<PlayerIdentity, Man> ClientReconnectEventParams; 
-//! PlayerIdentity, Man
+//! PlayerIdentity, Man, LogoutTime, AuthFailed
 typedef Param4<PlayerIdentity, Man, int, bool> ClientDisconnectedEventParams; 
 //! PlayerIdentity, QueueTime, NewChar
 typedef Param2<int, bool> ClientSpawningEventParams; 
@@ -1032,6 +1032,7 @@ class CETesting
 {
 	proto native void ExportSpawnData();
 	proto native void ExportProxyData( vector vCenter, float fRadius );
+	proto native void ExportClusterData();
 	proto native void ExportProxyProto();
 	proto native void MarkCloseProxy( float fRadius, bool bAllSelections );
 	proto native void RemoveCloseProxy();

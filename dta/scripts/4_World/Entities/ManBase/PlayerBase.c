@@ -618,6 +618,9 @@ class PlayerBase extends ManBase
 		SwitchItemTypeAttach(item, slot_name);
 		m_QuickBarBase.updateSlotsCount();
 		CalculateVisibilityForAI();
+		
+		AnalyticsManager.OnItemAttachedAtPlayer(item, slot_name);
+		
 		//Print("item " + item.GetType() + " in slot" + slot_name);
 	}
 	
@@ -2594,20 +2597,31 @@ class PlayerBase extends ManBase
 	{
 		if( GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_CLIENT )
 		{
-			if( GetHumanInventory().GetEntityInHands()!= magazine )
+			if (GetWeaponManager().IsRunning())
+			{
+				GetWeaponManager().LoadMultiBulletStop();
+			}
+			else if( GetHumanInventory().GetEntityInHands()!= magazine )
 			{
 				Weapon_Base wpn;
 				Magazine mag;
 				Class.CastTo( wpn,  weapon );
 				Class.CastTo( mag,  magazine );
-				if(GetWeaponManager().CanAttachMagazine( wpn, mag ) )
-					GetWeaponManager().AttachMagazine( mag );
-				else if(GetWeaponManager().CanSwapMagazine( wpn, mag ) )
-					GetWeaponManager().SwapMagazine( mag );
-				else if(GetWeaponManager().CanLoadBullet( wpn, mag ) )				
-					GetWeaponManager().LoadBullet( mag );
-				else
+				if( GetWeaponManager().CanUnjam(wpn) )
 				{
+					GetWeaponManager().Unjam();
+				}
+				else if( GetWeaponManager().CanAttachMagazine( wpn, mag ) )
+				{
+					GetWeaponManager().AttachMagazine( mag );
+				}
+				else if( GetWeaponManager().CanSwapMagazine( wpn, mag ) )
+				{
+					GetWeaponManager().SwapMagazine( mag );
+				}
+				else if( GetWeaponManager().CanLoadBullet( wpn, mag ) )
+				{
+					GetWeaponManager().LoadMultiBullet( mag );
 				}
 			}
 		}		
@@ -3719,21 +3733,24 @@ class PlayerBase extends ManBase
 	{
 		if ( GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER || !GetGame().IsMultiplayer() )
 		{
-			ItemBase item;
-			for ( int i = 0; i < GetInventory().GetAttachmentSlotsCount(); ++i )
+			if ( GetInventory() )
 			{
-				item = ItemBase.Cast( GetInventory().FindAttachment(i) );
-				if ( item )
+				ItemBase item;
+				for ( int i = 0; i < GetInventory().GetAttachmentSlotsCount(); ++i )
 				{
-					GetGame().ObjectDelete(item);
+					item = ItemBase.Cast( GetInventory().FindAttachment(i) );
+					if ( item )
+					{
+						GetGame().ObjectDelete(item);
+					}
 				}
-			}
-
-			ItemBase item_in_hands = ItemBase.Cast( GetHumanInventory().GetEntityInHands() );
-
-			if ( item_in_hands )
-			{
-				LocalDestroyEntityInHands();
+	
+				ItemBase item_in_hands = ItemBase.Cast( GetHumanInventory().GetEntityInHands() );
+	
+				if ( item_in_hands )
+				{
+					LocalDestroyEntityInHands();
+				}
 			}
 		}
 	}

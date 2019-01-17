@@ -608,7 +608,7 @@ class Inventory: LayoutHolder
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionUp( UAUIFastTransferItem, false ) )
+		if( GetGame().GetInput().GetActionUp( UAUICtrlY, false ) )
 		{
 			if( ItemManager.GetInstance().IsMicromanagmentMode() )
 			{

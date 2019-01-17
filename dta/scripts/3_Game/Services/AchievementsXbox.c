@@ -96,9 +96,9 @@ class AchievementsXbox
 	}
 	
 	//===================================
-	// OnActionIgniteFlare
+	// OnActionIgniteRoadflare
 	//===================================
-	static void OnActionIgniteFlare()
+	static void OnActionIgniteRoadflare()
 	{
 		CheckError( SendEventAction( EAchievementActionId.ACTION_IGNITE_FIRE_ROAD_FLARE ) );
 	}
@@ -176,6 +176,11 @@ class AchievementsXbox
 				range_id = EAchievementRangeId.RANGE_RANGED;
 				distance = vector.Distance( killer.GetPosition(), victim.GetPosition() );
 			}
+		}
+		
+		if ( is_headshot )
+		{
+			hit_id = EAchievementHitId.HIT_HEADSHOT;
 		}
 		
 		CheckError( SendEventKill(target_id, target_rank_id, range_id, hit_id, distance) );

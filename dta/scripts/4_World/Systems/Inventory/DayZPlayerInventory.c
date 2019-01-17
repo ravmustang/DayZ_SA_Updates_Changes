@@ -334,7 +334,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 					break; // not in bubble
 				}
 				
-				if (false == GameInventory.CheckMoveToDstRequest(GetManOwner(), src.GetItem(), dst))
+				if (false == GameInventory.CheckMoveToDstRequest(GetManOwner(), src.GetItem(), dst, GameInventory.c_MaxItemDistanceRadius))
 				{
 					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
 					return false; // cheater
@@ -426,7 +426,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 					break; // not in bubble
 				}
 
-				if (false == GameInventory.CheckSwapItemsRequest(GetManOwner(), item1, item2))
+				if (false == GameInventory.CheckSwapItemsRequest(GetManOwner(), item1, item2, GameInventory.c_MaxItemDistanceRadius))
 				{
 					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
 					return false; // cheater
@@ -491,7 +491,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 					break; // not in bubble
 				}
 
-				if (false == GameInventory.CheckDropRequest(GetManOwner(), src.GetItem()))
+				if (false == GameInventory.CheckDropRequest(GetManOwner(), src.GetItem(), GameInventory.c_MaxItemDistanceRadius))
 				{
 					Error("[cheat] HandleInputData man=" + GetManOwner() + " is cheating with cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString());
 					return false; // cheater

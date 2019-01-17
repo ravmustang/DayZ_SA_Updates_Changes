@@ -112,9 +112,12 @@ class DayZCreatureAI extends DayZCreature
 			Print("Error registering anim. event (SoundVoice)");
 		}
 		
-		if(!RegisterAnimationEvent("Step", "OnStepEvent"))
-		{
-			Print("Error registering anim. event (Step)");
+		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
+		{		
+			if(!RegisterAnimationEvent("Step", "OnStepEvent"))
+			{
+				Print("Error registering anim. event (Step)");
+			}
 		}
 		
 		if(!RegisterAnimationEvent("Damage", "OnDamageEvent"))
@@ -290,6 +293,10 @@ class DayZAnimal extends DayZCreatureAI
 	
 		if (HandleDamageHit(currentCommandID))
 		{
+			if (currentCommandID  == DayZAnimalConstants.COMMANDID_ATTACK)
+			{
+				SignalAIAttackEnded();
+			}
 			return;
 		}
 	

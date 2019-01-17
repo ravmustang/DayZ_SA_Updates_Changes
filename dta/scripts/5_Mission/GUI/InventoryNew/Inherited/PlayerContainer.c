@@ -751,7 +751,7 @@ class PlayerContainer: CollapsibleContainer
 				ItemManager.GetInstance().PrepareTooltip( focused_item, x, y );
 			}
 			
-			ScrollToActiveContainer( cnt.Get( m_FocusedRow ) );
+			ScrollToActiveContainer( cnt );
 		}
 	}
 	

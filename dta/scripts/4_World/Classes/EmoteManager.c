@@ -23,10 +23,10 @@ class EmoteCB : HumanCommandActionCallback
 		}
 		else if (GetGame().IsServer() && pEventID == UA_ANIM_EVENT)
 		{
-			if (m_player.GetItemInHands())
+			if (m_player.GetItemInHands() && m_player.GetItemInHands().GetType() == "SurrenderDummyItem")
 				m_player.GetItemInHands().Delete();
-			/*else if ( m_player.GetCommand_Move() && m_player.GetCommand_Move().IsOnBack() ) //no surrender state on back, bugs out
-				return;*/
+			if (m_player.GetItemInHands())
+				m_player.DropItem(m_player.GetItemInHands());
 			else
 				m_player.GetHumanInventory().CreateInHands("SurrenderDummyItem");
 		}
@@ -257,11 +257,6 @@ class EmoteManager
 				if ( m_Player.GetItemInHands() )
 					m_Player.GetItemInHands().Delete();
 				return;
-				/*
-				SurrenderDataRestrain sdr = new SurrenderDataRestrain;
-				EndSurrenderRequest(sdr);
-				return;
-				*/
 			}
 			
 			// fallback in case lock does not end properly
@@ -338,10 +333,6 @@ class EmoteManager
 			m_BelayedEmoteSlot = -1;
 			m_BelayedEmote = false;
 		}
-		/*else
-		{
-			SetEmoteLockState(false);
-		}*/
 
 		//! back to the default - shoot from camera - if not set already
 		if (!m_Player.IsShootingFromCamera()) m_Player.OverrideShootFromCamera(true);
@@ -1152,13 +1143,16 @@ class EmoteManager
 		if (state)
 		{
 			m_ItemToBeCreated = true;
-			if ((GetGame().IsMultiplayer() && !GetGame().IsServer()) || !GetGame().IsMultiplayer())
+			/*if ((GetGame().IsMultiplayer() && !GetGame().IsServer()) || !GetGame().IsMultiplayer())
+			{*/
+			if (m_Player.GetItemInHands() && !m_Player.CanDropEntity(m_Player.GetItemInHands()))
+				return;
+			if (m_Player.GetItemInHands())
 			{
-				if (m_Player.GetItemInHands() && !m_Player.CanDropEntity(m_Player.GetItemInHands()))
-					return;
-				if (m_Player.GetItemInHands())
-					m_Player.DropItem(m_Player.GetItemInHands());
+				//m_Player.DropItem(m_Player.GetItemInHands());
+				m_Player.LocalDropEntity(m_Player.GetItemInHands());
 			}
+			//}
 			CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_SURRENDERIN,DayZPlayerConstants.STANCEMASK_ALL,true);
 			if (m_Callback)
 				m_Callback.RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);

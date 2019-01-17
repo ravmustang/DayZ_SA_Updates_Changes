@@ -87,7 +87,7 @@ class AttachmentCategoriesSlotsContainer: Container
 		if( direction == Direction.RIGHT )
 		{
 			m_FocusedColumn++;
-			if( m_FocusedColumn == m_ItemsCont.GetColumnCount() )
+			if( m_FocusedColumn >= m_ItemsCont.GetColumnCount() )
 			{
 				m_FocusedColumn = 0;
 			}
@@ -98,10 +98,10 @@ class AttachmentCategoriesSlotsContainer: Container
 			m_FocusedColumn--;
 			if( m_FocusedColumn < 0 )
 			{
-				m_FocusedColumn = m_ItemsCont.GetColumnCount();
+				m_FocusedColumn = m_ItemsCont.GetColumnCount() - 1;
 			}
 		}
-
+		
 		m_ItemsCont.GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).Show( true );
 		
 		EntityAI focused_item = GetFocusedEntity();

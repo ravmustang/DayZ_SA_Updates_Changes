@@ -266,6 +266,8 @@ class OptionsMenu extends UIScriptedMenu
 			m_GameTab.Revert();
 		//if( m_SoundsTab.IsChanged() )
 			m_SoundsTab.Revert();
+		//if( m_ControlsTab.IsChanged() )
+			m_ControlsTab.Revert();
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		//if( m_VideoTab.IsChanged() )

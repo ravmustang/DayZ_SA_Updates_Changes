@@ -15,6 +15,12 @@ class UIMenuPanel: Managed
 	proto native bool IsAnyMenuVisible();
 	proto native bool IsVisible();
 	
+	//! If visibility of application is changed. On console it is called when application is suspended or constrained.
+	//! @param isVisible indicate if application is visible in foreground
+	void OnVisibilityChanged(bool isVisible)
+	{
+	}
+	
 	//! Safe way to close window, using this function can even window safely close itself
 	proto native void Close();
 

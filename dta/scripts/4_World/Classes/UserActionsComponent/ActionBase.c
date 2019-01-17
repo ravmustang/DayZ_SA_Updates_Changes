@@ -171,6 +171,12 @@ class ActionBase
 	{
 		return false;
 	}
+	
+	bool IsShaveSelf()
+	{
+		return false;
+	}
+
 
 	string GetText() //text game displays in HUD hint 
 	{

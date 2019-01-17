@@ -34,7 +34,12 @@ class SyncEvents
 			{
 				ClientData.SyncEvent_OnEntityKilled( data.m_EntityKill );
 				break;
-			}			
+			}
+			case ESyncEvent.PlayerIgnateFireplayce:
+			{
+				ClientData.SyncEvent_OnPlayerIgnitedFireplace( data.m_SyncInt );
+				break;
+			}
 		}
 	}
 	
@@ -71,6 +76,14 @@ class SyncEvents
 				SendSyncEvent( ERPCs.RPC_SYNC_EVENT, ESyncEvent.EntityKill, data, true, man_killer.GetIdentity() );
 			}
 		}
+	}
+	
+	static void SendPlayerIgnatedFireplace( Man player, EFireIgniteType ignite_type )
+	{
+		ref SyncData data = new SyncData;
+		data.m_SyncInt = ignite_type;
+		
+		SendSyncEvent( ERPCs.RPC_SYNC_EVENT, ESyncEvent.PlayerIgnateFireplayce, data, true, player.GetIdentity() );
 	}
 	
 	private static void SendSyncEvent( ERPCs rpc_event_id, ESyncEvent sync_event_type, ref SyncData data = null, bool guaranteed = true, PlayerIdentity player_target = null )

@@ -225,4 +225,19 @@ class ActionSkinning: ActionContinuousBase
 		added_item.InsertAgent(eAgents.SALMONELLA, 1);
 		return added_item;
 	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		super.OnFinishProgressClient( action_data );
+		
+		if ( action_data.m_Target ) 
+		{
+			Object target_obj = action_data.m_Target.GetObject();
+			
+			if ( target_obj.IsKindOf( "Animal_CapreolusCapreolus" ) || target_obj.IsKindOf( "Animal_CapreolusCapreolusF" ) || target_obj.IsKindOf( "Animal_CervusElaphus" ) || target_obj.IsKindOf( "Animal_CervusElaphusF" ) )
+			{
+				AnalyticsManager.OnActionFinishedGutDeer();
+			}
+		}
+	}
 };

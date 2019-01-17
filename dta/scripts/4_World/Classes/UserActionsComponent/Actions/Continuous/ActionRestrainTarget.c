@@ -139,6 +139,13 @@ class ActionRestrainTarget: ActionContinuousBase
 		
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		super.OnFinishProgressClient( action_data );
+		
+		AnalyticsManager.OnActionRestrain();
+	}
 };
 
 class RestrainTargetPlayerLambda : ReplaceItemWithNewLambdaBase

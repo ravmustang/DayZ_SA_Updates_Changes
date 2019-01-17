@@ -33,7 +33,7 @@ class InGameMenuXbox extends UIScriptedMenu
 			IngameHud hud = IngameHud.Cast( mission.GetHud() );
 			if ( hud )
 			{
-				hud.ToggleHud( true, true );
+				hud.ToggleHud( hud.GetHudState() );
 			}
 		}
 		PPEffects.SetBlurMenu( 0 );

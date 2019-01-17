@@ -208,13 +208,16 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	
 	override bool OnClick( Widget w, int x, int y, int button )
 	{
-		if( w == m_PrimaryBindButton )
+		if( !m_Group.IsEnteringKeyBind() )
 		{
-			m_EntryTimer.Run( 0.01, this, "StartEnteringKeybind" );
-		}
-		if( w == m_AlternativeBindButton )
-		{
-			m_EntryTimer.Run( 0.01, this, "StartEnteringAlternateKeybind" );
+			if( w == m_PrimaryBindButton )
+			{
+				m_EntryTimer.Run( 0.01, this, "StartEnteringKeybind" );
+			}
+			if( w == m_AlternativeBindButton )
+			{
+				m_EntryTimer.Run( 0.01, this, "StartEnteringAlternateKeybind" );
+			}
 		}
 		return false;
 	}

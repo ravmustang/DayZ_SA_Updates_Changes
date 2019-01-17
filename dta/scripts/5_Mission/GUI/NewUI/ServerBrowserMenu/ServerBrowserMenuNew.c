@@ -56,9 +56,11 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		m_Version				= TextWidget.Cast( layoutRoot.FindAnyWidget( "version" ) );
 		
 		// TODO: Temporary Hide for 1.0
+		#ifndef PLATFORM_CONSOLE
 		layoutRoot.FindAnyWidget( "customize_character" ).Show( false );
 		layoutRoot.FindAnyWidget( "character" ).Show( false );
-				
+		#endif
+		
 		Refresh();
 		
 		string version;

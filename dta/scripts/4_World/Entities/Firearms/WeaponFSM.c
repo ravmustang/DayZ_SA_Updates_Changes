@@ -4,7 +4,7 @@
 class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionBase, WeaponGuardBase>
 {
 	protected int m_NextStateId = 0; /// counter for InternalID: each state in a fsm is assigned an unique number
-	protected ref set<WeaponStateBase> m_UniqueStates = new set<WeaponStateBase>; /// unique list of states in this machine (automation of save/load)
+	protected ref array<WeaponStateBase> m_UniqueStates = new array<WeaponStateBase>; /// unique list of states in this machine (automation of save/load)
 
 	protected void SetInternalID (WeaponStateBase state)
 	{

@@ -62,6 +62,10 @@ class CAContinuousTimeIgnite : CAContinuousBase
 						return UA_CANCEL;
 					}					
 				}
+				else
+				{
+					Print("Ignite...");
+				}
 			}
 			
 			return UA_PROCESSING;

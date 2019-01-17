@@ -91,14 +91,19 @@ class BiosUserManager
 	*/
 	void OnUserPicked(BiosUser user, EBiosError error)
 	{
-		if( !OnlineServices.ErrorCaught( error ) || user )
+		if( !user )
+		{
+			GetGame().GetInput().ResetActiveGamepad();
+			g_Game.GamepadCheck();
+		}
+		else if( !OnlineServices.ErrorCaught( error ) )
 		{
 			SelectUser( user );
 			if( GetGame().GetMission() )
 				GetGame().GetMission().Reset();
 			OnGameNameChanged( user );
+			g_Game.SelectUser();
 		}
-		g_Game.SelectUser();
 	}
 	
 	//! Callback function.

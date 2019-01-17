@@ -934,9 +934,12 @@ class ItemBase extends InventoryItem
 		}
 		else if( destination_entity && slot_id == -1 )
 		{
-			split_quantity_new = stackable;
+			if( quantity > stackable )
+				split_quantity_new = stackable;
+			else
+				split_quantity_new = quantity;
+			
 			destination_entity.GetInventory().FindFreeLocationFor( this, FindInventoryLocationType.ANY, loc );
-			Print( loc.IsValid() );
 			Object o = destination_entity.GetInventory().LocationCreateEntity( loc, GetType() );
 			new_item = ItemBase.Cast( o );
 			if( new_item )
@@ -1012,12 +1015,16 @@ class ItemBase extends InventoryItem
 
 	void SplitIntoStackMaxCargo( EntityAI destination_entity, int idx, int row, int col )
 	{
+		float quantity = GetQuantity();
 		float split_quantity_new;
 		ref ItemBase new_item;
 		if( destination_entity )
 		{
 			float stackable = ConfigGetFloat("varStackMax");
-			split_quantity_new = stackable;
+			if( quantity > stackable )
+				split_quantity_new = stackable;
+			else
+				split_quantity_new = quantity;
 			
 			new_item = ItemBase.Cast( destination_entity.GetInventory().CreateEntityInCargoEx( this.GetType(), idx, row, col ) );
 			if( new_item )
@@ -1055,12 +1062,16 @@ class ItemBase extends InventoryItem
 
 	void SplitIntoStackMaxHands( PlayerBase player )
 	{
+		float quantity = GetQuantity();
 		float split_quantity_new;
 		ref ItemBase new_item;
 		if( player )
 		{
 			float stackable = ConfigGetFloat("varStackMax");
-			split_quantity_new = stackable;
+			if( quantity > stackable )
+				split_quantity_new = stackable;
+			else
+				split_quantity_new = quantity;
 			
 			EntityAI in_hands = player.GetHumanInventory().CreateInHands(this.GetType());
 			new_item = ItemBase.Cast(in_hands);

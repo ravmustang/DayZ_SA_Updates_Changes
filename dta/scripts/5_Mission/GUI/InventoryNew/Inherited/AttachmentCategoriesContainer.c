@@ -176,6 +176,11 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 			ref AttachmentCategoriesSlotsContainer items_cont = new AttachmentCategoriesSlotsContainer(this);
 			m_Body.Insert(items_cont);
 			m_OpenedContainers.Insert(items_cont);
+			
+			if( i < ( attachments_categories_count / 7 ) )
+				items_cont.GetSlotsContainer().SetColumnCount( 7 );
+			else
+				items_cont.GetSlotsContainer().SetColumnCount( attachments_categories_count % 7 );
 		}
 	}
 	

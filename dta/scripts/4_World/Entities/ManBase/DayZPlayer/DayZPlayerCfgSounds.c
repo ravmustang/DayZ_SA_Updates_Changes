@@ -1,11 +1,11 @@
 class DayZPlayerTypeStepSoundLookupTableImpl extends DayZPlayerTypeStepSoundLookupTable
 {
-	void DayZPlayerTypeStepSoundLookupTableImpl(string pPlayerStepsCfgPath)
+	void DayZPlayerTypeStepSoundLookupTableImpl()
 	{
 		m_pSoundTableInstances = new map<int, ref StepSoundLookupTable>;
 		m_pSoundTables = new map<int, StepSoundLookupTable>;
 		
-		string stepsCfgPath = pPlayerStepsCfgPath + " ";
+		string stepsCfgPath = "CfgVehicles SurvivorBase AnimEvents Steps ";
 		int stepsCount = GetGame().ConfigGetChildrenCount(stepsCfgPath);
 		for(int i = 0; i < stepsCount; i++)
 		{
@@ -85,20 +85,29 @@ class DayZPlayerTypeStepSoundLookupTableImpl extends DayZPlayerTypeStepSoundLook
 		
 		return soundBuilder;
 	}
+	
+	static DayZPlayerTypeStepSoundLookupTableImpl GetInstance()
+	{
+		if(m_instance == NULL)
+			m_instance = new DayZPlayerTypeStepSoundLookupTableImpl();
 
-	autoptr map<int, ref StepSoundLookupTable> m_pSoundTableInstances;//unique tables
-	autoptr map<int, StepSoundLookupTable> m_pSoundTables;//pointers to tables above
+		return m_instance;
+	}
+
+	private static ref DayZPlayerTypeStepSoundLookupTableImpl m_instance;
+	private autoptr map<int, ref StepSoundLookupTable> m_pSoundTableInstances;//unique tables
+	private autoptr map<int, StepSoundLookupTable> m_pSoundTables;//pointers to tables above
 }
 
 
 class DayZPlayerTypeAttachmentSoundLookupTableImpl extends DayZPlayerTypeAttachmentSoundLookupTable
 {
-	void DayZPlayerTypeAttachmentSoundLookupTableImpl(string pPlayerAttachmentCfgPath)
+	void DayZPlayerTypeAttachmentSoundLookupTableImpl()
 	{
 		m_pSoundTableInstances = new map<int, ref AttachmentSoundLookupTable>;
 		m_pSoundTables = new map<int, AttachmentSoundLookupTable>();
 		
-		string attachCfgPath = pPlayerAttachmentCfgPath + " ";
+		string attachCfgPath = "CfgVehicles SurvivorBase AnimEvents Attachments ";
 		int attachCount = GetGame().ConfigGetChildrenCount(attachCfgPath);
 		for(int i = 0; i < attachCount; i++)
 		{
@@ -139,7 +148,16 @@ class DayZPlayerTypeAttachmentSoundLookupTableImpl extends DayZPlayerTypeAttachm
 		return soundBuilder;
 	}
 	
-	autoptr map<int, ref AttachmentSoundLookupTable> m_pSoundTableInstances;
+	static DayZPlayerTypeAttachmentSoundLookupTableImpl GetInstance()
+	{
+		if(m_instance == NULL)
+			m_instance = new DayZPlayerTypeAttachmentSoundLookupTableImpl();
+
+		return m_instance;
+	}
+	
+	private static ref DayZPlayerTypeAttachmentSoundLookupTableImpl m_instance;
+	private autoptr map<int, ref AttachmentSoundLookupTable> m_pSoundTableInstances;
 	private autoptr map<int, AttachmentSoundLookupTable> m_pSoundTables;
 }
 
@@ -178,12 +196,21 @@ class DayZPlayerTypeSoundTableImpl extends DayZPlayerTypeAnimTable
 		return NULL;
 	}
 	
-	ref array<ref AnimSoundEvent> m_animSoundEvents;
+	static DayZPlayerTypeSoundTableImpl GetInstance()
+	{
+		if(m_instance == NULL)
+			m_instance = new DayZPlayerTypeSoundTableImpl();
+
+		return m_instance;
+	}
+	
+	private static ref DayZPlayerTypeSoundTableImpl m_instance;
+	private ref array<ref AnimSoundEvent> m_animSoundEvents;
 }
 
-class DayZPlayerSoundVoiceTableImpl extends DayZPlayerTypeAnimTable
+class DayZPlayerTypeSoundVoiceTableImpl extends DayZPlayerTypeAnimTable
 {
-	void DayZPlayerSoundVoiceTableImpl()
+	void DayZPlayerTypeSoundVoiceTableImpl()
 	{
 		m_animSoundEvents = new array<ref AnimSoundEvent>;
 		
@@ -236,16 +263,16 @@ void DayZPlayerTypeRegisterSounds(DayZPlayerType pType)
 	if(GetGame().IsClient() || !GetGame().IsMultiplayer())//sounds are unnecessary on server
 	{
 		//! load and register step sound lookup table
-		DayZPlayerTypeStepSoundLookupTableImpl stepTable = new DayZPlayerTypeStepSoundLookupTableImpl("CfgVehicles SurvivorBase AnimEvents Steps");
+		DayZPlayerTypeStepSoundLookupTableImpl stepTable = DayZPlayerTypeStepSoundLookupTableImpl.GetInstance();
 		pType.RegisterStepSoundLookupTable(stepTable);
 		
-		DayZPlayerTypeAttachmentSoundLookupTableImpl attachTable = new DayZPlayerTypeAttachmentSoundLookupTableImpl("CfgVehicles SurvivorBase AnimEvents Attachments");
+		DayZPlayerTypeAttachmentSoundLookupTableImpl attachTable = DayZPlayerTypeAttachmentSoundLookupTableImpl.GetInstance();
 		pType.RegisterAttachmentSoundLookupTable(attachTable);
 		
-		DayZPlayerTypeSoundTableImpl soundTable = new DayZPlayerTypeSoundTableImpl();
+		DayZPlayerTypeSoundTableImpl soundTable = DayZPlayerTypeSoundTableImpl.GetInstance();
 		pType.RegisterSoundTable(soundTable);
 		
-		DayZPlayerSoundVoiceTableImpl voiceTable = new DayZPlayerSoundVoiceTableImpl();
+		DayZPlayerTypeSoundVoiceTableImpl voiceTable = new DayZPlayerTypeSoundVoiceTableImpl();
 		pType.RegisterSoundVoiceTable(voiceTable);
 	}
 	GetGame().ProfilerStop("DayZPlayerTypeRegisterSounds");

@@ -197,7 +197,7 @@ class WeaponManager
 			return false;
 
 		
-		if( wpn.IsJammed(/*wpn.GetCurrentMuzzle()*/) )
+		if( !wpn.IsJammed(/*wpn.GetCurrentMuzzle()*/) )
 			return false;
 		 
 		return true;

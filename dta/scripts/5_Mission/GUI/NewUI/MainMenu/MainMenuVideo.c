@@ -76,4 +76,13 @@ class MainMenuVideo extends UIScriptedMenu
 			StopVideo();
 		}
 	}
+	
+	override void OnVisibilityChanged(bool isVisible)
+	{
+		if ( !isVisible )
+		{
+			m_Video.Play( VideoCommand.KILL );
+		}
+	}
+	
 }

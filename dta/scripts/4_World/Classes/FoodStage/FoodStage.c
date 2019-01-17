@@ -13,6 +13,7 @@ enum FoodStageType
 
 class FoodStage
 {
+	protected FoodStageType m_FoodStageTypeClientLast;
 	protected FoodStageType m_FoodStageType;
 	protected Edible_Base m_FoodItem;
 	
@@ -51,6 +52,8 @@ class FoodStage
 			SetTextureIndex( visual_properties.Get( 1 ) );
 			SetMaterialIndex( visual_properties.Get( 2 ) );
 		}
+		
+		m_FoodStageTypeClientLast = m_FoodStageType;
 	}
 	
 	//Food Stage Type
@@ -307,6 +310,13 @@ class FoodStage
 			food_item.SetObjectTexture( GetSelectionIndex(), config_textures.Get( GetTextureIndex() ) );
 			//set materials
 			food_item.SetObjectMaterial( GetSelectionIndex(), config_materials.Get( GetMaterialIndex() ) );
+		
+		if ( m_FoodItem.KindOf( "DeerSteakMeat" ) && m_FoodStageType == FoodStageType.BAKED && m_FoodStageTypeClientLast == FoodStageType.RAW )
+		{
+			Print("Meet Cooked!");
+		}
+		
+		m_FoodStageTypeClientLast = m_FoodStageType;
 	}
 
 	//Food States

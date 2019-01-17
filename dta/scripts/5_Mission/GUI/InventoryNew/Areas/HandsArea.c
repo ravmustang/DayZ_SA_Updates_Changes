@@ -10,7 +10,7 @@ class HandsArea: LayoutHolder
 		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
 
 		m_HandsContainer = new HandsContainer( this );
-
+		
 		m_MainWidget.GetScript( m_Spacer );
 		m_MainWidget.Update();
 		m_Spacer.Update();
@@ -206,7 +206,7 @@ class HandsArea: LayoutHolder
 		
 		if( !ipw )
 		{
-		  ipw = ItemPreviewWidget.Cast( w );
+			ipw = ItemPreviewWidget.Cast( w );
 		}
 		
 		if( !ipw || !ipw.GetItem() || !ipw.IsInherited( ItemPreviewWidget ) )
@@ -221,7 +221,7 @@ class HandsArea: LayoutHolder
 		{
 			ItemBase item_base = ItemBase.Cast( ipw.GetItem() );
 			float stackable = item_base.ConfigGetFloat("varStackMax");
-			if( stackable == 0 && item_base.GetQuantity() >= stackable )
+			if( stackable == 0 || item_base.GetQuantity() <= stackable )
 			{
 				GetGame().GetPlayer().PredictiveTakeEntityToHands( item_base );		
 			}

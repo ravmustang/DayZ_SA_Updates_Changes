@@ -61,7 +61,7 @@ class CAContinuousTimeCooking : CAContinuousBase
 			if ( m_TimeElapsedRepeat >= m_AdjustedCookingUpdateTime )
 			{
 				cooking_state_update = m_CookingProcess.CookOnStick( m_ItemToCook, m_CookingUpdateTime );
-				
+				Print("cooking_state_update: "+ cooking_state_update);
 				//refresh action when food changed state
 				if ( cooking_state_update == 1 )
 				{
@@ -71,8 +71,15 @@ class CAContinuousTimeCooking : CAContinuousBase
 					{
 						action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_Action.GetSpecialtyWeight() );
 					}
+					else
+					{
+						if ( m_ItemToCook.ClassName() == "DeerSteakMeat" && m_ItemToCook.GetFoodStage().GetFoodStageType() == FoodStageType.BAKED )
+						{
+							AnalyticsManager.OnActionCookedSteak();
+						}
+					}
 				}
-				
+			
 				m_TimeElapsedRepeat = 0;
 			}				
 					

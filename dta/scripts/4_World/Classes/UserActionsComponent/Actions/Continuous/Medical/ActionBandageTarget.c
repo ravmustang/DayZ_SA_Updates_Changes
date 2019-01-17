@@ -59,4 +59,9 @@ class ActionBandageTarget: ActionContinuousBase
 
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		AnalyticsManager.OnActionBandageTarget();
+	}
 };

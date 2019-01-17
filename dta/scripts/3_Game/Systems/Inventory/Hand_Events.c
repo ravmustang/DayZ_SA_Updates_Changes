@@ -140,7 +140,7 @@ class HandEventTake extends HandEventBase
 	
 	override bool CheckRequest ()
 	{
-		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst());
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst(), GameInventory.c_MaxItemDistanceRadius);
 	}
 
 	override bool AcquireInventoryJunctureFromServer (notnull Man player)
@@ -178,7 +178,7 @@ class HandEventMoveTo extends HandEventBase
 	
 	override bool CheckRequest ()
 	{
-		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst());
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst(), GameInventory.c_MaxItemDistanceRadius);
 	}
 
 	override bool AcquireInventoryJunctureFromServer (notnull Man player)
@@ -211,7 +211,7 @@ class HandEventDrop extends HandEventBase
 	
 	override bool CheckRequest ()
 	{
-		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst());
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst(), GameInventory.c_MaxItemDistanceRadius);
 	}
 
 	override bool AcquireInventoryJunctureFromServer (notnull Man player)
@@ -269,8 +269,12 @@ class HandEventSwap extends HandEventBase
 		EntityAI inHands = m_Player.GetHumanInventory().GetEntityInHands();
 		if (m_Entity && inHands)
 		{
-			bool test1 = GameInventory.CheckSwapItemsRequest(m_Player, m_Entity, inHands);
+			bool test1 = GameInventory.CheckSwapItemsRequest(m_Player, m_Entity, inHands, GameInventory.c_MaxItemDistanceRadius);
+			if (!test1)
+				Print("Warning: test1 failed");
 			bool test2 = GameInventory.CanSwapEntities(m_Entity, inHands);
+			if (!test2)
+				Print("Warning: test2 failed");
 			return test1 && test2;
 		}
 		return false;
@@ -329,7 +333,7 @@ class HandEventForceSwap extends HandEventBase
 		EntityAI inHands = m_Player.GetHumanInventory().GetEntityInHands();
 		if (m_Entity && inHands && m_Dst && m_Dst.IsValid())
 		{
-			bool test1 = GameInventory.CheckSwapItemsRequest(m_Player, m_Entity, inHands);
+			bool test1 = GameInventory.CheckSwapItemsRequest(m_Player, m_Entity, inHands, GameInventory.c_MaxItemDistanceRadius);
 			bool test2 = GameInventory.CanForceSwapEntities(m_Entity, inHands, m_Dst);
 			return test1 && test2;
 		}

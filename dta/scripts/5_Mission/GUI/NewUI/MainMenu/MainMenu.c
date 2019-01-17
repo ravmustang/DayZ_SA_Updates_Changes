@@ -415,27 +415,27 @@ class MainMenu extends UIScriptedMenu
 
 	override void Update(float timeslice)
 	{
+		#ifndef PLATFORM_CONSOLE
 		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) && g_Game.GetLoadState() != DayZGameState.CONNECTING && !GetGame().GetUIManager().IsDialogVisible() )
 		{
-			#ifdef PLATFORM_CONSOLE
-				g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
-				#ifndef PLATFORM_WINDOWS
-				GetGame().GetInput().ResetActiveGamepad();
-				#endif
-				GetGame().GetUIManager().Back();
-			#else
 				Exit();
-			#endif
 		}
-		
+		#endif
+		#ifdef PLATFORM_CONSOLE
 		if ( GetGame().GetInput().GetActionDown(UAUICtrlY, false) )
 		{
 			BiosUserManager user_manager = GetGame().GetUserManager();
 			if( user_manager )
 			{
-				user_manager.PickUserAsync();
+				g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+				#ifndef PLATFORM_WINDOWS
+				//GetGame().GetInput().ResetActiveGamepad();
+				user_manager.SelectUser( null );
+				#endif
+				GetGame().GetUIManager().Back();
 			}
 		}
+		#endif
 	}
 	
 	void Play()

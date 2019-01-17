@@ -193,8 +193,16 @@ class Weapon_Base extends Weapon
 	
 	bool IsJammed () { return m_isJammed; }
 	void SetJammed (bool value) { m_isJammed = value; }
-	float GetChanceToJam () { return m_ChanceToJam[GetHealthLevel()]; }
 	float GetSyncChanceToJam () { return m_ChanceToJamSync; }
+	float GetChanceToJam()
+	{
+		int level = GetHealthLevel();
+	
+		if (level >= 0 && level < m_ChanceToJam.Count())
+			return m_ChanceToJam[level];
+		else
+			return 0.0;
+	}
 	
 	void SyncSelectionState (bool has_bullet, bool has_mag)
 	{

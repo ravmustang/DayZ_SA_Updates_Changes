@@ -218,14 +218,22 @@ class Input
 			{
 				g_Game.CreateGamepadDisconnectMenu();
 			}
-				IdentifyGamepad( GamepadButton.A );
-			}
+			
+			IdentifyGamepad( GamepadButton.A );
 		}
+	}
+
 	//! callback that is fired when identification was requested
 	void OnGamepadIdentification(int gamepad)
 	{
 		if( gamepad > -1 )
 		{
+			DayZLoadState state = g_Game.GetLoadState();
+			if( state == DayZLoadState.MAIN_MENU_START || state == DayZLoadState.MAIN_MENU_USER_SELECT )
+			{
+				if( GetGame().GetMission() )
+					GetGame().GetMission().Reset();
+			}
 			g_Game.DeleteGamepadDisconnectMenu();
 			SelectActiveGamepad( gamepad );
 			g_Game.SelectUser( gamepad );

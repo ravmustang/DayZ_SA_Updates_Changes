@@ -322,7 +322,33 @@ class Fireplace extends FireplaceBase
 		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( DestroyClutterCutter, 200, false, cc_object );
 		
 		//start fire
-		StartFire(); 
+		StartFire();
+		
+		if ( fire_source )
+		{
+			Man player = fire_source.GetHierarchyRootPlayer();
+			
+			if ( player )
+			{
+				EFireIgniteType ignate_type = EFireIgniteType.Unknow;
+				
+				if ( fire_source.ClassName() == "Matchbox"  )
+				{
+					ignate_type = EFireIgniteType.Matchbox;
+				}
+				else if ( fire_source.ClassName() == "Roadflare"  )
+				{
+					ignate_type = EFireIgniteType.Roadflare;
+				}
+				else if ( fire_source.ClassName() == "HandDrillKit"  )
+				{
+					ignate_type = EFireIgniteType.HandDrill;
+				}
+				
+				
+				SyncEvents.SendPlayerIgnatedFireplace( player, ignate_type );
+			}
+		}
 	}
 	
 	void DestroyClutterCutter( Object clutter_cutter )

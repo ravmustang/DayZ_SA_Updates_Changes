@@ -114,6 +114,11 @@ class ActionLightItemOnFire: ActionContinuousBase
 		}
 	}
 	
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		Print("Ignite client");
+	}
+	
 	//setup
 	override bool SetupAction( PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL )
 	{	
