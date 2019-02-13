@@ -16,21 +16,28 @@ void main()
 		ce.InitOffline();
 
 	//DATE RESET AFTER ECONOMY INIT-------------------------
-	int year;
-	int month;
-	int day;
-	int hour;
-	int minute;
-
+	int year, month, day, hour, minute;
+	int reset_month = 9, reset_day = 20;
 	GetGame().GetWorld().GetDate(year, month, day, hour, minute);
 
-    if (((month <= 9) && (day < 20)) || ((month >= 10) && (day > 20)))
+    if ((month == reset_month) && (day < reset_day))
     {
-        month = 9;
-        day = 20;
-		
-		GetGame().GetWorld().SetDate(year, month, day, hour, minute);
-	}
+        GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
+    }
+    else
+    {
+        if ((month == reset_month + 1) && (day > reset_day))
+        {
+            GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
+        }
+        else
+        {
+            if ((month < reset_month) || (month > reset_month + 1))
+            {
+                GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
+            }
+        }
+    }
 }
 
 class CustomMission: MissionServer
@@ -57,13 +64,6 @@ class CustomMission: MissionServer
 	
 	override void StartingEquipSetup(PlayerBase player, bool clothesChosen)
 	{
-/*
-		player.RemoveAllItems();
-
-		EntityAI item = player.GetInventory().CreateInInventory(topsMissionArray.GetRandomElement());
-		EntityAI item2 = player.GetInventory().CreateInInventory(pantsArray.GetRandomElement());
-		EntityAI item3 = player.GetInventory().CreateInInventory(shoesArray.GetRandomElement());
-*/
 		EntityAI itemTop;
 		EntityAI itemEnt;
 		ItemBase itemBs;
@@ -81,30 +81,17 @@ class CustomMission: MissionServer
 			
 			itemEnt = itemTop.GetInventory().CreateInInventory("RoadFlare");
 			SetRandomHealth(itemEnt);
+			
+			rand = Math.RandomFloatInclusive(0.0, 1.0);
+			if ( rand < 0.35 )
+				itemEnt = player.GetInventory().CreateInInventory("Apple");
+			else if ( rand > 0.65 )
+				itemEnt = player.GetInventory().CreateInInventory("Pear");
+			else
+				itemEnt = player.GetInventory().CreateInInventory("Plum");
 		
-			itemEnt = itemTop.GetInventory().CreateInInventory("StoneKnife");
 			SetRandomHealth(itemEnt);
 		}
-
-		rand = Math.RandomFloatInclusive(0.0, 1.0);
-		if ( rand < 0.25 )
-			itemEnt = player.GetInventory().CreateInInventory("SodaCan_Cola");
-		else if ( rand > 0.75 )
-			itemEnt = player.GetInventory().CreateInInventory("SodaCan_Spite");
-		else
-			itemEnt = player.GetInventory().CreateInInventory("SodaCan_Pipsi");
-		
-		SetRandomHealth(itemEnt);
-
-		rand = Math.RandomFloatInclusive(0.0, 1.0);
-		if ( rand < 0.35 )
-			itemEnt = player.GetInventory().CreateInInventory("Apple");
-		else if ( rand > 0.65 )
-			itemEnt = player.GetInventory().CreateInInventory("Pear");
-		else
-			itemEnt = player.GetInventory().CreateInInventory("Plum");
-		
-		SetRandomHealth(itemEnt);
 	}
 };
   

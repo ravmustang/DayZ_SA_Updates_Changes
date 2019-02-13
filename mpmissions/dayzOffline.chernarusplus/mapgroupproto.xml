@@ -17,12 +17,11 @@
 		</defaults>
 
 		<group name="Land_Shed_M1" lootmax="2">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="2">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="0.504883 -1.174019 0.807373" range="0.587867" height="1.469666" flags="32" />
 						<point pos="0.852539 -1.174019 -0.850342" range="0.595474" height="1.488685" flags="32" />
@@ -30,12 +29,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_M3" lootmax="2">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="2">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="-1.299217 -1.048233 0.636453" range="0.302246" height="0.755615" flags="32" />
 						<point pos="1.220291 -1.346603 -0.727190" range="0.328613" height="0.821533" flags="32" />
@@ -45,12 +43,10 @@
 				</container>
 		</group>
 		<group name="Land_Shed_M4" lootmax="3">
-				<usage name="Village" />
+				<usage name="Industrial" />
 				<container name="lootFloor" lootmax="3">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="-1.876667 -1.211807 1.021349" range="0.483887" height="1.209718" flags="32" />
 						<point pos="0.396737 -1.174454 -0.807087" range="0.564209" height="1.410522" flags="32" />
@@ -60,12 +56,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_W1" lootmax="2">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="2">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="-0.223142 -1.146324 -1.269616" range="0.418396" height="1.045990" flags="32" />
 						<point pos="0.819095 -1.148674 -0.215999" range="0.581250" height="1.453125" flags="32" />
@@ -74,12 +69,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_W2" lootmax="2">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="2">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="0.699416 -0.021996 0.985949" range="0.657227" height="1.643067" flags="32" />
 						<point pos="0.685769 0.085831 -1.264014" range="0.670410" height="0.583664" flags="32" />
@@ -87,12 +81,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_W3" lootmax="2">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="2">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="0.952282 -0.885551 -1.611025" range="0.218464" height="0.546160" flags="32" />
 						<point pos="1.230646 -0.859039 -0.337205" range="0.364746" height="0.911865" flags="32" />
@@ -105,12 +98,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_W4" lootmax="3">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="3">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="-0.110607 -1.329193 -0.761492" range="0.417725" height="1.044312" flags="32" />
 						<point pos="0.436773 -1.319656 0.737083" range="0.436035" height="1.090088" flags="32" />
@@ -119,12 +111,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_W5" lootmax="3">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="3">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
-						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="-1.097940 -1.326691 1.196910" range="0.220215" height="0.550537" />
 						<point pos="-0.947935 -1.445526 -1.914181" range="0.535645" height="1.330627" />
@@ -134,11 +125,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_W6">
-				<usage name="Village" />
+				<usage name="Industrial" />
+				<usage name="Farm" />
 				<container name="lootFloor" lootmax="6">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
 						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="0.919720 -1.320877 -1.997921" range="0.739502" height="1.841980" />
@@ -151,11 +142,11 @@
 				</container>
 		</group>
 		<group name="Land_Shed_Closed">
+				<usage name="Industrial" />
 				<usage name="Village" />
 				<container name="lootFloor">
 						<category name="tools" />
 						<category name="containers" />
-						<category name="clothes" />
 						<category name="vehiclesparts" />
 						<tag name="floor" />
 						<point pos="-1.515579 -4.639580 2.899451" range="1.199951" height="1.987068" />
@@ -7032,8 +7023,8 @@
 						<category name="clothes" />
 						<category name="weapons" />
 						<category name="explosives" />
-						<point pos="1.600356 1.158478 0.420877" range="0.374023" height="0.935057" />
-						<point pos="1.052357 1.202087 -0.288277" range="0.400879" height="1.002198" />
+						<point height="1.114502" range="0.445802" pos="1.538687 1.277588 0.398074"/>
+						<point height="0.973297" range="0.416016" pos="0.955226 1.277588 -0.327999"/>
 				</container>
 		</group>
 		<group name="Land_Mil_Fortified_Nest_Big">
