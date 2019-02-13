@@ -50,7 +50,6 @@ class PluginKeyBinding extends PluginBase
 		RegisterKeyBind(	 MENU_NONE|MENU_SCRIPTCONSOLE	,KeyCode.KC_RCONTROL	,KeyCode.KC_GRAVE	,"PluginDeveloper"		,"ToggleScriptConsole" 			,"[RCTRL]+[~]"					,"Show/Hide this script console");
 		RegisterKeyBind(	 MENU_NONE|MENU_SCENE_EDITOR	,KeyCode.KC_LCONTROL	,KeyCode.KC_TAB		,"PluginSceneManager"	,"EditorToggle"					,"[LCTRL]+[TAB]"				,"Show/Hide Scripted Scene Editor");
 		RegisterKeyBind(	 MENU_NONE|MENU_SCENE_EDITOR	,KeyCode.KC_RCONTROL	,KeyCode.KC_TAB		,"PluginSceneManager"	,"EditorToggle"					,"[RCTRL]+[TAB]"				,"Show/Hide Scripted Scene Editor");
-		RegisterKeyBind(	 MENU_MAIN						,KeyCode.KC_LCONTROL	,KeyCode.KC_E		,"PluginDeveloper"		,"ToggleMissionLoader"			,"[LCtrl]+[E]"					,"Show/Hide mission loader");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_RSHIFT		,-1					,"PluginDeveloper"		,"SpawnFromClipboard"			,"[Right Shift]"				,"Spawn item from clipboard");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_INSERT		,-1					,"PluginDeveloper"		,"TeleportAtCursor"				,"[Insert]"		 				,"Teleport player to cursor position");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_HOME		,-1					,"PluginDeveloper"		,"ToggleFreeCamera"				,"[Home]"						,"Toggle free camera and teleport player to its position");
@@ -68,7 +67,7 @@ class PluginKeyBinding extends PluginBase
 		RegisterKeyBind(	 MENU_ANY						,KeyCode.KC_LCONTROL	,KeyCode.KC_NUMPAD0	,"PluginDayzPlayerDebug","ToggleDebugWindowEvent"		,"[LCtrl]+[NUMPAD0]"			,"Open/Close Player debug window");
 		RegisterKeyBind(	 MENU_ANY						,KeyCode.KC_LCONTROL	,KeyCode.KC_DECIMAL	,"PluginDayzPlayerDebug","ToggleDebugWindowEventP"		,"[LCtrl]+[DECIMAL]"			,"Open/Close Player debug window");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_LCONTROL	,KeyCode.KC_NUMPAD9	,"PluginDeveloperSync"	,"ToggleFocus"					,"[LCtrl]+[NUMPAD9]"			,"Toggle game focus");
-		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_LCONTROL	,KeyCode.KC_SCROLL	,"PluginDoorRuler"		,"CheckInit"					,"[LCtrl]+[SCROLL LOCK]"		,"Enable Door Ruler");
+		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_LCONTROL	,KeyCode.KC_SCROLL	,"PluginNutritionDumper"		,"CheckInit"					,"[LCtrl]+[SCROLL LOCK]"		,"Enable Door Ruler");
 		RegisterKeyBind(	 MENU_NONE						,KeyCode.KC_LCONTROL	,KeyCode.KC_RBRACKET,"PluginCharPlacement"	,"CheckInit"					,"[LCtrl]+[)]"					,"Enable CharPlacer");
 		
 		RegisterKeyBind(	 MENU_NONE|MENU_CAMERA_TOOLS	,KeyCode.KC_LCONTROL	,KeyCode.KC_K		,"PluginCameraTools"	,"ToggleCameraTools"			,"[LCtrl]+[K]"					,"Toggle Camera Recording Tools");

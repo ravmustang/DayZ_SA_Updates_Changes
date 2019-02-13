@@ -291,7 +291,6 @@ class ServerBrowserTabPage extends ServerBrowserTab
 	{
 		m_PageIndex = page_index;
 		UpdateServerList();
-		ShowServerList();
 	}
 	
 	void UpdateServerList()

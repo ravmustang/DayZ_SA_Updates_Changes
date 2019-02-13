@@ -19,4 +19,14 @@ class Armband_ColorBase extends Clothing
 		}
 		return false;
 	}
-}
+};
+
+class Armband_Dyed extends Armband_ColorBase {};
+class Armband_White extends Armband_ColorBase {};
+class Armband_Yellow extends Armband_ColorBase {};
+class Armband_Orange extends Armband_ColorBase {};
+class Armband_Red extends Armband_ColorBase {};
+class Armband_Green extends Armband_ColorBase {};
+class Armband_Pink extends Armband_ColorBase {};
+class Armband_Blue extends Armband_ColorBase {};
+class Armband_Black extends Armband_ColorBase {};

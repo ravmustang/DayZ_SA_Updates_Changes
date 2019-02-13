@@ -3,34 +3,20 @@ enum EPSstatsFlags
 	EMPTY,
 };
 
-
-enum EPlayerStats
-{
-	HEATCOMFORT,
-	TREMOR,
-	WET,
-	ENERGY,
-	WATER,
-	STOMACH_SOLID,
-	STOMACH_ENERGY,
-	STOMACH_WATER,
-	DIET,
-	STAMINA,
-	SPECIALTY,
-	BLOODTYPE,
-};
-
-
 class PlayerStats
 {
-
 	ref array<ref PlayerStatBase> m_PlayerStats;
 	ref array<ref StatDebugObject> m_PlayerStatsDebug;
+	
+	//ref PlayerStatsPCO_current m_PCO = new PlayerStatsPCO_current();
+	ref PCOHandlerStats m_PCOhandler = new PCOHandlerStats();
 	
 	ref Timer m_SyncTimer;
 	Man m_Player;
 	bool m_AllowLogs;
 	string m_System = "Stats"; //debuging tag
+	
+	//int m_SystemVersion = 101;
 	
 	void PlayerStats(Man player)
 	{
@@ -39,45 +25,38 @@ class PlayerStats
 
 	void Init(Man player)
 	{
-		m_PlayerStats 	= new array<ref PlayerStatBase>;
 		m_Player 		= player;
-		
-		//																	min						max						initial					name				flag
-		RegisterStat(EPlayerStats.HEATCOMFORT,  	new PlayerStat<float>	(-1,					1,						0,						"HeatComfort",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.TREMOR,		  	new PlayerStat<float>	(0,						1,						0,						"Tremor",			EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.WET,  			new PlayerStat<int>		(0,						1,						0,						"Wet",				EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.ENERGY,  			new PlayerStat<float>	(0,						20000,					600,					"Energy",			EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.WATER,  			new PlayerStat<float>	(0,						5000,					500,					"Water",			EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.STOMACH_SOLID,  	new PlayerStat<float>	(0,						5000,					0,						"StomachSolid",			EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.STOMACH_ENERGY,  	new PlayerStat<float>	(0,						40000,					0,						"StomachEnergy",	EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.STOMACH_WATER,  	new PlayerStat<float>	(0,						5000,					0,						"StomachWater",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.DIET,  			new PlayerStat<float>	(0,						5000,					2500,					"Diet",				EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.STAMINA,  		new PlayerStat<float>	(0,						STAMINA_MAX,			100,					"Stamina",			EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.SPECIALTY,  		new PlayerStat<float>	(-1,					1,						0,						"Specialty",		EPSstatsFlags.EMPTY) );
-		RegisterStat(EPlayerStats.BLOODTYPE,  		new PlayerStat<int>		(0,						128,					BloodTypes.GenerateBloodType(),	"BloodType",		EPSstatsFlags.EMPTY) );
 	}
 
+	PlayerStatsPCO_Base GetPCO(int version = -1 )
+	{
+		return m_PCOhandler.GetPCO(version);
+	}
+	
 	void ~PlayerStats()
 	{
 		//if( GetGame() && GetGame().IsDebugActions() ) GatherAllRecords();
 	}
 	
-	void RegisterStat(int id, PlayerStatBase stat)
-	{
-		m_PlayerStats.InsertAt(stat, id);
-		stat.Init(id, this);
-	}
-
+	
 	PlayerStatBase GetStatObject(int id)
 	{
-		return m_PlayerStats.Get(id);
+		if( GetPCO() )
+		{
+			return GetPCO().GetStatObject(id);
+		}
+		else
+		{
+			return null;
+		}
 	}
-
+	
+/*
 	array<ref PlayerStatBase> Get()
 	{
 		return m_PlayerStats;
 	}
-
+*/
 	void SetAllowLogs(bool enable)
 	{
 		m_AllowLogs = enable;
@@ -90,14 +69,17 @@ class PlayerStats
 	
 	void GetDebugInfo( array<ref StatDebugObject> objects, int flags )
 	{
+		/*
 		for(int i = 0; i < m_PlayerStats.Count(); i++)
 		{
 			m_PlayerStats.Get(i).SerializeValue(objects, flags);
 		}
+		*/
 	}
 	
 	void GatherAllRecords()
 	{
+		/*
 		FileHandle file = OpenFile("$profile:StatRecords.log", FileMode.WRITE);
 		
 		FPrintln(file, "================================================================");
@@ -117,22 +99,36 @@ class PlayerStats
 				FPrintln(file, output);
 			}
 		}
+		*/
 	}
 	
 	void SaveStats ( ParamsWriteContext ctx )
 	{
-		for ( int i = 0; i < m_PlayerStats.Count(); i++ )
+		int current_version = GetGame().SaveVersion();
+		
+		if( GetPCO(current_version ) )
 		{
-			m_PlayerStats.Get(i).OnStoreSave(ctx);
+			GetPCO(current_version).OnStoreSave(ctx);
+			Print("Saving stats in version: "+ GetPCO(current_version ).GetVersion());
+		}
+		else
+		{
+			return;
 		}
 	}
 
-	void LoadStats ( ParamsReadContext ctx, int version )
+	bool LoadStats ( ParamsReadContext ctx, int version )
 	{
-		for ( int i = 0; i < m_PlayerStats.Count(); i++ )
+		if(GetPCO(version) && GetPCO(version).OnStoreLoad(ctx))
 		{
-			m_PlayerStats.Get(i).OnStoreLoad(ctx, version);
+			Print("********* LoadStats loading version: " + GetPCO(version).GetVersion());
+			return true;
 		}
+		else
+		{
+			return false;
+		}
+		
 	}
 
 }

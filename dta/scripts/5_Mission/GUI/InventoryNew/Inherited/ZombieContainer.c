@@ -1,34 +1,50 @@
 class ZombieContainer: CollapsibleContainer
 {
-	protected ref Container m_Container;
-	protected ref map<int, ref Widget> m_InventorySlots;
-	protected ref map<EntityAI, ref Container> m_ShowedItems = new ref map<EntityAI, ref Container>;
-	protected EntityAI m_ZombieEntity;
+	protected ref Container						m_Container;
+	protected ref CargoContainer				m_CargoGrid;
+	protected ref map<int, ref Widget>			m_InventorySlots;
+	protected ref map<EntityAI, ref Container>	m_ShowedItems = new ref map<EntityAI, ref Container>;
+	protected EntityAI							m_ZombieEntity;
 	
 	void ZombieContainer( LayoutHolder parent, int sort = -1 )
 	{
 		m_InventorySlots = new ref map<int, ref Widget>;
 		m_Container = new Container( this );
-		m_Container.Insert( new SlotsContainer( m_Container ) );
 		m_Body.Insert( m_Container );
 		
+		m_MainWidget = m_RootWidget.FindAnyWidget( "body" );
+		
+		WidgetEventHandler.GetInstance().RegisterOnChildAdd( m_MainWidget, this, "OnChildAdd" );
+		WidgetEventHandler.GetInstance().RegisterOnChildRemove( m_MainWidget, this, "OnChildRemove" );
+		
 		SetHeaderName();
-	}
-	
-	void ~ZombieContainer()
-	{
-		if ( GetMainWidget() && GetMainWidget().GetParent() )
-		{
-			delete GetMainWidget().GetParent();
-		}
 	}
 	
 	void SetEntity( EntityAI zombie_entity )
 	{
 		m_ZombieEntity = zombie_entity;
 		InitGhostSlots();
-		( Container.Cast( m_Parent ) ).m_Body.Insert( this );
 		m_Parent.Refresh();
+	}
+	
+	override bool IsLastIndex()
+	{
+		return m_ActiveIndex == m_Body.Count() - 1;
+	}
+	
+	override bool IsFirstIndex()
+	{
+		return m_ActiveIndex == 1; 
+	}
+	
+	override bool IsFirstContainerFocused()
+	{
+		return IsFirstIndex();
+	}
+	
+	override bool IsLastContainerFocused()
+	{
+		return IsLastIndex();
 	}
 	
 	void OnIconDrag( Widget w )
@@ -57,7 +73,7 @@ class ZombieContainer: CollapsibleContainer
 		name.Replace( "Render", "Col" );
 		w.FindAnyWidget( name ).Show( true );
 		name.Replace( "Col", "RadialIcon" );
-		w.FindAnyWidget( name ).Show( false );
+		w.GetParent().FindAnyWidget( name ).Show( false );
 	}
 	
 	void OnIconDrop( Widget w )
@@ -178,7 +194,7 @@ class ZombieContainer: CollapsibleContainer
 
 	override void UpdateInterval()
 	{
-		if( m_ZombieEntity == NULL )
+		if( m_ZombieEntity == null )
 		{
 			return;
 		}
@@ -192,7 +208,7 @@ class ZombieContainer: CollapsibleContainer
 			{
 				int slot_id = entity.GetInventory().GetSlotId(0);
 				ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_InventorySlots.Get( slot_id ) );
-				if( ipw == NULL )
+				if( ipw == null )
 				{
 					return;
 				}
@@ -221,7 +237,7 @@ class ZombieContainer: CollapsibleContainer
 
 							name = ipw.GetName();
 							name.Replace( "Icon", "RadialIcon" );
-							ipw.GetParent().FindAnyWidget( name ).Show(true);
+							ipw.GetParent().GetParent().FindAnyWidget( name ).Show(true);
 						}
 						else if( entity.GetSlotsCountCorrect() > 0 )
 						{
@@ -234,7 +250,7 @@ class ZombieContainer: CollapsibleContainer
 
 							name = ipw.GetName();
 							name.Replace( "Icon", "RadialIcon" );
-							ipw.GetParent().FindAnyWidget( name ).Show( true );
+							ipw.GetParent().GetParent().FindAnyWidget( name ).Show( true );
 						}
 					}
 					else
@@ -273,18 +289,178 @@ class ZombieContainer: CollapsibleContainer
 		for ( i = 0; i < m_InventorySlots.Count(); i++)
 		{
 			ipw = ItemPreviewWidget.Cast( m_InventorySlots.GetElement(i) );
-			if( ipw.GetItem() != NULL && showed_player_ghost_entities.Find( ipw.GetItem() ) == INDEX_NOT_FOUND )
+			if( ipw.GetItem() != null && showed_player_ghost_entities.Find( ipw.GetItem() ) == INDEX_NOT_FOUND )
 			{
 				name2 = ipw.GetParent().GetName();
 				ipw.Show( false );
 				name2.Replace( "PanelWidget", "GhostSlot" );
 				ipw.GetParent().GetParent().FindAnyWidget( name2 ).Show( true );
-				ipw.SetItem( NULL );
+				ipw.SetItem( null );
 			}
 			
 		}
 
 		m_ShowedItems = new_showed_items;
+	}
+	
+	override void RecomputeOpenedContainers()
+	{
+		m_OpenedContainers.Clear();
+		m_OpenedContainers.Insert( m_Body[0] );
+		m_OpenedContainers.Insert( m_Body[1] );
+		for ( int i = 2; i < m_Body.Count(); i++ )
+		{
+			ClosableContainer cnt = ClosableContainer.Cast( m_Body.Get( i ) );
+			if( cnt && cnt.IsOpened() )
+			{
+				m_OpenedContainers.Insert( cnt );
+			}
+		}
+	}
+	
+	override void SetNextActive()
+	{
+		ItemManager.GetInstance().HideTooltip( );
+		if( ItemManager.GetInstance().IsMicromanagmentMode() )
+		{
+			ItemManager.GetInstance().SetItemMoving( true );
+		}
+		
+		if( IsLastIndex() )
+		{
+			Container.Cast( GetParent() ).SetNextActive();
+			m_ActiveIndex = 1;
+			UnfocusAll();
+		}
+		else
+		{
+			m_ActiveIndex++;
+			GetFocusedContainer().SetActive( false );
+			SetFocusedContainer( Container.Cast( m_Body.Get( m_ActiveIndex ) ) );
+			GetFocusedContainer().SetActive( true );
+		}
+	}
+
+	override void SetPreviousActive()
+	{
+		if( ItemManager.GetInstance().IsMicromanagmentMode() )
+		{
+			ItemManager.GetInstance().SetItemMoving( true );
+		}
+		
+		if( IsFirstIndex() )
+		{
+			Container.Cast( GetParent() ).SetPreviousActive();
+			m_ActiveIndex = 1;
+			UnfocusAll();
+		}
+		else
+		{
+			m_ActiveIndex--;
+			GetFocusedContainer().SetActive( false );
+			SetFocusedContainer( Container.Cast( m_Body.Get( m_ActiveIndex ) ) );
+			GetFocusedContainer().SetActive( true );
+		}
+	}
+	
+	override void MoveGridCursor( int direction )
+	{
+		if( !GetFocusedContainer() || !GetFocusedContainer().IsActive() )
+		{
+			return;
+		}
+
+		float x, y;
+		if( GetFocusedContainer() && ( GetFocusedContainer().IsInherited( ContainerWithCargo ) || GetFocusedContainer().IsInherited( ContainerWithCargoAndAttachments ) ) )
+		{
+			ContainerWithCargo iwc = ContainerWithCargo.Cast( GetFocusedContainer() );
+			ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( GetFocusedContainer() );
+			if( iwc )
+			{
+				iwc.MoveGridCursor(direction);
+			}
+			else if( iwca )
+			{
+				iwca.MoveGridCursor(direction);
+			}
+		}
+		else
+		{
+			ItemManager.GetInstance().HideTooltip();
+			GetFocusedContainer().UnfocusAll();
+			
+			if( direction == Direction.UP )
+			{
+				m_FocusedRow--;
+				if( m_FocusedRow <= 0 )
+				{
+					m_FocusedRow  = 0;
+					RightArea right_area = RightArea.Cast( GetParent() );
+					LeftArea left_area = LeftArea.Cast( GetParent() );
+					if( right_area )
+					{
+						right_area.SetPreviousActive();
+					}
+					else
+					{
+						left_area.SetPreviousActive();
+					}
+					return;
+				}				
+			}
+			else if( direction == Direction.DOWN )
+			{
+				m_FocusedRow++;
+				if( m_FocusedRow >= m_InventorySlots.Count() / ITEMS_IN_ROW + 1 )
+				{
+					m_FocusedRow = m_Container.Count() - 1;
+					m_Body.Get( m_ActiveIndex ).SetActive( false );
+					m_ActiveIndex++;
+					if( m_ActiveIndex > m_Body.Count() )
+					{
+						right_area = RightArea.Cast( GetParent() );
+						left_area = LeftArea.Cast( GetParent() );
+						if( right_area )
+						{
+							right_area.SetNextActive();
+						}
+						else
+						{
+							left_area.SetNextActive();
+						}
+					}
+					else
+					{
+						SetFocusedContainer( Container.Cast( m_Body.Get( m_ActiveIndex ) ) );
+						m_Body.Get( m_ActiveIndex ).SetActive( true );
+					}
+					return;
+				}				
+			}
+			else if( direction == Direction.RIGHT )
+			{
+				m_FocusedColumn++;
+				SlotsContainer cont = SlotsContainer.Cast( m_Container.Get( m_FocusedRow ) );
+				if( m_FocusedColumn >= cont.GetColumnCount() )
+				{
+					m_FocusedColumn = 0;
+				}
+			}
+			else if( direction == Direction.LEFT )
+			{
+				m_FocusedColumn--;
+				SlotsContainer cont2 = SlotsContainer.Cast( m_Container.Get( m_FocusedRow ) );
+				if( m_FocusedColumn < 0 )
+				{
+					m_FocusedColumn = cont2.GetColumnCount() - 1;
+				}				
+			}
+			
+			Container cnt = Container.Cast( m_Body.Get( 1 ) );
+   			cnt.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).Show( true );
+			
+			//ScrollToActiveContainer( Container.Cast( cnt.Get( m_FocusedRow ) ) );
+		}
 	}
 
 	void ToggleContainer( Widget w , int number )
@@ -301,7 +477,7 @@ class ZombieContainer: CollapsibleContainer
 
 		string name = w.GetName();
 		name.Replace( "PanelWidget", "RadialIcon" );
-		w.GetParent().FindAnyWidget( name ).Show( !w.FindAnyWidget( name ).IsVisible() );
+		w.GetParent().GetParent().FindAnyWidget( name ).Show( !w.FindAnyWidget( name ).IsVisible() );
 	}
 
 	void ToggleWidget( Widget w )
@@ -331,6 +507,14 @@ class ZombieContainer: CollapsibleContainer
 				string icon_name;
 				GetGame().ConfigGetText( path + " ghostIcon", icon_name );
 
+				int row = i / ITEMS_IN_ROW;
+				if( row >= m_Container.Count() )
+				{
+					if( row < ( player_ghosts_slots.Count() / ITEMS_IN_ROW ) )
+						AddSlotsContainer( ITEMS_IN_ROW );
+					else
+						AddSlotsContainer( player_ghosts_slots.Count() % ITEMS_IN_ROW );
+				}
 				Widget item_preview = GetWidgetSlot( i );
 				LoadIconIntoWidgetSlot( icon_name, i );
 
@@ -339,6 +523,13 @@ class ZombieContainer: CollapsibleContainer
 				m_InventorySlots.Set( slot_id, item_preview );
 			}
 		}
+	}
+	
+	void AddSlotsContainer( int row_count )
+	{
+		ref SlotsContainer s_cont = new SlotsContainer( m_Container );
+		s_cont.SetColumnCount( row_count );
+		m_Container.Insert( s_cont );
 	}
 
 	Widget GetWidgetSlot( int slot_number )
@@ -361,7 +552,7 @@ class ZombieContainer: CollapsibleContainer
 	{
 		if( button == MouseState.LEFT )
 		{
-			if( w == NULL )
+			if( w == null )
 			{
 				return;
 			}
@@ -410,7 +601,7 @@ class ZombieContainer: CollapsibleContainer
 					}
 				}
 			}
-			iw.SetItem( NULL );
+			iw.SetItem( null );
 			name.Replace( "Render", "GhostSlot" );
 			w.GetParent().FindAnyWidget( name ).Show( true );
 			
@@ -418,7 +609,7 @@ class ZombieContainer: CollapsibleContainer
 		}
 	}
 	
-	void LoadIconIntoWidgetSlot( string icon_name, int slot_number  )
+	void LoadIconIntoWidgetSlot( string icon_name, int slot_number )
 	{
 		int column = slot_number % ITEMS_IN_ROW;
 		Widget item_preview = GetWidgetSlot( slot_number );
@@ -427,6 +618,7 @@ class ZombieContainer: CollapsibleContainer
 		{
 			image_widget = ImageWidget.Cast( item_preview.GetParent().GetParent().FindAnyWidget( "GhostSlot" + column ) );
 		}
+		item_preview.GetParent().GetParent().Show( true );
 		image_widget.Show( true );
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( item_preview.GetParent().GetParent().FindAnyWidget( "PanelWidget" + column ),  this, "OnDropReceivedFromGhostArea" );
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( item_preview.GetParent().GetParent().FindAnyWidget( "GhostSlot" + column ),  this, "OnDropReceivedFromGhostArea" );
@@ -438,26 +630,19 @@ class ZombieContainer: CollapsibleContainer
 		super.CollapseButtonOnMouseButtonDown(w);
 	}
 	
-	override void SelectItem()
+	override bool SelectItem()
 	{
 		if( GetFocusedContainer().IsInherited( ContainerWithCargo ) || GetFocusedContainer().IsInherited( ContainerWithCargoAndAttachments ) )
 		{
-			ContainerWithCargo iwc = ContainerWithCargo.Cast( GetFocusedContainer() );
-			ContainerWithCargoAndAttachments iwca = ContainerWithCargoAndAttachments.Cast( GetFocusedContainer() );
-			if( iwc )
-			{
-				iwc.SelectItem();
-			}
-			else if ( iwca )
-			{
-				//iwca.SelectItem();
-			}
+			return GetFocusedContainer().SelectItem();
 		}
 		else
 		{
 			ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Render" + m_FocusedColumn ) );
 			ItemBase item = ItemBase.Cast( item_preview.GetItem() );
-			ItemManager.GetInstance().SetSelectedItem( item, NULL, NULL );
+			ItemManager.GetInstance().SetSelectedItem( item, null, null );
+			return true;
 		}
+		return false;
 	}
 }

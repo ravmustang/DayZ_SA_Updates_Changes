@@ -161,8 +161,8 @@ class WeaponDebug
 			Weapon weapon = GetWeaponInHands();
 			vector cameraDirection = GetGame().GetCurrentCameraDirection();
 			vector cameraPosition = GetGame().GetCurrentCameraPosition();
-			vector usti_hlavne_position = weapon.GetSelectionPosition( "usti hlavne" );//usti hlavne
-			vector konec_hlavne_position = weapon.GetSelectionPosition( "konec hlavne" );//konec hlavne
+			vector usti_hlavne_position = weapon.GetSelectionPositionMS( "usti hlavne" );//usti hlavne
+			vector konec_hlavne_position = weapon.GetSelectionPositionMS( "konec hlavne" );//konec hlavne
 			usti_hlavne_position = weapon.ModelToWorld(usti_hlavne_position);
 			konec_hlavne_position = weapon.ModelToWorld(konec_hlavne_position);
 			
@@ -276,9 +276,9 @@ class WeaponDebug
 		if(optics)
 		{
 			memory_point_name = optics.ConfigGetString("memoryPointCamera");
-			return optics.ModelToWorld(optics.GetSelectionPosition( memory_point_name ));
+			return optics.ModelToWorld(optics.GetSelectionPositionLS( memory_point_name ));
 		}
-		return weapon.ModelToWorld(weapon.GetSelectionPosition( memory_point_name ));
+		return weapon.ModelToWorld(weapon.GetSelectionPositionLS( memory_point_name ));
 		
 	}
 

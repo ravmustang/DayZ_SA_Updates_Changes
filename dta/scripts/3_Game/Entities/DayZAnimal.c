@@ -111,9 +111,9 @@ class DayZCreatureAI extends DayZCreature
 		{
 			Print("Error registering anim. event (SoundVoice)");
 		}
-		
+
 		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
-		{		
+		{
 			if(!RegisterAnimationEvent("Step", "OnStepEvent"))
 			{
 				Print("Error registering anim. event (Step)");
@@ -169,26 +169,15 @@ class DayZCreatureAI extends DayZCreature
 
 	private void ProcessStepEvent(AnimStepEvent step_event)
 	{
-		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
-		{
-			SoundObjectBuilder soundBuilder = step_event.GetSoundBuilder(GetSurfaceType().Hash());
-			if(soundBuilder == NULL)
-				return;
-			
-			soundBuilder.UpdateEnvSoundControllers(GetPosition());
-			SoundObject soundObject = soundBuilder.BuildSoundObject();
-			AttenuateSoundIfNecessary(soundObject);
-			PlaySound(soundObject, soundBuilder);
-		}
+		SoundObjectBuilder soundBuilder = step_event.GetSoundBuilder(GetSurfaceType().Hash());
+		if(soundBuilder == NULL)
+			return;
 		
-		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
-		{
-			if(step_event.m_NoiseParams != NULL)
-			{
-				float noiseMultiplier = GetSurfaceNoise();
-				GetGame().GetNoiseSystem().AddNoise(this, step_event.m_NoiseParams, noiseMultiplier);
-			}
-		}
+		soundBuilder.UpdateEnvSoundControllers(GetPosition());
+		SoundObject soundObject = soundBuilder.BuildSoundObject();
+		AttenuateSoundIfNecessary(soundObject);
+		PlaySound(soundObject, soundBuilder);
+		
 		//TODO effects
 	}
 	
@@ -365,6 +354,7 @@ class DayZAnimal extends DayZCreatureAI
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
 		super.EEHitBy(damageResult, damageType, source, component, dmgZone, ammo, modelPos);
+		m_TransportHitRegistered = false;
 		
 		ComponentAnimalBleeding animal_bleeding = ComponentAnimalBleeding.Cast( GetComponent( COMP_TYPE_ANIMAL_BLEEDING ) );
 		animal_bleeding.CreateWound( damageResult, dmgZone, ammo );
@@ -455,6 +445,50 @@ class DayZAnimal extends DayZCreatureAI
 		}
 		
 		return offset;
+	}
+	
+	//-------------------------------------------------------------
+	//!
+	//! Phx contact event
+	//! 
+	
+	override private void EOnContact(IEntity other, Contact extra)
+	{
+		if( !IsAlive() )
+			return;
+		
+		Transport transport = Transport.Cast(other);
+		if( transport )
+		{
+			if ( GetGame().IsServer() || !GetGame().IsMultiplayer() )
+			{
+				RegisterTransportHit(transport);
+			}			
+		}
+	}
+	
+	bool m_TransportHitRegistered = false;
+	vector m_TransportHitVelocity;
+	
+	void RegisterTransportHit(Transport transport)
+	{
+		if( !m_TransportHitRegistered )
+		{
+			m_TransportHitRegistered = true;
+			
+			// compute impulse & damage 
+			m_TransportHitVelocity = GetVelocity(transport);
+			float damage = 15 * m_TransportHitVelocity.Length();
+			//Print("Transport damage: " + damage.ToString());
+			
+			vector impulse = 40 * m_TransportHitVelocity;
+			impulse[1] = 40 * 1.5;
+			//Print("Impulse: " + impulse.ToString());
+			
+			dBodyApplyImpulse(this, impulse);
+			
+			ProcessDirectDamage( 3, transport, "", "TransportHit", "0 0 0", damage );
+		}
 	}
 }
 

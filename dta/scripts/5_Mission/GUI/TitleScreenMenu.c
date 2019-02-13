@@ -22,13 +22,14 @@ class TitleScreenMenu extends UIScriptedMenu
 		{
 			string gamertag;
 			GetGame().GetPlayerName(gamertag);
-#ifdef PLATFORM_XBOX
-		text_widget.SetText("#dayz_game_press" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "#dayz_game_to_start");
-#endif
-		
-#ifdef PLATFORM_PS4
-		text_widget.SetText("Press <image set=\"playstation_buttons\" name=\"cross\" /> to start the game");
-#endif
+			
+			#ifdef PLATFORM_XBOX
+					text_widget.SetText("#dayz_game_press" + " " + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "#dayz_game_to_start");
+			#endif
+					
+			#ifdef PLATFORM_PS4
+					text_widget.SetText("#dayz_game_press" + " " + "<image set=\"playstation_buttons\" name=\"cross\" />" + "" + "#dayz_game_to_start");
+			#endif
 		}
 		return layoutRoot;
 	}
@@ -37,22 +38,24 @@ class TitleScreenMenu extends UIScriptedMenu
 	{
 		if( g_Game.GetGameState() != DayZGameState.CONNECTING )
 		{
-			g_Game.GamepadCheck();
+			#ifdef PLATFORM_CONSOLE
+				g_Game.GamepadCheck();
+			#endif
 		}
 	}
 	
 	override void OnHide()
 	{
-		
 	}
 	
 	override void Update(float timeslice)
 	{
-		if( GetGame().GetInput().GetActionDown( UAUISelect, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUISelect",false) )
 		{
 			#ifdef PLATFORM_WINDOWS
 				EnterScriptedMenu(MENU_MAIN);
-			#else
+			#endif
+			#ifdef PLATFORM_CONSOLE
 				g_Game.GamepadCheck();
 			#endif
 		}

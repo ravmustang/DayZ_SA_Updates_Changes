@@ -101,15 +101,18 @@ class EffBulletImpactBase : EffectParticle
 		float size = MIN_SCALING_PARAM + ( m_StoppingForce * m_EnterSplashCoef)*randomize_scale;
 		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef)*randomize_scale;
 		
+		if ( m_AmmoType == "Bullet_12GaugePellets" )
+		{
+			birth_rate *= 0.5;
+			velocity_min *= 2;
+			velocity_max *= 2;
+		}
+		
 		if (velocity_min < MIN_SCALING_PARAM)
 			velocity_min = MIN_SCALING_PARAM;
 		
 		if (size < MIN_SCALING_PARAM)
 			size = MIN_SCALING_PARAM;
-		
-		if (birth_rate < MIN_SCALING_PARAM)
-			birth_rate = MIN_SCALING_PARAM;
-		
 		
 		
 		p.ScaleParticleParam(EmitorParam.VELOCITY, velocity_min);

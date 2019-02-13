@@ -41,9 +41,10 @@ class TentBase extends ItemBase
 		ctx.Write( m_State );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
 		
 		ctx.Read( m_State );
 		
@@ -58,12 +59,15 @@ class TentBase extends ItemBase
 					m_ClutterCutter = GetGame().CreateObject( GetClutterCutter(), GetPosition(), false );
 					m_ClutterCutter.SetOrientation( GetOrientation() );
 				}
+				
+				RefreshAttachements();
 			}
 		}
 		else
 		{
 			Pack();
 		}
+		return true;
 	}
 	
 	override void EEInit()
@@ -198,6 +202,45 @@ class TentBase extends ItemBase
 		return CanBeManipulated();
 	}
 	
+	void RefreshAttachements()
+	{
+		int slot_id_camo;
+		int slot_id_xlights;
+		EntityAI eai_camo;
+		EntityAI eai_xlights;
+
+		slot_id_camo = InventorySlots.GetSlotIdFromString("CamoNet");
+		eai_camo = GetInventory().FindAttachment( slot_id_camo );
+		
+		//Print("slot_id_camo: " + slot_id_camo);
+		//Print("eai_camo: " + eai_camo);
+		
+		slot_id_xlights = InventorySlots.GetSlotIdFromString("Lights");
+		eai_xlights = GetInventory().FindAttachment( slot_id_xlights );
+		
+		//Print("slot_id_xlights: " + slot_id_xlights);
+		//Print("eai_xlights: " + eai_xlights);
+		
+		if ( eai_camo )
+		{
+			SetAnimationPhase( "Camonet", 0 );
+			
+			if ( !IsKindOf ( "MediumTent" ) )
+			{
+				AddProxyPhysics( "camonet" );
+			}	
+		}
+		
+		if ( eai_xlights )
+		{
+			SetAnimationPhase( "Xlights", 0 );
+			SetAnimationPhase( "Xlights_glass_r", 0 );
+			SetAnimationPhase( "Xlights_glass_g", 0 );
+			SetAnimationPhase( "Xlights_glass_b", 0 );
+			SetAnimationPhase( "Xlights_glass_y", 0 );
+		}
+	}
+	
 	override void EEItemAttached(EntityAI item, string slot_name)
 	{
 		super.EEItemAttached(item, slot_name);
@@ -248,7 +291,7 @@ class TentBase extends ItemBase
 			SetAnimationPhase( "Xlights_glass_y", 1 );
 			
 			XmasLights xlights = XmasLights.Cast( item );
-			xlights.DetachFromObject( this );
+			xlights.DetachFromObject( this );	
 		}
 	}
 		

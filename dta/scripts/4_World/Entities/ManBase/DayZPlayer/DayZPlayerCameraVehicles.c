@@ -27,7 +27,7 @@ class DayZPlayerCamera3rdPersonVehicle extends DayZPlayerCameraBase
 
 	void DayZPlayerCamera3rdPersonVehicle (DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonVehicle");
+		//Print("new camera: DayZPlayerCamera3rdPersonVehicle");
 		
 		m_fDistance 		= 4.0;
 		m_CameraOffsetMS	= "0.0 1.3 0.0";

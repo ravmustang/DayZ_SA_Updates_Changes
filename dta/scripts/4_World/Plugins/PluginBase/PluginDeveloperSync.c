@@ -4,10 +4,12 @@ class PluginDeveloperSync extends PluginBase
 	ref array<PlayerBase> m_RegisteredPlayers;
 	
 	ref array<ref SyncedValue> m_PlayerStatsSynced;
+	ref array<ref SyncedValue> m_PlayerLevelsSynced;
 	ref array<ref SyncedValue> m_PlayerModsSynced;
 	ref array<ref SyncedValue> m_PlayerAgentsSynced;
 	
 	bool m_StatsUpdateStatus;
+	bool m_LevelsUpdateStatus;
 	bool m_ModsUpdateStatus;
 	bool m_AgentsUpdateStatus;
 	
@@ -15,10 +17,12 @@ class PluginDeveloperSync extends PluginBase
 	{
 		m_RegisteredPlayers 	= new array<PlayerBase>;
 		m_PlayerStatsSynced 	= new array<ref SyncedValue>;
+		m_PlayerLevelsSynced 	= new array<ref SyncedValue>;
 		m_PlayerModsSynced 		= new array<ref SyncedValue>;
 		m_PlayerAgentsSynced 	= new array<ref SyncedValue>;
 		
 		m_StatsUpdateStatus 	= false;
+		m_LevelsUpdateStatus 	= false;
 		m_ModsUpdateStatus 		= false;
 		m_AgentsUpdateStatus 	= false;
 	}
@@ -48,6 +52,12 @@ class PluginDeveloperSync extends PluginBase
 				break;	
 			}
 			
+			case ERPCs.DEV_LEVELS_UPDATE: 
+			{
+				m_LevelsUpdateStatus = state; 
+				break;	
+			}
+			
 			case ERPCs.DEV_MODS_UPDATE: 
 			{
 				m_ModsUpdateStatus = state; 
@@ -66,7 +76,7 @@ class PluginDeveloperSync extends PluginBase
 			{
 				//Print("ToggleUpdate() - RUN");
 				
-				if ( m_StatsUpdateStatus || m_ModsUpdateStatus || m_AgentsUpdateStatus )
+				if ( m_StatsUpdateStatus || m_ModsUpdateStatus || m_AgentsUpdateStatus || m_LevelsUpdateStatus )
 				{
 					m_UpdateTimer.Run( 1, this, "Update", NULL, true );
 					
@@ -78,7 +88,7 @@ class PluginDeveloperSync extends PluginBase
 			{
 				//Print("ToggleUpdate() - STOP");
 				
-				if ( !m_StatsUpdateStatus && !m_ModsUpdateStatus && !m_AgentsUpdateStatus )
+				if ( !m_StatsUpdateStatus && !m_ModsUpdateStatus && !m_AgentsUpdateStatus && !m_LevelsUpdateStatus)
 				{
 					m_UpdateTimer.Stop();
 				
@@ -92,7 +102,7 @@ class PluginDeveloperSync extends PluginBase
 	void Update()
 	{
 		//Stats
-		if ( m_StatsUpdateStatus )
+		if ( m_LevelsUpdateStatus )
 		{
 			//Multiplayer server
 			if ( GetDayZGame().IsMultiplayer() && GetDayZGame().IsServer() )
@@ -101,7 +111,34 @@ class PluginDeveloperSync extends PluginBase
 				{
 					if ( m_RegisteredPlayers.Get( i ) )
 					{
-						SendRPCStats( m_RegisteredPlayers.Get( i ) );		
+						SendRPCLevels( m_RegisteredPlayers.Get( i ) );		
+					}
+				}
+			}	
+			//Local server
+			
+			else
+			{
+				if ( GetDayZGame().IsServer() )
+				{
+					//update local
+					UpdateLevelsLocal();	
+				}
+			}
+		}
+		
+		
+		//Stats
+		if ( m_StatsUpdateStatus )
+		{
+			//Multiplayer server
+			if ( GetDayZGame().IsMultiplayer() && GetDayZGame().IsServer() )
+			{
+				for ( int z = 0; z < m_RegisteredPlayers.Count(); z++ )
+				{
+					if ( m_RegisteredPlayers.Get( z ) )
+					{
+						SendRPCStats( m_RegisteredPlayers.Get( z ) );		
 					}
 				}
 			}	
@@ -211,6 +248,11 @@ class PluginDeveloperSync extends PluginBase
 				EnableUpdate( GetRPCUpdateState( ctx ), ERPCs.DEV_STATS_UPDATE, player ); break;
 			}
 			
+			case ERPCs.DEV_LEVELS_UPDATE:
+			{
+				EnableUpdate( GetRPCUpdateState( ctx ), ERPCs.DEV_LEVELS_UPDATE, player ); break;
+			}
+			
 			case ERPCs.DEV_MODS_UPDATE:
 			{
 				EnableUpdate( GetRPCUpdateState( ctx ), ERPCs.DEV_MODS_UPDATE, player ); break;
@@ -224,6 +266,11 @@ class PluginDeveloperSync extends PluginBase
 			case ERPCs.DEV_RPC_STATS_DATA:
 			{
 				OnRPCStats( ctx ); break;
+			}
+			
+			case ERPCs.DEV_RPC_LEVELS_DATA:
+			{
+				OnRPCLevels( ctx ); break;
 			}
 			
 			case ERPCs.DEV_RPC_MODS_DATA:
@@ -303,16 +350,16 @@ class PluginDeveloperSync extends PluginBase
 			array<ref Param> rpc_params = new array<ref Param>;
 			
 			//param count
-			float param_count = (float) player.m_PlayerStats.Get().Count();
-			rpc_params.Insert( new Param2<string, float>( "PARAM_COUNT", param_count ) );
-			
-			for ( int i = 0; i < player.m_PlayerStats.Get().Count(); i++ ) 
+			for ( int i = 0; i < player.m_PlayerStats.GetPCO().Get().Count(); i++ ) 
 			{
-				string label = player.m_PlayerStats.Get().Get( i ).GetLabel();
-				float value = (float) player.m_PlayerStats.Get().Get( i ).Get();
+				string label = player.m_PlayerStats.GetPCO().Get().Get( i ).GetLabel();
+				float value = (float) player.m_PlayerStats.GetPCO().Get().Get( i ).Get();
 				rpc_params.Insert( new Param2<string, float>( label, value ) );
 			}
-			
+			rpc_params.Insert(new Param2<string, float>( "(NaS)Immunity", player.GetImmunity() ));
+		
+			float param_count = (float) rpc_params.Count();
+			rpc_params.InsertAt( new Param2<string, float>( "PARAM_COUNT", param_count ), 0);
 			//send params
 			GetDayZGame().RPC( player, ERPCs.DEV_RPC_STATS_DATA, rpc_params, true, player.GetIdentity() );
 		}
@@ -350,15 +397,79 @@ class PluginDeveloperSync extends PluginBase
 		m_PlayerStatsSynced.Clear();
 		
 		//set values
-		for ( int i = 0; i < player.m_PlayerStats.Get().Count(); i++ ) 
+		for ( int i = 0; i < player.m_PlayerStats.GetPCO().Get().Count(); i++ ) 
 		{
-			string label = player.m_PlayerStats.Get().Get( i ).GetLabel();
-			float value = player.m_PlayerStats.Get().Get( i ).Get();
+			string label = player.m_PlayerStats.GetPCO().Get().Get( i ).GetLabel();
+			float value = player.m_PlayerStats.GetPCO().Get().Get( i ).Get();
 			m_PlayerStatsSynced.Insert( new SyncedValue( label, value, false ) );
 		}
-
+			m_PlayerStatsSynced.Insert(new SyncedValue(  "(NaS)Immunity", player.GetImmunity() , false));
 	}
 
+	//============================================
+	// LEVELS
+	//============================================	
+	//send player stats through RPC
+	void SendRPCLevels( PlayerBase player )
+	{
+		//write and send values
+		if ( player )
+		{
+			array<ref Param> rpc_params = new array<ref Param>;
+
+			rpc_params.Insert(new Param2<string, float>( "Immunity: "+ typename.EnumToString(EStatLevels, player.GetImmunityLevel() ),player.GetImmunityLevel()));
+			rpc_params.Insert(new Param2<string, float>( "Blood: "+ typename.EnumToString(EStatLevels, player.GetStatLevelBlood()),player.GetStatLevelBlood()));
+			rpc_params.Insert(new Param2<string, float>( "Health: "+ typename.EnumToString(EStatLevels, player.GetStatLevelHealth() ),player.GetStatLevelHealth()));
+			rpc_params.Insert(new Param2<string, float>( "Energy: "+ typename.EnumToString(EStatLevels, player.GetStatLevelEnergy() ),player.GetStatLevelEnergy()));
+			rpc_params.Insert(new Param2<string, float>( "Water: "+ typename.EnumToString(EStatLevels, player.GetStatLevelWater() ),player.GetStatLevelWater()));
+			
+			int param_count = rpc_params.Count();
+			rpc_params.InsertAt( new Param2<string, float>( "PARAM_COUNT", param_count ), 0);
+			//send params
+			GetDayZGame().RPC( player, ERPCs.DEV_RPC_LEVELS_DATA, rpc_params, true, player.GetIdentity() );
+		}
+	}
+
+	//Display player stats
+	void OnRPCLevels( ParamsReadContext ctx )
+	{
+		//clear values
+		m_PlayerLevelsSynced.Clear();
+		
+		ref Param2<string, float> p = new Param2<string, float>( "", 0 );
+		
+		//get param count
+		int param_count = 0;
+		if ( ctx.Read(p) )
+		{
+			param_count = p.param2;
+		}
+		
+		//read values and set 
+		for ( int i = 0; i < param_count; i++ )
+		{
+			ctx.Read(p);
+			m_PlayerLevelsSynced.Insert( new SyncedValue( p.param1, p.param2, false ) );
+		}
+	}
+	
+	//Update data on local
+	void UpdateLevelsLocal()
+	{
+		PlayerBase player = PlayerBase.Cast( GetDayZGame().GetPlayer() );
+		
+		//clear values
+		m_PlayerLevelsSynced.Clear();
+		m_PlayerLevelsSynced.Insert(new SyncedValue( "Immunity: "+ typename.EnumToString(EStatLevels, player.GetImmunityLevel() ),player.GetImmunityLevel(), false));
+		m_PlayerLevelsSynced.Insert(new SyncedValue( "Blood: "+ typename.EnumToString(EStatLevels, player.GetStatLevelBlood()),player.GetStatLevelBlood(), false));
+		m_PlayerLevelsSynced.Insert(new SyncedValue( "Health: "+ typename.EnumToString(EStatLevels, player.GetStatLevelHealth() ),player.GetStatLevelHealth(), false));
+		m_PlayerLevelsSynced.Insert(new SyncedValue( "Energy: "+ typename.EnumToString(EStatLevels, player.GetStatLevelEnergy() ),player.GetStatLevelEnergy(), false));
+		m_PlayerLevelsSynced.Insert(new SyncedValue( "Water: "+ typename.EnumToString(EStatLevels, player.GetStatLevelWater() ),player.GetStatLevelWater(), false));
+	}
+	
+	
+	
+	
 	//============================================
 	// MODS
 	//============================================	

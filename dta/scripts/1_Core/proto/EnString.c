@@ -85,6 +85,15 @@ class string
 	*/
 	proto string Substring(int start, int len);
 	
+	//! Inverted SubString. This deletes everything in between position_start and position_end.
+	string SubstringInverted( string string_to_split, int position_start, int position_end )
+	{
+		string first_half = string_to_split.Substring(0, position_start);
+		string second_half = string_to_split.Substring( position_end, string_to_split.Length() - position_end );
+		string result = first_half + second_half;
+		return result;
+	}
+	
 	/**
 	\brief Substring of 'str' from 'startChar' position 'len' number of characters for UTF8 strings with multibyte chars
 		\param startChar Position in \p str.

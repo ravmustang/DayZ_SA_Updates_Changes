@@ -90,7 +90,7 @@ class AnalyticsManager
 	//===================================
 	static void OnItemAttachedAtPlayer(EntityAI item, string slot_name)
 	{
-		#ifdef PLATFORM_XBOX
+		//#ifdef PLATFORM_XBOX
 			if ( GetDayZGame().GetGameState() != DayZGameState.IN_GAME )
 			{
 				return;
@@ -107,14 +107,15 @@ class AnalyticsManager
 					
 					if ( !att_item )
 					{
+						//Print("index: "+ i +" slot_id: "+ slot_id +" = "+ att_item + " EMPTY");
 						return;
 					}
-					//Print("index: "+ i +" slot_id: "+ slot_id +" = "+ att_item);
+					//Print("index: "+ i +" slot_id: "+ slot_id +" = "+ att_item + " ATTACHED");
 				}
-			}
 			
-			AchievementsXbox.OnEquippedFullGear();
-		#endif
+				AchievementsXbox.OnEquippedFullGear();
+			}
+		//#endif
 	}
 	
 	//===================================

@@ -87,7 +87,7 @@ class InGameMenuXbox extends UIScriptedMenu
 		{
 			m_OnlineButton.Show( true );
 			
-			string header_text = "Server";
+			string header_text = "#server_browser_tab_server";
 			GetServersResultRow info = OnlineServices.GetCurrentServerInfo();
 			if( info )
 			{
@@ -220,7 +220,7 @@ class InGameMenuXbox extends UIScriptedMenu
 			}
 			case IDC_MAIN_QUIT:
 			{
-				GetGame().GetUIManager().ShowDialog("EXIT", "Are you sure you want to exit?", IDC_INT_EXIT, DBT_YESNO, DBB_YES, DMT_QUESTION, NULL);
+				GetGame().GetUIManager().ShowDialog("#main_menu_exit", "#main_menu_exit_desc", IDC_INT_EXIT, DBT_YESNO, DBB_YES, DMT_QUESTION, NULL);
 				return true;
 			}
 			case IDC_INT_RETRY:
@@ -345,7 +345,7 @@ class InGameMenuXbox extends UIScriptedMenu
 		if( GetGame().IsMultiplayer() && layoutRoot.FindAnyWidget( "OnlineInfo" ).IsVisible() )
 		{
 			TextWidget mute_text = TextWidget.Cast( layoutRoot.FindAnyWidget( "Mute" ).FindAnyWidget( "MuteText" ) );
-			if( GetGame().GetInput().GetActionDown( UAUIUp, false ) )
+			if( GetGame().GetInput().GetActionDown( "UAUIUp", false ) )
 			{
 				if( m_ServerInfoPanel )
 				{
@@ -379,7 +379,7 @@ class InGameMenuXbox extends UIScriptedMenu
 					}
 				}
 			}
-			if( GetGame().GetInput().GetActionDown( UAUIDown, false ) )
+			if( GetGame().GetInput().GetActionDown( "UAUIDown", false ) )
 			{
 				if( m_ServerInfoPanel )
 				{
@@ -414,7 +414,7 @@ class InGameMenuXbox extends UIScriptedMenu
 				}
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
+			if( GetGame().GetInput().GetActionDown( "UAUICtrlX", false ) )
 			{
 				bool muted;
 				ScriptInputUserData ctx;
@@ -448,7 +448,7 @@ class InGameMenuXbox extends UIScriptedMenu
 				}
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUICtrlY, false ) )
+			if( GetGame().GetInput().GetActionDown( "UAUICtrlY", false ) )
 			{
 				if( m_ServerInfoPanel )
 				{

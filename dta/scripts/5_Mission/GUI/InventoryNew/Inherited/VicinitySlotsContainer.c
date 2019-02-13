@@ -1,13 +1,15 @@
 class VicinitySlotsContainer: Container
 {
-	protected ref Container m_Container;
-
+	protected ref Container		m_Container;
+	protected int				m_ItemsCount;
+	protected int				m_SlotsCount;
+	
 	void VicinitySlotsContainer( LayoutHolder parent )
 	{
 		m_Container = new Container( this );
 		m_Container.Insert( new SlotsContainer( m_Container ) );
 		m_Body.Insert( m_Container );
-		for( int j = 0; j < 7; j++ )
+		for( int j = 0; j < ITEMS_IN_ROW; j++ )
 		{
 			WidgetEventHandler.GetInstance().RegisterOnDropReceived( m_Container.GetMainWidget().FindAnyWidget( "PanelWidget" + j ),  m_Parent, "OnDropReceivedFromIcon" );
 			WidgetEventHandler.GetInstance().RegisterOnDropReceived( m_Container.GetMainWidget().FindAnyWidget( "GhostSlot" + j ),  m_Parent, "OnDropReceivedFromHeader" );
@@ -21,7 +23,13 @@ class VicinitySlotsContainer: Container
 			TextWidget tw = TextWidget.Cast( m_Container.GetMainWidget().FindAnyWidget( "ItemSize" + j) );
 			tw.Show( true );
 			#endif
-		}		
+		}
+		
+		SlotsContainer.Cast( m_Container.Get( 0 ) ).SetColumnCount( 0 );
+		
+		WidgetEventHandler.GetInstance().RegisterOnDropReceived( m_Container.GetMainWidget(),  m_Parent, "OnDropReceivedFromHeader" );
+		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( m_Container.GetMainWidget(),  m_Parent, "DraggingOverHeader" );
+		m_SlotsCount++;
 	}
 	
 	EntityAI GetActiveItem()
@@ -37,13 +45,13 @@ class VicinitySlotsContainer: Container
 		return ent && ( ent.GetInventory().GetCargo() || ent.GetSlotsCountCorrect() > 0 );
 	}
 	
-	bool IsItemWithQuantityActive()
+	override bool IsItemWithQuantityActive()
 	{
 		EntityAI ent = GetActiveItem();
 		return ent && QuantityConversions.HasItemQuantity( ent );
 	}
 	
-	bool IsItemActive()
+	override bool IsItemActive()
 	{
 		EntityAI ent = GetActiveItem();
 		return ent && !IsItemWithQuantityActive() && !IsItemWithContainerActive();
@@ -52,7 +60,7 @@ class VicinitySlotsContainer: Container
 	bool IsEmptyItemActive()
 	{
 		EntityAI ent = GetActiveItem();
-		return ent == NULL;
+		return ent == null;
 	}
 	
 	override void UnfocusAll()
@@ -70,18 +78,18 @@ class VicinitySlotsContainer: Container
 	{
 		ItemManager.GetInstance().HideTooltip();
 		UnfocusAll();
-
+		
 		if( direction == Direction.RIGHT )
 		{
 			m_FocusedColumn++;
-			if( m_FocusedColumn == ITEMS_IN_ROW )
+			if( m_FocusedColumn >= GetRowSlotCount() )
 				m_FocusedColumn = 0;
 		}
 		else if( direction == Direction.LEFT )
 		{
 			m_FocusedColumn--;
 			if( m_FocusedColumn < 0 )
-				m_FocusedColumn = ITEMS_IN_ROW - 1;
+				m_FocusedColumn = GetRowSlotCount() - 1;
 		}
 		else if( direction == Direction.UP )
 		{
@@ -106,6 +114,9 @@ class VicinitySlotsContainer: Container
 			}				
 		}
 		
+		if( m_FocusedColumn < 0 )
+			m_FocusedColumn = 0;
+		
 		m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ).Show( true );
 		
 		LayoutHolder cnt = LayoutHolder.Cast( m_Container.Get( m_FocusedRow ) );
@@ -123,10 +134,10 @@ class VicinitySlotsContainer: Container
 	int GetRecipeCount( bool recipe_anywhere, EntityAI entity1, EntityAI entity2 )
 	{
 		PluginRecipesManager plugin_recipes_manager = PluginRecipesManager.Cast( GetPlugin( PluginRecipesManager ) );
-		return plugin_recipes_manager.GetValidRecipes( ItemBase.Cast( entity1 ), ItemBase.Cast( entity2 ), NULL, PlayerBase.Cast( GetGame().GetPlayer() ) );
+		return plugin_recipes_manager.GetValidRecipes( ItemBase.Cast( entity1 ), ItemBase.Cast( entity2 ), null, PlayerBase.Cast( GetGame().GetPlayer() ) );
 	}
 	
-	bool CanCombine()
+	override bool CanCombine()
 	{
 		ItemBase ent = ItemBase.Cast(  GetActiveItem() );
 		ItemBase item_in_hands = ItemBase.Cast(	GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
@@ -134,7 +145,7 @@ class VicinitySlotsContainer: Container
 		return GetRecipeCount( false, ent, item_in_hands ) > 0;
 	}
 	
-	bool CanCombineAmmo()
+	override bool CanCombineAmmo()
 	{
 		PlayerBase m_player = PlayerBase.Cast( GetGame().GetPlayer() );
 		ItemBase ent = ItemBase.Cast(  GetActiveItem() );
@@ -145,7 +156,7 @@ class VicinitySlotsContainer: Container
 		return amc.CanPerformActionFromInventory( item_in_hands, ent );
 	}
 	
-	bool CanEquip()
+	override bool CanEquip()
 	{
 		EntityAI ent = GetActiveItem();
 		InventoryLocation il = new InventoryLocation;
@@ -160,7 +171,7 @@ class VicinitySlotsContainer: Container
 		}
 	}
 	
-	override void EquipItem( )
+	override bool EquipItem( )
 	{
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn ).FindAnyWidget( "Render" + m_FocusedColumn ) );
 		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
@@ -169,10 +180,12 @@ class VicinitySlotsContainer: Container
 		if( ent && !ent.IsInherited( Magazine ))
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, ent );
+			return true;
 		}
+		return false;
 	}
 		
-	override void TransferItem( )
+	override bool TransferItem()
 	{
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn ).FindAnyWidget( "Render" + m_FocusedColumn ) );
 		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
@@ -180,13 +193,12 @@ class VicinitySlotsContainer: Container
 		if( ent )
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.CARGO, ent );
+			return true;
 		}
-		else
-		{
-		}
+		return false;
 	}
 	
-	override void Combine( )
+	override bool Combine( )
 	{
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn ).FindAnyWidget( "Render" + m_FocusedColumn ) );
 		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
@@ -199,20 +211,28 @@ class VicinitySlotsContainer: Container
 		if( item_in_hands && ent && hands_icon )
 		{
 			hands_icon.CombineItems( item_in_hands, ent );
+			return true;
 		}
 		else if( ent && !ent.IsInherited( Magazine ))
 		{
 			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, ent );
+			return true;
 		}
+		return false;
 	}
 	
-	override void SelectItem()
+	override bool SelectItem()
 	{
 		EntityAI ent = GetActiveItem();
-		ItemManager.GetInstance().SetSelectedItem( ent, NULL, m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ) );
+		if( ent )
+		{
+			ItemManager.GetInstance().SetSelectedItem( ent, null, m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Cursor" + m_FocusedColumn ) );
+			return true;
+		}
+		return false;
 	}
 	
-	override void Select()
+	override bool Select()
 	{
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn ).FindAnyWidget( "Render" + m_FocusedColumn ) );
 		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
@@ -224,9 +244,8 @@ class VicinitySlotsContainer: Container
 			if( selected_item && GetGame().GetPlayer().CanDropEntity( selected_item ) )
 			{
 				GetGame().GetPlayer().PredictiveDropEntity( selected_item );
-				ItemManager.GetInstance().SetSelectedItem( NULL, NULL, NULL );
-				GetMainWidget().FindAnyWidget( "Cursor" + 0 ).Show( true );
-				return;
+				ItemManager.GetInstance().SetSelectedItem( null, null, null );
+				return true;
 			}
 		}
 		
@@ -238,6 +257,7 @@ class VicinitySlotsContainer: Container
 				if( GameInventory.CanSwapEntities( item_in_hands, ent ) )
 				{
 					GetGame().GetPlayer().PredictiveSwapEntities( item_in_hands, ent );
+					return true;
 				}
 			}
 			else
@@ -245,12 +265,12 @@ class VicinitySlotsContainer: Container
 				if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( ent ) )
 				{
 					GetGame().GetPlayer().PredictiveTakeEntityToHands( ent );
+					return true;
 				}
 			}
 		}
-		else
-		{
-		}
+		
+		return false;
 	}
 	
 	void ~VicinitySlotsContainer()
@@ -267,7 +287,7 @@ class VicinitySlotsContainer: Container
 
 	override void SetLayoutName()
 	{
-		m_LayoutName = WidgetLayoutName.ClosableContainer;
+		m_LayoutName = WidgetLayoutName.Container;
 	}
 
 	override void OnShow()
@@ -298,10 +318,12 @@ class VicinitySlotsContainer: Container
 		w.SetSize( icon_x * m_sizeX - 1 , icon_y * m_sizeY + m_sizeY - 1 );
 		name.Replace( "Render", "Col" );
 		w.FindAnyWidget( name ).Show( true );
-		name.Replace( "Col", "Temperature" );
-		w.FindAnyWidget( name ).Show( false );
-		name.Replace( "Temperature", "RadialIcon" );
-		w.FindAnyWidget( name ).Show( false );
+		w.SetAlpha( 0.1 );
+		w.SetColor( ColorManager.BASE_COLOR );
+		name.Replace( "Col", "RadialIcon" );
+		w.GetParent().FindAnyWidget( name ).Show( true );
+		name.Replace( "RadialIcon", "Selected" );
+		w.FindAnyWidget( name ).Show( true );
 	}
 	
 	void OnIconDrop( Widget w )
@@ -314,19 +336,31 @@ class VicinitySlotsContainer: Container
 		string name = w.GetName();
 		name.Replace( "PanelWidget", "Col" );
 		w.FindAnyWidget( name ).Show(false);
+		name.Replace( "Col", "RadialIcon" );
+		w.GetParent().FindAnyWidget( name ).Show( true );
+		name.Replace( "RadialIcon", "Selected" );
+		w.FindAnyWidget( name ).Show( false );
 	}
 	
-	Widget widgett;
-
+	int GetRowSlotCount()
+	{
+		return SlotsContainer.Cast( m_Container.Get( m_FocusedRow ) ).GetColumnCount();
+	}
+	
 	void ShowItemsInContainers( array<Object> items )
 	{
-		this.RecomputeNumberOfContainers( items );
-
+		EntityAI item;
+		Widget icon;
+		Widget panel;
 		ItemPreviewWidget item_preview;
-		int visible_items = 0;
-		for( int x=0; x < items.Count(); x++ )
+		int x;
+		int visible_items_count = 0;
+		int visible_rows = 0;
+		array<Object> visible_items = new array<Object>;
+		
+		for( x = 0; x < items.Count(); x++ )
 		{
-			EntityAI item = EntityAI.Cast( items.Get( x ) );
+			item = EntityAI.Cast( items.Get( x ) );
 			if( item.IsInherited(DayZAnimal) && item.IsAlive() )
 			{
 				continue;
@@ -335,8 +369,29 @@ class VicinitySlotsContainer: Container
 			{
 				continue;
 			}
-			visible_items++;
-			item_preview = ItemPreviewWidget.Cast( m_Container.Get( x / ITEMS_IN_ROW ).GetMainWidget().FindAnyWidget( "Icon" + x % ITEMS_IN_ROW ).FindAnyWidget( "Render" + x % ITEMS_IN_ROW ) );
+			visible_items.Insert( item );
+			visible_items_count++;
+		}
+		
+		if( visible_items_count > ITEMS_IN_ROW )
+		{
+			SlotsContainer.Cast( ( m_Container.Get( 0 ) ) ).SetColumnCount( ITEMS_IN_ROW );
+		}
+		else
+		{
+			SlotsContainer.Cast( ( m_Container.Get( 0 ) ) ).SetColumnCount( visible_items_count );
+		}
+		
+		RecomputeNumberOfContainers( visible_items );
+		
+		for( x = 0; x < visible_items_count; x++ )
+		{
+			item			= EntityAI.Cast( visible_items.Get( x ) );
+			icon			= m_Container.Get( x / ITEMS_IN_ROW ).GetMainWidget().FindAnyWidget( "Icon" + x % ITEMS_IN_ROW );
+			panel			= icon.FindAnyWidget( "PanelWidget" + x % ITEMS_IN_ROW );
+			item_preview	= ItemPreviewWidget.Cast( icon.FindAnyWidget( "Render" + x % ITEMS_IN_ROW ) );
+			
+			icon.Show( true );
 			item_preview.Show( true );
 			item_preview.GetParent().Show( true );
 			item_preview.SetItem( item );
@@ -344,29 +399,32 @@ class VicinitySlotsContainer: Container
 			item_preview.SetView( item.GetViewIndex() );
 			item_preview.GetParent().SetUserID( item.GetID() );
 			
-			InventoryItem inventory_item = InventoryItem.Cast( item);
+			InventoryItem inventory_item = InventoryItem.Cast( item );
+			#ifdef PLATFORM_CONSOLE
 			if( inventory_item )
 			{
 				int size_x, size_y;
 				GetGame().GetInventoryItemSize( inventory_item, size_x, size_y );
-				int capacity = size_x * size_y;
-				TextWidget tw = TextWidget.Cast( m_Container.Get( x / ITEMS_IN_ROW ).GetMainWidget().FindAnyWidget( "ItemSize" + x % ITEMS_IN_ROW ) );
+				int capacity	= size_x * size_y;
+				Widget tw_p		= m_Container.Get( x / ITEMS_IN_ROW ).GetMainWidget().FindAnyWidget( "ItemSize" + x % ITEMS_IN_ROW );
+				TextWidget tw	= TextWidget.Cast( m_Container.Get( x / ITEMS_IN_ROW ).GetMainWidget().FindAnyWidget( "ItemSize" + x % ITEMS_IN_ROW ) );
+				tw_p.Show( true );
 				tw.SetText( capacity.ToString() );
 			}
+			#endif
 			
 			if( !ItemManager.GetInstance().IsDragging() )
 			{
 				ItemManager.GetInstance().SetTemperature( item, item_preview );
 			}
 			
-			WidgetEventHandler.GetInstance().RegisterOnDrag( item_preview.GetParent(),  this, "OnIconDrag" );
-			WidgetEventHandler.GetInstance().RegisterOnDrop( item_preview.GetParent(),  this, "OnIconDrop" );
-			WidgetEventHandler.GetInstance().RegisterOnDoubleClick( item_preview.GetParent(),  this, "DoubleClick" );
-			WidgetEventHandler.GetInstance().RegisterOnMouseEnter( item_preview.GetParent(),  this, "MouseEnter" );
-			WidgetEventHandler.GetInstance().RegisterOnMouseLeave( item_preview.GetParent(),  this, "MouseLeave" );
-			WidgetEventHandler.GetInstance().RegisterOnMouseButtonUp( item_preview.GetParent(),  this, "MouseClick" );
-			WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( item_preview.GetParent(),  this, "MouseButtonDown" );
-			widgett = item_preview.GetParent();
+			WidgetEventHandler.GetInstance().RegisterOnDrag( panel,  this, "OnIconDrag" );
+			WidgetEventHandler.GetInstance().RegisterOnDrop( panel,  this, "OnIconDrop" );
+			WidgetEventHandler.GetInstance().RegisterOnDoubleClick( panel,  this, "DoubleClick" );
+			WidgetEventHandler.GetInstance().RegisterOnMouseEnter( panel,  this, "MouseEnter" );
+			WidgetEventHandler.GetInstance().RegisterOnMouseLeave( panel,  this, "MouseLeave" );
+			WidgetEventHandler.GetInstance().RegisterOnMouseButtonUp( panel,  this, "MouseClick" );
+			WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( panel,  this, "MouseButtonDown" );
 
 			ref map<int, ref Container> showed_items = ( VicinityContainer.Cast( m_Parent ) ).m_ShowedItemsIDs;
 			ClosableContainer conta;
@@ -377,36 +435,36 @@ class VicinitySlotsContainer: Container
 			if(conta && conta.IsInherited( ClosableContainer ))
 			{
 				bool show_radial_icon = conta.IsOpened() && ( item.GetInventory().GetCargo() || item.GetSlotsCountCorrect() > 0 ) && !GetGame().ConfigIsExisting( config );
-				name.Replace( "Render", "RadialIcon" );
-				item_preview.FindAnyWidget( name ).Show( !show_radial_icon );
+				name.Replace( "Render", "RadialIconPanel" );
+				icon.FindAnyWidget( name ).Show( true );
+				name.Replace( "RadialIconPanel", "RadialIcon" );
+				icon.FindAnyWidget( name ).Show( !show_radial_icon );
 				name.Replace( "RadialIcon", "RadialIconClosed" );
-				item_preview.FindAnyWidget( name ).Show( show_radial_icon );		
+				icon.FindAnyWidget( name ).Show( show_radial_icon );		
 			}
 			else
 			{
-				name.Replace( "Render", "RadialIcon" );
-				item_preview.FindAnyWidget( name ).Show( false );
-				name.Replace( "RadialIcon", "RadialIconClosed" );
-				item_preview.FindAnyWidget( name ).Show( false );		
+				name.Replace( "Render", "RadialIconPanel" );
+				icon.FindAnyWidget( name ).Show( false );
 			}
-			Widget item_w = item_preview;
-			if ( item_w )
+			
+			if ( item_preview )
 			{
 				int has_quantity = HasItemQuantity( item );
-				Widget quantity_panel = item_w.FindAnyWidget( "QuantityPanel" + x % ITEMS_IN_ROW );
-				TextWidget item_quantity = TextWidget.Cast( item_w.FindAnyWidget( "Quantity" + x % ITEMS_IN_ROW ) );
-				ProgressBarWidget quantity_progress = ProgressBarWidget.Cast( item_w.FindAnyWidget( "QuantityBar" + x % ITEMS_IN_ROW ) );
-				Widget quantity_stack = item_w.FindAnyWidget( "QuantityStackPanel" + x % ITEMS_IN_ROW );
+				Widget quantity_panel = item_preview.FindAnyWidget( "QuantityPanel" + x % ITEMS_IN_ROW );
+				TextWidget item_quantity = TextWidget.Cast( item_preview.FindAnyWidget( "Quantity" + x % ITEMS_IN_ROW ) );
+				ProgressBarWidget quantity_progress = ProgressBarWidget.Cast( item_preview.FindAnyWidget( "QuantityBar" + x % ITEMS_IN_ROW ) );
+				Widget quantity_stack = item_preview.FindAnyWidget( "QuantityStackPanel" + x % ITEMS_IN_ROW );
 				
 				Weapon_Base wpn;
 				if ( Class.CastTo(wpn,  item ) )
 				{
 					int mi = wpn.GetCurrentMuzzle();
-					item_w.GetParent().GetParent().FindAnyWidget( "AmmoIcon" + x % ITEMS_IN_ROW ).Show( wpn.IsChamberFull( mi ) );
+					item_preview.GetParent().GetParent().FindAnyWidget( "AmmoIcon" + x % ITEMS_IN_ROW ).Show( wpn.IsChamberFull( mi ) );
 				}
 				else
 				{
-					item_w.GetParent().GetParent().FindAnyWidget( "AmmoIcon" + x % ITEMS_IN_ROW ).Show( false );
+					item_preview.GetParent().GetParent().FindAnyWidget( "AmmoIcon" + x % ITEMS_IN_ROW ).Show( false );
 				}
 				
 				if ( has_quantity == QUANTITY_HIDDEN )
@@ -446,15 +504,32 @@ class VicinitySlotsContainer: Container
 			}
 		}
 		
-		for(int c = visible_items; c < ITEMS_IN_ROW; c++)
+		for(int c = visible_items_count % ITEMS_IN_ROW; c < ITEMS_IN_ROW; c++)
 		{
-			int f = items.Count() / ITEMS_IN_ROW;
-			item_preview = ItemPreviewWidget.Cast( m_Container.Get( f ).GetMainWidget().FindAnyWidget( "Icon" + c ).FindAnyWidget( "Render" + c ) );
+			int f = visible_items.Count() / ITEMS_IN_ROW;
+			icon = m_Container.Get( f ).GetMainWidget().FindAnyWidget( "Icon" + c );
+			item_preview = ItemPreviewWidget.Cast( m_Container.Get( f ).GetMainWidget().FindAnyWidget( "Render" + c ) );
+			icon.Show(false);
 			item_preview.Show(false);
 			item_preview.SetItem( null );
 			item_preview.GetParent().Show(false);
-			TextWidget tw1 = TextWidget.Cast( m_Container.Get( f ).GetMainWidget().FindAnyWidget( "Icon" + c ).FindAnyWidget( "ItemSize" + c ) );
+			
+			item_preview.GetParent().GetParent().FindAnyWidget( "RadialIconPanel" + c ).Show( false );
+			
+			#ifdef PLATFORM_CONSOLE
+			Widget tw_p1		= m_Container.Get( f ).GetMainWidget().FindAnyWidget( "ItemSizePanel" + c );
+			TextWidget tw1	= TextWidget.Cast( m_Container.Get( f ).GetMainWidget().FindAnyWidget( "ItemSize" + c ) );
+			tw_p1.Show( false );
 			tw1.SetText( "" );
+			#endif
+		}
+		
+		if( visible_items_count % ITEMS_IN_ROW == 0 )
+		{
+			int s = m_Container.Count() - 1;
+			icon = m_Container.Get( s ).GetMainWidget().FindAnyWidget( "Icon0" );
+			icon.Show( true );
+			m_Container.Get( s ).GetMainWidget().Update();
 		}
 	}
 	
@@ -462,7 +537,7 @@ class VicinitySlotsContainer: Container
 	{
 		if( button == MouseState.LEFT )
 		{
-			if( w == NULL )
+			if( w == null )
 			{
 				return;
 			}
@@ -473,16 +548,17 @@ class VicinitySlotsContainer: Container
 			  name.Replace( "PanelWidget", "Render" );
 			  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
 			} 
+			
 			if( !iw )
 			{
 			  iw = ItemPreviewWidget.Cast( w );
 			}
-			if( !iw.GetItem() )
+			
+			ItemBase item = ItemBase.Cast( iw.GetItem() );
+			if( !item )
 			{
 				return;
 			}
-			
-			ItemBase item = ItemBase.Cast( iw.GetItem() );
 			
 			if( GetGame().GetPlayer().GetInventory().HasInventoryReservation( item, null ) )
 			{
@@ -525,7 +601,6 @@ class VicinitySlotsContainer: Container
 	
 	bool MouseEnter( Widget w, int x, int y )
 	{
-		//SetFocus( widgett );
 		string name = w.GetName();
 		name.Replace( "PanelWidget", "Render" );
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
@@ -635,9 +710,13 @@ class VicinitySlotsContainer: Container
 		name.Replace( "PanelWidget", "Render" );
 		ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
 		EntityAI item = item_preview.GetItem();
-		bool draggable = !GetGame().GetPlayer().GetInventory().HasInventoryReservation( item, NULL );
-		draggable = draggable && item.CanPutIntoHands( GetGame().GetPlayer() );
-		draggable = draggable && item.GetInventory().CanRemoveEntity();
+		bool draggable = false;
+		if( item )
+		{
+			draggable = !GetGame().GetPlayer().GetInventory().HasInventoryReservation( item, null );
+			draggable = draggable && item.CanPutIntoHands( GetGame().GetPlayer() );
+			draggable = draggable && item.GetInventory().CanRemoveEntity();
+		}
 		
 		ItemManager.GetInstance().SetWidgetDraggable( w, draggable );
 	}
@@ -716,19 +795,18 @@ class VicinitySlotsContainer: Container
 	{
 		int number_of_containers = m_Container.m_Body.Count();
 		int number_of_containers_needed = ( items.Count() / ITEMS_IN_ROW ) + 1;
-		int differnece = number_of_containers_needed - number_of_containers;
+		int difference = number_of_containers_needed - number_of_containers;
 
-		if( differnece != 0 )
+		if( difference != 0 )
 		{	
-			if( differnece > 0 )
+			if( difference > 0 )
 			{
-				for( int g = 0; g < differnece; g++ )
+				for( int g = 0; g < difference; g++ )
 				{
-					LayoutHolder con = new SlotsContainer( m_Container );
+					Print( "Creating new container." );
+					SlotsContainer con = new SlotsContainer( m_Container );
 					m_Container.Insert( con );
-					//WidgetEventHandler.GetInstance().RegisterOnDropReceived( con.GetMainWidget().FindAnyWidget( "widget" ),  m_Parent, "OnDropReceivedFromHeader" );
-					//WidgetEventHandler.GetInstance().RegisterOnDraggingOver( con.GetMainWidget().FindAnyWidget( "widget" ),  m_Parent, "OnDropReceivedFromHeader" );
-					for( int j = 0; j < 7; j++ )
+					for( int j = 0; j < ITEMS_IN_ROW; j++ )
 					{
 						WidgetEventHandler.GetInstance().RegisterOnDropReceived( con.GetMainWidget().FindAnyWidget( "PanelWidget" + j ),  m_Parent, "OnDropReceivedFromIcon" );
 						WidgetEventHandler.GetInstance().RegisterOnDropReceived( con.GetMainWidget().FindAnyWidget( "GhostSlot" + j ),  m_Parent, "OnDropReceivedFromHeader" );
@@ -739,19 +817,25 @@ class VicinitySlotsContainer: Container
 						WidgetEventHandler.GetInstance().RegisterOnDraggingOver( con.GetMainWidget().FindAnyWidget( "Icon" + j ),  m_Parent, "DraggingOverHeader" );
 						
 						#ifdef PLATFORM_CONSOLE
-						TextWidget tw = TextWidget.Cast( con.GetMainWidget().FindAnyWidget( "ItemSize" + j) );
+						Widget tw_p		= con.GetMainWidget().FindAnyWidget( "ItemSizePanel" + j );
+						TextWidget tw	= TextWidget.Cast( con.GetMainWidget().FindAnyWidget( "ItemSize" + j ) );
+						tw_p.Show( true );
 						tw.Show( true );
 						#endif
 					}
+					con.SetColumnCount( items.Count() % ITEMS_IN_ROW );
+					m_SlotsCount++;
 				}
 			}
 			else
 			{
-				for( int gx = 0; gx < ( differnece * -1 ); gx++ )
+				for( int gx = 0; gx < ( difference * -1 ); gx++ )
 				{
-					Widget w = m_Container.m_Body.Get( 0 ).GetMainWidget();
-					m_Container.m_Body.Remove( 0 );
+					Widget w = m_Container.m_Body.Get( m_SlotsCount - 1 ).GetMainWidget();
 					delete w;
+					m_Container.m_Body.Remove( m_SlotsCount - 1 );
+					Print( "Removing container." );
+					m_SlotsCount--;
 				}
 			}
 			if( m_Parent )

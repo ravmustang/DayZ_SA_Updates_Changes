@@ -35,8 +35,8 @@ class PropertyModifiers
 */
 	float CalculateBarrelLength(ItemBase owner)
 	{
-		vector usti_hlavne_position = owner.GetSelectionPosition( "usti hlavne" );//usti hlavne
-		vector konec_hlavne_position = owner.GetSelectionPosition( "konec hlavne" );//konec hlavne
+		vector usti_hlavne_position = owner.GetSelectionPositionLS( "usti hlavne" );//usti hlavne
+		vector konec_hlavne_position = owner.GetSelectionPositionLS( "konec hlavne" );//konec hlavne
 		usti_hlavne_position = owner.ModelToWorld(usti_hlavne_position);
 		konec_hlavne_position = owner.ModelToWorld(konec_hlavne_position);
 		return vector.Distance(usti_hlavne_position, konec_hlavne_position);

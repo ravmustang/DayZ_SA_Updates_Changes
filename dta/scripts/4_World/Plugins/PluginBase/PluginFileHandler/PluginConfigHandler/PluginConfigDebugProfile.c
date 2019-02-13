@@ -9,6 +9,7 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 	protected const string ITEM_SEARCH						= "console_ItemSearch";
 	protected const string SPAWN_DISTANCE					= "console_SpawnDistance";
 	protected const string CHAR_STATS_VIS					= "console_character_stats_visible";
+	protected const string CHAR_LEVELS_VIS					= "console_character_levels_visible";
 	protected const string CHAR_MODIFIERS_VIS				= "console_character_modifiers_visible";
 	protected const string CHAR_AGENTS_VIS					= "console_character_agents_visible";
 	protected const string CHAR_DEBUG_VIS					= "console_character_debug_visible";
@@ -281,6 +282,7 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 		m_DefaultValues.Insert(SPAWN_DISTANCE, 			GetNewCfgParamFloat(0.0) );
 		m_DefaultValues.Insert(LOGS_ENABLED, 			GetNewCfgParamBool(true) );
 		m_DefaultValues.Insert(CHAR_STATS_VIS, 			GetNewCfgParamBool(false) );
+		m_DefaultValues.Insert(CHAR_LEVELS_VIS, 		GetNewCfgParamBool(false) );
 		m_DefaultValues.Insert(CHAR_MODIFIERS_VIS, 		GetNewCfgParamBool(false) );
 		m_DefaultValues.Insert(CHAR_AGENTS_VIS, 		GetNewCfgParamBool(false) );
 		m_DefaultValues.Insert(CHAR_DEBUG_VIS, 			GetNewCfgParamBool(false) );
@@ -417,12 +419,28 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 	}
 	
 	//========================================
+	// CharacterLevelsVisible
+	//========================================	
+	bool GetCharacterLevelsVisible()
+	{
+		return GetBool( CHAR_LEVELS_VIS );
+	}
+	
+
+	void SetCharacterLevelsVisible( bool is_visible )
+	{
+		SetBool( CHAR_LEVELS_VIS, is_visible );
+	}
+	
+	
+	//========================================
 	// CharacterStatsVisible
 	//========================================	
 	bool GetCharacterStatsVisible()
 	{
 		return GetBool( CHAR_STATS_VIS );
 	}
+	
 
 	void SetCharacterStatsVisible( bool is_visible )
 	{

@@ -3,7 +3,7 @@ class ColorManager
 	private ref static ColorManager m_Instance;
 	
 	static int ITEM_BACKGROUND_COLOR = ARGB( 50, 255, 255, 255 );
-	static int BASE_COLOR = ARGB( 200, 95, 95, 95 );
+	static int BASE_COLOR = ARGB( 10, 255, 255, 255 );
 	static int RED_COLOR = ARGB( 150, 255, 1, 1 );
 	static int GREEN_COLOR = ARGB( 150, 1, 255, 1 );
 	static int SWAP_COLOR = ARGB( 150, 135, 206, 250 );
@@ -21,15 +21,15 @@ class ColorManager
 	
 	void SetColor( Widget w, int color )
 	{
-		if( w.FindAnyWidget( "Color" ) )
+		if( w.FindAnyWidget( "Selected" ) )
 		{
-			w.FindAnyWidget( "Color" ).SetColor( color );
+			w.FindAnyWidget( "Selected" ).SetColor( color );
 		}
 		else
 		{
 			string name = w.GetName();
-			name.Replace( "PanelWidget", "Col" );
-			Widget w2 = w.FindAnyWidget( name );
+			name.Replace( "PanelWidget", "Selected" );
+			Widget w2 = w.GetParent().FindAnyWidget( name );
 			if( w2 )
 			{
 				w2.SetColor( color );

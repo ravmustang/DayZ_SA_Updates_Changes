@@ -35,9 +35,14 @@ class SalineMdfr: ModifierBase
 
 	}
 	
+	override void OnActivate(PlayerBase player)
+	{
+
+	}
+	
 	override void OnTick(PlayerBase player, float deltaT)
 	{
-		player.AddHealth("","Blood",PlayerConstants.SALINE_BLOOD_REGEN_PER_SEC * deltaT);
+		
 	}
 	
 	float CalculateRegenTime()

@@ -38,7 +38,7 @@ class InfluenzaMdfr: ModifierBase
 	{
 		float chance_of_cough = player.GetSingleAgentCountNormalized(eAgents.INFLUENZA);
 		
-		if( Math.RandomFloat01() < chance_of_cough / Math.RandomInt(1,10) )
+		if( Math.RandomFloat01() < chance_of_cough / Math.RandomInt(5,20) )
 		{
 			player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_COUGH);
 		}

@@ -161,14 +161,14 @@ class InventoryQuickbar extends InventoryGridController
 
 			color = ARGB( 150, 255, 1, 1 );
 
-			if( w.FindAnyWidget("Color") )
+			if( w.FindAnyWidget("Selected") )
 			{
-				w.FindAnyWidget("Color").SetColor( color );
+				w.FindAnyWidget("Selected").SetColor( color );
 			}
 			else
 			{
 				name = w.GetName();
-				name.Replace( "PanelWidget", "Col" );
+				name.Replace( "PanelWidget", "Cursor" );
 				w.FindAnyWidget( name ).SetColor( color );
 				if( w.FindAnyWidget( name ) )
 				{
@@ -180,14 +180,14 @@ class InventoryQuickbar extends InventoryGridController
 		{
 			color = ARGB( 150, 1, 255, 1 );
 
-			if( w.FindAnyWidget("Color") )
+			if( w.FindAnyWidget("Selected") )
 			{
-				w.FindAnyWidget("Color").SetColor( color );
+				w.FindAnyWidget("Selected").SetColor( color );
 			}
 			else
 			{
 				name = w.GetName();
-				name.Replace( "PanelWidget", "Col" );
+				name.Replace( "PanelWidget", "Cursor" );
 				if( w.FindAnyWidget( name ) )
 				{
 					w.FindAnyWidget( name ).SetColor( color );

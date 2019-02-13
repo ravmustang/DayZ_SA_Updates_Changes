@@ -574,7 +574,7 @@ class ActionTargets
 				if(at.GetObject())
 				{
 					string compName = at.GetObject().GetActionComponentName(at.GetComponentIndex());
-					vector modelPos = at.GetObject().GetSelectionPosition(compName);
+					vector modelPos = at.GetObject().GetSelectionPositionMS(compName);
 					vector worldPos = at.GetObject().ModelToWorld(modelPos);
 					dbgPosShapes.Insert( Debug.DrawSphere(worldPos, 0.25, Colors.PURPLE, ShapeFlags.NOZBUFFER) );
 				}

@@ -387,7 +387,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	override void Update(float timeslice)
 	{
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+		if ( GetGame().GetInput().GetActionDown("UAUIBack",false) )
 		{
 			Back();
 		}

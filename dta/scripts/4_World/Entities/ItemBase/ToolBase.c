@@ -1,105 +1,32 @@
-//TODO trees are static objects, there is no script event for playing sounds on clients when they are chopped down. Below is a temporary sollution. Redo once trees are entities
+//TODO trees are static objects, there is no script event for playing sounds on clients when they are chopped down.
 class ToolBase extends ItemBase
-{
-	//m_SynchSwitch invokes synch everytime a tree is choped
-	protected bool m_SynchSwitch;
-	protected bool m_HaveCutHardTree;
-	protected bool m_HaveCutSoftTree;
-	protected bool m_HaveCutHardBush;
-	protected bool m_HaveCutSoftBush;
-	
+{	
 	void ToolBase()
 	{
-		m_SynchSwitch = false;
-		m_HaveCutHardTree = false;
-		m_HaveCutSoftTree = false;
-		m_HaveCutHardBush = false;
-		m_HaveCutSoftBush = false;
 		
-		RegisterNetSyncVariableBool("m_SynchSwitch");
-		RegisterNetSyncVariableBool("m_HaveCutHardTree");
-		RegisterNetSyncVariableBool("m_HaveCutSoftTree");
-		RegisterNetSyncVariableBool("m_HaveCutHardBush");
-		RegisterNetSyncVariableBool("m_HaveCutSoftBush");
 	}
-	
-	void HardTreeCut()
+			
+	override void OnRPC(PlayerIdentity sender, int rpc_type,ParamsReadContext  ctx) 
 	{
-		m_SynchSwitch = !m_SynchSwitch;
-		m_HaveCutHardTree = true;
-		SetSynchDirty();
+		super.OnRPC(sender, rpc_type,ctx);
 		
-		//Local singleplayer
-		if ( !GetGame().IsMultiplayer() )
+		switch(rpc_type)
 		{
-			SoundHardTreeFallingPlay();
-		}
-	}
-	
-	void SoftTreeCut()
-	{
-		m_SynchSwitch = !m_SynchSwitch;
-		m_HaveCutSoftTree = true;
-		SetSynchDirty();
-		
-		//Local singleplayer
-		if ( !GetGame().IsMultiplayer() )
-		{
-			SoundSoftTreeFallingPlay();
-		}
-	}
-	
-	void HardBushCut()
-	{
-		m_SynchSwitch = !m_SynchSwitch;
-		m_HaveCutHardBush = true;
-		SetSynchDirty();
-		
-		//Local singleplayer
-		if ( !GetGame().IsMultiplayer() )
-		{
-			SoundHardBushFallingPlay();
-		}
-	}
-	
-	void SoftBushCut()
-	{
-		m_SynchSwitch = !m_SynchSwitch;
-		m_HaveCutSoftBush = true;
-		SetSynchDirty();
-		
-		//Local singleplayer
-		if ( !GetGame().IsMultiplayer() )
-		{
-			SoundSoftBushFalling();
-		}
-	}
-	
-	override void OnVariablesSynchronized()
-	{
-		super.OnVariablesSynchronized();
-							
-		if ( GetGame().IsMultiplayer() )
-		{
-			if ( m_HaveCutHardTree )
-			{
+			case PlantType.TREE_HARD:
 				SoundHardTreeFallingPlay();
-			}
+			break;
 			
-			if ( m_HaveCutSoftTree )
-			{
+			case PlantType.TREE_SOFT:
 				SoundSoftTreeFallingPlay();
-			}
+			break;
 			
-			if ( m_HaveCutHardBush )
-			{
+			case PlantType.BUSH_HARD:
 				SoundHardBushFallingPlay();
-			}
+			break;
 			
-			if ( m_HaveCutSoftBush )
-			{
-				SoundSoftBushFalling();
-			}
+			case PlantType.BUSH_SOFT:
+				SoundSoftBushFallingPlay();
+			break;
 		}
 	}
 	
@@ -121,40 +48,9 @@ class ToolBase extends ItemBase
 		sound.SetSoundAutodestroy( true );
 	}
 		
-	void SoundSoftBushFalling()
+	void SoundSoftBushFallingPlay()
 	{
 		EffectSound sound =	SEffectManager.PlaySound( "softBushFall_SoundSet", GetPosition() );
 		sound.SetSoundAutodestroy( true );
-	}
-	
-	//Reset synchronization after the UA is completed.
-	override void SoundSynchRemoteReset()
-	{
-		super.SoundSynchRemoteReset();
-		
-		m_HaveCutHardTree = false;
-		m_HaveCutSoftTree = false;
-		m_HaveCutHardBush = false;
-		m_HaveCutSoftBush = false;
-	}
-	
-	bool GetHaveCutHardTree()
-	{
-		return m_HaveCutHardTree;
-	}
-	
-	bool GetHaveCutSoftTree()
-	{
-		return m_HaveCutSoftTree;
-	}
-	
-	bool GetHaveCutHardBush()
-	{
-		return m_HaveCutHardBush;
-	}
-	
-	bool GetHaveCutSoftBush()
-	{
-		return m_HaveCutSoftBush;
 	}
 }

@@ -1,0 +1,1 @@
+class PolicePants extends Clothing {};

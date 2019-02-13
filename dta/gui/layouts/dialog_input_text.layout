@@ -17,7 +17,7 @@ WindowWidgetClass TextInputDialogRoot {
    visible 1
    color 1 0 0 1
    position 14 14
-   size 90 40
+   size 130 40
    halign right_ref
    valign bottom_ref
    hexactpos 1
@@ -35,7 +35,7 @@ WindowWidgetClass TextInputDialogRoot {
    visible 1
    color 1 0 0 1
    position 14 14
-   size 90 40
+   size 130 40
    valign bottom_ref
    hexactpos 1
    vexactpos 1

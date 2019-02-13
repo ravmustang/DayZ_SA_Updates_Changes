@@ -7,6 +7,10 @@ class Torch : ItemBase
 	static float 			m_BurnTimePerRag;
 	static float 			m_BurnTimePerFullLard;
 	static float 			m_MaxConsumableLardQuantity;
+	static float 			m_WaterEvaporationByFireIntensity = 0.001;
+	vector 					m_ParticleLocalPos = Vector(0, 0.67, 0);
+	
+	string					m_DecraftResult = "WoodenStick";
 	
 	void Torch()
 	{
@@ -29,6 +33,8 @@ class Torch : ItemBase
 		{
 			GetGame().ObjectDelete( m_LoopSoundEntity );
 		}
+		
+		StopAllParticles();
 	}
 	
 	override bool CanPutInCargo( EntityAI parent )
@@ -69,9 +75,9 @@ class Torch : ItemBase
 		if ( !GetCompEM().CheckWetness() )
 			return false;
 		
-		ItemBase rag = ItemBase.Cast( GetAttachmentByType(Rag) );
+		ItemBase rag = GetRag();
 		
-		if (rag)
+		if (rag  &&  GetCompEM().GetEnergy() < GetCompEM().GetEnergyUsage() * GetCompEM().GetUpdateInterval() )
 		{
 			float wetness = rag.GetWet();
 			bool is_dry_enough = wetness <= 1-GetCompEM().GetWetnessExposure();
@@ -81,7 +87,7 @@ class Torch : ItemBase
 		if ( !GetCompEM().CanWork() )
 			return false;
 		
-		if ( GetCompEM().GetEnergy() > 3 )
+		if ( GetCompEM().GetEnergy() >= 3 )
 			return true;
 		
 		return false;
@@ -125,10 +131,15 @@ class Torch : ItemBase
 	
 	bool ConsumeRag()
 	{
-		ItemBase rag = ItemBase.Cast(GetAttachmentByType(Rag));
+		ItemBase rag = GetRag();
 		
 		if (rag)
 		{
+			if (rag.GetQuantity() <= 1)
+			{
+				LockRags(false); // Unlock attachment slot before deletion. Otherwise it will get stuck locked and unusable.
+			}
+			
 			rag.AddQuantity(-1);
 			rag.SetHealth(0);
 			GetCompEM().AddEnergy( m_BurnTimePerRag );
@@ -178,7 +189,7 @@ class Torch : ItemBase
 	
 	void RuinRags()
 	{
-		ItemBase rag = ItemBase.Cast(GetAttachmentByType(Rag));
+		ItemBase rag = GetRag();
 		
 		if (rag)
 		{
@@ -206,7 +217,7 @@ class Torch : ItemBase
 		{
 			vector ori_rotate = "0 0 0";
 			ori_rotate[0] = Math.RandomFloat(0, 360);
-			ori_rotate[1] = Math.RandomFloat(0, 20);
+			ori_rotate[1] = Math.RandomFloat(0, 10);
 			SetOrientation(ori_rotate);
 			
 			return true; // I am standing up
@@ -223,7 +234,7 @@ class Torch : ItemBase
 			float q_max = GetCompEM().GetEnergyMax() + m_BurnTimePerRag * 6; // TO DO: Replace 6 by max rag quantity
 			float q_min = GetCompEM().GetEnergy();
 			
-			ItemBase rag = ItemBase.Cast( GetAttachmentByType(Rag) );
+			ItemBase rag = GetRag();
 			
 			if (rag)
 			{
@@ -270,33 +281,104 @@ class Torch : ItemBase
 		UpdateCheckForReceivingUpgrade();
 	}
 	
+	bool CanTransformIntoStick()
+	{
+		if ( GetGame().IsServer()  &&  GetCompEM().GetEnergy() < GetCompEM().GetEnergyUsage()  &&  !GetRag() )
+			return true;
+		else
+			return false;
+		;
+	}
+	
+	void TryTransformIntoStick()
+	{
+		if ( CanTransformIntoStick() )
+		{
+			PlayerBase player = PlayerBase.Cast( GetHierarchyParent() );
+				
+			if (player)
+			{
+				// Transform object into wooden stick
+				StopAllParticles();
+				
+				TorchLambda lambda = new TorchLambda(this, m_DecraftResult);
+				player.ServerReplaceItemInHandsWithNew(lambda);
+			}
+			else
+			{
+				// Create wooden stick and delete Torch
+				vector pos = GetPosition();
+				vector ori = GetOrientation();
+				
+				if ( GetType() == "WoodenStick" )
+					ori = ori + Vector(0,90,0);
+				
+				ItemBase stick = ItemBase.Cast( GetGame().CreateObject(m_DecraftResult, pos) );
+				stick.SetPosition(pos);
+				stick.PlaceOnSurface();
+				
+				if ( stick.GetType() == "LongWoodenStick" )
+				{
+					pos = stick.GetPosition() + Vector(0,-0.3,0);
+					stick.SetPosition(pos);
+				}
+				
+				stick.SetOrientation(ori);
+				GetGame().ObjectDelete(this);
+			}
+		}
+	}
+	
 	override void EEItemDetached ( EntityAI item, string slot_name ) 
 	{
 		super.EEItemDetached( item, slot_name );
 		CalculateQuantity();
 		UpdateCheckForReceivingUpgrade();
 		
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		
-		// Uncomment this when its fixed
-		/*
-		if ( GetGame().IsServer()  &&  GetCompEM().GetEnergy0To100() < 1 )
-		{
-			//MiscGameplayFunctions.TurnItemIntoItemEx(player, new TurnItemIntoItemLambda(this, "WoodenStick", player));
-		}
-		*/
+		TryTransformIntoStick();
 	}
 	
 	override void OnWorkStart()
 	{
 		SetPilotLight(true);
+		LockRags(true);
+	}
+	
+	void StopAllParticles()
+	{
+		if (m_FireParticle)
+		{
+			m_FireParticle.Stop();
+		}
+	}
+	
+	Rag GetRag()
+	{
+		return Rag.Cast( GetAttachmentByType(Rag) );
+	}
+	
+	void LockRags(bool do_lock)
+	{
+		ItemBase rag = GetRag();
+		
+		if (rag)
+		{
+			if (do_lock)
+			{
+				rag.LockToParent();
+			}
+			else
+			{
+				rag.UnlockFromParent();
+			}
+		}
 	}
 	
 	override void OnWork ( float consumed_energy )
 	{
 		if ( GetGame().IsServer() )
 		{
-			if ( GetCompEM().GetEnergy() <= GetCompEM().GetEnergyUsage() )
+			if ( GetCompEM().GetEnergy()  <=  ( GetCompEM().GetEnergyUsage() * GetCompEM().GetUpdateInterval() ) )
 			{
 				ConsumeRag();
 			}
@@ -307,7 +389,14 @@ class Torch : ItemBase
 			
 			UpdateCheckForReceivingUpgrade();
 			
-			AddWet(-0.0005);
+			AddWet( -m_WaterEvaporationByFireIntensity * GetCompEM().GetUpdateInterval() );
+			
+			Rag rag = GetRag();
+			
+			if ( rag )
+			{
+				rag.AddWet( -m_WaterEvaporationByFireIntensity * GetCompEM().GetUpdateInterval() );
+			}
 		}
 		
 		if ( !m_LoopSoundEntity && GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
@@ -320,15 +409,22 @@ class Torch : ItemBase
 		{
 			if ( GetQuantity() < 40 )
 			{
-				if ( !m_FireParticle  ||  m_FireParticle.GetParticleID() != ParticleList.TORCH_T1 )
-				{
-					// Executes once when fire particle starts or changes
-					
-					if (m_FireParticle)
-						m_FireParticle.Stop();
-					
-					m_FireParticle = Particle.Play(ParticleList.TORCH_T1, this, Vector(0, 0.65, 0));
-				}
+				if (m_FireParticle)
+					m_FireParticle.Stop();
+				
+				m_FireParticle = Particle.Play(ParticleList.TORCH_T1, this, m_ParticleLocalPos);
+				float scale = GetQuantity() / 40;
+				
+				if (scale > 1)
+					scale = 1;
+				
+				if (scale < 0.5)
+					scale = 0.5;
+				
+				m_FireParticle.ScaleParticleParam(EmitorParam.SIZE, scale);
+				m_FireParticle.ScaleParticleParam(EmitorParam.BIRTH_RATE, scale);
+				m_FireParticle.ScaleParticleParam(EmitorParam.VELOCITY, scale);
+				m_FireParticle.ScaleParticleParam(EmitorParam.VELOCITY_RND, scale);
 			}
 			else
 			{
@@ -339,7 +435,7 @@ class Torch : ItemBase
 					if (m_FireParticle)
 						m_FireParticle.Stop();
 					
-					m_FireParticle = Particle.Play(ParticleList.TORCH_T2, this, Vector(0, 0.65, 0));
+					m_FireParticle = Particle.Play(ParticleList.TORCH_T2, this, m_ParticleLocalPos);
 				}
 			}
 		}
@@ -363,6 +459,10 @@ class Torch : ItemBase
 		
 		CalculateQuantity();
 		UpdateCheckForReceivingUpgrade();
+		
+		LockRags(false);
+		
+		TryTransformIntoStick();
 	}
 	
 	// COMBAT
@@ -389,5 +489,17 @@ class Torch : ItemBase
 			return 5; // ???
 		else
 			return 2; // ???
+	}
+};
+
+class TorchLambda : ReplaceItemWithNewLambdaBase
+{
+	override void CopyOldPropertiesToNew (notnull EntityAI old_item, EntityAI new_item)
+	{
+		super.CopyOldPropertiesToNew(old_item, new_item);
+
+		ItemBase stick;
+		Class.CastTo(stick, new_item);
+		stick.SetQuantity(1);
 	}
 };

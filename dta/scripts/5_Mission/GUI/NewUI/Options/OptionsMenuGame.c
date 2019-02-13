@@ -50,9 +50,9 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "fov_setting_option" ).SetUserID( AT_OPTIONS_FIELD_OF_VIEW );
 		m_Root.FindAnyWidget( "hud_setting_option" ).SetUserID( 1 );
 		m_Root.FindAnyWidget( "crosshair_setting_option" ).SetUserID( 2 );
-		m_Root.FindAnyWidget( "game_setting_option" ).SetUserID( 3 );
-		m_Root.FindAnyWidget( "admin_setting_option" ).SetUserID( 4 );
-		m_Root.FindAnyWidget( "player_setting_option" ).SetUserID( 5 );
+		m_Root.FindAnyWidget( "game_setting_option" ).SetUserID( 4 );
+		m_Root.FindAnyWidget( "admin_setting_option" ).SetUserID( 5 );
+		m_Root.FindAnyWidget( "player_setting_option" ).SetUserID( 6 );
 		
 		#ifdef PLATFORM_CONSOLE
 		m_Root.FindAnyWidget( "brightness_setting_option" ).SetUserID( AT_OPTIONS_BRIGHT_SLIDER );
@@ -329,11 +329,18 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 		m_TextMap.Insert( AT_OPTIONS_FIELD_OF_VIEW, new Param2<string, string>( "#options_game_field_of_view", "#options_game_field_of_view_desc" ) );
 		m_TextMap.Insert( 1, new Param2<string, string>( "#options_game_show_HUD", "#options_game_show_HUD_desc" ) );
 		m_TextMap.Insert( 2, new Param2<string, string>( "#options_game_show_crosshair", "#options_game_show_crosshair_desc" ) );
+	
 		#ifdef PLATFORM_WINDOWS
-		m_TextMap.Insert( 3, new Param2<string, string>( "#options_game_show_quickbar", "#options_game_show_quickbar_desc" ) );
+		m_TextMap.Insert( 3, new Param2<string, string>( "#options_game_show_quickbar",			"#options_game_show_quickbar_desc" ) );
+		m_TextMap.Insert( 4, new Param2<string, string>( "#options_pc_game_messages",	"#options_game_show_game_msg" ) );
+		m_TextMap.Insert( 5, new Param2<string, string>( "#options_pc_admin_mes",		"#options_game_show_admin_msg" ) );
+		m_TextMap.Insert( 6, new Param2<string, string>( "#options_pc_player_messages",	"#options_game_show_player_msg" ) );
 		#else
 		#ifdef PLATFORM_CONSOLE
 		m_TextMap.Insert( AT_OPTIONS_BRIGHT_SLIDER, new Param2<string, string>( "#options_video_brightness", "#options_video_brightness_desc" ) );
+		m_TextMap.Insert( 4, new Param2<string, string>( "#options_xbox_game_messages",	"#options_game_show_game_msg" ) );
+		m_TextMap.Insert( 5, new Param2<string, string>( "#options_xbox_admin_mes",		"#options_game_show_admin_msg" ) );
+		m_TextMap.Insert( 6, new Param2<string, string>( "#options_xbox_player_messages","#options_game_show_player_msg" ) );
 		#endif
 		#endif
 	}

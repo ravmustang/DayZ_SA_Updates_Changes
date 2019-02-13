@@ -148,9 +148,9 @@ class MeleeCombatData
 {
 	proto native int GetModesCount();
 
-	proto native string GetModeName(int index);
+	proto native owned string GetModeName(int index);
 
-	proto native string GetAmmoTypeName(int index);
+	proto native owned string GetAmmoTypeName(int index);
 
 	proto native float GetModeRange(int index);
 	
@@ -165,7 +165,7 @@ const string NullStringArray[1] = { "" };
 //! Selection class
 class Selection
 {
-	proto native string GetName();
+	proto native owned string GetName();
 	proto native int GetVertexCount();
 	proto native int GetLODVertexIndex(int sel_vertex_index);
 
@@ -191,7 +191,7 @@ class LOD
 
 	proto native vector GetVertexPosition(int vertex_index);
 	
-	proto native string GetName(Object myObject);
+	proto native owned string GetName(Object myObject);
 	
 	Selection GetSelectionByName( string name )
 	{
@@ -213,8 +213,8 @@ class LOD
 	}
 	
 	proto native int GetPropertyCount();
-	proto native string GetPropertyName(int index);
-	proto native string GetPropertyValue(int index);
+	proto native owned string GetPropertyName(int index);
+	proto native owned string GetPropertyValue(int index);
 }
 
 class Plant extends Object
@@ -664,13 +664,11 @@ class MenuData: Managed
 const int AT_UNKNOWN = 0;
 const int AT_OBJECTS_DETAIL = 1;
 const int AT_TEXTURE_DETAIL = 2;
-const int AT_VRAM_VALUE = 3;
 const int AT_HDR_DETAIL = 4;
 const int AT_FSAA_DETAIL = 5;
 const int AT_VSYNC_VALUE = 6;
 const int AT_ANISO_DETAIL = 7;
 const int AT_OPTIONS_FXAA_VALUE = 8;
-const int AT_OPTIONS_PIP_VALUE = 9;
 const int AT_OPTIONS_SW_VALUE = 10;
 const int AT_POSTPROCESS_EFFECTS = 11;
 const int AT_QUALITY_PREFERENCE = 12;
@@ -678,47 +676,31 @@ const int AT_ATOC_DETAIL = 13;
 const int AT_AMBIENT_OCCLUSION = 14;
 const int AT_BLOOM = 15;
 const int AT_ROTATION_BLUR = 16;
-const int AT_SHADING_DETAIL = 17;
 const int AT_SHADOW_DETAIL = 18;
 const int AT_OPTIONS_TERRAIN = 19;
 const int AT_OPTIONS_RESOLUTION = 20;
-const int AT_OPTIONS_SLIDER_FILLRATE = 21;
-const int AT_OPTIONS_REFRESH = 22;
 const int AT_OPTIONS_GAMMA_SLIDER = 23;
 const int AT_OPTIONS_BRIGHT_SLIDER = 24;
 const int AT_OPTIONS_VISIBILITY_SLIDER = 25;
 const int AT_OPTIONS_OBJECT_VISIBILITY_SLIDER = 26;
-const int AT_OPTIONS_TRAFFIC_VISIBILITY_SLIDER = 27;
 const int AT_OPTIONS_SHADOW_VISIBILITY_SLIDER = 28;
 const int AT_OPTIONS_DRAWDISTANCE_SLIDER = 29;
-const int AT_OPTIONS_BLOOD = 30;
-const int AT_OPTIONS_IMPERIALUNITS = 31;
-const int AT_OPTIONS_VEHICLEFREELOOK = 32;
-const int AT_OPTIONS_WBUFFER = 33;
 const int AT_ASPECT_RATIO = 34;
-const int AT_OPTIONS_IGUISIZE = 35;
 const int AT_CONFIG_YREVERSED = 36;
-const int AT_OPTIONS_PERSPECTIVE = 37;
 const int AT_OPTIONS_FIELD_OF_VIEW = 38;
 const int AT_OPTIONS_MUSIC_SLIDER = 39;
 const int AT_OPTIONS_EFFECTS_SLIDER = 40;
 const int AT_OPTIONS_VON_SLIDER = 41;
 const int AT_OPTIONS_MASTER_VOLUME = 42;
-const int AT_OPTIONS_VOICES_SLIDER = 43;
-const int AT_OPTIONS_MIC_SENS_SLIDER = 44;
-const int AT_OPTIONS_SAMPLES_SLIDER = 45;
 const int AT_OPTIONS_HWACC = 46;
 const int AT_OPTIONS_EAX = 47;
-const int AT_OPTIONS_SINGLE_VOICE = 48;
 const int AT_OPTIONS_LANGUAGE = 49;
 const int AT_OPTIONS_SUBTITLES = 50;
 const int AT_OPTIONS_RADIO = 51;
 const int AT_CONFIG_XAXIS = 52;
 const int AT_CONFIG_YAXIS = 53;
-const int AT_CONFIG_FLOATING_ZONE = 54;
 const int AT_CONFIG_MOUSE_FILTERING = 55;
 const int AT_CONFIG_HEAD_BOB = 56;
-const int AT_OPTIONS_VIDEO_DEFAULT = 57,
 const int AT_CONFIG_CONTROLLER_XAXIS = 58,
 const int AT_CONFIG_CONTROLLER_YAXIS = 59,
 const int AT_CONFIG_CONTROLLER_REVERSED_LOOK = 60,
@@ -890,9 +872,11 @@ proto native Hive CreateHive();
 proto native void DestroyHive();
 proto native Hive GetHive();
 
+
 // -------------------------------------------------------------------------
 class UAInput
 {
+	proto native int ID();			// return input index
 	proto native int NameHash();	// return input hash
 
 	proto native int BindingCount();	// return binding count
@@ -939,6 +923,9 @@ class UAInput
 
 	proto native int ConflictCount();		// get number of conflicts with other inputs
 
+	proto native void Backlit_Override( int eType, int iColor ); // enable/ disable backlit of associated controls (EUABACKLIT_*)
+	proto native bool Backlit_Enabled(); // check whether associated controls are backlit
+
 };
 
 // -------------------------------------------------------------------------
@@ -952,10 +939,10 @@ class UAInputAPI
 	proto native UAInput GetInputByID( int iID );
 	proto native UAInput GetInputByName( string sInputName );
 
-	proto native string GetButtonName( int iHash );	// get localized name for any button hash
+	proto native owned string GetButtonName( int iHash );	// get localized name for any button hash
 
 	proto native int ModificatorCount();	// modificator count
-	proto native string GetModificatorName( int index );	// modificator name
+	proto native owned string GetModificatorName( int index );	// modificator name
 	
 	// for options only mapping, do not call normally as it is not performance wise!
 	proto native int DeterminePressedButton();	// recently pressed key, mouse button or pad button (returns zero if nothing pressed)
@@ -983,50 +970,78 @@ class UAInputAPI
 	proto native int PresetCurrent(); // determine index of current preset - (-1 == not selected)
 	proto native void PresetSelect( int index ); // select specific preset
 	proto native int PresetCount(); // count of presets
-	proto native string PresetName( int index ); // name of selected preset
+	proto native owned string PresetName( int index ); // name of selected preset
 
 	proto native int SortingCount();				// sorting group count
-	proto native string SortingName( int index );	// sorting group name
+	proto native owned string SortingName( int index );	// sorting group name
 
 	proto native void Export();	// export XML (user) configuration
+	
+	proto native void Backlit_None(); // turn off backlit
+	proto native void Backlit_Background( int eType, int iColor1, int iColor2 ); // start backlit
+	proto native void Backlit_Animation( string strName, float fLifeTime, int iColor1, int iColor2 ); // start backlit animation and after time limit -> continue with another one
+	proto native bool Backlit_Enabled(); // check whether backlit active
+	proto native void Backlit_KeyByHash( int uHash, int eLayer, int eType, int iColor ); // key directly (during keybinding process) (EUABACKLIT_*)
+	proto native void Backlit_KeyByName( string strName, int eLayer, int eType, int iColor ); // key directly (by name) (EUABACKLIT_*)
+	proto native void Backlit_Remove( int eLayer ); // turn off layer of backlit
+	proto native void Backlit_ForceUpdate(); // this forces update immediately - USE ONLY IN LOADING SEQUENCE !!!
+	proto native void Backlit_EmptyQueue(); // empty queue of animations - use if you want to play something immediately
+
 };
 
 proto native UAInputAPI GetUApi();
 
 // -------------------------------------------------------------------------
-
-/*
-	ECE_SETUP									= BITF(1),	// process full entity setup (when creating NEW entity)
-	ECE_TRACE									= BITF(2),	// trace under entity when being placed
-	ECE_CENTER								= BITF(3),	// placement center
-	ECE_POINTAREA							= BITF(4),	// use point are when placing (otherwise point directly)
-	ECE_UPDATEPATHGRAPH				= BITF(5),	// update navmesh data after creation
-	ECE_RETRACEPOINT					= BITF(6),	// trace point placement
-	ECE_FORCE									= BITF(7),	// force spawn (ignore checks)
-	ECE_EQUIP									= BITF(8),	// equip with configured attachments/ cargo
-	ECE_ROTATIONFLAGS					= BITF(9),	// to enable rotation flags
-	ECE_OVERRIDEHERDLIMIT			= BITF(10),	// override spawn limit when spawning herd (herd will be bigger)
-
-	ECE_FULL									= ECE_TRACE|ECE_ROTATIONFLAGS|ECE_EQUIP, // basic spawn flags for most of CE stuff
-*/	
-/*const int CESPAWN_NONE							= 0;	// 
+// object (SF) Spawn Flags (use to setup behavior and/ or trigger functionality)
+//
+const int ECE_NONE							= 0;
 	
-const int CESPAWN_SETUP							= 1;	// 
-const int CESPAWN_TRACE							= 2;	// 
-const int CESPAWN_CENTER						= 4;	// 
-const int CESPAWN_POINTAREA						= 8;	// 
-const int CESPAWN_UPDATEPATHGRAPH				= 16;	// 
-const int CESPAWN_RETRACEPOINT					= 32;	// 
-const int ECE_FORCE_POINTKEEP					= 64;	// 
-const int CESPAWN_EQUIP							= 128;	// 
-const int CESPAWN_ROTATIONFLAGS					= 256;	// 
+const int ECE_SETUP							= 2;	// process full entity setup (when creating NEW entity)
+const int ECE_TRACE							= 4;	// trace under entity when being placed (from the point of creation)
+const int ECE_CENTER						= 8;	// use center from shape (model) for placement
 
-const int CESPAWN_NOSURFACEALIGN				= 262144;	// do not use surface align (enabled by default)
+const int ECE_UPDATEPATHGRAPH				= 32;	// update navmesh when object placed upon it
 
-const int CESPAWN_OVERRIDEHERDLIMIT				= -1;	// todo:
+const int ECE_EQUIP							= 256;	// equip with configured attachments/ cargo
+const int ECE_ROTATIONFLAGS					= 512;	// enable rotation flags for object placement
+const int ECE_CREATEPHYSICS					= 1024;	// create collision envelope and related physics data (if object has them)
+const int ECE_AIRBORNE						= 4096;	// create flying unit in the air
 
-const int CESPAWN_FULL							= 386;	// TRACE + ROTATIONFLAGS + EQUIP
-*/
+const int ECE_NOSURFACEALIGN				= 262144;	// do not align object on surface/ terrain
+const int ECE_KEEPHEIGHT					= 524288;	// keep height when creating object (do not use trace or placement on surface)
+
+// note: use predefined combination when not solving something specific
+//
+const int ECE_IN_INVENTORY					= 787456;	// ECE_CREATEPHYSICS|ECE_KEEPHEIGHT|ECE_NOSURFACEALIGN
+const int ECE_PLACE_ON_SURFACE				= 1060;		// ECE_CREATEPHYSICS|ECE_UPDATEPATHGRAPH|ECE_TRACE
+const int ECE_OBJECT_SWAP					= 787488;	// ECE_CREATEPHYSICS|ECE_UPDATEPATHGRAPH|ECE_KEEPHEIGHT|ECE_NOSURFACEALIGN
+
+
+// -------------------------------------------------------------------------
+// object (RF) Rotation Flags (use to force and/ or invoke placement rotation)
+//
+const int	RF_NONE					= 0;
+
+const int	RF_FRONT				= 1;	// front side placement
+const int	RF_TOP					= 2;	// top side placement
+const int	RF_LEFT					= 4;	// left side placement
+const int	RF_RIGHT				= 8;	// right side placement
+const int	RF_BACK					= 16;	// back side placement
+const int	RF_BOTTOM				= 32;	// bottom side placement
+
+const int	RF_ALL					= 63;	// RF_FRONT|RF_TOP|RF_LEFT|RF_RIGHT|RF_BACK|RF_BOTTOM
+
+const int	RF_IGNORE				= 64;	// ignore placement RF flags - object will spawn as model was created
+
+const int	RF_TOPBOTTOM			= 34;	// RF_TOP|RF_BOTTOM
+const int	RF_LEFTRIGHT			= 12;	// RF_LEFT|RF_RIGHT
+const int	RF_FRONTBACK			= 17;	// RF_FRONT|RF_BACK
+
+const int	RF_RANDOMROT			= 64;	// allow random rotation around axis when placing
+const int	RF_ORIGINAL				= 128;	// use default placement setuped on object in config
+const int	RF_DECORRECTION			= 256;	// angle correction when spawning InventoryItem at Building angle
+const int	RF_DEFAULT				= 512;	// use default placement setuped on object in config
+
 
 class CETesting
 {
@@ -1047,7 +1062,7 @@ class CETesting
 
 	proto native void SpawnGroup( string sEvName, vector vPos );
 	proto native void SpawnDE( string sEvName, vector vPos, float fAngle ); /* THIS WILL BE OBSOLETE OR PREFERABLY DEFAULT? */
-//	proto native void SpawnDE_WIP( string sEvName, vector vPos, float fAngle, int uFlags );
+	proto native void SpawnDE_WIP( string sEvName, vector vPos, float fAngle, int uFlags );
 	proto native void SpawnLoot( string sEvName, vector vPos, float fAngle, int iCount, float fRange );
 
 	proto native void SpawnDynamic( vector vPos, bool bShowCylinders );
@@ -1102,7 +1117,7 @@ typedef Link<Object> OLinkT;
  **/
 EntityAI SpawnEntity (string object_name, notnull InventoryLocation inv_loc)
 {
-	return GameInventory.LocationCreateEntity(inv_loc, object_name);
+	return GameInventory.LocationCreateEntity(inv_loc, object_name,ECE_IN_INVENTORY,RF_DEFAULT);
 }
 
 class Static : Object

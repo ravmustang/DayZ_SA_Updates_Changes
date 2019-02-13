@@ -1,22 +1,20 @@
-PanelWidgetClass closable_header_root {
+FrameWidgetClass closable_header_root {
  clipchildren 0
  ignorepointer 0
- color 0.1882 0.1882 0.1882 1
  position 0 0
- size 1 42
+ size 1 48
  halign center_ref
  hexactpos 1
  vexactpos 1
  hexactsize 0
  vexactsize 1
- fixaspect inside
  draggable 1
  scriptclass ""
  {
-  FrameWidgetClass PanelWidget {
+  ImageWidgetClass PanelWidget {
    clipchildren 0
    ignorepointer 1
-   color 0.298 0.298 0.298 1
+   color 0 0 0 0.8
    position 0 0
    size 1 1
    halign center_ref
@@ -25,12 +23,17 @@ PanelWidgetClass closable_header_root {
    hexactsize 0
    vexactsize 0
    priority 8
+   image0 "set:dayz_gui image:inv_header_1"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
    {
     ImageWidgetClass collapse_button {
      visible 1
      clipchildren 0
      position 10 0
-     size 42 42
+     size 30 30
      halign right_ref
      valign center_ref
      hexactpos 1
@@ -42,6 +45,8 @@ PanelWidgetClass closable_header_root {
      image0 "set:dayz_gui image:icon_x"
      mode additive
      "src alpha" 1
+     "no wrap" 0
+     stretch 0
     }
     TextWidgetClass TextWidget0 {
      ignorepointer 1
@@ -59,6 +64,7 @@ PanelWidgetClass closable_header_root {
      "text offset" 10 0
      "exact text" 1
      "exact text size" 20
+     "text halign" center
      "text valign" center
     }
     PanelWidgetClass Dropzone {
@@ -77,7 +83,7 @@ PanelWidgetClass closable_header_root {
      ignorepointer 1
      color 0.6235 0.6235 0.6235 1
      position 62 0
-     size 42 42
+     size 49 48
      halign right_ref
      valign center_ref
      hexactpos 1
@@ -114,7 +120,7 @@ PanelWidgetClass closable_header_root {
      }
     }
     ItemPreviewWidgetClass Render {
-     clipchildren 0
+     clipchildren 1
      ignorepointer 1
      color 0.702 0.702 0.702 1
      size 1 1
@@ -132,7 +138,7 @@ PanelWidgetClass closable_header_root {
      disabled 1
      clipchildren 0
      ignorepointer 1
-     position 100 0
+     position 50 0
      size 0.1 0.6
      halign right_ref
      valign center_ref
@@ -154,7 +160,7 @@ PanelWidgetClass closable_header_root {
   }
   ItemPreviewWidgetClass Drag_Render {
    visible 0
-   clipchildren 0
+   clipchildren 1
    ignorepointer 1
    position 0 0
    size 0 0
@@ -164,17 +170,34 @@ PanelWidgetClass closable_header_root {
    vexactsize 1
    draggable 0
    {
-    SmartPanelWidgetClass Color {
+    ImageWidgetClass Color {
      clipchildren 0
      ignorepointer 1
-     color 0.298 0.298 0.298 1
+     color 1 1 1 0.0392
      position 0 0
      size 1 1
      hexactpos 0
      vexactpos 0
      hexactsize 0
      vexactsize 0
-     style GrungeBorder
+     mode additive
+     "src alpha" 1
+    }
+    PanelWidgetClass Selected {
+     visible 1
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 999
+     draggable 0
+     style Outline
     }
    }
   }

@@ -5,7 +5,6 @@ class WeaponFireAndChamberNext extends WeaponStateBase
 
 	float m_dtAccumulator;
 	ref WeaponFire m_fire;
-	ref WeaponEjectCasingAndChamberFromAttMag_W4T m_chamberNext;
 
 	void WeaponFireAndChamberNext (Weapon_Base w = NULL, WeaponStateBase parent = NULL, WeaponActions action = WeaponActions.NONE, int actionType = -1, int alternativeType = -1)
 	{
@@ -14,7 +13,6 @@ class WeaponFireAndChamberNext extends WeaponStateBase
 
 		// setup nested state machine
 		m_fire = new WeaponFireAndChamber(m_weapon, this, m_action, m_actionType, alternativeType);
-		//m_chamberNext = new WeaponEjectCasingAndChamberFromAttMag_W4T(m_weapon, this);
 
 		// events
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
@@ -24,7 +22,6 @@ class WeaponFireAndChamberNext extends WeaponStateBase
 		m_fsm = new WeaponFSM(this); // @NOTE: set owner of the submachine fsm
 
 		// transitions
-		//m_fsm.AddTransition(new WeaponTransition(m_fire       , __be_, m_chamberNext));
 		m_fsm.AddTransition(new WeaponTransition(m_fire, _fin_, NULL));
 		m_fsm.AddTransition(new WeaponTransition(m_fire, __to_, NULL));
 

@@ -11,27 +11,14 @@ class ActionEmptyBottleBaseCB : ActionContinuousBaseCB
 	{
 		super.OnAnimationEvent( pEventID );
 				
-		Bottle_Base vessel_in_hands = Bottle_Base.Cast( m_ActionData.m_MainItem );
-		
 		switch (pEventID)
 		{
 			case UA_ANIM_EVENT:			
-				if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
-				{		
-					//local singleplayer
-					Print("OnAnimationEvent IsServer single");
-					vessel_in_hands.PlayEmptyingLoopSound();
-				}
-			
-				if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-				{			
-					Print("OnAnimationEvent IsServer ");
-					vessel_in_hands.PlayEmptyingLoopSound();				
-				}
-			
-				if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-				{			
-					
+				if ( !GetGame().IsMultiplayer() || GetGame().IsServer() )
+				{
+					Bottle_Base vessel_in_hands = Bottle_Base.Cast( m_ActionData.m_MainItem );
+					Param1<bool> play = new Param1<bool>( true );
+					GetGame().RPCSingleParam( vessel_in_hands, SoundType.EMPTYING, play, true );
 				}
 
 			break;
@@ -42,24 +29,11 @@ class ActionEmptyBottleBaseCB : ActionContinuousBaseCB
 	{
 		super.EndActionComponent();
 		
-		Bottle_Base vessel_in_hands = Bottle_Base.Cast( m_ActionData.m_MainItem );
-
-		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+		if ( !GetGame().IsMultiplayer() || GetGame().IsServer() )
 		{
-			//local singleplayer
-			Print("EndActionComponent IsServer single");
-			vessel_in_hands.StopEmptyingSound();
-		}
-		
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{			
-			Print("EndActionComponent IsServer ");
-			vessel_in_hands.StopEmptyingSound();				
-		}
-		
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{		
-		
+			Bottle_Base target_vessel = Bottle_Base.Cast( m_ActionData.m_MainItem );
+			Param1<bool> play = new Param1<bool>( false );
+			GetGame().RPCSingleParam( target_vessel, SoundType.EMPTYING, play, true );
 		}
 	}
 };
@@ -131,7 +105,6 @@ class ActionEmptyBottleBase: ActionContinuousBase
 		}
 		return false;
 	}
-	
 	
 	/*override void OnCompleteLoopServer( ActionData action_data )
 	{

@@ -43,4 +43,14 @@ class ActionAttachOnProxy: ActionAttach
 		
 		return false;
 	}
+	
+	override void OnExecuteClient( ActionData action_data )
+	{
+		super.OnExecuteClient( action_data );
+		
+		if ( action_data.m_Player.IsPlacingLocal() )
+		{
+			action_data.m_Player.TogglePlacingLocal();
+		}
+	}
 }

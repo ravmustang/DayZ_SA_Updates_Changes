@@ -390,6 +390,8 @@ class WidgetEventHandler: ScriptedWidgetEventHandler
 		}
 
 		Param param2 = new Param4<Widget, int, int, Widget>( w, x, y, reciever );
+		Print( param.param2 );
+		Print( param.param1 );
 		GetGame().GameScript.CallFunctionParams( param.param1, param.param2, NULL, param2 );
 
 		return true;

@@ -83,8 +83,8 @@ class IconsContainer: Container
 			Icon icon = m_EntitiesMap.GetElement( i );
 			icon.SetSort( i );
 			icon.SetPos( (i % 5)*2, (i / 5)*2 );
-			icon.m_posX = (i % 5)*2;
-			icon.m_posY = (i / 5)*2;
+			icon.SetPosX( (i % 5) * 2 );
+			icon.SetPosY( (i / 5) * 2 );
 		}
 	}
 	

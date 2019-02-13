@@ -1,6 +1,6 @@
 class NightLightPrototype extends ItemBase
 {
-	PlayerNightGlow m_Light;
+	PlayerNightLight m_Light;
 	float m_Timer = 0;
 	
 	void NightLightPrototype()
@@ -10,8 +10,11 @@ class NightLightPrototype extends ItemBase
 	
 	override void OnWorkStart()
 	{
-		vector pos = GetGame().GetCurrentCameraPosition();
-		m_Light = PlayerNightGlow.Cast( GetGame().CreateObject("PlayerNightGlow", pos, true) );
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // Client side
+		{
+			vector pos = GetGame().GetCurrentCameraPosition();
+			m_Light = PlayerNightLight.Cast( ScriptedLightBase.CreateLight(PlayerNightLight, pos) );
+		}
 	}
 	
 	override void OnWorkStop()

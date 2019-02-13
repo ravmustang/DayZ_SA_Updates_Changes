@@ -1,0 +1,1 @@
+class PoliceJacketOrel extends Clothing {};

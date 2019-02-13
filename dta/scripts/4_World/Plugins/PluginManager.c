@@ -54,6 +54,8 @@ class PluginManager
 		RegisterPlugin( "PluginTransmissionAgents",				true, 	true );
 		RegisterPlugin( "PluginAdditionalInfo",					true,	true ); //TODO clean up after Gamescom
 		RegisterPlugin( "PluginConfigEmotesProfile",			true, 	true );
+		RegisterPlugin( "PluginPresenceNotifier",				true,	false );
+		RegisterPlugin( "PluginAdminLog",						false, 	true );
 		
 		// Only In Debug / Internal
 		RegisterPluginDebug( "PluginConfigViewer",				true, 	true );
@@ -79,9 +81,9 @@ class PluginManager
 		RegisterPluginDebug( "PluginRemotePlayerDebugClient",	true,	false );
 		RegisterPluginDebug( "PluginRemotePlayerDebugServer",	false,	true );
 		RegisterPluginDebug( "PluginDrawCheckerboard",			true,	false );
-		RegisterPluginDebug( "PluginPresenceNotifier",			true,	false );
 		//RegisterPluginDebug( "PluginSoundDebug",				false,	false );
 		RegisterPluginDebug( "PluginCameraTools",					true, 	true );
+		RegisterPluginDebug( "PluginNutritionDumper",				true, 	false );
 		
 		GetGame().GetUpdateQueue(CALL_CATEGORY_GAMEPLAY).Insert(this.MainOnUpdate);
 	}

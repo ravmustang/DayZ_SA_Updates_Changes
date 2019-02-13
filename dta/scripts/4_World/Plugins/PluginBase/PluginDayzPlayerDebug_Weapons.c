@@ -118,8 +118,9 @@ class PluginDayzPlayerDebug_Weapons
 		PluginDayzPlayerDebug_AbilityConfig("Chamb 2 Bullets Start", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_TWOBULLETS_START),
 		PluginDayzPlayerDebug_AbilityConfig("Chamb 2 Bullets End", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_TWOBULLETS_END),
 
-		PluginDayzPlayerDebug_AbilityConfig("Chamb Loopable Start Opened", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED),
 		PluginDayzPlayerDebug_AbilityConfig("Chamb Loopable Start Closed", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED),
+		PluginDayzPlayerDebug_AbilityConfig("Chamb Loopable Start Closed keep bullet", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP),
+		PluginDayzPlayerDebug_AbilityConfig("Chamb Loopable Start Opened", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED),
 		PluginDayzPlayerDebug_AbilityConfig("Chamb Loopable End", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE),
 		
 		PluginDayzPlayerDebug_AbilityConfig("Chamb Loopable Shotgun Start Uncocked", WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_SHOTGUN_UNCOCKED),

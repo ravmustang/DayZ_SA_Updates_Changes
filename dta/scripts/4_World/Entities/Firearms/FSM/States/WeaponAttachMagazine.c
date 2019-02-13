@@ -74,9 +74,9 @@ class WeaponAttachingMagStartAction extends WeaponStartAction
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!OptionalLocationReadFromContext(m_newSrc, ctx))
@@ -182,9 +182,9 @@ class RemoveNewMagazineFromInventory extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_newMagazine))
@@ -224,6 +224,7 @@ class WeaponAttachMagazine extends WeaponStateBase
 	ref AttachNewMagazine m_attach;
 	ref WeaponChamberFromAttMag_W4T m_chamber;
 	ref WeaponCharging_CK m_onCK;
+	ref WeaponEjectCasing m_eject;
 
 	void WeaponAttachMagazine (Weapon_Base w = NULL, WeaponStateBase parent = NULL, WeaponActions action = WeaponActions.NONE, int actionType = -1)
 	{
@@ -232,6 +233,7 @@ class WeaponAttachMagazine extends WeaponStateBase
 
 		// setup nested state machine
 		m_start = new WeaponAttachingMagStartAction(m_weapon, this, m_action, m_actionType);
+		m_eject = new WeaponEjectCasing(m_weapon, this);
 		m_getNew = new RemoveNewMagazineFromInventory_OnEntryShowMag(m_weapon, this);
 		m_attach = new AttachNewMagazine(m_weapon, this);
 		m_chamber = new WeaponChamberFromAttMag_W4T(m_weapon, this);
@@ -240,6 +242,7 @@ class WeaponAttachMagazine extends WeaponStateBase
 		// events: MS, MA, BE, CK
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
 		WeaponEventBase __ms_ = new WeaponEventAnimMagazineShow;
+		WeaponEventBase __so_ = new WeaponEventAnimSliderOpen;
 		WeaponEventBase __ma_ = new WeaponEventAnimMagazineAttached;
 		//WeaponEventBase __be_ = new WeaponEventAnimBulletEject;
 		WeaponEventBase __ck_ = new WeaponEventAnimCocked;
@@ -247,6 +250,8 @@ class WeaponAttachMagazine extends WeaponStateBase
 		m_fsm = new WeaponFSM(this); // @NOTE: set owner of the submachine fsm
 
 		m_fsm.AddTransition(new WeaponTransition(   m_start, __ms_, m_getNew));
+		m_fsm.AddTransition(new WeaponTransition(   m_start, __so_, m_eject));
+		m_fsm.AddTransition(new WeaponTransition(   m_eject, __ms_, m_getNew));
 		m_fsm.AddTransition(new WeaponTransition(  m_getNew, __ma_, m_attach));
 		m_fsm.AddTransition(new WeaponTransition(  m_attach, __ck_, m_chamber, NULL, new GuardAnd(new WeaponGuardChamberEmpty(m_weapon), new WeaponGuardHasAmmo(m_weapon)))); // when opened, there is no __be_ event
 		m_fsm.AddTransition(new WeaponTransition(  m_attach, __ck_, m_onCK, NULL, new GuardAnd(new WeaponGuardChamberEmpty(m_weapon), new GuardNot(new WeaponGuardHasAmmo(m_weapon)))));
@@ -304,9 +309,9 @@ class WeaponAttachMagazine extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_newMagazine))

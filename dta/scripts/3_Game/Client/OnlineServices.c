@@ -545,7 +545,7 @@ class OnlineServices
 			}
 			else
 			{
-				GetGame().GetUIManager().ShowDialog( "SERVERS UNAVALIABLE", "#str_xbox_authentification_fail", 232, DBT_OK, DBB_NONE, DMT_INFO, GetGame().GetUIManager().GetMenu() );
+				GetGame().GetUIManager().ShowDialog( "#str_xbox_authentification_fail_title", "#str_xbox_authentification_fail", 232, DBT_OK, DBB_NONE, DMT_INFO, GetGame().GetUIManager().GetMenu() );
 			}
 		}
 		
@@ -558,7 +558,7 @@ class OnlineServices
 		}
 		else
 		{
-			GetGame().GetUIManager().ShowDialog( "SERVERS UNAVALIABLE", "#xbox_authentification_fail", 232, DBT_OK, DBB_NONE, DMT_INFO, GetGame().GetUIManager().GetMenu() );
+			GetGame().GetUIManager().ShowDialog( "#str_xbox_authentification_fail_title", "#xbox_authentification_fail", 232, DBT_OK, DBB_NONE, DMT_INFO, GetGame().GetUIManager().GetMenu() );
 		}
 	}
 	

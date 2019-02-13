@@ -43,20 +43,37 @@ class FireplaceIndoor extends FireplaceBase
 		ctx.Write( m_SmokePosZ );
 	}
 
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
 
+		//--- Fireplace Indoor data ---
 		//fire point name
-		ctx.Read( m_FirePointIndex );
+		if( !ctx.Read( m_FirePointIndex ) )
+		{
+			m_FirePointIndex = 1;		//set default
+		}
 		
 		//smoke position
-		ctx.Read( m_SmokePosX );
-		ctx.Read( m_SmokePosY );
-		ctx.Read( m_SmokePosZ );
-
+		if ( !ctx.Read( m_SmokePosX ) )
+		{
+			m_SmokePosX = 0;		//set default
+		}
+		if ( !ctx.Read( m_SmokePosY ) )
+		{
+			m_SmokePosY = 0;		//set default
+		}
+		if ( !ctx.Read( m_SmokePosZ ) )
+		{
+			m_SmokePosZ = 0;		//set default
+		}
+		//---
+		
 		//synchronize
 		Synchronize();
+
+		return true;
 	}
 	
 	//================================================================
@@ -77,7 +94,7 @@ class FireplaceIndoor extends FireplaceBase
 	static bool CanPlaceFireplaceInSelectedSpot( Object building, int fire_point_index, out vector fire_point_pos_world )
 	{
 		//Get fire point index position
-		vector fire_point_pos = building.GetSelectionPosition( FIREPOINT_FIRE_POSITION + fire_point_index.ToString() );
+		vector fire_point_pos = building.GetSelectionPositionMS( FIREPOINT_FIRE_POSITION + fire_point_index.ToString() );
 		fire_point_pos_world = building.ModelToWorld( fire_point_pos );
 		
 		//check if there is any FireplaceIndoor objects near selected fire point

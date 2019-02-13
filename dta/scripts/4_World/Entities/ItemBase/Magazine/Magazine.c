@@ -282,6 +282,8 @@ class Magazine : InventoryItemSuper
 				other_magazine.ServerAcquireCartridge(damage, cartrige_name);
 				this.ServerStoreCartridge(damage, cartrige_name);
 			}
+			other_magazine.SetSynchDirty();
+			SetSynchDirty();
 		}
 	}
 	

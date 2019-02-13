@@ -115,7 +115,7 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 
 	void OnShow()
 	{
-		m_MainWidget.Show( true );
+		m_RootWidget.Show( true );
 		if( m_ParentWidget )
 		{
 			m_ParentWidget.Show( true );
@@ -124,12 +124,12 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 
 	void OnHide()
 	{
-		m_MainWidget.Show( false );
+		m_RootWidget.Show( false );
 	}
 
 	void Refresh()
 	{
-		m_MainWidget.Update();
+		m_RootWidget.Update();
 	}
 	
 	void InspectItem(InventoryItem item)
@@ -148,7 +148,8 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 		if( !m_Cache )
 		{
 			MissionGameplay mission = MissionGameplay.Cast( GetGame().GetMission() );
-			m_Cache = mission.GetWidgetCache();
+			if( mission )
+				m_Cache = mission.GetWidgetCache();
 		}
 		return m_Cache;
 	}

@@ -72,6 +72,8 @@ class ActionGetOutTransport: ActionInteractBase
 					}
 					//action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 					//action_data.m_Player.GetItemAccessor().OnItemInHandsChanged();
+					
+					GetDayZGame().GetBacklit().OnLeaveCar();									
 				}
 			}
 		}

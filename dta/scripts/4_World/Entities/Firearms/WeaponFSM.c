@@ -66,7 +66,7 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 		return null;
 	}
 
-	protected bool LoadAndSetCurrentFSMState (ParamsReadContext ctx)
+	protected bool LoadAndSetCurrentFSMState (ParamsReadContext ctx, int version)
 	{
 		int curr_state_id = -1;
 		if (!ctx.Read(curr_state_id))
@@ -91,23 +91,23 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 	/**@fn		LoadCurrentFSMState
 	 * @brief	load current state of fsm
 	 **/
-	bool LoadCurrentFSMState (ParamsReadContext ctx)
+	bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (LoadAndSetCurrentFSMState(ctx))
-			return m_State.LoadCurrentFSMState(ctx);
+		if (LoadAndSetCurrentFSMState(ctx, version))
+			return m_State.LoadCurrentFSMState(ctx, version);
 		return false;
 	}
 	
-	bool LoadCurrentUnstableFSMState (ParamsWriteContext ctx)
+	bool LoadCurrentUnstableFSMState (ParamsWriteContext ctx, int version)
 	{
-		if (LoadAndSetCurrentFSMState(ctx))
+		if (LoadAndSetCurrentFSMState(ctx, version))
 		{
 			// read all substates
 			int state_count = m_UniqueStates.Count();
 			for (int idx = 0; idx < state_count; ++idx)
 			{
 				wpnDebugSpam("[wpnfsm] LoadCurrentUnstableFSMState - loading unique state " + idx + "/" + state_count + " with id=" + m_UniqueStates.Get(idx).GetInternalStateID() + " state=" + m_UniqueStates.Get(idx));
-				if (!m_UniqueStates.Get(idx).LoadCurrentFSMState(ctx))
+				if (!m_UniqueStates.Get(idx).LoadCurrentFSMState(ctx, version))
 					Error("[wpnfsm] LoadCurrentUnstableFSMState - cannot load unique state " + idx + "/" + state_count + " with id=" + m_UniqueStates.Get(idx).GetInternalStateID() + " state=" + m_UniqueStates.Get(idx));
 			}
 			return true;
@@ -171,7 +171,7 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 	/**@fn		OnStoreLoad
 	 * @brief	load state of fsm
 	 **/
-	void OnStoreLoad (ParamsReadContext ctx, int version)
+	bool OnStoreLoad (ParamsReadContext ctx, int version)
 	{
 		int id = 0;
 		ctx.Read(id);
@@ -185,6 +185,8 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 		{
 			Print("[wpnfsm] Warning! OnStoreLoad - cannot load curent weapon state, id=" + id);
 		}
+
+		return true;
 	}
 
 	/**@fn		GetCurrentStateID

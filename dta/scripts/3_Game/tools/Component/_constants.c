@@ -12,9 +12,6 @@ const int PLUG_BARBED_WIRE				= 6;
 const int PLUG_GAS_CAN_SLOT				= 7;
 const int PLUG_VEHICLE_BATTERY_PINS		= 8;
 
-// Main timer for all devices
-const int CONSUME_ENERGY_INTERVAL 		= 1;
-
 // Automatic attachment actions
 const int NO_ATTACHMENT_ACTION 			= 0;
 const int PLUG_THIS_INTO_ATTACHMENT 	= 1;

@@ -84,24 +84,57 @@ class CombinationLock extends ItemBase
 		ctx.Write( m_IsLockAttached );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
 		
+		//--- Combination Lock data ---
 		//combination
 		int combination;
-		ctx.Read( combination );
+		if ( !ctx.Read( combination ) )
+		{
+			combination = 0;		//set default
+		}
+		
 		SetCombination( combination );
 		
 		//combination locked
 		int combination_locked;
-		ctx.Read( combination_locked );
+		if ( !ctx.Read( combination_locked ) )
+		{
+			combination_locked = 0;
+		}
 		SetCombinationLocked( combination_locked );
 		
 		//lock attached
-		int is_lock_attached;
-		ctx.Read( is_lock_attached );
-		SetLockAttachedState( is_lock_attached );		
+		bool is_lock_attached;
+		Fence fence = Fence.Cast( GetHierarchyParent() );
+		if ( !ctx.Read( is_lock_attached ) )
+		{
+			//is attached to base building object
+			
+			if ( fence )
+			{
+				//check for gate part
+				is_lock_attached = fence.HasGate();
+			}
+		}
+		//failsafe check when data are not loaded properly
+		//do check for lock not attached but locked
+		if ( is_lock_attached )
+		{
+			if ( fence && !fence.HasGate() )
+			{
+				InventoryLocation inventory_location = new InventoryLocation;
+				GetInventory().GetCurrentInventoryLocation( inventory_location );		
+				fence.GetInventory().SetSlotLock( inventory_location.GetSlot(), false );
+			}
+		}
+		SetLockAttachedState( is_lock_attached );
+		//---
+		
+		return true;
 	}
 	
 	// --- SYNCHRONIZATION

@@ -538,5 +538,190 @@ ImageSetClass {
   }
  }
  Groups {
+  ImageSetGroupClass AttachmentCategory {
+   Name "AttachmentCategory"
+   Images {
+    ImageSetDefClass cat_bb_base {
+     Name "cat_bb_base"
+     Pos 1773 233
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_material {
+     Name "cat_bb_material"
+     Pos 1773 430
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_attachments {
+     Name "cat_bb_attachments"
+     Pos 1773 627
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_1 {
+     Name "cat_bb_level_1"
+     Pos 1773 824
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_1_wall_1 {
+     Name "cat_bb_level_1_wall_1"
+     Pos 1773 1021
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_1_wall_2 {
+     Name "cat_bb_level_1_wall_2"
+     Pos 1773 1218
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_1_wall_3 {
+     Name "cat_bb_level_1_wall_3"
+     Pos 1773 1415
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_camonet {
+     Name "cat_camonet"
+     Pos 198 37
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_christmaslights {
+     Name "cat_christmaslights"
+     Pos 788 1415
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_tan_leather {
+     Name "cat_tan_leather"
+     Pos 1773 1809
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bleach_cotton {
+     Name "cat_bleach_cotton"
+     Pos 1773 1612
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_color_leather {
+     Name "cat_color_leather"
+     Pos 1773 2203
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_color_cotton {
+     Name "cat_color_cotton"
+     Pos 1773 2006
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_fp_cooking {
+     Name "cat_fp_cooking"
+     Pos 1576 1809
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_fp_upgrade {
+     Name "cat_fp_upgrade"
+     Pos 985 1809
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_fp_fuel {
+     Name "cat_fp_fuel"
+     Pos 1576 2006
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_fp_kindling {
+     Name "cat_fp_kindling"
+     Pos 1576 2203
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_gp_filling {
+     Name "cat_gp_filling"
+     Pos 0 627
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_vehicle_engine {
+     Name "cat_vehicle_engine"
+     Pos 591 1021
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_vehicle_body {
+     Name "cat_vehicle_body"
+     Pos 591 1415
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_vehicle_chassis {
+     Name "cat_vehicle_chassis"
+     Pos 591 1218
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_3 {
+     Name "cat_bb_level_3"
+     Pos 197 430
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_3_wall_1 {
+     Name "cat_bb_level_3_wall_1"
+     Pos 394 430
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_3_wall_2 {
+     Name "cat_bb_level_3_wall_2"
+     Pos 394 627
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_2_wall_3 {
+     Name "cat_bb_level_2_wall_3"
+     Pos 591 627
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_2 {
+     Name "cat_bb_level_2"
+     Pos 788 430
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_2_wall_1 {
+     Name "cat_bb_level_2_wall_1"
+     Pos 985 233
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_2_wall_2 {
+     Name "cat_bb_level_2_wall_2"
+     Pos 985 430
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_bb_level_2_wall_3 {
+     Name "cat_bb_level_2_wall_3"
+     Pos 985 627
+     Size 197 197
+     Flags 0
+    }
+    ImageSetDefClass cat_common_cargo {
+     Name "cat_common_cargo"
+     Pos 1182 430
+     Size 197 197
+     Flags 0
+    }
+   }
+  }
  }
 }

@@ -135,9 +135,9 @@ class ShotgunChambering extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_srcMagazine))
@@ -156,11 +156,18 @@ class ShotgunChambering extends WeaponStateBase
  **/
 class Mp133Shotgun : Rifle_Base
 {
-	ref WeaponStateBase E;
-ref WeaponStateBase F;
-ref WeaponStateBase L;
-ref WeaponStateBase J;
+	//ref Magazine m_InnerMagazine;
 	
+	ref WeaponStateBase E;
+	ref WeaponStateBase F;
+	ref WeaponStateBase L;
+	ref WeaponStateBase J;
+	
+	void Mp133Shotgun ()
+	{
+		//m_InnerMagazine = new Magazine;
+		//m_InnerMagazine.m_ChanceToJam = 
+	}
 	
 	override RecoilBase SpawnRecoilObject()
 	{
@@ -207,10 +214,10 @@ ref WeaponStateBase J;
 		WeaponStateBase		Trigger_L = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL, WeaponActionFireTypes.FIRE_JAM);
 		WeaponStateBase		Trigger_J = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
 		// extend Rifle_Base fsm
-		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering psh = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering lch2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
-		LoopedChambering psh2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
+		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering psh = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP	, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering lch2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
+		LoopedChambering psh2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP	, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
 		*/
 		
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
@@ -265,25 +272,9 @@ ref WeaponStateBase J;
 		m_fsm.AddTransition(new WeaponTransition( Chamber_F,	_fin_,  L));
 		m_fsm.AddTransition(new WeaponTransition( Chamber_F,	_abt_,  F, NULL, new WeaponGuardChamberFiredOut(this)));
 		m_fsm.AddTransition(new WeaponTransition( Chamber_F,	_abt_,  L));
+
 		
-//----------------------------------------		
-		
-/*		m_fsm.AddTransition(new WeaponTransition( C0,			__lS_,  LChamber_C0));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_C0,	_fin_,  C1));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_C0,	_abt_,  C0, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_C0,	_abt_,  C1));
-		
-		m_fsm.AddTransition(new WeaponTransition( C1,			__lS_,  LChamber_C1, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_C1,	_fin_,  C1));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_C1,	_abt_,  C1));
-		
-		m_fsm.AddTransition(new WeaponTransition( D1,			__lS_,  LChamber_D1));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_D1,	_fin_,  C1));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_D1,	_abt_,  D1, NULL, new WeaponGuardChamberFiredOut(this)));
-		m_fsm.AddTransition(new WeaponTransition( LChamber_D1,	_abt_,  C1));*/
-		
-//------------------------------------------
-		
+//-------------------------------------------		
 			
 		m_fsm.AddTransition(new WeaponTransition(J, 		__U__, Unjam_J));
 		m_fsm.AddTransition(new WeaponTransition(Unjam_J,	_fin_, J, NULL, new WeaponGuardJammed(this)));
@@ -323,31 +314,6 @@ ref WeaponStateBase J;
 		m_fsm.AddTransition(new WeaponTransition(Trigger_J,	_abt_, J));
 		
 //-----------------------------------------	
-
-		// load cartridge
-/*		m_fsm.AddTransition(new WeaponTransition( E_C, __lS_,  lch, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( lch, _fin_,  L_C));
-		
-		m_fsm.AddTransition(new WeaponTransition( E_C, __L__,  lch2));
-		m_fsm.AddTransition(new WeaponTransition( lch2, _fin_,  L_C));
-
-		m_fsm.AddTransition(new WeaponTransition( E_D, __lS_,  lch, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( lch, _fin_,  L_C));
-		
-		m_fsm.AddTransition(new WeaponTransition( E_D, __L__,  lch2));
-		m_fsm.AddTransition(new WeaponTransition( lch2, _fin_,  L_C));
-
-		m_fsm.AddTransition(new WeaponTransition( L_C, __lS_,  psh, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition( psh, _fin_,  L_C));
-		
-	
-		m_fsm.AddTransition(new WeaponTransition( L_C, __L__,  psh2, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition( psh2, _fin_,  L_C));
-
-		// @TODO: chci load z loaded_fired_out - nefunguje mi nejak ten m_eject
-		m_fsm.AddTransition(new WeaponTransition( E_D, __lS_, psh, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition(psh, _fin_,  L_C));
-	*/	
 		
 		m_fsm.SetInitialState(E);
 

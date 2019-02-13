@@ -1,19 +1,19 @@
 class HandsArea: LayoutHolder
 {
-	ref HandsContainer		m_HandsContainer;
-	ref AutoHeightSpacer	m_Spacer;
+	protected ScrollWidget			m_Scroller;
+	protected ref HandsContainer	m_HandsContainer;
+	protected ref SizeToChild		m_HandsResizer;
+	
+	protected bool					m_ShouldChangeSize = true;
 
 	void HandsArea( LayoutHolder parent )
 	{
-		Widget root_panel = m_MainWidget;
+		m_HandsContainer	= new HandsContainer( this );
 		
-		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
-
-		m_HandsContainer = new HandsContainer( this );
-		
-		m_MainWidget.GetScript( m_Spacer );
 		m_MainWidget.Update();
-		m_Spacer.Update();
+		
+		m_ParentWidget.GetScript( m_HandsResizer );
+		m_Scroller = ScrollWidget.Cast( m_ParentWidget );
 	}
 
 	override void SetActive( bool active )
@@ -81,29 +81,29 @@ class HandsArea: LayoutHolder
 		}
 	}
 	
-	void EquipItem()
+	bool EquipItem()
 	{
-		m_HandsContainer.EquipItem();
+		return m_HandsContainer.EquipItem();
 	}
 	
-	void SelectItem()
+	bool SelectItem()
 	{
-		m_HandsContainer.SelectItem();
+		return m_HandsContainer.SelectItem();
 	}
 
-	void Select()
+	bool Select()
 	{
-		m_HandsContainer.Select();
+		return m_HandsContainer.Select();
 	}
 	
-	void TransferItem()
+	bool TransferItem()
 	{
-		m_HandsContainer.TransferItem();
+		return m_HandsContainer.TransferItem();
 	}
 	
-	void TransferItemToVicinity()
+	bool TransferItemToVicinity()
 	{
-		m_HandsContainer.TransferItemToVicinity();
+		return m_HandsContainer.TransferItemToVicinity();
 	}
 	
 	bool IsItemActive()
@@ -123,14 +123,17 @@ class HandsArea: LayoutHolder
 
 	override void UpdateInterval()
 	{
-		float x, y;
-		GetMainWidget().GetSize( x, y );
-		if( y > 500 )
-		{
-			y = 500;
-		}
-		GetMainWidget().GetParent().SetSize( x, y );
+		m_Scroller.VScrollToPos01( m_Scroller.GetVScrollPos01() );
 		m_HandsContainer.UpdateInterval();
+		
+		bool changed_size;
+		if( m_ShouldChangeSize && m_HandsResizer.ResizeParentToChild( changed_size, InventoryMenu.GetHeight() * 0.5 ) )
+			m_Scroller.SetAlpha( 0.3921 );
+		else
+			m_Scroller.SetAlpha( 0 );
+		
+		if( changed_size )
+			m_ShouldChangeSize = false;
 	}
 
 	void RefreshQuantity( EntityAI item_to_refresh )
@@ -152,15 +155,12 @@ class HandsArea: LayoutHolder
 	{
 		super.OnShow();
 		m_HandsContainer.OnShow();
-		m_Spacer.Update();
 	}
 
 	override void Refresh()
 	{
-		super.Refresh();
 		m_HandsContainer.Refresh();
-		m_MainWidget.Update();
-		m_Spacer.Update();
+		m_ShouldChangeSize = true;
 	}
 	
 	void DraggingOverHandsPanel( Widget w, int x, int y, Widget receiver )

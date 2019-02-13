@@ -57,9 +57,13 @@ class ActionBurnSewSelf: ActionContinuousBase
 	{	
 		const float ITEM_DAMAGE = 0.05;
 		const float SHOCK_AMOUNT = 1000;
-		action_data.m_MainItem.DecreaseHealth ( "", "", action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() )*100 );
-		action_data.m_Player.m_ModifiersManager.DeactivateModifier(eModifiers.MDF_BLEEDING);		
+		
+		if (action_data.m_Player.GetBleedingManagerServer() )
+		{
+			action_data.m_Player.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();	
+		}		
 		//OlD_SHOCK//action_data.m_Player.GetStatShock().Add( action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( SHOCK_AMOUNT, this.GetSpecialtyWeight() ) );
+		action_data.m_MainItem.DecreaseHealth ( "", "", action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() )*100 );
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

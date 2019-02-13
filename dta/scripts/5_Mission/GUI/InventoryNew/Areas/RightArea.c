@@ -1,6 +1,7 @@
 class RightArea: Container
 {
 	ref PlayerContainer m_PlayerContainer;
+	
 	void RightArea( LayoutHolder parent )
 	{
 		m_MainWidget.Show( true );
@@ -24,7 +25,8 @@ class RightArea: Container
 	
 	EntityAI GetFocusedItem()
 	{
-		return m_PlayerContainer.GetFocusedItem();
+		EntityAI item = m_PlayerContainer.GetFocusedItem();
+		return item;
 	}
 	
 	PlayerContainer GetPlayerContainer()
@@ -32,39 +34,44 @@ class RightArea: Container
 		return m_PlayerContainer;
 	}
 	
+	override void DraggingOverHeader( Widget w, int x, int y, Widget receiver )
+	{
+		m_PlayerContainer.DraggingOverHeader( w, x, y, receiver );
+	}
+	
 	override void MoveGridCursor( int direction )
 	{
 		m_PlayerContainer.MoveGridCursor( direction );
 	}
 	
-	override void Select()
+	override bool Select()
 	{
-		m_PlayerContainer.Select();
+		return m_PlayerContainer.Select();
 	}
 	
-	override void SelectItem()
+	override bool SelectItem()
 	{
-		m_PlayerContainer.SelectItem();
+		return m_PlayerContainer.SelectItem();
 	}
 	
-	override void Combine()
+	override bool Combine()
 	{
-		m_PlayerContainer.Combine();
+		return m_PlayerContainer.Combine();
 	}
 	
-	override void EquipItem()
+	override bool EquipItem()
 	{
-		m_PlayerContainer.EquipItem();
+		return m_PlayerContainer.EquipItem();
 	}
 	
-	override void TransferItem()
+	override bool TransferItem()
 	{
-		m_PlayerContainer.TransferItem();
+		return m_PlayerContainer.TransferItem();
 	}
 	
-	void TransferItemToVicinity()
+	override bool TransferItemToVicinity()
 	{
-		m_PlayerContainer.TransferItemToVicinity();
+		return m_PlayerContainer.TransferItemToVicinity();
 	}
 	
 	override void UnfocusGrid()
@@ -115,10 +122,37 @@ class RightArea: Container
 	{
 		return m_PlayerContainer.IsActive( );
 	}
+	
+	override void Refresh()
+	{
+		m_PlayerContainer.Refresh();
+	}
 
 	override void SetLayoutName()
 	{
-		m_LayoutName = WidgetLayoutName.LeftArea;
+		#ifdef PLATFORM_CONSOLE
+			m_LayoutName = WidgetLayoutName.RightAreaXbox;
+		#else
+			switch( InventoryMenu.GetWidthType() )
+			{
+				case ScreenWidthType.NARROW:
+				{
+					m_LayoutName = WidgetLayoutName.RightAreaNarrow;
+					break;
+				}
+				case ScreenWidthType.MEDIUM:
+				{
+					m_LayoutName = WidgetLayoutName.RightAreaMedium;
+					break;
+				}
+				case ScreenWidthType.WIDE:
+				{
+					m_LayoutName = WidgetLayoutName.RightAreaWide;
+					break;
+				}
+			}
+		#endif
+			
 	}
 	
 	override void RefreshQuantity( EntityAI item_to_refresh )

@@ -449,6 +449,9 @@ class MissionServer extends MissionBase
 			return;
 		}
 		
+		// disable reconnecting to old char
+		GetGame().RemoveFromReconnectCache(uid);
+		
 		// now player can't cancel logout anymore, so call everything needed upon disconnect
 		InvokeOnDisconnect(player);
 		
@@ -468,7 +471,7 @@ class MissionServer extends MissionBase
 		HandleBody(player);
 		
 		// remove player from server
-		GetGame().DisconnectPlayer(identity, uid);
+		GetGame().DisconnectPlayer(identity);
 	}
 	
 	void HandleBody(PlayerBase player)

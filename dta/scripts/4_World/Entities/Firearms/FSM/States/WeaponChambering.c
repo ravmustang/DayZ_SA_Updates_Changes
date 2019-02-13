@@ -88,9 +88,9 @@ class WeaponChambering_Cartridge extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_damage))
@@ -124,6 +124,7 @@ class WeaponChambering extends WeaponStateBase
 	Magazine m_srcMagazine; /// source of the cartridge
 
 	ref WeaponStateBase m_start;
+	ref WeaponEjectCasing m_eject;
 	ref WeaponChambering_Cartridge m_chamber;
 	ref WeaponChambering_W4T m_w4t;
 
@@ -136,13 +137,17 @@ class WeaponChambering extends WeaponStateBase
 		m_start = new WeaponChambering_Start(m_weapon, this, m_action, m_actionType);
 		m_chamber = new WeaponChambering_Cartridge(m_weapon, this);
 		m_w4t = new WeaponChambering_W4T(m_weapon, this);
+		m_eject = new WeaponEjectCasing(m_weapon, this);
 		// events
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
 		WeaponEventAnimBulletInChamber __bc_ = new WeaponEventAnimBulletInChamber;
 		WeaponEventAnimBulletShow  __bs_ = new WeaponEventAnimBulletShow;
+		WeaponEventAnimBulletEject	__be_ = new WeaponEventAnimBulletEject;
 
 		m_fsm = new WeaponFSM(this); // @NOTE: set owner of the submachine fsm
+		m_fsm.AddTransition(new WeaponTransition(m_start  , __be_, m_eject, NULL, new WeaponGuardChamberFiredOut(m_weapon)));
 		m_fsm.AddTransition(new WeaponTransition(m_start  , __bs_, m_chamber));
+		m_fsm.AddTransition(new WeaponTransition(m_eject  , __bs_, m_chamber));
 		m_fsm.AddTransition(new WeaponTransition(m_chamber, __bc_, m_w4t));
 		m_fsm.AddTransition(new WeaponTransition(m_w4t    , _fin_, NULL));
 
@@ -197,9 +202,9 @@ class WeaponChambering extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_srcMagazine))

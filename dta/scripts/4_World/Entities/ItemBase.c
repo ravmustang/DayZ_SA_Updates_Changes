@@ -36,8 +36,6 @@ class ItemBase extends InventoryItem
 	int 	m_ColorComponentB;
 	int 	m_ColorComponentA;
 	//-------------------------------------------------------
-	//open / close actions
-	bool m_Opened = true;
 	
 	ref TIntArray m_SingleUseActions;
 	ref TIntArray m_ContinuousActions;
@@ -66,6 +64,9 @@ class ItemBase extends InventoryItem
 	float 								m_OverheatingDecayInterval = 1; // Timer's interval for decrementing overheat effect's lifespan
 	ref array <ref OverheatingParticle> m_OverheatingParticles;
 	
+	// inventory location management
+	//ref InventoryLocation m_OldLocation;
+	
 	// -------------------------------------------------------------------------
 	void ItemBase()
 	{
@@ -91,6 +92,7 @@ class ItemBase extends InventoryItem
 		{
 			PreLoadSoundAttachmentType();
 		}
+		m_OldLocation = null;
 	}
 	
 	void InitItemVariables()
@@ -125,7 +127,6 @@ class ItemBase extends InventoryItem
 		RegisterNetSyncVariableInt("m_ColorComponentA", 0, 255);
 		
 		RegisterNetSyncVariableBool("m_IsBeingPlaced");
-		RegisterNetSyncVariableBool("m_Opened");
 		RegisterNetSyncVariableBool("m_IsTakeable");
 	}
 	
@@ -221,15 +222,18 @@ class ItemBase extends InventoryItem
 	
 	void IncreaseOverheating(ItemBase weapon, string ammoType, ItemBase muzzle_owner, ItemBase suppressor, string config_to_search)
 	{
-		m_OverheatingShots++;
-		
-		if (!m_CheckOverheating)
-				m_CheckOverheating = new Timer( CALL_CATEGORY_SYSTEM );
-		
-		m_CheckOverheating.Stop();
-		m_CheckOverheating.Run(m_OverheatingDecayInterval, this, "OnOverheatingDecay");
-		
-		CheckOverheating(weapon, ammoType, muzzle_owner, suppressor, config_to_search);
+		if (m_MaxOverheatingValue > 0)
+		{
+			m_OverheatingShots++;
+			
+			if (!m_CheckOverheating)
+					m_CheckOverheating = new Timer( CALL_CATEGORY_SYSTEM );
+			
+			m_CheckOverheating.Stop();
+			m_CheckOverheating.Run(m_OverheatingDecayInterval, this, "OnOverheatingDecay");
+			
+			CheckOverheating(weapon, ammoType, muzzle_owner, suppressor, config_to_search);
+		}
 	}
 	
 	void CheckOverheating(ItemBase weapon = null, string ammoType = "", ItemBase muzzle_owner = null, ItemBase suppressor = null, string config_to_search = "")
@@ -256,7 +260,10 @@ class ItemBase extends InventoryItem
 	
 	void OnOverheatingDecay()
 	{
-		m_OverheatingShots--;
+		if (m_MaxOverheatingValue > 0)
+			m_OverheatingShots -= 1 + m_OverheatingShots / m_MaxOverheatingValue; // The hotter a barrel is, the faster it needs to cool down.
+		else
+			m_OverheatingShots--;
 		
 		if (m_OverheatingShots <= 0)
 		{
@@ -587,7 +594,7 @@ class ItemBase extends InventoryItem
 	{
 		m_IsHologram = is_hologram;
 	}
-	
+	/*
 	protected float GetNutritionalEnergy()
 	{
 		Edible_Base edible = Edible_Base.Cast( this );
@@ -618,27 +625,34 @@ class ItemBase extends InventoryItem
 		return edible.GetFoodToxicity();
 
 	}
-
-	NutritionalProfile GetNutritionalProfile()
-	{
-		NutritionalProfile profile; 
-		if( !IsLiquidPresent() )
-		{
-			profile = NutritionalProfile(GetNutritionalEnergy(),GetNutritionalWaterContent(),GetNutritionalIndex(),GetNutritionalFullnessIndex(), GetNutritionalToxicity());
-		}
-		else
-		{
-			int liquid_type = GetLiquidType();
-			profile = Liquid.GetNutritionalProfile(liquid_type);
-		}
-		return profile;
-		
-	}
+*/
+	
 	
 	// -------------------------------------------------------------------------
 	override void EECargoIn(EntityAI item)
 	{
 		super.EECargoIn(item);
+	}
+	
+	override void EEItemLocationChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
+	{
+		super.EEItemLocationChanged(oldLoc,newLoc);
+		if(newLoc.GetType() == InventoryLocationType.HANDS)
+		{
+			m_OldLocation = new InventoryLocation;
+			//Print("is valid? "+m_OldLocation.IsValid());
+			m_OldLocation.Copy(oldLoc);
+		}
+		//out of hands, maybe save hand inventory location here?
+		/*else
+		{
+			m_OldLocation = null;
+		}*/
+	}
+	
+	override void OnItemAttachmentSlotChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
+	{
+		
 	}
 	// -------------------------------------------------------------------------
 	override void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner)
@@ -649,7 +663,7 @@ class ItemBase extends InventoryItem
 		Man owner_player_new = NULL;
 	
 		if (old_owner)   
-		{      
+		{
 			if (old_owner.IsMan())
 			{
 				owner_player_old = Man.Cast( old_owner );
@@ -657,20 +671,20 @@ class ItemBase extends InventoryItem
 			else
 			{
 				owner_player_old = Man.Cast( old_owner.GetHierarchyRootPlayer() );
-			}   
-		}   
+			}
+		}
 		if (new_owner)
-		{     
+		{
 			if ( new_owner.IsMan() )
 			{
 				owner_player_new = Man.Cast( new_owner );
-			}      
-			else      
+			}
+			else
 			{
 				owner_player_new = Man.Cast( new_owner.GetHierarchyRootPlayer() );
-			}   
-		}   
-		if ( owner_player_old != owner_player_new )   
+			}
+		}
+		if ( owner_player_old != owner_player_new )
 		{
 			if ( owner_player_old )
 				OnInventoryExit(owner_player_old);
@@ -747,10 +761,12 @@ class ItemBase extends InventoryItem
 		//{
 		//	player.UpdateQuickBarEntityVisibility(this);
 		//}*/
+		//Print("OnWasAttached: " + GetType());
 	}
 	
 	override void OnWasDetached ( EntityAI parent, int slot_id )
-	{		
+	{
+		//Print("OnWasDetached: " + GetType());
 		PlayerBase player = PlayerBase.Cast(parent);
 		if (player)
 		{
@@ -759,53 +775,83 @@ class ItemBase extends InventoryItem
 			
 			if (this.ConfigIsExisting("ChangeIntoOnDetach"))
 			{
-				int idx = -1;
-				string slot;
-				
-				TStringArray inventory_slots = new TStringArray;
-				TStringArray detach_types = new TStringArray;
-				
-				this.ConfigGetTextArray("inventorySlot",inventory_slots);
-				if (inventory_slots.Count() < 1) //is string
-				{
-					inventory_slots.Insert(this.ConfigGetString("inventorySlot"));
-					detach_types.Insert(this.ConfigGetString("ChangeIntoOnDetach"));
-				}
-				else //is array
-				{
-					this.ConfigGetTextArray("ChangeIntoOnDetach",detach_types);
-					if (detach_types.Count() < 1)
-						detach_types.Insert(this.ConfigGetString("ChangeIntoOnDetach"));
-				}
-				
-				for (int i = 0; i < inventory_slots.Count(); i++)
-				{
-					if (InventorySlots.GetSlotIdFromString(inventory_slots.Get(i)) == slot_id)
-					{
-						slot = inventory_slots.Get(i);
-						break;
-					}
-				}
-				
-				if (slot != "")
-				{
-					if (detach_types.Count() == 1)
-						idx = 0;
-					else
-						idx = inventory_slots.Find(slot);
-				}
-				if (idx < 0)
-					return;
-				
-				if (detach_types.Get(idx) != "")
+				string str = ChangeIntoOnDetach(slot_id);
+				if (str  != "")
 				//quantity override is needed here, otherwise optional
 				{
-					TurnItemIntoItemLambda lamb = new TurnItemIntoItemLambda(this, detach_types.Get(idx), player);
+					TurnItemIntoItemLambda lamb = new TurnItemIntoItemLambda(this, str, player);
 					lamb.SetTransferParams(true, true, true, false,1);
 					MiscGameplayFunctions.TurnItemIntoItemEx(player, lamb);
 				}
 			}
 		}
+	}
+	
+	override string ChangeIntoOnAttach(string slot)
+	{
+		int idx;
+		TStringArray inventory_slots = new TStringArray;
+		TStringArray attach_types = new TStringArray;
+		
+		ConfigGetTextArray("inventorySlot",inventory_slots);
+		if (inventory_slots.Count() < 1) //is string
+		{
+			inventory_slots.Insert(ConfigGetString("inventorySlot"));
+			attach_types.Insert(ConfigGetString("ChangeIntoOnAttach"));
+		}
+		else //is array
+		{
+			ConfigGetTextArray("ChangeIntoOnAttach",attach_types);
+		}
+		
+		idx = inventory_slots.Find(slot);
+		if (idx < 0)
+			return "";
+		
+		return attach_types.Get(idx);
+	}
+	
+	override string ChangeIntoOnDetach(int slot_id)
+	{
+		int idx = -1;
+		string slot;
+		
+		TStringArray inventory_slots = new TStringArray;
+		TStringArray detach_types = new TStringArray;
+		
+		this.ConfigGetTextArray("inventorySlot",inventory_slots);
+		if (inventory_slots.Count() < 1) //is string
+		{
+			inventory_slots.Insert(this.ConfigGetString("inventorySlot"));
+			detach_types.Insert(this.ConfigGetString("ChangeIntoOnDetach"));
+		}
+		else //is array
+		{
+			this.ConfigGetTextArray("ChangeIntoOnDetach",detach_types);
+			if (detach_types.Count() < 1)
+				detach_types.Insert(this.ConfigGetString("ChangeIntoOnDetach"));
+		}
+		
+		for (int i = 0; i < inventory_slots.Count(); i++)
+		{
+			if (InventorySlots.GetSlotIdFromString(inventory_slots.Get(i)) == slot_id)
+			{
+				slot = inventory_slots.Get(i);
+				break;
+			}
+		}
+		
+		if (slot != "")
+		{
+			if (detach_types.Count() == 1)
+				idx = 0;
+			else
+				idx = inventory_slots.Find(slot);
+		}
+		if (idx < 0)
+			return "";
+	
+		return detach_types.Get(idx);
 	}
 	
 	void ExplodeAmmo()
@@ -939,9 +985,12 @@ class ItemBase extends InventoryItem
 			else
 				split_quantity_new = quantity;
 			
-			destination_entity.GetInventory().FindFreeLocationFor( this, FindInventoryLocationType.ANY, loc );
-			Object o = destination_entity.GetInventory().LocationCreateEntity( loc, GetType() );
-			new_item = ItemBase.Cast( o );
+			if (destination_entity.GetInventory().FindFreeLocationFor( this, FindInventoryLocationType.ANY, loc ))
+			{
+				Object o = destination_entity.GetInventory().LocationCreateEntity( loc, GetType(), ECE_IN_INVENTORY, RF_DEFAULT );
+				new_item = ItemBase.Cast( o );
+			}
+
 			if( new_item )
 			{			
 				MiscGameplayFunctions.TransferItemProperties( this, new_item );
@@ -1715,11 +1764,21 @@ class ItemBase extends InventoryItem
 	
 	//----------------------------------------------------------------
 	//has FoodStages in config?
-	bool CanBeCooked()
+	bool HasFoodStage()
 	{
 		string config_path = "CfgVehicles" + " " + GetType() + " " + "Food" + " " + "FoodStages";
 		return GetGame().ConfigIsExisting ( config_path );
 	}
+	
+	bool CanBeCooked()
+	{
+		return false;
+	}
+	
+	bool CanBeCookedOnStick()
+	{
+		return false;
+	}		
 	
 	//----------------------------------------------------------------
 	bool CanRepair(ItemBase item_repair_kit)
@@ -2037,20 +2096,25 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
-	void ReadVarsFromCTX(ParamsReadContext ctx)//with ID optimization
+	bool ReadVarsFromCTX(ParamsReadContext ctx)//with ID optimization
 	{
-		ctx.Read(CachedObjectsParams.PARAM1_INT);
+		if(!ctx.Read(CachedObjectsParams.PARAM1_INT))
+			return false;
+		
 		int numOfItems = CachedObjectsParams.PARAM1_INT.param1;
 		CachedObjectsArrays.ARRAY_FLOAT.Clear();
 		
 		for(int i = 0; i < numOfItems; i++)
 		{
-			ctx.Read(CachedObjectsParams.PARAM1_FLOAT);
+			if(!ctx.Read(CachedObjectsParams.PARAM1_FLOAT))
+				return false;
 			float value = CachedObjectsParams.PARAM1_FLOAT.param1;
 			
 			CachedObjectsArrays.ARRAY_FLOAT.Insert(value);
 		}
+		
 		DeSerializeNumericalVars(CachedObjectsArrays.ARRAY_FLOAT);
+		return true;
 	}
 	
 	void SaveVariables(ParamsWriteContext ctx)
@@ -2083,37 +2147,55 @@ class ItemBase extends InventoryItem
 
 		
 	//----------------------------------------------------------------
-	void LoadVariables(ParamsReadContext ctx)
+	bool LoadVariables(ParamsReadContext ctx, int version)
 	{
 		//read the flags
-		ctx.Read(CachedObjectsParams.PARAM1_INT);
-		
-		int varFlags = CachedObjectsParams.PARAM1_INT.param1;
-		//--------------
-		if( varFlags & ItemVariableFlags.FLOAT )
+		if(!ctx.Read(CachedObjectsParams.PARAM1_INT))
 		{
-			ReadVarsFromCTX(ctx);
+			return false;
 		}
+		else
+		{
+			int varFlags = CachedObjectsParams.PARAM1_INT.param1;
+			//--------------
+			if( varFlags & ItemVariableFlags.FLOAT )
+			{
+				if(!ReadVarsFromCTX(ctx))
+					return false;
+			}
+		}
+		return true;
 	}
 
 
 	//----------------------------------------------------------------
-	override void OnStoreLoad(ParamsReadContext ctx, int version)
+	override bool OnStoreLoad(ParamsReadContext ctx, int version)
 	{   
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
+
 		PlayerBase player;
 		if( Class.CastTo(player, GetHierarchyRootPlayer()) )
 		{
 			//Load quickbar item bind
 			int itemQBIndex;
-			ctx.Read(itemQBIndex);
+			if(!ctx.Read(itemQBIndex))
+				return false;
 			if( itemQBIndex != -1 )
 			{
 				player.SetLoadedQuickBarItemBind(this,itemQBIndex);
 			}
 		}
-		LoadVariables(ctx);// variable management system
-		LoadAgents(ctx);//agent trasmission system
+		
+		// variable management system
+		if ( !LoadVariables(ctx, version) )
+			return false;
+
+		//agent trasmission system
+		if ( !LoadAgents(ctx, version) )
+			return false;
+
+		return true;
 	}
 
 	//----------------------------------------------------------------
@@ -2162,6 +2244,8 @@ class ItemBase extends InventoryItem
 		//----------------------------------
 	}
 
+	
+	//bool Consume(float amount, PlayerBase consumer);
 
 	//-------------------------	Quantity
 	//----------------------------------------------------------------
@@ -2275,9 +2359,8 @@ class ItemBase extends InventoryItem
 
 	float GetQuantity()
 	{
-			//PrintString(m_VarQuantity.ToString());
-			return m_VarQuantity;
-		}
+		return m_VarQuantity;
+	}
 	
 	bool IsFullQuantity()
 	{
@@ -2732,9 +2815,11 @@ class ItemBase extends InventoryItem
 	}
 
 	// -------------------------------------------------------------------------
-	void LoadAgents(ParamsReadContext ctx)
+	bool LoadAgents(ParamsReadContext ctx, int version)
 	{
-		ctx.Read(m_AttachedAgents);
+		if(!ctx.Read(m_AttachedAgents))
+			return false;
+		return true;
 	}
 	// -------------------------------------------------------------------------
 	void SaveAgents(ParamsWriteContext ctx)
@@ -2744,12 +2829,6 @@ class ItemBase extends InventoryItem
 	}
 	// -------------------------------------------------------------------------
 
-	
-	//! Called when entity is being restored from storage folder
-	override void EEOnStorageLoad()
-	{
-		//Print("EEOnStorageLoad");
-	}
 
 	//! Called when entity is being created as new by CE/ Debug
 	override void EEOnCECreate()
@@ -2763,27 +2842,10 @@ class ItemBase extends InventoryItem
 	//-------------------------
 	// OPEN/CLOSE USER ACTIONS
 	//-------------------------
-	void Open()
-	{
-		SetOpenState( true );
-	}
-
-	void Close()
-	{
-		SetOpenState( false );
-	}
-
-	void SetOpenState( bool state )
-	{
-		m_Opened = state;
-		
-		SetSynchDirty();
-	}
-	
-	bool IsOpen()
-	{
-		return m_Opened;
-	}
+	//! Implementations only
+	void Open() {}
+	void Close() {}
+	bool IsOpen() {}
 	
 	
 	// ------------------------------------------------------------

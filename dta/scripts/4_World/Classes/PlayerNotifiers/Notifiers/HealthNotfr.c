@@ -36,12 +36,14 @@ class HealthNotfr: NotifierBase
 		//PrintString("tendency:" + tendency);
 		//GetVirtualHud().SetStatus(eDisplayElements.DELM_TDCY_HEALTH,tendency);
 		
-		DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_HEALTH_WARNING, PlayerConstants.THRESHOLD_HEALTH_CRITICAL, PlayerConstants.THRESHOLD_HEALTH_BLINKING, PlayerConstants.THRESHOLD_HEALTH_EXTRA);
+		//DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_HEALTH_WARNING, PlayerConstants.THRESHOLD_HEALTH_CRITICAL, PlayerConstants.THRESHOLD_HEALTH_BLINKING, PlayerConstants.THRESHOLD_HEALTH_EXTRA);
+		
+		EStatLevels health_level = m_Player.GetStatLevelHealth();
 		DisplayElementTendency dis_elm = DisplayElementTendency.Cast(GetVirtualHud().GetElement(eDisplayElements.DELM_TDCY_HEALTH));
 		
 		if( dis_elm )
 		{
-			dis_elm.SetSeriousnessLevel(level);
+			dis_elm.SetSeriousnessLevel(health_level);
 			dis_elm.SetTendency(tendency);
 		}
 	}

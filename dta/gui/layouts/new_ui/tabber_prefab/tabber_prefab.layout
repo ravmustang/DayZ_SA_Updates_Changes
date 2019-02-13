@@ -124,7 +124,7 @@ FrameWidgetClass Tabber {
       }
      }
     }
-    FrameWidgetClass XboxControls {
+    FrameWidgetClass ConsoleControls {
      visible 0
      clipchildren 0
      ignorepointer 1
@@ -136,7 +136,7 @@ FrameWidgetClass Tabber {
      hexactsize 0
      vexactsize 0
      {
-      ImageWidgetClass XboxTabLeftControl {
+      ImageWidgetClass TabLeftControl {
        visible 1
        clipchildren 1
        ignorepointer 1
@@ -153,7 +153,7 @@ FrameWidgetClass Tabber {
        "no wrap" 1
        stretch 0
       }
-      ImageWidgetClass XboxTabRightControl {
+      ImageWidgetClass TabRightControl {
        visible 1
        clipchildren 1
        ignorepointer 1

@@ -18,17 +18,49 @@ class Spotlight extends ItemBase
 	static const string SEL_REFLECTOR_U				= "reflector_unfolded";
 	static const string SEL_REFLECTOR_FAR_U			= "reflector_far_unfolded";
 	
-	ref protected EffectSound 						m_DeployLoopSound;
+	//sound
+	const string 				SOUND_TURN_ON		= "spotlight_turn_on_SoundSet";
+	const string 				SOUND_TURN_OFF		= "spotlight_turn_off_SoundSet";
+	
+	protected EffectSound 		m_SoundTurnOn;
+	protected EffectSound 		m_SoundTurnOff;	
+	
+	ref protected EffectSound 	m_DeployLoopSound;
 	/*
 	Spotlight, folded and unfolded.
 	*/
 	
 	void Spotlight()
 	{
-		Fold();
-		UpdateAllSelections();
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 	}
+	
+	override void OnInitEnergy()
+	{
+		if ( GetCompEM().IsPlugged() )
+			Unfold();
+		else
+			Fold();
+		
+		UpdateAllSelections();
+	}
+	
+	//--- POWER EVENTS
+	override void OnSwitchOn()
+	{
+		super.OnSwitchOn();
+		
+		//sound (client only)
+		SoundTurnOn();
+	}
+
+	override void OnSwitchOff()
+	{
+		super.OnSwitchOff();
+		
+		//sound (client only)
+		SoundTurnOff();
+	}	
 	
 	override void OnWorkStart()
 	{
@@ -54,12 +86,12 @@ class Spotlight extends ItemBase
 
 	override void OnIsPlugged(EntityAI source_device)
 	{
+		Unfold();
 		UpdateAllSelections();
 	}
 	
 	void UpdateAllSelections()
 	{
-		PlayerBase player = PlayerBase.Cast( GetHierarchyRootPlayer() );
 		bool is_plugged = GetCompEM().IsPlugged();
 		HideAllSelections();
 		
@@ -147,13 +179,15 @@ class Spotlight extends ItemBase
 		ctx.Write( m_IsFolded );
 	}
 
-	override void OnStoreLoad(ParamsReadContext ctx, int version)
+	override bool OnStoreLoad(ParamsReadContext ctx, int version)
 	{   
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
 		
 		// Load folded/unfolded state
 		bool b_is_folded = false;
-		ctx.Read(b_is_folded );
+		if (!ctx.Read(b_is_folded))
+			b_is_folded = true;
 		
 		if (b_is_folded)
 		{
@@ -163,6 +197,8 @@ class Spotlight extends ItemBase
 		{
 			Unfold();
 		}
+
+		return true;
 	}
 
 	override bool CanPutInCargo( EntityAI parent )
@@ -186,6 +222,19 @@ class Spotlight extends ItemBase
 	{
 		return m_IsFolded;
 	}
+	
+	//================================================================
+	// SOUNDS
+	//================================================================
+	protected void SoundTurnOn()
+	{
+		PlaySoundSet( m_SoundTurnOn, SOUND_TURN_ON, 0, 0 );
+	}
+	
+	protected void SoundTurnOff()
+	{
+		PlaySoundSet( m_SoundTurnOff, SOUND_TURN_OFF, 0, 0 );
+	}		
 	
 	//================================================================
 	// ADVANCED PLACEMENT

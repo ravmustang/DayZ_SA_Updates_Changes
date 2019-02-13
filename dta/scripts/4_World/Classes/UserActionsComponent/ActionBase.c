@@ -117,7 +117,9 @@ class ActionBase
 		m_ConditionTarget = new CCTDummy;
 	}
 
-	//! For UI: true - widget will be on item/traced pos; false - will be in under Item in hands widget
+	//! Action is performed on target, not with item itself, when set to true.
+	//!   * target will be synced to server
+	//!   * UI: floating widget will be displayed at target pos
 	bool HasTarget()
 	{
 		return true;
@@ -339,7 +341,15 @@ class ActionBase
 	{
 		if(HasTarget())
 		{
-			action_data.m_Target = action_recive_data.m_Target;
+			if (action_recive_data.m_Target)
+			{
+				action_data.m_Target = action_recive_data.m_Target;
+			}
+			else
+			{
+				Error("Action target not created.");
+				action_data.m_Target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0); 
+			}
 		}
 	}
 	
@@ -359,7 +369,7 @@ class ActionBase
 		return m_StanceMask;
 	}
 	
-	protected bool IsFullBody(PlayerBase player)
+	bool IsFullBody(PlayerBase player)
 	{
 		if ( HasProneException() )
 		{
@@ -746,7 +756,7 @@ class ActionBase
 			MiscGameplayFunctions.GetHeadBonePos(player, playerHeadPos);
 
 			compName = target.GetObject().GetActionComponentName(target.GetComponentIndex());
-			modelPos = target.GetObject().GetSelectionPosition(compName);
+			modelPos = target.GetObject().GetSelectionPositionMS(compName);
 			worldPos = target.GetObject().ModelToWorld(modelPos);
 
 			distanceRoot = Math.AbsFloat(vector.DistanceSq(worldPos, playerRootPos));

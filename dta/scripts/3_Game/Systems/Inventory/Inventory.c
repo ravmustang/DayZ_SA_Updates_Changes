@@ -232,7 +232,7 @@ class GameInventory
 	 * @param[in]	type	\p		item type to be placed in inventory
 	 * @return	created entity, null otherwise
 	 **/
-	static proto native EntityAI LocationCreateEntity (notnull InventoryLocation inv_loc, string type);
+	static proto native EntityAI LocationCreateEntity (notnull InventoryLocation inv_loc, string type, int iSetupFlags, int iRotation);
 	/**
 	 * @fn		LocationCreateLocalEntity
 	 * @brief	creates new <b>local</b> item directly at location
@@ -240,7 +240,7 @@ class GameInventory
 	 * @param[in]	type	\p		item type to be placed in inventory
 	 * @return	created entity, null otherwise
 	 **/	
-	static proto native EntityAI LocationCreateLocalEntity (notnull InventoryLocation inv_loc, string type);
+	static proto native EntityAI LocationCreateLocalEntity (notnull InventoryLocation inv_loc, string type, int iSetupFlags, int iRotation);
 	/**
 	 * @fn		LocationCanAddEntity
 	 * @brief	queries if the entity contained in inv_loc.m_item can be added to ground/attachment/cargo/hands/...
@@ -513,7 +513,10 @@ class GameInventory
 	void Init () { }
 
 	/// db load hooks
-	void OnStoreLoad (ParamsReadContext ctx, int version) { }
+	bool OnStoreLoad (ParamsReadContext ctx, int version)
+	{
+		return true;
+	}
 	void OnAfterStoreLoad () { }
 	/// db store hook
 	void OnStoreSave (ParamsWriteContext ctx) { }

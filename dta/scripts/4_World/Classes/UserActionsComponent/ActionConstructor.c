@@ -11,7 +11,7 @@ class ActionConstructor
 		//actions.Insert(new ActionTakeASip);
 		//actions.Insert(new ActionForceABite);
 		//actions.Insert(new ActionForceASip);
-		actions.Insert(new ActionMeasureBattery);
+		//actions.Insert(new ActionMeasureBattery);
 		actions.Insert(new ActionTurnOnChemlight);
 		actions.Insert(new ActionBiteCharcoalTablets);
 		actions.Insert(new ActionBitePurificationTablets);

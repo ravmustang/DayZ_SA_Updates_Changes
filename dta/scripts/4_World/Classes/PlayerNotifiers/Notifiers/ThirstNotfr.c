@@ -27,14 +27,14 @@ class ThirstNotfr: NotifierBase
 		int tendency = CalculateTendency(delta, INC_TRESHOLD_LOW, INC_TRESHOLD_MED, INC_TRESHOLD_HIGH, DEC_TRESHOLD_LOW, DEC_TRESHOLD_MED, DEC_TRESHOLD_HIGH);
 		//GetVirtualHud().SetStatus(eDisplayElements.DELM_TDCY_WATER,tendency);
 		
-		DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_WATER_WARNING, PlayerConstants.THRESHOLD_WATER_CRITICAL, PlayerConstants.THRESHOLD_WATER_BLINKING, PlayerConstants.THRESHOLD_WATER_EXTRA);
-		
+		//DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_WATER_WARNING, PlayerConstants.THRESHOLD_WATER_CRITICAL, PlayerConstants.THRESHOLD_WATER_BLINKING, PlayerConstants.THRESHOLD_WATER_EXTRA);
+		EStatLevels water_level = m_Player.GetStatLevelWater();
 		DisplayElementTendency dis_elm = DisplayElementTendency.Cast(GetVirtualHud().GetElement(eDisplayElements.DELM_TDCY_WATER));
 		
 		if( dis_elm )
 		{
 			dis_elm.SetTendency(tendency);
-			dis_elm.SetSeriousnessLevel(level);
+			dis_elm.SetSeriousnessLevel(water_level);
 			
 		}
 	}

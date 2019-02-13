@@ -160,11 +160,8 @@ class OptionsMenu extends UIScriptedMenu
 			m_GameTab.Apply();
 		}
 		
-		#ifdef WIP_INPUTS
-			// save input configuration
-			GetUApi().Export();
-		#endif		
-		
+		// save input configuration
+		GetUApi().Export();	
 		
 		#ifdef PLATFORM_CONSOLE
 			layoutRoot.FindAnyWidget( "Reset" ).Show( false );
@@ -421,28 +418,28 @@ class OptionsMenu extends UIScriptedMenu
 	override void Update( float timeslice )
 	{
 		super.Update( timeslice );
-		if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUITabLeft",false) )
 		{
 			m_Tabber.PreviousTab();
 		}
 		
 		//RIGHT BUMPER - TAB RIGHT
-		if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUITabRight",false) )
 		{
 			m_Tabber.NextTab();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUICtrlX",false) )
 		{
 			Apply();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUICtrlY, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUICtrlY",false) )
 		{
 			Reset();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
 		{
 			Back();
 		}

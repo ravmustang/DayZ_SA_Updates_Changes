@@ -35,6 +35,7 @@ class RefuelTorch extends RecipeBase
 		
 		//ingredient 2
 		InsertIngredient(1,"Torch");//you can insert multiple ingredients this way
+		InsertIngredient(1,"LongTorch");//you can insert multiple ingredients this way
 		
 		m_IngredientAddHealth[1] = 0;// 0 = do nothing
 		m_IngredientSetHealth[1] = -1; // -1 = do nothing

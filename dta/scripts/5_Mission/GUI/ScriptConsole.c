@@ -57,6 +57,7 @@ class ScriptConsole extends UIScriptedMenu
 		m_PlayerCurPos		= TextWidget.Cast( layoutRoot.FindAnyWidget("PlayerPosLabel") );
 		m_LogsEnabled		= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_LogsEnabled") );
 		m_HudDCharStats		= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterStats") );
+		m_HudDCharLevels	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterLevels") );
 		m_HudDCharModifiers	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterModifiers") );
 		m_HudDCharAgents	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterAgents") );
 		m_HudDCharDebug		= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterDebug") );
@@ -90,6 +91,7 @@ class ScriptConsole extends UIScriptedMenu
 		m_SpawnInInvButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("ButtonSpawnInInv") );
 		m_SpawnGroundButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("ButtonSpawnInGround") );
 		m_SpawnAsAttachment = ButtonWidget.Cast( layoutRoot.FindAnyWidget("SpawnAsAttachment") );
+		m_SpawnSpecial = ButtonWidget.Cast( layoutRoot.FindAnyWidget("SpawnSpecial") );
 
 
 		m_HelpTextListboxWidget = TextListboxWidget.Cast( layoutRoot.FindAnyWidget("HelpTextListboxWidget") );
@@ -112,6 +114,7 @@ class ScriptConsole extends UIScriptedMenu
 
 		// Update checkbox Character Values
 		m_HudDCharStats.SetChecked(m_ConfigDebugProfile.GetCharacterStatsVisible());
+		m_HudDCharLevels.SetChecked(m_ConfigDebugProfile.GetCharacterLevelsVisible());
 		m_HudDCharModifiers.SetChecked(m_ConfigDebugProfile.GetCharacterModifiersVisible());
 		m_HudDCharAgents.SetChecked(m_ConfigDebugProfile.GetCharacterAgentsVisible());
 		m_HudDCharDebug.SetChecked(m_ConfigDebugProfile.GetCharacterDebugVisible());
@@ -446,6 +449,18 @@ class ScriptConsole extends UIScriptedMenu
 
 			return true;
 		}
+		else if ( w == m_HudDCharLevels )
+		{
+			if ( m_ConfigDebugProfile )
+			{
+				m_ConfigDebugProfile.SetCharacterLevelsVisible(m_HudDCharLevels.IsChecked());
+			}
+
+			// Refresh UI by new settings
+			m_MissionGameplay.GetHudDebug().RefreshByLocalProfile();
+
+			return true;
+		}
 		else if ( w == m_HudDCharModifiers )
 		{
 			if ( m_ConfigDebugProfile )
@@ -513,7 +528,7 @@ class ScriptConsole extends UIScriptedMenu
 			ChangeFilter();
 			return true;
 		}
-		else if ( w == m_SpawnInInvButton || w == m_SpawnGroundButton || w == m_SpawnAsAttachment )
+		else if ( w == m_SpawnInInvButton || w == m_SpawnGroundButton || w == m_SpawnAsAttachment || w == m_SpawnSpecial )
 		{
 			SaveProfileSpawnDistance();
 
@@ -566,6 +581,13 @@ class ScriptConsole extends UIScriptedMenu
 						{
 							float distance = m_SpawnDistanceEditBox.GetText().ToFloat();
 							m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance );
+							break;
+						}
+						
+						case m_SpawnSpecial:
+						{
+							distance = m_SpawnDistanceEditBox.GetText().ToFloat();
+							m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance , true);
 							break;
 						}
 
@@ -1473,6 +1495,7 @@ class ScriptConsole extends UIScriptedMenu
 	TextListboxWidget	m_PositionsListbox;
 	CheckBoxWidget		m_LogsEnabled;
 	CheckBoxWidget		m_HudDCharStats;
+	CheckBoxWidget		m_HudDCharLevels;
 	CheckBoxWidget		m_HudDCharModifiers;
 	CheckBoxWidget		m_HudDCharAgents;
 	CheckBoxWidget		m_HudDCharDebug;
@@ -1506,6 +1529,7 @@ class ScriptConsole extends UIScriptedMenu
 	ButtonWidget m_SpawnInInvButton;
 	ButtonWidget m_SpawnGroundButton;
 	ButtonWidget m_SpawnAsAttachment;
+	ButtonWidget m_SpawnSpecial;
 	ButtonWidget m_CloseConsoleButton;
 
 	// Config Viewer

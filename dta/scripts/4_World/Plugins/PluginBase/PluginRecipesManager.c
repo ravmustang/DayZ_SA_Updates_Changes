@@ -13,7 +13,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	ref Timer m_TestTimer;
 	const string KEYWORD_NEW_ITEM = "Item:";
 	const string PATH_CACHE_FILE = "Scripts/Data/cache_recipes.cache";
-	const int MAX_NUMBER_OF_RECIPES = 256;
+	const int MAX_NUMBER_OF_RECIPES = GetMaxNumberOfRecipes();
 	const int MAX_CONCURENT_RECIPES = 20;
 	const int MASK_BOTH_INGREDIENTS = 3;
 	
@@ -61,9 +61,15 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	int m_NumOfConfRecipes;
 	
 	
-	ref RecipeBase m_RecipeList[MAX_NUMBER_OF_RECIPES];//all recipes
+	//ref RecipeBase m_RecipeList[MAX_NUMBER_OF_RECIPES];//all recipes
+	ref array<ref RecipeBase> m_RecipeList = new array<ref RecipeBase>;//all recipes
 	
 	ref Timer myTimer1;
+	
+	static int GetMaxNumberOfRecipes()
+	{
+		return 2048;
+	}
 	
 	void PluginRecipesManager()
 	{
@@ -72,12 +78,12 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		m_CacheBasesMap = new map<string,ref CacheObject>;
 		
 		m_NumberOfRecipes = 0;
-		
+		/*
 		for(int i = 0; i < MAX_NUMBER_OF_RECIPES; i++)
 		{
 			m_RecipeList[i] = NULL;
 		}
-		
+		*/
 		CreateAllRecipes();
 		
 		myTimer1 = new Timer();
@@ -99,7 +105,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	}
 
 
-		string GetRecipeName(int recipe_id)
+	string GetRecipeName(int recipe_id)
 	{
 		if( m_RecipeList[recipe_id] ) return m_RecipeList[recipe_id].GetName();
 		return "";
@@ -228,7 +234,6 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		ResolveItemClasses(full_path);
 		LeechRecipesFromBases(full_path);
 	}
-
 	
 	protected void SortRecipesOrderInCache()
 	{
@@ -238,12 +243,9 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			CacheObject value = m_CacheItemMap.GetElement(i);
 			
 			//Sort( value.GetRecipes(), value.GetRecipes().Count() ); //use the sort here
-			
 		}
-	
 	}
 
-	
 	protected void ResolveBaseClasses(TStringArray full_path)
 	{
 		int mask;
@@ -256,7 +258,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			
 			if( !m_CacheBasesMap.Contains( item ) )//resolve new base classes
 			{
-				for(int x = 0; x < MAX_NUMBER_OF_RECIPES; x++)
+				for(int x = 0; x < m_RecipeList.Count(); x++)
 				{
 					if (m_RecipeList[x] != NULL)
 					{
@@ -276,7 +278,6 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 				}
 			}
 		}
-		
 	}
 	
 	protected void LeechRecipesFromBases(TStringArray full_path)
@@ -331,7 +332,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		string item_name = full_path.Get(0);
 		RecipeBase p_recipe;
 		
-		for(int i = 0; i < MAX_NUMBER_OF_RECIPES; i++)
+		for(int i = 0; i < m_RecipeList.Count(); i++)
 		{
 			if (m_RecipeList[i] != NULL)
 			{
@@ -474,12 +475,14 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 
 	override protected void RegisterRecipe(RecipeBase recipe)
 	{
+		
 		if( m_RegRecipeIndex >= MAX_NUMBER_OF_RECIPES )
 		{
 			Error("Exceeded max. number of recipes, max set to: "+MAX_NUMBER_OF_RECIPES.ToString());
 		}
+		
 		recipe.SetID(m_RegRecipeIndex);
-		m_RecipeList[m_RegRecipeIndex] = recipe;
+		m_RecipeList.Insert(recipe);
 		m_RegRecipeIndex++;
 	}
 

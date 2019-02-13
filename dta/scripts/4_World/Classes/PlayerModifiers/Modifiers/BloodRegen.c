@@ -44,8 +44,8 @@ class BloodRegenMdfr: ModifierBase
 	override void OnTick(PlayerBase player, float deltaT)
 	{
 		float regen_modifier_water = GetRegenModifierWater( player.GetStatWater().Get() );
-		float regen_modifier_energy = GetRegenModifierWater( player.GetStatEnergy().Get() );
-		float blood_regen_speed = PlayerConstants.BLOOD_REGEN_SPEED * regen_modifier_water * regen_modifier_energy;
+		float regen_modifier_energy = GetRegenModifierEnergy( player.GetStatEnergy().Get() );
+		float blood_regen_speed = PlayerConstants.BLOOD_REGEN_RATE_PER_SEC * regen_modifier_water * regen_modifier_energy;
 		/*
 		PrintString("regen_modifier_water" + regen_modifier_water);
 		PrintString("regen_modifier_energy" + regen_modifier_energy);
@@ -57,16 +57,30 @@ class BloodRegenMdfr: ModifierBase
 	float GetRegenModifierWater(float water)
 	{
 		float modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_WATER_HIGH;
+		int water_level = m_Player.GetStatLevelWater();
+		
+		/*
 		if( water < PlayerConstants.BLOOD_REGEN_THRESHOLD_WATER_MID ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_WATER_MID}
 		if( water < PlayerConstants.BLOOD_REGEN_THRESHOLD_WATER_LOW ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_WATER_LOW}
+		*/
+		
+		if( water_level == EStatLevels.MEDIUM ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_WATER_MID}
+		if( water_level >= EStatLevels.LOW ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_WATER_LOW}
+		
 		return modifier;
 	}
 	
 	float GetRegenModifierEnergy(float energy)
 	{
 		float modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_ENERGY_HIGH;
-		if( energy < PlayerConstants.BLOOD_REGEN_THRESHOLD_ENERGY_MID ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_ENERGY_MID}
-		if( energy < PlayerConstants.BLOOD_REGEN_THRESHOLD_ENERGY_LOW ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_WATER_LOW}
+		int energy_level = m_Player.GetStatLevelEnergy();
+				
+		//if( energy < PlayerConstants.BLOOD_REGEN_THRESHOLD_ENERGY_MID ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_ENERGY_MID}
+		//if( energy < PlayerConstants.BLOOD_REGEN_THRESHOLD_ENERGY_LOW ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_ENERGY_LOW}
+		
+		if( energy_level == EStatLevels.MEDIUM ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_ENERGY_MID}
+		if( energy_level >= EStatLevels.LOW ) {modifier = PlayerConstants.BLOOD_REGEN_MODIFIER_ENERGY_LOW}
+		
 		return modifier;
 	}
 	

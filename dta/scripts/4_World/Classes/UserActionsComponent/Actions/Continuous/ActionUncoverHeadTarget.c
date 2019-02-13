@@ -70,7 +70,7 @@ class ActionUncoverHeadTarget: ActionContinuousBase
 				action_data.m_Player.GetTransformWS(m4);
 				InventoryLocation target_gnd = new InventoryLocation;
 				target_gnd.SetGround(null, m4);
-				GameInventory.LocationCreateEntity(target_gnd, "BurlapSack");
+				GameInventory.LocationCreateEntity(target_gnd, "BurlapSack",ECE_IN_INVENTORY,RF_DEFAULT);
 			}
 			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		}

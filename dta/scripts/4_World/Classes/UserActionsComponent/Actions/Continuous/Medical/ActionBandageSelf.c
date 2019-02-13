@@ -52,7 +52,7 @@ class ActionBandageSelf: ActionContinuousBase
 	{	
 		if (action_data.m_Player.GetBleedingManagerServer() )
 		{
-			action_data.m_Player.GetBleedingManagerServer().RemoveAnyBleedingSource();	
+			action_data.m_Player.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();	
 		}
 		
 		if (action_data.m_MainItem.GetQuantity() > 0)

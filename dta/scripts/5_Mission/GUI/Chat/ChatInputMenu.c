@@ -34,7 +34,7 @@ class ChatInputMenu extends UIScriptedMenu
 
 		if (text != "")
 		{
-			GetGame().ChatPlayer(/*GetGame().ChatGetChannel()*/0, text);
+			GetGame().ChatPlayer(text);
 			if( !GetGame().IsMultiplayer() )
 			{
 				string name;

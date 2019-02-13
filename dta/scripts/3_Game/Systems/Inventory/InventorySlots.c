@@ -27,6 +27,12 @@ class InventorySlots
 	 * i.e. it does NOT look at name= or displayName= attributes of the entry!
 	 **/
 	static proto native int GetSlotIdFromString (string slot_name);
+	/**@fn		GetSlotName
+	 * @brief	converts slot_id to string
+	 * @param[in]	slot_id	\p	slot id to be find.
+	 * @return		string or null string
+	 **/
+	static proto string GetSlotName (int id);
 	/**@fn		IsSlotIdValid
 	 * @brief	verifies existence of the slot id
 	 * @return	true if slot valid

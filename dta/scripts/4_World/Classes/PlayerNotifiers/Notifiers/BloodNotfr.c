@@ -23,13 +23,15 @@ class BloodNotfr: NotifierBase
 		//PrintString(delta.ToString());
 		//GetVirtualHud().SetStatus(eDisplayElements.DELM_TDCY_BLOOD,tendency);
 		
-		DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_BLOOD_WARNING,  PlayerConstants.THRESHOLD_BLOOD_CRITICAL, PlayerConstants.THRESHOLD_BLOOD_BLINKING, PlayerConstants.THRESHOLD_BLOOD_EXTRA );
+		//DSLevels level = DetermineLevel( GetObservedValue(), PlayerConstants.THRESHOLD_BLOOD_WARNING,  PlayerConstants.THRESHOLD_BLOOD_CRITICAL, PlayerConstants.THRESHOLD_BLOOD_BLINKING, PlayerConstants.THRESHOLD_BLOOD_EXTRA );
 		DisplayElementTendency dis_elm = DisplayElementTendency.Cast(GetVirtualHud().GetElement(eDisplayElements.DELM_TDCY_BLOOD));
+		
+		EStatLevels blood_level = m_Player.GetStatLevelBlood();
 		
 		if( dis_elm )
 		{
 			dis_elm.SetTendency(tendency);
-			dis_elm.SetSeriousnessLevel(level);
+			dis_elm.SetSeriousnessLevel(blood_level);
 			
 		}
 		

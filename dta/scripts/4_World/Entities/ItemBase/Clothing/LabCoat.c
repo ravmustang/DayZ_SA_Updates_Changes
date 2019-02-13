@@ -1,0 +1,1 @@
+class LabCoat extends Clothing {};

@@ -43,6 +43,8 @@ class XmasLights extends Inventory_Base
 		m_AttachedTo = NULL;
 		HideOnItem( parent );
 		TurnOnItem( this );
+		
+		GetCompEM().UnplugThis();
 	}
 
 	void TurnOnItem(ItemBase item)

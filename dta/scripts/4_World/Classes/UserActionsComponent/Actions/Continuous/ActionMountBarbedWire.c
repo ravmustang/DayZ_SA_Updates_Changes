@@ -68,11 +68,6 @@ class ActionMountBarbedWire: ActionContinuousBase
 		BaseBuildingBase base_building = BaseBuildingBase.Cast( action_data.m_Target.GetObject() );
 		BarbedWire barbed_wire = BarbedWire.Cast( base_building.FindAttachmentBySlotName( m_SlotName ) );
 		
-		//lock slot
-		InventoryLocation inventory_location = new InventoryLocation;
-		barbed_wire.GetInventory().GetCurrentInventoryLocation( inventory_location );			
-		base_building.GetInventory().SetSlotLock( inventory_location.GetSlot(), true );
-		
 		//mount and refresh parent
 		barbed_wire.SetMountedState( true );
 		

@@ -30,10 +30,6 @@ class PluginPresenceNotifier extends PluginBase
 
 		if (pEnabled)
 		{
-			float visualMean = (m_pPlayer.GetVisibilityCoef() + GetMovementSpeedVisualCoef() + GetMovementStanceVisualCoef()) / 3;
-			float noiseMean = (GetSurfaceNoiseCoef() + GetMovementSpeedNoiseCoef() + GetBootsNoiseCoef() + GetLandNoise()) / 4;
-			float resultMean = (visualMean + noiseMean) / 2;
-
 			DbgUI.Begin("Presence Notifier", windowPosX + 10, windowPosY);
 			DbgUI.Panel("MinimumSize", mainPanelSizeX, mainPanelSizeY);
 
@@ -52,19 +48,19 @@ class PluginPresenceNotifier extends PluginBase
 
 			DbgUI.Panel("-- Result", mainPanelSizeX, 2);
 			DbgUI.Text("Result: ");
-			DbgUI.Text("Visual coef: " + visualMean);
-			DbgUI.Text("Noise coef: " + noiseMean);
-			DbgUI.Text("Result coef: " + resultMean);
+			DbgUI.Text("Visual coef: " + GetVisualPresence());
+			DbgUI.Text("Noise coef: " + GetNoisePresence());
+			DbgUI.Text("Result coef: " + GetPresence());
 			DbgUI.Spacer(20);
 			DbgUI.Text("Alert Level:");
 			DbgUI.Spacer(20);
 			DbgUI.SameLine();
 
-			if (resultMean <= 0.5)
+			if (GetPresence() <= 0.5)
 			{
 				DbgUI.Text("!");
 			}
-			else if (resultMean <= 0.75)
+			else if (GetPresence() <= 0.75)
 			{
 				DbgUI.Text("!!");
 			}
@@ -87,6 +83,35 @@ class PluginPresenceNotifier extends PluginBase
 		DbgUI.EndCleanupScope();
 	}
 	
+	//! returns overall presence coef
+	float GetPresence()
+	{
+		float resultMean = (GetVisualPresence() + GetNoisePresence()) / 2;
+		
+		return resultMean;
+	}
+	
+	protected float GetVisualPresence()
+	{
+		float visualMean = 0;
+		if (m_pPlayer)
+		{
+			visualMean = (m_pPlayer.GetVisibilityCoef() + GetMovementSpeedVisualCoef() + GetMovementStanceVisualCoef()) / 3;
+		}
+		
+		return visualMean;	
+	}
+
+	protected float GetNoisePresence()
+	{
+		float noiseMean = 0;
+		if (m_pPlayer)
+		{
+			noiseMean = (GetSurfaceNoiseCoef() + GetMovementSpeedNoiseCoef() + GetBootsNoiseCoef() + GetLandNoise()) / 4;
+		}
+		
+		return noiseMean;
+	}
 	
 	protected float GetMovementSpeedVisualCoef()
 	{

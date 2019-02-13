@@ -18,6 +18,7 @@ class ControlsXbox extends UIScriptedMenu
 	//============================================
 	void ControlsXbox()
 	{
+		
 	}
 	
 	void ~ControlsXbox()
@@ -94,9 +95,17 @@ class ControlsXbox extends UIScriptedMenu
 			}
 		}
 		
+		Widget controls_image;
 		// hide all button markers
-		Widget xbox_controls_image = layoutRoot.FindAnyWidget( "XboxControlsImage" );
-		Widget child = xbox_controls_image.GetChildren();
+		#ifdef PLATFORM_XBOX
+			controls_image = layoutRoot.FindAnyWidget( "XboxControlsImage" );
+		#else
+		#ifdef PLATFORM_PS4
+			controls_image = layoutRoot.FindAnyWidget( "PSControlsImage" );
+		#endif
+		#endif
+		
+		Widget child = controls_image.GetChildren();
 		child.Show(false);
 		while( child.GetSibling() )
 		{
@@ -112,7 +121,15 @@ class ControlsXbox extends UIScriptedMenu
 			if( tab_array[index][l] != NULL )
 			{
 				TextWidget text_widget = TextWidget.Cast( panel_widget.FindAnyWidget( "TextWidget" + l ) );
-				button_marker_widget = layoutRoot.FindAnyWidget( "button_marker_" + tab_array[index][l].m_ButtonName );
+				string key_prefix;
+				#ifdef PLATFORM_XBOX
+					key_prefix = "xb_button_marker_";
+				#else
+				#ifdef PLATFORM_PS4
+					key_prefix = "ps_button_marker_";
+				#endif
+				#endif
+				button_marker_widget = layoutRoot.FindAnyWidget( key_prefix + tab_array[index][l].m_ButtonName );
 				text_widget.SetText( tab_array[index][l].m_InfoText );
 				panel_widget.Show( true );
 				button_marker_widget.Show( true );
@@ -158,7 +175,14 @@ class ControlsXbox extends UIScriptedMenu
 			
 			ref array<int> element = button_marker_groups.GetElement( l );
 			string key_name = button_marker_groups.GetKey( l );
-			button_marker_widget = layoutRoot.FindAnyWidget( "button_marker_" + key_name );
+			#ifdef PLATFORM_XBOX
+				key_prefix = "xb_button_marker_";
+			#else
+			#ifdef PLATFORM_PS4
+				key_prefix = "ps_button_marker_";
+			#endif
+			#endif
+			button_marker_widget = layoutRoot.FindAnyWidget( key_prefix + key_name );
 			
 			for( int g = 0; g < element.Count(); g++ )
 			{
@@ -223,6 +247,9 @@ class ControlsXbox extends UIScriptedMenu
 		array<ref JsonControlMappingInfo> control_mapping_info = new array<ref JsonControlMappingInfo>;
 		
 		string file_path =	"Xbox/PageDataControlIer.json";
+		#ifdef PLATFORM_PS4
+			file_path =	"Ps4/PageDataControlIer.json";
+		#endif
 		FileHandle file_handle = OpenFile(file_path, FileMode.READ);
 		JsonSerializer js = new JsonSerializer();
 		
@@ -231,7 +258,7 @@ class ControlsXbox extends UIScriptedMenu
 		string content = "";
 		if ( file_handle )
 		{
-			while ( FGets( file_handle,  line_content ) > 0 )
+			while ( FGets( file_handle,  line_content ) >= 0 )
 			{
 				content += line_content;
 			}
@@ -260,6 +287,15 @@ class ControlsXbox extends UIScriptedMenu
 		
 		layoutRoot.FindAnyWidget("Tabber").GetScript( m_TabScript );
 		
+		#ifdef PLATFORM_XBOX
+			layoutRoot.FindAnyWidget("XboxControlsImage").Show( true );
+		#else
+		#ifdef PLATFORM_PS4
+			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
+			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:circle" );
+			layoutRoot.FindAnyWidget("PSControlsImage").Show( true );
+		#endif
+		#endif
 		m_tab_images[0] = ImageWidget.Cast( layoutRoot.FindAnyWidget("MovementTabBackdropImageWidget") );
 		m_tab_images[1] = ImageWidget.Cast( layoutRoot.FindAnyWidget("WeaponsAndActionsBackdropImageWidget") );
 		m_tab_images[2] = ImageWidget.Cast( layoutRoot.FindAnyWidget("InventoryTabBackdropImageWidget") );
@@ -271,20 +307,20 @@ class ControlsXbox extends UIScriptedMenu
 	
 	override void Update( float timeslice )
 	{
-		if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUITabLeft",false) )
 		{
 			m_TabScript.PreviousTab();
 			DrawConnectingLines( m_TabScript.GetSelectedIndex() );
 		}
 		
 		//RIGHT BUMPER - TAB RIGHT
-		if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUITabRight",false) )
 		{
 			m_TabScript.NextTab();
 			DrawConnectingLines( m_TabScript.GetSelectedIndex() );
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
+		if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
 		{
 			Back();
 		}

@@ -11,17 +11,17 @@ PanelWidgetClass rootFrame {
  style rover_sim_black
  {
   ImageWidgetClass XboxControlsImage {
-   visible 1
+   visible 0
    inheritalpha 0
    ignorepointer 0
    position 0 0.03
-   size 0.792 0.554
+   size 792 554
    halign center_ref
    valign center_ref
    hexactpos 0
    vexactpos 0
-   hexactsize 0
-   vexactsize 0
+   hexactsize 1
+   vexactsize 1
    fixaspect fixwidth
    priority 1
    imageTexture "{1D599221D74CCBEF}Gui/textures/controller_xboxone.edds"
@@ -33,7 +33,7 @@ PanelWidgetClass rootFrame {
    filter 1
    nocache 0
    {
-    PanelWidgetClass button_marker_X {
+    PanelWidgetClass xb_button_marker_X {
      visible 1
      position 0.687 0.2676
      size 7 7
@@ -44,7 +44,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_UP {
+    PanelWidgetClass xb_button_marker_UP {
      visible 1
      position 0.3626 0.4328
      size 7 7
@@ -55,7 +55,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_R {
+    PanelWidgetClass xb_button_marker_R {
      visible 1
      position 0.63 0.4855
      size 7 7
@@ -66,7 +66,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_A {
+    PanelWidgetClass xb_button_marker_A {
      visible 1
      position 0.757 0.3663
      size 7 7
@@ -77,7 +77,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_LEFT {
+    PanelWidgetClass xb_button_marker_LEFT {
      visible 1
      position 0.308 0.505
      size 7 7
@@ -88,7 +88,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_DOWN {
+    PanelWidgetClass xb_button_marker_DOWN {
      visible 1
      position 0.3626 0.5742
      size 7 7
@@ -99,7 +99,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_RIGHT {
+    PanelWidgetClass xb_button_marker_RIGHT {
      visible 1
      position 0.4156 0.505
      size 7 7
@@ -110,7 +110,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_Y {
+    PanelWidgetClass xb_button_marker_Y {
      visible 1
      position 0.7572 0.175
      size 7 7
@@ -121,7 +121,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_B {
+    PanelWidgetClass xb_button_marker_B {
      visible 1
      position 0.82687 0.27343
      size 7 7
@@ -132,7 +132,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_START {
+    PanelWidgetClass xb_button_marker_START {
      visible 1
      position 0.569 0.2311
      size 7 7
@@ -143,7 +143,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_BACK {
+    PanelWidgetClass xb_button_marker_BACK {
      visible 1
      position 0.4218 0.2311
      size 7 7
@@ -154,7 +154,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_L {
+    PanelWidgetClass xb_button_marker_L {
      visible 1
      position 0.237 0.2685
      size 7 7
@@ -165,7 +165,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_LTilt {
+    PanelWidgetClass xb_button_marker_LTilt {
      visible 1
      position 0.1902 0.2685
      size 7 7
@@ -176,7 +176,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_RS {
+    PanelWidgetClass xb_button_marker_RS {
      visible 1
      position 0.6904 0.0149
      size 7 7
@@ -187,7 +187,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_RT {
+    PanelWidgetClass xb_button_marker_RT {
      visible 1
      position 0.7841 0.0478
      size 7 7
@@ -198,7 +198,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_LS {
+    PanelWidgetClass xb_button_marker_LS {
      visible 1
      position 0.3008 0.0149
      size 7 7
@@ -209,7 +209,7 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_LT {
+    PanelWidgetClass xb_button_marker_LT {
      visible 1
      position 0.2054 0.0478
      size 7 7
@@ -220,9 +220,210 @@ PanelWidgetClass rootFrame {
      fixaspect fixwidth
      style rover_sim_colorable
     }
-    PanelWidgetClass button_marker_XBOX {
+   }
+  }
+  ImageWidgetClass PSControlsImage {
+   visible 0
+   inheritalpha 0
+   ignorepointer 0
+   position 0 0.03
+   size 796 449
+   halign center_ref
+   valign center_ref
+   hexactpos 0
+   vexactpos 0
+   hexactsize 1
+   vexactsize 1
+   fixaspect fixwidth
+   priority 1
+   imageTexture "{83AFFB564105BB71}Gui/textures/controller_ps4.edds"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
+   "flip u" 0
+   filter 1
+   nocache 0
+   {
+    PanelWidgetClass ps_button_marker_X {
      visible 1
-     position 0.495 0.0995
+     position 0.737 0.2898
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_UP {
+     visible 1
+     position 0.18 0.2
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_R {
+     visible 1
+     position 0.65778 0.51258
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_A {
+     visible 1
+     position 0.811 0.4077
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_LEFT {
+     visible 1
+     position 0.125 0.288
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_DOWN {
+     visible 1
+     position 0.18 0.38
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_RIGHT {
+     visible 1
+     position 0.24 0.288
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_Y {
+     visible 1
+     position 0.811 0.1701
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_B {
+     visible 1
+     position 0.885 0.2898
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_START {
+     visible 1
+     position 0.70232 0.13016
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_BACK {
+     visible 1
+     position 0.5 0.2311
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_L {
+     visible 1
+     position 0.33143 0.50731
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_LTilt {
+     visible 1
+     position 0.2763 0.51223
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_RS {
+     visible 1
+     position 0.8015 0.0149
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_RT {
+     visible 1
+     position 0.86603 0.03057
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_LS {
+     visible 1
+     position 0.18693 0.00998
+     size 7 7
+     hexactpos 0
+     vexactpos 0
+     hexactsize 1
+     vexactsize 1
+     fixaspect fixwidth
+     style rover_sim_colorable
+    }
+    PanelWidgetClass ps_button_marker_LT {
+     visible 1
+     position 0.12208 0.0281
      size 7 7
      hexactpos 0
      vexactpos 0
@@ -1440,7 +1641,7 @@ PanelWidgetClass rootFrame {
         }
        }
       }
-      FrameWidgetClass XboxControls {
+      FrameWidgetClass ConsoleControls {
        visible 1
        clipchildren 0
        ignorepointer 1
@@ -1452,7 +1653,7 @@ PanelWidgetClass rootFrame {
        hexactsize 0
        vexactsize 0
        {
-        ImageWidgetClass XboxTabLeftControl {
+        ImageWidgetClass TabLeftControl {
          visible 1
          clipchildren 1
          ignorepointer 1
@@ -1469,7 +1670,7 @@ PanelWidgetClass rootFrame {
          "no wrap" 1
          stretch 0
         }
-        ImageWidgetClass XboxTabRightControl {
+        ImageWidgetClass TabRightControl {
          visible 1
          clipchildren 1
          ignorepointer 1
@@ -1722,7 +1923,7 @@ PanelWidgetClass rootFrame {
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         text "Back"
+         text "#str_rootframe_toolbar_bg_consoletoolbar_back_backtext0"
          font "gui/fonts/sdf_MetronLight24"
          "exact text" 1
          "exact text size" 22

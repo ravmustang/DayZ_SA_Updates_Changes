@@ -48,6 +48,8 @@ class SymptomManager
 	int m_ActiveSymptomIndexPrimary = -1;
 	int m_CurrentCommandID;
 	
+	const int STORAGE_VERSION = 100;
+	
 	ref Timer m_Timer;
 	
 	bool m_ShowDebug = false;
@@ -68,7 +70,13 @@ class SymptomManager
 		RegisterSymptom(new HotSymptom);
 		//RegisterSymptom(new BulletHitSymptom);
 	}
-
+	
+	int GetStorageVersion()
+	{
+		return STORAGE_VERSION;
+	}
+	
+	
 	void AutoactivateSymptoms()
 	{
 		if( GetGame().IsClient() ) 
@@ -645,13 +653,12 @@ class SymptomManager
 		ctx.Write( m_SaveQueue );
 	}
 
-	void OnStoreLoad( ParamsReadContext ctx, int version )
+	bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		ref array<int> m_SaveQueue;
 		
 		if(ctx.Read(m_SaveQueue))
 		{
-		
 			for( int i = 0; i < m_SaveQueue.Count(); i++ )
 			{
 				int id = m_SaveQueue.Get(i);
@@ -665,7 +672,14 @@ class SymptomManager
 					QueueUpSecondarySymptom( id );
 				}
 			}
+			return true;
 		}
+		else
+		{
+			return false;
+		}
+		
+		
 	}
 	
 	void DebugRequestExitSymptom(int SYMPTOM_uid)

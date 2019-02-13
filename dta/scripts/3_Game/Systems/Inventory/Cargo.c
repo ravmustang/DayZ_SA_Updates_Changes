@@ -52,6 +52,12 @@ class CargoBase : Managed
 	 * @return		true if cargo can be added, false otherwise
 	 **/
 	bool CanReceiveItemIntoCargo (EntityAI item) { return true; }
+
+	/**@fn			CanSwapItemInCargo
+	 * @brief		condition EntityAI::CanSwapItemInCargo for Cargo.
+	 * @return		true if cargo can be added, false otherwise
+	 **/
+	bool CanSwapItemInCargo (EntityAI child_entity, EntityAI new_entity) { return true; }
 };
 
 
@@ -83,6 +89,44 @@ class CargoBase : Managed
 		}
 	};
 #else
+#ifdef SERVER_FOR_CONSOLE
+	class CargoList : CargoBase
+	{
+		/**@fn			GetMaxWeight
+		 * @return		maximum weight that the cargo can hold
+		 **/
+		proto native int GetMaxWeight ();
+	
+		/**@fn			GetTotalWeight
+		 * @brief		sums weight of all items in cargo and adds weight of item if item != null
+		 * @return		sum of weights plus weight of item (if !null)
+		 **/
+		proto native int GetTotalWeight (EntityAI item);
+
+		/**@fn			CanFitItemIntoCargo
+		 * @return		true if adding item does not exceed GetMaxWeight, false otherwise
+		 **/		
+		proto native bool CanFitItemIntoCargo (EntityAI cargo);
+	
+		/**@fn			CanReceiveItemIntoCargo
+		 * @return		true if adding item does not exceed GetMaxWeight, false otherwise
+		 **/
+		override bool CanReceiveItemIntoCargo (EntityAI item)
+		{
+			return CanFitItemIntoCargo(item);
+		}
+	
+		/**@fn			CanFitSwappedItemInCargo
+		 * @return		true if swapping item does not exceed GetMaxWeight, false otherwise
+		 **/		
+		proto native bool CanFitSwappedItemInCargo (EntityAI child_entity, EntityAI new_entity);
+	
+		override bool CanSwapItemInCargo (EntityAI child_entity, EntityAI new_entity)
+		{
+			return CanFitSwappedItemInCargo(child_entity, new_entity);
+		}
+	};
+#else
 	class CargoGrid : CargoBase
 	{
 		/**@fn			FindEntityInCargoOn
@@ -90,4 +134,5 @@ class CargoBase : Managed
 		 **/
 		proto native EntityAI FindEntityInCargoOn (int row, int col);
 	};
+#endif
 #endif

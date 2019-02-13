@@ -3,7 +3,7 @@ class Watchtower extends BaseBuildingBase
 	typename ATTACHMENT_BARBED_WIRE			= BarbedWire;
 	typename ATTACHMENT_CAMONET 			= CamoNet;
 	
-	const float MAX_FLOOR_VERTICAL_DISTANCE = 0.5;
+	const float MAX_FLOOR_VERTICAL_DISTANCE 		= 0.5;
 	
 	void Watchtower()
 	{
@@ -19,10 +19,32 @@ class Watchtower extends BaseBuildingBase
 	{
 		if ( !super.CanReceiveAttachment( attachment, slotId ) )
 			return false;
-
+		
 		string slot_name;
 		InventorySlots.GetSelectionForSlotId( slotId , slot_name );
 		slot_name.ToLower();
+		
+		//!!! 
+		//because CanReceiveAttachment() method can be called on all clients in the vicinity, vertical distance check needs to be skipped on clients that don't
+		//interact with the object through attach action (AT_ATTACH_TO_CONSTRUCTION)
+		bool client_skip_check;
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{
+			//check action initiator (AT_ATTACH_TO_CONSTRUCTION)
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			PlayerBase action_initiator = construction_action_data.GetActionInitiator();
+			
+			if ( action_initiator == player )			
+			{
+				construction_action_data.SetActionInitiator( NULL );				//reset action initiator and return
+			}
+			else
+			{
+				client_skip_check = true;
+			}
+		}
+		//
 		
 		//wall attachments
 		//level 1
@@ -30,11 +52,11 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( slot_name.Contains( "woodenlogs" ) )
 			{
-				return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
+				return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1", client_skip_check );
 			}
 			else
 			{
-				return GetConstruction().IsPartConstructed( "level_1_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
+				return GetConstruction().IsPartConstructed( "level_1_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1", client_skip_check );
 			}
 		}
 		//level 2
@@ -42,17 +64,17 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( slot_name.Contains( "material_l2w" ) || slot_name.Contains( "level_2_wall" ) )
 			{
-				return GetConstruction().IsPartConstructed( "level_2_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+				return GetConstruction().IsPartConstructed( "level_2_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2", client_skip_check );
 			}
 			else
 			{
 				if ( slot_name.Contains( "woodenlogs" ) )
 				{
-					return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+					return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2", client_skip_check );
 				}
 				else
 				{
-					return GetConstruction().IsPartConstructed( "level_1_roof" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+					return GetConstruction().IsPartConstructed( "level_1_roof" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2", client_skip_check );
 				}
 			}
 		}
@@ -61,17 +83,17 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( slot_name.Contains( "material_l3w" ) || slot_name.Contains( "level_3_wall" ) )
 			{
-				return GetConstruction().IsPartConstructed( "level_3_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+				return GetConstruction().IsPartConstructed( "level_3_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3", client_skip_check );
 			}
 			else
 			{
 				if ( slot_name.Contains( "woodenlogs" ) )
 				{
-					return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+					return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3", client_skip_check );
 				}
 				else
 				{
-					return GetConstruction().IsPartConstructed( "level_2_roof" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+					return GetConstruction().IsPartConstructed( "level_2_roof" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3", client_skip_check );
 				}
 			}
 		}		
@@ -100,33 +122,33 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( slot_name.Contains( "woodenlogs" ) )
 			{
-				return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
+				return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
 			}
 			else
 			{
-				return GetConstruction().IsPartConstructed( "level_1_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
+				return GetConstruction().IsPartConstructed( "level_1_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
 			}
 		}
 		else if ( slot_name.Contains( "material_l2" ) || slot_name.Contains( "level_2_" ) )
 		{
 			if ( slot_name.Contains( "woodenlogs" ) )
 			{
-				return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+				return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
 			}
 			else
 			{
-				return GetConstruction().IsPartConstructed( "level_2_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+				return GetConstruction().IsPartConstructed( "level_2_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
 			}
 		}
 		else if ( slot_name.Contains( "material_l3" ) || slot_name.Contains( "level_3_" ) )
 		{
 			if ( slot_name.Contains( "woodenlogs" ) )
 			{
-				return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+				return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
 			}
 			else
 			{
-				return GetConstruction().IsPartConstructed( "level_3_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+				return GetConstruction().IsPartConstructed( "level_3_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
 			}
 		}
 				
@@ -147,11 +169,11 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( category_name.Contains( "level_1_" ) )
 			{
-				return GetConstruction().IsPartConstructed( "level_1_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
+				return GetConstruction().IsPartConstructed( "level_1_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
 			}
 			else
 			{
-				return CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
+				return CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_1" );
 			}
 		}
 		//level 2
@@ -159,11 +181,11 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( category_name.Contains( "level_2_" ) )
 			{
-				return GetConstruction().IsPartConstructed( "level_2_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+				return GetConstruction().IsPartConstructed( "level_2_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
 			}
 			else
 			{
-				return GetConstruction().IsPartConstructed( "level_1_roof" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
+				return GetConstruction().IsPartConstructed( "level_1_roof" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_2" );
 			}
 		}
 		//level 3
@@ -171,36 +193,43 @@ class Watchtower extends BaseBuildingBase
 		{
 			if ( category_name.Contains( "level_3_" ) )
 			{
-				return GetConstruction().IsPartConstructed( "level_3_base" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+				return GetConstruction().IsPartConstructed( "level_3_base" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
 			}
 			else
 			{
-				return GetConstruction().IsPartConstructed( "level_2_roof" ) && CheckVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
+				return GetConstruction().IsPartConstructed( "level_2_roof" ) && CheckMemoryPointVerticalDistance( MAX_FLOOR_VERTICAL_DISTANCE, "level_3" );
 			}
 		}
 		
 		return true;
 	}	
 	
-
-	protected bool CheckVerticalDistance( float max_dist, string selection )
+	//returns true if player->mem_point position is within given range (client only)
+	protected bool CheckMemoryPointVerticalDistance( float max_dist, string selection, bool client_skip_check = false )
 	{
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
-			vector player_pos = GetGame().GetPlayer().GetPosition();
-			vector pos;
-			if ( MemoryPointExists( selection ) )
+			if ( !client_skip_check )
 			{
-				pos = ModelToWorld( GetMemoryPointPos( selection ) );
-			}
-			
-			if ( Math.AbsFloat( player_pos[1] - pos[1] ) <= max_dist )
-			{
-				return true;
-			}
-			else
-			{
-				return false;
+				PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+				
+				//check vertical distance
+				vector player_pos = player.GetPosition();
+				vector pos;
+				
+				if ( MemoryPointExists( selection ) )
+				{
+					pos = ModelToWorld( GetMemoryPointPos( selection ) );
+				}
+				
+				if ( Math.AbsFloat( player_pos[1] - pos[1] ) <= max_dist )
+				{
+					return true;
+				}
+				else
+				{
+					return false;
+				}				
 			}
 		}
 		

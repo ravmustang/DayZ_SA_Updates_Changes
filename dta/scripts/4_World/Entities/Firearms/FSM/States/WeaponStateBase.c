@@ -51,14 +51,14 @@ class WeaponStateBase
 		return true;
 	}
 
-	bool LoadCurrentFSMState (ParamsReadContext ctx)
+	bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
 		if (HasFSM())
 		{
 			if (IsIdle())
 			{
 				wpnDebugSpam("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - idle state, skipping other substates");
-				if (m_fsm.LoadCurrentFSMState(ctx))
+				if (m_fsm.LoadCurrentFSMState(ctx, version))
 					return true;
 				else
 					Error("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - Cannot load stable state for weapon=" + this);
@@ -67,7 +67,7 @@ class WeaponStateBase
 			{
 				// if parent state is !idle (unstable) then load whole machine
 				wpnDebugSpam("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - NOT idle state, loading full submachine state");
-				if (m_fsm.LoadCurrentUnstableFSMState(ctx))
+				if (m_fsm.LoadCurrentUnstableFSMState(ctx, version))
 					return true;
 				else
 					Error("[wpnfsm] WeaponStateBase::LoadCurrentFSMState - Cannot load unstable state for weapon=" + this);

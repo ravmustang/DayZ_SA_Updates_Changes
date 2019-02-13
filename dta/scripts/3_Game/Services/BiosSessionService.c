@@ -1,4 +1,3 @@
-
 class BiosSessionService
 {
 	protected int		m_GetSessionAttempts;
@@ -45,13 +44,20 @@ class BiosSessionService
 		{
 			m_GetSessionAttempts	= 0;
 			m_CurrentHandle			= join_handle;
-			Print( m_CurrentHandle );
 		}
 		
 		if( m_GetSessionAttempts < 10 )
 			GetSessionAsync( m_CurrentHandle );
 		else
-			Error( "Cannot get session." ); //TODOPAL
+		{
+			GetGame().GetUIManager().CloseAllSubmenus();
+			GetGame().GetMission().AbortMission();
+			
+			GetGame().GetUIManager().ShowDialog( "#str_xbox_join_fail_title", "#str_xbox_join_fail", 444, DBT_OK, DBB_NONE, DMT_INFO, GetGame().GetUIManager().GetMenu() );
+			g_Game.SetGameState( DayZGameState.MAIN_MENU );
+			g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+			g_Game.GamepadCheck();
+		}
 	}
 	
 	//! Gets a session from a join handle

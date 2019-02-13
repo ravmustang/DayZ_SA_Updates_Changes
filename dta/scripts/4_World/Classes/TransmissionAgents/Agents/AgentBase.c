@@ -11,7 +11,7 @@ enum eAgents
 class AgentBase extends MessageReceiverBase
 {
 	float			m_Type = 0;
-	float			m_Invasibility;//increase the agent count by this number per second
+	float			m_Invasibility;//how fast the agent grows when potent enough to grow
 	float 			m_TransferabilityIn;//to the player
 	float			m_TransferabilityOut;//from the player
 	float			m_ImmunityResistance;//from the player
@@ -19,6 +19,10 @@ class AgentBase extends MessageReceiverBase
 	float 			m_AutoinfectProbability = -1;//probability of autoinfect as percentage per hour (50 means 50% chance autoinfect with this agent will happen 1x times within an hour of gameplay)(also dependent on CanAutoinfectPlayer check)
 	//int				m_ChanceOfInfection = 1;//chance of transmission from enviro sources like ponds etc. [0..1]
 	float 			m_TransferabilityAirOut; // transferibility airborne out
+	float 			m_AntibioticsResistance = 1;//[0..1], 0 means antibiotics have full effect, 1 means no effect
+	
+	EStatLevels m_Potency = EStatLevels.MEDIUM;//grow when player's immune system is at this level or lower
+	float m_DieOffSpeed = 1;//how fast the agent dies off when not potent enough to grow(per sec)
 	
 	void AgentBase()
 	{
@@ -31,6 +35,22 @@ class AgentBase extends MessageReceiverBase
 	{
 		return m_Type;
 	}
+	
+	EStatLevels GetPotency()
+	{
+		return m_Potency;
+	}	
+	
+	float GetDieOffSpeed()
+	{
+		return m_DieOffSpeed;
+	}
+	
+	float GetAntiboticsResistance()
+	{
+		return m_AntibioticsResistance;
+	}
+	
 	float GetInvasibility()
 	{
 		return m_Invasibility;
@@ -82,12 +102,12 @@ class AgentBase extends MessageReceiverBase
 	{
 		return m_MaxCount;
 	}
-	
+	/*
 	float GetImmunityResistance()
 	{
 		return m_ImmunityResistance;
 	}
-
+*/
 	string GetName()
 	{
 		return ClassName();

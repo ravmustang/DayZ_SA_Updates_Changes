@@ -237,6 +237,9 @@ class BaseBuildingBase extends ItemBase
 					GetConstruction().RemoveFromConstructedParts( key );
 				}
 			}
+			
+			//check slot lock for material attachments	
+			GetConstruction().SetLockOnAttachedMaterials( value.GetPartName(), value.IsBuilt() );		//failsafe for corrupted sync/storage data			
 		}
 	}
 	
@@ -271,12 +274,6 @@ class BaseBuildingBase extends ItemBase
 		m_HasBase = has_base;
 	}
 
-	// --- PLACING
-	/*override bool IsHeavyBehaviour()
-	{
-		return true;
-	}*/
-	
 	override bool IsDeployable()
 	{
 		return true;
@@ -331,24 +328,42 @@ class BaseBuildingBase extends ItemBase
 		ctx.Write( m_HasBase );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
 		
+		//--- Base building data ---
 		//Restore synced parts data
 		//sync parts 01
-		ctx.Read( m_SyncParts01 );
-		ctx.Read( m_SyncParts02 );
-		ctx.Read( m_SyncParts03 );
+		if ( !ctx.Read( m_SyncParts01 ) )
+		{
+			m_SyncParts01 = 0;		//set default
+		}
+		if ( !ctx.Read( m_SyncParts02 ) )
+		{
+			m_SyncParts02 = 0;		//set default
+		}
+		if ( !ctx.Read( m_SyncParts03 ) )
+		{
+			m_SyncParts03 = 0;		//set default
+		}
 		
 		//has base
-		ctx.Read( m_HasBase );
+		if ( !ctx.Read( m_HasBase ) )
+		{
+			ConstructionPart construction_part = GetConstruction().GetBaseConstructionPart();
+			m_HasBase = construction_part.IsBuilt();
+		}
+		//---
 		
 		//update server data
 		SetPartsFromSyncData();
-		
+				
 		//synchronize after load
 		Synchronize();
+
+		return true;
 	}
 	
 	override void EEInit()

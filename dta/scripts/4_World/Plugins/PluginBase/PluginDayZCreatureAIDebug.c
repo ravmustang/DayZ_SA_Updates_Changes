@@ -7,7 +7,7 @@ class DayZCreatureAnimScriptDebug
 	proto native void 	SetCreature(DayZCreature creature);
 
 	proto native int 	GetVariableCount();
-	proto native string GetVariableName(int index);
+	proto native owned string GetVariableName(int index);
 	proto native int 	GetVariableType(int index);
 	proto native int 	GetVariableInt(int index);
 	proto native float 	GetVariableFloat(int index);
@@ -18,7 +18,7 @@ class DayZCreatureAnimScriptDebug
 	proto native bool 	SetVariableBool(int index, bool value);
 		
 	proto native int 	GetCommandCount();
-	proto native string GetCommandName(int index);
+	proto native owned string GetCommandName(int index);
 	proto native int 	GetCommandID(int index);
 
 	proto native void 	ActivateCommand(int index, int userInt, float userFloat);

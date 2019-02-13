@@ -251,10 +251,16 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 				string text;
 				ref array<int> new_keybinds = new array<int>;
 				
+				// remove previous backlit
+				GetDayZGame().GetBacklit().KeybindingClear();
+
 				for( int i = 0; i < ua_api.DeterminedCount(); ++i )
 				{
 					int kb_id = ua_api.GetDetermined( i );
 					new_keybinds.Insert( kb_id );
+					
+					// light up specific key
+					GetDayZGame().GetBacklit().KeybindingShow(kb_id);
 				}
 				
 				if( m_CurrentSettingKeyIndex != -1 )

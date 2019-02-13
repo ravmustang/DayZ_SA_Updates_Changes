@@ -38,14 +38,23 @@ class ActionSewTarget: ActionContinuousBase
 	{
 		return "#sew_targets_cuts";
 	}
+	
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		PlayerBase other_player = PlayerBase.Cast(target.GetObject());
+		return other_player.IsBleeding();
+	}
 
-	override void OnEndServer( ActionData action_data )
-	{			
+	override void OnFinishProgressServer( ActionData action_data )
+	{
 		const float ITEM_DAMAGE = 10;
 		float delta = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() );
-		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		
-		ntarget.m_ModifiersManager.DeactivateModifier(eModifiers.MDF_BLEEDING);
+		PlayerBase ntarget = PlayerBase.Cast(action_data.m_Target.GetObject());
+		if (ntarget.GetBleedingManagerServer() )
+		{
+			ntarget.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();
+		}
 		action_data.m_MainItem.AddHealth("GlobalHealth","Health",-delta);
 
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );

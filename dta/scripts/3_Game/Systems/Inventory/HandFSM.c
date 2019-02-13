@@ -64,7 +64,7 @@ class HandFSM extends HFSMBase<HandStateBase, HandEventBase, HandActionBase, Han
 	/**@fn			OnStoreLoad
 	 * @brief		load state of fsm
 	 **/
-	void OnStoreLoad (ParamsReadContext ctx, int version)
+	bool OnStoreLoad (ParamsReadContext ctx, int version)
 	{
 		/*int id = 0;
 		ctx.Read(id);
@@ -72,6 +72,7 @@ class HandFSM extends HFSMBase<HandStateBase, HandEventBase, HandActionBase, Han
 			hndDebugPrint("[hndfsm] OnStoreLoad - loaded current state from id=" + id);
 		else
 			Print("[hndfsm] Warning! OnStoreLoad - cannot load curent hand state, id=" + id);*/
+		return true;
 	}
 
 	/**@fn			OnStoreSave

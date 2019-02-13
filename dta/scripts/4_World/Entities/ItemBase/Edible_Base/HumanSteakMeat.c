@@ -4,6 +4,17 @@ class HumanSteakMeat extends Edible_Base
 	{
 		InsertAgent(eAgents.BRAIN, 1);
 	}
+	
+	override bool CanBeCooked()
+	{
+		return true;
+	}		
+	
+	override bool CanBeCookedOnStick()
+	{
+		return true;
+	}
+	
 	override bool IsMeat()
 	{
 		return true;

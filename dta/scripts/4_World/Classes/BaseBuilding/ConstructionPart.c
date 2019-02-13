@@ -1,19 +1,19 @@
 class ConstructionPart
 {
-	string 	m_Name;
-	int		m_Id;
-	string 	m_PartName;
-	string 	m_MainPartName;
-	bool 	m_IsBuilt;
-	bool 	m_IsBase;
-	bool 	m_IsGate;
+	string 	m_Name;				//localized text name that is displayed ingame
+	int		m_Id;				//a number used for synchronization and persistence purposes, must be unique and withing sync limit (total number of bits in all sync/persistence variables)
+	string 	m_PartName;			//config class name
+	string 	m_MainPartName;		//main (parent) config class name
+	bool 	m_IsBuilt;			//defines part build state
+	bool 	m_IsBase;			//defines if this part is the foundation of the whole construction
+	bool 	m_IsGate;			//defines part gate state
 	
-	void ConstructionPart( string name, string part_name, string main_part_name, int part_id, bool is_built, bool is_base, bool is_gate )
+	void ConstructionPart( string name, string part_name, string main_part_name, int id, bool is_built, bool is_base, bool is_gate )
 	{
 		m_Name = name;
 		m_PartName = part_name;
 		m_MainPartName = main_part_name;
-		m_Id = part_id;
+		m_Id = id;
 		m_IsBuilt = is_built;
 		m_IsBase = is_base;
 		m_IsGate = is_gate;

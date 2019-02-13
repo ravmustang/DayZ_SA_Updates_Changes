@@ -11,7 +11,6 @@ class BleedingNotfr: NotifierBase
 		return eNotifiers.NTF_BLEEDISH;
 	}
 
-
 	override void DisplayBadge()
 	{
 		

@@ -65,5 +65,23 @@ class PlayerPreview: LayoutHolder
 		m_CharacterScaleDelta = wheel;
 		GetGame().GetDragQueue().Call( this, "UpdateScale" );
 		return true;
-	}	
+	}
+	
+	override void UpdateInterval()
+	{
+		SetItemInHands( GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
+	}
+	
+	Man GetPlayerInstance()
+	{
+		return m_CharacterPanelWidget.GetPlayer();
+	}
+	
+	void SetItemInHands( EntityAI new_item )
+	{
+		if( m_CharacterPanelWidget.GetItemInHands() != new_item )
+		{
+			//m_CharacterPanelWidget.SetItemInHands( InventoryItem.Cast( new_item ) );
+		}
+	}
 }

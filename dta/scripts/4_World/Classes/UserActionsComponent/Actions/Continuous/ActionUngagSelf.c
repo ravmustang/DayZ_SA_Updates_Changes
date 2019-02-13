@@ -52,7 +52,7 @@ class ActionUngagSelf: ActionContinuousBase
 		}
 		//action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
-
+	
 	bool IsWearingGag( PlayerBase player )
 	{
 		EntityAI attachment;

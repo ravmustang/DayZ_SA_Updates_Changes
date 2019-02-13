@@ -1,0 +1,3 @@
+class USMCJacket_ColorBase extends Clothing {};
+class USMCJacket_Desert extends USMCJacket_ColorBase {};
+class USMCJacket_Woodland extends USMCJacket_ColorBase {};

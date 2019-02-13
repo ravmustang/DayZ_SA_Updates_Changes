@@ -26,8 +26,8 @@ class ActionViewCompass : ActionContinuousBase
 	void ActionViewCompass()
 	{
 		m_CallbackClass = ActionRaiseAndViewCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_VIEWCOMPASS;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_VIEWCOMPASS;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM_ONCE;
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_OPENITEM_ONCE;
 	}
 	
 	override void CreateConditionComponents()  

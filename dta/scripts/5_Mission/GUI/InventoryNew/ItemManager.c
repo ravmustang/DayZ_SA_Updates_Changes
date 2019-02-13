@@ -299,7 +299,6 @@ class ItemManager
 	void HideTooltip()
 	{
 		m_TooltipWidget.Show( false );
-		delete m_ItemPreviewWidget;
 		delete m_ToolTipTimer;
 	}
 	
@@ -378,23 +377,20 @@ class ItemManager
 	{
 		if ( item_w )
 		{
-			if ( true/*show_temperature */ )
+			if ( item && item.IsInherited( ItemBase ) )
 			{
-				if ( item && item.IsInherited( ItemBase ) )
-				{
-					int color = ColorManager.GetInstance().GetItemColor( ItemBase.Cast( item ) );
+				int color = ColorManager.GetInstance().GetItemColor( ItemBase.Cast( item ) );
 
-					if ( color )
+				if ( color )
+				{
+					Widget color_widget = item_w.FindAnyWidget( "Color" );
+					if( color != -1 )
 					{
-						Widget color_widget = item_w.FindAnyWidget( "Color" );
-						if( color != -1 )
-						{
-							color_widget.SetColor( color );
-						}
-						else
-						{
-							color_widget.SetColor( ColorManager.BASE_COLOR );
-						}
+						color_widget.SetColor( color );
+					}
+					else
+					{
+						color_widget.SetColor( ColorManager.BASE_COLOR );
 					}
 				}
 			}
@@ -403,12 +399,12 @@ class ItemManager
 
 	void PrepareTooltip( EntityAI item, int x = 0, int y = 0 )
 	{
-		if( IsDragging() )
+		if( IsDragging() || !item )
 		{
 			return;
 		}
 
-		if ( item.IsInherited( InventoryItem) )
+		if ( item.IsInherited( InventoryItem ) )
 		{
 			InspectMenuNew.UpdateItemInfo( m_TooltipWidget, item );
 			int screen_w, screen_h;
@@ -444,16 +440,10 @@ class ItemManager
 			
 			m_ToolTipTimer.Run( TOOLTIP_DELAY, this, "ShowTooltip" );
 			
-			// item preview
-			delete m_ItemPreviewWidget;
-
 			Widget preview_frame = m_TooltipWidget.FindAnyWidget("ItemFrameWidget");
 			if (preview_frame)
 			{
-				float ww;
-				float hh;
-				preview_frame.GetSize(ww, hh);
-				m_ItemPreviewWidget = ItemPreviewWidget.Cast( GetGame().GetWorkspace().CreateWidget(ItemPreviewWidgetTypeID, 0, 0, 1, 1, WidgetFlags.VISIBLE, ARGB(255, 255, 255, 255), 210, preview_frame) );
+				m_ItemPreviewWidget = ItemPreviewWidget.Cast( preview_frame );
 				m_ItemPreviewWidget.SetItem(item);
 				m_ItemPreviewWidget.SetView( item.GetViewIndex() );
 			}

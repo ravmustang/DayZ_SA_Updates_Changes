@@ -71,6 +71,8 @@ class CameraToolsMenu extends UIScriptedMenu
 		GetGame().GetInput().ChangeGameFocus(-1);
 		GetGame().GetUIManager().ShowCursor(false);
 		
+		MissionGameplay.Cast( GetGame().GetMission() ).PlayerControlEnable();
+		
 		GetGame().ObjectDelete( m_Camera1 );
 		GetGame().ObjectDelete( m_Camera2 );
 		
@@ -86,6 +88,8 @@ class CameraToolsMenu extends UIScriptedMenu
 		{
 			GetGame().GetInput().ChangeGameFocus(1);
 			GetGame().GetUIManager().ShowCursor(true);
+			MissionGameplay.Cast( GetGame().GetMission() ).PlayerControlDisable();
+			
 		}
 	}
 	
@@ -96,6 +100,7 @@ class CameraToolsMenu extends UIScriptedMenu
 			GetGame().GetInput().ResetGameFocus();
 			GetGame().GetInput().ChangeGameFocus(-1);
 			GetGame().GetUIManager().ShowCursor(false);
+			MissionGameplay.Cast( GetGame().GetMission() ).PlayerControlEnable();
 		}
 	}
 	
@@ -686,6 +691,7 @@ class CameraToolsMenu extends UIScriptedMenu
 			GetGame().GetInput().ResetGameFocus();
 			GetGame().GetInput().ChangeGameFocus(-1);
 			GetGame().GetUIManager().ShowCursor(false);
+			MissionGameplay.Cast( GetGame().GetMission() ).PlayerControlEnable();
 			SetFocus( layoutRoot );
 			return true;
 		}

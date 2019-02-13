@@ -883,7 +883,7 @@ ImageSetClass {
     }
     ImageSetDefClass iconPill {
      Name "iconPill"
-     Pos 612 200
+     Pos 612 161
      Size 38 38
      Flags 3
     }

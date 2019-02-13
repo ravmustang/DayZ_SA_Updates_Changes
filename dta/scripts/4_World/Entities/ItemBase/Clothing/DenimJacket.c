@@ -1,0 +1,1 @@
+class DenimJacket extends Clothing {};

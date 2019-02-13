@@ -85,6 +85,11 @@ class DayZPlayerCamera
 		return -1;
 	}
 	
+	bool IsCamera3rdRaised()
+	{
+		return true;
+	}
+	
 	//! data 
 	protected 	DayZPlayer 				m_pPlayer;		//!< player camera is attached to
 	protected 	HumanInputController	m_pInput;		//!< human input 
@@ -644,6 +649,7 @@ enum DayZPlayerConstants
 	CMD_ACTIONMOD_EMPTYSEEDSPACK		= 520,		// erc,cro
 	CMD_ACTIONMOD_INTERACTONCE			= 521,		// erc,cro
 	CMD_ACTIONMOD_ATTACHITEM			= 522,		// erc,cro
+	CMD_ACTIONMOD_CLOSEITEM_ONCE		= 523,		// erc,cro,pne
 	
 	CMD_ACTIONMOD_DROPITEM_HANDS		= 900,		// erc, cro
 	CMD_ACTIONMOD_DROPITEM_INVENTORY	= 901,		// erc, cro

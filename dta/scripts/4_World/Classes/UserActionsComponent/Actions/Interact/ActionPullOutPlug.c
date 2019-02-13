@@ -14,38 +14,31 @@ class ActionPullOutPlug: ActionInteractBase
 		
 	override string GetText()
 	{
-		/*
-		string return_string = "unplug";
-		string selection;
-		PlayerBase m_Player = GetGame().GetPlayer();
-		g_Game.GetPlayerCursorObjectComponentName( m_Player, selection );
-		EntityAI target_EAI = g_Game.GetPlayerCursorObject(m_Player);
-		EntityAI device = target_EAI.GetCompEM().GetPlugOwner(selection);
-		
-		if ( device )
-		{
-			return_string = return_string + " " + device.GetName();
-		}
-		
-		return return_string;
-		*/
-		
 		return "#pull_out_plug";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		Object targetObject = target.GetObject();
-		EntityAI target_EAI = EntityAI.Cast( target.GetObject() ); // cast to EntityAI
+		EntityAI target_EAI = EntityAI.Cast( target.GetObject() );
 		
 		if ( target_EAI.HasEnergyManager() )
 		{
 			string selection = targetObject.GetActionComponentName(target.GetComponentIndex());
-			EntityAI device = target_EAI.GetCompEM().GetPlugOwner(selection);
 			
-			if ( device )
+			
+			if ( GetGame().IsServer() )
 			{
-				return true;
+				EntityAI device = target_EAI.GetCompEM().GetPlugOwner(selection);
+				
+				if ( device )
+				{
+					return true;
+				}
+			}
+			else
+			{
+				return target_EAI.GetCompEM().IsSelectionAPlug(selection);
 			}
 		}
 		

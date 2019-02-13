@@ -1,4 +1,4 @@
-class GasMask extends ClothingBase
+class DallasMask extends ClothingBase
 {
 	override bool CanPutAsAttachment( EntityAI parent )
 	{

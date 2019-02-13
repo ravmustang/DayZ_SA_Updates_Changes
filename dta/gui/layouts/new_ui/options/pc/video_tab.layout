@@ -31,7 +31,7 @@ FrameWidgetClass video_tab_root {
      priority 3
      "no focus" 1
      Padding 8
-     Margin 8
+     Margin 0
      "Size To Content H" 1
      "Size To Content V" 1
      Columns 1
@@ -942,7 +942,7 @@ FrameWidgetClass video_tab_root {
                hexactsize 0
                vexactsize 0
                {
-                TextWidgetClass clouds_detail_label {
+                TextWidgetClass clouds_detail_setting_label {
                  ignorepointer 1
                  size 1 0.55
                  valign center_ref

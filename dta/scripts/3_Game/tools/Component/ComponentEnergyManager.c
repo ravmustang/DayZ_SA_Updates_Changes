@@ -17,7 +17,7 @@ Every EntityAI object which uses this API gains these functions:
 
 class ComponentEnergyManager : Component
 {
-	protected static bool 			m_DebugPlugs = false; // Use this to toggle visualisation of plug connections
+	protected static bool 			m_DebugPlugs = true; // Use this to toggle visualisation of plug connections
 	protected 		Shape			m_DebugPlugArrow;
 	
 	protected 		bool			m_IsSwichedOn;
@@ -31,12 +31,15 @@ class ComponentEnergyManager : Component
 	protected 		bool			m_ShowSocketsInInventory;
 	protected 		bool			m_HasElectricityIcon; // Electricity icon over the item in inventory
 	protected 		bool			m_AutoSwitchOffWhenInCargo;
+	protected 		bool			m_IsPlugged; // Synchronized variable
 	
 	protected 		int				m_MySocketID = -1;
 	protected 		int				m_PlugType;
-	protected 		int				m_EnergySourceIDLow;  // Persistent ID
-	protected 		int				m_EnergySourceIDHigh; // persistent ID
+	protected 		int				m_EnergySourceStorageIDLow;  // Storage persistence ID
+	protected 		int				m_EnergySourceStorageIDHigh; // Storage persistence ID
 	protected 		int				m_AttachmentActionType;
+	protected 		int				m_EnergySourceNetworkIDLow = -1;  // Network ID
+	protected 		int				m_EnergySourceNetworkIDHigh = -1; // Network ID
 	
 	protected 		float			m_EnergyUsage;
 	protected 		float			m_Energy;
@@ -46,6 +49,7 @@ class ComponentEnergyManager : Component
 	protected 		float			m_CordLength;
 	protected 		float			m_LastUpdateTime;
 	protected 		float			m_WetnessExposure;
+	protected 		float			m_UpdateInterval; // Interval of OnWork(...) calls and device updates.
 	
 	protected 		string			m_CordTextureFile;
 	
@@ -64,7 +68,7 @@ class ComponentEnergyManager : Component
 	ref Timer 						m_UpdateTimer;
 	ref Timer 						m_DebugUpdate;
 	
-	const int MAX_SOCKETS_COUNT 	= 10;
+	const int MAX_SOCKETS_COUNT 	= 4;
 	EntityAI m_Sockets[MAX_SOCKETS_COUNT];
 	
 	
@@ -72,7 +76,11 @@ class ComponentEnergyManager : Component
 	// Constructor
 	void ComponentEnergyManager()
 	{
-		
+		// Disable debug arrows on public release, so that they don't use their timers.
+		if ( !GetGame().IsDebug() )
+		{
+			m_DebugPlugs = false;
+		}
 	}
 
 	// Initialization. Energy Manager is ready.
@@ -98,7 +106,7 @@ class ComponentEnergyManager : Component
 			m_DebugPlugArrow = NULL; 
 		}
 		
-		if ( IsPlugged() )
+		if ( GetEnergySource() )
 		{
 			vector from = GetEnergySource().GetPosition() + "0 0.1 0";
 			vector to = m_ThisEntityAI.GetPosition() + "0 0.1 0";
@@ -159,6 +167,14 @@ class ComponentEnergyManager : Component
 		
 		m_AttachmentActionType			= GetGame().ConfigGetFloat (param_access_energy_sys + "attachmentAction");
 		m_WetnessExposure				= GetGame().ConfigGetFloat (param_access_energy_sys + "wetnessExposure");
+		
+		float update_interval			= GetGame().ConfigGetFloat (param_access_energy_sys + "updateInterval");
+		
+		// Set update interval
+		if ( update_interval <= 0 )
+			update_interval = 1;
+		
+		SetUpdateInterval( update_interval );
 		
 		// If energyAtSpawn is present, then use its value for energyStorageMax if that cfg param is not present (for convenience's sake)
 		string cfg_check_energy_limit = param_access_energy_sys + "energyStorageMax";
@@ -248,8 +264,16 @@ class ComponentEnergyManager : Component
 	// When the object is deleted
 	void OnDeviceDestroyed()
 	{
+		bool was_working = m_ThisEntityAI.GetCompEM().IsWorking();
+		
+		SwitchOff();
 		UnplugAllDevices();
 		UnplugThis();
+		SetPowered( false );
+		
+		if ( was_working )
+			m_ThisEntityAI.OnWorkStop();
+		;
 	}
 	
 	
@@ -504,8 +528,8 @@ class ComponentEnergyManager : Component
 	// Stores IDs of the energy source.
 	void StoreEnergySourceIDs(int ID_low, int ID_high)
 	{
-		m_EnergySourceIDLow = ID_low;
-		m_EnergySourceIDHigh = ID_high;
+		m_EnergySourceStorageIDLow = ID_low;
+		m_EnergySourceStorageIDHigh = ID_high;
 	}
 	
 	//! Energy manager: Changes the maximum amount of energy this device can store (when pristine).
@@ -592,6 +616,13 @@ class ComponentEnergyManager : Component
 			SwitchOff();
 		}
 	}
+	
+	//! Energy manager: Sets the interval of the OnWork(...) calls. Changing this value does not change the rate of energy consumption.
+	void SetUpdateInterval( float value )
+	{
+		m_UpdateInterval = value;
+	}
+	
 	
 	
 	
@@ -715,12 +746,7 @@ class ComponentEnergyManager : Component
 	//! Energy manager: Returns true if this device is plugged into some other device (even if they are OFF or ruined). Otherwise it returns false.
 	bool IsPlugged()
 	{
-		if ( GetEnergySource() != NULL )
-		{
-			return true;
-		}
-		
-		return false;	
+		return m_IsPlugged;
 	}
 	
 	
@@ -868,12 +894,16 @@ class ComponentEnergyManager : Component
 			return true;
 		}
 		
-		EntityAI energy_source = GetEnergySource();
 		vector source_pos;
 		float distance;
 		
 		if ( override_source_position == "-1 -1 -1" )
 		{
+			EntityAI energy_source = GetEnergySource();
+			
+			if (!energy_source)
+				return false;
+			
 			source_pos = energy_source.GetPosition();
 			distance = vector.Distance( from_position, source_pos );
 		}
@@ -898,6 +928,27 @@ class ComponentEnergyManager : Component
 		return m_ShowSocketsInInventory;
 	}
 	
+	//! Energy manager: Returns true if this selection is a plug that's plugged into this device. Otherwise returns false.
+	bool IsSelectionAPlug(string selection_to_test )
+	{
+		if ( GetPluggedDevices() )
+		{
+			int socket_count = GetSocketsCount();
+			
+			for ( int i = socket_count; i >= 0; --i )
+			{
+				string real_selection = SOCKET_ + i.ToString() +_PLUGGED;
+				
+				if ( selection_to_test == real_selection)
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
 	
 	
 	
@@ -920,15 +971,27 @@ class ComponentEnergyManager : Component
 	}
 
 	// Returns persistent ID (low) of the energy source
-	int GetEnergySourceIDLow()
+	int GetEnergySourceStorageIDLow()
 	{
-		return m_EnergySourceIDLow;
+		return m_EnergySourceStorageIDLow;
 	}
 
 	// Returns persistent ID (high) of the energy source
-	int GetEnergySourceIDHigh()
+	int GetEnergySourceStorageIDHigh()
 	{
-		return m_EnergySourceIDHigh;
+		return m_EnergySourceStorageIDHigh;
+	}
+	
+	// Returns network ID (low) of the energy source
+	int GetEnergySourceNetworkIDLow()
+	{
+		return m_EnergySourceNetworkIDLow;
+	}
+
+	// Returns network ID (high) of the energy source
+	int GetEnergySourceNetworkIDHigh()
+	{
+		return m_EnergySourceNetworkIDHigh;
 	}
 	
 	//! Energy manager: Returns the number of devices plugged into this one.
@@ -963,6 +1026,12 @@ class ComponentEnergyManager : Component
 		}
 		
 		return 0;
+	}
+	
+	//! Energy manager: Returns the update interval of this device.
+	float GetUpdateInterval()
+	{
+		return m_UpdateInterval;
 	}
 	
 
@@ -1125,8 +1194,9 @@ class ComponentEnergyManager : Component
 		
 		UpdateCanWork();
 		
+		
+		
 		m_ThisEntityAI.OnIsPlugged(source_device);
-		SynchPlug(source_device, true);
 	}
 
 	// Called when this device is UNPLUGGED from the energy source
@@ -1135,14 +1205,33 @@ class ComponentEnergyManager : Component
 		UpdateCanWork();
 		
 		m_ThisEntityAI.OnIsUnplugged( last_energy_source );
-		SynchPlug(last_energy_source, false);
 	}
 
 	// When something is plugged into this device
-	void OnOwnSocketTaken( EntityAI device ) {	m_ThisEntityAI.OnOwnSocketTaken(device);}
+	void OnOwnSocketTaken( EntityAI device ) 
+	{
+		//play sound
+		if ( device.GetCompEM().GetPlugType() == PLUG_COMMON_APPLIANCE )
+		{
+			EffectSound sound_plug;
+			m_ThisEntityAI.PlaySoundSet( sound_plug, "cablereel_plugin_SoundSet", 0, 0 );
+		}
+		
+		m_ThisEntityAI.OnOwnSocketTaken(device);
+	}
 
 	// When something is UNPLUGGED from this device
-	void OnOwnSocketReleased( EntityAI device ) {m_ThisEntityAI.OnOwnSocketReleased( device );}
+	void OnOwnSocketReleased( EntityAI device ) 
+	{
+		//play sound
+		if ( device.GetCompEM().GetPlugType() == PLUG_COMMON_APPLIANCE )
+		{
+			EffectSound sound_unplug;
+			m_ThisEntityAI.PlaySoundSet( sound_unplug, "cablereel_unplug_SoundSet", 0, 0 );
+		}
+				
+		m_ThisEntityAI.OnOwnSocketReleased( device );
+	}
 	
 	
 	// Handles automatic attachment action
@@ -1191,7 +1280,7 @@ class ComponentEnergyManager : Component
 			
 			if ( !m_UpdateTimer.IsRunning() ) // Makes sure the timer is NOT running already
 			{
-				m_UpdateTimer.Run(CONSUME_ENERGY_INTERVAL, this, "DeviceUpdate", NULL, true);
+				m_UpdateTimer.Run( GetUpdateInterval() , this, "DeviceUpdate", NULL, true);
 			}
 		}
 	}
@@ -1287,8 +1376,26 @@ class ComponentEnergyManager : Component
 		
 		if (source)
 		{
+			m_IsPlugged = true;
 			StartUpdates();
 		}
+		else
+		{
+			m_IsPlugged = false;
+			m_EnergySourceNetworkIDLow = -1;
+			m_EnergySourceNetworkIDHigh = -1;
+		}
+		
+		if (m_EnergySource)
+		{
+			m_EnergySource.GetNetworkID( m_EnergySourceNetworkIDLow, m_EnergySourceNetworkIDHigh );
+			
+			Print(m_EnergySource);
+			Print(m_EnergySourceNetworkIDLow);
+			Print(m_EnergySourceNetworkIDHigh);
+		}
+		
+		Synch();
 	}
 
 	// Plugs the given device into this one
@@ -1316,31 +1423,8 @@ class ComponentEnergyManager : Component
 			
 			return true;
 		}
-		else
-		{ 
-			// The receiving device cannot accept this plug. Figure out why:
-			
-			string this_str = m_ThisEntityAI.GetType();
-			string device_str = device_to_plug.GetType();
-			
-			if ( GetPlugType() != device_to_plug.GetCompEM().GetPlugType() )
-			{
-				// Technically, plug compatibility is not a problem. However, having incompatible devices connected might cause issues elsewhere, so that's why it is forbidden here.
-				DPrint("WARNING! Attempt at plugging " + device_str + " into " + this_str + " has failed due to incompatible plug! To make the plug compatible, include its type in the receiving device's config (array parameter 'compatiblePlugTypes')");
-			}
-			
-			if ( m_ThisEntityAI == device_to_plug.GetCompEM().GetEnergySource() )
-			{
-				DPrint("WARNING! Attempt at plugging " + device_str + " into " + this_str + " has encountered a problem. These devices are already connected! Solution: Do not plug a device into its current power source twice.");
-			}
-			
-			if ( GetPluggedDevicesCount() >= GetSocketsCount() )
-			{
-				DPrint("WARNING! Attempt at plugging " + device_str + " into " + this_str + " has failed! The receiver has no free socket for another plug!");
-			}
-			
-			return false;
-		}
+		
+		return false;
 	}
 
 	// Sets the device to which the given plug selection belongs to
@@ -1427,10 +1511,10 @@ class ComponentEnergyManager : Component
 	
 	void RememberLastUpdateTime()
 	{
-		m_LastUpdateTime = GetGame().GetTime();
+		m_LastUpdateTime = GetCurrentUpdateTime();
 	}
 	
-	float GetLastUpdateTime()
+	float GetCurrentUpdateTime()
 	{
 		return GetGame().GetTime();
 	}
@@ -1454,16 +1538,18 @@ class ComponentEnergyManager : Component
 				if ( m_LastUpdateTime == 0 )
 				{
 					RememberLastUpdateTime();
-					consumed_energy_coef = 1000 / (CONSUME_ENERGY_INTERVAL * 1000);
+					consumed_energy_coef = 1.0;
 				}
 				else
 				{
-					consumed_energy_coef = (GetLastUpdateTime() - m_LastUpdateTime) / (CONSUME_ENERGY_INTERVAL * 1000);
+					float updatetime = GetCurrentUpdateTime();
+					float time = updatetime - m_LastUpdateTime;
+					consumed_energy_coef = time / 1000;
 				}
 				
 				if (consumed_energy_coef > 0) // Prevents calling of OnWork events when no energy is consumed
 				{
-					m_LastUpdateTime = GetLastUpdateTime();
+					m_LastUpdateTime = GetCurrentUpdateTime();
 					float consume_energy = GetEnergyUsage() * consumed_energy_coef;
 					bool has_consumed_enough = true;
 					
@@ -1527,41 +1613,6 @@ class ComponentEnergyManager : Component
 						SwitchOff(); 
 					}
 				}
-			}
-		}
-	}
-	
-	/*====================================
-	  SERVER --> CLIENT  SYNCHRONIZATION
-	====================================*/
-	
-	// Synchronizes plug state (plugged/unplugged)
-	protected void SynchPlug( EntityAI source_device, bool is_plugging_in )
-	{
-		if ( GetGame().IsServer() )
-		{
-			// Filter: Do not synchronize plug connections when energy source is attachment of this device, or this device is energy source of attachment. These cases are already handled client-side to save on traffic.
-			Object attachment = m_ThisEntityAI.GetAttachmentByType( source_device.Type() );
-			
-			if (attachment == source_device)
-				return;
-
-			attachment = source_device.GetAttachmentByType(m_ThisEntityAI.Type());
-			
-			if (attachment == m_ThisEntityAI)
-				return;
-			
-			// Filter was passed, now let's send signals.
-		
-			if (is_plugging_in)
-			{
-				// Send plug in signal with source_device
-				GetGame().RPCSingleParam( m_ThisEntityAI, ERPCs.RPC_EM_PLUG_CHANGED, new Param1<EntityAI>(source_device), true);
-			}
-			else
-			{
-				// Send unplug signal
-				GetGame().RPCSingleParam( m_ThisEntityAI, ERPCs.RPC_EM_PLUG_CHANGED, new Param1<EntityAI>(NULL), true);
 			}
 		}
 	}

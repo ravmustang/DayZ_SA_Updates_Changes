@@ -29,6 +29,17 @@ class RestrainingToolLocked extends ItemBase
 				this.Delete();
 			}
 		}
+		if( new_owner )
+		{
+			PlayerBase player = PlayerBase.Cast(new_owner);
+			
+			if(player)
+			{
+				player.GetItemInHands() == this;
+				player.OnRestrainStart();
+				//Print("---------============ restraining item goes into inventory =============-----------");
+			}
+		}
 	}
 }
 

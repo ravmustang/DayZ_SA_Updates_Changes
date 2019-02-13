@@ -11,8 +11,12 @@ class BleedingSource
 	Shape m_DebugShape1;
 	ref Timer m_DebugTick;
 	vector m_Offset;
+	float m_FlowModifier;
+	float m_ActiveTime;
+	float m_MaxTime;
+	bool m_DeleteRequested;
 	
-	void BleedingSource(PlayerBase player, int bit, string bone, vector orientation, vector offset)
+	void BleedingSource(PlayerBase player, int bit, string bone, vector orientation, vector offset,int max_time, float flow_modifier)
 	{
 		//m_Position = position;
 		m_Player = player;
@@ -20,6 +24,9 @@ class BleedingSource
 		m_Bone = bone;
 		m_Orientation = orientation;
 		m_Offset = offset;
+		m_FlowModifier = flow_modifier;
+		m_MaxTime = max_time;
+		
 		//CreateBleedSymptom();
 		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{	
@@ -39,8 +46,18 @@ class BleedingSource
 		{
 			Debug.RemoveShape(m_DebugShape1);
 		}
-		
-		
+	}
+	
+	
+	
+	int GetActiveTime()
+	{
+		return m_ActiveTime;
+	}
+	
+	void SetActiveTime(int time)
+	{
+		m_ActiveTime = time;
 	}
 	
 	int GetBit()
@@ -73,10 +90,23 @@ class BleedingSource
 
 	void OnUpdateServer(float deltatime, bool no_blood_loss)
 	{
+		m_ActiveTime += deltatime;
+		
+		if(m_ActiveTime >= m_MaxTime)
+		{
+			if(m_Player.GetBleedingManagerServer() && !m_DeleteRequested)
+			{
+				m_Player.GetBleedingManagerServer().RequestDeletion(GetBit());//add yourself to a list of sources to be deleted
+				m_DeleteRequested = true;
+			}
+		}
+		
 		if( !no_blood_loss )
 		{
-			m_Player.AddHealth("GlobalHealth","Blood", (PlayerConstants.BLEEDING_SOURCE_BLOODLOSS_PER_SEC * deltatime) );
+			m_Player.AddHealth("GlobalHealth","Blood", (PlayerConstants.BLEEDING_SOURCE_BLOODLOSS_PER_SEC * deltatime * m_FlowModifier) );
 		}
+		
+		
 		
 	}
 	

@@ -114,7 +114,7 @@ FrameWidgetClass FrameWidget {
        lines 30
       }
       ButtonWidgetClass ButtonSpawnInInv {
-       position 0.8224 0.882
+       position 0.8224 0.87098
        size 0.1577 20
        vexactsize 1
        style Default
@@ -328,12 +328,21 @@ FrameWidgetClass FrameWidget {
        text_proportion 0.8
       }
       ButtonWidgetClass SpawnAsAttachment {
-       position 0.8224 0.9265
+       position 0.8231 0.9045
        size 0.1577 20
        vexactsize 1
        style Default
        text "Spawn As Attachment"
        text_proportion 0.8
+      }
+      ButtonWidgetClass SpawnSpecial {
+       position 0.8231 0.9381
+       size 0.1577 20
+       hexactpos 0
+       vexactpos 0
+       hexactsize 0
+       vexactsize 1
+       text "Spawn Ground Special"
       }
      }
     }
@@ -662,7 +671,7 @@ FrameWidgetClass FrameWidget {
          text "Character Modifiers"
         }
         CheckBoxWidgetClass cbx_CharacterDebug {
-         position 0 90
+         position 0 130.149
          size 1 20
          hexactpos 1
          vexactpos 1
@@ -688,6 +697,15 @@ FrameWidgetClass FrameWidget {
          hexactsize 0
          vexactsize 1
          text "Character Agents"
+        }
+        CheckBoxWidgetClass cbx_CharacterLevels {
+         position 1.6768 90.85291
+         size 149.70999 18.5576
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         text "Character Levels"
         }
        }
       }

@@ -43,14 +43,22 @@ class ActionSewSelf: ActionContinuousBase
 	{
 		return "#sew_cuts";
 	}
+	
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		return player.IsBleeding();
+	}
 
-	override void OnEndServer( ActionData action_data )
-	{	
+	override void OnFinishProgressServer( ActionData action_data )
+	{
 		const float ITEM_DAMAGE = 10;
 		float delta = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() );
 
+		if (action_data.m_Player.GetBleedingManagerServer() )
+		{
+			action_data.m_Player.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();	
+		}
 		action_data.m_MainItem.AddHealth("GlobalHealth","Health",-delta);
-		action_data.m_Player.m_ModifiersManager.DeactivateModifier(eModifiers.MDF_BLEEDING);
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

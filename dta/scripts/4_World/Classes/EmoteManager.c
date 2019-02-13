@@ -77,6 +77,7 @@ class EmoteManager
 	protected bool 			m_PlayerDies;
 	protected bool 			m_controllsLocked;
 	protected bool 			m_EmoteLockState;
+	protected int 			m_DeferredMenuEmoteLaunch;
 	protected int  			m_GestureID;
 	protected int			m_BelayedEmoteSlot;
 	protected int			m_PreviousGestureID;
@@ -84,6 +85,7 @@ class EmoteManager
 	protected int 			m_LastMask;
 	protected int 			m_RPSOutcome;
 	protected const float 	WATER_DEPTH = 0.15;
+	PluginAdminLog 			m_AdminLog;
 	
 	void EmoteManager( PlayerBase player ) 
 	{
@@ -91,6 +93,7 @@ class EmoteManager
 		m_HIC = m_Player.GetInputController();
 		m_ItemIsOn = false;
 		m_RPSOutcome = -1;
+		m_DeferredMenuEmoteLaunch = -1;
 		
 		// new input-based interrupt actions
 		m_InterruptInputs = new array<string>;
@@ -121,6 +124,8 @@ class EmoteManager
 		//leave this here?
 		m_HandInventoryLocation = new InventoryLocation;
 		m_HandInventoryLocation.SetHands(m_Player,null);
+		
+		m_AdminLog = PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
 	}
 	
 	void SetGesture(int id)
@@ -237,7 +242,7 @@ class EmoteManager
 				EndCallback();
 			}
 		}	
-		//no m_Callback exists
+		//no m_Callback exists //TODO please future me, refactor into some sort of switch
 		else
 		{
 			if (m_bEmoteIsPlaying)
@@ -267,7 +272,13 @@ class EmoteManager
 				//m_Player.OnSurrenderEnd();
 				return;
 			}
-			else if (!m_bEmoteIsPlaying && m_MenuEmote)
+			else if (m_DeferredMenuEmoteLaunch != -1)
+			{
+				PlayEmote(m_DeferredMenuEmoteLaunch);
+				m_MenuEmote = NULL;
+				m_DeferredMenuEmoteLaunch = -1;
+			}
+			else if (!m_bEmoteIsPlaying && m_MenuEmote && GetGame().IsClient())
 			{
 				PlayEmoteFromMenu();
 			}
@@ -302,7 +313,6 @@ class EmoteManager
 			}
 			else
 			{
-				//TODO, HACK: fix this hack once inventory lock conditions have been sorted out
 				SetEmoteLockState(true);
 				/*if ( m_Player.GetCommand_Move() && m_Player.GetCommand_Move().IsOnBack() )
 				{
@@ -354,7 +364,9 @@ class EmoteManager
 				
 				if ( gestureID >= 0 )
 				{
-					PlayEmote(gestureID);
+					//PlayEmote(gestureID);
+					m_DeferredMenuEmoteLaunch = gestureID;
+					
 				}
 				else
 				{
@@ -935,8 +947,18 @@ class EmoteManager
 				m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 				if (m_Player.IsAlive()) 
 				{
+					EntityAI helm = m_Player.FindAttachmentBySlotName("Headgear");
+					if (helm && GetGame().IsServer())
+					{
+						float damage = helm.GetMaxHealth("","");
+						helm.AddHealth( "","", -damage/2); //TODO damages by 50% now. Use some proper, projectile-related value here
+					}
 					GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(this.KillPlayer);
-					LogSuicide();
+					//LogSuicide(); 	// older logging
+					if ( m_AdminLog )
+					{
+						m_AdminLog.Suicide( m_Player );
+					}
 				}
 			}
 			else
@@ -1060,7 +1082,8 @@ class EmoteManager
 			}
 			if (m_RPSOutcome != -1) 	ctx.Write(m_RPSOutcome);
 			ctx.Send();
-			PlayEmote(m_MenuEmote.m_ID);
+			m_DeferredMenuEmoteLaunch = m_MenuEmote.m_ID;
+			//PlayEmote(m_MenuEmote.m_ID);
 			m_MenuEmote = NULL;
 		}
 		else if (!GetGame().IsMultiplayer())
@@ -1098,7 +1121,7 @@ class EmoteManager
 			return false;
 		}
 		
-		if ( m_HIC.IsWeaponRaised() || m_Player.IsFighting() || m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsFalling() || m_Player.IsUnconscious() ) 	//TODO rework conditions into something better?
+		if ( m_HIC.IsWeaponRaised() || m_Player.IsFighting() || m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsFalling() || m_Player.IsUnconscious() ) 	// rework conditions into something better?
 		{
 			return false;
 		}
@@ -1147,10 +1170,10 @@ class EmoteManager
 			{*/
 			if (m_Player.GetItemInHands() && !m_Player.CanDropEntity(m_Player.GetItemInHands()))
 				return;
-			if (m_Player.GetItemInHands())
+			if (m_Player.GetItemInHands() && GetGame().IsClient())
 			{
-				//m_Player.DropItem(m_Player.GetItemInHands());
-				m_Player.LocalDropEntity(m_Player.GetItemInHands());
+				m_Player.DropItem(m_Player.GetItemInHands());
+				//m_Player.LocalDropEntity(m_Player.GetItemInHands());
 			}
 			//}
 			CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_SURRENDERIN,DayZPlayerConstants.STANCEMASK_ALL,true);
@@ -1168,6 +1191,7 @@ class EmoteManager
 	//!
 	void SetEmoteLockState(bool state)
 	{
+		DayZPlayerCameraBase camera = DayZPlayerCameraBase.Cast(m_Player.GetCurrentCamera());
 		if (!m_HandInventoryLocation)
 		{
 			m_HandInventoryLocation = new InventoryLocation;
@@ -1189,8 +1213,9 @@ class EmoteManager
 			if ( m_controllsLocked )
 			{
 				m_controllsLocked = false;
-				m_Player.GetInputController().OverrideAimChangeX(false,0);
-				m_Player.GetInputController().OverrideMovementSpeed(false,0);
+				//camera.ForceFreelook(false);
+				//m_Player.GetInputController().OverrideAimChangeX(false,0);
+				//m_Player.GetInputController().OverrideMovementSpeed(false,0);
 			}
 		}
 		else
@@ -1207,11 +1232,13 @@ class EmoteManager
 			//m_Player.SetInventorySoftLock(true);
 			
 			//Movement lock in fullbody anims
-			if (m_Callback && m_Callback.m_IsFullbody && !m_controllsLocked && m_CurrentGestureID == ID_EMOTE_SURRENDER)
+			if (m_Callback && m_Callback.m_IsFullbody && !m_controllsLocked /*&& m_CurrentGestureID == ID_EMOTE_SURRENDER*/)
 			{
 				m_controllsLocked = true;
 				//m_Player.GetInputController().OverrideAimChangeX(true,0);
 				//m_Player.GetInputController().OverrideMovementSpeed(true,0);
+				
+				//camera.ForceFreelook(true);
 			}
 		}
 		m_EmoteLockState = state;

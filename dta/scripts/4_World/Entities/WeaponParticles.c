@@ -160,11 +160,11 @@ class WeaponParticlesBase // This class represents every particle effect you see
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
 		{
 			// Handle effect's parameters
-			if ( PrtTest.m_GunParticlesState ) // Check if particles are enambled by debug
+			if ( PrtTest.m_GunParticlesState ) // Check if particles are enabled by debug
 			{
 				if ( !suppressor  ||  !(m_IgnoreIfSuppressed) ) // ignoreIfSuppressed
 				{
-					if ( CheckHealthCondition( muzzle_owner.GetHealthLevel() ) ) // onlyWithinHealthLevel
+					if ( CheckHealthCondition( muzzle_owner.GetHealthLevel() ) ) // onlyWithinHealthLabel
 					{
 						if (CheckOverheatingCondition( muzzle_owner.GetOverheatingCoef() ) ) // onlyWithinOverheatLimits
 						{
@@ -178,7 +178,7 @@ class WeaponParticlesBase // This class represents every particle effect you see
 										int particle_id = CheckParticleOverride(ammoType);
 										
 										// Get position of the particle
-										vector local_pos = muzzle_owner.GetSelectionPosition(m_OverridePoint);
+										vector local_pos = muzzle_owner.GetSelectionPositionLS(m_OverridePoint);
 										local_pos += m_PositionOffset;
 										
 										// Set orientation of the particle
@@ -188,20 +188,10 @@ class WeaponParticlesBase // This class represents every particle effect you see
 										
 										OnParticleCreated(weapon, ammoType, muzzle_owner, suppressor, config_to_search, p);
 										
-										// HACK: We need propper Lights API to avoid this workaround
 										if (m_IlluminateWorld)
 										{
 											vector global_pos = muzzle_owner.ModelToWorld(local_pos + Vector(-0.2, 0, 0));
-											Object o_light = GetGame().CreateObject( "Light", global_pos, true );
-											
-											if ( o_light )
-											{
-												Light l_light = Light.Cast( o_light );
-												if (l_light)
-												{
-													l_light.SetLifetime(0.05);
-												}
-											}
+											ScriptedLightBase.CreateLight(MuzzleFlashLight, global_pos);
 										}
 									}
 								}
@@ -294,7 +284,13 @@ class WeaponParticlesBase // This class represents every particle effect you see
 			else
 			{
 				particle_id = ParticleList.GetParticleID( ParticleList.GetPathToParticles() + particle_file);
-				m_OverrideParticle = particle_id;
+				
+				if (particle_id == 0)
+				{
+					string err = "Error! Cannot play particle effect with name " + particle_file + " because no such file is registered in ParticleList.c! Make sure it's registered there and then rebuild Scripts and Graphics PBOs.";
+					Error(err);
+					m_OverrideParticle = particle_id; // Prevents another appearence of the above error.
+				}
 			}
 		}
 		else
@@ -311,7 +307,7 @@ class WeaponParticlesBase // This class represents every particle effect you see
 		vector particle_ori = "0 0 0";
 		if (m_OverrideDirectionPoint != "")
 		{
-			vector target_pos = muzzle_owner.GetSelectionPosition(m_OverrideDirectionPoint);
+			vector target_pos = muzzle_owner.GetSelectionPositionLS(m_OverrideDirectionPoint);
 			target_pos = vector.Direction(local_pos, target_pos);
 			particle_ori = target_pos.VectorToAngles();
 		}

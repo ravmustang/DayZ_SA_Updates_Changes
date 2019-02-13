@@ -20,7 +20,7 @@ class CGame
 		m_ParamCache.Insert(NULL);
 		
 		// actual script version - increase by one when you make changes
-		StorageVersion(100);
+		StorageVersion(103);
 	}
 	
 	private void ~CGame();
@@ -292,7 +292,7 @@ class CGame
   	\brief Destroy player info and disconnect 
 	\note Works only on server
 	*/
-	proto native void		DisconnectPlayer(PlayerIdentity identity, string uid);
+	proto native void		DisconnectPlayer(PlayerIdentity identity);
 	
 	/**
   	\brief Add player to reconnect cache to be able to rejoin character still existing in the world
@@ -547,6 +547,15 @@ class CGame
 	proto native Object CreateObject( string type, vector pos, bool create_local = false, bool init_ai = false, bool create_physics = true );
 	proto native SoundOnVehicle CreateSoundOnObject(Object source, string sound_name, float distance, bool looped, bool create_local = false);
 	proto native SoundWaveOnVehicle CreateSoundWaveOnObject(Object source, SoundObject soundObject, AbstractWave soundWave);
+
+	/**
+	\brief Creates object of certain type
+	@param type of objects to create
+	@param pos position where to create object
+	@param iFlags are used to setup object and/ or spawn behavior
+	\return new Object
+	*/
+	proto native Object CreateObject_WIP( string type, vector pos, int iFlags );
 	
 	proto native void   ObjectDelete( Object obj );
     proto native void   RemoteObjectDelete( Object obj ); /// RemoteObjectDelete - deletes only remote object (unregisters from network). do not use if not sure what you do
@@ -557,6 +566,9 @@ class CGame
 	proto void          ObjectGetType( Object obj, out string type );
 	proto void          ObjectGetDisplayName( Object obj, out string name );
 	proto native vector ObjectGetSelectionPosition(Object obj, string name);
+	proto native vector ObjectGetSelectionPositionLS(Object obj, string name);
+	proto native vector ObjectGetSelectionPositionMS(Object obj, string name);
+	proto native vector ObjectGetSelectionPositionWS(Object obj, string name);
 	proto native vector ObjectModelToWorld(Object obj, vector modelPos);
 	proto native vector ObjectWorldToModel(Object obj, vector worldPos);
 	//! returns true if player can access item's cargo/attachments (check only distance)
@@ -724,7 +736,7 @@ class CGame
 */
 	proto native void		Chat(string text, string colorClass);
 	proto native void		ChatMP(Man recipient, string text, string colorClass);
-	proto native void		ChatPlayer(ChatChannel channel, string text);
+	proto native void		ChatPlayer(string text);
 	/**
 	 \brief Mutes voice of source player to target player
 	@param sourceVoice uid of source player
@@ -740,8 +752,13 @@ class CGame
 	*/
 	proto native void		EnableVoN(Object player, bool enable);
 	
-	//! Returns current chat channel.
-	//proto native ChatChannel ChatGetChannel();
+	/**
+	 \brief Enable/disable VoN effect (only on server)
+	@param player in question
+	@param voice effect (VoiceEffectMumbling, VoiceEffectExtortion)
+	@param enable or disable effect
+	*/
+	proto native void		SetVoiceEffect(Object player, int effect, bool enable);
 
 	// mission
 	proto native Mission 	GetMission();

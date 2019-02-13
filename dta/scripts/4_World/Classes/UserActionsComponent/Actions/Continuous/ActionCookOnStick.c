@@ -44,13 +44,13 @@ class ActionCookOnStick: ActionContinuousBase
 		FireplaceBase fireplace_target = FireplaceBase.Cast( target.GetObject() );
 		Object targetObject = target.GetObject();
 		Edible_Base item_on_stick = Edible_Base.Cast( item.GetAttachmentByType( Edible_Base ) );
-		if ( fireplace_target && item_on_stick )
+		if ( fireplace_target && item_on_stick && item_on_stick.CanBeCookedOnStick() )
 		{
 			BarrelHoles_ColorBase barrel = BarrelHoles_ColorBase.Cast( fireplace_target );
 			//barrel with holes
 			if ( barrel )
 			{
-				if ( barrel.IsOpened() && fireplace_target.CanCookOnStick() )
+				if ( barrel.IsOpen() && fireplace_target.CanCookOnStick() )
 				{
 					return true;
 				}

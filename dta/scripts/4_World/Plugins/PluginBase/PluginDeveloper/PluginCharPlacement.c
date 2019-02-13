@@ -72,7 +72,7 @@ class PluginCharPlacement extends PluginBase
 		Math3D.MatrixIdentity4(m_cameraTrans);
 		Math3D.DirectionAndUpMatrix(m_camera_dir/* - SnapToGround(cam_pos)*/, "0 1 0", m_cameraTrans);
 		m_cameraTrans[3] = cam_pos;
-		m_demoPos = Vector(0.685547, -0.988281, 3.68823).Multiply4(m_cameraTrans);
+		m_demoPos = Vector(/*0.685547, -0.988281,*/0,0, 3.68823).Multiply4(m_cameraTrans);
 		m_demoPos[1] = GetGame().SurfaceY(m_demoPos[0], m_demoPos[2]);
 		
 		return m_demoPos;

@@ -173,8 +173,6 @@ class Construction
 		
 		if ( GetGame().ConfigIsExisting( construction_path ) )
 		{
-			int part_id;
-			
 			//main parts
 			for ( int i = 0; i < GetGame().ConfigGetChildrenCount( construction_path ); ++i )
 			{
@@ -185,18 +183,17 @@ class Construction
 				//parts
 				for ( int j = 0; j < GetGame().ConfigGetChildrenCount( part_path ); ++j )
 				{
-					part_id++;		//inc part_id
-					
 					string part_name;
 					GetGame().ConfigGetChildName( part_path, j, part_name );
 					
 					string name;
 					GetGame().ConfigGetText( part_path + " " + part_name + " " + "name", name );							//name
 					bool show_on_init = GetGame().ConfigGetInt( part_path + " " + part_name + " " + "show_on_init" );		//show on init
+					int id = GetGame().ConfigGetInt( part_path + " " + part_name + " " + "id" );							//part id
 					bool is_base = GetGame().ConfigGetInt( part_path + " " + part_name + " " + "is_base" );					//is base (part)
 					bool is_gate = GetGame().ConfigGetInt( part_path + " " + part_name + " " + "is_gate" );					//is gate (part)
 					
-					m_ConstructionParts.Insert( part_name, new ConstructionPart( name, part_name, main_part_name, part_id, show_on_init, is_base, is_gate ) );
+					m_ConstructionParts.Insert( part_name, new ConstructionPart( name, part_name, main_part_name, id, show_on_init, is_base, is_gate ) );
 				}
 			}
 		}
@@ -252,6 +249,40 @@ class Construction
 			}
 		}
 	}
+	
+	//Returns (first found) base construction part
+	ConstructionPart GetBaseConstructionPart()
+	{
+		for ( int i = 0; i < m_ConstructionParts.Count(); ++i )
+		{
+			string key = m_ConstructionParts.GetKey( i );
+			ConstructionPart value = m_ConstructionParts.Get( key );
+		
+			if ( value.IsBase() )
+			{
+				return value;
+			}
+		}
+		
+		return NULL;
+	}
+	
+	//Returns (first found) gate construction part
+	ConstructionPart GetGateConstructionPart()
+	{
+		for ( int i = 0; i < m_ConstructionParts.Count(); ++i )
+		{
+			string key = m_ConstructionParts.GetKey( i );
+			ConstructionPart value = m_ConstructionParts.Get( key );
+		
+			if ( value.IsGate() )
+			{
+				return value;
+			}
+		}
+		
+		return NULL;
+	}	
 	
 	//checks if construction part has required part already built
 	protected bool HasRequiredPart( string part_name )
@@ -587,7 +618,7 @@ class Construction
 						slot_id = InventorySlots.GetSlotIdFromString( slot_name );
 						InventoryLocation attLoc = new InventoryLocation;
 						attLoc.SetAttachment(GetParent(), null, slot_id);
-						attachment = ItemBase.Cast( GetParent().GetInventory().LocationCreateLocalEntity( attLoc, type ) ); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
+						attachment = ItemBase.Cast( GetParent().GetInventory().LocationCreateLocalEntity( attLoc, type, ECE_IN_INVENTORY, RF_DEFAULT ) ); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
 						if ( attachment && quantity > 0 ) 					//object was deleted or the quantity is ignored
 						{
 							attachment.SetQuantity( quantity );
@@ -714,6 +745,51 @@ class Construction
 
 			//2. client update
 			GetGame().RemoteObjectTreeCreate( GetParent() );
+		}
+	}
+	
+	//set lock on materials that are attached and cannot be locked/unlocked
+	void SetLockOnAttachedMaterials( string part_name, bool lock_slot )
+	{
+		string main_part_name = GetConstructionPart( part_name ).GetMainPartName();
+		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "Materials";
+		
+		if ( GetGame().ConfigIsExisting( cfg_path ) )
+		{
+			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
+			
+			for ( int i = 0; i < child_count; i++ )
+			{
+				string child_name;
+				GetGame().ConfigGetChildName( cfg_path, i, child_name );
+				
+				//get type, quantity from material
+				string config_path;
+				string type;
+				string slot_name;
+				config_path = cfg_path + " " + child_name + " " + "type";
+				GetGame().ConfigGetText( config_path, type );
+				config_path = cfg_path + " " + child_name + " " + "slot_name";
+				GetGame().ConfigGetText( config_path, slot_name );
+				config_path = cfg_path + " " + child_name + " " + "quantity";
+				float quantity = GetGame().ConfigGetFloat( config_path );
+				config_path = cfg_path + " " + child_name + " " + "lockable";
+				bool lockable = GetGame().ConfigGetInt( config_path );
+				
+				//get material
+				ItemBase attachment = ItemBase.Cast( GetParent().FindAttachmentBySlotName( slot_name ) );
+				
+				//material still attached
+				if ( lockable )			//if lockable 
+				{
+					if ( attachment )
+					{
+						InventoryLocation inventory_location = new InventoryLocation;
+						attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
+						GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot(), lock_slot );
+					}
+				}
+			}
 		}
 	}
 	

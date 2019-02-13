@@ -17,3 +17,11 @@ class DarkMotoHelmet_ColorBase extends ClothingBase
 		return false;
 	}
 }
+
+class DarkMotoHelmet_Black extends DarkMotoHelmet_ColorBase {};
+class DarkMotoHelmet_Grey extends DarkMotoHelmet_ColorBase {};
+class DarkMotoHelmet_Green extends DarkMotoHelmet_ColorBase {};
+class DarkMotoHelmet_Lime extends DarkMotoHelmet_ColorBase {};
+class DarkMotoHelmet_Blue extends DarkMotoHelmet_ColorBase {};
+class DarkMotoHelmet_Red extends DarkMotoHelmet_ColorBase {};
+class DarkMotoHelmet_White extends DarkMotoHelmet_ColorBase {};

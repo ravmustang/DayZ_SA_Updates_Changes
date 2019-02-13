@@ -103,12 +103,12 @@ class Liquid
 		}
 	}
 	
-	static bool CanFillContainer(ItemBase container, int liquid_type)
+	static bool CanFillContainer(ItemBase container, int liquid_type, bool ignore_fullness_check = false)
 	{
 		if(!container) return false;
 		bool is_container_full = container.IsFullQuantity();
 		
-		if( is_container_full )
+		if( is_container_full && !ignore_fullness_check)
 		{
 			//Debug.Log("container is full", "LiquidTransfer");
 			return false;

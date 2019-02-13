@@ -344,7 +344,7 @@ class SceneEditorMenu extends UIScriptedMenu
 	//============================================
 	override bool UseMouse()
 	{
-		return false;
+		return true;
 	}
 
 	//============================================
@@ -352,7 +352,7 @@ class SceneEditorMenu extends UIScriptedMenu
 	//============================================
 	override bool UseKeyboard()
 	{
-		return false;
+		return true;
 	}
 	
 	// System Events
@@ -392,87 +392,87 @@ class SceneEditorMenu extends UIScriptedMenu
 	override Widget Init()
 	{
 		// Create Main layout menu
-		Widget wgt = GetGame().GetWorkspace().CreateWidgets("gui/layouts/scene_editor/day_z_scene_editor.layout");
-		m_WgtPnlWrapper = wgt.FindAnyWidget("pnl_presets_wrapper_outer");
-		m_SlWgtLoadedScene		= TextWidget.Cast( wgt.FindAnyWidget("txt_left_label_loaded_scene") );
+		layoutRoot				= GetGame().GetWorkspace().CreateWidgets("gui/layouts/scene_editor/day_z_scene_editor.layout");
+		m_WgtPnlWrapper			= layoutRoot.FindAnyWidget("pnl_presets_wrapper_outer");
+		m_SlWgtLoadedScene		= TextWidget.Cast( layoutRoot.FindAnyWidget("txt_left_label_loaded_scene") );
 		// Find ListTextBoxWidget for objects list
-		m_SlWgtLbxObjectsList	= TextListboxWidget.Cast(wgt.FindAnyWidget("txtlist_left_items") );
+		m_SlWgtLbxObjectsList	= TextListboxWidget.Cast(layoutRoot.FindAnyWidget("txtlist_left_items") );
 		// Find Edit Box for shearching in object list
-		m_SlWgtEbxFilter		= EditBoxWidget.Cast(wgt.FindAnyWidget("edit_left_search_item") );
+		m_SlWgtEbxFilter		= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("edit_left_search_item") );
 		// Find Select Button for selecting in object list
-		m_SlWgtSelect			= ButtonWidget.Cast(wgt.FindAnyWidget("btn_left_select") );
-		m_SlWgtFocus			= ButtonWidget.Cast(wgt.FindAnyWidget("btn_left_focus") );
+		m_SlWgtSelect			= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_left_select") );
+		m_SlWgtFocus			= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_left_focus") );
 		// Find Popup main panel
-		m_WgtPopupsMain			= wgt.FindAnyWidget("pnl_popups");
+		m_WgtPopupsMain			= layoutRoot.FindAnyWidget("pnl_popups");
 		// Find Poups backgroudn
-		m_WgtPopupsBg			= wgt.FindAnyWidget("pnl_popup_bg");
+		m_WgtPopupsBg			= layoutRoot.FindAnyWidget("pnl_popup_bg");
 		// Find Edit Box for shearching in class list
-		m_ClWgtEbxFilter		= EditBoxWidget.Cast(wgt.FindAnyWidget("edit_left_search_class") );
+		m_ClWgtEbxFilter		= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("edit_left_search_class") );
 		// Find ListTextBoxWidget for class list
-		m_ClWgtLbxClassesList	= TextListboxWidget.Cast(wgt.FindAnyWidget("txtlist_left_classes") );
+		m_ClWgtLbxClassesList	= TextListboxWidget.Cast(layoutRoot.FindAnyWidget("txtlist_left_classes") );
 		// Find Buttons
-		m_WgtBtnSceneManager	= ButtonWidget.Cast(wgt.FindAnyWidget("btn_top_scene_manager") );
-		m_WgtBtnPositionManager	= ButtonWidget.Cast(wgt.FindAnyWidget("btn_top_position_manager") );
-		m_WgtBtnSceneSettings	= ButtonWidget.Cast(wgt.FindAnyWidget("btn_top_settings") );
-		m_ClWgtButtonAddAtt		= ButtonWidget.Cast(wgt.FindAnyWidget("btn_left_cl_add_attachment") );
-		m_WgtBtnSceneSave		= ButtonWidget.Cast(wgt.FindAnyWidget("btn_top_save_scene") );
-		m_WgtBtnEditorSettings	= ButtonWidget.Cast(wgt.FindAnyWidget("btn_top_editor_settings") );
-		m_WgtBtnEditInitScript	= ButtonWidget.Cast(wgt.FindAnyWidget("btn_right_prop_pos_iscr_value") );
-		m_WgtBtnDeleteRuler		= ButtonWidget.Cast(wgt.FindAnyWidget("btn_delete_ruler") );
-		m_WgtBtnLeftPresets		= ButtonWidget.Cast(wgt.FindAnyWidget("btn_left_presets") );	
+		m_WgtBtnSceneManager	= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_top_scene_manager") );
+		m_WgtBtnPositionManager	= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_top_position_manager") );
+		m_WgtBtnSceneSettings	= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_top_settings") );
+		m_ClWgtButtonAddAtt		= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_left_cl_add_attachment") );
+		m_WgtBtnSceneSave		= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_top_save_scene") );
+		m_WgtBtnEditorSettings	= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_top_editor_settings") );
+		m_WgtBtnEditInitScript	= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_right_prop_pos_iscr_value") );
+		m_WgtBtnDeleteRuler		= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_delete_ruler") );
+		m_WgtBtnLeftPresets		= ButtonWidget.Cast(layoutRoot.FindAnyWidget("btn_left_presets") );	
 			
 		// Find Widgets for properties
-		m_PrWgtClassName		= TextWidget.Cast(wgt.FindAnyWidget("txt_right_prop_class_value") );
-		m_PrWgtPoxX				= EditBoxWidget.Cast(wgt.FindAnyWidget("ebx_right_prop_pos_x_value") );
-		m_PrWgtPoxY				= EditBoxWidget.Cast(wgt.FindAnyWidget("ebx_right_prop_pos_y_value") );
-		m_PrWgtPoxZ				= EditBoxWidget.Cast(wgt.FindAnyWidget("ebx_right_prop_pos_z_value") );
-		m_PrWgtDir				= EditBoxWidget.Cast(wgt.FindAnyWidget("ebx_right_prop_pos_dir_value") );
-		m_PrWgtDmg				= EditBoxWidget.Cast(wgt.FindAnyWidget("ebx_right_prop_pos_hlt_value") );
-		m_PrWgtAttRoot			= wgt.FindAnyWidget("pnl_right_inspector_attachments");
-		m_PrWgtAttTitle			= wgt.FindAnyWidget("pnl_att_title");
+		m_PrWgtClassName		= TextWidget.Cast(layoutRoot.FindAnyWidget("txt_right_prop_class_value") );
+		m_PrWgtPoxX				= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("ebx_right_prop_pos_x_value") );
+		m_PrWgtPoxY				= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("ebx_right_prop_pos_y_value") );
+		m_PrWgtPoxZ				= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("ebx_right_prop_pos_z_value") );
+		m_PrWgtDir				= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("ebx_right_prop_pos_dir_value") );
+		m_PrWgtDmg				= EditBoxWidget.Cast(layoutRoot.FindAnyWidget("ebx_right_prop_pos_hlt_value") );
+		m_PrWgtAttRoot			= layoutRoot.FindAnyWidget("pnl_right_inspector_attachments");
+		m_PrWgtAttTitle			= layoutRoot.FindAnyWidget("pnl_att_title");
 		m_PrWidgetsAttachments	= new array<ref UIPropertyAttachment>;
 		
 		// Notify
-		m_NotifyWgtPanel		= wgt.FindAnyWidget("pnl_notify");
+		m_NotifyWgtPanel		= layoutRoot.FindAnyWidget("pnl_notify");
 		m_NotifyWgtPanel.SetAlpha(0.0);
 		m_NotifyFadeTimer		= new WidgetFadeTimer;
 		
 		// Register Poups
-		m_Popups.Insert(POPUP_ID_SCENE_MANAGER,		new UIPopupScriptSceneManager(wgt.FindAnyWidget("pnl_popup_scene_manager")));
-		m_Popups.Insert(POPUP_ID_POSITION_MANAGER,		new UIPopupScriptPositionManager(wgt.FindAnyWidget("pnl_popup_position_manager")));
-		m_Popups.Insert(POPUP_ID_SCENE_SETTINGS,	new UIPopupScriptSceneSettings(wgt.FindAnyWidget("pnl_popup_settings")) );
-		m_Popups.Insert(POPUP_ID_SCENE_NEW, 		new UIPopupScriptSceneNew(wgt.FindAnyWidget("pnl_popup_scene_new")) );
-		m_Popups.Insert(POPUP_ID_SCENE_RENAME, 		new UIPopupScriptSceneRename(wgt.FindAnyWidget("pnl_popup_scene_rename")) );
-		m_Popups.Insert(POPUP_ID_SCENE_DELETE, 		new UIPopupScriptSceneDelete(wgt.FindAnyWidget("pnl_popup_scene_delete")) );
-		m_Popups.Insert(POPUP_ID_NOTIFY,	 		new UIPopupScriptNotify(wgt.FindAnyWidget("pnl_popup_notify")) );
-		m_Popups.Insert(POPUP_ID_EDITOR_SETTINGS,	new UIPopupScriptEditorSettings(wgt.FindAnyWidget("pnl_popup_editor_settings")));
-		m_Popups.Insert(POPUP_ID_INIT_SCRIPT,		new UIPopupScriptInitScript(wgt.FindAnyWidget("pnl_popup_init_script")));
-		m_Popups.Insert(POPUP_ID_PRESET_NEW,		new UIPopupScriptPresetNew(wgt.FindAnyWidget("pnl_popup_preset_new")));
-		m_Popups.Insert(POPUP_ID_PRESET_RENAME,		new UIPopupScriptPresetRename(wgt.FindAnyWidget("pnl_popup_preset_rename")));
-		m_Popups.Insert(POPUP_ID_CONFIGS,		new UIPopupScriptConfigs(wgt.FindAnyWidget("pnl_popup_configs")));
+		m_Popups.Insert(POPUP_ID_SCENE_MANAGER,		new UIPopupScriptSceneManager(layoutRoot.FindAnyWidget("pnl_popup_scene_manager")));
+		m_Popups.Insert(POPUP_ID_POSITION_MANAGER,	new UIPopupScriptPositionManager(layoutRoot.FindAnyWidget("pnl_popup_position_manager")));
+		m_Popups.Insert(POPUP_ID_SCENE_SETTINGS,	new UIPopupScriptSceneSettings(layoutRoot.FindAnyWidget("pnl_popup_settings")) );
+		m_Popups.Insert(POPUP_ID_SCENE_NEW, 		new UIPopupScriptSceneNew(layoutRoot.FindAnyWidget("pnl_popup_scene_new")) );
+		m_Popups.Insert(POPUP_ID_SCENE_RENAME, 		new UIPopupScriptSceneRename(layoutRoot.FindAnyWidget("pnl_popup_scene_rename")) );
+		m_Popups.Insert(POPUP_ID_SCENE_DELETE, 		new UIPopupScriptSceneDelete(layoutRoot.FindAnyWidget("pnl_popup_scene_delete")) );
+		m_Popups.Insert(POPUP_ID_NOTIFY,	 		new UIPopupScriptNotify(layoutRoot.FindAnyWidget("pnl_popup_notify")) );
+		m_Popups.Insert(POPUP_ID_EDITOR_SETTINGS,	new UIPopupScriptEditorSettings(layoutRoot.FindAnyWidget("pnl_popup_editor_settings")));
+		m_Popups.Insert(POPUP_ID_INIT_SCRIPT,		new UIPopupScriptInitScript(layoutRoot.FindAnyWidget("pnl_popup_init_script")));
+		m_Popups.Insert(POPUP_ID_PRESET_NEW,		new UIPopupScriptPresetNew(layoutRoot.FindAnyWidget("pnl_popup_preset_new")));
+		m_Popups.Insert(POPUP_ID_PRESET_RENAME,		new UIPopupScriptPresetRename(layoutRoot.FindAnyWidget("pnl_popup_preset_rename")));
+		m_Popups.Insert(POPUP_ID_CONFIGS,			new UIPopupScriptConfigs(layoutRoot.FindAnyWidget("pnl_popup_configs")));
 		
-		m_PresetsTextListbox = TextListboxWidget.Cast( wgt.FindAnyWidget("pnl_presets") );
-		m_PresetItemsTextListbox = TextListboxWidget.Cast( wgt.FindAnyWidget("pnl_preset_items") );
+		m_PresetsTextListbox = TextListboxWidget.Cast( layoutRoot.FindAnyWidget("pnl_presets") );
+		m_PresetItemsTextListbox = TextListboxWidget.Cast( layoutRoot.FindAnyWidget("pnl_preset_items") );
 		m_ConfigDebugProfileFixed	= PluginConfigDebugProfileFixed.Cast( GetPlugin(PluginConfigDebugProfileFixed) );
 		m_ConfigDebugProfile		= PluginConfigDebugProfile.Cast( GetPlugin(PluginConfigDebugProfile) );
-		m_PresetAddItemtButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_add_to_preset") );
-		m_PresetRemoveItemButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_remove_from_preset") );
-		m_SpawnOnGroundButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_spawn_on_ground") );
-		m_SpawnInInventoryButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_spawn_in_inventory") );
-		m_SpawnAsAttachmentButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_spawn_as_attachment") );
-		m_UpButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_up") );
-		m_DownButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_down") );
+		m_PresetAddItemtButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_add_to_preset") );
+		m_PresetRemoveItemButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_remove_from_preset") );
+		m_SpawnOnGroundButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_spawn_on_ground") );
+		m_SpawnInInventoryButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_spawn_in_inventory") );
+		m_SpawnAsAttachmentButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_spawn_as_attachment") );
+		m_UpButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_up") );
+		m_DownButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_down") );
 		m_Developer					= PluginDeveloper.Cast( GetPlugin(PluginDeveloper) );
-		m_QuantityEditBox = EditBoxWidget.Cast( wgt.FindAnyWidget("txt_quantity_value") );
-		m_DamageEditBox = EditBoxWidget.Cast( wgt.FindAnyWidget("txt_damage_value") );
-		m_SpawnDistanceEditBox = EditBoxWidget.Cast( wgt.FindAnyWidget("txt_distance_value") );
-		m_PresetNewButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_new") );
-		m_PresetDeleteButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_delete") );
-		m_PresetRenameButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_rename") );
-		m_PresetSetDefaultButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_default") );
-		m_CopyToClipboardButton = ButtonWidget.Cast( wgt.FindAnyWidget("btn_copy_to_clipboard") );
-		m_ConfigsButton = EditBoxWidget.Cast( wgt.FindAnyWidget("btn_top_configs") );
-	  m_SpawnDistanceEditBox.SetText( m_ConfigDebugProfile.GetSpawnDistance().ToString() );
+		m_QuantityEditBox = EditBoxWidget.Cast( layoutRoot.FindAnyWidget("txt_quantity_value") );
+		m_DamageEditBox = EditBoxWidget.Cast( layoutRoot.FindAnyWidget("txt_damage_value") );
+		m_SpawnDistanceEditBox = EditBoxWidget.Cast( layoutRoot.FindAnyWidget("txt_distance_value") );
+		m_PresetNewButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_new") );
+		m_PresetDeleteButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_delete") );
+		m_PresetRenameButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_rename") );
+		m_PresetSetDefaultButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_default") );
+		m_CopyToClipboardButton = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btn_copy_to_clipboard") );
+		m_ConfigsButton = EditBoxWidget.Cast( layoutRoot.FindAnyWidget("btn_top_configs") );
+		m_SpawnDistanceEditBox.SetText( m_ConfigDebugProfile.GetSpawnDistance().ToString() );
 		
 		RenderPresets();
 		
@@ -481,7 +481,7 @@ class SceneEditorMenu extends UIScriptedMenu
 		
 		PopupHideAll();
 		
-		return wgt;
+		return layoutRoot;
 	}
 	
 	override bool OnDoubleClick( Widget w, int x, int y, int button )
@@ -795,6 +795,16 @@ class SceneEditorMenu extends UIScriptedMenu
 		bool ret = ComponentsOnChange(w, x, y, finished);
 		
 		return false;
+	}
+	
+	override void OnShow()
+	{
+		MissionGameplay.Cast( GetGame().GetMission() ).PlayerControlDisable();
+	}
+	
+	override void OnHide()
+	{
+		MissionGameplay.Cast( GetGame().GetMission() ).PlayerControlEnable();
 	}
 
 	//============================================

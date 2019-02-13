@@ -108,7 +108,7 @@ FrameWidgetClass ServerBrowserRoot {
              hexactsize 0
              vexactsize 0
              priority 250
-             text "OFFICIAL"
+             text "#str_serverbrowserroot_tabber_tabcontrols_tabbar_tab_control_container_tab_control_0_tab_control_0_title0"
              font "gui/fonts/sdf_MetronLight72"
              "text halign" center
              "text valign" center
@@ -142,7 +142,7 @@ FrameWidgetClass ServerBrowserRoot {
         }
        }
       }
-      FrameWidgetClass XboxControls {
+      FrameWidgetClass ConsoleControls {
        visible 0
        clipchildren 0
        ignorepointer 1
@@ -154,7 +154,7 @@ FrameWidgetClass ServerBrowserRoot {
        hexactsize 0
        vexactsize 0
        {
-        ImageWidgetClass XboxTabLeftControl {
+        ImageWidgetClass TabLeftControl {
          visible 1
          clipchildren 1
          ignorepointer 1
@@ -171,7 +171,7 @@ FrameWidgetClass ServerBrowserRoot {
          "no wrap" 1
          stretch 0
         }
-        ImageWidgetClass XboxTabRightControl {
+        ImageWidgetClass TabRightControl {
          visible 1
          clipchildren 1
          ignorepointer 1
@@ -216,7 +216,7 @@ FrameWidgetClass ServerBrowserRoot {
    vexactsize 1
    priority 1
    style Normal
-   text "SERVER BROWSER"
+   text "#str_serverbrowserroot_serverbrowsertextwidget0"
    font "gui/fonts/sdf_MetronLight72"
    "text color" 0.8157 0.1255 0.7843 1
    "exact text" 0

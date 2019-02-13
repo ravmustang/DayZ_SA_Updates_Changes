@@ -17,3 +17,8 @@ class LeatherHat_ColorBase extends ClothingBase
 		return false;
 	}
 }
+
+class LeatherHat_Natural extends LeatherHat_ColorBase {};
+class LeatherHat_Beige extends LeatherHat_ColorBase {};
+class LeatherHat_Brown extends LeatherHat_ColorBase {};
+class LeatherHat_Black extends LeatherHat_ColorBase {};

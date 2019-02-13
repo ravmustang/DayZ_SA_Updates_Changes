@@ -14,7 +14,7 @@ class MissionMainMenu extends MissionBase
 		
 		if (!m_mainmenu)
 		{
-			#ifdef PLATFORM_XBOX
+			#ifdef PLATFORM_CONSOLE
 				m_mainmenu = UIScriptedMenu.Cast( g_Game.GetUIManager().EnterScriptedMenu( MENU_TITLE_SCREEN, null ) );
 			#else
 				m_mainmenu = UIScriptedMenu.Cast( g_Game.GetUIManager().EnterScriptedMenu( MENU_MAIN, null ) );

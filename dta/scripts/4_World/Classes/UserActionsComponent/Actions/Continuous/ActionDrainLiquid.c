@@ -54,7 +54,7 @@ class ActionDrainLiquid: ActionContinuousBase
 		if ( target_item && item && GetGame().IsServer() && GetGame().IsMultiplayer() )
 			return true;
 		
-		if ( target_item && item && target_item.GetQuantity() > target_item.GetQuantityMin() && item.GetQuantity() < item.GetQuantityMax() && player.GetLiquidTendencyDrain() && Liquid.CanFillContainer( item, target_item.GetLiquidType() ) )
+		if ( target_item && item && target_item.GetQuantity() > target_item.GetQuantityMin() && item.GetQuantity() < item.GetQuantityMax() && player.GetLiquidTendencyDrain() && Liquid.CanFillContainer( item, target_item.GetLiquidType() ) && target_item.IsOpen() )
 		{
 			return true;
 		}

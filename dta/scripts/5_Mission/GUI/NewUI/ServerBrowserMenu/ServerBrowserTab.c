@@ -671,7 +671,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			{
 				if( PassFilter( result ) )
 				{
-					Print("ServerBrowserEntry -> LoadEntries");
 					ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
 					entry.FillInfo( result );
 					entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
@@ -1044,7 +1043,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			}
 			case ESortType.TIME:
 			{
-				return a1.m_TimeOfDay <= b1.m_TimeOfDay;
+				return CompareTime( a1.m_TimeOfDay, b1.m_TimeOfDay );
 			}
 			case ESortType.POPULATION:
 			{
@@ -1060,6 +1059,64 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			}
 		}
 		return false;
+	}
+	
+	bool CompareTime( string t1, string t2 )
+	{
+		TStringArray time1	= new TStringArray;
+		TStringArray time2	= new TStringArray;
+			
+		t1.Split( ":", time1 );
+		t2.Split( ":", time2 );
+		
+		float hour1		= time1.Get( 0 ).ToInt();
+		float hour2		= time2.Get( 0 ).ToInt();
+		
+		int minute1, minute2;
+		
+		if( hour1 == hour2 )
+		{
+			if( time1.Count() == 2 )
+			{
+				minute1		= time1.Get( 1 ).ToInt();
+			}
+			
+			if( time2.Count() == 2 )
+			{
+				minute2		= time2.Get( 1 ).ToInt();
+			}
+			
+			hour1 += minute1 / 60;
+			hour2 += minute2 / 60;
+		}
+		
+		bool in_night1 = ( hour1 >= 19 || hour1 <= 5 );
+		bool in_night2 = ( hour2 >= 19 || hour2 <= 5 );
+
+		if( in_night1 == in_night2 )
+		{
+			if( hour1 <= hour2 )
+			{
+				Print( "" + hour1 + " <= " + hour2 );
+			}
+			else
+			{
+				Print( "" + hour1 + " > " + hour2 );
+			}
+			return hour1 <= hour2;
+		}
+		else
+		{
+			if( in_night1 == false )
+			{
+				Print( "" + hour1 + " > " + hour2 );
+			}
+			else
+			{
+				Print( "" + hour1 + " < " + hour2 );
+			}
+			return in_night1 == false;
+		}
 	}
 	
 	void AddSorted( GetServersResultRow entry )

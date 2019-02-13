@@ -1,0 +1,1 @@
+class NVGHeadstrap extends Clothing {};

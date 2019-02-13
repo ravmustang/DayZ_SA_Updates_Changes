@@ -102,7 +102,7 @@ class PluginDiagMenu extends PluginBase
 	bool m_DrawCheckerboard			= false;
 	bool m_PresenceNotifierDebug	= false;
 	bool m_ShowBleedingSources		= false;
-	bool m_XboxCursor				= false;
+	bool m_XboxCursor				= true;
 	float m_SpecialtyLevel			= 0;
 	float m_LifespanLevel			= 0;
 	int  m_DayzPlayerDebugMenu		= -1;

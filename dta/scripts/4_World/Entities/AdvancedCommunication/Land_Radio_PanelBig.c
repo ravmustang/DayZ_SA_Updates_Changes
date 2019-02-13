@@ -9,14 +9,22 @@ class Land_Radio_PanelBig extends StaticTransmitter
 		ctx.Write( GetTunedFrequencyIndex() );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
-		
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
+
+		//--- Panel Radio data ---
 		//load and set tuned frequency
 		int tuned_frequency_idx;
-		ctx.Read( tuned_frequency_idx );
+		if ( !ctx.Read( tuned_frequency_idx ) )
+		{
+			tuned_frequency_idx = 0;		//set default
+		}
 		SetFrequencyByIndex( tuned_frequency_idx );
+		//---
+		
+		return true;
 	}	
 	
 	//--- BASE

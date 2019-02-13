@@ -126,7 +126,7 @@ class Cooking
 	//Returns 1 if the item changed its cooking stage, 0 if not
 	int CookOnStick( Edible_Base item_to_cook, float cook_time_inc )
 	{
-		if ( item_to_cook && item_to_cook.CanBeCooked() )
+		if ( item_to_cook && item_to_cook.CanBeCookedOnStick() )
 		{
 			//update food
 			return UpdateCookingStateOnStick( item_to_cook, cook_time_inc );

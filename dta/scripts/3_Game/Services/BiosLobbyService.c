@@ -54,8 +54,9 @@ class GetServersResultRow
   	int m_Disable3rdPerson;  //1 for disabled, ie. hardcore
 	//! time multiplier of environment
 	float m_EnvironmentTimeMul;
-	string m_ShardId;
 	bool		m_AllowedFilePatching;
+	string m_ShardId;
+	int m_SteamQueryPort;
 
 };
 

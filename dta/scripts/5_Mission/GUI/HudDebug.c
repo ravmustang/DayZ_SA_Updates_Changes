@@ -30,6 +30,7 @@ class HudDebug extends Hud
 	static const int HUD_WIN_CHAR_MODIFIERS		= 2;
 	static const int HUD_WIN_CHAR_AGENTS		= 3;
 	static const int HUD_WIN_CHAR_DEBUG			= 4;
+	static const int HUD_WIN_CHAR_LEVELS		= 5;
 	
 	Widget							m_WgtRoot;
 	Widget							m_Crosshair;
@@ -71,6 +72,10 @@ class HudDebug extends Hud
 		HudDebugWinCharStats win_char_stats = new HudDebugWinCharStats( m_WgtRoot.FindAnyWidget( "wdw_CharacterStats" ) );
 		m_Panels.Insert( win_char_stats );
 		
+		// Register Window Character Stats
+		HudDebugWinCharLevels win_char_levels = new HudDebugWinCharLevels( m_WgtRoot.FindAnyWidget( "wdw_CharacterLevels" ) );
+		m_Panels.Insert( win_char_levels );
+		
 		// Register Window Chracter Modifiers
 		m_WinCharModifiers = new HudDebugWinCharModifiers( m_WgtRoot.FindAnyWidget( "wdw_CharacterModifiers" ) );
 		m_Panels.Insert( m_WinCharModifiers );
@@ -82,6 +87,7 @@ class HudDebug extends Hud
 		// Register Window Chracter Debug
 		HudDebugWinCharDebug win_char_debug = new HudDebugWinCharDebug( m_WgtRoot.FindAnyWidget( "wdw_CharacterDebug" ) );
 		m_Panels.Insert( win_char_debug );
+		
 		
 		RefreshByLocalProfile();
 		RefreshCrosshairVisibility();
@@ -206,6 +212,7 @@ class HudDebug extends Hud
 		if ( module_cfg_profile )
 		{
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_STATS, 		module_cfg_profile.GetCharacterStatsVisible() );
+			SetPanelVisible( HudDebug.HUD_WIN_CHAR_LEVELS, 		module_cfg_profile.GetCharacterLevelsVisible() );
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_MODIFIERS, 	module_cfg_profile.GetCharacterModifiersVisible() );
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_AGENTS,	 	module_cfg_profile.GetCharacterAgentsVisible() );
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_DEBUG, 		module_cfg_profile.GetCharacterDebugVisible() );

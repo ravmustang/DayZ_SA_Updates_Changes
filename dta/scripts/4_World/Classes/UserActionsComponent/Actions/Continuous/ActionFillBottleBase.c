@@ -144,7 +144,7 @@ class ActionFillBottleBase: ActionContinuousBase
 		int liquidType;
 		g_Game.SurfaceUnderObject(player, surfType, liquidType);
 		
-		if( g_Game.SurfaceIsPond(pos_cursor[0], pos_cursor[2]) || (target.GetObject() && (target.GetObject().GetType() == "Land_Misc_Well_Pump_Yellow" || target.GetObject().GetType() == "Land_Misc_Well_Pump_Blue")) )
+		if( g_Game.SurfaceIsPond(pos_cursor[0], pos_cursor[2]) || (target.GetObject() && target.GetObject().IsWell()) )
 		{
 			if ( vector.Distance(player.GetPosition(), pos_cursor) < UAMaxDistances.DEFAULT && Liquid.CanFillContainer(item, LIQUID_WATER ) )
 			{

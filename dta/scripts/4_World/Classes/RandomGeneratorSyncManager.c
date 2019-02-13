@@ -2,14 +2,15 @@ enum RandomGeneratorSyncUsage
 {
 	RGSRecoil,
 	RGSJam,
-	RGSCount,
+	RGSGeneric,
+	Count,
 }
 
 class RandomGeneratorSyncManager
 {
-	const int UsageCount = RandomGeneratorSyncUsage.RGSCount;
+	const int USAGE_COUNT = RandomGeneratorSyncUsage.Count;
 	
-	float randomValuesArray[UsageCount];
+	float randomValuesArray[USAGE_COUNT];
 	DayZPlayer m_player;
 	
 	void RandomGeneratorSyncManager(DayZPlayer player)
@@ -19,24 +20,24 @@ class RandomGeneratorSyncManager
 
 	void Update()
 	{
-		for(int i = 0; i < UsageCount; i++ )
+		for(int i = 0; i < USAGE_COUNT; i++ )
 		{
 			randomValuesArray[i] = m_player.Random01();
 		}
 	}	
 	
 	
-	float GetRandom01(int UsageIndex)
+	float GetRandom01(RandomGeneratorSyncUsage usage_index)
 	{
-		if(UsageIndex < UsageCount)
+		if(usage_index < USAGE_COUNT)
 		{
-			return randomValuesArray[UsageIndex];
+			return randomValuesArray[usage_index];
 		}
 		return -1;
 	}
 	
-	float GetRandomInRange(int UsageIndex, float min, float max)
+	float GetRandomInRange(RandomGeneratorSyncUsage usage_index, float min, float max)
 	{
-		return GetRandom01(UsageIndex)*(max - min) + min;
+		return GetRandom01(usage_index)*(max - min) + min;
 	}
 }

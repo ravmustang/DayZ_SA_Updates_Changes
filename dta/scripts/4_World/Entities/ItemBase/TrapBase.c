@@ -29,6 +29,8 @@ class TrapBase extends ItemBase
 
 	ref protected EffectSound 	m_DeployLoopSound;
 	
+	PluginAdminLog 				m_AdminLog;
+	
 	void TrapBase()
 	{
 		m_IsInProgress = false;
@@ -56,6 +58,8 @@ class TrapBase extends ItemBase
 		RegisterNetSyncVariableBool("m_IsActive");
 		RegisterNetSyncVariableBool("m_IsInProgress");
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
+		
+		m_AdminLog = PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
 	}
 	
 	//! this event is called all variables are synchronized on client
@@ -114,15 +118,18 @@ class TrapBase extends ItemBase
 	}
 	
 	//----------------------------------------------------------------
-	override void OnStoreLoad(ParamsReadContext ctx, int version)
+	override bool OnStoreLoad(ParamsReadContext ctx, int version)
 	{   
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
 		
 		bool b_is_active = false;
-		ctx.Read( b_is_active );
+		if ( !ctx.Read( b_is_active ) )
+			b_is_active = false;
 		
 		bool b_is_in_progress = false;
-		ctx.Read( b_is_in_progress );
+		if ( !ctx.Read( b_is_in_progress ) )
+			b_is_in_progress = false;
 		
 		if ( b_is_active )
 		{
@@ -133,6 +140,8 @@ class TrapBase extends ItemBase
 		{
 			StartActivate( NULL );
 		}
+
+		return true;
 	}
 	
 	bool IsActive()
@@ -414,15 +423,15 @@ class TrapBase extends ItemBase
 	
 	void SetActive()
 	{
-			m_WasActivatedOrDeactivated = true;
-			
-			m_IsInProgress = false;
-			m_IsActive = true;
+		m_WasActivatedOrDeactivated = true;
 		
-			if ( m_AddActivationDefect )
-			{
-				this.AddDefect();
-			}
+		m_IsInProgress = false;
+		m_IsActive = true;
+	
+		if ( m_AddActivationDefect )
+		{
+			this.AddDefect();
+		}
 			
 		if ( g_Game.IsServer() )
 		{
@@ -604,10 +613,15 @@ class TrapBase extends ItemBase
 	override void OnPlacementComplete( Man player )
 	{
 		super.OnPlacementComplete( player );
-		
+				
 		if ( GetGame().IsServer() )
 		{
 			SetupTrapPlayer( PlayerBase.Cast( player ), false );
+			
+			if ( m_AdminLog )
+			{
+				m_AdminLog.OnPlacementComplete( player, this );
+			}
 		}	
 		
 		SetIsDeploySound( true );

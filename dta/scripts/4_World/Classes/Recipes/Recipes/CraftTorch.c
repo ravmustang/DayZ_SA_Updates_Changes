@@ -71,6 +71,7 @@ class CraftTorch extends RecipeBase
 		if ( GetGame().IsMultiplayer()  &&  GetGame().IsServer() )
 		{
 			player.ServerTakeEntityToTargetAttachment(torch, rag);
+			torch.StandUp();
 		}
 		else if ( !GetGame().IsMultiplayer() )
 		{

@@ -369,4 +369,34 @@ class OffroadHatchback extends CarScript
 		
 		return false;		
 	}
+	
+	override void OnDebugSpawn()
+	{
+		EntityAI entity;
+		
+		if ( Class.CastTo(entity, this) )
+		{
+			entity.GetInventory().CreateInInventory( "HatchbackWheel" );
+			entity.GetInventory().CreateInInventory( "HatchbackWheel" );
+			entity.GetInventory().CreateInInventory( "HatchbackWheel" );
+			entity.GetInventory().CreateInInventory( "HatchbackWheel" );
+
+			entity.GetInventory().CreateInInventory( "CarBattery" );
+			entity.GetInventory().CreateInInventory( "SparkPlug" );
+			entity.GetInventory().CreateInInventory( "CarRadiator" );
+
+			entity.GetInventory().CreateInInventory( "HatchbackDoors_Driver" );
+			entity.GetInventory().CreateInInventory( "HatchbackDoors_CoDriver" );
+			entity.GetInventory().CreateInInventory( "HatchbackHood" );
+			entity.GetInventory().CreateInInventory( "HatchbackTrunk" );
+
+			entity.GetInventory().CreateInInventory( "HeadlightH7" );
+			entity.GetInventory().CreateInInventory( "HeadlightH7" );
+		};
+
+		Fill( CarFluid.FUEL, 50 );
+		Fill( CarFluid.COOLANT, 6.0 );
+		Fill( CarFluid.OIL, 4.0 );
+
+	};
 }

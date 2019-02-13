@@ -1,0 +1,1 @@
+class HockeyMask extends Clothing {};

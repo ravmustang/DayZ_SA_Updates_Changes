@@ -10,6 +10,7 @@ class PluginRecipesManagerBase extends PluginBase
 	void RegisterRecipies()
 	{
 		RegisterRecipe(new CraftTorch);
+		RegisterRecipe(new CraftLongTorch);
 		RegisterRecipe(new SharpenStick);
 		RegisterRecipe(new PokeHolesBarrel);
 		RegisterRecipe(new CraftBaseBallBatNailed);
@@ -114,7 +115,7 @@ class PluginRecipesManagerBase extends PluginBase
 		RegisterRecipe(new ExtinguishTorch);
 		RegisterRecipe(new AttachHolsterPouch);
 		RegisterRecipe(new AttachPouchesHolster);
-		RegisterRecipe(new CraftGorkaHelmetComplete);
+		//RegisterRecipe(new CraftGorkaHelmetComplete);
 		RegisterRecipe(new SawoffShotgunIzh43);
 		RegisterRecipe(new SawoffMosin);
 		RegisterRecipe(new SawoffMosinPainted);
@@ -157,5 +158,6 @@ class PluginRecipesManagerBase extends PluginBase
 		RegisterRecipe(new CraftFenceKit);
 		RegisterRecipe(new CraftWatchtowerKit);
 		RegisterRecipe(new CraftWoodenPlank);
+		RegisterRecipe(new SawWoodenLog);
 	}
 };

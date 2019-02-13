@@ -9,11 +9,11 @@ class Hit_MeatBones : EffBulletImpactBase
 		//SetRicochetParticle(ParticleList.IMPACT_MEATBONES_RICOCHET);
 		
 		m_AngledEnter = 10;
-		m_EnterSplashCoef = 0.001;
+		m_EnterSplashCoef = 0.002;
 		m_ExitSplashCoef = 0.006;
 		m_ScalingByDistance = 0.05;
 		
-		MIN_SCALING_PARAM = 0.4;
+		MIN_SCALING_PARAM = 0.2;
 	}
 	
 	override float CalculateStoppingForce(float in_speedf, float out_speedf, string ammoType, float weight)
@@ -92,7 +92,31 @@ class Hit_MeatBones : EffBulletImpactBase
 			
 			power = power * decay_coef;
 			upscale = upscale + Math.RandomFloat(0.1, 1);
+			
+			
+			BloodSplatWall();
 		}
+	}
+	
+	void BloodSplatWall()
+	{
+		// Commented out due to age rating process :(
+		
+		/*if (m_OutSpeed.Length() > 0)
+		{
+			Object projected_surface;
+			vector hit_pos;
+			vector hit_normal;
+			float hit_fraction; 
+			DayZPhysics.RayCastBullet(m_ExitPos, m_ExitPos + m_OutSpeed, PhxInteractionLayers.BUILDING, m_Object, projected_surface, hit_pos, hit_normal, hit_fraction);
+			
+			hit_normal = hit_normal.VectorToAngles();
+			hit_normal[1] = hit_normal[1] + 90;
+			
+			int effect_id = SEffectManager.PlayInWorld( new BloodSplatter, hit_pos);
+			Particle blood = EffectParticle.Cast( SEffectManager.GetEffectByID(effect_id) ).GetParticle();
+			blood.SetOrientation(hit_normal);
+		}*/
 	}
 	
 	override void OnEnterCalculations( Particle p )
@@ -101,7 +125,14 @@ class Hit_MeatBones : EffBulletImpactBase
 		float velocity_min = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef);
 		float velocity_max = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef);
 		float size = MIN_SCALING_PARAM + ( m_StoppingForce * m_EnterSplashCoef);
-		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef);
+		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef/2);
+		
+		if ( m_AmmoType == "Bullet_12GaugePellets" )
+		{
+			birth_rate *= 0.5;
+			velocity_min *= 2;
+			velocity_max *= 2;
+		}
 		
 		// Additional size increase by distance from camera
 		vector camera_pos = GetGame().GetCurrentCameraPosition();
@@ -123,6 +154,9 @@ class Hit_MeatBones : EffBulletImpactBase
 		
 		if (velocity_min < MIN_SCALING_PARAM)
 			velocity_min = MIN_SCALING_PARAM;
+		
+		if (velocity_max < MIN_SCALING_PARAM * 2)
+			velocity_max = MIN_SCALING_PARAM * 2;
 		
 		if (size < MIN_SCALING_PARAM)
 			size = MIN_SCALING_PARAM;

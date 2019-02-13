@@ -62,7 +62,7 @@ class ActionGagTarget: ActionContinuousBase
 
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
-
+	
 	bool IsWearingMask( PlayerBase player)
 	{
 		if ( player.GetInventory().FindAttachment(InventorySlots.MASK) )

@@ -49,9 +49,12 @@ class ActionBurnSewTarget: ActionContinuousBase
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )
-	{	
-		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
-		ntarget.m_ModifiersManager.DeactivateModifier(eModifiers.MDF_BLEEDING);
+	{
+		PlayerBase ntarget = PlayerBase.Cast(action_data.m_Target.GetObject());
+		if (ntarget.GetBleedingManagerServer() )
+		{
+			ntarget.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();
+		}
 		//OlD_SHOCK//ntarget.GetStatShock().Add(1000);
 		action_data.m_MainItem.DecreaseHealth ( "", "", 5 );
 

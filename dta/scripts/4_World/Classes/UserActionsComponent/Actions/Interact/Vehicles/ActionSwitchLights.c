@@ -47,6 +47,14 @@ class ActionSwitchLights: ActionInteractBase
 
 							if ( !neededItem || (neededItem && neededItem.IsRuined()) )
 								return false;
+							
+							EntityAI item1 = car.FindAttachmentBySlotName("Reflector_1_1");
+							EntityAI item2 = car.FindAttachmentBySlotName("Reflector_2_1");
+			
+							if ( !item1 && !item2 )
+								return false;
+							else if ( item1 && item1.IsRuined() && item2 && item2.IsRuined() )
+								return false;
 
 							return true;
 						}

@@ -1,15 +1,15 @@
 class PlayerStatBase
 {
-	EPlayerStats	m_Type;
+	int	m_Type;
 	void 	OnStoreSave( ParamsWriteContext ctx );
-	void 	OnStoreLoad( ParamsReadContext ctx, int version );
+	bool 	OnStoreLoad( ParamsReadContext ctx);
 	void 	OnRPC(ParamsReadContext ctx);
 	float 	Get();
 	string 	GetLabel();
 	void 	SetByFloat(float value);
 	bool	IsSynced();
 	array<PlayerStatRecord> GetRecords();
-	void 	Init(int id, PlayerStats manager);
+	void 	Init(int id/*, PlayerStats manager*/);
 	void 	SerializeValue(array<ref StatDebugObject> objects, int flags);
 	int		GetType()
 	{
@@ -40,10 +40,10 @@ class PlayerStat<Class T> extends PlayerStatBase
 		m_Records = new array<PlayerStatRecord>;
 	}
 		
-	override void Init(int id, PlayerStats manager)
+	override void Init(int id/*, PlayerStats manager*/)
 	{
 		m_Type = id;
-		m_Manager = manager;	
+		//m_Manager = manager;	
 	}
 	
 	override void SerializeValue(array<ref StatDebugObject> objects, int flags)
@@ -70,7 +70,7 @@ class PlayerStat<Class T> extends PlayerStatBase
 		{
 			m_Value = value;
 		}
-		if( GetManager().GetAllowLogs() ) CreateRecord(value, system);
+		//if( GetManager().GetAllowLogs() ) CreateRecord(value, system);
 	}
 	
 	void SetByFloat(float value, string system = "" )
@@ -130,18 +130,25 @@ class PlayerStat<Class T> extends PlayerStatBase
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{   
 		//ctx.Write(m_ValueLabel);
-		//PrintString("saving " + ClassName()+" value:" +m_Value);
+		//PrintString("saving " + GetLabel()+" value:" +m_Value);
 		ctx.Write(m_Value);
 	}
 
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx)
 	{
 		//string name;
 		
 		//ctx.Read(name);
-		
-		ctx.Read(m_Value);
-		//PrintString("loading " + ClassName()+" value:" +m_Value);
-
+		T value;
+		if(ctx.Read(value))
+		{
+			m_Value = value;
+		}
+		else
+		{
+			return false;
+		}
+		//PrintString("loading " + GetLabel()+" value:" +m_Value);
+		return true;
 	}
 }

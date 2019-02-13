@@ -6,7 +6,7 @@ class Man extends EntityAI
 	//! Returns vehicle which this Man object is driving. If this Man object isn't as driver of any vehicle it will return NULL.
 	proto native EntityAI GetDrivingVehicle();
 
-	proto native string GetCurrentWeaponMode();
+	proto native owned string GetCurrentWeaponMode();
 
 	//! Set speech restriction
 	proto native void SetSpeechRestricted(bool state);
@@ -20,6 +20,9 @@ class Man extends EntityAI
 
 	proto native bool IsSoundInsideBuilding();
 	proto native bool IsCameraInsideVehicle();
+
+	proto native string GetMasterAttenuation();
+	proto native void SetMasterAttenuation(string masterAttenuation);
 
 	void Man()
 	{
@@ -157,6 +160,24 @@ class Man extends EntityAI
 			return;
 		}
 
+		//! returns item to previous location, if available
+		if (GetHumanInventory().GetEntityInHands().m_OldLocation.IsValid())
+		{
+			InventoryLocation invLoc = new InventoryLocation;
+			GetHumanInventory().GetEntityInHands().GetInventory().GetCurrentInventoryLocation(invLoc);
+			//old location is somewhere on player
+			if (GetHumanInventory().GetEntityInHands().m_OldLocation.GetParent() && GetHumanInventory().GetEntityInHands().m_OldLocation.GetParent().GetHierarchyRootPlayer())
+			{
+				if (GetHumanInventory().LocationCanMoveEntity(invLoc, GetHumanInventory().GetEntityInHands().m_OldLocation))
+				{
+					if (GetHumanInventory().TakeToDst(InventoryMode.PREDICTIVE,invLoc,GetHumanInventory().GetEntityInHands().m_OldLocation))
+					{
+						UpdateInventoryMenu();
+						return;
+					}
+				}
+			}
+		}
 		GetHumanInventory().TakeEntityToInventory(InventoryMode.PREDICTIVE, FindInventoryLocationType.ATTACHMENT | FindInventoryLocationType.CARGO, GetHumanInventory().GetEntityInHands());
 		UpdateInventoryMenu();
 	}

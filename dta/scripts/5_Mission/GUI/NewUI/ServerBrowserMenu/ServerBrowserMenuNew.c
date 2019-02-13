@@ -55,8 +55,8 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		m_PlayerName			= TextWidget.Cast( layoutRoot.FindAnyWidget( "character_name_text" ) );
 		m_Version				= TextWidget.Cast( layoutRoot.FindAnyWidget( "version" ) );
 		
-		// TODO: Temporary Hide for 1.0
 		#ifndef PLATFORM_CONSOLE
+		// TODO: Temporary Hide for 1.0
 		layoutRoot.FindAnyWidget( "customize_character" ).Show( false );
 		layoutRoot.FindAnyWidget( "character" ).Show( false );
 		#endif
@@ -311,52 +311,52 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( !GetGame().GetUIManager().IsDialogVisible() )
 		{
-			if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUITabLeft",false) )
 			{
 				m_Tabber.PreviousTab();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUITabRight",false) )
 			{
 				m_Tabber.NextTab();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUISelect, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUISelect",false) )
 			{
 				GetSelectedTab().PressA();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUICtrlX, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUICtrlX",false) )
 			{
 				GetSelectedTab().PressX();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUICtrlY, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUICtrlY",false) )
 			{
 				GetSelectedTab().PressY();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUILeft, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUILeft",false) )
 			{
 				GetSelectedTab().Left();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUIRight, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUIRight",false) )
 			{
 				GetSelectedTab().Right();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUIUp, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUIUp",false) )
 			{
 				GetSelectedTab().Up();
 			}
 			
-			if( GetGame().GetInput().GetActionDown( UAUIDown, false ) )
+			if( GetGame().GetInput().GetActionDown("UAUIDown",false) )
 			{
 				GetSelectedTab().Down();
 			}
 	
-			if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+			if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
 			{
 				Back();
 			}

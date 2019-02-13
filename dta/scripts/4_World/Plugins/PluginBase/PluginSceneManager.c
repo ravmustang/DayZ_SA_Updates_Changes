@@ -413,6 +413,9 @@ class PluginSceneManager extends PluginBase
 		
 		// Disable Cursor
 		GetGame().GetUIManager().ShowUICursor(false);
+		
+		if( GetGame().GetUIManager().GetMenu() )
+			GetGame().GetUIManager().GetMenu().OnHide();
 	}
 
 	//==========================================
@@ -425,6 +428,9 @@ class PluginSceneManager extends PluginBase
 		
 		// Enable Cursor
 		GetGame().GetUIManager().ShowUICursor(true);
+		
+		if( GetGame().GetUIManager().GetMenu() )
+			GetGame().GetUIManager().GetMenu().OnShow();
 	}
 	
 	//==========================================

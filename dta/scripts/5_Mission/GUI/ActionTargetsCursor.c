@@ -72,6 +72,11 @@ class ActionTargetsCursor extends ObjectFollower
 	ref AutoHeightSpacer					m_MainSpacer;
 	ref AutoHeightSpacer					m_HealthQuantitySpacer;
 
+	//! widget width
+	protected float m_MaxWidthChild;
+	protected float m_RootWidth;
+	protected float m_RootHeight;
+
 	void ActionTargetsCursor()
 	{
 		m_Interact = null;
@@ -147,7 +152,7 @@ class ActionTargetsCursor extends ObjectFollower
 		SetInteractXboxIcon("playstation_buttons", "square");
 #endif
 	}
-	
+
 	protected void PrepareCursorContent()
 	{
 		int health = -1;
@@ -184,6 +189,7 @@ class ActionTargetsCursor extends ObjectFollower
 
 		m_Root.SetPos(x, y);
 
+		UpdateWidth();
 		m_MainSpacer.Update();
 		m_HealthQuantitySpacer.Update();	
 	}
@@ -202,7 +208,8 @@ class ActionTargetsCursor extends ObjectFollower
 		//! in case of cached item, all above is reused except the position
 		else
 		{
-			vector screen_pos = GetGame().GetScreenPos( m_CachedObject.GetCursorWorldPos() );
+			vector screen_pos = TransformToScreenPos(m_CachedObject.GetCursorWorldPos());
+	
 			pos_x = screen_pos[0];
 			pos_y = screen_pos[1];
 		}
@@ -211,9 +218,39 @@ class ActionTargetsCursor extends ObjectFollower
 		pos_y = Math.Ceil(pos_y);
 
 		m_Root.SetPos(pos_x, pos_y);
-		
+
+		UpdateWidth();
 		m_MainSpacer.Update();
 		m_HealthQuantitySpacer.Update();
+	}
+
+	protected void UpdateWidth()
+	{
+		m_Root.GetSize(m_RootWidth, m_RootHeight);
+		Widget child = m_Root.GetChildren();
+		int index = 0;
+		int width;
+
+		if (m_MaxWidthChild > 100 && m_MaxWidthChild < m_RootWidth)
+		{
+			m_Root.SetSize(m_MaxWidthChild + 60, 0);
+			while (child)
+			{
+				child.SetSize(m_MaxWidthChild + 60, 40);
+				index++;
+				child = child.GetSibling();
+			}
+		}
+		else
+		{
+			m_Root.SetSize(350, 170);
+			while (child)
+			{
+				child.SetSize(290, 40);
+				index++;
+				child = child.GetSibling();
+			}
+		}
 	}
 	
 	override protected void Update()
@@ -302,16 +339,32 @@ class ActionTargetsCursor extends ObjectFollower
 			}
 			else
 			{
-				m_CachedObject.Invalidate();
-				m_Root.Show(false);
+				if (m_Root.IsVisible())
+				{
+					m_CachedObject.Invalidate();
+					m_Root.Show(false);				
+
+					// remove previous backlit
+					GetDayZGame().GetBacklit().HintClear();
+				}
+				
 			}
 		}
 		else
 		{
-			m_CachedObject.Invalidate();
-			m_Root.Show(false);
-			m_FixedOnPosition = false;
+			if (m_Root.IsVisible())
+			{
+				m_CachedObject.Invalidate();
+				m_Root.Show(false);
+				m_FixedOnPosition = false;
+
+				// remove previous backlit
+				GetDayZGame().GetBacklit().HintClear();
+			}
+			
 		}
+		
+		m_MaxWidthChild = 350;
 	}
 	
 	protected void ShowXboxHidePCIcons( string widget, bool show_xbox_icon )
@@ -319,7 +372,26 @@ class ActionTargetsCursor extends ObjectFollower
 		m_Root.FindAnyWidget( widget + "_btn_icon_xbox" ).Show( show_xbox_icon );
 		m_Root.FindAnyWidget( widget + "_btn_icon" ).Show( !show_xbox_icon );
 	}
-	
+
+
+	//! transform world pos to screen pos (related to parent widget size)
+	protected vector TransformToScreenPos(vector pWorldPos)
+	{
+		float parent_width, parent_height;
+		vector transformed_pos, screen_pos;
+		
+		//! get relative pos for screen from world pos vector
+		screen_pos = GetGame().GetScreenPosRelative( pWorldPos );
+		//! get size of parent widget
+		m_Root.GetParent().GetScreenSize(parent_width, parent_height);
+		
+		//! calculate corrent position from relative pos and parent widget size
+		transformed_pos[0] = screen_pos[0] * parent_width;
+		transformed_pos[1] = screen_pos[1] * parent_height;
+		
+		return transformed_pos;
+	}
+
 	override protected void GetOnScreenPosition(out float x, out float y)
 	{
 		const float 	DEFAULT_HANDLE_OFFSET 	= 0.2;
@@ -380,7 +452,7 @@ class ActionTargetsCursor extends ObjectFollower
 							if( memSelections[i2].GetName() == CE_CENTER_COMP_NAME && memSelections[i2].GetVertexCount() == 1 )
 							{
 								m_FixedOnPosition = false;
-								modelPos = object.GetSelectionPosition( CE_CENTER_COMP_NAME );
+								modelPos = object.GetSelectionPositionMS( CE_CENTER_COMP_NAME );
 								worldPos = object.ModelToWorld( modelPos );
 								if ( memOffset != 0.0 )
 								{
@@ -404,7 +476,7 @@ class ActionTargetsCursor extends ObjectFollower
 							//! single vertex in selection
 							if( memSelections[i1].GetName() == compName && memSelections[i1].GetVertexCount() == 1 )
 							{
-								modelPos = object.GetSelectionPosition( compName );
+								modelPos = object.GetSelectionPositionMS( compName );
 								worldPos = object.ModelToWorld( modelPos );
 
 								m_FixedOnPosition = false;
@@ -425,7 +497,7 @@ class ActionTargetsCursor extends ObjectFollower
 								{
 									if( IsComponentInSelection(memSelections, components[j]) )
 									{
-										modelPos = object.GetSelectionPosition( components[j] );
+										modelPos = object.GetSelectionPositionMS( components[j] );
 										worldPos = object.ModelToWorld( modelPos );
 
 										m_FixedOnPosition = false;
@@ -443,7 +515,7 @@ class ActionTargetsCursor extends ObjectFollower
 						}
 						
 						//! cache current object and the widget world pos
-						m_CachedObject.Store(object, worldPos, compIdx);
+						m_CachedObject.Store(object, worldPos, -1); //! do not store component index for doors/handles
 					}
 					//! ladders handling
 					else if( compName.Contains("ladder") && IsComponentInSelection( memSelections, compName))
@@ -504,9 +576,10 @@ class ActionTargetsCursor extends ObjectFollower
 				m_FixedOnPosition = true;
 			}
 
-			vector screen_pos = GetGame().GetScreenPos( worldPos );
-			x = screen_pos[0];
-			y = screen_pos[1];
+			vector pos = TransformToScreenPos(worldPos);
+
+			x = pos[0];
+			y = pos[1];
 		}
 
 		worldPos = vector.Zero;
@@ -736,6 +809,13 @@ class ActionTargetsCursor extends ObjectFollower
 		}
 		else
 			itemName.SetText(descText);
+		
+		/*
+		int x, y;
+		itemName.GetTextSize(x, y);
+		if (x > m_MaxWidthChild);
+			m_MaxWidthChild = x;
+		*/
 
 		widget.Show(true);
 	}
@@ -871,15 +951,20 @@ class ActionTargetsCursor extends ObjectFollower
 				}
 
 				widget.Show(true);
+				
+				int x, y;
+				actionName.GetTextSize(x, y);
+				if (x > m_MaxWidthChild);
+					m_MaxWidthChild = x;
 			}
 			else
 			{
-				widget.Show(false);
+				widget.Show(false);			
 			}
 		}
 		else
 		{
-			widget.Show(false);
+			widget.Show(false);			
 		}
 	}
 
@@ -893,7 +978,7 @@ class ActionTargetsCursor extends ObjectFollower
 		if(m_InteractActionsNum > 1)
 			widget.Show(true);
 		else
-			widget.Show(false);
+			widget.Show(false);	
 	}
 	
 	protected void SetInteractActionIcon(string actionWidget, string actionIconFrameWidget, string actionIconWidget, string actionIconTextWidget)
@@ -909,7 +994,8 @@ class ActionTargetsCursor extends ObjectFollower
 		Class.CastTo(textWidget, widget.FindAnyWidget(actionIconTextWidget));
 
 		//! get name of key which is used for UAAction input 
-		UAInput i1 = GetUApi().GetInputByName("UAAction"); 
+		UAInput i1 = GetUApi().GetInputByName("UAAction");
+		GetDayZGame().GetBacklit().HintShow(i1);
 		
 		i1.SelectAlternative(0); //! select first alternative (which is the primary bind)
 		for( int c = 0; c < i1.BindKeyCount(); c++ )

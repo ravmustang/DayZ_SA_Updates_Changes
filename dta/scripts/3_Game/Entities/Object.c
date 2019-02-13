@@ -16,7 +16,7 @@ class Object extends IEntity
 	proto native bool GetLODS(notnull out array<LOD> lods);
 	
 	//! Retrieve LOD name
-	proto native string GetLODName(LOD lod);
+	proto native owned string GetLODName(LOD lod);
 	
 	//! Retrieve LOD by given name
 	LOD GetLODByName( string name )
@@ -108,10 +108,10 @@ class Object extends IEntity
 	}
 	
 	//! returns action component name by given component index, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
-	proto native string GetActionComponentName(int componentIndex, string geometry = "");
+	proto native owned string GetActionComponentName(int componentIndex, string geometry = "");
 
 	//! returns action component name list by given component index, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
-	proto native void GetActionComponentNameList(int componentIndex, TStringArray nameList, string geometry = "");
+	proto native owned void GetActionComponentNameList(int componentIndex, TStringArray nameList, string geometry = "");
 	
 	//! return true if selection containts action component, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
 	proto native bool IsActionComponentPartOfSelection(int componentIndex, string selectionName, string geometry = "");
@@ -267,10 +267,10 @@ class Object extends IEntity
 	}
 	
 	//! If Returns true if this item has EnergyManager in its config. Otherwise returns false.
-	bool HasEnergyManager()
+	/*bool HasEnergyManager()
 	{
 		return false;
-	}
+	}*/
 	
 	proto native int GetMemoryPointIndex(string memoryPointName);
 	proto native vector GetMemoryPointPos(string memoryPointName);
@@ -485,10 +485,26 @@ class Object extends IEntity
 	*/
 	void OnRPC(PlayerIdentity sender, int rpc_type, ParamsReadContext ctx);
 
-	vector GetSelectionPosition(string name)
+	vector GetSelectionPositionOld(string name)
 	{
 		return GetGame().ObjectGetSelectionPosition(this, name);
 	}
+	
+	vector GetSelectionPositionLS(string name)
+	{
+		return GetGame().ObjectGetSelectionPositionLS(this, name);
+	}
+	
+	vector GetSelectionPositionMS(string name)
+	{
+		return GetGame().ObjectGetSelectionPositionMS(this, name);
+	}
+	
+	vector GetSelectionPositionWS(string name)
+	{
+		return GetGame().ObjectGetSelectionPositionWS(this, name);
+	}
+
 	
 	vector ModelToWorld(vector modelPos)
 	{
@@ -700,7 +716,7 @@ class Object extends IEntity
   \brief Obtains name of damage zone based on index of specific component
 	@param index of the component
 	*/
-	proto native string GetDamageZoneNameByComponentIndex(int componentIndex);
+	proto native owned string GetDamageZoneNameByComponentIndex(int componentIndex);
 	
 	/**
   \brief Is this just static object without config? So we can avoid calling unnecessary methods
@@ -717,8 +733,20 @@ class Object extends IEntity
 	/**
   \brief Enable or disable object to receive damage
 	@param enable or disable
+	@warning works only in internal version
 	*/
 	proto native void SetAllowDamage(bool val);
+	
+	/**
+	\brief Returns if object is destroyable
+	*/
+	proto native bool GetCanBeDestroyed();
+	
+	/**
+	\brief Enable or disable destruction of object (after health is depleated)
+	@param enable or disable
+	*/
+	proto native void SetCanBeDestroyed(bool val);
 	
 	/**
 	\brief Returns whether the object is ruined (0 Health).

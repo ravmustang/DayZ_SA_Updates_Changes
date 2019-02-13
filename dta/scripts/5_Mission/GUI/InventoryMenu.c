@@ -1,12 +1,28 @@
+enum ScreenWidthType
+{
+	NARROW,
+	MEDIUM,
+	WIDE
+}
+
 class InventoryMenu extends UIScriptedMenu
 {
-	ref Inventory m_Inventory;
-	private ref ContextMenu m_context_menu;
-	protected bool m_IsOpened;
-	protected bool m_OnlyFirstTime;
-
+	ref Inventory						m_Inventory;
+	private ref ContextMenu				m_context_menu;
+	protected bool						m_IsOpened;
+	protected bool						m_OnlyFirstTime;
+	
+	protected float						m_RefreshTimer;
+	
+	protected static ScreenWidthType	m_WidthType;
+	protected static int				m_Width;
+	protected static int				m_Height;
+	
+	
+	
 	void InventoryMenu()
 	{
+		CheckWidth();
 		m_Inventory = new Inventory(NULL);
 		m_Inventory.Reset();
 		m_Inventory.UpdateInterval();
@@ -19,6 +35,37 @@ class InventoryMenu extends UIScriptedMenu
 		m_context_menu.Init(layoutRoot);
 		layoutRoot = m_Inventory.GetMainWidget();
 		return layoutRoot;
+	}
+	
+	void CheckWidth()
+	{
+		GetScreenSize( m_Width, m_Height );
+		
+		if( m_Height > 0 )
+		{
+			float ratio = m_Width / m_Height;
+			if( ratio > 1.75 )
+				m_WidthType = ScreenWidthType.WIDE;
+			else if( ratio > 1.5 )
+				m_WidthType = ScreenWidthType.MEDIUM;
+			else
+				m_WidthType = ScreenWidthType.NARROW;
+		}
+	}
+	
+	static ScreenWidthType GetWidthType()
+	{
+		return m_WidthType;
+	}
+	
+	static int GetWidth()
+	{
+		return m_Width;
+	}
+	
+	static int GetHeight()
+	{
+		return m_Height;
 	}
 	
 	void RefreshQuickbar()
@@ -43,6 +90,21 @@ class InventoryMenu extends UIScriptedMenu
 
 	void InitContainers(EntityAI target)
 	{
+		
+	}
+	
+	override void Update( float timeslice )
+	{
+		if( m_Inventory )
+			m_Inventory.UpdateInterval();
+		
+		m_RefreshTimer += timeslice;
+		if( m_RefreshTimer > 10 )
+		{
+			m_Inventory.Refresh();
+			m_RefreshTimer = timeslice;
+			Print( "Refresh" );
+		}
 	}
 
 	override void OnShow()
@@ -64,12 +126,12 @@ class InventoryMenu extends UIScriptedMenu
 		ItemManager.GetInstance().SetSelectedItem( null, null, null );
 	}
 	
-	#ifdef PLATFORM_CONSOLE
+	//#ifdef PLATFORM_CONSOLE
 	override bool OnController( Widget w, int control, int value )
 	{
 		return m_Inventory.Controller( w, control, value );
 	}
-	#endif
+	//#endif
 	
 	int Reset()
 	{
@@ -88,6 +150,14 @@ class InventoryMenu extends UIScriptedMenu
 		return false;
 #endif
 		return true;
+	}
+	
+	override bool UseGamepad()
+	{
+#ifdef PLATFORM_CONSOLE
+		return true;
+#endif
+		return false;
 	}
 
 	override void OnHide()

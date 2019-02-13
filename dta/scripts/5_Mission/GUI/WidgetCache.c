@@ -37,7 +37,7 @@ class WidgetCache
 	{
 		//m_Inventory.Reset();
 	}
-
+	/*
 	void CreateWidgetsCache()
 	{
 		CreateWidgetCache( WidgetLayoutName.Inventory, INVENTORY_CACHES );
@@ -49,9 +49,9 @@ class WidgetCache
 		CreateWidgetCache( WidgetLayoutName.HandsHeader, 1 );
 		CreateWidgetCache( WidgetLayoutName.HandsArea, 1 );
 		CreateWidgetCache( WidgetLayoutName.ClosableContainer, COLLAPSIBLE_HEADER_CACHES );
-		CreateWidgetCache( WidgetLayoutName.GridContainer, GRID_CONTAINER_CACHES );
+		CreateWidgetCache( WidgetLayoutName.CargoContainerRow, GRID_CONTAINER_CACHES );
 	}
-
+	*/
 	void CreateWidgetCache( string layoutName, int numberOfCaches )
 	{
 		ref array<ref WidgetCacheObject> widgets = new array<ref WidgetCacheObject>;

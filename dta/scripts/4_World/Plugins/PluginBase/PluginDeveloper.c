@@ -167,10 +167,10 @@ class PluginDeveloper extends PluginBase
 	// Client -> Server Spawning: Server Side
 	void OnRPCSpawnEntityOnCursorDir(PlayerBase player, ParamsReadContext ctx)
 	{
-		ref Param4<string, float, float, float> p = new Param4<string, float, float, float>("", 0, 0, 0);
+		ref Param5<string, float, float, float, bool> p = new Param5<string, float, float, float, bool>("", 0, 0, 0, false);
 		if ( ctx.Read(p) )
 		{
-			SpawnEntityOnCursorDir(player, p.param1, p.param2,  p.param3,  p.param4);
+			SpawnEntityOnCursorDir(player, p.param1, p.param2,  p.param3,  p.param4, p.param5);
 		}
 	}
 	void OnRPCSpawnEntityOnGround(PlayerBase player, ParamsReadContext ctx)
@@ -203,8 +203,9 @@ class PluginDeveloper extends PluginBase
 		PrintString("PluginDeveloper.SpawnEntity() Warning END");
 	}
 
-	void SetupSpawnedEntity (EntityAI entity, float health, float quantity)
+	void SetupSpawnedEntity (EntityAI entity, float health, float quantity, bool special = false)
 	{
+		entity.OnDebugSpawn();
 		if ( entity.IsInherited( PlayerBase ) ) 
 		{
 			PlayerBase plr = PlayerBase.Cast( entity );
@@ -251,14 +252,14 @@ class PluginDeveloper extends PluginBase
 	 * @param[in]	distance	\p	distance of the item from player
 	 * @return	entity if ok, null otherwise
 	 **/
-	EntityAI SpawnEntityOnCursorDir (PlayerBase player, string item_name, float health, float quantity, float distance)
+	EntityAI SpawnEntityOnCursorDir (PlayerBase player, string item_name, float health, float quantity, float distance, bool special = false)
 	{
 		if ( GetGame().IsServer() )
 		{		
 			// Client -> Server Spawning: Server Side
 			EntityAI entity = player.SpawnEntityOnGroundOnCursorDir(item_name, distance);
 			if (entity)
-				SetupSpawnedEntity(entity, health, quantity);
+				SetupSpawnedEntity(entity, health, quantity, special);
 			else
 				OnSpawnErrorReport(item_name);
 			return entity;
@@ -266,7 +267,7 @@ class PluginDeveloper extends PluginBase
 		else
 		{		
 			// Client -> Server Spawning: Client Side
-			ref Param4<string, float, float, float> params = new Param4<string, float, float, float>(item_name, health, quantity, distance);
+			ref Param5<string, float, float, float, bool> params = new Param5<string, float, float, float, bool>(item_name, health, quantity, distance, special);
 			player.RPCSingleParam(ERPCs.DEV_RPC_SPAWN_ITEM_ON_CURSOR, params, true);
 		}
 		return NULL;

@@ -102,13 +102,17 @@ class HumanInventoryWithFSM : HumanInventory
 		}
 	}
 
-	override void OnStoreLoad (ParamsReadContext ctx, int version)
+	override bool OnStoreLoad (ParamsReadContext ctx, int version)
 	{
-		super.OnStoreLoad(ctx, version);
-    //@TODO
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
+		
+		//@TODO
 		//m_FSM.OnStoreLoad(ctx, version);
+
+		return true;
 	}
-	
+
 	override void OnStoreSave (ParamsWriteContext ctx)
 	{
 		super.OnStoreSave(ctx);

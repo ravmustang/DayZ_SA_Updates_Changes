@@ -103,7 +103,7 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		}
 
 		//! lr angle
-		if (m_pInput.CameraIsFreeLook())	
+		if( m_pInput.CameraIsFreeLook() )	
 		{
 			pAngleAdd 	+= m_pInput.GetAimChange()[1] * Math.RAD2DEG;
 			pAngleAdd	= Limit(pAngleAdd, pMin, pMax);
@@ -112,11 +112,21 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		}
 		else
 		{
-			//! update it in degrees
-			pAngle 	+= m_pInput.GetAimChange()[1] * Math.RAD2DEG;
-			pAngle 	= Limit(pAngle, pMin, pMax);
+			if( m_pInput.CameraIsTracking() )
+			{
+				pAngleAdd 	= m_pInput.GetTracking()[1] * Math.RAD2DEG;
+				pAngleAdd	= Limit(pAngleAdd, pMin, pMax);
 
-			pAngleAdd	= Math.SmoothCD(pAngleAdd, 0, m_fUDAngleVel, 0.14, 1000, pDt);
+				m_fUDAngleVel[0]	= 0;
+			}
+			else
+			{	
+				//! update it in degrees
+				pAngle 	+= m_pInput.GetAimChange()[1] * Math.RAD2DEG;
+				pAngle 	= Limit(pAngle, pMin, pMax);
+
+				pAngleAdd	= Math.SmoothCD(pAngleAdd, 0, m_fUDAngleVel, 0.14, 1000, pDt);
+			}
 		}
 		
 		/*{
@@ -143,9 +153,19 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		}
 		else
 		{
-			// smooth value back to 0 
-			pAngle		= Math.SmoothCD(pAngle, 0, m_fLRAngleVel, 0.14, 1000, pDt);
-			// m_fLeftRightAngle	= 0.9 * (1.0 - pDt);			
+			if( m_pInput.CameraIsTracking() )
+			{
+				pAngle = m_pInput.GetTracking()[0] * Math.RAD2DEG;
+				pAngle	= Limit(-pAngle, pMin, pMax);
+				
+				m_fLRAngleVel[0]	= 0;	// reset filter
+			}
+			else
+			{	
+				// smooth value back to 0 
+				pAngle		= Math.SmoothCD(pAngle, 0, m_fLRAngleVel, 0.14, 1000, pDt);
+				// m_fLeftRightAngle	= 0.9 * (1.0 - pDt);			
+			}
 		}
 
 		return pAngle;
@@ -193,6 +213,11 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 			PPEffects.SetNVValueEV(0); //sets EV value immediately to avoid bright flashes at night
 		}
 		GetGame().GetCallQueue(CALL_CATEGORY_GUI).CallLater(SetCameraPP,m_CameraPPDelay*1000,false,true,this); // this takes care of weapon/optics postprocessing
+		DayZPlayerCameraOptics optic_camera;
+		if (DayZPlayerCamera.CastTo(optic_camera,pPrevCamera))
+		{
+			GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(PlayerBase.Cast(m_pPlayer).HideClothing,null,false);
+		}
 	}
 	
 	float GetWeaponSwayModifier()
@@ -234,6 +259,11 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 	override float GetCurrentPitch()
 	{
 		return m_CurrentCameraPitch;
+	}
+	
+	void ForceFreelook(bool state)
+	{
+		m_bForceFreeLook = state;
 	}
 	
 	protected float 				m_fLRAngleVel[1];

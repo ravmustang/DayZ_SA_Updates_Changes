@@ -13,7 +13,6 @@ class FeverMdfr: ModifierBase
 	{
 		//Print(GetGame().GetTime());
 		return player.GetModifiersManager().IsModifierActive(eModifiers.MDF_INFLUENZA);
-		return false;
 	}
 
 	override void OnActivate(PlayerBase player)

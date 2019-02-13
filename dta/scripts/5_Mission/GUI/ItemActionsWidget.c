@@ -17,6 +17,11 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 	protected Widget					m_Root;
 	protected Widget 					m_ItemLeft;
 	ref AutoHeightSpacer				m_HealthQuantitySpacer;
+
+	//! widget width
+	protected float m_MaxWidthChild;
+	protected float m_RootWidth;
+	protected float m_RootHeight;
 	
 	void ItemActionsWidget()
 	{
@@ -103,12 +108,14 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 		SetItemHealth(health, "ia_item", "ia_item_health_mark", m_HealthEnabled);
 		
 		// quantity
+		//! weapon specific
 		if( m_EntityInHands && m_EntityInHands.IsWeapon() )
 		{
 			GetWeaponQuantity(q_chamber, q_mag);
 			SetWeaponQuantity(q_chamber, q_mag, "ia_item", "ia_item_quantity_pb", "ia_item_quantity_text", m_QuantityEnabled);
 			SetWeaponModeAndZeroing("ia_item_subdesc", "ia_item_subdesc_up", "ia_item_subdesc_down", true);
 		}
+		//! transmitter/PAS specific
 		else if( m_EntityInHands && m_EntityInHands.IsTransmitter() )
 		{
 			SetRadioFrequency(GetRadioFrequency(), "ia_item_subdesc", "ia_item_subdesc_up", "ia_item_subdesc_down", m_QuantityEnabled);
@@ -127,7 +134,36 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 		SetActionWidget(m_Continuous, GetActionDesc(m_Continuous), "ia_continuous", "ia_continuous_action_name");
 		SetMultipleInteractAction("ia_interact_mlt_wrapper");
 		
+		UpdateWidth();
 		m_HealthQuantitySpacer.Update();
+	}
+	
+	protected void UpdateWidth()
+	{
+		m_Root.GetSize(m_RootWidth, m_RootHeight);
+		Widget child = m_Root.GetChildren();
+		int index = 0;
+
+		if (m_MaxWidthChild > 100 && m_MaxWidthChild < m_RootWidth)
+		{
+			m_Root.SetSize(m_MaxWidthChild + 60, 0);
+			while (child)
+			{
+				child.SetSize(m_MaxWidthChild + 60, 40);
+				index++;
+				child = child.GetSibling();
+			}
+		}
+		else
+		{
+			m_Root.SetSize(300, 0);
+			while (child)
+			{
+				child.SetSize(250, 40);
+				index++;
+				child = child.GetSibling();
+			}
+		}
 	}
 		
 	protected void Update()
@@ -157,8 +193,13 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 		}
 		else
 		{
-			m_Root.Show(false);
+			if (m_Root.IsVisible())
+			{
+				m_Root.Show(false);
+			}
 		}
+
+		m_MaxWidthChild = 200;
 	}
 
 	// getters
@@ -331,6 +372,14 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 			Class.CastTo(itemName, widget.FindAnyWidget(descWidget));
 			itemName.SetText(descText);
 			widget.Show(true);
+
+			/*
+			int x, y;
+			itemName.GetTextSize(x, y);
+			if (descText.Length() > 0 && x > m_MaxWidthChild);
+				m_MaxWidthChild = x;
+			*/
+
 		}
 		else
 			widget.Show(false);
@@ -546,6 +595,12 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 		{
 			TextWidget actionName;
 			Class.CastTo(actionName, widget.FindAnyWidget(descWidget));
+			
+			int x, y;
+			actionName.GetTextSize(x, y);
+			if (x > m_MaxWidthChild);
+				m_MaxWidthChild = x;
+
 			if(action.IsInherited(ActionContinuousBase))
 			{
 				descText = descText + " " + "#action_target_cursor_hold";

@@ -9,8 +9,16 @@ class BleedingSourcesManagerRemote extends BleedingSourcesManagerBase
 	{
 		if (m_Player.GetBleedingBits() != m_BleedingBits)
 		{
+			if(m_BleedingBits == 0)
+			{
+				m_Player.OnBleedingBegin();
+			}
 			OnBleedingBitsUpdate(m_BleedingBits, m_Player.GetBleedingBits());
 			m_BleedingBits = m_Player.GetBleedingBits();
+			if(m_BleedingBits == 0)
+			{
+				m_Player.OnBleedingEnd();
+			}
 		}
 	}
 	

@@ -1,0 +1,1 @@
+class ChernarusSportShirt extends Clothing {};

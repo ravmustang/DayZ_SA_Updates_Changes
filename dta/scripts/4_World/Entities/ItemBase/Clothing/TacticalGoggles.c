@@ -1,0 +1,1 @@
+class TacticalGoggles extends Clothing {};

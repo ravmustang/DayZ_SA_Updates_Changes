@@ -78,9 +78,9 @@ class DetachOldMagazine extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_oldMagazine))
@@ -142,9 +142,9 @@ class OldMagazineHide : MagazineHide
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_oldMagazine))
@@ -318,9 +318,9 @@ class SwapOldAndNewMagazine extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_newMagazine))
@@ -433,9 +433,9 @@ class AttachNewMagazine extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_newMagazine))
@@ -476,6 +476,7 @@ class WeaponReplacingMagAndChamberNext extends WeaponStateBase
 	ref AttachNewMagazine_W4T m_attach;
 	ref WeaponChamberFromAttMag_W4T m_chamber;
 	ref WeaponCharging_CK m_onCK;
+	ref WeaponEjectCasing m_eject;
 
 	// substates configuration
 	Magazine m_oldMagazine; /// magazine that will be detached
@@ -493,6 +494,7 @@ class WeaponReplacingMagAndChamberNext extends WeaponStateBase
 
 		// setup nested state machine
 		m_start = new WeaponStartAction(m_weapon, this, m_action, m_actionType);
+		m_eject = new WeaponEjectCasing(m_weapon,this);
 		m_detach = new DetachOldMagazine(m_weapon, this);
 		m_hideOld = new OldMagazineHide(m_weapon, this);
 		m_swapMags = new SwapOldAndNewMagazine(m_weapon, this);
@@ -501,6 +503,7 @@ class WeaponReplacingMagAndChamberNext extends WeaponStateBase
 		m_onCK = new WeaponCharging_CK(m_weapon, this);
 
 		// events
+		WeaponEventBase __so_ = new WeaponEventAnimSliderOpen;
 		WeaponEventBase __md_ = new WeaponEventAnimMagazineDetached;
 		WeaponEventBase __mh_ = new WeaponEventAnimMagazineHide;
 		WeaponEventBase __ms_ = new WeaponEventAnimMagazineShow;
@@ -510,6 +513,8 @@ class WeaponReplacingMagAndChamberNext extends WeaponStateBase
 
 		m_fsm = new WeaponFSM(this); // @NOTE: set owner of the submachine fsm
 		m_fsm.AddTransition(new WeaponTransition(   m_start, __md_, m_detach));
+		m_fsm.AddTransition(new WeaponTransition(   m_start, __so_, m_eject));
+		m_fsm.AddTransition(new WeaponTransition(   m_eject, __md_, m_detach));
 		m_fsm.AddTransition(new WeaponTransition(  m_detach, __mh_, m_hideOld));
 		m_fsm.AddTransition(new WeaponTransition( m_hideOld, __ms_, m_swapMags));
 		m_fsm.AddTransition(new WeaponTransition(m_swapMags, __ma_, m_attach));

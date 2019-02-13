@@ -24,12 +24,18 @@ class HumanInputController
 	//! returns per tick aim change (in radians) 
 	proto native vector 		GetAimChange();
 
+	//! returns absolute tracking change (in radians) 
+	proto native vector 		GetTracking();
+
 	//! 1st/3rd person camera view
 	proto native bool			CameraViewChanged();
 
-	//! returns per tickaim change (in radians) 
+	//! returns true if freelook is active
 	proto native bool			CameraIsFreeLook();
-	
+
+	//! returns if camera is tracking (using IR device)
+	proto native bool			CameraIsTracking();
+
 	//! returns true if camera is on right/ false-left shoulder
 	proto native bool			Camera3rdIsRightShoulder();
 
@@ -633,16 +639,18 @@ enum WeaponActionMechanismTypes
 enum WeaponActionChamberingTypes
 {
 	//! chambering action types
-	CHAMBERING_ONEBULLET_OPENED 					= 0,		// CMD_Reload_Chambering
-	CHAMBERING_ONEBULLET_CLOSED  					= 1,		//
-	CHAMBERING_ONEBULLET_CLOSED_UNCOCKED 	= 2,
-	CHAMBERING_ONEBULLET_UNIQUE_OPENED 		= 3,		//
-	CHAMBERING_ONEBULLET_UNIQUE_CLOSED		= 4,		//
-	CHAMBERING_TWOBULLETS_START						= 6,		//  plays one bullet, then second, then ends, when CHAMBERING_TWOBULLETS_END arise, it's canceled
-	CHAMBERING_TWOBULLETS_END							= 7,		//  - one bullet reload with closed mechanism		
-	CHAMBERING_STARTLOOPABLE_OPENED				= 10,		// start loop chambering
-	CHAMBERING_ENDLOOPABLE								= 11,		// end loop chambering
-	CHAMBERING_STARTLOOPABLE_CLOSED				= 12,		// start loop chambering
+	CHAMBERING_ONEBULLET_OPENED 				= 0,		// CMD_Reload_Chambering
+	CHAMBERING_ONEBULLET_CLOSED  				= 1,		//
+	CHAMBERING_ONEBULLET_CLOSED_UNCOCKED 		= 2,
+	CHAMBERING_ONEBULLET_UNIQUE_OPENED 			= 3,		//
+	CHAMBERING_ONEBULLET_UNIQUE_CLOSED			= 4,		//
+	CHAMBERING_TWOBULLETS_START					= 6,		//  plays one bullet, then second, then ends, when CHAMBERING_TWOBULLETS_END arise, it's canceled
+	CHAMBERING_TWOBULLETS_END					= 7,		//  - one bullet reload with closed mechanism		
+	CHAMBERING_STARTLOOPABLE_CLOSED				= 10,		// start loop chambering
+	CHAMBERING_ENDLOOPABLE						= 11,		// end loop chambering
+	CHAMBERING_STARTLOOPABLE_CLOSED_KEEP		= 12,		// start loop chambering and keep last bullet
+	CHAMBERING_STARTLOOPABLE_OPENED				= 13,		// 
+	
 	CHAMBERING_STARTLOOPABLE_SHOTGUN_UNCOCKED	= 15,
 	CHAMBERING_STARTLOOPABLE_SHOTGUN_COCKED		= 16, 
 	
@@ -862,6 +870,18 @@ class HumanMovementState
 	{
 		return m_iStanceIdx >= DayZPlayerConstants.STANCEIDX_RAISEDERECT;
 	}
+	
+	//! 
+	bool		IsInProne()
+	{
+		return m_iStanceIdx == DayZPlayerConstants.STANCEIDX_PRONE;
+	}
+	
+	//! 
+	bool		IsLeaning()
+	{
+		return m_fLeaning != 0;
+	}	
 }
 
 
@@ -1084,13 +1104,13 @@ class Human extends Man
 
 
 	//! returns current item's class name
-	proto native   string  						DebugGetItemClass();
+	proto native   owned string  						DebugGetItemClass();
 
 	//! returns current item's class that is found in config
-	proto native   string  						DebugGetItemSuperClass();
+	proto native   owned string  						DebugGetItemSuperClass();
 
 	//! returns current item's animation instance 
-	proto native   string  						DebugGetItemAnimInstance();
+	proto native   owned string  						DebugGetItemAnimInstance();
 
 
 }

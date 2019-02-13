@@ -7,8 +7,8 @@ enum EBiosJoinType
 
 class BiosUser
 {
-	proto native string GetName();
-	proto native string GetUid();
+	proto native owned string GetName();
+	proto native owned string GetUid();
 	proto native BiosClientServices GetClientServices();
 };
 

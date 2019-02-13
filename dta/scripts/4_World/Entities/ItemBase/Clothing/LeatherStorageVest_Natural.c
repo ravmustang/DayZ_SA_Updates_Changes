@@ -1,3 +1,4 @@
+/*
 class LeatherStorageVest_Natural : Clothing
 {
 	override bool IsClothing()
@@ -5,3 +6,4 @@ class LeatherStorageVest_Natural : Clothing
 		return true;
 	}
 }
+*/

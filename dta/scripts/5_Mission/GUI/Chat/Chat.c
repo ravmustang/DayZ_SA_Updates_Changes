@@ -66,7 +66,7 @@ class Chat
 	
 	void Add(ChatMessageEventParams params)
 	{
-		int max_lenght = 60;
+		int max_lenght = ChatMaxUserLength;
 		int name_lenght = params.param2.Length();
 		int text_lenght = params.param3.Length();
 		int total_lenght = text_lenght + name_lenght;
@@ -76,6 +76,8 @@ class Chat
  		{
 			if( g_Game.GetProfileOption( EDayZProfilesOptions.GAME_MESSAGES ) )
 				return;
+			
+			max_lenght = ChatMaxSystemLength; // system messages can be longer
  		}
 		else if( channel & CCAdmin )
 		{
@@ -86,6 +88,11 @@ class Chat
 		{
 			if( g_Game.GetProfileOption( EDayZProfilesOptions.PLAYER_MESSAGES ) )
 				return;
+		}
+		else
+		{
+			Print("Chat: Unknown channel " + channel);
+			return;
 		}
 		
 		if (total_lenght > max_lenght)

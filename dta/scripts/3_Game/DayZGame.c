@@ -48,7 +48,10 @@ class LoadingScreen
 		m_ImageWidgetBackground.LoadImageFile( 0, GetRandomLoadingBackground() );
 		m_ImageWidgetBackground.Show( false );		
 		m_Counter = 0;
-		
+				
+		// lighten up your desktop
+		game.GetBacklit().LoadingAnim();
+	
 	}
 	
 	void OnTimer()
@@ -245,7 +248,7 @@ class LoginQueueMenu extends UIScriptedMenu
 			}
 		}
 		
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+		if ( GetGame().GetInput().GetActionDown("UAUIBack",false) )
 		{
 			LeaveConnectQueue();
 		}
@@ -492,6 +495,8 @@ class DayZGame extends CGame
 	ref TIntArray demounit = new TIntArray;
 	
 	static ref ScriptInvoker Event_OnRPC = new ScriptInvoker();
+	
+	private ref Backlit m_Backlit;
 
 	// CGame override functions
 	void DayZGame()
@@ -528,11 +533,15 @@ class DayZGame extends CGame
 			m_ParamNewMenu = true;
 		}*/	
 		
+		// initialize backlit effects
+		m_Backlit = new Backlit();
+		m_Backlit.OnInit(this);
+		
 	#ifndef NO_GUI	
 		m_loading = new LoadingScreen(this);
 		m_loading.Show();
 	#endif
-		
+			
 		Debug.Init();
 		Component.Init();
 		LogTemplates.Init();
@@ -542,6 +551,7 @@ class DayZGame extends CGame
 		m_DayZProfileOptions = new DayZProfilesOptions;
 		GetCallQueue(CALL_CATEGORY_GUI).Call(DeferredInit);
 		//m_isTileSet = true;
+		
 	}
 	
 	// ------------------------------------------------------------
@@ -681,6 +691,11 @@ class DayZGame extends CGame
 		return m_LoadState;
 	}
 	
+	Backlit GetBacklit()
+	{
+		return m_Backlit;
+	}
+	
 	// ------------------------------------------------------------
 	override bool IsInventoryOpen()
 	{
@@ -762,6 +777,13 @@ class DayZGame extends CGame
 				}
 			}
 #endif
+			
+			// analytics - disconnected player
+			ref StatsEventDisconnectedData discData = new StatsEventDisconnectedData();
+			discData.m_CharacterId = g_Game.GetDatabaseID();
+			discData.m_Reason = "quit";
+			ScriptAnalytics.PlayerDisconnected(discData);
+			
 			if( GetPlayer() )
 			{
 				GetPlayer().GetNetworkID( low, high );
@@ -793,6 +815,19 @@ class DayZGame extends CGame
 			{
 				AddVisitedServer( address, port );
 			}
+			
+			// analytics - spawned
+			ref StatsEventSpawnedData spawnData = new StatsEventSpawnedData();
+			spawnData.m_CharacterId = g_Game.GetDatabaseID();
+			spawnData.m_Lifetime = 0;
+			spawnData.m_Position = vector.Zero;
+			if ( GetPlayer() )
+			{
+				spawnData.m_Position = GetPlayer().GetPosition();
+			}
+			spawnData.m_DaytimeHour = 0;
+			spawnData.m_Population = 0;
+			ScriptAnalytics.PlayerSpawned(spawnData);
 			
 #ifdef PLATFORM_CONSOLE
 	#ifndef PLATFORM_WINDOWS // if app is not on Windows with -XBOX parameter
@@ -1169,7 +1204,7 @@ class DayZGame extends CGame
 			#endif
 					
 			#ifdef PLATFORM_PS4
-					text_widget.SetText("Please reconnect and press <image set=\"playstation_buttons\" name=\"cross\" /> to continue");
+					text_widget.SetText("#dayz_game_reconnect" + "" + "<image set=\"playstation_buttons\" name=\"cross\" />" + "" + "#dayz_game_to_continue");
 			#endif
 		}
 	}
@@ -1271,6 +1306,7 @@ class DayZGame extends CGame
 			{
 				GetGame().GetInput().GetGamepadUser( gamepad, uid );
 				selected_user = user_manager.GetUser( uid );
+				user_manager.SelectUser( selected_user );
 			}
 			
 			if( !selected_user )
@@ -1352,12 +1388,21 @@ class DayZGame extends CGame
 		}
 		else
 		{
-			#ifdef PLATFORM_CONSOLE
+			#ifdef PLATFORM_XBOX
 			#ifndef PLATFORM_WINDOWS
 			if( !m_IntroMenu && !( GetGame().GetUIManager().GetMenu() && GetGame().GetUIManager().GetMenu().GetID() == MENU_TITLE_SCREEN ) )
 				CreateTitleScreen();
 			GetGame().GetInput().IdentifyGamepad( GamepadButton.A );
 			#endif
+			#endif
+			
+			#ifdef PLATFORM_PS4
+			BiosUserManager user_manager = GetGame().GetUserManager();
+			if( user_manager )
+			{
+				user_manager.SelectUser( user_manager.GetTitleInitiator() );
+			}
+			g_Game.SelectUser();
 			#endif
 		}
 	}

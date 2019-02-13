@@ -3,7 +3,7 @@ class CraftFenceKit extends RecipeBase
 	override void Init()
 	{
 		//m_Name = "#STR_CraftHandDrillKit0";
-		m_Name = "#STR_CraftFenceKit0";
+		m_Name = "#STR_craftfencebase0";
 		m_IsInstaRecipe = false;//should this recipe be performed instantly without animation
 		m_AnimationLength = 0.5;//animation length in relative time units
 		m_Specialty = -0.02;// value > 0 for roughness, value < 0 for precision

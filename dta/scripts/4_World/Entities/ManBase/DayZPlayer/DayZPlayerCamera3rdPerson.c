@@ -156,7 +156,7 @@ class DayZPlayerCamera3rdPersonErc extends DayZPlayerCamera3rdPerson
 {
 	void DayZPlayerCamera3rdPersonErc(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonErc");
+		//Print("new camera: DayZPlayerCamera3rdPersonErc");
 		
 		m_fDistance 		= 1.6;
 		m_CameraOffsetMS	= "0.0 1.4 0.0";
@@ -173,7 +173,7 @@ class DayZPlayerCamera3rdPersonJump extends DayZPlayerCamera3rdPersonErc
 {
 	void DayZPlayerCamera3rdPersonJump(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonJump");
+		//Print("new camera: DayZPlayerCamera3rdPersonJump");
 		
 		//! runtime config
 		m_fDelay			= 0.15;
@@ -226,7 +226,7 @@ class DayZPlayerCamera3rdPersonErcSpr extends DayZPlayerCamera3rdPersonErc
 {
 	void DayZPlayerCamera3rdPersonErcSpr(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonErcSpr");
+		//Print("new camera: DayZPlayerCamera3rdPersonErcSpr");
 		
 		m_fDistance 		= 2.0;
 		m_CameraOffsetMS    = "0.0 1.3 0.0";
@@ -279,7 +279,7 @@ class DayZPlayerCamera3rdPersonErcRaised extends DayZPlayerCamera3rdPersonErc
 {
 	void DayZPlayerCamera3rdPersonErcRaised(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonErcRaised");
+		//Print("new camera: DayZPlayerCamera3rdPersonErcRaised");
 
 		if ( pPlayer.GetCurrentPerItemCameraUD () == DayZPlayerCameras.PERITEMUD_EMPTYHANDED )
 		{
@@ -319,6 +319,11 @@ class DayZPlayerCamera3rdPersonErcRaised extends DayZPlayerCamera3rdPersonErc
 		}
 		
 	}
+	
+	override bool IsCamera3rdRaised()
+	{
+		return true;
+	}
 }
 
 
@@ -329,7 +334,7 @@ class DayZPlayerCamera3rdPersonErcRaisedMelee extends DayZPlayerCamera3rdPersonE
 {
 	void DayZPlayerCamera3rdPersonErcRaisedMelee(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonErcRaisedMelee");
+		//Print("new camera: DayZPlayerCamera3rdPersonErcRaisedMelee");
 
 		//! shift on override - stay at current state
 		pInput.Override3rdIsRightShoulder(true, pInput.Camera3rdIsRightShoulder());
@@ -352,7 +357,7 @@ class DayZPlayerCamera3rdPersonCrouch extends DayZPlayerCamera3rdPerson
 
 	void DayZPlayerCamera3rdPersonCrouch (DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonCrouch");
+		//Print("new camera: DayZPlayerCamera3rdPersonCrouch");
 		
 		m_fDistance 		= 1.4;
 		m_CameraOffsetMS	= "0.0 0.7 0.1";
@@ -387,12 +392,17 @@ class DayZPlayerCamera3rdPersonCrouchRaised extends DayZPlayerCamera3rdPersonCro
 {
 	void DayZPlayerCamera3rdPersonCrouchRaised(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonCrouchRaised");
+		//Print("new camera: DayZPlayerCamera3rdPersonCrouchRaised");
 		
 		m_fDistance 		= 0.8;
 		m_CameraOffsetMS    = "0.0 0.8 0.1"; // being overwritten by m_CameraOffsetMS[1] from DayZPlayerCamera3rdPersonCrouch 
 		m_CameraOffsetLS	= "0.0 0.3 0.0";
 		m_fShoulderWidth	= 0.5;
+	}
+	
+	override bool IsCamera3rdRaised()
+	{
+		return true;
 	}
 }
 
@@ -506,7 +516,7 @@ class DayZPlayerCamera3rdPersonProne extends DayZPlayerCamera3rdPersonProneBase
 {
 	void DayZPlayerCamera3rdPersonProne(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonProne");
+		//Print("new camera: DayZPlayerCamera3rdPersonProne");
 		m_iBoneIndex		= pPlayer.GetBoneIndexByName ("Camera3rd_Helper");
 		m_fDistance 		= 1.0;
 		m_CameraOffsetMS	= "0.0 0.4 0.0";
@@ -523,11 +533,16 @@ class DayZPlayerCamera3rdPersonProneRaised extends DayZPlayerCamera3rdPersonPron
 {
 	void DayZPlayerCamera3rdPersonProneRaised(DayZPlayer pPlayer, HumanInputController pInput)
 	{
-		Print("new camera: DayZPlayerCamera3rdPersonProneRaised");
+		//Print("new camera: DayZPlayerCamera3rdPersonProneRaised");
 		m_iBoneIndex		= pPlayer.GetBoneIndexByName ("Camera3rd_Helper");
 		m_fDistance 		= 1.0;
 		m_CameraOffsetMS	= "0.0 0.4 0.0";
 		m_CameraOffsetLS	= "0.0 0.2 0.0";
 		m_fShoulderWidth	= 0.5;
+	}
+	
+	override bool IsCamera3rdRaised()
+	{
+		return true;
 	}
 }

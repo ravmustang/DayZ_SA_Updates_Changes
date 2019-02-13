@@ -48,7 +48,7 @@ class WeatherPhenomenon
 		\param fnMin Function minimum (in range <0, 1>).
 		\param fnMax Function maximum (in range <0, 1>).
 	*/
-	proto external void GetLimits( out float fnMin, out float fnMax );
+	proto void GetLimits( out float fnMin, out float fnMax );
 	/*!
 		\brief Sets limits of this phenomenon.
 
@@ -68,7 +68,7 @@ class WeatherPhenomenon
 		\param fcMin Forecast change minimum (in range <0, 1>).
 		\param fcMax Forecast change maximum (in range <0, 1>).
 	*/
-	proto external void GetForecastChangeLimits( out float fcMin, out float fcMax );
+	proto void GetForecastChangeLimits( out float fcMin, out float fcMax );
 	/*!
 		\brief Sets limits of change when forecast is computed.
 
@@ -89,7 +89,7 @@ class WeatherPhenomenon
 		\param ftMin Minimal number of seconds.
 		\param ftMax Maximal number of seconds.
 	*/
-	proto external void GetForecastTimeLimits( out float ftMin, out float ftMax );
+	proto void GetForecastTimeLimits( out float ftMin, out float ftMax );
 	/*!
 		\brief Sets time range in which next forecast can be computed.
 
@@ -107,12 +107,12 @@ class WeatherPhenomenon
 
 		\note Called on server only.
 
-		\param type   Type of this phenomenon.
 		\param change Computed change of forecast value.
 		\param time   Seconds when the next forecast will be computed.
 		\return True when script modifies state of this phenomenon false otherwise.
 	*/
-	bool OnBeforeChange( EWeatherPhenomenon type, float change, float time )
+
+	bool OnBeforeChange( float change, float time )
 	{
 		Weather weather = g_Game.GetWeather();
 		
@@ -135,7 +135,7 @@ class WeatherPhenomenon
 		weather.SetRainThresholds( 0.75, 1.0, 30 );
 		weather.SetWindMaximumSpeed( 30 );
 
-		switch( type )
+		switch( GetType() )
 		{
 			case EWeatherPhenomenon.OVERCAST:
 				Print( "COMPUTING NEW OVERCAST" );
@@ -421,4 +421,5 @@ class Weather
 	{
 		return m_missionWeather;
 	}
+
 };

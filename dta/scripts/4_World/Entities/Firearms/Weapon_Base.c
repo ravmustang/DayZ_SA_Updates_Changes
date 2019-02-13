@@ -217,9 +217,11 @@ class Weapon_Base extends Weapon
 			SelectionMagazineHide();
 	}
 
-	override void OnStoreLoad (ParamsReadContext ctx, int version)
+	override bool OnStoreLoad (ParamsReadContext ctx, int version)
 	{
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
+
 		if (m_fsm)
 		{
 			m_fsm.OnStoreLoad(ctx, version);
@@ -229,6 +231,8 @@ class Weapon_Base extends Weapon
 			int dummy = 0;
 			ctx.Read(dummy);
 		}
+
+		return true;
 	}
 
 	void SaveCurrentFSMState (ParamsWriteContext ctx)
@@ -244,11 +248,11 @@ class Weapon_Base extends Weapon
 			Error("[wpnfsm] Weapon.SaveCurrentFSMState: trying to save weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
 	}
 
-	void LoadCurrentFSMState (ParamsReadContext ctx)
+	bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
 		if (m_fsm)
 		{
-			if (m_fsm.LoadCurrentFSMState(ctx))
+			if (m_fsm.LoadCurrentFSMState(ctx, version))
 			{
 				WeaponStableState state = WeaponStableState.Cast(GetCurrentState());
 				if (state)
@@ -256,18 +260,28 @@ class Weapon_Base extends Weapon
 					SyncSelectionState(state.HasBullet(), state.HasMagazine());
 					state.SyncAnimState();
 					wpnDebugPrint("[wpnfsm] Weapon=" + this + " stable state loaded and synced.");
+					return true;
 				}
 				else
+				{
 					wpnDebugPrint("[wpnfsm] Weapon=" + this + " unstable/error state loaded.");
+					return false;
+				}
 			}
 			else
+			{
 				Error("[wpnfsm] Weapon=" + this + " did not load.");
+				return false;
+			}
 		}
 		else
+		{
 			Error("[wpnfsm] Weapon.LoadCurrentFSMState: trying to load weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
+			return false;
+		}
 	}
 
-	void AfterStoreLoad ()
+	override void AfterStoreLoad ()
 	{
 		if (m_fsm)
 		{
@@ -563,9 +577,9 @@ class Weapon_Base extends Weapon
 		if ( player.GetInputController() && !player.GetInputController().IsWeaponRaised() )
 			return false;
 		
-		vector usti_hlavne_position = GetSelectionPosition( "Usti hlavne" ); 	// Usti hlavne
+		vector usti_hlavne_position = GetSelectionPositionLS( "Usti hlavne" ); 	// Usti hlavne
 		//vector weapon_back_position = GetSelectionPosition( "Weapon back" ); 	// back of weapon; barrel length
-		vector trigger_axis_position = GetSelectionPosition("trigger_axis");
+		vector trigger_axis_position = GetSelectionPositionLS("trigger_axis");
 		//usti_hlavne_position = ModelToWorld(usti_hlavne_position);
 		
 		vector hit_pos, hit_normal; //junk

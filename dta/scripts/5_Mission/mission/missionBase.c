@@ -151,9 +151,9 @@ class MissionBase extends Mission
 		case MENU_OPTIONS:
 			menu = new OptionsMenu;
 			break;
-		case MENU_ASSIGNMENT:
-			menu = new AssignmentMenu;
-			break;
+//		case MENU_***: removed - can be recycled to something else
+//			menu = new ***;
+//			break;
 		case MENU_STARTUP:
 			menu = new StartupMenu;
 			break;

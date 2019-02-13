@@ -58,6 +58,30 @@ class int
 
 		return str;
 	}
+	
+	/**
+	\brief Check whether integer falls into an inclusive range
+		\param min \p int low end of range
+		\param max \p int high end of range
+		\return \p bool True if this value is withing the set range
+		@code
+			int num = 123;
+			bool test = num.InRange( 100, 150 );
+			Print(test);
+
+			>> s = true
+		@endcode
+	*/
+	bool InRange( int min, int max, bool inclusive_min = true, bool inclusive_max = true )
+	{
+		if( ( !inclusive_min && value <= min ) || value < min )
+			return false;
+		
+		if( ( !inclusive_max && value >= max ) || value > max )
+			return false;
+		
+		return true;
+	}
 };
 
 class float

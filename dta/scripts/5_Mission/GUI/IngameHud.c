@@ -18,6 +18,7 @@ class IngameHud extends Hud
 	protected ref map<int,string>				m_VehicleGearTable;
 
 	protected Widget							m_HudPanelWidget;
+	protected Widget							m_LeftHudPanelWidget;
 	protected Widget							m_QuickbarWidget;
 	protected ref InventoryQuickbar				m_Quickbar;
 	
@@ -160,11 +161,14 @@ class IngameHud extends Hud
 		m_HudPanelWidget = hud_panel_widget;
 		m_HudPanelWidget.Show( true );
 
-		// quickbar
-		m_QuickbarWidget = m_HudPanelWidget.FindAnyWidget("QuickbarGrid");
+		//Quickbar
+		m_QuickbarWidget		= m_HudPanelWidget.FindAnyWidget("QuickbarGrid");
 		m_QuickbarWidget.Show( false );
 		
-		// TEMPORARY HACK!!! player is not present when Hud is being initialized 
+		//Left HUD Panel
+		m_LeftHudPanelWidget	= m_HudPanelWidget.FindAnyWidget("LeftHUDPanel");
+		
+		//TEMPORARY HACK!!! player is not present when Hud is being initialized 
 		myTimer = new Timer( CALL_CATEGORY_GAMEPLAY );
 		myTimer.Run( 1, this, "InitQuickbar" );
 		
@@ -172,12 +176,12 @@ class IngameHud extends Hud
 		m_CursorWidget.Show(true);
 		Class.CastTo(m_CursorIcon, m_HudPanelWidget.FindAnyWidget("Cursor"));
 
-		// Permanent CrossHairs
+		//Permanent Crosshair
 		Class.CastTo(m_PermanentCrossHair, m_HudPanelWidget.FindAnyWidget("PermanentCrossHair"));
 		
 		m_WalkieTalkie = m_HudPanelWidget.FindAnyWidget("WalkieTalkie");
 		
-		// panels
+		//Panels
 		Class.CastTo(m_Stamina, m_HudPanelWidget.FindAnyWidget("StaminaBar"));
 		m_SpecializationPanel			= m_HudPanelWidget.FindAnyWidget("SpecializationPanel");
 		m_SpecializationIcon			= m_HudPanelWidget.FindAnyWidget("SpecializationIcon");
@@ -251,7 +255,6 @@ class IngameHud extends Hud
 				w.Show( true );
 				for ( int y = 0; y < 5; y++ )
 				{
-					Print( "Loading: " +  "set:dayz_gui image:icon" + widget_name + y );
 					w.LoadImageFile( y, "set:dayz_gui image:icon" + widget_name + y );
 				}
 				// clear all arrows
@@ -272,11 +275,13 @@ class IngameHud extends Hud
 			m_BadgesWidgetDisplay.Clear();
 			m_BadgesWidgetNames.Set( NTFKEY_FRACTURE, "Fracture" );
 			m_BadgesWidgetNames.Set( NTFKEY_STUFFED, "Stomach" );
-			m_BadgesWidgetNames.Set( NTFKEY_SICK, "Pill" );
+			m_BadgesWidgetNames.Set( NTFKEY_SICK, "Sick" );
 			m_BadgesWidgetNames.Set( NTFKEY_WETNESS, "Wetness" );
 			m_BadgesWidgetNames.Set( NTFKEY_FEVERISH, "Skull" );
 			m_BadgesWidgetNames.Set( NTFKEY_BLEEDISH, "Bleeding" );
 			m_BadgesWidgetNames.Set( NTFKEY_LIVES, "Shock" );
+			m_BadgesWidgetNames.Set( NTFKEY_PILLS, "Pills" );
+		
 			// NTFKEY_SICK
 			// NTFKEY_BLEEDISH
 			// NTFKEY_FRACTURE
@@ -598,7 +603,7 @@ class IngameHud extends Hud
 		ImageWidget stomach = ImageWidget.Cast( m_Badges.FindAnyWidget( "Stomach" ) );
 		stomach.LoadImageFile( 0, "set:dayz_gui image:iconStomach" + state );
 	}
-	
+
 	override void SetStamina( int value , int range )
 	{
 		//PlayerBase player = GetGame().GetPlayer();
@@ -613,6 +618,28 @@ class IngameHud extends Hud
 		m_Stamina.GetSize( sx, sy );
 		m_Stamina.SetSize( percentage, sy );
  		m_StaminaBackground.SetSize( 1-percentage, sy);
+
+		// set health & blood values
+		if( !GetGame().IsMultiplayer() )
+		{
+			if( GetGame().GetPlayer() )
+			{
+				PlayerBase player;
+				Class.CastTo(player, GetGame().GetPlayer() );
+
+				if( player )
+				{
+					float h1 = player.GetHealth("","");
+					float b1 = player.GetHealth("","Blood");
+
+					GetDayZGame().GetBacklit().SetHealth(h1);
+					GetDayZGame().GetBacklit().SetBlood(b1);
+				}
+			}
+		}
+		
+		// update backlit
+		GetDayZGame().GetBacklit().UpdatePlayer(false);		
 	}
 
 /*	
@@ -883,8 +910,9 @@ class IngameHud extends Hud
 	
 	void RefreshVehicleHud( float timeslice )
 	{
-		if ( m_CurrentVehicle )
+		if ( m_CurrentVehicle && !GetGame().GetUIManager().GetMenu() )
 		{
+			m_VehiclePanel.Show( true );
 			float rpm_value = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMMax() ) ;
 			float rpm_value_red = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMRedline() ) ;
 			float speed_value = ( m_CurrentVehicle.GetSpeedometer() / 200 );
@@ -893,7 +921,9 @@ class IngameHud extends Hud
 			m_VehicleSpeedPointer.SetRotation( 0, 0, speed_value * 260 - 130, true );
 			m_VehicleSpeedValue.SetText( Math.Floor( m_CurrentVehicle.GetSpeedometer() ).ToString() );
 
-			int engaged_gear = m_CurrentVehicle.GetController().GetGear();
+
+			int engaged_gear = m_CurrentVehicle.GetController().GetGear();	
+			
 			int prev_gear = engaged_gear - 1;
 			int next_gear = engaged_gear + 1;
 
@@ -907,6 +937,8 @@ class IngameHud extends Hud
 				next_gear = CarGear.NEUTRAL;
 			}
 			
+			bool newHealth = false;
+			
 			int health = m_CurrentVehicle.GetHealthLevel( "Engine" );
 			int color;
 			if( rpm_value_red > 1 )
@@ -919,19 +951,23 @@ class IngameHud extends Hud
 					m_TimeSinceLastEngineLightChange = 0;
 				}
 				m_TimeSinceLastEngineLightChange += timeslice;
+				newHealth = true;
 			}
 			else if( health > 1 && health < 5 )
 			{
-				m_VehicleEngineLight.Show( true );
 				color = ItemManager.GetItemHealthColor( m_CurrentVehicle, "Engine" );
 				
 				m_VehicleEngineLight.SetColor( color );
 				m_VehicleEngineLight.SetAlpha( 1 );
+				m_VehicleEngineLight.Show( true );
 			}
 			else
 			{
 				m_VehicleEngineLight.Show( false );
 			}
+				
+			// refresh backlit
+			GetDayZGame().GetBacklit().RefreshVehicleLayout( engaged_gear, newHealth );
 			
 			m_VehicleCurrentGearValue.SetText( m_VehicleGearTable.Get( engaged_gear ) );
 			
@@ -973,6 +1009,10 @@ class IngameHud extends Hud
 			m_VehiclePanelFuelIcon.SetColor( color );
 			m_VehiclePanelFuelIcon.SetAlpha( 1 );
 			*/
+		}
+		else
+		{
+			m_VehiclePanel.Show( false );
 		}
 	}
 	
@@ -1079,11 +1119,10 @@ class IngameHud extends Hud
 	void ToggleHud( bool show, bool ignore_state = false )
 	{
 		//You can add more widgets to toggle here
-		SetLeftStatsVisibility( show && !m_InVehicleAsDriver );
+		SetLeftStatsVisibility( show );
 		m_Badges.Show( show );
 		m_Notifiers.Show( show );
 		m_BadgeNotifierDivider.Show( show && m_AnyBadgeVisible );
-		m_VehiclePanel.Show( show && m_InVehicleAsDriver );
 		
 		if( !ignore_state )
 		{
@@ -1105,10 +1144,7 @@ class IngameHud extends Hud
 	
 	void SetLeftStatsVisibility(bool visible)
 	{
-		m_StaminaBackground.Show(visible);
-		m_Stamina.Show(visible);
-		m_StancePanel.Show(visible);
-		m_Presence.Show(visible);
+		m_LeftHudPanelWidget.Show( visible );
 	}
 
 	void SetSpecialtyMeterVisibility( bool visible )

@@ -1,5 +1,13 @@
 // Register all particles below!
 
+// Example how to register particles from a mod
+/*
+modded class ParticleList
+{
+	static const int MODDED_PARTICLE = RegisterParticle( "mod_folder/" , "my_modded_particle");
+}
+*/
+
 class ParticleList
 {
 	ref static map<int, string> m_ParticlePaths;
@@ -92,6 +100,7 @@ class ParticleList
 	static const int GUN_IZH18						= RegisterParticle("weapon_shot_izh18_01");
 	static const int GUN_IZH18_SUPPRESSED			= RegisterParticle("weapon_shot_izh18_02");
 	static const int GUN_MP5K						= RegisterParticle("weapon_shot_mp5k_01");
+	static const int GUN_MP5K_2						= RegisterParticle("weapon_shot_mp5k_02_boris");
 	static const int GUN_MP5K_SUPPRESSED			= RegisterParticle("weapon_shot_mp5k_02");
 	static const int GUN_MP5K_COMPENSATOR			= RegisterParticle("weapon_shot_mp5k_02");
 	static const int GUN_UMP45						= RegisterParticle("weapon_shot_ump45_01");
@@ -103,9 +112,9 @@ class ParticleList
 	static const int GUN_LONG_WINDED_SMOKE_SMALL	= RegisterParticle("weapon_shot_winded_smoke_small");
 	static const int SMOKING_BARREL					= RegisterParticle("smoking_barrel");
 	static const int SMOKING_BARREL_SMALL			= RegisterParticle("smoking_barrel_small");
+	static const int SMOKING_BARREL_HEAVY			= RegisterParticle("smoking_barrel_heavy");
 	static const int SMOKING_BARREL_STEAM			= RegisterParticle("smoking_barrel_steam");
 	static const int SMOKING_BARREL_STEAM_SMALL		= RegisterParticle("smoking_barrel_steam_small");
-	static const int SMOKING_BARREL_HOT				= RegisterParticle("smoking_barrel_heavy");
 	
 	// BULLET & MELEE IMPACTS
 	static const int IMPACT_TEST					= RegisterParticle("impacts/bullet_impact_placeholder");
@@ -115,7 +124,7 @@ class ParticleList
 	static const int IMPACT_TEST_ENTER_DEBUG		= RegisterParticle("impacts/_test_impact_enter_debug");
 	static const int IMPACT_TEST_RICOCHET_DEBUG		= RegisterParticle("impacts/_test_impact_ricochet_debug");
 	static const int IMPACT_TEST_EXIT_DEBUG			= RegisterParticle("impacts/_test_impact_exit_debug");
-	static const int IMPACT_TEST_NO_MATERIAL_ERROR	= RegisterParticle("impacts/hit_default_ent_01");
+	static const int IMPACT_TEST_NO_MATERIAL_ERROR	= RegisterParticle("_test_no_material");
 	static const int IMPACT_WOOD_ENTER				= RegisterParticle("impacts/hit_wood_ent_01");
 	static const int IMPACT_WOOD_RICOCHET			= RegisterParticle("impacts/hit_wood_ric_01");
 	static const int IMPACT_WOOD_EXIT				= RegisterParticle("impacts/hit_wood_ext_01");
@@ -227,17 +236,9 @@ class ParticleList
 		return m_ParticlePaths.GetKeyByValue(particle_file);
 	}
 	
-	//! Returns base bath to all particles
+	//! Returns base path to all particles
 	static string GetPathToParticles()
 	{
 		return "graphics/particles/";
 	}
 }
-
-// Example how to register particles from a mod
-/*
-modded class ParticleList
-{
-	static const int MODDED_PARTICLE = RegisterParticle( "modded_particles_folder/" , "moddedpart");
-}
-*/

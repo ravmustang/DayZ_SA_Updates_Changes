@@ -619,7 +619,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		{
 			hndDebugSpam("[hndfsm] recv event from remote: created event=" + e);
 			//m_FSM.ProcessEvent(e);
-			if (e.GetEventID() == WeaponEventID.HUMANCOMMAND_ACTION_ABORTED)
+			if (e.GetEventID() == HandEventID.HUMANCOMMAND_ACTION_ABORTED)
 			{
 				ProcessEventResult aa;
 				m_FSM.ProcessAbortEvent(e, aa);

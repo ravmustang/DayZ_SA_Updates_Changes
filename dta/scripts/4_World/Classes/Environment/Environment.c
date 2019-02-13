@@ -471,7 +471,10 @@ class Environment
 		{
 			//! player is drying
 			float sun_effect = (ENVIRO_SUN_INCREMENT * m_DayOrNight * (1-m_Fog))*(1-(m_Clouds*ENVIRO_CLOUD_DRY_EFFECT));
-			wet_delta = -((ENVIRO_DRY_INCREMENT * Math.Sqrt(m_PlayerHeat + GetEnvironmentTemperature())) + sun_effect) * (1+(ENVIRO_WIND_EFFECT*m_Wind));
+			float temp_effect = Math.Sqrt(m_PlayerHeat + GetEnvironmentTemperature());
+			//! Coef should be higher than 0 (Sqrt is none for x < 0)
+			if (temp_effect <= 0) { temp_effect = 1; }
+			wet_delta = -( ENVIRO_DRY_INCREMENT * ( temp_effect + sun_effect ) * ( 1 + ( ENVIRO_WIND_EFFECT * m_Wind ) ) );
 		}
 
 		return wet_delta;

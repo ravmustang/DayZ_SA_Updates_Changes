@@ -108,13 +108,18 @@ class Roadflare : ItemBase
 		ctx.Write( m_ModelState );
 	}
 	
-	override void OnStoreLoad(ParamsReadContext ctx, int version)
+	override bool OnStoreLoad(ParamsReadContext ctx, int version)
 	{
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
 		
 		int state;
-		ctx.Read(state);
+		if ( !ctx.Read(state) )
+			state = RoadflareModelStates.DEFAULT;
+		
 		SetModelState(state);
+
+		return true;
 	}
 	
 	void UpdateModelSelections()

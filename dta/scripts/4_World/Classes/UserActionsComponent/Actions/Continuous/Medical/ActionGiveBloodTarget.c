@@ -59,11 +59,13 @@ class ActionGiveBloodTarget: ActionContinuousBase
 
 	override void OnEndAnimationLoopServer( ActionData action_data )
 	{
-		OnFinishProgressServer(action_data);
+		//OnFinishProgressServer(action_data);
 
 		if ( action_data.m_MainItem.IsKindOf("BloodSyringe") )
 		{
-			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, new SyringeLambda(action_data.m_MainItem, "Syringe", action_data.m_Player));
+			SyringeLambda lambda = new SyringeLambda(action_data.m_MainItem, "Syringe", action_data.m_Player);
+			lambda.SetTransferParams(true, true, true);
+			MiscGameplayFunctions.TurnItemIntoItemEx(action_data.m_Player, lambda);
 		}
 		
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
@@ -71,25 +73,31 @@ class ActionGiveBloodTarget: ActionContinuousBase
 	
 	override void OnEndServer(ActionData action_data)
 	{
-		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
-		action_data.m_MainItem.TransferModifiers(ntarget);
-		Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
-		float delta = nacdata.param1;
+		ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
 		
-		ntarget.AddHealth("","Blood",delta);
+		Param1<float> nacdata = Param1<float>.Cast( action_data_b.m_ActionComponent.GetACData() );
+		float delta = 0;
 		
-		int itembloodtype = action_data.m_MainItem.GetLiquidType();
-		int bloodtypetarget = ntarget.GetStatBloodType().Get();
-		bool bloodmatch = BloodTypes.MatchBloodCompatibility(itembloodtype, bloodtypetarget);
-
-		if ( !bloodmatch )
+		if ( nacdata )
 		{
-			ntarget.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+			delta = nacdata.param1;
+		}
+		if ( delta > 0 )
+		{
+			action_data_b.m_Player.AddHealth("","Blood",delta);
+
+			int bloodtypetarget = action_data_b.m_Player.GetStatBloodType().Get();
+			bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);
+
+			if ( !bloodmatch )
+			{
+				action_data_b.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+			}
 		}
 		
-		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0.01 )
+		if ( action_data_b.m_MainItem && action_data_b.m_MainItem.GetQuantity() <= 0.01 )
 		{
-			action_data.m_MainItem.SetQuantity(0);
+			action_data_b.m_MainItem.SetQuantity(0);
 		}
 	}
 };

@@ -34,7 +34,7 @@ class EffectSound : Effect
 	//=====================================
 	void EffectSound()
 	{
-		m_SoundWaveKind = WaveKind.WAVEEFFECT;
+		m_SoundWaveKind = WaveKind.WAVEEFFECTEX;
 		m_SoundWaveVolumeMax = 1;
 		m_SoundAutodestroy = false;
 	}
@@ -423,7 +423,10 @@ class EffectSound : Effect
 		if ( IsSoundAutodestroy() )
 		{
 			//SEffectManager.DestroySound( this );
-			GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( SEffectManager.DestroySound, this );
+			if ( GetGame() )
+			{
+				GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( SEffectManager.DestroySound, this );			
+			}
 		}		
 	}
 	

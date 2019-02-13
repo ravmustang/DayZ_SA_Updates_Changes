@@ -29,5 +29,15 @@ class ReplaceItemWithNewLambda : ReplaceItemWithNewLambdaBase
 			m_Player.SetQuickBarEntityShortcut(new_item, m_IndexQB, true);
 		}
 	}
+	
+	override void OnSuccess (EntityAI new_item)
+	{
+		super.OnSuccess(new_item);
+		
+		if (m_Player && m_IndexQB != -1)
+		{
+			m_Player.SetQuickBarEntityShortcut(new_item, m_IndexQB, true);
+		}
+	}
 };
 

@@ -48,7 +48,7 @@ FrameWidgetClass HudDebugFrameWidget {
    }
   }
   WindowWidgetClass wdw_CharacterModifiers {
-   position 0 0.4
+   position 4.01487 0.41983
    size 260 500
    halign right_ref
    hexactpos 1
@@ -193,6 +193,41 @@ FrameWidgetClass HudDebugFrameWidget {
      colums "text;52;text2;48;"
      lines 0
      font "gui/fonts/MetronBook16"
+    }
+   }
+  }
+  WindowWidgetClass wdw_CharacterLevels {
+   position 268.996 453.681
+   size 318.33499 529.78406
+   halign right_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style rover_sim_black_2
+   {
+    TextWidgetClass txt_CharLvels_Title {
+     position 77.8665 8.62855
+     size 185.84399 27.9257
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     text "Player Levels"
+     font "gui/fonts/MetronBook22"
+    }
+    TextListboxWidgetClass txl_CharLevels_Values {
+     disabled 1
+     position 18.4651 39.93
+     size 280.862 481.60602
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     style NoScrollBar
+     colums "text;52;text2;48;"
+     lines 0
     }
    }
   }

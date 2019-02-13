@@ -88,7 +88,7 @@ class FireplaceToIndoorsLambda : TurnItemIntoItemLambda
 		//set fire point index and smoke point position in world
 		m_FirePointIndex = player.GetLastFirePointIndex();
 		
-		vector smoke_point_pos = target.GetSelectionPosition( FireplaceIndoor.FIREPOINT_SMOKE_POSITION + m_FirePointIndex.ToString() );
+		vector smoke_point_pos = target.GetSelectionPositionMS( FireplaceIndoor.FIREPOINT_SMOKE_POSITION + m_FirePointIndex.ToString() );
 		vector smoke_point_pos_world = target.ModelToWorld( smoke_point_pos );		
 		m_SmokePosition = smoke_point_pos_world;
 	}

@@ -17,8 +17,6 @@ class InspectMenuNew extends UIScriptedMenu
 	void ~InspectMenuNew()
 	{
 		GetGame().GetDragQueue().RemoveCalls(this);
-	
-		delete m_item_widget;
 	}
 	
 	//--------------------------------------------------------------------------
@@ -57,26 +55,13 @@ class InspectMenuNew extends UIScriptedMenu
 				Widget preview_frame = layoutRoot.FindAnyWidget("ItemFrameWidget");
 				if (preview_frame)
 				{
-					float w;
-					float h;
-					preview_frame.GetSize(w, h);
-					m_item_widget = ItemPreviewWidget.Cast( GetGame().GetWorkspace().CreateWidget(ItemPreviewWidgetTypeID, 0, 0, 1, 1, WidgetFlags.VISIBLE, ARGB(255, 255, 255, 255), 10, preview_frame) );
+					m_item_widget = ItemPreviewWidget.Cast( preview_frame );
 				}
 			}
 			
 			m_item_widget.SetItem(item);
 			m_item_widget.SetView( item.GetViewIndex() );
 			m_item_widget.SetModelPosition(Vector(0,0,1));
-			
-			float x, y;		
-			m_item_widget.GetPos(x, y);
-
-			m_item_widget.SetSize( 1.75, 1.75 );
-		
-			// align to center 
-			m_item_widget.SetPos( -0.375, -0.375 );
-			
-			//m_item_widget.SetModelOrientation
 			PPEffects.SetBlurInventory(1);
 		}
 	}
@@ -175,6 +160,8 @@ class InspectMenuNew extends UIScriptedMenu
 		InspectMenuNew.UpdateItemInfoQuantity(root_widget, item);
 		InspectMenuNew.UpdateItemInfoWeight(root_widget, item);
 		InspectMenuNew.UpdateItemInfoFoodStage(root_widget, item);
+		
+		Widget content = root_widget.FindAnyWidget("InventoryInfoPanelWidget");
 	}
 
 	//--------------------------------------------------------------------------
@@ -238,8 +225,8 @@ class InspectMenuNew extends UIScriptedMenu
 			if( blood_container.GetBloodTypeVisible() )
 			{
 				string type;
-				bool pos;
-				string blood_type_name = BloodTypes.GetBloodTypeName(blood_container.GetLiquidType(), type, pos);
+				bool positive;
+				string blood_type_name = BloodTypes.GetBloodTypeName(blood_container.GetLiquidType(), type, positive);
 				WidgetTrySetText(root_widget, "ItemLiquidTypeWidget", "#inv_inspect_blood: " + blood_type_name, Colors.COLOR_LIQUID);
 			}
 			else
@@ -518,10 +505,9 @@ class InspectMenuNew extends UIScriptedMenu
 	//--------------------------------------------------------------------------
 	static void UpdateItemInfoFoodStage(Widget root_widget, EntityAI item)
 	{
-		if ( item.IsInherited( Edible_Base ) && !item.IsInherited( Bottle_Base ) )
+		Edible_Base food_item = Edible_Base.Cast( item );
+		if ( food_item && food_item.HasFoodStage() )
 		{
-			Edible_Base food_item = Edible_Base.Cast( item );
-			
 			ref FoodStage food_stage = food_item.GetFoodStage();
 			FoodStageType food_stage_type = food_stage.GetFoodStageType();
 					
@@ -569,10 +555,10 @@ class InspectMenuNew extends UIScriptedMenu
 	static void WidgetTrySetText(Widget root_widget, string widget_name, string text, int color = 0)
 	{
 		TextWidget widget = TextWidget.Cast( root_widget.FindAnyWidget(widget_name) );
+		RichTextWidget rt_widget = RichTextWidget.Cast( root_widget.FindAnyWidget(widget_name) );
 		if (widget)
 		{
 			widget.SetText(text);
-	
 			Widget widget_background = root_widget.FindAnyWidget(widget_name+"Background");
 			if (widget_background)
 			{
@@ -586,6 +572,10 @@ class InspectMenuNew extends UIScriptedMenu
 					widget_background.Show( false );
 				}
 			}
+		}
+		if( rt_widget )
+		{
+			rt_widget.Update();
 		}
 	}
 

@@ -114,9 +114,9 @@ class WeaponEjectBullet extends WeaponStateBase
 		return true;
 	}
 
-	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	override bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
-		if (!super.LoadCurrentFSMState(ctx))
+		if (!super.LoadCurrentFSMState(ctx, version))
 			return false;
 
 		if (!ctx.Read(m_dstMagazine))

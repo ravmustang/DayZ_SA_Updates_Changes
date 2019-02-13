@@ -37,10 +37,16 @@ class UIPopupScriptPositionManager extends UIPopupScript
 	//================================================	
 	override void OnOpen( Param param )
 	{		
-		vector player_pos = PluginSceneManager.GetInstance().GetSelectedSceneObject().GetPosition();
-		
-		m_TxtCurrentX.SetText( player_pos[0].ToString() );
-		m_TxtCurrentY.SetText( player_pos[2].ToString() );
+		if( PluginSceneManager.GetInstance() )
+		{
+			if( PluginSceneManager.GetInstance().GetSelectedSceneObject() )
+			{
+				vector player_pos = PluginSceneManager.GetInstance().GetSelectedSceneObject().GetPosition();
+			
+				m_TxtCurrentX.SetText( player_pos[0].ToString() );
+				m_TxtCurrentY.SetText( player_pos[2].ToString() );
+			}
+		}
 	}
 	
 	//================================================

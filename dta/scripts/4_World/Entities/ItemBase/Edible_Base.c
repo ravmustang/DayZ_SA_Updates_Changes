@@ -4,30 +4,53 @@ class Edible_Base extends ItemBase
 	
 	void Edible_Base()
 	{
-		if ( !m_FoodStage )
+		if ( HasFoodStage() )
 		{
-			m_FoodStage = new FoodStage ( this );
+			m_FoodStage = new FoodStage( this );
+			
+			//synchronized variables
+			RegisterNetSyncVariableInt( "m_FoodStage.m_FoodStageType", 	FoodStageType.NONE, FoodStageType.COUNT );
+			RegisterNetSyncVariableInt( "m_FoodStage.m_SelectionIndex", 0, 6 );
+			RegisterNetSyncVariableInt( "m_FoodStage.m_TextureIndex", 	0, 6 );
+			RegisterNetSyncVariableInt( "m_FoodStage.m_MaterialIndex", 	0, 6 );
+			RegisterNetSyncVariableFloat( "m_FoodStage.m_CookingTime", 	0, 600, 0 );						//min = 0; max = 0; precision = 0;
 		}
-		
-		//synchronized variables
-		RegisterNetSyncVariableInt( "m_FoodStage.m_FoodStageType", 	FoodStageType.NONE, FoodStageType.COUNT );
-		RegisterNetSyncVariableInt( "m_FoodStage.m_SelectionIndex", 0, 6 );
-		RegisterNetSyncVariableInt( "m_FoodStage.m_TextureIndex", 	0, 6 );
-		RegisterNetSyncVariableInt( "m_FoodStage.m_MaterialIndex", 	0, 6 );
-		RegisterNetSyncVariableFloat( "m_FoodStage.m_CookingTime", 	0, 600, 0 );						//min = 0; max = 0; precision = 0;
 	}
 	
 	override void EEInit()
 	{
 		super.EEInit();
 		
-		//refresh visual after init
-		RefreshVisuals();
+		//update visual
+		UpdateVisuals();
 	}
 	
-	void RefreshVisuals()
+	void UpdateVisuals()
 	{
-		GetFoodStage().RefreshVisuals();
+		if ( GetFoodStage() )
+		{
+			GetFoodStage().UpdateVisuals();
+		}
+	}
+	
+	bool Consume(float amount, PlayerBase consumer)
+	{
+		AddQuantity(-amount, false, false);
+		OnConsume(amount, consumer);
+		return true;
+	}
+	
+	void OnConsume(float amount, PlayerBase consumer);	
+	
+	//food staging
+	override bool CanBeCooked()
+	{
+		return false;
+	}
+	
+	override bool CanBeCookedOnStick()
+	{
+		return false;
 	}
 	
 	//================================================================
@@ -41,7 +64,7 @@ class Edible_Base extends ItemBase
 			
 			if ( GetGame().IsMultiplayer() )
 			{
-				RefreshVisuals();
+				UpdateVisuals();
 			}
 		}
 	}
@@ -50,8 +73,8 @@ class Edible_Base extends ItemBase
 	{
 		super.OnVariablesSynchronized();
 		
-		//refresh visuals
-		RefreshVisuals();
+		//update visuals
+		UpdateVisuals();
 	}	
 	
 	//================================================================
@@ -60,46 +83,68 @@ class Edible_Base extends ItemBase
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{   
 		super.OnStoreSave( ctx );
-		
-		//Food stage type 
-		ctx.Write( GetFoodStage().GetFoodStageType() );
-		
-		//Selection index
-		ctx.Write( GetFoodStage().GetSelectionIndex() );
-		
-		//Texture index
-		ctx.Write( GetFoodStage().GetTextureIndex() );
-		
-		//Material index
-		ctx.Write( GetFoodStage().GetMaterialIndex() );
+
+		if ( GetFoodStage() )
+		{
+			//Food stage type 
+			ctx.Write( GetFoodStage().GetFoodStageType() );
+			
+			//Selection index
+			ctx.Write( GetFoodStage().GetSelectionIndex() );
+
+			//Texture index
+			ctx.Write( GetFoodStage().GetTextureIndex() );
+
+			//Material index
+			ctx.Write( GetFoodStage().GetMaterialIndex() );
+		}
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		super.OnStoreLoad(ctx, version);
-		
-		//Food stage name 
-		FoodStageType stage_type = FoodStageType.RAW;
-		ctx.Read( stage_type );
-		GetFoodStage().SetFoodStageType( stage_type );
-		
-		//Selection index
-		int selection_idx = 0;
-		ctx.Read( selection_idx );
-		GetFoodStage().SetSelectionIndex( selection_idx );
-		
-		//Texture index
-		int texture_idx = 0;
-		ctx.Read( texture_idx );
-		GetFoodStage().SetTextureIndex( texture_idx );
-		
-		//Material index
-		int material_idx = 0;
-		ctx.Read( material_idx );
-		GetFoodStage().SetMaterialIndex( material_idx );
+
+		if ( GetFoodStage() )
+		{
+			//--- Edible data ---
+			//Food stage name 
+			FoodStageType stage_type;
+			if ( !ctx.Read( stage_type ) )
+			{
+				stage_type = FoodStageType.RAW;		//set default
+			}
+			GetFoodStage().SetFoodStageType( stage_type );
+			
+			//Selection index
+			int selection_idx;
+			if ( !ctx.Read( selection_idx ) )
+			{
+				selection_idx = 0;		//set default
+			}
+			GetFoodStage().SetSelectionIndex( selection_idx );
+			
+			//Texture index
+			int texture_idx;
+			if ( !ctx.Read( texture_idx ) )
+			{
+				texture_idx = 0;		//set default
+			}
+			GetFoodStage().SetTextureIndex( texture_idx );
+			
+			//Material index
+			int material_idx;
+			if ( !ctx.Read( material_idx ) )
+			{
+				material_idx = 0;		//set default			
+			}
+			GetFoodStage().SetMaterialIndex( material_idx );
+			//---
+		}
 		
 		//refresh visual after load
 		Synchronize();
+		
+		return true;
 	}
 
 	//get food stage
@@ -119,13 +164,18 @@ class Edible_Base extends ItemBase
 		return false;
 	}
 	
+	bool IsMushroom()
+	{
+		return false;
+	}	
+	
 	//================================================================
 	// NUTRITIONAL VALUES
 	//================================================================	
 	//food properties
 	float GetFoodTotalVolume()
 	{
-		if ( !CanBeCooked() )
+		if ( !GetFoodStage() )
 		{
 			string class_path = "cfgVehicles " + GetType() + " Nutrition";
 			return GetGame().ConfigGetFloat( class_path + " fullnessIndex" );			
@@ -136,7 +186,7 @@ class Edible_Base extends ItemBase
 	
 	float GetFoodEnergy()
 	{
-		if ( !CanBeCooked() )
+		if ( !GetFoodStage() )
 		{
 			string class_path = "cfgVehicles " + GetType() + " Nutrition";
 			return GetGame().ConfigGetFloat( class_path + " energy" );			
@@ -147,7 +197,7 @@ class Edible_Base extends ItemBase
 	
 	float GetFoodWater()
 	{
-		if ( !CanBeCooked() )
+		if ( !GetFoodStage() )
 		{
 			string class_path = "cfgVehicles " + GetType() + " Nutrition";
 			return GetGame().ConfigGetFloat( class_path + " water" );			
@@ -158,7 +208,7 @@ class Edible_Base extends ItemBase
 	
 	float GetFoodNutritionalIndex()
 	{
-		if ( !CanBeCooked() )
+		if ( !GetFoodStage() )
 		{
 			string class_path = "cfgVehicles " + GetType() + " Nutrition";
 			return GetGame().ConfigGetFloat( class_path + " nutritionalIndex" );			
@@ -169,7 +219,7 @@ class Edible_Base extends ItemBase
 	
 	float GetFoodToxicity()
 	{
-		if ( !CanBeCooked() )
+		if ( !GetFoodStage() )
 		{
 			string class_path = "cfgVehicles " + GetType() + " Nutrition";
 			return GetGame().ConfigGetFloat( class_path + " toxicity" );			
@@ -178,6 +228,21 @@ class Edible_Base extends ItemBase
 		return GetFoodStage().GetToxicity();
 	}
 	
+	NutritionalProfile GetNutritionalProfile()
+	{
+		NutritionalProfile profile; 
+		if( !IsLiquidPresent() )
+		{
+			profile = NutritionalProfile(GetFoodEnergy(),GetFoodWater(),GetFoodNutritionalIndex(),GetFoodTotalVolume(), GetFoodToxicity());
+		}
+		else
+		{
+			int liquid_type = GetLiquidType();
+			profile = Liquid.GetNutritionalProfile(liquid_type);
+		}
+		return profile;
+		
+	}
 	
 	//================================================================
 	// FOOD STAGING
@@ -190,32 +255,62 @@ class Edible_Base extends ItemBase
 	//food stage states
 	bool IsFoodRaw()
 	{
-		return GetFoodStage().IsFoodRaw();
+		if ( GetFoodStage() ) 
+		{
+			return GetFoodStage().IsFoodRaw();
+		}
+		
+		return false;
 	}
 
 	bool IsFoodBaked()
 	{
-		return GetFoodStage().IsFoodBaked();
+		if ( GetFoodStage() ) 
+		{
+			return GetFoodStage().IsFoodBaked();
+		}
+		
+		return false;
 	}
 	
 	bool IsFoodBoiled()
 	{
-		return GetFoodStage().IsFoodBoiled();
+		if ( GetFoodStage() ) 
+		{
+			return GetFoodStage().IsFoodBoiled();
+		}
+		
+		return false;
 	}
 	
 	bool IsFoodDried()
 	{
-		return GetFoodStage().IsFoodDried();
+		if ( GetFoodStage() ) 
+		{
+			return GetFoodStage().IsFoodDried();
+		}
+		
+		return false;
 	}
 	
 	bool IsFoodBurned()
 	{
-		return GetFoodStage().IsFoodBurned();
+		if ( GetFoodStage() ) 
+		{
+			return GetFoodStage().IsFoodBurned();
+		}
+		
+		return false;
 	}
 	
 	bool IsFoodRotten()
 	{
-		return GetFoodStage().IsFoodRotten();
+		if ( GetFoodStage() ) 
+		{
+			return GetFoodStage().IsFoodRotten();
+		}
+		
+		return false;
 	}				
 	
 	//food stage change

@@ -1,0 +1,1 @@
+class SurgicalMask extends Clothing {};

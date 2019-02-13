@@ -10,6 +10,7 @@ class EntityAI extends Entity
 {
 	ref array<EntityAI> m_AttachmentsWithCargo;
 	ref array<EntityAI> m_AttachmentsWithAttachments;
+	ref InventoryLocation m_OldLocation;
 	
 	void EntityAI ()
 	{
@@ -18,12 +19,15 @@ class EntityAI extends Entity
 		string param_access_energy_sys = "CfgVehicles " + type + " EnergyManager ";
 		bool is_electic_device = GetGame().ConfigIsExisting(param_access_energy_sys);
 
-		if (is_electic_device)
+		if (is_electic_device) // TO DO: Check if this instance is a hologram (advanced placement). If Yes, then do not create Energy Manager component.
 		{
 			CreateComponent(COMP_TYPE_ENERGY_MANAGER);
 			m_EM = ComponentEnergyManager.Cast(  CreateComponent(COMP_TYPE_ENERGY_MANAGER));
 			RegisterNetSyncVariableBool("m_EM.m_IsSwichedOn");
 			RegisterNetSyncVariableBool("m_EM.m_CanWork");
+			RegisterNetSyncVariableBool("m_EM.m_IsPlugged");
+			RegisterNetSyncVariableInt ("m_EM.m_EnergySourceNetworkIDLow");
+			RegisterNetSyncVariableInt ("m_EM.m_EnergySourceNetworkIDHigh");
 		}
 		
 		// Item preview index
@@ -31,6 +35,8 @@ class EntityAI extends Entity
 		
 		m_AttachmentsWithCargo			= new array<EntityAI>;
 		m_AttachmentsWithAttachments	= new array<EntityAI>;
+		//m_NewLocation 					= new InventoryLocation;
+		//m_OldLocation 					= new InventoryLocation;
 	}
 	
 	void ~EntityAI()
@@ -304,11 +310,18 @@ class EntityAI extends Entity
 	
 	void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner) { }
 	
+	void OnItemAttachmentSlotChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc) {}
+	
 	void EEItemLocationChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
 	{
 		EntityAI old_owner = oldLoc.GetParent();
 		EntityAI new_owner = newLoc.GetParent();
 		OnItemLocationChanged(old_owner, new_owner);
+		
+		if (oldLoc.GetType() == InventoryLocationType.ATTACHMENT && newLoc.GetType() == InventoryLocationType.ATTACHMENT)
+		{
+			OnItemAttachmentSlotChanged(oldLoc,newLoc);
+		}
 		
 		if (oldLoc.GetType() == InventoryLocationType.ATTACHMENT)
 		{
@@ -504,8 +517,8 @@ class EntityAI extends Entity
 		// Restore connections between devices which were connected before server restart
 		if ( HasEnergyManager()  &&  GetCompEM().GetRestorePlugState() )
 		{
-			int low = GetCompEM().GetEnergySourceIDLow();
-			int high = GetCompEM().GetEnergySourceIDHigh();
+			int low = GetCompEM().GetEnergySourceStorageIDLow();
+			int high = GetCompEM().GetEnergySourceStorageIDHigh();
 			
 			// get pointer to EntityAI based on this ID
 			EntityAI potential_energy_source = GetGame().GetEntityByPersitentID(low, high); // This function is available only in this event!
@@ -530,13 +543,13 @@ class EntityAI extends Entity
 		}
 	}
 	
-	//! Called when entity is being restored from storage folder
-	void EEOnStorageLoad()
+	//! Called when entity is being created as new by CE/ Debug
+	void EEOnCECreate()
 	{
 	}
 
-	//! Called when entity is being created as new by CE/ Debug
-	void EEOnCECreate()
+	//! Called when entity is being loaded from DB or Storage (after all children loaded)
+	void AfterStoreLoad()
 	{
 	}
 
@@ -646,6 +659,20 @@ class EntityAI extends Entity
 	 **/
 	bool CanPutInCargo (EntityAI parent)
 	{
+		return true;
+	}
+
+	/**@fn		CanSwapItemInCargo
+	 * @brief	calls this->CanSwapItemInCargo(child_entity, new_entity)
+	 * @return	true if action allowed
+	 *
+	 * @note: return ScriptConditionExecute(GetOwner(), child_entity, "CanSwapItemInCargo", new_entity);
+	 **/
+	bool CanSwapItemInCargo (EntityAI child_entity, EntityAI new_entity)
+	{
+		if (GetInventory() && GetInventory().GetCargo())
+			return GetInventory().GetCargo().CanSwapItemInCargo(child_entity, new_entity));
+		
 		return true;
 	}
 
@@ -768,7 +795,7 @@ class EntityAI extends Entity
 	 **/		
 	bool IgnoreOutOfReachCondition()
 	{
-		return false;
+		return GetHierarchyRootPlayer() == GetGame().GetPlayer();
 	}	
 
 	// !Called on CHILD when it's attached to parent.
@@ -1067,10 +1094,7 @@ class EntityAI extends Entity
 		
 	proto native bool	IsPilotLight();
 	proto native void SetPilotLight(bool isOn);
-	
-	//! Returns the vehicle in which the given unit is mounted. If there is none, NULL is returned.
-	proto native Transport GetTransport();
-	
+
 	/**
 	\brief Engine calls this function to collect data from entity to store to game database (on server side).
 	@code
@@ -1160,37 +1184,46 @@ class EntityAI extends Entity
 	}
 	@endcode
 	*/
-	void OnStoreLoad (ParamsReadContext ctx, int version)
+	bool OnStoreLoad (ParamsReadContext ctx, int version)
 	{
 		// Restoring of energy related states
 		if ( HasEnergyManager() )
 		{
 			// Load energy amount
 			float f_energy = 0;
-			ctx.Read( f_energy );
+			if ( !ctx.Read( f_energy ) )
+				f_energy = 0;
 			GetCompEM().SetEnergy(f_energy);
 			
 			// Load passive/active state
 			bool b_is_passive = false;
-			ctx.Read( b_is_passive );
+			if ( !ctx.Read( b_is_passive ) )
+				return false;
 			GetCompEM().SetPassiveState(b_is_passive);
 			
 			// Load ON/OFF state
 			bool b_is_on = false;
-			ctx.Read( b_is_on );
+			if ( !ctx.Read( b_is_on ) )
+			{
+				GetCompEM().SwitchOn();
+				return false;
+			}
 			
 			// Load plugged/unplugged state
 			bool b_is_plugged = false;
-			ctx.Read( b_is_plugged );
+			if ( !ctx.Read( b_is_plugged ) )
+				return false;
 			
 			// ENERGY SOURCE
 			// Load energy source ID low
 			int i_energy_source_ID_low = 0; // Even 0 can be valid ID!
-			ctx.Read( i_energy_source_ID_low );
+			if ( !ctx.Read( i_energy_source_ID_low ) )
+				return false;
 			
 			// Load energy source ID high
 			int i_energy_source_ID_high = 0; // Even 0 can be valid ID!
-			ctx.Read( i_energy_source_ID_high );
+			if ( !ctx.Read( i_energy_source_ID_high ) )
+				return false;
 			
 			if ( b_is_plugged )
 			{
@@ -1204,6 +1237,7 @@ class EntityAI extends Entity
 				GetCompEM().SwitchOn();
 			}
 		}
+		return true;
 	}
 
 	//! Sets object synchronization dirty flag, which signalize that object wants to be synchronized (take effect only in MP on server side)
@@ -1216,19 +1250,50 @@ class EntityAI extends Entity
 	{
 		if ( HasEnergyManager() )
 		{
-			bool is_on = GetCompEM().IsSwitchedOn();
-			
-			if (is_on != GetCompEM().GetPreviousSwitchState())
+			if ( GetGame().IsMultiplayer() )
 			{
-				if (is_on)
-					GetCompEM().SwitchOn();
-				else
-					GetCompEM().SwitchOff();
-				;
-			}
+				bool is_on = GetCompEM().IsSwitchedOn();
 				
-			GetCompEM().DeviceUpdate();
-			GetCompEM().StartUpdates();
+				if (is_on != GetCompEM().GetPreviousSwitchState())
+				{
+					if (is_on)
+						GetCompEM().SwitchOn();
+					else
+						GetCompEM().SwitchOff();
+					;
+				}
+				
+				int id_low = GetCompEM().GetEnergySourceNetworkIDLow();
+				int id_High = GetCompEM().GetEnergySourceNetworkIDHigh();
+				
+				EntityAI energy_source = EntityAI.Cast( GetGame().GetObjectByNetworkId(id_low, id_High) );
+				
+				if (energy_source)
+				{
+					// Boris: The following prints are here to help fix DAYZ-37406. They will be removed when I find out what is causing the issue.
+					Print(energy_source);
+					Print(id_low);
+					Print(id_High);
+					Print(energy_source.GetCompEM());
+					Print(this);
+					
+					if ( !energy_source.GetCompEM() )
+					{
+						string object = energy_source.GetType();
+						Error("Synchronization error! Object " + object + " has no instance of the Energy Manager component!");
+					}
+					
+					GetCompEM().PlugThisInto(energy_source);
+					
+				}
+				else
+				{
+					GetCompEM().UnplugThis();
+				}
+				
+				GetCompEM().DeviceUpdate();
+				GetCompEM().StartUpdates();
+			}
 		}
 	}
 
@@ -1325,7 +1390,7 @@ class EntityAI extends Entity
 	}
 
 	//! If this item has class EnergyManager in its config then it returns true. Otherwise returns false.
-	override bool HasEnergyManager()
+	bool HasEnergyManager()
 	{
 		return HasComponent(COMP_TYPE_ENERGY_MANAGER);
 	}
@@ -1370,22 +1435,6 @@ class EntityAI extends Entity
 		{
 			switch(rpc_type)
 			{
-				// ENERGY MANAGER - server => client synchronization of plug connections, switch states and energy values.
-				case ERPCs.RPC_EM_PLUG_CHANGED:
-				{
-					ref Param1<EntityAI> p_plug = new Param1<EntityAI>(NULL);
-					if (ctx.Read(p_plug))
-					{
-						EntityAI energy_source = p_plug.param1;
-						
-						if (energy_source)
-							GetCompEM().PlugThisInto(energy_source);
-						else
-							GetCompEM().UnplugThis();
-					}
-					break;
-				}
-
 				// BODY STAGING - server => client synchronization of skinned state.
 				case ERPCs.RPC_BS_SKINNED_STATE:
 				{
@@ -1485,4 +1534,9 @@ class EntityAI extends Entity
 	{
 		return false;
 	}
+	
+	string ChangeIntoOnAttach(string slot) {};
+	string ChangeIntoOnDetach(int slot_id) {};
+	
+	void OnDebugSpawn() {};
 };

@@ -126,7 +126,7 @@ class ActionRestrainTarget: ActionContinuousBase
 			InventoryLocation target_gnd = new InventoryLocation;
 			target_gnd.SetGround(null, m4);
 		
-			EntityAI hcuff_locked = GameInventory.LocationCreateEntity(target_gnd, new_item_name);
+			EntityAI hcuff_locked = GameInventory.LocationCreateEntity(target_gnd, new_item_name,ECE_IN_INVENTORY,RF_DEFAULT);
 			target_player.ServerSwapEntities(hcuff_locked, item_in_hands_target);
 			target_player.SetRestrained(true);
 		}

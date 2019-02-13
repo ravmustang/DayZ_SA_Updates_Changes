@@ -76,12 +76,11 @@ class PlantBase extends ItemBase
 	{
 		m_GardenBase = garden_base;
 		
-		float divided = (float) ((60 * 27) + Math.RandomInt(0, 60 * 6)) / fertility;
-		Print(divided);
+		float divided = (float) ((60 * 5) + Math.RandomInt(0, 60 * 1)) / fertility;
 		m_FullMaturityTime = divided;
 		
-		//divided = (float)((60 * 30) + Math.RandomInt(0, 60 * 30)) * fertility;
-		m_SpoilAfterFullMaturityTime = divided*5;
+		divided = (float)((60 * 30) + Math.RandomInt(0, 60 * 30)) * fertility;
+		m_SpoilAfterFullMaturityTime = divided;
 
 		divided = (float)((float)m_FullMaturityTime / ((float)m_GrowthStagesCount - 2.0));
 		m_StateChangeTime = divided;
@@ -114,9 +113,10 @@ class PlantBase extends ItemBase
 	}
 
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
 		
 		Print("Plant - OnStoreLoad - ");
 		
@@ -132,21 +132,23 @@ class PlantBase extends ItemBase
 		Print(slot);
 		
 		SetSlot(slot);
-		
-		OnStoreLoadCustom( ctx );
+
+		if ( !OnStoreLoadCustom( ctx, version ) )
+			return false;
+
+		return true;
 	}
 
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{
 		super.OnStoreSave( ctx );
 		
-		Print("Plant - OnStoreSave - ");
 		Slot slot = GetSlot();
-		Print(slot);
+		
 		if (slot)
 		{
 			int slot_index = slot.GetSlotIndex();
-			Print(slot_index);
+			
 			ctx.Write( slot_index );
 			
 			OnStoreSaveCustom( ctx );
@@ -158,132 +160,182 @@ class PlantBase extends ItemBase
 		}
 	}
 	
-	void OnStoreLoadCustom( ParamsReadContext ctx )
+	bool OnStoreLoadCustom( ParamsReadContext ctx, int version )
 	{
 		int loadInt;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 0;
+		
 		m_SprayUsage = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 5;
+		
 		m_DeleteDryPlantTime = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			 loadInt = 5;
 		m_SpoiledRemoveTime = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 300;
 		m_FullMaturityTime = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 300;
 		m_SpoilAfterFullMaturityTime = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			return false;
 		m_StateChangeTime = loadInt;
 		
 		float loadFloat = 0.0;
-		ctx.Read( loadFloat );
+		if ( !ctx.Read( loadFloat ) )
+			loadFloat = 0;
 		m_InfestationChance = loadFloat;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			return false;
 		m_GrowthStagesCount = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 1;
 		m_CropsCount = loadInt;
 		
 		string loadString = "";
-		ctx.Read( loadString );
+		if ( !ctx.Read( loadString ) )
+			return false;
 		m_CropsType = loadString;
 		
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
+		if ( !ctx.Read( loadFloat ) )
+			loadFloat = 1;
 		m_PlantMaterialMultiplier = loadFloat;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 1;
 		m_PlantState = loadInt;
 		
 		loadInt = 0;
-		ctx.Read( loadInt );
+		if ( !ctx.Read( loadInt ) )
+			loadInt = 0;
 		m_PlantStateIndex = loadInt;
 		
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
+		if ( !ctx.Read( loadFloat ) )
+			loadFloat = 1;
 		m_CurrentPlantMaterialQuantity = loadFloat;
 		
 		bool loadBool = false;
-		ctx.Read( loadBool );
+		if ( !ctx.Read( loadBool ) )
+			loadBool = false;
 		m_IsInfested = loadBool;
 		 
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
+		if ( !ctx.Read( loadFloat ) )
+			loadFloat = 0;
 		m_SprayQuantity = loadFloat;
 		
 		
 		
 		loadBool = false;
-		ctx.Read( loadBool );
-		if ( loadBool )
+		if ( ctx.Read( loadBool ) )
 		{
-			if (GetGame().IsServer())
+			if ( loadBool )
 			{
-				m_GrowthTimer = new Timer( CALL_CATEGORY_SYSTEM );
-				m_GrowthTimer.Run( m_StateChangeTime, this, "GrowthTimerTick", NULL, true );
+				if (GetGame().IsServer())
+				{
+					m_GrowthTimer = new Timer( CALL_CATEGORY_SYSTEM );
+					m_GrowthTimer.Run( m_StateChangeTime, this, "GrowthTimerTick", NULL, true );
+				}
 			}
+		}
+		else
+		{
+			return false;
 		}
 		
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
-		if ( loadFloat > 0.0 )
+		if ( ctx.Read( loadFloat ) )
 		{
-			if (GetGame().IsServer())
+			if ( loadFloat > 0.0 )
 			{
-				m_InfestationTimer = new Timer( CALL_CATEGORY_SYSTEM );
-				m_InfestationTimer.Run( loadFloat, this, "InfestationTimerTick", NULL, false );
+				if (GetGame().IsServer())
+				{
+					m_InfestationTimer = new Timer( CALL_CATEGORY_SYSTEM );
+					m_InfestationTimer.Run( loadFloat, this, "InfestationTimerTick", NULL, false );
+				}
 			}
+		}
+		else
+		{
+			return false;
 		}
 		
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
-		if ( loadFloat > 0.0 )
+		if ( ctx.Read( loadFloat ) )
 		{
-			if (GetGame().IsServer())
+			if ( loadFloat > 0.0 )
 			{
-				m_SpoilAfterFullMaturityTimer = new Timer( CALL_CATEGORY_SYSTEM );
-				m_SpoilAfterFullMaturityTimer.Run( loadFloat, this, "SetSpoiled", NULL, false );
+				if (GetGame().IsServer())
+				{
+					m_SpoilAfterFullMaturityTimer = new Timer( CALL_CATEGORY_SYSTEM );
+					m_SpoilAfterFullMaturityTimer.Run( loadFloat, this, "SetSpoiled", NULL, false );
+				}
 			}
+		}
+		else
+		{
+			return false;
 		}
 		
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
-		if ( loadFloat > 0.0 )
+		if ( ctx.Read( loadFloat ) )
 		{
-			if (GetGame().IsServer())
+			if ( loadFloat > 0.0 )
 			{
-				if (!m_SpoiledRemoveTimer)
-					m_SpoiledRemoveTimer = new Timer( CALL_CATEGORY_SYSTEM );
-				
-				m_SpoiledRemoveTimer.Run( loadFloat, this, "SpoiledRemoveTimerTick", NULL, false );
+				if (GetGame().IsServer())
+				{
+					if (!m_SpoiledRemoveTimer)
+						m_SpoiledRemoveTimer = new Timer( CALL_CATEGORY_SYSTEM );
+					
+					m_SpoiledRemoveTimer.Run( loadFloat, this, "SpoiledRemoveTimerTick", NULL, false );
+				}
 			}
+		}
+		else
+		{
+			return false;
 		}
 		
 		loadFloat = 0.0;
-		ctx.Read( loadFloat );
-		if ( loadFloat > 0.0 )
+		if ( ctx.Read( loadFloat ) )
 		{
-			if (GetGame().IsServer())
+			if ( loadFloat > 0.0 )
 			{
-				m_DeleteDryPlantTimer = new Timer( CALL_CATEGORY_SYSTEM );
-				m_DeleteDryPlantTimer.Run( loadFloat, this, "DeleteDryPlantTick", NULL, false );
+				if (GetGame().IsServer())
+				{
+					m_DeleteDryPlantTimer = new Timer( CALL_CATEGORY_SYSTEM );
+					m_DeleteDryPlantTimer.Run( loadFloat, this, "DeleteDryPlantTick", NULL, false );
+				}
 			}
 		}
+		else
+		{
+			return false;
+		}
 		
+
 		UpdatePlant();
+		return true;
 	}
 
 	void OnStoreSaveCustom( ParamsWriteContext ctx )

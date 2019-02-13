@@ -19,6 +19,28 @@ class SlotsContainer: LayoutHolder
 
 	override void SetLayoutName()
 	{
-		m_LayoutName = WidgetLayoutName.InventorySlotsContainer;
+		#ifdef PLATFORM_CONSOLE
+			m_LayoutName = WidgetLayoutName.InventorySlotsContainerXbox;
+		#else
+			switch( InventoryMenu.GetWidthType() )
+			{
+				case ScreenWidthType.NARROW:
+				{
+					m_LayoutName = WidgetLayoutName.InventorySlotsContainerNarrow;
+					break;
+				}
+				case ScreenWidthType.MEDIUM:
+				{
+					m_LayoutName = WidgetLayoutName.InventorySlotsContainerMedium;
+					break;
+				}
+				case ScreenWidthType.WIDE:
+				{
+					m_LayoutName = WidgetLayoutName.InventorySlotsContainerWide;
+					break;
+				}
+			}
+		#endif
+			
 	}
 }

@@ -20,6 +20,8 @@ class ReplaceItemWithNewLambdaBase
 	{
 		m_NewLocation = newLocation;
 	}
+	
+	void VerifyItemTypeBySlotType () {}
 
 	protected bool WantCreateNewEntity ()
 	{
@@ -99,7 +101,8 @@ class ReplaceItemWithNewLambdaBase
 	{
 		if (WantCreateNewEntity())
 		{
-			EntityAI new_item = GameInventory.LocationCreateLocalEntity(m_NewLocation, m_NewItemType); // create LOCAL new one in the place of old one
+			VerifyItemTypeBySlotType(); //TODO move to child class just to be safe?
+			EntityAI new_item = GameInventory.LocationCreateLocalEntity(m_NewLocation, m_NewItemType,ECE_OBJECT_SWAP,RF_NONE); // create LOCAL new one in the place of old one
 			hndDebugPrint("[inv] ReplaceItemWithNewLambdaBase Step D) Created new new_item=" + new_item);
 			if (new_item)
 			{
@@ -115,7 +118,7 @@ class ReplaceItemWithNewLambdaBase
 				mtx[3] = m_OldItem.GetPosition();
 				backupLocation.SetGround(null, mtx);
 				hndDebugPrint("[inv] ReplaceItemWithNewLambdaBase Step D) plan B - creating=" + m_NewItemType + " at bkp loc=" + backupLocation.DumpToString() + ", but failed");
-				new_item = GameInventory.LocationCreateLocalEntity(backupLocation, m_NewItemType); // create LOCAL new one on ground
+				new_item = GameInventory.LocationCreateLocalEntity(backupLocation, m_NewItemType,ECE_OBJECT_SWAP,RF_NONE); // create LOCAL new one on ground
 				if (!new_item)
 				{
 					Error("[inv] ReplaceItemWithNewLambdaBase Step D) plan B - wanted to create=" + m_NewItemType + " at bkp loc=" + backupLocation.DumpToString() + ", but failed");

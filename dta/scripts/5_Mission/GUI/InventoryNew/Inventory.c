@@ -49,11 +49,15 @@ class Inventory: LayoutHolder
 	protected ref InventoryQuickbar			m_Quickbar;
 	
 	protected Widget						m_QuickbarWidget;
-	protected Widget						m_ConsoleToolbar;
+	protected RichTextWidget				m_TopConsoleToolbarLeft;
+	protected RichTextWidget				m_TopConsoleToolbarRight;
+	protected RichTextWidget				m_BottomConsoleToolbar;
 
 	protected ref ContextMenu				m_ContextMenu;
 	protected static ref map<string, int>	m_PlayerAttachmentsIndexes;
 	protected static ref map<int, string>	m_SlotIDs;
+	
+	protected bool							m_HadFastTransferred;
 	
 	void Inventory( LayoutHolder parent )
 	{
@@ -91,8 +95,8 @@ class Inventory: LayoutHolder
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "HandsPanel" ),  this, "OnHandsPanelDropReceived" );
 		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "HandsPanel" ),  this, "DraggingOverHandsPanel" );
 		
-		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "InventoryWindow" ),  this, "OnLeftPanelDropReceived" );
-		WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "InventoryWindow" ),  this, "DraggingOverLeftPanel" );
+		//WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "InventoryWindow" ),  this, "OnLeftPanelDropReceived" );
+		//WidgetEventHandler.GetInstance().RegisterOnDraggingOver( GetMainWidget().FindAnyWidget( "InventoryWindow" ),  this, "DraggingOverLeftPanel" );
 		
 		#ifdef PLATFORM_CONSOLE
 		
@@ -102,10 +106,33 @@ class Inventory: LayoutHolder
 				GetMainWidget().FindAnyWidget( "CursorCharacter" ).Show( false );
 		
 				//console inventory toolbar
-				m_ConsoleToolbar = GetMainWidget().FindAnyWidget( "ConsoleToolbar" );
-				m_ConsoleToolbar.Show( true );
+				m_TopConsoleToolbarLeft		= RichTextWidget.Cast( GetRootWidget().FindAnyWidget( "GeneralToolbarTextLeft" ) );
+				m_TopConsoleToolbarRight	= RichTextWidget.Cast( GetRootWidget().FindAnyWidget( "GeneralToolbarTextRight" ) );
+				m_BottomConsoleToolbar		= RichTextWidget.Cast( GetRootWidget().FindAnyWidget( "ContextToolbarText" ) );
 				UpdateConsoleToolbar();
 		#endif
+	}
+	
+	void Serialize()
+	{
+		ItemManager.GetInstance().SerializeDefaultOpenStates();
+		ItemManager.GetInstance().SerializeDefaultHeaderOpenStates();
+	}
+
+	void Deserialize()
+	{
+		ItemManager.GetInstance().DeserializeDefaultOpenStates();
+		ItemManager.GetInstance().DeserializeDefaultHeaderOpenStates();
+	}
+
+	void ~Inventory()
+	{
+		
+	}
+	
+	Man GetPreviewPlayer()
+	{
+		return m_PlayerPreview.GetPlayerInstance();
 	}
 	
 	static int GetPlayerAttachmentIndex( string slot_name )
@@ -155,6 +182,30 @@ class Inventory: LayoutHolder
 		data = JsonFileLoader<map<string, int>>.JsonMakeData( m_PlayerAttachmentsIndexes );
 		GetGame().SetProfileString( "INV_AttIndexes", data );
 	}
+	
+	static void MoveAttachmentUp( int slot_id )
+	{
+		int curr = GetPlayerAttachmentIndex( m_SlotIDs[slot_id] );
+		string prev_item = m_PlayerAttachmentsIndexes.GetKeyByValue( curr - 1 );
+		if( prev_item != "" )
+		{
+			int prev = GetPlayerAttachmentIndex( prev_item );
+			m_PlayerAttachmentsIndexes.Set( m_SlotIDs[slot_id], prev );
+			m_PlayerAttachmentsIndexes.Set( prev_item, curr );
+		}
+	}
+	
+	static void MoveAttachmentDown( int slot_id )
+	{
+		int curr = GetPlayerAttachmentIndex( m_SlotIDs[slot_id] );
+		string next_item = m_PlayerAttachmentsIndexes.GetKeyByValue( curr + 1 );
+		if( next_item != "" )
+		{
+			int prev = GetPlayerAttachmentIndex( next_item );
+			m_PlayerAttachmentsIndexes.Set( m_SlotIDs[slot_id], prev );
+			m_PlayerAttachmentsIndexes.Set( next_item, curr );
+		}
+	}
 
 	protected int GetProperControllerStickAngle( int angle )
 	{
@@ -190,10 +241,10 @@ class Inventory: LayoutHolder
 		m_ControllerRightStickTimer.Stop();
 	}
 	
-	protected int m_ControllerAngle;
-	protected int m_ControllerTilt;
-	protected bool m_ControllerRightStickTimerEnd = true;
-	ref Timer m_ControllerRightStickTimer;
+	protected int		m_ControllerAngle;
+	protected int		m_ControllerTilt;
+	protected bool		m_ControllerRightStickTimerEnd = true;
+	protected ref Timer	m_ControllerRightStickTimer;
 
 	bool Controller( Widget w, int control, int value )
 	{
@@ -225,7 +276,7 @@ class Inventory: LayoutHolder
 		
 		if ( control == ControlID.CID_RIGHT && value == 1 )
 		{
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -236,7 +287,7 @@ class Inventory: LayoutHolder
 		}
 		else if ( control == ControlID.CID_LEFT && value == 1 )
 		{
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -247,7 +298,7 @@ class Inventory: LayoutHolder
 		}
 		else if ( control == ControlID.CID_UP && value == 1 )
 		{
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -258,7 +309,7 @@ class Inventory: LayoutHolder
 		}
 		else if ( control == ControlID.CID_DOWN && value == 1 )
 		{
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -271,26 +322,7 @@ class Inventory: LayoutHolder
 		UpdateConsoleToolbar();
 		return false;
 	}
-
-	void Serialize()
-	{
-		//m_LeftArea.GetVicinityContainer().TraverseShowedItems();
-		ItemManager.GetInstance().SerializeDefaultOpenStates();
-		ItemManager.GetInstance().SerializeDefaultHeaderOpenStates();
-		//ItemManager.GetInstance().SetDefaultOpenStateHands( true );
-	}
-
-	void Deserialize()
-	{
-		ItemManager.GetInstance().DeserializeDefaultOpenStates();
-		ItemManager.GetInstance().DeserializeDefaultHeaderOpenStates();
-	}
-
-	void ~Inventory()
-	{
-		GetGame().GetUpdateQueue(CALL_CATEGORY_SYSTEM).Remove(this.UpdateInterval);
-	}
-
+	
 	void RefreshQuantity( EntityAI item_to_refresh )
 	{
 		m_RightArea.RefreshQuantity( item_to_refresh );
@@ -379,7 +411,7 @@ class Inventory: LayoutHolder
 				if( !item.GetInventory().CanRemoveEntity() )
 					return;
 				PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-				if( player && ( player.GetInventory().CanAddAttachment( item ) ) || player.GetHumanInventory().HasEntityInHands( item ) )
+				if( player && ( player.GetInventory().CanAddAttachment( item ) ) )
 				{
 					player.PredictiveTakeEntityAsAttachment( item );
 				}
@@ -391,6 +423,10 @@ class Inventory: LayoutHolder
 					{
 						player.PredictiveSwapEntities(item, slot_item);
 					}
+					else if( player.CanReceiveItemIntoCargo( item ) )
+					{
+						player.PredictiveTakeEntityToCargo( item );
+					}
 				}
 			}
 		}
@@ -398,89 +434,12 @@ class Inventory: LayoutHolder
 
 	void DraggingOverLeftPanel( Widget w, int x, int y, Widget receiver )
 	{
-		if( w )
-		{
-			ItemPreviewWidget ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-			if( !ipw )
-			{
-				string name = w.GetName();
-				name.Replace( "PanelWidget", "Render" );
-				ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-				if( !ipw )
-				{
-					ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Preview" ) );
-					if( !ipw )
-					{
-						ipw = ItemPreviewWidget.Cast( w );
-						if( !ipw || !ipw.GetItem() )
-						{
-							return;
-						}
-					}
-				}
-			}
-			
-			ItemBase item = ItemBase.Cast( ipw.GetItem() );
-			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-			
-			if( player && item && player.CanDropEntity( item ) )
-			{
-				ItemManager.GetInstance().HideDropzones();
-				GetMainWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
-				ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
-			}
-			else if( item )
-			{
-				ItemManager.GetInstance().ShowSourceDropzone( item );
-				ColorManager.GetInstance().SetColor( w, ColorManager.RED_COLOR );
-			}
-		}
+		m_LeftArea.DraggingOverHeader( w, x, y, receiver );
 	}
 
 	void DraggingOverRightPanel( Widget w, int x, int y, Widget receiver )
 	{
-		if( w )
-		{
-			ItemPreviewWidget ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( "Render" ) );
-			if( !ipw )
-			{
-				string name = w.GetName();
-				name.Replace( "PanelWidget", "Render" );
-				ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-				if( !ipw )
-				{
-					ipw = ItemPreviewWidget.Cast( w );
-					if( !ipw )
-					{
-						return;
-					}
-				}
-			}
-			
-			EntityAI item = ipw.GetItem();
-			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-			
-			if( player && item && ( ( player.GetInventory().CanAddEntityToInventory( item ) ) || ( player.GetHumanInventory().HasEntityInHands( item ) ) ) )
-			{
-				InventoryLocation inv_loc = new InventoryLocation;
-				player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, inv_loc );
-	
-				ItemManager.GetInstance().HideDropzones();
-				GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
-				if( inv_loc.GetType() == 4 )
-				{
-					ItemManager.GetInstance().HideDropzones();
-					GetMainWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
-				}
-	
-				ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
-			}
-			else if( item )
-			{
-				ItemManager.GetInstance().ShowSourceDropzone( item );
-				ColorManager.GetInstance().SetColor( w, ColorManager.RED_COLOR );
-			}
-		}
+		m_RightArea.DraggingOverHeader( w, x, y, receiver );
 	}
 	
 	void DraggingOverCenterPanel( Widget w, int x, int y, Widget receiver )
@@ -511,12 +470,10 @@ class Inventory: LayoutHolder
 				int slot_id = item.GetInventory().GetSlotId(0);
 				EntityAI slot_item = player.GetInventory().FindAttachment( slot_id );
 				
-				bool can_take =( player.GetInventory().CanAddAttachment( item ) || ( slot_item && player.GetInventory().CanSwapEntities( item, slot_item ) ) );
-				if( can_take )
+				InventoryLocation inv_loc = new InventoryLocation;
+				player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ATTACHMENT | FindInventoryLocationType.CARGO, inv_loc );
+				if( inv_loc.IsValid() )
 				{
-					InventoryLocation inv_loc = new InventoryLocation;
-					player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ATTACHMENT, inv_loc );
-		
 					ItemManager.GetInstance().HideDropzones();
 					GetMainWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 					if( inv_loc.GetType() == 4 )
@@ -544,7 +501,7 @@ class Inventory: LayoutHolder
 	{
 		PlayerBase player;
 		
-		if( GetGame().GetInput().GetActionDown( UAUIExpandCollapseContainer, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUIExpandCollapseContainer", false ) )
 		{
 			if( m_RightArea.IsActive() )
 			{
@@ -556,11 +513,16 @@ class Inventory: LayoutHolder
 			}
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUIFastEquipOrSplit, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUIFastEquipOrSplit", false ) )
 		{
 			if( m_HandsArea.IsActive() )
 			{
-				m_HandsArea.EquipItem();
+				if( m_HandsArea.EquipItem() )
+				{
+					m_HandsArea.SetActive( false );
+					m_HandsArea.UnfocusGrid();
+					m_RightArea.SetActive( true );
+				}
 			}
 			if( m_RightArea.IsActive() )
 			{
@@ -568,47 +530,85 @@ class Inventory: LayoutHolder
 			}
 			if( m_LeftArea.IsActive() )
 			{
-				m_LeftArea.EquipItem();
+				if( m_LeftArea.EquipItem() )
+				{
+					//m_LeftArea.SetActive( false );
+					//m_LeftArea.UnfocusAll();
+					//m_RightArea.SetActive( true );
+				}
 			}
 			UpdateConsoleToolbar();
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionUp( UAUISelectItem, false ) )
+		if( GetGame().GetInput().GetActionUp( "UAUISelectItem", false ) )
 		{
 			if( m_RightArea.IsActive() )
 			{
-				m_RightArea.Select();
+				if( m_RightArea.Select() && !ItemManager.GetInstance().IsMicromanagmentMode() )
+				{
+					m_RightArea.SetActive( false );
+					m_RightArea.UnfocusAll();
+					m_HandsArea.SetActive( true );
+				}
 			}
 			if( m_LeftArea.IsActive() )
 			{
-				m_LeftArea.Select();
+				if( m_LeftArea.Select() && !ItemManager.GetInstance().IsMicromanagmentMode() )
+				{
+					//m_LeftArea.SetActive( false );
+					//m_LeftArea.UnfocusAll();
+					//m_RightArea.SetActive( true );
+				}
 			}
 			if( m_HandsArea.IsActive() )
 			{
-				m_HandsArea.Select();
+				if( m_HandsArea.Select() && !ItemManager.GetInstance().IsMicromanagmentMode() )
+				{
+					m_HandsArea.SetActive( false );
+					m_HandsArea.UnfocusGrid();
+					m_RightArea.SetActive( true );
+				}
 			}
-			ItemManager.GetInstance().SetItemMicromanagmentMode( false );
-			ItemManager.GetInstance().SetItemMoving( false );
-			ItemManager.GetInstance().SetSelectedItem( null, null, null );
+			DisableMicromanagement();
 			UpdateConsoleToolbar();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUIFastTransferToVicinity, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUIFastTransferToVicinity", false ) )
 		{
 			if( m_HandsArea.IsActive() )
 			{
-				m_HandsArea.TransferItemToVicinity();
+				if( m_HandsArea.TransferItemToVicinity() )
+				{
+					m_HandsArea.SetActive( false );
+					m_HandsArea.UnfocusGrid();
+					m_LeftArea.SetActive( true );
+					m_HadFastTransferred = true;
+				}
 			}
 			if( m_RightArea.IsActive() )
 			{
-				m_RightArea.TransferItemToVicinity();
+				if( m_RightArea.TransferItemToVicinity() )
+				{
+					//m_RightArea.SetActive( false );
+					//m_RightArea.UnfocusAll();
+					//m_LeftArea.SetActive( true );
+					m_HadFastTransferred = true;
+				}
+			}
+			if( m_LeftArea.IsActive() )
+			{
+				m_LeftArea.TransferItemToVicinity();
+				m_HadFastTransferred = true;
 			}
 			UpdateConsoleToolbar();
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionUp( UAUICtrlY, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUIFastTransferItem", false ) )
+			m_HadFastTransferred = false;
+		
+		if( !m_HadFastTransferred && GetGame().GetInput().GetActionUp( "UAUIFastTransferItem", false ) )
 		{
 			if( ItemManager.GetInstance().IsMicromanagmentMode() )
 			{
@@ -620,21 +620,31 @@ class Inventory: LayoutHolder
 			}
 			if( m_LeftArea.IsActive() )
 			{
-				m_LeftArea.TransferItem();
+				if( m_LeftArea.TransferItem() )
+				{
+					//m_LeftArea.SetActive( false );
+					//m_LeftArea.UnfocusAll();
+					//m_RightArea.SetActive( true );
+				}
 			}
 			if( m_HandsArea.IsActive() )
 			{
-				m_HandsArea.TransferItem();
+				if( m_HandsArea.TransferItem() )
+				{
+					m_HandsArea.SetActive( false );
+					m_HandsArea.UnfocusGrid();
+					m_RightArea.SetActive( true );
+				}
 			}
 			UpdateConsoleToolbar();
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
-		if( GetGame().GetInput().GetActionDown( UAUINextUp, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUINextUp", false ) )
 		{
 			ItemManager.GetInstance().HideTooltip();
 			
-			if( GetGame().GetInput().GetActionDown( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetActionDown( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -663,11 +673,11 @@ class Inventory: LayoutHolder
 #endif		
 		}
 
-		if( GetGame().GetInput().GetActionDown( UAUINextDown, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUINextDown", false ) )
 		{
 			ItemManager.GetInstance().HideTooltip();
 			
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -695,11 +705,11 @@ class Inventory: LayoutHolder
 #endif
 		}
 
-		if( GetGame().GetInput().GetActionDown( UAUITabLeft, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUITabLeft", false ) )
 		{
 			ItemManager.GetInstance().HideTooltip();
 			
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -748,9 +758,9 @@ class Inventory: LayoutHolder
 			}
 		}
 
-		if( GetGame().GetInput().GetActionDown( UAUITabRight, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUITabRight", false ) )
 		{
-			if( GetGame().GetInput().GetAction( UAUISelectItem, false ) )
+			if( GetGame().GetInput().GetAction( "UAUISelectItem", false ) )
 			{
 				EnableMicromanagement();
 			}
@@ -804,7 +814,7 @@ class Inventory: LayoutHolder
 		MissionGameplay mission = MissionGameplay.Cast( GetGame().GetMission() );
 #ifdef PLATFORM_CONSOLE
 		//Open Quickbar radial menu
-		if( GetGame().GetInput().GetActionDown( UAUIQuickbarRadialInventoryOpen, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUIQuickbarRadialInventoryOpen", false ) )
 		{
 			//assign item
 			EntityAI item_to_assign;
@@ -831,11 +841,12 @@ class Inventory: LayoutHolder
 			}
 		}
 #endif
-		if( GetGame().GetInput().GetActionDown( UAUIBack, false ) )
+		if( GetGame().GetInput().GetActionDown( "UAUIBack", false ) )
 		{
 			if( GetMainWidget().IsVisible() )
 			{
 			#ifdef PLATFORM_CONSOLE
+				DisableMicromanagement();
 				if( m_RightArea.IsActive() )
 				{
 					m_RightArea.Combine();
@@ -855,6 +866,7 @@ class Inventory: LayoutHolder
 		m_LeftArea.UpdateInterval();
 		m_RightArea.UpdateInterval();
 		m_HandsArea.UpdateInterval();
+		m_PlayerPreview.UpdateInterval();
 	}
 	
 	void EnableMicromanagement()
@@ -881,12 +893,40 @@ class Inventory: LayoutHolder
 	
 	void DisableMicromanagement()
 	{
-
-}
+		if( ItemManager.GetInstance().IsMicromanagmentMode() )
+		{
+			ItemManager.GetInstance().SetItemMicromanagmentMode( false );
+			ItemManager.GetInstance().SetItemMoving( false );
+			ItemManager.GetInstance().SetSelectedItem( null, null, null );
+			UpdateConsoleToolbar();
+			ItemManager.GetInstance().HideTooltip();
+		}
+	}
 
 	override void SetLayoutName()
 	{
-		m_LayoutName = WidgetLayoutName.Inventory;
+		#ifdef PLATFORM_CONSOLE
+			m_LayoutName = WidgetLayoutName.InventoryXbox;
+		#else
+			switch( InventoryMenu.GetWidthType() )
+			{
+				case ScreenWidthType.NARROW:
+				{
+					m_LayoutName = WidgetLayoutName.InventoryNarrow;
+					break;
+				}
+				case ScreenWidthType.MEDIUM:
+				{
+					m_LayoutName = WidgetLayoutName.InventoryMedium;
+					break;
+				}
+				case ScreenWidthType.WIDE:
+				{
+					m_LayoutName = WidgetLayoutName.InventoryWide;
+					break;
+				}
+			}
+		#endif
 	}
 
 	void Init() {}
@@ -939,15 +979,12 @@ class Inventory: LayoutHolder
 		#endif	
 		RefreshQuickbar();
 		UpdateInterval();
-		GetGame().GetUpdateQueue(CALL_CATEGORY_SYSTEM).Insert(this.UpdateInterval);
 		UpdateConsoleToolbar();
+		m_HadFastTransferred = false;
 	}
 
 	override void OnHide()
 	{
-		//start update
-		GetGame().GetUpdateQueue(CALL_CATEGORY_SYSTEM).Remove(this.UpdateInterval);
-		
 		Serialize();
 		ItemManager.GetInstance().HideTooltip();
 		Mission mission = GetGame().GetMission();
@@ -965,9 +1002,16 @@ class Inventory: LayoutHolder
 				hud.ToggleHud( hud.GetHudState(), true );
 			}
 		}
-		ItemManager.GetInstance().SetSelectedItem( NULL, NULL, NULL );
+		ItemManager.GetInstance().SetSelectedItem( null, null, null );
 	}
-
+	
+	override void Refresh()
+	{
+		m_LeftArea.Refresh();
+		m_HandsArea.Refresh();
+		m_RightArea.Refresh();
+	}
+	
 	void RefreshQuickbar()
 	{
 #ifdef PLATFORM_CONSOLE
@@ -992,25 +1036,25 @@ class Inventory: LayoutHolder
 	}
 	
 	#ifdef PLATFORM_XBOX
-	string to_hands_swap = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_to_hands_swap" + "    ";
-	string drop = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_drop" + "    ";
-	string equip = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_equip" + "    ";
-	string split = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_split" + "    ";
-	string to_inventory = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_to_inventory" + "    ";
-	string open_close_container = "<image set=\"xbox_buttons\" name=\"RS\" /> " + "#dayz_context_menu_open_close" + "    ";
-	string combine = "<image set=\"xbox_buttons\" name=\"B\" /> " + "#dayz_context_menu_combine";
-	string micromanagment = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_micro" + "    ";
-	string quickslot = "<image set=\"xbox_buttons\" name=\"LS\" /> " + "#dayz_context_menu_quickslot" + "    ";
+	static const string to_hands_swap = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_to_hands_swap" + "    ";
+	static const string drop = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_drop" + "    ";
+	static const string equip = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_equip" + "    ";
+	static const string split = "<image set=\"xbox_buttons\" name=\"Y\" /> " + "#dayz_context_menu_split" + "    ";
+	static const string to_inventory = "<image set=\"xbox_buttons\" name=\"X\" /> " + "#dayz_context_menu_to_inventory" + "    ";
+	static const string open_close_container = "<image set=\"xbox_buttons\" name=\"RS\" /> " + "#dayz_context_menu_open_close" + "    ";
+	static const string combine = "<image set=\"xbox_buttons\" name=\"B\" /> " + "#dayz_context_menu_combine";
+	static const string micromanagment = "<image set=\"xbox_buttons\" name=\"A\" /> " + "#dayz_context_menu_micro" + "    ";
+	static const string quickslot = "<image set=\"xbox_buttons\" name=\"LS\" /> " + "#dayz_context_menu_quickslot" + "    ";
 	#else
-	string to_hands_swap = "<image set=\"playstation_buttons\" name=\"cross\" /> To hands/swap    ";
-	string drop = "<image set=\"playstation_buttons\" name=\"triangle\" />(hold) Drop    ";
-	string equip = "<image set=\"playstation_buttons\" name=\"square\" /> Equip    ";
-	string split = "<image set=\"playstation_buttons\" name=\"square\" /> Split    ";
-	string to_inventory = "<image set=\"playstation_buttons\" name=\"triangle\" /> To inventory    ";
-	string open_close_container = "<image set=\"playstation_buttons\" name=\"R3\" /> Open/Close container    ";
-	string combine = "<image set=\"playstation_buttons\" name=\"circle\" /> Combine";
-	string micromanagment = "<image set=\"playstation_buttons\" name=\"cross\" /> (hold) Micromanagment    ";
-	string quickslot = "<image set=\"playstation_buttons\" name=\"L3\" /> (hold) Quickslot    ";
+	static const string to_hands_swap = "<image set=\"playstation_buttons\" name=\"cross\" /> To hands/swap    ";
+	static const string drop = "<image set=\"playstation_buttons\" name=\"square\" />(hold) Drop    ";
+	static const string equip = "<image set=\"playstation_buttons\" name=\"triangle\" /> Equip    ";
+	static const string split = "<image set=\"playstation_buttons\" name=\"triangle\" /> Split    ";
+	static const string to_inventory = "<image set=\"playstation_buttons\" name=\"square\" /> To inventory    ";
+	static const string open_close_container = "<image set=\"playstation_buttons\" name=\"R3\" /> Open/Close container    ";
+	static const string combine = "<image set=\"playstation_buttons\" name=\"circle\" /> Combine";
+	static const string micromanagment = "<image set=\"playstation_buttons\" name=\"cross\" /> (hold) Micromanagment    ";
+	static const string quickslot = "<image set=\"playstation_buttons\" name=\"L3\" /> (hold) Quickslot    ";
 	#endif
 	
 	string ConsoleToolbarTypeToString( int console_toolbar_type )
@@ -1049,26 +1093,26 @@ class Inventory: LayoutHolder
 			return "";
 			
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM_WITH_CONTAINER:
-			return open_close_container + to_hands_swap + to_inventory + equip  + micromanagment + quickslot;
+			return open_close_container + to_hands_swap + to_inventory + equip  + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM_WITH_CONTAINER_NO_EQUIP:
-			return open_close_container + to_hands_swap + to_inventory  + micromanagment + quickslot;
+			return open_close_container + to_hands_swap + to_inventory  + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM:
-			return to_hands_swap + to_inventory + equip  + micromanagment + quickslot;
+			return to_hands_swap + to_inventory + equip  + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM_NO_EQUIP:
-			return to_hands_swap + to_inventory  + micromanagment + quickslot;
+			return to_hands_swap + to_inventory  + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM_WITH_QUANTITY:
-			return to_hands_swap + to_inventory  + micromanagment + quickslot;
+			return to_hands_swap + to_inventory  + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_EMPTY_ITEM:
 			return "";
 			
 			case ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY:
 			return "";
 			case ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM:
-			return to_hands_swap + to_inventory + equip + micromanagment + quickslot;
+			return to_hands_swap + to_inventory + equip + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_NO_EQUIP:
-			return to_hands_swap + to_inventory + micromanagment + quickslot;
+			return to_hands_swap + to_inventory + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY:
-			return to_hands_swap + to_inventory + split + micromanagment + quickslot;
+			return to_hands_swap + to_inventory + split + micromanagment;
 		}
 		return "";
 	}
@@ -1077,14 +1121,8 @@ class Inventory: LayoutHolder
 	void UpdateConsoleToolbar()
 	{
 #ifdef PLATFORM_CONSOLE		
-		string general_text;
 		string context_text;
 		
-		#ifdef PLATFORM_XBOX
-		general_text = "<image set=\"xbox_buttons\" name=\"LB\" />/<image set=\"xbox_buttons\" name=\"RB\" /> " + "#dayz_context_menu_switch_column" + "        <image set=\"xbox_buttons\" name=\"LT\" />/<image set=\"xbox_buttons\" name=\"RT\"/>" + "#dayz_context_menu_switch_cargo_container";
-		#else
-		general_text = "<image set=\"playstation_buttons\" name=\"L2\" />/<image set=\"playstation_buttons\" name=\"R2\" /> Switch column        <image set=\"playstation_buttons\" name=\"L1\" />/<image set=\"playstation_buttons\" name=\"R1\"/> Switch cargo container";
-		#endif
 		//context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_EQUIPMENT_SLOTS_ITEM );
 		if ( m_LeftArea.IsActive() )
 		{
@@ -1183,6 +1221,34 @@ class Inventory: LayoutHolder
 				}
 				
 				if( iwca.CanCombine() )
+				{
+					context_text += combine;
+				}
+			}
+			else if( AttachmentCategoriesContainer.Cast( m_LeftArea.GetFocusedContainer() ) )
+			{
+				AttachmentCategoriesContainer acc = AttachmentCategoriesContainer.Cast( m_LeftArea.GetFocusedContainer() );
+				if( acc.IsEmpty() )
+				{
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY );
+				}
+				else if( acc.IsItemActive() )
+				{
+					if( acc.CanEquip() )
+					{
+						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM );
+					}
+					else
+					{
+						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_NO_EQUIP );
+					}
+				}
+				else if( acc.IsItemWithQuantityActive() )
+				{
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
+				}
+				
+				if( acc.CanCombine() )
 				{
 					context_text += combine;
 				}
@@ -1295,16 +1361,47 @@ class Inventory: LayoutHolder
 				context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.HANDS_ITEM_EMPTY );
 			}
 		}
+		string general_text_left;
+		string general_text_right;
 		
-		//!!!!! Richtext string must end with character or white space (no tag elements)
+		#ifdef PLATFORM_XBOX
+			if ( m_LeftArea.IsActive() )
+			{
+				general_text_left	= "<image set=\"xbox_buttons\" name=\"LB\"/> " + "#switch_to_equipment";
+				general_text_right	= "#switch_to_hands" + " <image set=\"xbox_buttons\" name=\"RB\"/>";
+			}
+			else if ( m_RightArea.IsActive() )
+			{
+				general_text_left	= "<image set=\"xbox_buttons\" name=\"LB\"/> " + "#switch_to_hands";
+				general_text_right	= "#switch_to_vicinity" + " <image set=\"xbox_buttons\" name=\"RB\"/>";
+			}
+			else if ( m_HandsArea.IsActive() )
+			{
+				general_text_left	= "<image set=\"xbox_buttons\" name=\"LB\"/> " + "#switch_to_vicinity";
+				general_text_right	= "#switch_to_equipment" + " <image set=\"xbox_buttons\" name=\"RB\"/>";
+			}
+		#else
+			if ( m_LeftArea.IsActive() )
+			{
+				general_text_left	= "<image set=\"playstation_buttons\" name=\"L2\"/> " + "#switch_to_equipment";
+				general_text_right	= "#switch_to_hands" + " <image set=\"playstation_buttons\" name=\"R2\"/>";
+			}
+			else if ( m_RightArea.IsActive() )
+			{
+				general_text_left	= "<image set=\"playstation_buttons\" name=\"L2\"/> " + "#switch_to_hands";
+				general_text_right	= "#switch_to_vicinity" + " <image set=\"playstation_buttons\" name=\"R2\"/>";
+			}
+			else if ( m_HandsArea.IsActive() )
+			{
+				general_text_left	= "<image set=\"playstation_buttons\" name=\"L2\"/> " + "#switch_to_vicinity";
+				general_text_right	= "#switch_to_equipment" + " <image set=\"playstation_buttons\" name=\"R2\"/>";
+			}
+		#endif
+		
 		//set toolbar text
-		RichTextWidget general_toolbar = RichTextWidget.Cast( m_ConsoleToolbar.FindAnyWidget( "GeneralToolbarText" ) );
-		general_text = general_text + " ";							//richtext end-tag issue hotfix
-		general_toolbar.SetText( general_text );
-		
-		RichTextWidget context_toolbar = RichTextWidget.Cast( m_ConsoleToolbar.FindAnyWidget( "ContextToolbarText" ) );
-		context_text = context_text + " ";					//richtext end-tag issue hotfix
-		context_toolbar.SetText( context_text );
+		m_TopConsoleToolbarLeft.SetText( general_text_left + " " );
+		m_TopConsoleToolbarRight.SetText( general_text_right + " " );
+		m_BottomConsoleToolbar.SetText( context_text + " " );
 		#endif
 	}
 }

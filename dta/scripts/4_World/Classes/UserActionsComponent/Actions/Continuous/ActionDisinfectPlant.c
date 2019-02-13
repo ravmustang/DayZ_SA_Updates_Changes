@@ -42,8 +42,6 @@ class ActionDisinfectPlant: ActionContinuousBase
 
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
 	{
-		return false; // Plant infestation was temporarily disabled.
-		
 		PlantBase plant;
 		if ( Class.CastTo(plant,  target.GetObject() ) && !item.IsDamageDestroyed() )
 		{			

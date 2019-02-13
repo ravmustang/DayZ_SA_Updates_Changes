@@ -46,11 +46,17 @@ class TabberUI extends ScriptedWidgetEventHandler
 			}
 			
 			AlignTabbers( m_Root.FindAnyWidget( "TabControls" ) );
-			
+			Widget xb_controls = m_Root.FindAnyWidget( "ConsoleControls" );
 			#ifdef PLATFORM_CONSOLE
-				Widget xb_controls = m_Root.FindAnyWidget( "XboxControls" );
 				if( xb_controls )
 					xb_controls.Show( tab_count > 1 );
+			#endif
+			
+			#ifdef PLATFORM_PS4
+				ImageWidget toolbar_lb = xb_controls.FindAnyWidget( "TabLeftControl" );
+				ImageWidget toolbar_rb = xb_controls.FindAnyWidget( "TabRightControl" );
+				toolbar_lb.LoadImageFile( 0, "set:playstation_buttons image:L1" );
+				toolbar_rb.LoadImageFile( 0, "set:playstation_buttons image:R1" );
 			#endif
 		}
 	}
@@ -101,7 +107,7 @@ class TabberUI extends ScriptedWidgetEventHandler
 		tab_controls.Update();
 		
 		#ifdef PLATFORM_CONSOLE
-			m_Root.FindAnyWidget( "XboxControls" ).Show( m_Tabs.Count() > 1 );
+			m_Root.FindAnyWidget( "ConsoleControls" ).Show( m_Tabs.Count() > 1 );
 		#endif
 	}
 	

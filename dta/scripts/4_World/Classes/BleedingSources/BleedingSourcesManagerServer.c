@@ -3,10 +3,41 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 	const float TICK_INTERVAL_SEC = 3;
 	float 	m_Tick;
 	bool	m_DisableBloodLoss = false;
+	ref array<int> m_DeleteList = new array<int>;
+	
+	int STORAGE_VERSION = 103;
 	
 	protected BleedingSourceZone GetBleedingSourceZone(int bit)
 	{
 		return m_BleedingSourceZone.Get(GetSelectionNameFromBit(bit));
+	}
+	
+	int GetStorageVersion()
+	{
+		return STORAGE_VERSION;
+	}
+	
+	void RequestDeletion(int bit)
+	{
+		m_DeleteList.Insert(bit);
+	}
+	
+	override protected void AddBleedingSource(int bit)
+	{
+		m_Player.SetBleedingBits(m_Player.GetBleedingBits() | bit );
+		super.AddBleedingSource(bit);
+	}
+	
+	override protected bool RemoveBleedingSource(int bit)
+	{
+		if(!super.RemoveBleedingSource(bit))
+		{
+			Error("Failed to remove bleeding source:" + bit);
+		}
+		
+		int inverse_bit_mask = ~bit;
+		m_Player.SetBleedingBits(m_Player.GetBleedingBits() & inverse_bit_mask );
+		return true;
 	}
 	
 	void RemoveAnyBleedingSource()
@@ -17,11 +48,53 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 		RemoveBleedingSource(rightmost_bit);
 	}
 	
+	void RemoveMostSignificantBleedingSource()
+	{
+		int bit = GetMostSignificantBleedingSource();
+		RemoveBleedingSource(bit);
+	}
+	
+	int GetMostSignificantBleedingSource()
+	{
+		int bleeding_sources_bits = m_Player.GetBleedingBits();
+		
+		float highest_flow;
+		int highest_flow_bit;
+		int bit_offset;
+		
+		for(int i = 0; i < BIT_INT_SIZE; i++)
+		{
+			int bit = 1 << bit_offset;
+			
+			if( (bit & bleeding_sources_bits) != 0 )
+			{
+				BleedingSourceZone meta = GetBleedingSourceMeta(bit);
+				if(meta)
+				{
+					if( meta.GetFlowModifier() > highest_flow )
+					{
+						highest_flow = meta.GetFlowModifier();
+						highest_flow_bit = bit;
+						//Print(meta.GetSelectionName());
+					}
+				}
+			}
+			bit_offset++;
+		}
+		return highest_flow_bit;
+	}
+	
 	void OnTick(float delta_time)
 	{
 		m_Tick += delta_time;
 		if( m_Tick > TICK_INTERVAL_SEC )
 		{
+			while( m_DeleteList.Count() > 0 )
+			{
+				RemoveBleedingSource(m_DeleteList.Get(0));
+				m_DeleteList.Remove(0);
+			} 
+			
 			for(int i = 0; i < m_BleedingSources.Count(); i++)
 			{
 				m_BleedingSources.GetElement(i).OnUpdateServer(delta_time, m_DisableBloodLoss);
@@ -89,14 +162,29 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 	void OnStoreSave( ParamsWriteContext ctx )
 	{
 		//int count = m_BleedingSources.Count();
-		ctx.Write(m_Player.GetBleedingBits());
+		int active_bits = m_Player.GetBleedingBits();
+		ctx.Write(active_bits);
 		
+		int bit_offset = 0;
+		for(int i = 0; i < BIT_INT_SIZE; i++)
+		{
+			int bit = 1 << bit_offset;
+			if( (bit & active_bits) != 0 )
+			{
+				int active_time = GetBleedingSourceActiveTime(bit);
+				ctx.Write(active_time);
+			}
+			bit_offset++;
+		}
 	}
 
-	void OnStoreLoad( ParamsReadContext ctx, int version )
+	bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		int active_bits;
-		ctx.Read(active_bits);
+		if(!ctx.Read(active_bits))
+		{
+			return false;
+		}
 	
 		int bit_offset = 0;
 		for(int i = 0; i < BIT_INT_SIZE; i++)
@@ -105,9 +193,20 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 			if( (bit & active_bits) != 0 && CanAddBleedingSource(bit))
 			{
 				AddBleedingSource(bit);
+				int active_time = 0;
+				if(!ctx.Read(active_time))
+				{
+					return false;
+				}
+				else
+				{
+					SetBleedingSourceActiveTime(bit,active_time);
+				}
+				
 			}
 			bit_offset++;
 		}
+		return true;
 	}
 	
 }

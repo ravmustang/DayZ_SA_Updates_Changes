@@ -1,5 +1,6 @@
 FrameWidgetClass rootFrame {
  clipchildren 1
+ ignorepointer 0
  color 0.8824 0.8824 0.8824 0.8824
  size 1 1
  hexactpos 0
@@ -8,6 +9,7 @@ FrameWidgetClass rootFrame {
  vexactsize 0
  {
   FrameWidgetClass WindowWidget {
+   ignorepointer 0
    position 0 0
    size 1 1
    halign center_ref
@@ -44,7 +46,7 @@ FrameWidgetClass rootFrame {
      fixaspect inside
      priority 1
      {
-      ItemPreviewWidgetClass ItemFrameWidget {
+      ItemPreviewWidgetClass ItemFrameWidgetPanel {
        visible 1
        position 0.1592 0.095
        size 0.60163 0.85
@@ -54,6 +56,18 @@ FrameWidgetClass rootFrame {
        hexactsize 0
        vexactsize 0
        priority 2
+       {
+        ItemPreviewWidgetClass ItemFrameWidget {
+         position 0 0
+         size 1 1
+         halign center_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+        }
+       }
       }
       PanelWidgetClass InventoryInfoPanelWidget {
        visible 1

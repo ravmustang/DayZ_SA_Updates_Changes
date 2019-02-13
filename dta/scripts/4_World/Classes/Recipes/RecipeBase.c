@@ -211,6 +211,10 @@ class RecipeBase
 			{
 				//spawning in inventory failed, spawning on the ground instead.....
 				object = player.SpawnEntityOnGroundOnCursorDir(item_to_spawn, 0.5);
+				if( !object)
+				{
+					Error("failed to spawn entity "+item_to_spawn+" , make sure the classname exists and item can be spawned");
+				}
 			}
 			spawned_objects.Insert(ItemBase.Cast(object));
 			Debug.Log("spawning item "+item_to_spawn,"recipes");
@@ -232,6 +236,10 @@ class RecipeBase
 		for(i = 0; i < m_NumberOfResults; i++)
 		{
 			ItemBase res = results.Get(i);
+			if(!res)
+			{
+				continue;
+			}
 			
 			bool use_soft_skills = m_ResultUseSoftSkills[i];
 			

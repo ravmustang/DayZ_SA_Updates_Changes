@@ -1,14 +1,22 @@
 class ClosableContainer extends Container
 {
-	protected bool m_Closed;
-	protected EntityAI m_Entity;
+	protected ref ClosableHeader	m_ClosableHeader;
+	protected bool					m_Closed;
+	protected EntityAI				m_Entity;
 
 	void ClosableContainer( LayoutHolder parent, int sort = -1 )
 	{
-		m_Body = new array<ref LayoutHolder>;
-		m_Body.Insert( new ClosableHeader( this, "CloseButtonOnMouseButtonDown" ) );
+		m_Body				= new array<ref LayoutHolder>;
+		m_ClosableHeader	= new ClosableHeader( this, "CloseButtonOnMouseButtonDown" );
+		
+		WidgetEventHandler.GetInstance().RegisterOnMouseEnter( GetRootWidget(),  this, "EnterContainer" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( GetRootWidget(),  this, "LeaveContainer" );
+		m_Body.Insert( m_ClosableHeader );
+		
 		if( sort > -1 )
-			m_MainWidget.SetSort( sort + 2 );
+			m_RootWidget.SetSort( sort + 2 );
+		
+		m_MainWidget = m_MainWidget.FindWidget( "body" );
 	}
 
 	void Open()
@@ -44,6 +52,24 @@ class ClosableContainer extends Container
 	{
 		return !m_Closed;
 	}
+	
+	void EnterContainer()
+	{
+		PlayerContainer p = PlayerContainer.Cast( m_Parent );
+		if( p )
+		{
+			p.EnterContainer( this );
+		}
+	}
+	
+	void LeaveContainer()
+	{
+		PlayerContainer p = PlayerContainer.Cast( m_Parent );
+		if( p )
+		{
+			p.LeaveContainer( this );
+		}
+	}
 
 	override void SetLayoutName()
 	{
@@ -56,11 +82,6 @@ class ClosableContainer extends Container
 		{
 			super.OnShow();
 		}
-	}
-
-	override void Insert( LayoutHolder container )
-	{
-		m_Body.Insert( container );
 	}
 
 	override LayoutHolder Get( int x )
@@ -83,5 +104,41 @@ class ClosableContainer extends Container
 		m_Closed = true;
 		this.OnHide();
 		m_Parent.m_Parent.Refresh();
+	}
+	
+	override void SetActive( bool active )
+	{
+		super.SetActive( active );
+		m_ClosableHeader.SetActive( active );
+	}
+	
+	override float GetFocusedContainerHeight( bool contents = false )
+	{
+		float x, y;
+		if( contents && GetFocusedContainer() )
+			y = GetFocusedContainer().GetFocusedContainerHeight( contents );
+		else
+			GetRootWidget().GetScreenSize( x, y );
+		return y;
+	}
+	
+	override float GetFocusedContainerYPos( bool contents = false )
+	{
+		float x, y;
+		if( contents && GetFocusedContainer() )
+			y = GetFocusedContainer().GetFocusedContainerYPos( contents );
+		else
+			GetRootWidget().GetPos( x, y );
+		return y;
+	}
+	
+	override float GetFocusedContainerYScreenPos( bool contents = false )
+	{
+		float x, y;
+		if( contents && GetFocusedContainer() )
+			y = GetFocusedContainer().GetFocusedContainerYScreenPos( contents );
+		else
+			GetRootWidget().GetScreenPos( x, y );
+		return y;
 	}
 }

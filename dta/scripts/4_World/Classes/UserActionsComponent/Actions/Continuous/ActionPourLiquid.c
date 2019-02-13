@@ -7,29 +7,18 @@ class ActionPourLiquidCB : ActionContinuousBaseCB
 		m_ActionData.m_ActionComponent = new CAContinuousQuantityLiquidTransfer(UAQuantityConsumed.POUR_LIQUID, TIME_TO_REPEAT);
 	}
 	
-/*	override void OnAnimationEvent(int pEventID)	
+	override void OnAnimationEvent(int pEventID)	
 	{
 		super.OnAnimationEvent( pEventID );
-				
-		Bottle_Base target_vessel = Bottle_Base.Cast( m_ActionData.m_Target.GetObject());
 		
 		switch (pEventID)
 		{
 			case UA_ANIM_EVENT:			
-				if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
-				{		
-					//local singleplayer
-					target_vessel.PlayPouringSound();
-				}
-			
-				if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-				{			
-					target_vessel.PlayPouringSound();					
-				}
-			
-				if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-				{			
-					
+				if ( !GetGame().IsMultiplayer() || GetGame().IsServer() )
+				{
+					Bottle_Base vessel_in_hands = Bottle_Base.Cast( m_ActionData.m_Target.GetObject() );
+					Param1<bool> play = new Param1<bool>( true );
+					GetGame().RPCSingleParam( vessel_in_hands, SoundType.POURING, play, true );
 				}
 
 			break;
@@ -39,25 +28,14 @@ class ActionPourLiquidCB : ActionContinuousBaseCB
 	override void EndActionComponent()
 	{
 		super.EndActionComponent();
-		
-		Bottle_Base target_vessel = Bottle_Base.Cast( m_ActionData.m_Target.GetObject());
-
-		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
+				
+		if ( !GetGame().IsMultiplayer() || GetGame().IsServer() )
 		{
-			//local singleplayer
-			target_vessel.StopPouringSound();
+			Bottle_Base target_vessel = Bottle_Base.Cast( m_ActionData.m_Target.GetObject());
+			Param1<bool> play = new Param1<bool>( false );
+			GetGame().RPCSingleParam( target_vessel, SoundType.POURING, play, true );
 		}
-		
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{			
-			target_vessel.StopPouringSound();					
-		}
-		
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{		
-		
-		}
-	}*/
+	}
 };
 
 class ActionPourLiquid: ActionContinuousBase
@@ -112,28 +90,20 @@ class ActionPourLiquid: ActionContinuousBase
 			return false;
 		}
 		
-		if ( target_item && item && item.GetQuantity() > item.GetQuantityMin() && target_item.GetQuantity() < target_item.GetQuantityMax() && !player.GetLiquidTendencyDrain() && Liquid.CanFillContainer( target_item, item.GetLiquidType() ) )
+		if ( target_item && item && item.GetQuantity() > item.GetQuantityMin() && target_item.GetQuantity() < target_item.GetQuantityMax() && !player.GetLiquidTendencyDrain() && Liquid.CanFillContainer( target_item, item.GetLiquidType() ) && target_item.IsOpen() )
 		{
 			return true;
 		}
 		return false;
 	}
-	
-	override void OnExecuteServer( ActionData action_data ) 
-	{
-		Bottle_Base target_vessel = Bottle_Base.Cast( action_data.m_Target.GetObject());
-		if (target_vessel) target_vessel.PlayPouringSound();
-	}
-	
+		
 	override void OnStartServer( ActionData action_data )
 	{
 		action_data.m_Player.SetLiquidTendencyDrain(false);
 	}
 	
 	override void OnEndServer( ActionData action_data )
-	{
-		Bottle_Base target_vessel = Bottle_Base.Cast( action_data.m_Target.GetObject());
-		if (target_vessel) target_vessel.StopPouringSound();
+	{		
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

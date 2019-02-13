@@ -41,6 +41,42 @@ class TurnItemIntoItemLambda extends ReplaceItemWithNewLambda
 			Debug.LogError("TurnItemIntoItemLambda: failed to create new item","static");
 		}
 	}
+	
+	//! if attaching from att.slot to att.slot, skips the change to "ground" version. Allows for correct property transfers.
+	override void VerifyItemTypeBySlotType ()
+	{
+		if (m_NewLocation.GetType() == InventoryLocationType.ATTACHMENT && m_OldItem.ConfigIsExisting("ChangeIntoOnAttach"))
+		{
+			string str;
+			int idx = -1;
+			TStringArray inventory_slots = new TStringArray;
+			TIntArray inventory_slots_idx = new TIntArray;
+			TStringArray attach_types = new TStringArray;
+			
+			m_OldItem.ConfigGetTextArray("inventorySlot",inventory_slots);
+			if (inventory_slots.Count() < 1) //is string
+			{
+				inventory_slots_idx.Insert(InventorySlots.GetSlotIdFromString(m_OldItem.ConfigGetString("inventorySlot")));
+				attach_types.Insert(m_OldItem.ConfigGetString("ChangeIntoOnAttach"));
+			}
+			else //is array
+			{
+				inventory_slots_idx.Clear();
+				for (int i = 0; i < inventory_slots.Count(); i++)
+				{
+					inventory_slots_idx.Insert(InventorySlots.GetSlotIdFromString(inventory_slots.Get(i)));
+				}
+				m_OldItem.ConfigGetTextArray("ChangeIntoOnAttach",attach_types);
+			}
+		
+			idx = m_NewLocation.GetSlot();
+			str = attach_types.Get(inventory_slots_idx.Find(idx));
+			if (str != "")
+			{
+				m_NewItemType = str;
+			}
+		}
+	}
 };
 
 class TurnItemIntoItemLambdaAnimSysNotifyLambda extends TurnItemIntoItemLambda
@@ -225,6 +261,7 @@ class MiscGameplayFunctions
 				if (drop)
 				{
 					player.LocalDropEntity(child);
+					GetGame().RemoteObjectTreeCreate(child);
 					result = TransferInventoryResult.DroppedSome;
 				}
 			}
@@ -392,8 +429,8 @@ class MiscGameplayFunctions
 	
 	static bool GetProjectedCursorPos3d (out vector position, Weapon_Base weapon)
 	{
-		vector usti_hlavne_position = weapon.GetSelectionPosition( "usti hlavne" );
-		vector konec_hlavne_position = weapon.GetSelectionPosition( "konec hlavne" );
+		vector usti_hlavne_position = weapon.GetSelectionPositionMS( "usti hlavne" );
+		vector konec_hlavne_position = weapon.GetSelectionPositionMS( "konec hlavne" );
 		vector end_point = weapon.ModelToWorld(usti_hlavne_position);
 		vector begin_point = weapon.ModelToWorld(konec_hlavne_position);
 		vector contact_dir;

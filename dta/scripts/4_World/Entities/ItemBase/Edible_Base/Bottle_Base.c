@@ -1,3 +1,9 @@
+enum SoundType
+{
+	POURING			= 1,
+	EMPTYING		= 0,	
+}
+
 class Bottle_Base extends Edible_Base
 {
 	//Particles
@@ -20,11 +26,8 @@ class Bottle_Base extends Edible_Base
 	//Sounds
 	protected SoundOnVehicle	m_SoundCooking;
 	protected string			m_SoundPlaying = "";
-	ref protected EffectSound 	m_PouringSound;
+	ref protected EffectSound 	m_PouringLoopSound;
 	ref protected EffectSound 	m_EmptyingLoopSound;
-	ref protected EffectSound 	m_EmptyingEndSound;
-	protected bool 				m_IsPouring;
-	protected bool 				m_IsEmptying;
 	
 	//cooking data
 	protected CookingMethodType 	m_CookingMethod;
@@ -47,14 +50,8 @@ class Bottle_Base extends Edible_Base
 		
 	void Bottle_Base()
 	{
-		m_PouringSound  	= new EffectSound;
+		m_PouringLoopSound  	= new EffectSound;
 		m_EmptyingLoopSound = new EffectSound;
-		m_EmptyingEndSound  = new EffectSound;
-		m_IsPouring 		= false;
-		m_IsEmptying 		= false;
-		
-		RegisterNetSyncVariableBool("m_IsPouring");
-		RegisterNetSyncVariableBool("m_IsEmptying");
 		
 		RegisterNetSyncVariableInt( "m_CookingMethod", CookingMethodType.NONE, CookingMethodType.COUNT );
 		RegisterNetSyncVariableBool("m_CookingIsDone");
@@ -64,9 +61,8 @@ class Bottle_Base extends Edible_Base
 	
 	void ~Bottle_Base()
 	{
-		SEffectManager.DestroySound( m_PouringSound );
+		SEffectManager.DestroySound( m_PouringLoopSound );
 		SEffectManager.DestroySound( m_EmptyingLoopSound );
-		SEffectManager.DestroySound( m_EmptyingEndSound );
 	}
 	
 	override void EEDelete( EntityAI parent )
@@ -92,29 +88,52 @@ class Bottle_Base extends Edible_Base
 		}
 	}
 	
+	override void OnRPC(PlayerIdentity sender, int rpc_type,ParamsReadContext  ctx) 
+	{
+		super.OnRPC(sender, rpc_type, ctx);
+		
+		ref Param1<bool> p = new Param1<bool>(false);
+				
+		if (ctx.Read(p))
+		{
+			bool play = p.param1;
+		}
+		
+		switch(rpc_type)
+		{
+			case SoundType.POURING:
+			
+				if ( play )
+				{
+					PlayPouringLoopSound();
+				}
+				
+				if ( !play )
+				{
+					StopPouringLoopSound();
+				}
+			
+			break;
+			
+			case SoundType.EMPTYING:
+				
+				if ( play )
+				{
+					PlayEmptyingLoopSound();
+				}
+				
+				if ( !play )
+				{
+					StopEmptyingLoopSound();
+				}
+			
+			break;
+		}
+	}
+	
 	override void OnVariablesSynchronized()
 	{
 		super.OnVariablesSynchronized();
-				
-		if ( GetIsPouring() && !m_PouringSound.IsSoundPlaying() )
-		{
-			PlayPouringSound();
-		}
-		
-		if ( !GetIsPouring() && m_PouringSound.IsSoundPlaying() )
-		{
-			StopPouringSound();
-		}
-		
-		if ( GetIsEmptying() && !m_EmptyingLoopSound.IsSoundPlaying() )
-		{
-			PlayEmptyingLoopSound();
-		}
-		
-		if ( !GetIsEmptying() && m_EmptyingLoopSound.IsSoundPlaying() )
-		{
-			StopEmptyingSound();
-		}
 		
 		//refresh audio visuals
 		if ( m_CookingMethod != CookingMethodType.NONE )
@@ -315,127 +334,35 @@ class Bottle_Base extends Edible_Base
 		}
 	}	
 		
-	void PlayPouringSound()
+	void PlayPouringLoopSound()
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		if ( !m_PouringLoopSound.IsSoundPlaying() )
 		{
-			m_PouringSound = SEffectManager.PlaySound( GetPouringSoundset(), GetPosition(), 0, 0, true );
-		}
-		
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{
-			SetIsPouring( true );
-		}
-		
-		//local singleplayer
-		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{		
-			if ( !GetIsPouring() )
-			{
-				SetIsPouring( true );
-				m_PouringSound = SEffectManager.PlaySound( GetPouringSoundset(), GetPosition(), 0, 0, true );
-			}
+			m_PouringLoopSound = SEffectManager.PlaySound( GetPouringSoundset(), GetPosition() );
 		}
 	}
 	
-	void StopPouringSound()
+	void StopPouringLoopSound()
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{
-			m_PouringSound.SoundStop();
-		}
+		m_PouringLoopSound.SoundStop();
+	}
 		
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{
-			SetIsPouring( false );
-		}
-		
-		//local singleplayer
-		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{	
-			if ( GetIsPouring() )
-			{
-				SetIsPouring( false );
-				m_PouringSound.SoundStop();
-			}
-		}
-	}
-	
-	void SetIsPouring( bool is_pouring )
-	{
-		m_IsPouring = is_pouring;
-		SetSynchDirty();
-	}
-	
-	bool GetIsPouring()
-	{
-		return m_IsPouring;
-	}
-	
-	string GetPouringSoundset()
-	{
-		
-	}
-	
 	void PlayEmptyingLoopSound()
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
+		if ( !m_EmptyingLoopSound.IsSoundPlaying() )
 		{
-			m_EmptyingLoopSound = SEffectManager.PlaySound( GetEmptyingLoopSoundset(), GetPosition(), 0, 0, true );
-		}
-		
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{
-			SetIsEmptying( true );
-		}
-		
-		//local singleplayer
-		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{		
-			if ( !GetIsEmptying() )
-			{
-				SetIsEmptying( true );
-				m_EmptyingLoopSound = SEffectManager.PlaySound( GetEmptyingLoopSoundset(), GetPosition(), 0, 0, true );
-			}
+			m_EmptyingLoopSound = SEffectManager.PlaySound( GetEmptyingLoopSoundset(), GetPosition() );
 		}
 	}
 	
-	void StopEmptyingSound()
+	void StopEmptyingLoopSound()
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
-		{
-			m_EmptyingLoopSound.SoundStop();
-			m_EmptyingEndSound = SEffectManager.PlaySound( GetEmptyingEndSoundset(), GetPosition() );
-		}
+		m_EmptyingLoopSound.SoundStop();
+				
+		EffectSound sound =	SEffectManager.PlaySound( GetEmptyingEndSoundset(), GetPosition() );
+		sound.SetSoundAutodestroy( true );
+	}
 		
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{
-			SetIsEmptying( false );
-		}
-		
-		//local singleplayer
-		if ( !GetGame().IsMultiplayer() && GetGame().IsServer() )
-		{	
-			if ( GetIsEmptying() )
-			{
-				SetIsEmptying( false );
-				m_EmptyingLoopSound.SoundStop();
-				m_EmptyingEndSound = SEffectManager.PlaySound( GetEmptyingEndSoundset(), GetPosition() );
-			}
-		}
-	}
-	
-	void SetIsEmptying( bool is_emptying )
-	{
-		m_IsEmptying = is_emptying;
-		SetSynchDirty();
-	}
-	
-	bool GetIsEmptying()
-	{
-		return m_IsEmptying;
-	}
-	
 	string GetEmptyingLoopSoundset()
 	{		
 		vector pos = GetPosition();
@@ -479,34 +406,18 @@ class Bottle_Base extends Edible_Base
 		
 		return sound_set;
 	}
+
+	string GetPouringSoundset() {}
 	
-	string GetEmptyingLoopSoundsetHard()
-	{
-		
-	}
+	string GetEmptyingLoopSoundsetHard() {};
 	
-	string GetEmptyingLoopSoundsetSoft()
-	{
-		
-	}
+	string GetEmptyingLoopSoundsetSoft() {};
 	
-	string GetEmptyingLoopSoundsetWater()
-	{
-		
-	}
+	string GetEmptyingLoopSoundsetWater() {};
 	
-	string GetEmptyingEndSoundsetHard()
-	{
-		
-	}
+	string GetEmptyingEndSoundsetHard() {};
 	
-	string GetEmptyingEndSoundsetSoft()
-	{
-		
-	}
+	string GetEmptyingEndSoundsetSoft() {};
 	
-	string GetEmptyingEndSoundsetWater()
-	{
-		
-	}
+	string GetEmptyingEndSoundsetWater() {};
 }

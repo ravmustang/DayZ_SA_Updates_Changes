@@ -120,21 +120,33 @@ class Fence extends BaseBuildingBase
 		ctx.Write( m_IsOpened );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
-		
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
+
+		//--- Fence data ---
 		//has gate
-		ctx.Read( m_HasGate );			
+		ConstructionPart gate_part = GetConstruction().GetGateConstructionPart();
+		if ( !ctx.Read( m_HasGate ) )
+		{
+			m_HasGate = gate_part.IsBuilt();
+		}		
 		
 		//is opened
-		ctx.Read( m_IsOpened );
+		if ( !ctx.Read( m_IsOpened ) )
+		{
+			m_IsOpened = false;
+		}
+		//---
 		
 		//update gate state visual
 		if ( m_IsOpened )
 		{
 			OpenFence();
 		}
+		
+		return true;
 	}
 	
 	override void OnVariablesSynchronized()
@@ -212,6 +224,18 @@ class Fence extends BaseBuildingBase
 	//--- ATTACHMENT & CONDITIONS
 	override bool CanReceiveAttachment( EntityAI attachment, int slotId )
 	{
+		//manage action initiator (AT_ATTACH_TO_CONSTRUCTION)
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+		{
+			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+			ConstructionActionData construction_action_data = player.GetConstructionActionData();
+			
+			//reset action initiator
+			construction_action_data.SetActionInitiator( NULL );
+		}
+		//			
+		
+		//conditions
 		if ( attachment.Type() != ATTACHMENT_WOODEN_LOG )
 		{
 			if ( !HasBase() )

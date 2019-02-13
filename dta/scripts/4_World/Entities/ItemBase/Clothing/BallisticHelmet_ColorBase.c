@@ -16,4 +16,8 @@ class BallisticHelmet_ColorBase extends ClothingBase
 		}
 		return false;
 	}
-}
+};
+
+class BallisticHelmet_Green extends BallisticHelmet_ColorBase {};
+class BallisticHelmet_Black extends  BallisticHelmet_ColorBase {};
+class BallisticHelmet_UN extends BallisticHelmet_ColorBase {};

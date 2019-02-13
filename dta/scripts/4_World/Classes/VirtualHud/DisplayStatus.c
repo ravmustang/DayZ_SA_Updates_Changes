@@ -40,20 +40,22 @@ class VirtualHud
 
 		// !!!!!! don't add new stuff unless you really really REALLY know what you're doing !!!!!!
 		RegisterElement(new BadgeStuffed);// size 2
-		RegisterElement(new BadgeWet);// size 2
-		RegisterElement(new BadgeSick);// size 2
-		RegisterElement(new BadgePoisoned);// size 2
-		RegisterElement(new BadgeFracture);// size 2
+		RegisterElement(new BadgeWet);// size 1
+		RegisterElement(new BadgeSick);// size 1
+		RegisterElement(new BadgePills);// size 1
+		RegisterElement(new BadgePoisoned);// size 1
+		RegisterElement(new BadgeFracture);// size 1
 		RegisterElement(new TendencyHealth);// size 6
 		RegisterElement(new TendencyBlood);// size 6
 		RegisterElement(new TendencyTemperature);// size 6
-		// sum 28/32
+		// sum 25/32
 		RegisterElement(new TendencyHunger);// size 6
 		RegisterElement(new TendencyThirst);// size 6
 		RegisterElement(new TendencyBacteria);// size 6
 		// sum 18/32
 
 		RegisterElement(new ElementStance);// size 0(client only)
+		RegisterElement(new BadgeBleeding);// size 0(client only)
 
 		mission = GetGame().GetMission();
 		if ( mission )
@@ -61,6 +63,7 @@ class VirtualHud
 			m_Hud = mission.GetHud();
 		}
 	}
+	
 	
 	void OnScheduledTick()
 	{

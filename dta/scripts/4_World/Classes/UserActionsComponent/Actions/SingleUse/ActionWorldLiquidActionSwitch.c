@@ -20,15 +20,18 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 	override string GetText()
 	{
 		//return "#switch_to" + " " + m_switch_to;
-		if (m_switch_to)
+		if (!m_switch_to)
 			return  "#switch_to_liquid_drain";
-		return "switch_to_liquid_pour";
+		return "#switch_to_liquid_pour";
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		ItemBase target_item = ItemBase.Cast(target.GetObject());
-		if ( target_item && item && target_item.IsKindOf("Bottle_Base") && item.IsKindOf("Bottle_Base") && !GetGame().IsInventoryOpen() ) //TODO find better condition than IsKindOf
+		if (Barrel_ColorBase.Cast(target_item) && !target_item.IsOpen())
+			return false;
+		
+		if ( target_item && item && Liquid.CanFillContainer( item, target_item.GetLiquidType(),true ) && Liquid.CanFillContainer( target_item, item.GetLiquidType(), true ) && !GetGame().IsInventoryOpen() ) //TODO find better condition than IsKindOf
 		{
 			if ( target_item.GetQuantity() > target_item.GetQuantityMin() && item.GetQuantity() < item.GetQuantityMax() && !player.GetLiquidTendencyDrain() && Liquid.CanFillContainer( item, target_item.GetLiquidType() ) )
 			{

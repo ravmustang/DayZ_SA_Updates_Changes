@@ -45,7 +45,7 @@ const int IDC_INT_EXIT				= 107;
 
 const int MENU_ANY									= 1;
 const int MENU_NONE									= 2;
-const int MENU_ASSIGNMENT							= 3;
+//const int MENU_***								= 3; // removed - can be recycled to something else
 const int MENU_UNKNOWN								= 4;
 const int MENU_CHARACTER							= 5;
 const int MENU_CHAT									= 6;

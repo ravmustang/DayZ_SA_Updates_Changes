@@ -96,7 +96,7 @@ class MainMenu extends UIScriptedMenu
 		#endif
 		#ifdef PLATFORM_XBOX
 			m_CustomizeCharacter.Show( true );
-			m_CustomizeCharacter.SetText( "#main_menu_configure" );
+			m_CustomizeCharacter.SetText( "#layout_xbox_ingame_menu_options" );
 			m_PlayVideo.Show( true );
 		#endif
 		
@@ -129,9 +129,9 @@ class MainMenu extends UIScriptedMenu
 		
 		#ifdef PLATFORM_PS4
 			ImageWidget toolbar_a = layoutRoot.FindAnyWidget( "SelectIcon" );
-			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
+			ImageWidget toolbar_y = layoutRoot.FindAnyWidget( "ChooseAccount" );
 			toolbar_a.LoadImageFile( 0, "set:playstation_buttons image:cross" );
-			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:circle" );
+			toolbar_y.Show( false );
 		#endif
 		
 		Refresh();
@@ -148,6 +148,11 @@ class MainMenu extends UIScriptedMenu
 	
 	void UpdateNewsFeed()
 	{
+		layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
+		layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
+		layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
+		
+		/*
 		#ifdef PLATFORM_XBOX
 			layoutRoot.FindAnyWidget( "news_feed_root" ).Show( false );
 		
@@ -172,6 +177,7 @@ class MainMenu extends UIScriptedMenu
 			layoutRoot.FindAnyWidget( "news_feed_root_xbox" ).Show( false );
 			layoutRoot.FindAnyWidget( "news_feed_root_xbox_trial" ).Show( false );
 		#endif
+		*/
 	}
 	
 	override bool OnMouseButtonDown( Widget w, int x, int y, int button )
@@ -389,10 +395,12 @@ class MainMenu extends UIScriptedMenu
 			version = "#main_menu_version" + " " + version;
 		#endif
 		m_Version.SetText( version );
-	}
+	}	
 	
 	override void OnShow()
 	{
+		GetDayZGame().GetBacklit().MainMenu_OnShow();
+	
 		#ifdef PLATFORM_CONSOLE
 			ColorRed( m_Play );
 		#else
@@ -410,26 +418,26 @@ class MainMenu extends UIScriptedMenu
 	
 	override void OnHide()
 	{
+		GetDayZGame().GetBacklit().MainMenu_OnHide();
 		//super.OnHide();
 	}
 
 	override void Update(float timeslice)
 	{
 		#ifndef PLATFORM_CONSOLE
-		if ( GetGame().GetInput().GetActionDown(UAUIBack, false) && g_Game.GetLoadState() != DayZGameState.CONNECTING && !GetGame().GetUIManager().IsDialogVisible() )
+		if ( GetGame().GetInput().GetActionDown("UAUIBack", false) && g_Game.GetLoadState() != DayZGameState.CONNECTING && !GetGame().GetUIManager().IsDialogVisible() )
 		{
 				Exit();
 		}
 		#endif
-		#ifdef PLATFORM_CONSOLE
-		if ( GetGame().GetInput().GetActionDown(UAUICtrlY, false) )
+		#ifdef PLATFORM_XBOX
+		if ( GetGame().GetInput().GetActionDown("UAUICtrlY",false) )
 		{
 			BiosUserManager user_manager = GetGame().GetUserManager();
 			if( user_manager )
 			{
 				g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
 				#ifndef PLATFORM_WINDOWS
-				//GetGame().GetInput().ResetActiveGamepad();
 				user_manager.SelectUser( null );
 				#endif
 				GetGame().GetUIManager().Back();
@@ -480,7 +488,11 @@ class MainMenu extends UIScriptedMenu
 			m_ScenePC.GetIntroCharacter().SaveCharName();
 		}*/
 		
-		EnterScriptedMenu(MENU_SERVER_BROWSER);
+		//#ifdef NEW_UI
+			EnterScriptedMenu(MENU_SERVER_BROWSER);
+		//#else
+		//	g_Game.GetUIManager().EnterServerBrowser(this);
+		//#endif
 		
 		//saves demounit for further use
 		if (m_ScenePC && m_ScenePC.GetIntroCharacter() && m_ScenePC.GetIntroCharacter().GetCharacterObj().GetInventory().FindAttachment(InventorySlots.BODY) && m_ScenePC.GetIntroCharacter().GetCharacterID() == -1)
@@ -638,7 +650,15 @@ class MainMenu extends UIScriptedMenu
 		}
 		else
 		{
-			EnterScriptedMenu(MENU_SERVER_BROWSER);
+			#ifdef NEW_UI
+				EnterScriptedMenu(MENU_SERVER_BROWSER);
+			#else
+				#ifdef PLATFORM_CONSOLE
+					EnterScriptedMenu(MENU_SERVER_BROWSER);
+				#else
+					g_Game.GetUIManager().EnterServerBrowser(this);
+				#endif
+			#endif
 		}
 	}
 	

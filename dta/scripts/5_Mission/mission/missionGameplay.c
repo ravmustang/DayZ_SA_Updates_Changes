@@ -258,9 +258,9 @@ class MissionGameplay extends MissionBase
 
 #ifdef PLATFORM_CONSOLE
 		//Quick Reload Weapon
-		if ( !menu && input.GetActionDown( UAQuickReload, false ) )
+		if ( !menu && input.GetActionDown("UAQuickReload",false) )
 		{
-			if ( !GetGame().IsInventoryOpen() && playerPB && !playerPB.GetActionManager().FindActionTarget().GetObject() )
+			if ( !GetGame().IsInventoryOpen() && playerPB )
 			{
 				EntityAI entity_hands = playerPB.GetHumanInventory().GetEntityInHands();
 				
@@ -271,68 +271,20 @@ class MissionGameplay extends MissionBase
 			}
 		}
 
-		//Switch beween weapons in quickslots 
-		if( !menu && input.GetActionDown( UAUIRadialMenuPick, false ) )
-		{
-			if ( !GetGame().IsInventoryOpen() )
-			{
-				EntityAI entity_in_hands = playerPB.GetHumanInventory().GetEntityInHands();
-				EntityAI quickbar_entity;
-				int quickbar_index = 0;
-				
-				if ( entity_in_hands )
-				{			
-					int quickbar_entity_hands_index = playerPB.FindQuickBarEntityIndex( entity_in_hands );
-					
-					if ( quickbar_entity_hands_index > -1 && quickbar_entity_hands_index < MAX_QUICKBAR_SLOTS_COUNT - 1 )	//(0->8)
-					{
-						quickbar_index = quickbar_entity_hands_index + 1;
-					}
-				}
-
-				//find next weapon
-				for ( int iter = 0; iter < MAX_QUICKBAR_SLOTS_COUNT; ++iter )
-				{
-					quickbar_entity = playerPB.GetQuickBarEntity( quickbar_index );
-					
-					if ( quickbar_entity && ( quickbar_entity.IsWeapon() || ( quickbar_entity.IsMeleeWeapon() && !quickbar_entity.IsMagazine() ) ) )
-					{
-						break;
-					}
-					
-					quickbar_index += 1;
-					if ( quickbar_index > MAX_QUICKBAR_SLOTS_COUNT - 1 )
-					{
-						quickbar_index = 0;	//reset
-					}
-				}
-				
-				//swap
-				int slot_id;
-				if ( quickbar_index > -1 )
-				{
-					slot_id = quickbar_index + 1;
-					if ( slot_id == MAX_QUICKBAR_SLOTS_COUNT )
-					{
-						slot_id = 0;
-					}
-					
-					playerPB.RadialQuickBarSingleUse( slot_id );
-				}
-			}
-		}
-
 		//Radial quickbar
-		if(input.GetActionDown(UAUIQuickbarRadialOpen, false))
+		if( input.GetActionDown("UAUIQuickbarRadialOpen",false) )
 		{
 			//open gestures menu
-			if ( !GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
+			if ( !playerPB.IsRaised() && !playerPB.IsInProne() )
 			{
-				RadialQuickbarMenu.OpenMenu();
+				if ( !GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
+				{
+					RadialQuickbarMenu.OpenMenu();
+				}	
 			}
 		}
 		
-		if(input.GetActionUp(UAUIQuickbarRadialOpen, false))
+		if( input.GetActionUp("UAUIQuickbarRadialOpen",false) )
 		{
 			//close gestures menu
 			if ( GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
@@ -342,7 +294,7 @@ class MissionGameplay extends MissionBase
 		}
 		
 		//Radial Quickbar from inventory
-		if( GetGame().GetInput().GetActionUp( UAUIQuickbarRadialInventoryOpen, false ) )
+		if( GetGame().GetInput().GetActionUp("UAUIQuickbarRadialInventoryOpen",false) )
 		{
 			//close radial quickbar menu
 			if ( GetGame().GetUIManager().IsMenuOpen( MENU_RADIAL_QUICKBAR ) )
@@ -351,19 +303,56 @@ class MissionGameplay extends MissionBase
 				RadialQuickbarMenu.CloseMenu();
 				RadialQuickbarMenu.SetItemToAssign( NULL );
 			}
-		}		
+		}
+		
+		//Special behaviour for leaning [CONSOLE ONLY]
+		if ( playerPB )
+		{
+			if ( playerPB.IsRaised() || playerPB.IsInProne() )
+			{
+				GetUApi().GetInputByName( "UALeanLeft" 	).Unlock();
+				GetUApi().GetInputByName( "UALeanRight" ).Unlock();
+			}
+			else
+			{
+				GetUApi().GetInputByName( "UALeanLeft" 	).Lock();
+				GetUApi().GetInputByName( "UALeanRight" ).Lock();	
+			}		
+		}
+		
+		//Special behaviour for freelook & zeroing [CONSOLE ONLY]
+		if ( playerPB )
+		{
+			if ( playerPB.IsRaised() )
+			{
+				GetUApi().GetInputByName( "UALookAround" 	).Lock();		//disable freelook
+				
+				GetUApi().GetInputByName( "UAZeroingUp" 	).Unlock();		//enable zeroing
+				GetUApi().GetInputByName( "UAZeroingDown" 	).Unlock();
+			}
+			else
+			{
+				GetUApi().GetInputByName( "UALookAround" 	).Unlock();	//enable freelook
+				
+				GetUApi().GetInputByName( "UAZeroingUp" 	).Lock();		//disable zeroing
+				GetUApi().GetInputByName( "UAZeroingDown" 	).Lock();
+			}		
+		}
 #endif
 		//Gestures
-		if(input.GetActionDown(UAUIGesturesOpen, false))
+		if( input.GetActionDown("UAUIGesturesOpen",false) )
 		{
 			//open gestures menu
-			if ( !GetUIManager().IsMenuOpen( MENU_GESTURES ) )
+			if ( !playerPB.IsRaised() && !playerPB.IsInProne() )
 			{
-				GesturesMenu.OpenMenu();
+				if ( !GetUIManager().IsMenuOpen( MENU_GESTURES ) )
+				{
+					GesturesMenu.OpenMenu();
+				}
 			}
 		}
 		
-		if(input.GetActionUp(UAUIGesturesOpen, false))
+		if( input.GetActionUp("UAUIGesturesOpen",false) )
 		{
 			//close gestures menu
 			if ( GetUIManager().IsMenuOpen( MENU_GESTURES ) )
@@ -373,7 +362,7 @@ class MissionGameplay extends MissionBase
 		}
 		
 		//if(GetUApi().GetInputByName("UADropitem").LocalPress())
-		/*if(input.GetActionDown(UADropitem, false))
+		/*if( input.GetActionDown("UADropitem",false) )
 		{
 			//drops item
 			if (playerPB && playerPB.GetItemInHands() && !GetUIManager().GetMenu())
@@ -401,7 +390,7 @@ class MissionGameplay extends MissionBase
 			
 		#endif
 		
-			if( input.GetActionDown(UAGear, false ) )
+			if( input.GetActionDown("UAGear",false) )
 			{
 				if( !inventory && playerPB.CanManipulateInventory() )
 				{
@@ -413,7 +402,7 @@ class MissionGameplay extends MissionBase
 				}
 			}
 
-			if (input.GetActionDown(UAChat, false))
+			if( input.GetActionDown("UAChat",false) )
 			{
 				ChatInputMenu chat = ChatInputMenu.Cast( m_UIManager.FindMenu(MENU_CHAT) );		
 				if( menu == NULL )
@@ -422,14 +411,14 @@ class MissionGameplay extends MissionBase
 				}
 			}
 			
-			if ( input.GetActionDown( UAUIQuickbarToggle, false) )
+			if( input.GetActionDown("UAUIQuickbarToggle",false) )
 			{
 				SetActionDownTime( GetGame().GetTime() );
 				bool hud_state = m_Hud.GetHudState();
 				m_ToggleHudTimer.Run( 0.3, m_Hud, "ToggleHud", new Param1<bool>( !hud_state ) );
 			}
 			
-			if ( input.GetActionUp( UAUIQuickbarToggle, false) )
+			if( input.GetActionUp("UAUIQuickbarToggle",false) )
 			{
 				SetActionUpTime( GetGame().GetTime() );
 				
@@ -451,7 +440,7 @@ class MissionGameplay extends MissionBase
 				m_ToggleHudTimer.Stop();
 			}
 			
-			if ( g_Game.GetInput().GetActionDown( UAZeroingUp, false) || g_Game.GetInput().GetActionDown( UAZeroingDown, false) || g_Game.GetInput().GetActionDown( UAToggleWeapons, false) )
+			if ( g_Game.GetInput().GetActionDown("UAZeroingUp",false) || g_Game.GetInput().GetActionDown("UAZeroingDown",false) || g_Game.GetInput().GetActionDown("UAToggleWeapons",false) )
 			{
 
 				m_Hud.ZeroingKeyPress();
@@ -461,12 +450,12 @@ class MissionGameplay extends MissionBase
 			{
 				m_ActionMenu.Refresh();
 				
-				if (input.GetActionDown(UANextAction, false))
+				if (input.GetActionDown("UANextAction",false))
 				{
 					m_ActionMenu.NextAction();
 				}
 				
-				if (input.GetActionDown(UAPrevAction, false))
+				if (input.GetActionDown("UAPrevAction",false))
 				{
 					m_ActionMenu.PrevAction();
 				}
@@ -479,12 +468,12 @@ class MissionGameplay extends MissionBase
 			//hologram rotation
 			if (menu == NULL && playerPB.IsPlacingLocal())
 			{
-				if (input.GetActionUp(UANextAction, false))
+				if( input.GetActionUp("UANextAction",false) )
 				{
 					playerPB.GetHologramLocal().SubtractProjectionRotation(15);
 				}
 				
-				if (input.GetActionUp(UAPrevAction, false))
+				if( input.GetActionUp("UAPrevAction",false) )
 				{
 					playerPB.GetHologramLocal().AddProjectionRotation(15);
 				}
@@ -531,18 +520,18 @@ class MissionGameplay extends MissionBase
 
 				if ( IsPaused() )
 				{
-					if( input.GetActionDown(UAUIBack, false) )
+					if( input.GetActionDown("UAUIBack",false) )
 					{
 						Continue();						
 					}
-					else if( input.GetActionDown(UAUIMenu, false) )
+					else if( input.GetActionDown("UAUIMenu",false) )
 					{
 						Continue();
 					}
 				}
 				else if ( menu == inventory )
 				{
-					if(input.GetActionDown(UAUIBack, false))
+					if(input.GetActionDown("UAUIBack",false))
 					{
 						if( !ItemManager.GetInstance().GetSelectedItem() )
 						{
@@ -552,14 +541,14 @@ class MissionGameplay extends MissionBase
 				}
 				else if( menu == inspect )
 				{
-					if(input.GetActionDown(UAGear, false))
+					if(input.GetActionDown("UAGear",false))
 					{
 						if( ItemManager.GetInstance().GetSelectedItem() == NULL )
 						{
 							HideInventory();
 						}
 					}
-					else if(input.GetActionDown(UAUIBack, false))
+					else if(input.GetActionDown("UAUIBack",false))
 					{
 						if( ItemManager.GetInstance().GetSelectedItem() == NULL )
 						{
@@ -567,8 +556,11 @@ class MissionGameplay extends MissionBase
 						}
 					}
 				}
-				else if(input.GetActionDown(UAUIBack, false))
+				else if(input.GetActionDown("UAUIBack",false))
 				{
+					if ( menu == quickbar_menu ) return;		//workaround until context input are fixed
+					if ( menu == gestures_menu ) return;
+					
 					m_UIManager.Back();
 					PlayerControlEnable();
 				}
@@ -578,17 +570,17 @@ class MissionGameplay extends MissionBase
 				}
 				else if(menu == gestures_menu && !m_ControlDisabled)
 				{
-					PlayerMouseControlDisable();
+					PlayerMouseControlDisableRadial();
 					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
 				}
 				else if(menu == quickbar_menu && !m_ControlDisabled)
 				{
-					PlayerMouseControlDisableQuickslot();
+					PlayerMouseControlDisableRadial();
 					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
 				}
 				
 			}
-			else if (input.GetActionDown(UAUIMenu, false))
+			else if (input.GetActionDown("UAUIMenu",false))
 			{
 				Pause();
 				PlayerControlDisable();
@@ -730,40 +722,32 @@ class MissionGameplay extends MissionBase
 	override void PlayerControlEnable()
 	{
 		//Print("Enabling Controls");
-#ifdef WIP_INPUTS
 		GetUApi().ActivateGroup("infantry");
-#endif	
 		m_ControlDisabled = false;	
 	}
 
 	override void PlayerControlDisable()
 	{
 		//Print("Disabling Controls");
-#ifdef WIP_INPUTS
-			GetUApi().ActivateExclude("inventory");
-			GetUApi().ActivateGroup("infantry");
-#endif
+		GetUApi().ActivateExclude("inventory");
+		GetUApi().ActivateGroup("infantry");
 		m_ControlDisabled = true;
 	}
 	
-	void PlayerMouseControlDisableQuickslot()
+	void PlayerMouseControlDisableRadial()
 	{
 		//Print("Disabling Mouse Controls Quickslot");
-#ifdef WIP_INPUTS
-			GetUApi().ActivateExclude("radialmenu");
-			GetUApi().ActivateExclude("inventory");
-			GetUApi().ActivateGroup("infantry");
-#endif
+		GetUApi().ActivateExclude("radialmenu");
+		GetUApi().ActivateExclude("inventory");
+		GetUApi().ActivateGroup("infantry");
 		m_ControlDisabled = true;
 	}
 	
 	void PlayerMouseControlDisable()
 	{
 		//Print("Disabling Mouse Controls");
-#ifdef WIP_INPUTS
-			GetUApi().ActivateExclude("radialmenu");
-			GetUApi().ActivateGroup("infantry");
-#endif
+		GetUApi().ActivateExclude("radialmenu");
+		GetUApi().ActivateGroup("infantry");
 		m_ControlDisabled = true;
 	}
 
@@ -798,14 +782,14 @@ class MissionGameplay extends MissionBase
 		IngameHud hud = IngameHud.Cast( GetHud() );
 		if( hud )
 		{
-		if( inv_open )
-		{
-			hud.GetHudPanelWidget().SetPos( 0, -0.09 );
-		}
-		else
-		{
-			hud.GetHudPanelWidget().SetPos( 0, 0 );
-		}
+			if( inv_open )
+			{
+				hud.GetHudPanelWidget().SetPos( 0, -0.055 );
+			}
+			else
+			{
+				hud.GetHudPanelWidget().SetPos( 0, 0 );
+			}
 		}
 		#endif
 	}
@@ -836,21 +820,6 @@ class MissionGameplay extends MissionBase
 		
 		if (m_InventoryMenu && init)
 		{
-			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-			vector rayStart = GetGame().GetCurrentCameraPosition();
-			vector rayEnd = rayStart + GetGame().GetCurrentCameraDirection() * 1.5;
-			vector hitPos;
-			vector hitNormal;
-			int hitComponentIndex;
-			ref set<Object> hitObjects = new set<Object>;
-			DayZPhysics.RaycastRV(rayStart, rayEnd, hitPos, hitNormal, hitComponentIndex, hitObjects, NULL, player);
-			
-			Object target = NULL;
-			if( hitObjects.Count() )
-				target = hitObjects.Get(0);
-				
-			m_InventoryMenu.InitContainers(EntityAI.Cast(target));
-			
 			PlayerControlDisable();		
 		}
 	}

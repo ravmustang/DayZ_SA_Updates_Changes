@@ -1,0 +1,1 @@
+class TTSKOPants extends Clothing {};

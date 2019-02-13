@@ -6,6 +6,10 @@ ImageSetClass {
    mpix 1
    path "{1AA48F19AA1F2384}Gui/imagesets/playstation_buttons.edds"
   }
+  ImageSetTextureClass {
+   mpix 2
+   path "{60C59BB450EC9899}Gui/imagesets/playstation_buttons@2x.edds"
+  }
  }
  Images {
   ImageSetDefClass touch_pad {

@@ -30,7 +30,7 @@ FrameWidgetClass game_tab_root {
      priority 3
      "no focus" 1
      Padding 8
-     Margin 8
+     Margin 0
      "Size To Content H" 1
      "Size To Content V" 1
      Columns 1

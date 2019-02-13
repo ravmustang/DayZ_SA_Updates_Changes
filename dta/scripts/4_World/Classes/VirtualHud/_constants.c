@@ -6,6 +6,7 @@ enum eDisplayElements
 	DELM_BADGE_POISONED,
 	DELM_BADGE_FRACTURE,
 	DELM_BADGE_BLEEDING,
+	DELM_BADGE_PILLS,
 	//------------------
 	DELM_TDCY_HEALTH,
 	DELM_TDCY_BLOOD,
@@ -17,45 +18,6 @@ enum eDisplayElements
 	DELM_STANCE,
 	COUNT
 }
-
-
-/*
-// HUD badges, must be in range 1 - 99
-const int	eDisplayElements.DELM_BADGE_STUFFED		= 1;
-const int	eDisplayElements.DELM_BADGE_WET			= 2;
-const int	eDisplayElements.DELM_BADGE_SICK			= 3;
-const int	eDisplayElements.DELM_BADGE_POISONED		= 4;
-const int	eDisplayElements.DELM_BADGE_FRACTURE		= 5;
-const int	eDisplayElements.DELM_BADGE_BLEEDING		= 6;
-
-// HUD tendencies, must be in range 100 - 199
-const int	eDisplayElements.DELM_TDCY_HEALTH		= 100;
-const int	eDisplayElements.DELM_TDCY_BLOOD			= 101;
-const int	eDisplayElements.DELM_TDCY_TEMPERATURE	= 102;
-const int	eDisplayElements.DELM_TDCY_ENERGY 		= 103;
-const int	eDisplayElements.DELM_TDCY_WATER			= 104;
-const int	eDisplayElements.DELM_TDCY_BACTERIA		= 105;
-
-// HUD notifiers, must be in range 200 - 299
-const int	eDisplayElements.DELM_NTFR_BLOOD 		= 200;
-const int	eDisplayElements.DELM_NTFR_FULLNESS		= 201;
-const int	eDisplayElements.DELM_NTFR_HUNGER		= 202;
-const int	eDisplayElements.DELM_NTFR_FEVER			= 203;
-const int	eDisplayElements.DELM_NTFR_FRACTURE		= 204;
-const int	eDisplayElements.DELM_NTFR_HEALTHY		= 205;
-const int	eDisplayElements.DELM_NTFR_SICK			= 206;
-const int	eDisplayElements.DELM_NTFR_THIRST		= 207;
-const int	eDisplayElements.DELM_NTFR_TEMPERATURE	= 208;
-const int	eDisplayElements.DELM_NTFR_WETNESS		= 209;
-// HUD other 300 - 399
-const int	eDisplayElements.DELM_BAR_STAMINA		= 300;
-const int	eDisplayElements.DELM_STANCE		      	= 301;
-const int	eDisplayElements.DELM_PROGRESS_BAR		      	= 302;
-const int	DELM_SINGLE_USE_ACTION_NAME = 303;
-const int	DELM_CONTINUOUS_ACTION_NAME = 304;
-const int DELM_SHOW_SINGLE_USE_ACTION = 305;
-const int DELM_SHOW_CONTINUOUS_ACTION = 306;
-*/
 
 //----------------------------------------------
 
@@ -89,20 +51,21 @@ const int TYPE_SHOW_CONTINUOUS_ACTION = 10;
 
 //constants related to ui
 //key constants
-const int	NTFKEY_THIRSTY 	= 1;
-const int	NTFKEY_HUNGRY 	= 2;
-const int	NTFKEY_WARMTH 	= 3;
-const int	NTFKEY_WETNESS 	= 4;
-const int	NTFKEY_FRACTURE = 5;
-const int	NTFKEY_HEALTHY 	= 6;
-const int	NTFKEY_FEVERISH = 7;
-const int	NTFKEY_SICK	 	= 8;
+const int	NTFKEY_THIRSTY	= 1;
+const int	NTFKEY_HUNGRY	= 2;
+const int	NTFKEY_WARMTH	= 3;
+const int	NTFKEY_WETNESS	= 4;
+const int	NTFKEY_FRACTURE	= 5;
+const int	NTFKEY_HEALTHY	= 6;
+const int	NTFKEY_FEVERISH	= 7;
+const int	NTFKEY_SICK		= 8;
 const int	NTFKEY_STUFFED	= 9;
-const int	NTFKEY_BLEEDISH = 10;
+const int	NTFKEY_BLEEDISH	= 10;
 const int	NTFKEY_BLOOD	= 11;
 const int	NTFKEY_LIVES	= 12;
-const int	NTFKEY_POISONED	= 13;
 const int	NTFKEY_BACTERIA	= 13;
+const int	NTFKEY_POISONED	= 14;
+const int	NTFKEY_PILLS	= 15;
 
 //priority constants
 const int	NTFP_THIRSTY 	= 1;

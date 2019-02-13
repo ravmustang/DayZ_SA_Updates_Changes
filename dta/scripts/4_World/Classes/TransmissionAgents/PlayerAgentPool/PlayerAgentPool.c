@@ -6,6 +6,8 @@ class PlayerAgentPool
 	float m_TotalAgentCount;
 	PlayerBase m_Player;
 	
+	const int STORAGE_VERSION = 100;
+	
 	PluginTransmissionAgents m_PluginTransmissionAgents = PluginTransmissionAgents.Cast(GetPlugin(PluginTransmissionAgents));
 	
 	void PlayerAgentPool(PlayerBase player)
@@ -16,6 +18,11 @@ class PlayerAgentPool
 	void ~PlayerAgentPool()
 	{
 		
+	}
+	
+	int GetStorageVersion()
+	{
+		return STORAGE_VERSION;
 	}
 	
 	void PrintAgents()
@@ -30,12 +37,68 @@ class PlayerAgentPool
 		
 		}
 	}
-	
+	/*
 	void ImmuneSystemTick(float value, float deltaT)//this is a regular tick induced in the the player's immune system
 	{
 		SpawnAgents(deltaT);
 		GrowAgents(deltaT);
 		AttackAgents(value);
+	}
+	*/
+	void ImmuneSystemTick(float value, float deltaT)//this is a regular tick induced in the the player's immune system
+	{
+		SpawnAgents(deltaT);
+		GrowAgents(deltaT);
+	}
+	
+	void GrowAgents(float deltaT)
+	{
+		if ( !IsPluginManagerExists() )//check if modules are running
+			return;
+		
+		EStatLevels immunity_level = m_Player.GetImmunityLevel();
+		
+		m_TotalAgentCount = 0;
+		for(int i = 0; i < m_VirusPool.Count(); i++)
+		{	
+			int agent_id = m_VirusPool.GetKey(i);
+			int max_count = m_PluginTransmissionAgents.GetAgentMaxCount( agent_id );
+			EStatLevels agent_potency = m_PluginTransmissionAgents.GetPotency( agent_id );
+			
+			float grow_delta;
+			
+			if( agent_potency <= immunity_level )
+			{
+				float invasibility = m_PluginTransmissionAgents.GetAgentInvasibility( agent_id );
+				grow_delta = invasibility * deltaT;
+			}
+			else
+			{
+				float dieoff_speed = m_PluginTransmissionAgents.GetDieOffSpeed( agent_id );
+				grow_delta = -dieoff_speed * deltaT;
+			}
+			
+			float old_count = m_VirusPool.Get( agent_id );
+			float new_count = old_count + grow_delta;
+			new_count = Math.Clamp(new_count, 0,max_count);
+			
+			m_TotalAgentCount += new_count;
+			SetAgentCount(agent_id, new_count);
+			
+			/*
+			int agent_id = m_VirusPool.GetKey(i);
+			float invasibility = m_PluginTransmissionAgents.GetAgentInvasibility( agent_id );
+			float grow_delta = invasibility * deltaT;
+			float old_count = m_VirusPool.Get( agent_id );
+			float new_count = old_count + grow_delta;
+			m_TotalAgentCount += new_count;//count the overall num of agents
+			Debug.Log("old_count"+ old_count.ToString(), "Agents");
+			Debug.Log("new_count"+ new_count.ToString(), "Agents");
+			//PrintString(new_count.ToString());
+			SetAgentCount(agent_id, new_count);*/
+			
+			
+		}
 	}
 
 	void OnStoreSave(ParamsWriteContext ctx)
@@ -52,21 +115,34 @@ class PlayerAgentPool
 		}
 	}
 	
-	void OnStoreLoad(ParamsReadContext ctx, int version)
+	bool OnStoreLoad(ParamsReadContext ctx, int version)
 	{
 		//Debug.Log("PlayerAgentPool OnStoreLoad called", "Agents");
 		int count;
-		ctx.Read(count);
+		
+		if(!ctx.Read(count))
+		{
+			return false;
+		}
 	
 		for(int i = 0; i < count;i++)
 		{
 			int key;
 			int value;
-			ctx.Read(key);
-			ctx.Read(value);
+			if(!ctx.Read(key))
+			{
+				return false;
+			}
+			
+			if(!ctx.Read(value))
+			{
+				return false;
+			}
+			
 			m_VirusPool.Insert( key,value );
 		}
 	
+		return true;
 	}
 		
 	void AddAgent(int agent_id, float count)
@@ -160,7 +236,7 @@ class PlayerAgentPool
 		}			
 		
 	}
-	
+	/*
 	void GrowAgents(float deltaT)
 	{
 		if ( !IsPluginManagerExists() )//check if modules are running
@@ -185,15 +261,15 @@ class PlayerAgentPool
 			SetAgentCount(agent_id, new_count);
 		}
 	}
-	
+	*/
 
-	void AttackAgents(float immune_attack_value)
+	void AntibioticsAttack(float attack_value)
 	{
 		for(int i = 0; i < m_VirusPool.Count(); i++)
 		{
 			int agent_id = m_VirusPool.GetKey(i);
-			float agent_resistance_inverted = 1 - m_PluginTransmissionAgents.GetImmunityResistance( agent_id );
-			float delta = immune_attack_value * agent_resistance_inverted;
+			float antibiotics_resistance = 1 - m_PluginTransmissionAgents.GetAgentAntiboticsResistance(agent_id);
+			float delta = attack_value * antibiotics_resistance;
 			float old_count = m_VirusPool.Get( agent_id );
 			float new_count = old_count - delta;
 			//PrintString("delta:"+delta.ToString());
@@ -202,7 +278,7 @@ class PlayerAgentPool
 			SetAgentCount(agent_id, new_count);
 		}
 	}
-	
+
 	void GetDebugObject(array<ref Param> object_out)
 	{
 	

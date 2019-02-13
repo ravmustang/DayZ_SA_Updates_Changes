@@ -24,7 +24,6 @@ class GardenBase extends Building
 	
 	protected ref array<ref Slot> m_Slots;
 	protected float m_DefaultFertility = 1;
-	protected float m_BaseFertility = 1; // Obsolete value, but it is necesarry to have so that old storage_** data works. 
 	ref Timer 		m_CheckRainTimer;
 	
 	private static ref map<string,string> m_map_slots; // For the 'attachment slot -> plant slot' conversion. It is possible that this will be removed later.
@@ -106,31 +105,38 @@ class GardenBase extends Building
 		}
 	}
 
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad( ctx, version );
-		Print("OnStoreLoad GARDEN BASE");
-		ctx.Read( m_BaseFertility );
+		if ( !super.OnStoreLoad( ctx, version ) )
+			return false;
+		
+		if ( version < 102 )
+		{
+			float some_value;
+			ctx.Read( some_value ); // compatibility check
+		}
 		
 		int slots_count = GetGardenSlotsCount();
-		Print(slots_count);
+		
 		for ( int i = 0; i < slots_count; i++ )
 		{
-			Print(i);
 			Slot slot = m_Slots.Get( i );
+
 			Print(slot);
-			slot.OnStoreLoadCustom( ctx );
-			Print("after OnStoreLoadCustom");
+			if ( !slot.OnStoreLoadCustom( ctx, version ) )
+				return false;
+
 			UpdateSlotTexture( i );
-			Print("after UpdateSlotTexture");
 		}
+
+		return true;
 	}
 
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{
 		super.OnStoreSave( ctx );
 		
-		ctx.Write( m_BaseFertility );
+		// ctx.Write( m_BaseFertility ); // Not needed since storage version 102
 		
 		int slots_count = GetGardenSlotsCount();
 		
@@ -260,8 +266,6 @@ class GardenBase extends Building
 			{
 				converted_slot_name = SLOT_MEMORY_POINT_PREFIX + index.ToString();
 			}
-			
-			PlayerBase player = PlayerBase.Cast( item.GetParent() ); // TO DO: Get player somehow!
 			
 			PlantSeed( ItemBase.Cast( item ), converted_slot_name);
 		}
@@ -567,6 +571,7 @@ class GardenBase extends Building
 			slot_component_prefix_lower.ToLower();
 			
 			int start = selection_component_lower.IndexOf( slot_component_prefix_lower );
+			
 			if ( start > -1 )
 			{
 				start += SLOT_MEMORY_POINT_PREFIX.Length();
@@ -653,7 +658,7 @@ class GardenBase extends Building
 	vector GetSlotPosition( int index )
 	{
 		string memory_point = SLOT_MEMORY_POINT_PREFIX + (index + 1).ToStringLen(2);
-		vector pos = this.GetSelectionPosition( memory_point );
+		vector pos = this.GetSelectionPositionMS( memory_point );
 		
 		return this.ModelToWorld( pos );
 	}

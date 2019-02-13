@@ -113,8 +113,6 @@ class ModifierBase
 		return m_IsActive;
 	}
 	
-	
-	
 	void SetLock(bool state)
 	{
 		m_IsLocked = state;
@@ -147,7 +145,7 @@ class ModifierBase
 	
 	string GetName()
 	{
-		return this.ClassName() + " modifier";
+		return this.ClassName();
 	}
 
 	bool ActivateCondition(PlayerBase player)
@@ -192,6 +190,8 @@ class ModifierBase
 
 	void Deactivate(bool trigger = true)
 	{
+		if(!m_IsActive)
+			return;
 		m_ShouldBeActive = false;
 		m_IsActive = false;
 		m_ActivatedTime = 0;

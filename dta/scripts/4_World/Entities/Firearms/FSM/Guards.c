@@ -112,6 +112,24 @@ class WeaponGuardHasAmmo extends WeaponGuardBase
 	}
 };
 
+class WeaponGuardHasAmmoInnerMagazine extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardHasAmmoInnerMagazine (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		int mi = m_weapon.GetCurrentMuzzle();
+		if (m_weapon.GetChamberCartridgeCount(mi) > 1)
+		{
+			wpnDebugPrint("[wpnfsm] guard - has ammo in inner magazine");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - no ammo in inner magazine");
+		return false;
+	}
+};
+
 class WeaponGuardHasAmmoInEvent extends WeaponGuardBase
 {
 	protected Weapon_Base m_weapon;

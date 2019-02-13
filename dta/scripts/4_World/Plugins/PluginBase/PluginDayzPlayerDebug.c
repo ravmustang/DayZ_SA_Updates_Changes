@@ -617,6 +617,7 @@ class PluginDayzPlayerDebug extends PluginBase
 			m_ActionsSelector.AddItem("O FISHINGROD RETRACT", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_FISHINGRODRETRACT, false), 0);
 			m_ActionsSelector.AddItem("O CLEAN HANDS BOTTLE", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_CLEANHANDSBOTTLE, false), 0);
 			m_ActionsSelector.AddItem("O OPEN ITEM ONCE", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM_ONCE, false), 0);
+			m_ActionsSelector.AddItem("O CLOSE ITEM ONCE", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_CLOSEITEM_ONCE, false), 0);
 			m_ActionsSelector.AddItem("O ATTACH SCOPE", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_ATTACHSCOPE, false), 0);
 			m_ActionsSelector.AddItem("O ATTACH BARREL", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_ATTACHBARREL, false), 0);
 			m_ActionsSelector.AddItem("O EMPTY SEEDS PACK", new PluginDayzPlayerDebugUserData(DayZPlayerConstants.CMD_ACTIONMOD_EMPTYSEEDSPACK, false), 0);

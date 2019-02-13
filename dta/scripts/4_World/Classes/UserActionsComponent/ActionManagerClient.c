@@ -256,7 +256,7 @@ class ActionManagerClient: ActionManagerBase
 	{
 		RemoveActions();
 		
-		if (m_Player.IsRaised() || !ActionPossibilityCheck(pCurrentCommandID) || HasHandInventoryReservation() )
+		if (m_Player.IsRaised() || !ActionPossibilityCheck(pCurrentCommandID) || HasHandInventoryReservation() || GetGame().IsInventoryOpen() )
 		{
 			m_SelectableActions.Clear();
 			return;

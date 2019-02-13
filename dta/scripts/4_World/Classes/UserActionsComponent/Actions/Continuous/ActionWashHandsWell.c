@@ -38,7 +38,7 @@ class ActionWashHandsWell: ActionContinuousBase
 	{
 		if ( player.HasBloodyHands() && !player.GetItemInHands() )
 		{
-			if ( target.GetObject().GetType() == "Land_Misc_Well_Pump_Yellow" || target.GetObject().GetType() == "Land_Misc_Well_Pump_Blue" )
+			if (target.GetObject() && target.GetObject().IsWell() )
 			{
 				return true;
 			}

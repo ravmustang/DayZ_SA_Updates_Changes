@@ -1,0 +1,1 @@
+class BDUJacket extends Clothing {};

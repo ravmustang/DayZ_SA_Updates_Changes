@@ -163,6 +163,8 @@ class BearTrap extends TrapBase
 		{
 			PlayerBase player_PB = PlayerBase.Cast( player );
 			StartActivate( player_PB );
+			
+			m_TrapTrigger.SetPosition( player_PB.GetLocalProjectionPosition() );
 		}	
 	}
 	

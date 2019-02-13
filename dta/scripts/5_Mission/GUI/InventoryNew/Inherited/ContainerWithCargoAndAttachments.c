@@ -1,34 +1,48 @@
 class ContainerWithCargoAndAttachments extends ClosableContainer
 {
-	protected ref Attachments							m_Atts;
-	protected ref IconsContainer						m_IconsContainer;
-	protected ref UICargoGrid							m_CargoGrid;
+	protected ref Attachments								m_Atts;
+	protected ref CargoContainer							m_CargoGrid;
 	
-	protected ref map<EntityAI, ref IconsContainer>			m_AttachmentCargoContainers;
-	protected ref map<EntityAI, ref UICargoGrid>			m_AttachmentCargos;
+	protected ref map<EntityAI, ref CargoContainer>			m_AttachmentCargos;
 	protected ref map<EntityAI, ref AttachmentsWrapper>		m_AttachmentAttachmentsContainers;
 	protected ref map<EntityAI, ref Attachments>			m_AttachmentAttachments;
+
+	void ~ContainerWithCargoAndAttachments()
+	{
+		if( m_Atts )
+			delete m_Atts;
+		foreach( EntityAI e, Attachments att : m_AttachmentAttachments )
+		{
+			delete att;
+		}
+		if( m_AttachmentAttachments )
+			m_AttachmentAttachments.Clear();
+		if( m_AttachmentAttachmentsContainers )
+			m_AttachmentAttachmentsContainers.Clear();
+		if( m_AttachmentCargos )
+			m_AttachmentCargos.Clear();
+	}
 	
 	override void UpdateInterval()
 	{
 		int i;
 		if( m_Entity )
 		{
-			EntityAI e;/*
+			EntityAI e;
 			array<EntityAI> cargo_attachments = m_Entity.GetAttachmentsWithCargo();
-			if( cargo_attachments && m_AttachmentCargoContainers )
+			if( cargo_attachments && m_AttachmentCargos )
 			{
-				for( i = 0; i < m_AttachmentCargoContainers.Count(); i++ )
+				for( i = 0; i < m_AttachmentCargos.Count(); i++ )
 				{
-					e			= m_AttachmentCargoContainers.GetKey( i );
+					e			= m_AttachmentCargos.GetKey( i );
 					if( e )
 					{
 						if( cargo_attachments.Find( e ) == -1 )
 						{
-							IconsContainer old_cont = m_AttachmentCargoContainers.GetElement( i );
+							CargoContainer old_cont = m_AttachmentCargos.GetElement( i );
 							m_Body.RemoveItem( old_cont );
-							m_AttachmentCargoContainers.Remove( e );
 							m_AttachmentCargos.Remove( e );
+							RecomputeOpenedContainers();
 						}
 						else
 						{
@@ -39,17 +53,15 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 				
 				for( i = 0; i < cargo_attachments.Count(); i++ )
 				{
-					if( !m_AttachmentCargoContainers.Contains( cargo_attachments.Get( i ) ) )
+					if( !m_AttachmentCargos.Contains( cargo_attachments.Get( i ) ) )
 					{
-						ref IconsContainer cont = new IconsContainer( this );
+						ref CargoContainer cont = new CargoContainer( this, true );
 						cont.GetRootWidget().SetSort( i + 50 );
-						this.Insert( cont );
+						cont.SetEntity( cargo_attachments.Get( i ) );
+						Insert( cont, m_Atts.GetAttachmentHeight() + 1 + m_AttachmentCargos.Count() );
 						
-						ref UICargoGrid att_grid = new UICargoGrid( cargo_attachments.Get( i ), cont );
-						att_grid.SetParent( this );
-						
-						m_AttachmentCargos.Insert( cargo_attachments.Get( i ), att_grid );
-						m_AttachmentCargoContainers.Insert( cargo_attachments.Get( i ), cont );
+						m_AttachmentCargos.Insert( cargo_attachments.Get( i ), cont );
+						RecomputeOpenedContainers();
 					}
 				}
 			}
@@ -68,9 +80,10 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 							m_Body.RemoveItem( old_att_cont );
 							m_AttachmentAttachmentsContainers.Remove( e );
 							m_AttachmentAttachments.Remove( e );
-							
+							delete old_att_cont;
 							m_Body.RemoveItem( old_att_cont );
 							m_AttachmentAttachments.Remove( e );
+							RecomputeOpenedContainers();
 						}
 						else
 						{
@@ -84,17 +97,17 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 					if( !m_AttachmentAttachments.Contains( attachment_attachments.Get( i ) ) )
 					{
 						ref Attachments att_cont = new Attachments( this, attachment_attachments.Get( i ) );
-						att_cont.InitAttachmentGrid( i + 2 );
-						
+						att_cont.InitAttachmentGrid( i + m_Atts.GetAttachmentHeight() + 1 );
 						
 						m_AttachmentAttachments.Insert( attachment_attachments.Get( i ), att_cont );
-						m_AttachmentAttachmentsContainers.Insert( attachment_attachments.Get( i ), att_cont.m_AttachmentsContainer );
+						m_AttachmentAttachmentsContainers.Insert( attachment_attachments.Get( i ), att_cont.GetWrapper() );
 						
-						m_Atts.RefreshAtt();
+						att_cont.RefreshAtt();
+						RecomputeOpenedContainers();
 					}
 				}
 			}
-			*/
+			
 			if( m_Entity.GetInventory().IsInventoryLockedForLockType( HIDE_INV_FROM_SCRIPT ) || m_Closed )
 			{
 				HideContent();
@@ -116,72 +129,321 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		}
 	}
 	
-	bool CanEquip()
+	override Container GetFocusedContainer()
 	{
-		return m_Atts.CanEquip();
-	}
-	
-	bool CanCombine()
-	{
-		return m_Atts.CanCombine();
-	}
-	
-	void TransferItemToVicinity()
-	{
-		m_Atts.TransferItemToVicinity();
-	}
-	
-	override void SelectItem()
-	{
-		m_Atts.SelectItem();
-	}
-	
-	EntityAI GetFocusedItem()
-	{
-		return EntityAI.Cast( m_Atts.GetFocusedEntity() );
-	}
-	
-	bool IsEmpty()
-	{
-		return m_Atts.IsEmpty();
-	}
-	
-	bool IsItemActive()
-	{
-		return m_Atts.IsItemActive();
-	}
-
-	bool IsItemWithQuantityActive()
-	{
-		return m_Atts.IsItemWithQuantityActive();
-	}
-	
-	/*void SetLastActive()
-	{
+		int index = m_ActiveIndex - 1;
+		int attachment_start_index = -1;
+		int cargo_start_index = -1;
+		int attachment_end_index = -1;
+		int cargo_end_index = -1;
 		
-	}*/
-
-	override void Select()
+		if( m_Atts || m_AttachmentAttachments.Count() > 0 )
+		{
+			attachment_start_index = 0;
+			if( m_Atts )
+				attachment_end_index++;
+			attachment_end_index += m_AttachmentAttachments.Count();
+		}
+		
+		if( m_CargoGrid || m_AttachmentCargos.Count() > 0 )
+		{
+			cargo_start_index = attachment_end_index + 1;
+			if( m_CargoGrid )
+				cargo_end_index++;
+			cargo_end_index += cargo_start_index + m_AttachmentCargos.Count();
+		}
+		
+		if( index.InRange( 0, attachment_end_index ) )
+		{
+			if( m_Atts )
+			{
+				if( index == 0 )
+				{
+					return m_Atts.GetWrapper();
+				}
+				else
+				{
+					return m_AttachmentAttachments.GetElement( index - 1 ).GetWrapper();
+				}
+			}
+			else
+			{
+				return m_AttachmentAttachments.GetElement( index ).GetWrapper();
+			}
+		}
+		else if( index.InRange( cargo_start_index, cargo_end_index ) )
+		{
+			if( m_CargoGrid )
+			{
+				if( index == cargo_start_index )
+				{
+					return m_CargoGrid;
+				}
+				else
+				{
+					return m_AttachmentCargos.GetElement( index - 1 - cargo_start_index );
+				}
+			}
+			else
+			{
+				return m_AttachmentCargos.GetElement( index - cargo_start_index );
+			}
+		}
+		
+		return null;
+	}
+	
+	override void SetActive( bool active )
 	{
-		m_Atts.Select();
+		super.SetActive( active );
+		UnfocusAll();
+		if( active )
+			SetFocusToIndex( true );
 	}
 
 	void SetDefaultFocus()
 	{
-		//m_CargoGrid.SetDefaultFocus();
-		m_Atts.SetDefaultFocus();
+		UnfocusAll();
+		if( m_Atts )
+		{
+			m_Atts.SetDefaultFocus();
+		}
+		else if( m_CargoGrid )
+		{
+			m_CargoGrid.SetDefaultFocus();
+		}
+		else if( m_AttachmentAttachments.Count() > 0 )
+		{
+			m_AttachmentAttachments.GetElement( 0 ).SetDefaultFocus();
+		}
+		else if( m_AttachmentCargos.Count() > 0 )
+		{
+			m_AttachmentCargos.GetElement( 0 ).SetDefaultFocus();
+		}
 	}
 
 	override void UnfocusAll()
 	{
-		//m_CargoGrid.Unfocus();
-		m_Atts.UnfocusAll();
+		if( m_Atts )
+		{
+			m_Atts.UnfocusAll();
+		}
+			
+		if( m_CargoGrid )
+		{
+			m_CargoGrid.UnfocusAll();
+		}
+		
+		foreach( EntityAI e1, CargoContainer cargo : m_AttachmentCargos )
+		{
+			cargo.UnfocusAll();
+				
+		}
+		
+		foreach( EntityAI e2, Attachments att : m_AttachmentAttachments )
+		{
+			att.UnfocusAll();
+		}
+	}
+	
+	override bool IsLastIndex()
+	{
+		return m_ActiveIndex == ( m_Body.Count() - 1 );
+	}
+	
+	override bool IsFirstContainerFocused()
+	{
+		return IsFirstIndex();
+	}
+	
+	override bool IsLastContainerFocused()
+	{
+		return IsLastIndex();
 	}
 
 	override void MoveGridCursor( int direction )
 	{
-		//m_CargoGrid.MoveGridCursor( direction );
-		m_Atts.MoveGridCursor( direction );
+		int index = m_ActiveIndex - 1;
+		int attachment_start_index = -1;
+		int cargo_start_index = -1;
+		int attachment_end_index = -1;
+		int cargo_end_index = -1;
+		
+		if( m_Atts || m_AttachmentAttachments.Count() > 0 )
+		{
+			attachment_start_index = 0;
+			if( m_Atts )
+				attachment_end_index++;
+			attachment_end_index += m_AttachmentAttachments.Count();
+		}
+		
+		if( m_CargoGrid || m_AttachmentCargos.Count() > 0 )
+		{
+			cargo_start_index = attachment_end_index + 1;
+			if( m_CargoGrid )
+				cargo_end_index++;
+			cargo_end_index += cargo_start_index + m_AttachmentCargos.Count();
+		}
+		
+		if( index.InRange( 0, attachment_end_index ) )
+		{
+			if( m_Atts )
+			{
+				if( index == 0 )
+				{
+					m_Atts.MoveGridCursor( direction );
+				}
+				else
+				{
+					m_AttachmentAttachments.GetElement( index - 1 ).MoveGridCursor( direction );
+				}
+			}
+			else
+			{
+				m_AttachmentAttachments.GetElement( index ).MoveGridCursor( direction );
+			}
+		}
+		else if( index.InRange( cargo_start_index, cargo_end_index ) )
+		{
+			if( m_CargoGrid )
+			{
+				if( index == cargo_start_index )
+				{
+					m_CargoGrid.MoveGridCursor( direction );
+				}
+				else
+				{
+					m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).MoveGridCursor( direction );
+				}
+			}
+			else
+			{
+				m_AttachmentCargos.GetElement( index - cargo_start_index ).MoveGridCursor( direction );
+			}
+		}
+	}
+	
+	override void SetNextActive()
+	{
+		ItemManager.GetInstance().HideTooltip( );
+		if( ItemManager.GetInstance().IsMicromanagmentMode() )
+		{
+			ItemManager.GetInstance().SetItemMoving( true );
+		}
+		
+		if( IsLastIndex() )
+		{
+			Container.Cast( GetParent() ).SetNextActive();
+			m_ActiveIndex = 1;
+			UnfocusAll();
+		}
+		else
+		{
+			SetFocusToIndex( false );
+			m_ActiveIndex++;
+			SetFocusToIndex( true );
+		}
+	}
+
+	override void SetPreviousActive()
+	{
+		if( ItemManager.GetInstance().IsMicromanagmentMode() )
+		{
+			ItemManager.GetInstance().SetItemMoving( true );
+		}
+		
+		if( IsFirstIndex() )
+		{
+			Container.Cast( GetParent() ).SetPreviousActive();
+			m_ActiveIndex = 1;
+			UnfocusAll();
+		}
+		else
+		{
+			SetFocusToIndex( false );
+			m_ActiveIndex--;
+			SetFocusToIndex( true );
+		}
+	}
+	
+	void SetFocusToIndex( bool focus )
+	{
+		int index = m_ActiveIndex - 1;
+		int attachment_start_index = -1;
+		int cargo_start_index = -1;
+		int attachment_end_index = -1;
+		int cargo_end_index = -1;
+		
+		if( m_Atts || m_AttachmentAttachments.Count() > 0 )
+		{
+			attachment_start_index = 0;
+			if( m_Atts )
+				attachment_end_index++;
+			attachment_end_index += m_AttachmentAttachments.Count();
+		}
+		
+		if( m_CargoGrid || m_AttachmentCargos.Count() > 0 )
+		{
+			cargo_start_index = attachment_end_index + 1;
+			if( m_CargoGrid )
+				cargo_end_index++;
+			cargo_end_index += cargo_start_index + m_AttachmentCargos.Count();
+		}
+		
+		if( index.InRange( 0, attachment_end_index ) )
+		{
+			if( m_Atts )
+			{
+				if( index == 0 )
+				{
+					if( focus )
+						m_Atts.SetDefaultFocus();
+					else
+						m_Atts.UnfocusAll();
+				}
+				else
+				{
+					if( focus )
+						m_AttachmentAttachments.GetElement( index - 1 ).SetDefaultFocus();
+					else
+						m_AttachmentAttachments.GetElement( index - 1 ).UnfocusAll();
+				}
+			}
+			else
+			{
+				if( focus )
+					m_AttachmentAttachments.GetElement( index ).SetDefaultFocus();
+				else
+					m_AttachmentAttachments.GetElement( index ).UnfocusAll();
+			}
+		}
+		else if( index.InRange( cargo_start_index, cargo_end_index ) )
+		{
+			if( m_CargoGrid )
+			{
+				if( index == cargo_start_index )
+				{
+					if( focus )
+						m_CargoGrid.SetDefaultFocus();
+					else
+						m_CargoGrid.UnfocusAll();
+				}
+				else
+				{
+					if( focus )
+						m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).SetDefaultFocus();
+					else
+						m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).UnfocusAll();
+				}
+			}
+			else
+			{
+				if( focus )
+					m_AttachmentCargos.GetElement( index - cargo_start_index ).SetDefaultFocus();
+				else
+					m_AttachmentCargos.GetElement( index - cargo_start_index ).UnfocusAll();
+			}
+		}
 	}
 
 	void SetEntity( EntityAI entity )
@@ -194,19 +456,16 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		
 		m_Atts = new Attachments( this, entity );
 		m_Atts.InitAttachmentGrid( 1 );
-
-		m_IconsContainer = new IconsContainer( this );
-		this.Insert( m_IconsContainer );
-		m_IconsContainer.GetRootWidget().SetSort( 2 );
+		
 		if( entity.GetInventory().GetCargo() != NULL)
 		{
-			m_CargoGrid = new UICargoGrid( entity, m_IconsContainer );
-			m_CargoGrid.SetParent(this);
+			m_CargoGrid = new CargoContainer( this );
+			m_CargoGrid.GetRootWidget().SetSort( 2 );
+			m_CargoGrid.SetEntity( entity );
+			this.Insert( m_CargoGrid );
 		}
 
-		array<EntityAI> cargo_attachments	= entity.GetAttachmentsWithCargo();
-		m_AttachmentCargoContainers			= new map<EntityAI, ref IconsContainer>;
-		m_AttachmentCargos					= new map<EntityAI, ref UICargoGrid>;
+		m_AttachmentCargos					= new map<EntityAI, ref CargoContainer>;
 		m_AttachmentAttachmentsContainers	= new map<EntityAI, ref AttachmentsWrapper>;
 		m_AttachmentAttachments				= new map<EntityAI, ref Attachments>;
 		
@@ -222,17 +481,8 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		}
 		SetOpenState( ItemManager.GetInstance().GetDefaultOpenState( m_Entity.GetType() ) );
 		m_Parent.m_Parent.Refresh();
-	}
-
-	void ~ContainerWithCargoAndAttachments()
-	{
-		if( this )
-		{
-			if( this.GetMainWidget() )
-			{
-				delete this.GetMainWidget();
-			}
-		}
+		
+		RecomputeOpenedContainers();
 	}
 
 	EntityAI GetEntity()
@@ -282,28 +532,6 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		}
 		return ipw;
 	}
-	
-	int GetCargoHeight()
-	{
-		int count;
-		if( m_CargoGrid )
-			count = m_CargoGrid.GetCargoHeight();
-		foreach( UICargoGrid grid : m_AttachmentCargos )
-		{
-			count += grid.GetCargoHeight();
-		}
-		return count;
-	}
-	
-	Widget GetLastRowWidget()
-	{
-		if( m_AttachmentCargos.Count() > 0 )
-			return m_AttachmentCargos.GetElement( m_AttachmentCargos.Count() - 1 ).GetLastRowWidget();
-		else if( m_CargoGrid )
-			return m_CargoGrid.GetLastRowWidget();
-		else
-			return null;
-	}
 
 	void MouseClick2( Widget w, int x, int y, int button )
 	{
@@ -326,6 +554,13 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			if( button == MouseState.MIDDLE )
 			{
 				InspectItem( itemAtPos );
+			}
+			else if ( button == MouseState.LEFT && g_Game.IsLeftCtrlDown() )
+			{
+				if( itemAtPos.GetInventory().CanRemoveEntity() )
+				{
+					GetGame().GetPlayer().PredictiveDropEntity( itemAtPos );
+				}
 			}
 		}
 	}
@@ -370,9 +605,11 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		name.Replace( "Render", "Col" );
 		w.FindAnyWidget( name ).Show( true );
 		name.Replace( "Col", "RadialIcon" );
-		w.FindAnyWidget( name ).Show( false );
+		w.GetParent().FindAnyWidget( name ).Show( false );
 		name.Replace( "RadialIcon", "Temperature" );
 		w.FindAnyWidget( name ).Show( false );
+		name.Replace( "Temperature", "Selected" );
+		w.FindAnyWidget( name ).Show( true );
 	}
 
 	void OnIconDrop( Widget w )
@@ -387,11 +624,13 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		w.FindAnyWidget( name ).Show( false );
 		name.Replace( "Col", "Temperature" );
 		w.FindAnyWidget( name ).Show( false );
-		name.Replace( "Temperature", "GhostSlot" );
+		name.Replace( "Temperature", "Selected" );
+		w.FindAnyWidget( name ).Show( false );
+		name.Replace( "Selected", "GhostSlot" );
 		w.GetParent().FindAnyWidget( name ).Show( true );
 	}
 
-	void DropReceived( Widget w, int x, int y, IconsContainer cargo )
+	void DropReceived( Widget w, int x, int y, CargoContainer cargo )
 	{
 		EntityAI item = GetItemPreviewItem( w );
 		if( !item )
@@ -405,14 +644,14 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		EntityAI target_entity;
 		CargoBase target_cargo;
 		
-		if( cargo == m_IconsContainer )
+		if( cargo == m_CargoGrid )
 		{
 			target_entity	= m_Entity;
 			target_cargo 	= m_Entity.GetInventory().GetCargo();
 		}
 		else
 		{
-			target_entity	= m_AttachmentCargoContainers.GetKeyByValue( cargo );
+			target_entity	= m_AttachmentCargos.GetKeyByValue( cargo );
 			if( target_entity )
 			{
 				target_cargo 	= target_entity.GetInventory().GetCargo();
@@ -435,16 +674,17 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 
 			TakeIntoCargo( player, target_entity, item, idx, x, y );
 
-			Icon icon = cargo.GetIcon( item.GetID() );
+			Icon icon = cargo.GetIcon( item );
 			
 			if( icon )
 			{
-				//w.FindAnyWidget("Color").SetColor( ColorManager.BASE_COLOR );
-				icon.RefreshPos( x, y );
+				w.FindAnyWidget("Selected").SetColor( ColorManager.BASE_COLOR );
 				icon.Refresh();
 				Refresh();
 			}
 		}
+		
+		ItemManager.GetInstance().HideDropzones();
 	}
 	
 	void TakeIntoCargo( notnull PlayerBase player, notnull EntityAI entity, notnull EntityAI item, int idx = -1, int row = 0, int col = 0 )
@@ -452,7 +692,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		ItemBase item_base = ItemBase.Cast( item );
 		float stackable = item_base.ConfigGetFloat("varStackMax");
 		
-		if( !item.GetInventory().CanRemoveEntity() )
+		if( !item.GetInventory().CanRemoveEntity() || !player.CanManipulateInventory() )
 			return;
 		
 		if( stackable == 0 || stackable >= item_base.GetQuantity() )
@@ -471,14 +711,15 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 	void TakeAsAttachment( Widget w, Widget receiver )
 	{
 		EntityAI receiver_item;
+		int slot_id = -1;
 		string name = receiver.GetName();
 		name.Replace("PanelWidget", "Render");
 		
 		ItemPreviewWidget receiver_iw = ItemPreviewWidget.Cast( receiver.FindAnyWidget(name) );
-		
 		if( receiver_iw )
 		{
-			receiver_item = receiver_iw.GetItem();
+			receiver_item	= receiver_iw.GetItem();
+			slot_id			= receiver_iw.GetUserID();
 		}
 		
 		EntityAI item = GetItemPreviewItem( w );
@@ -487,12 +728,13 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			return;
 		}
 		
-		if( !item.GetInventory().CanRemoveEntity() )
+		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
+		if( !item.GetInventory().CanRemoveEntity() || !player.CanManipulateInventory() )
 			return;
-
+		
+		EntityAI target_att_entity = m_Entity;
 		Weapon_Base wpn;
 		Magazine mag;
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		if( Class.CastTo(wpn,  m_Entity ) && Class.CastTo(mag,  item ) )
 		{
 			if( player.GetWeaponManager().CanAttachMagazine( wpn, mag ) )
@@ -500,7 +742,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 				player.GetWeaponManager().AttachMagazine( mag );
 			}
 		}
-		else if(receiver_item)
+		else if( receiver_item )
 		{
 			if( ( ItemBase.Cast( receiver_item ) ).CanBeCombined( ItemBase.Cast( item ) ) )
 			{
@@ -515,9 +757,26 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		}
 		else if( m_Entity.GetInventory().CanAddAttachment( item ) )
 		{
+			ItemBase item_base	= ItemBase.Cast( item );
+			float stackable		= item_base.ConfigGetFloat("varStackMax");
+			
+			if( stackable == 0 || stackable >= item_base.GetQuantity() )
+			{
+				if( slot_id != -1 )
+					player.PredictiveTakeEntityToTargetAttachmentEx(m_Entity, item, slot_id);
+				else
+					player.PredictiveTakeEntityToTargetAttachment(m_Entity, item);
+			}
+			else if( stackable != 0 && stackable < item_base.GetQuantity() )
+			{
+				item_base.SplitIntoStackMaxClient( m_Entity, slot_id );
+			}
+		}
+		else if( ( m_Entity.GetInventory().CanAddEntityInCargo( item ) && ( !player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item )) ) || player.GetHumanInventory().HasEntityInHands( item ) )
+		{
 			TakeIntoCargo( PlayerBase.Cast( GetGame().GetPlayer() ), m_Entity, item );
 		}
-		else if( ( m_Entity.GetInventory().CanAddEntityInCargo( item ) && (!player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item )) ) || player.GetHumanInventory().HasEntityInHands( item ) )
+		else if( !player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item ) )
 		{
 			TakeIntoCargo( PlayerBase.Cast( GetGame().GetPlayer() ), m_Entity, item );
 		}
@@ -560,7 +819,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 	
 			EntityAI item = iw.GetItem();
 			
-			if( !item.GetInventory().CanRemoveEntity() )
+			if( !item.GetInventory().CanRemoveEntity() || !player.CanManipulateInventory() )
 				return;
 			
 			if( player.GetInventory().HasEntityInInventory( item ) && player.GetHumanInventory().CanAddEntityInHands( item ) )
@@ -593,7 +852,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		}
 	}
 
-	bool DraggingOverGrid( Widget w,  int x, int y, Widget reciever, IconsContainer cargo )
+	bool DraggingOverGrid( Widget w,  int x, int y, Widget reciever, CargoContainer cargo )
 	{
 		if( w == NULL )
 		{
@@ -614,14 +873,14 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		EntityAI target_entity;
 		CargoBase target_cargo;
 		
-		if( cargo == m_IconsContainer )
+		if( cargo == m_CargoGrid )
 		{
 			target_entity	= m_Entity;
 			target_cargo 	= m_Entity.GetInventory().GetCargo();
 		}
 		else
 		{
-			target_entity	= m_AttachmentCargoContainers.GetKeyByValue( cargo );
+			target_entity	= m_AttachmentCargos.GetKeyByValue( cargo );
 			if( target_entity )
 			{
 				target_cargo 	= target_entity.GetInventory().GetCargo();
@@ -647,14 +906,14 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			color = ColorManager.RED_COLOR;
 		}
 
-		if( w.FindAnyWidget("Color") )
+		if( w.FindAnyWidget("Selected") )
 		{
-			w.FindAnyWidget("Color").SetColor( color );
+			w.FindAnyWidget("Selected").SetColor( color );
 		}
 		else
 		{
 			string name = w.GetName();
-			name.Replace( "PanelWidget", "Col" );
+			name.Replace( "PanelWidget", "Selected" );
 			if( w.FindAnyWidget( name ) )
 			{
 				w.FindAnyWidget( name ).SetColor( color );
@@ -711,7 +970,8 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			}
 			else if( receiver_item )
 			{
-				if( ( ItemBase.Cast( receiver_item ) ).CanBeCombined( ItemBase.Cast( item )) )
+				ItemBase receiver_itemIB	= ItemBase.Cast( receiver_item );
+				if( receiver_itemIB && receiver_itemIB.CanBeCombined( ItemBase.Cast( item ) ) )
 				{
 					ItemManager.GetInstance().HideDropzones();
 					if( m_Entity.GetHierarchyParent() == GetGame().GetPlayer() )
@@ -738,8 +998,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 					ColorManager.GetInstance().SetColor( w, ColorManager.SWAP_COLOR );
 				}
 			}
-			else
-			if( m_Entity.GetInventory().CanAddAttachment( item ) )
+			else if( m_Entity.GetInventory().CanAddAttachment( item ) )
 			{
 				ItemManager.GetInstance().HideDropzones();
 				if( m_Entity.GetHierarchyParent() == GetGame().GetPlayer() )

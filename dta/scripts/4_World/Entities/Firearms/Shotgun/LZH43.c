@@ -113,9 +113,9 @@ class Izh43Shotgun_Base : Rifle_Base
 		/*WeaponStateBase		Mech_F = new WeaponCharging(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);
 		WeaponStateBase		Mech_L = new WeaponCharging(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);*/
 
-		LoopedChambering 	Chamber_E = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering 	Chamber_F = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering 	Chamber_L = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering 	Chamber_E = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering 	Chamber_F = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering 	Chamber_L = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
 		
 		WeaponStateBase		Unjam_J = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START);
 		
@@ -124,14 +124,13 @@ class Izh43Shotgun_Base : Rifle_Base
 		WeaponStateBase		Trigger_L = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL);
 		WeaponStateBase		Trigger_J = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
 		// extend Rifle_Base fsm
-		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering psh = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering lch2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
-		LoopedChambering psh2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
+		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering psh = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP	, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering lch2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
+		LoopedChambering psh2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP	, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
 		*/
 		
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
-		//WeaponEventBase __lS_ = new WeaponEventContinuousLoadBulletStart;
 		WeaponEventBase __L__ = new WeaponEventLoad1Bullet;
 		WeaponEventBase __T__ = new WeaponEventTrigger;
 		WeaponEventBase __U__ = new WeaponEventUnjam;
@@ -142,8 +141,7 @@ class Izh43Shotgun_Base : Rifle_Base
 
 		m_fsm = new WeaponFSM();
 		
-		
-		
+		m_fsm.AddTransition(new WeaponTransition( E_E,		__M__,  Mech));
 		m_fsm.AddTransition(new WeaponTransition( L_L,		__M__,  Mech));
 		m_fsm.AddTransition(new WeaponTransition( L_E,		__M__,  Mech));
 		m_fsm.AddTransition(new WeaponTransition( F_L,		__M__,  Mech));
@@ -151,8 +149,20 @@ class Izh43Shotgun_Base : Rifle_Base
 		m_fsm.AddTransition(new WeaponTransition( F_E,		__M__,  Mech));
 		m_fsm.AddTransition(new WeaponTransition( Mech,		_fin_,  E_E));
 		
-		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  L_L, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( Mech,	_abt_,  L_L));
+		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  L_L, NULL, new GuardAnd( new WeaponGuardRightChamberLoaded(this), new WeaponGuardLeftChamberLoaded(this))));
+		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  L_E, NULL, new GuardAnd( new WeaponGuardRightChamberLoaded(this), new WeaponGuardLeftChamberEmpty(this))));
+		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  F_L, NULL, new GuardAnd( new WeaponGuardRightChamberFireout(this), new WeaponGuardLeftChamberLoaded(this))));
+		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  F_F, NULL, new GuardAnd( new WeaponGuardRightChamberFireout(this), new WeaponGuardLeftChamberFireout(this))));
+		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  F_E, NULL, new GuardAnd( new WeaponGuardRightChamberFireout(this), new WeaponGuardLeftChamberEmpty(this))));
+		m_fsm.AddTransition(new WeaponTransition( Mech,		_abt_,  E_E));
+		
+		
+		m_fsm.SetInitialState(E_E);
+
+		SelectionBulletHide();
+		//SelectionMagazineHide();
+
+		m_fsm.Start();
 	
 	}
 	//Weapon
@@ -163,3 +173,184 @@ class Izh43Shotgun_Base : Rifle_Base
 	//F_F
 	//E_E
 };
+
+enum LZH43MuzzlesIndex
+{
+	LEFT 			= 0,
+	RIGHT			= 1,
+};
+
+class WeaponGuardLeftChamberEmpty extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardLeftChamberEmpty (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		if (m_weapon.IsChamberEmpty(LZH43MuzzlesIndex.LEFT))
+		{
+			wpnDebugPrint("[wpnfsm] guard - left chamber empty");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - left chamber not empty");
+		return false;
+	}
+};
+
+class WeaponGuardRightChamberEmpty extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardRightChamberEmpty (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		if (m_weapon.IsChamberEmpty(LZH43MuzzlesIndex.RIGHT))
+		{
+			wpnDebugPrint("[wpnfsm] guard - right chamber empty");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - right chamber not empty");
+		return false;
+	}
+};
+
+class WeaponGuardLeftChamberFireout extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardLeftChamberFireout (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		if (m_weapon.IsChamberFiredOut(LZH43MuzzlesIndex.LEFT))
+		{
+			wpnDebugPrint("[wpnfsm] guard - left chamber fireout");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - left chamber not fireout");
+		return false;
+	}
+};
+
+class WeaponGuardRightChamberFireout extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardRightChamberFireout (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		if (m_weapon.IsChamberFiredOut(LZH43MuzzlesIndex.RIGHT))
+		{
+			wpnDebugPrint("[wpnfsm] guard - right chamber fireout");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - right chamber not fireout");
+		return false;
+	}
+};
+
+class WeaponGuardLeftChamberLoaded extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardLeftChamberLoaded (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		if (m_weapon.IsCartridgeInChamber(LZH43MuzzlesIndex.LEFT))
+		{
+			wpnDebugPrint("[wpnfsm] guard - left chamber loaded");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - left chamber not loaded");
+		return false;
+	}
+};
+
+class WeaponGuardRightChamberLoaded extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardRightChamberLoaded (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		if (m_weapon.IsCartridgeInChamber(LZH43MuzzlesIndex.RIGHT))
+		{
+			wpnDebugPrint("[wpnfsm] guard - right chamber loaded");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] guard - right chamber not loaded");
+		return false;
+	}
+};
+//--------------------------------------
+//--------------------------------------
+//--------------------------------------
+/*
+class WeaponEjectRightCasing extends WeaponStateBase
+{
+	void WeaponEjectRightCasing (Weapon_Base w = NULL, WeaponStateBase parent = NULL) { }
+
+	override void OnEntry (WeaponEventBase e)
+	{
+		super.OnEntry(e);
+
+		wpnDebugPrint("[wpnfsm] ejected fired out casing");
+		int mi = m_weapon.GetCurrentMuzzle();
+		m_weapon.EjectCasing(LZH43MuzzlesIndex.RIGHT);
+		m_weapon.SelectionBulletHide();
+	}
+};
+
+class WeaponEjectRightBullet_Cartridge extends WeaponStateBase
+{
+	Magazine m_dstMagazine; /// destination of the cartridge
+
+	override void OnEntry (WeaponEventBase e)
+	{
+		super.OnEntry(e);
+
+		DayZPlayer p = e.m_player;
+		int mi = m_weapon.GetCurrentMuzzle();
+
+		ejectBulletAndStoreInMagazine(m_weapon, mi, m_dstMagazine, p); // MP-safe
+	}
+
+	override void OnAbort (WeaponEventBase e)
+	{
+		m_dstMagazine = NULL;
+		super.OnAbort(e);
+	}
+
+	override void OnExit (WeaponEventBase e)
+	{
+		m_dstMagazine = NULL;
+		super.OnExit(e);
+	}
+
+	override bool SaveCurrentFSMState (ParamsWriteContext ctx)
+	{
+		if (!super.SaveCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Write(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponEjectBullet_Cartridge.SaveCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+	override bool LoadCurrentFSMState (ParamsReadContext ctx)
+	{
+		if (!super.LoadCurrentFSMState(ctx))
+			return false;
+
+		if (!ctx.Read(m_dstMagazine))
+		{
+			Error("[wpnfsm] WeaponEjectBullet_Cartridge.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			return false;
+		}
+		return true;
+	}
+
+};
+*/

@@ -1,6 +1,6 @@
 class PluginRepairing extends PluginBase
 {	
-	static protected int HEALTH_UP_ONE_LVL = 25;
+	static protected const int HEALTH_UP_ONE_LVL = 25;
 	static protected const int PRISTINE_STATE = 0;
 	static protected const int WORN_STATE = 1;
 	static protected const int DAMAGED_STATE = 2;
@@ -43,20 +43,21 @@ class PluginRepairing extends PluginBase
 		float kit_repair_cost_adjusted;
 		float new_quantity;
 		float item_max_health = item.GetMaxHealth( "", "" );
+		float health_up_one_level = HEALTH_UP_ONE_LVL;
 		
 		if ( item_max_health > 100 )
 		{
-			HEALTH_UP_ONE_LVL = item_max_health / 4;
+			health_up_one_level = item_max_health / 4;
 		}
 		
-		if ( cur_kit_quantity > HEALTH_UP_ONE_LVL )
+		if ( cur_kit_quantity > health_up_one_level )
 		{
 			kit_repair_cost_adjusted = player.GetSoftSkillsManager().SubtractSpecialtyBonus( kit_repair_cost, specialty_weight );
 			kit_repair_cost_adjusted = Math.Clamp( kit_repair_cost_adjusted, 0, 100 );
 			new_quantity = kit.GetQuantity() - kit_repair_cost_adjusted;
 			kit.SetQuantity( new_quantity );
 			
-			item.AddHealth( "", "", HEALTH_UP_ONE_LVL );
+			item.AddHealth( "", "", health_up_one_level );
 		}
 		else
 		{

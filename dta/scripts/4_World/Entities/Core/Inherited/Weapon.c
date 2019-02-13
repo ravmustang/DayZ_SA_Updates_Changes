@@ -96,7 +96,7 @@ class Weapon extends InventoryItemSuper
 	 * @param[in]
 	 * @return	returns name of i-th ammo type for chambering
 	 **/
-	proto native string GetChamberAmmoTypeName (int muzzleIndex);
+	proto native owned string GetChamberAmmoTypeName (int muzzleIndex);
 	/**@fn		LoadChamber
 	 * @brief	loads cartridge(damage, type) to chamber
 	 * @param[in] muzzleIndex
@@ -185,7 +185,7 @@ class Weapon extends InventoryItemSuper
 	 * @param[in] muzzleIndex
 	 * @return entity type name
 	 **/
-	proto native string GetCartridgeMagazineTypeName (int muzzleIndex);
+	proto native owned string GetCartridgeMagazineTypeName (int muzzleIndex);
 
 	/**@fn		EnterOptics
 	 * @brief	switches to optics mode if possible

@@ -49,7 +49,7 @@ class ActionBandageTarget: ActionContinuousBase
 		PlayerBase ntarget = PlayerBase.Cast(action_data.m_Target.GetObject());
 		if (ntarget.GetBleedingManagerServer() )
 		{
-			ntarget.GetBleedingManagerServer().RemoveAnyBleedingSource();
+			ntarget.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();
 		}
 		
 		if (action_data.m_MainItem.GetQuantity() > 0)

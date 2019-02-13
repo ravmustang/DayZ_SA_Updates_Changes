@@ -31,13 +31,12 @@ class HeartAttackMdfr: ModifierBase
 		if ( player.GetHealth("GlobalHealth","Shock") <= SHOCK_LIMIT )
 		{
 			float currenthealth = player.GetHealth("GlobalHealth", "Health");
-			player.SetHealth("GlobalHealth", "Health" , ( currenthealth + (HEALTH_DECREMENT_PER_SEC * deltaT) ) );
-			
+			player.AddHealth("GlobalHealth", "Health" , HEALTH_DECREMENT_PER_SEC * deltaT );
 		}
 		else
 		{
 			float currentshock =  player.GetHealth("GlobalHealth", "Shock");
-			player.SetHealth("GlobalHealth", "Shock" , ( currentshock + (SHOCK_DECREMENT_PER_SEC * deltaT) ) );
+			player.AddHealth("GlobalHealth", "Shock", SHOCK_DECREMENT_PER_SEC * deltaT);
 		}
 	}
 };

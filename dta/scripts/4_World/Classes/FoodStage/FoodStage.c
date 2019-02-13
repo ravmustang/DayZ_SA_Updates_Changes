@@ -269,15 +269,12 @@ class FoodStage
 		GetFoodItem().Synchronize();
 	}	
 
-	void RefreshVisuals()
+	void UpdateVisuals()
 	{
+		//if item has food stages
+		if ( GetFoodItem().HasFoodStage() ) 
+		{
 			Edible_Base food_item = GetFoodItem();
-			
-			//if item has no food stages
-			if ( !GetFoodItem().CanBeCooked() ) 
-			{
-				return;
-			}
 			
 			//Selections
 			string config_path;
@@ -295,27 +292,47 @@ class FoodStage
 			config_path = "CfgVehicles" + " " + food_item.GetType() + " " + "hiddenSelectionsMaterials";
 			GetGame().ConfigGetTextArray( config_path, config_materials );
 			
+			//selection index
+			int selection_index;
+			if ( GetSelectionIndex() >= 0 && config_selections.Count() > GetSelectionIndex() )
+			{
+				selection_index = GetSelectionIndex();
+			}
+			
+			//texture index
+			int texture_index;
+			if ( GetTextureIndex() >= 0 && config_textures.Count() > GetTextureIndex() )
+			{
+				texture_index = GetTextureIndex();
+			}
+	
+			//material index
+			int material_index;
+			if ( GetMaterialIndex() >= 0 && config_materials.Count() > GetMaterialIndex() )
+			{
+				material_index = GetMaterialIndex();
+			}
+				
 			//hide all selection except the configured one
 			for ( int i = 0; i < config_selections.Count(); i++ )
 			{
-				if ( config_selections.Get( i ) != config_selections.Get( GetSelectionIndex() ) )
+				if ( config_selections.Get( i ) != config_selections.Get( selection_index ) )
 				{
 					food_item.SetAnimationPhase( config_selections.Get( i ), 1 );
 				}
 			}
-			
+	
+			//Debug	
+			//Print( "item = " + food_item.GetType() + " selection index = " + GetSelectionIndex().ToString() + " texture index = " + GetTextureIndex().ToString() );
+		
 			//show selection
-			food_item.SetAnimationPhase( config_selections.Get( GetSelectionIndex() ), 0 );
+			food_item.SetAnimationPhase( config_selections.Get( selection_index ), 0 );
 			//set texture
-			food_item.SetObjectTexture( GetSelectionIndex(), config_textures.Get( GetTextureIndex() ) );
+			food_item.SetObjectTexture( selection_index, config_textures.Get( texture_index ) );
 			//set materials
-			food_item.SetObjectMaterial( GetSelectionIndex(), config_materials.Get( GetMaterialIndex() ) );
-		
-		if ( m_FoodItem.KindOf( "DeerSteakMeat" ) && m_FoodStageType == FoodStageType.BAKED && m_FoodStageTypeClientLast == FoodStageType.RAW )
-		{
-			Print("Meet Cooked!");
+			food_item.SetObjectMaterial( selection_index, config_materials.Get( material_index ) );
 		}
-		
+				
 		m_FoodStageTypeClientLast = m_FoodStageType;
 	}
 

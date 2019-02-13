@@ -306,7 +306,7 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("AugSteyr_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_aug.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/aug.anm");
 		pType.AddItemInHandsProfileIK("B95_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_b95.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/b95.anm");
 		pType.AddItemInHandsProfileIK("CZ61_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_cz61.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/CZ61.anm", "dz/anims/anm/player/reloads/cz61/w_cz61_states.anm");
-		pType.AddItemInHandsProfileIK("CZ527_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_cz527.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/cz527.anm");
+		pType.AddItemInHandsProfileIK("CZ527_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_cz527.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/cz527.anm", "dz/anims/anm/player/reloads/cz527/w_CZ527_states.anm");
 		pType.AddItemInHandsProfileIK("FAL_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_fnfal.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/fn_fal.anm");
 		pType.AddItemInHandsProfileIK("Izh18_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_izh18.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/izh18.anm", "dz/anims/anm/player/reloads/IZH18/w_izh18_states.anm");
 		pType.AddItemInHandsProfileIK("M4A1_Base", "dz/anims/workspaces/player/player_main/weapons/player_main_m4a1.asi", fireArmsItemBehaviour, "dz/anims/anm/player/ik/weapons/m4a1_ik.anm", "dz/anims/anm/player/reloads/M4A1/w_M4A1_states.anm");
@@ -468,7 +468,7 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("ReflexOptic", "dz/anims/workspaces/player/player_main/props/player_main_1h_scope.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/attachments/optic/optic_reflex.anm");
 		pType.AddItemInHandsProfileIK("GrozaOptic", "dz/anims/workspaces/player/player_main/props/player_main_1h_scope.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/attachments/optic/optic_ots14.anm");
 		pType.AddItemInHandsProfileIK("KobraOptic", "dz/anims/workspaces/player/player_main/props/player_main_1h_scope_kobra.asi", toolsOneHanded, 					"dz/anims/anm/player/ik/attachments/optic/optic_kobra.anm");
-		pType.AddItemInHandsProfileIK("KazuarOptic", "dz/anims/workspaces/player/player_main/props/player_main_1h_scope.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/attachments/optic/optic_m68_cco.anm"); //placeholder stuff
+		pType.AddItemInHandsProfileIK("KazuarOptic", "dz/anims/workspaces/player/player_main/props/player_main_1h_scope.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/attachments/optic/optic_1PN51.anm"); 
 			
 		//! support		
 		pType.AddItemInHandsProfileIK("M4_OEBttstck", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/attachments/support/buttstock_m4_oe.anm");
@@ -557,6 +557,7 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("ObsoleteFishingRod", "dz/anims/workspaces/player/player_main/weapons/player_main_2h_light.asi", twoHanded, 		"dz/anims/anm/player/ik/gear/ImprovisedFishingRod.anm");
 		pType.AddItemInHandsProfileIK("Mace", "dz/anims/workspaces/player/player_main/weapons/player_main_1h_pipe.asi", toolsOneHanded, 				"dz/anims/anm/player/ik/gear/flanged_mace.anm");
 		pType.AddItemInHandsProfileIK("TireRepairKit", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 		 			"dz/anims/anm/player/ik/gear/TireRepairKit.anm");
+		pType.AddItemInHandsProfileIK("HandSaw", "dz/anims/workspaces/player/player_main/props/player_main_1h_hacksaw.asi", toolsOneHanded, 			"dz/anims/anm/player/ik/gear/handsaw.anm");
 
 		
 		//! Tools two handed
@@ -765,7 +766,8 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		pType.AddItemInHandsProfileIK("WoodenStick", "dz/anims/workspaces/player/player_main/weapons/player_main_1h_pipe.asi", toolsOneHanded,			"dz/anims/anm/player/ik/gear/WoodenStick.anm"); 
 		pType.AddItemInHandsProfileIK("LongWoodenStick", "dz/anims/workspaces/player/player_main/weapons/player_main_1h_pipe.asi", toolsOneHanded,		"dz/anims/anm/player/ik/gear/LongWoodenStick.anm");
 		pType.AddItemInHandsProfileIK("BurlapSack", "dz/anims/workspaces/player/player_main/player_main_1h.asi", toolsOneHanded, 						"dz/anims/anm/player/ik/gear/bp_burlap_sack.anm");
-	
+		pType.AddItemInHandsProfileIK("LongTorch", "dz/anims/workspaces/player/player_main/props/player_main_1h_torch.asi", toolsOneHanded,				"dz/anims/anm/player/ik/gear/longTorch.anm");
+
 		//! Crafting 2hd	
 		pType.AddItemInHandsProfileIK("Spear", "dz/anims/workspaces/player/player_main/player_main_2h.asi", twoHanded,				 					"dz/anims/anm/player/ik/two_handed/advanced_spear.anm"); 
 	
@@ -1050,14 +1052,17 @@ void DayZPlayerTypeRegisterItems(DayZPlayerType pType)
 		array<string> izh18BoneRemap = { "release", "Weapon_Bone_02", "barrel", "Weapon_Bone_01", "trigger", "Weapon_Trigger","ejector","Weapon_Bone_03","bullet", "Weapon_Bullet", };
 		pType.AddItemBoneRemap("Izh18_Base", izh18BoneRemap);
 		
-		array<string> Mosin9130BoneRemap ={ "bolthandle", "Weapon_Bolt", "boltbody", "Weapon_Bone_04","boltbodyS", "Weapon_Bone_05", "trigger", "Weapon_Trigger","bullet", "Weapon_Bullet"};
-		pType.AddItemBoneRemap("Mosin9130_Base", Mosin9130BoneRemap);
+		array<string> BoltActionRifleBoneRemap ={ "bolthandle", "Weapon_Bolt", "boltbody", "Weapon_Bone_04", "boltbodyS", "Weapon_Bone_05", "trigger", "Weapon_Trigger","bullet", "Weapon_Bullet", "magazine", "Weapon_Magazine"};
+		pType.AddItemBoneRemap("BoltRifle_Base", BoltActionRifleBoneRemap);
 		
 		array<string> ShotgunBoneRemap ={ "bolt", "Weapon_Bolt", "pump", "Weapon_Bone_01","feedRamp", "Weapon_Bone_02", "trigger", "Weapon_Trigger","bullet", "Weapon_Bullet", "boltrelease", "Weapon_Bone_03"};
 		pType.AddItemBoneRemap("Mp133Shotgun_Base", ShotgunBoneRemap);
 		
 		array<string> Izh43BoneRemap = { "release", "Weapon_Bone_02", "barrel", "Weapon_Bone_01", "trigger", "Weapon_Trigger","ejector","Weapon_Bone_03","bullet", "Weapon_Bullet", "bullet2", "Weapon_Bone_04", "snaploader", "Weapon_Bone_05"};
 		pType.AddItemBoneRemap("Izh43Shotgun_Base", Izh43BoneRemap);
+		
+		array<string> SKSBoneRemap = { "bolt", "Weapon_Bolt", "trigger", "Weapon_Trigger", "bullet", "Weapon_Bullet", "follower", "Weapon_Bone_02"};
+		pType.AddItemBoneRemap("SKS_Base", SKSBoneRemap);
 		
 		//array<string> M4A1BoneRemap ={ "bolt", "Weapon_Bolt", "magazine", "Weapon_Magazine", "trigger", "Weapon_Trigger","charginghandle", "Weapon_Bone_01","bullet","Weapon_Bullet", };
 		//pType.AddItemBoneRemap("M4A1_Base", M4A1BoneRemap);

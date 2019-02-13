@@ -95,7 +95,6 @@ class ActionGiveBloodSelf: ActionContinuousBase
 		if ( delta > 0 )
 		{
 			action_data_b.m_Player.AddHealth("","Blood",delta);
-			//action_data.m_Player.SetHealth("GlobalHealth", "Blood", action_data.m_Player.GetHealth("GlobalHealth", "Blood") );
 
 			int bloodtypetarget = action_data_b.m_Player.GetStatBloodType().Get();
 			bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);

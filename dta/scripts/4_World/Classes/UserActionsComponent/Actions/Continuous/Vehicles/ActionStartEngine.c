@@ -129,18 +129,33 @@ class ActionStartEngine: ActionContinuousBase
 
 					if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 					{
+						EffectSound effectSound = NULL;
+
 						if ( m_FuelCon && m_BeltCon && m_SparkCon && m_BatteryCon )
 						{
-							SEffectManager.PlaySound("offroad_engine_start_SoundSet", car.GetPosition() );
+							effectSound = SEffectManager.CreateSound("offroad_engine_start_SoundSet", car.GetPosition() );
 						}
 						else
 						{
 							if ( !m_FuelCon )
-								SEffectManager.PlaySound("offroad_engine_failed_start_fuel_SoundSet", car.GetPosition() );
+								effectSound = SEffectManager.CreateSound("offroad_engine_failed_start_fuel_SoundSet", car.GetPosition() );
 							else if ( !m_SparkCon )
-								SEffectManager.PlaySound("offroad_engine_failed_start_sparkplugs_SoundSet", car.GetPosition() );
+								effectSound = SEffectManager.CreateSound("offroad_engine_failed_start_sparkplugs_SoundSet", car.GetPosition() );
 							else if ( !m_BatteryCon )
-								SEffectManager.PlaySound("offroad_engine_failed_start_battery_SoundSet", car.GetPosition() );
+								effectSound = SEffectManager.CreateSound("offroad_engine_failed_start_battery_SoundSet", car.GetPosition() );
+						}
+						
+						WaveKind waveKind = WaveKind.WAVEEFFECT;
+						
+						if (GetGame().GetPlayer().GetParent() == NULL || !GetGame().GetPlayer().IsCameraInsideVehicle())
+						{
+							waveKind = WaveKind.WAVEEFFECTEX;
+						}
+						
+						if (effectSound != NULL)
+						{
+							effectSound.SetSoundWaveKind(waveKind);
+							effectSound.SoundPlay();
 						}
 					}
 				}

@@ -44,7 +44,7 @@ class CommonColdMdfr: ModifierBase
 	{
 		float chance_of_sneeze = player.GetSingleAgentCountNormalized(eAgents.INFLUENZA);
 		
-		if( Math.RandomFloat01() < chance_of_sneeze / Math.RandomInt(4,10) )
+		if( Math.RandomFloat01() < chance_of_sneeze / Math.RandomInt(15,20) )
 		{
 			player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_SNEEZE);
 		}

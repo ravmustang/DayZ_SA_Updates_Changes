@@ -220,12 +220,14 @@ class NotifierBase
 	
 	protected DSLevels DetermineLevel(float value, float warning_treshold, float critical_treshold, float empty_treshold, float extra_treshold )
 	{
+		/*
 		DSLevels level;
 		if(value < warning_treshold) level = DSLevels.WARNING;
 		if(value < critical_treshold) level = DSLevels.CRITICAL;
 		if(value <= empty_treshold) level = DSLevels.BLINKING;
 		if(value <= extra_treshold) level = DSLevels.EXTRA;
 		return level;
+		*/
 	}
 	
 

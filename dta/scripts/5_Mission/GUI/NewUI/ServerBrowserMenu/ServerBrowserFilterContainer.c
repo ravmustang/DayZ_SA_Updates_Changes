@@ -57,6 +57,9 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		
 		#ifdef PLATFORM_WINDOWS
 			#ifndef PLATFORM_CONSOLE
+				m_SearchByName.SetHandler( this );
+				m_SearchByIP.SetHandler( this );
+		
 				m_CharacterAliveFilter		= new OptionSelectorMultistate( root.FindAnyWidget( "restrict_char_setting_option" ), 0, this, false, character_name_options );
 				m_BattleyeFilter			= new OptionSelector( root.FindAnyWidget( "battleye_setting_option" ), 0, this, false );
 				m_PasswordFilter			= new OptionSelector( root.FindAnyWidget( "password_setting_option" ), 0, this, false  );
@@ -122,6 +125,122 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				#endif
 			}
 		}
+	}
+	
+	//! Removes all characters from the given string whirh are NOT a number, '.' or ':'. Returns true if any change was done to the input text.
+	bool ProcessIntoIPAddress(out string potential_ip)
+	{
+		bool was_text_changed = false;
+		int length = potential_ip.Length();
+		
+		// Filter out incompatible characters
+		for ( int i = length - 1 ; i >= 0; --i )
+		{
+			string character = potential_ip.Get(i);
+			
+			if ( character.ToInt() == 0  &&  character != "0"  &&  character != "."  &&  character != ":" )
+			{
+				potential_ip = potential_ip.SubstringInverted(potential_ip, i, i + 1);
+				was_text_changed = true;
+			}
+		}
+		
+		bool text_was_shortened = LimitTextBoxCharacterCount( potential_ip, 21 );
+		
+		return (was_text_changed  ||  text_was_shortened);
+	}
+	
+	//! Limits the given text to 'max_length' character count. Returns true if any change was done to the input.
+	bool LimitTextBoxCharacterCount( out string text, int max_length )
+	{
+		int length = text.Length();
+		bool was_text_changed = false;
+		
+		if ( length > max_length )
+		{
+			text = text.Substring(0, max_length);
+			was_text_changed = true;
+		}
+		
+		return was_text_changed;
+	}
+	
+	//! Attempts to generate a valid IP address & port from the given string in format like this: "192.168.0.2:2503". If the process fails, then an empty string is returned.
+	string GenerateValidIP(string potential_ip)
+	{
+		string correct_ip_format;
+		
+		TStringArray array_ip_and_port = new TStringArray;
+		potential_ip.Split( ":", array_ip_and_port );
+		
+		string ip_entries;
+		int port;
+		
+		if( array_ip_and_port.Count() > 0 )
+		{
+			ip_entries = array_ip_and_port.Get( 0 );
+			TStringArray array_ip = new TStringArray;
+			ip_entries.Split( ".", array_ip );
+			
+			string ip_string;
+			int ip_entries_count = array_ip.Count();
+			
+			if (ip_entries_count <= 3  ||  ip_entries_count > 4)
+				return "";
+			
+			for ( int i = 0; i < 4; i++ )
+			{
+				int ip_entry = array_ip.Get(i).ToInt();
+				
+				// Check if the entry is a valid number
+				if ( ip_entry > 255  ||  ip_entry < 0 )
+					ip_entry = 0;
+				
+				ip_string = ip_string + ip_entry.ToString();
+				
+				if ( i < ip_entries_count - 1 )
+					ip_string = ip_string + ".";
+				;
+			}
+			
+			correct_ip_format = ip_string;
+		}
+		else
+		{
+			ip_entries = "";
+			correct_ip_format = ip_entries;
+		}
+
+		if ( correct_ip_format == "" )
+			return ""; // Input string was not recognized as a valid IP address. Thus return an empty string.
+		
+		// The input string was recognized as a valid IP address. Thus continue with port number.
+		
+		if( array_ip_and_port.Count() > 1 )
+		{
+			port = array_ip_and_port.Get( 1 ).ToInt();
+			
+			if ( port > 65535  |  port < 0 ) // max port value is 65535
+				port = 2302;
+			
+			
+			if ( port >= 0 )
+				correct_ip_format = correct_ip_format + ":" + port.ToString();
+			;
+		}
+		else
+		{
+			port = 2302;
+			correct_ip_format = correct_ip_format + ":" + port.ToString();
+		}
+		
+		return correct_ip_format;
+	}
+	
+	//! Turns any given string into a more convenient filter (limits character count, forces lowercase, trims empty spaces).
+	bool GenerateValidFilter(out string potential_filter)
+	{
+		return LimitTextBoxCharacterCount( potential_filter, 16 );
 	}
 	
 	void SaveFilters()
@@ -222,49 +341,38 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		#endif
 	}
 	
-	override bool OnEvent( EventType eventType, Widget target, int parameter0, int parameter1 )
-	{
-		if( target )
-		{
-			if( target == m_SearchByName || target == m_SearchByIP )
-			{
-				OnFilterChanged();
-				return false;
-			}
-		}
-		return true;
-	}
-	
 	override bool OnChange( Widget w, int x, int y, bool finished )
 	{
 		if( w )
 		{
-			if( w == m_SearchByName || w == m_SearchByIP )
+			if( w == m_SearchByName )
 			{
+				string input_name = m_SearchByName.GetText();
+				
+				if ( GenerateValidFilter( input_name ) )
+					m_SearchByName.SetText( input_name ); // Warning! Using SetText() causes the cursor to move at the end of the text box!
+				
 				OnFilterChanged();
-				return false;
+				return true;
+			}
+			else if( w == m_SearchByIP )
+			{
+				string input_ip = m_SearchByIP.GetText();
+				
+				if ( ProcessIntoIPAddress( input_ip ) )
+					m_SearchByIP.SetText( input_ip ); // Warning! Using SetText() causes the cursor to move at the end of the text box!
+				
+				OnFilterChanged();
+				return true;
 			}
 		}
-		return true;
-	}
-	
-	override bool OnUpdate( Widget w )
-	{
-		if( w )
-		{
-			if( w == m_SearchByName || w == m_SearchByIP )
-			{
-				OnFilterChanged();
-				return false;
-			}
-		}
-		return true;
+		return false;
 	}
 	
 	override bool OnFocus( Widget w, int x, int y )
 	{
 		m_Tab.FilterFocus( ( w != null ) );
-		return true;
+		return false;
 	}
 	
 	GetServersInput GetFilterOptions()

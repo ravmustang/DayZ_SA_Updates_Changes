@@ -126,7 +126,7 @@ class KeybindingsMenu extends UIScriptedMenu
 	
 	override void Update(float timeslice)
 	{
-		if( GetGame().GetInput().GetActionDown(UAUIBack, false) )
+		if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
 		{
 			Back();
 		}
@@ -172,11 +172,9 @@ class KeybindingsMenu extends UIScriptedMenu
 			group.Apply();
 		}
 		
-		#ifdef WIP_INPUTS
-			// save input configuration
-			GetUApi().Export();
-			Print(" ----- Export -----");
-		#endif			
+		// save input configuration
+		GetUApi().Export();
+		Print(" ----- Export -----");
 	}
 	
 	void Back()

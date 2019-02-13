@@ -33,6 +33,7 @@ class UpgradeTorchWithLard extends RecipeBase
 		
 		//ingredient 2
 		InsertIngredient(1,"Torch");//you can insert multiple ingredients this way
+		InsertIngredient(1,"LongTorch");//you can insert multiple ingredients this way
 		
 		m_IngredientAddHealth[1] = 0;// 0 = do nothing
 		m_IngredientSetHealth[1] = -1; // -1 = do nothing
@@ -59,7 +60,7 @@ class UpgradeTorchWithLard extends RecipeBase
 		Lard lard = Lard.Cast(ingredients[0]);
 		Torch torch = Torch.Cast(ingredients[1]);
 		
-		Rag rag_on_torch = Rag.Cast(  torch.GetAttachmentByType(Rag)  );
+		Rag rag_on_torch = Rag.Cast(  torch.GetRag()  );
 		
 		if (rag_on_torch) // Check if torch already has rag with 100% quantity
 		{
@@ -75,7 +76,7 @@ class UpgradeTorchWithLard extends RecipeBase
 	override void Do(ItemBase ingredients[], PlayerBase player,array<ItemBase> results, float specialty_weight)//gets called upon recipe's completion
 	{
 		Torch torch = Torch.Cast(ingredients[1]);
-		Rag rag_on_torch = Rag.Cast(  torch.GetInventory().GetAttachmentFromIndex( 0 )  );
+		Rag rag_on_torch = Rag.Cast(  torch.GetRag()  );
 		
 		if (rag_on_torch)
 		{

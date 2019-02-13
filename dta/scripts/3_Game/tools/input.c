@@ -37,7 +37,6 @@ class Input
 	proto native void		SetActionKeys(int action_index, TIntArray keys);
 	proto int				GetActionKeyName(int key_index, out string name);
 	proto native int		GetActionsCount();
-	proto native void		GetSpecialKeys(out TIntArray special_keys);
 	proto native int		IsKeyReserved(int dikCode);
 	proto void				SeparateComboAndKey(int dik, out int dikCombo, out int dikKey);
 	proto native int		IsActionGroupCollision(int actionIndexA, int actionIndexB);
@@ -108,8 +107,8 @@ class Input
 	@param check_focus if true and game is unfocused, returns 0; otherwise returns actual value
 	@return actual action state as float, for regular two state buttons returns 0 or 1, for analog buttons/axes returns value in interval <0, 1> with consideration of defined deadzones
 	*/
-	proto native float	GetAction(int action, bool check_focus = true);
-	proto native float	GetAction_STR(string action, bool check_focus = true);
+	proto native float	GetAction_ID(int action, bool check_focus = true);
+	proto native float	GetAction(string action, bool check_focus = true);
 		
 	/**  
 	\brief Returns true just in frame, when action was invoked (button was pressed)
@@ -117,8 +116,8 @@ class Input
 	@param check_focus if true and game is unfocused, returns 0; otherwise returns actual value
 	@return true if action was invoked in that frame, false otherwise
 	*/
-	proto native bool	GetActionDown(int action, bool check_focus = true);
-	proto native bool	GetActionDown_STR(string action, bool check_focus = true);
+	proto native bool	GetActionDown_ID(int action, bool check_focus = true);
+	proto native bool	GetActionDown(string action, bool check_focus = true);
 	
 	/**  
 	\brief Returns true just in frame, when release action happened (button was released)
@@ -127,8 +126,8 @@ class Input
 	@return true if action was released in that frame, false otherwise
 	@see GetActionDown()
 	*/
-	proto native bool	GetActionUp(int action, bool check_focus = true);
-	proto native bool	GetActionUp_STR(string action, bool check_focus = true);
+	proto native bool	GetActionUp_ID(int action, bool check_focus = true);
+	proto native bool	GetActionUp(string action, bool check_focus = true);
 
 	/**  
 	\brief Returns true just in frame, when hold action invoked (button is hold)
@@ -137,8 +136,8 @@ class Input
 	@return true if action was released in that frame, false otherwise
 	@see GetActionHold()
 	*/
-	proto native bool	GetActionHold(int action, bool check_focus = true);
-	proto native bool	GetActionHold_STR(string action, bool check_focus = true);
+	proto native bool	GetActionHold_ID(int action, bool check_focus = true);
+	proto native bool	GetActionHold(string action, bool check_focus = true);
 
 	/**  
 	\brief Returns true just in frame, when double click action invoked (button double clicked)
@@ -147,8 +146,8 @@ class Input
 	@return true if action was released in that frame, false otherwise
 	@see GetActionDbl()
 	*/
-	proto native bool	GetActionDbl(int action, bool check_focus = true);
-	proto native bool	GetActionDbl_STR(string action, bool check_focus = true);
+	proto native bool	GetActionDbl_ID(int action, bool check_focus = true);
+	proto native bool	GetActionDbl(string action, bool check_focus = true);
 
 	proto native void	BlockInput(int key);
 	
@@ -167,8 +166,6 @@ class Input
 	*/
 	proto native void	DisableAction(int action);
 	
-	proto native int	GetSpecialKeyPressed(); // special key - gamepad, joystick, etc
-
 	//! gets currently selected profile
 	proto native int	GetCurrentProfile();
 	// gets currently selected profile keys for action

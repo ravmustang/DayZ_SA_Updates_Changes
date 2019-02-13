@@ -75,9 +75,9 @@ class CAContinuousMineWood : CAContinuousBase
 					if ( m_SpentUnits )
 					{
 						m_SpentUnits.param1 = m_TimeElpased;
-						SetACData(m_SpentUnits);	
+						SetACData(m_SpentUnits);
 					}
-					if ( targetObject.IsTree() )
+					if ( targetObject.IsTree() && TreeHard.Cast(targetObject) )
 					{
 						ItemBase wooden_logs = ItemBase.Cast(GetGame().CreateObject("WoodenLog",action_data.m_Player.GetPosition(), false));
 						
@@ -86,7 +86,7 @@ class CAContinuousMineWood : CAContinuousBase
 						{
 							ItemBase.Cast(GetGame().CreateObject("WoodenLog",action_data.m_Player.GetPosition(), false));
 						}
-					}						
+					}
 					
 					targetObject.OnTreeCutDown( action_data.m_MainItem );
 					OnCompletePogress(action_data);
@@ -111,11 +111,6 @@ class CAContinuousMineWood : CAContinuousBase
 		
 		if (!cut_tree_tool)
 			return super.Cancel( action_data );
-		
-		if ( cut_tree_tool.GetHaveCutHardTree() || cut_tree_tool.GetHaveCutSoftTree() || cut_tree_tool.GetHaveCutHardBush() || cut_tree_tool.GetHaveCutSoftBush() )
-		{
-			cut_tree_tool.SoundSynchRemoteReset();
-		}
 		
 		return super.Cancel( action_data );
 	}

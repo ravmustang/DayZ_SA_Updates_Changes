@@ -264,14 +264,36 @@ class Slot
 		return m_DiggedSlotComponent;
 	}
 	
-	void OnStoreLoadCustom( ParamsReadContext ctx )
+	bool OnStoreLoadCustom( ParamsReadContext ctx, int version )
 	{
-		ctx.Read( m_Fertility );		
-		ctx.Read( m_FertilizerUsage );
-		ctx.Read( m_FertilizerQuantity );		
-		ctx.Read( m_FertilizerType );		
-		ctx.Read( m_HarvestingEfficiency );
-		ctx.Read( m_State );
+		if ( version < 102 )
+		{
+			ctx.Read( m_Fertility );
+			ctx.Read( m_FertilizerUsage );
+			ctx.Read( m_FertilizerQuantity );
+			
+			if ( !ctx.Read( m_FertilizerType ) )
+				m_FertilizerType = "";
+			
+			ctx.Read( m_HarvestingEfficiency );
+			ctx.Read( m_State );
+		}
+		
+		if ( version >= 102 )
+		{
+			ctx.Read( m_Fertility );       
+			ctx.Read( m_FertilizerUsage );
+			ctx.Read( m_FertilizerQuantity );       
+			ctx.Read( m_HarvestingEfficiency );
+			ctx.Read( m_State );
+			
+			if( !ctx.Read( m_FertilizerType ) )
+			{
+				m_FertilizerType = "";
+			}
+		}
+		
+		return true;
 	}
 
 	void OnStoreSaveCustom( ParamsWriteContext ctx )
@@ -279,8 +301,8 @@ class Slot
 		ctx.Write( m_Fertility );
 		ctx.Write( m_FertilizerUsage );
 		ctx.Write( m_FertilizerQuantity );
-		ctx.Write( m_FertilizerType );
 		ctx.Write( m_HarvestingEfficiency );
 		ctx.Write( m_State );
+		ctx.Write( m_FertilizerType );
 	}
 }

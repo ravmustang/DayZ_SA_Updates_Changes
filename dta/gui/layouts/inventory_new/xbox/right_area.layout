@@ -1,0 +1,183 @@
+PanelWidgetClass DropzoneX {
+ visible 0
+ clipchildren 0
+ ignorepointer 1
+ color 1 1 1 0
+ size 533 1
+ halign right_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 0
+ priority 10
+ scriptclass ""
+ style Outline
+ {
+  ScrollWidgetClass Scroller {
+   visible 1
+   clipchildren 0
+   ignorepointer 0
+   color 0.1961 0.1961 0.1961 0.3922
+   size 533 1
+   halign right_ref
+   valign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 0
+   scriptclass ""
+   style blank
+   "Ignore invisible" 0
+   "Scrollbar V" 1
+   {
+    PanelWidgetClass DropzoneXa {
+     visible 0
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 1 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     priority 10
+     style dashed
+    }
+    FrameWidgetClass ContentParent {
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 513 0
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     scriptclass "SizeToChild"
+     {
+      WrapSpacerWidgetClass Content {
+       clipchildren 0
+       ignorepointer 1
+       position 0 0
+       size 513 1
+       hexactpos 0
+       vexactpos 0
+       hexactsize 1
+       vexactsize 0
+       scriptclass ""
+       style Colorable
+       Padding 0
+       Margin 0
+       "Size To Content V" 1
+      }
+      PanelWidgetClass Up {
+       clipchildren 0
+       size 36 140
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       {
+        ImageWidgetClass LT0 {
+         ignorepointer 1
+         position -60 -5
+         size 29 29
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:dayz_gui image:icon_minus"
+         mode blend
+         "src alpha" 1
+        }
+        ImageWidgetClass LT1 {
+         ignorepointer 1
+         position -60 0
+         size 29 29
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:dayz_gui image:icon_minus"
+         mode blend
+         "src alpha" 1
+        }
+        ImageWidgetClass LT {
+         ignorepointer 1
+         position 60 19
+         size 36 50
+         halign right_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:xbox_buttons image:LT"
+         mode blend
+         "src alpha" 1
+        }
+        ImageWidgetClass RT {
+         ignorepointer 1
+         position 60 19
+         size 36 50
+         halign right_ref
+         valign bottom_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:xbox_buttons image:RT"
+         mode blend
+         "src alpha" 1
+        }
+        ImageWidgetClass RT0 {
+         ignorepointer 1
+         position -60 -5
+         size 29 29
+         halign center_ref
+         valign bottom_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:dayz_gui image:icon_plus"
+         mode blend
+         "src alpha" 1
+        }
+        ImageWidgetClass RT1 {
+         ignorepointer 1
+         position -60 0
+         size 29 29
+         halign center_ref
+         valign bottom_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:dayz_gui image:icon_plus"
+         mode blend
+         "src alpha" 1
+        }
+       }
+      }
+      PanelWidgetClass Down {
+       clipchildren 0
+       position 0 50
+       size 36 50
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+      }
+     }
+     {
+      ScriptParamsClass {
+       m_ChildName "Content"
+       m_ResizeVertical 1
+      }
+     }
+    }
+   }
+  }
+ }
+}

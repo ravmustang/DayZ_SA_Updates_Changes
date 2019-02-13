@@ -57,7 +57,7 @@ class MosinLoadedJammed extends WeaponStateJammed
  * @brief		base for Mosin
  * @NOTE		name copies config base class
  **/
-class Mosin9130_Base extends Weapon_Base
+class Mosin9130_Base extends BoltRifle_Base
 {
 	ref WeaponStateBase C0;
 	ref	WeaponStateBase C1;
@@ -71,8 +71,8 @@ class Mosin9130_Base extends Weapon_Base
 	override void InitStateMachine ()
 	{
 		m_abilities.Insert(new AbilityRecord(WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED));
+		m_abilities.Insert(new AbilityRecord(WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP));
 		m_abilities.Insert(new AbilityRecord(WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED));
-		m_abilities.Insert(new AbilityRecord(WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED));
 		m_abilities.Insert(new AbilityRecord(WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE));
 		m_abilities.Insert(new AbilityRecord(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START));
 		m_abilities.Insert(new AbilityRecord(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_END));
@@ -87,17 +87,17 @@ class Mosin9130_Base extends Weapon_Base
 		J1 = new MosinLoadedJammed(this, NULL, MosinAnimState.JAMMED);
 		D1 = new MosinLoadedDischarged(this, NULL, MosinAnimState.DEFAULT);
 		
-	
-		WeaponStateBase		Mech_C1 = new WeaponCharging(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);
-		WeaponStateBase		Mech_D1 = new WeaponCharging(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);
 
-		//LoopedChamberingLoadSingleBullet 	SChamber_C0 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		//LoopedChamberingLoadSingleBullet 	SChamber_C1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		//LoopedChamberingLoadSingleBullet 	SChamber_D1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		WeaponStateBase		Mech_C1 = new WeaponChargingInnerMag(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);
+		WeaponStateBase		Mech_D1 = new WeaponChargingInnerMag(this, NULL, WeaponActions.MECHANISM, WeaponActionMechanismTypes.MECHANISM_CLOSED);
+
+		//LoopedChamberingLoadSingleBullet 	SChamber_C0 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		//LoopedChamberingLoadSingleBullet 	SChamber_C1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		//LoopedChamberingLoadSingleBullet 	SChamber_D1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
 		
-		LoopedChambering 	Chamber_C0 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering 	Chamber_C1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering 	Chamber_D1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering 	Chamber_C0 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering 	Chamber_C1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering 	Chamber_D1 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
 		
 		WeaponStateBase		Unjam_J1 = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START);
 		
@@ -106,14 +106,13 @@ class Mosin9130_Base extends Weapon_Base
 		WeaponStateBase		Trigger_D1 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
 		WeaponStateBase		Trigger_J1 = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_DRY);
 		// extend Rifle_Base fsm
-		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering psh = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
-		LoopedChambering lch2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_OPENED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
-		LoopedChambering psh2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
+		/*LoopedChambering lch = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering psh = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE);
+		LoopedChambering lch2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
+		LoopedChambering psh2 = new LoopedChambering(this, NULL, WeaponActions.CHAMBERING, WeaponActionChamberingTypes.CHAMBERING_STARTLOOPABLE_CLOSED_KEEP, WeaponActionChamberingTypes.CHAMBERING_ENDLOOPABLE,true);
 		*/
 		
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
-		WeaponEventBase __lS_ = new WeaponEventContinuousLoadBulletStart;
 		WeaponEventBase __L__ = new WeaponEventLoad1Bullet;
 		WeaponEventBase __T__ = new WeaponEventTrigger;
 		WeaponEventBase __U__ = new WeaponEventUnjam;
@@ -125,13 +124,6 @@ class Mosin9130_Base extends Weapon_Base
 		m_fsm = new WeaponFSM();
 		
 		// Mechanism
-		/*m_fsm.AddTransition(new WeaponTransition( D1	, __M__,	Mech));
-		m_fsm.AddTransition(new WeaponTransition( C1	, __M__,	Mech));
-		m_fsm.AddTransition(new WeaponTransition( Mech  , _fin_,	C0, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( Mech  , _fin_,	C1));
-		m_fsm.AddTransition(new WeaponTransition( Mech	, _abt_,	C0, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( Mech	, _abt_,	D1, NULL, new WeaponGuardChamberFiredOut(this)));
-		m_fsm.AddTransition(new WeaponTransition( Mech	, _abt_,	C1));*/
 //----------------------------------------	
 			
 		m_fsm.AddTransition(new WeaponTransition( C1,		__M__,  Mech_C1));
@@ -148,22 +140,6 @@ class Mosin9130_Base extends Weapon_Base
 		m_fsm.AddTransition(new WeaponTransition( Mech_D1,	_abt_,  D1, NULL, new WeaponGuardChamberFiredOut(this)));
 		m_fsm.AddTransition(new WeaponTransition( Mech_D1,	_abt_,  C1));
 		
-				
-//----------------------------------------		
-		
-/*		m_fsm.AddTransition(new WeaponTransition( C0,			__L__,  SChamber_C0));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_C0,	_fin_,  C1));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_C0,	_abt_,  C0, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_C0,	_abt_,  C1));
-		
-		m_fsm.AddTransition(new WeaponTransition( C1,			__L__,  SChamber_C1, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_C1,	_fin_,  C1));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_C1,	_abt_,  C1));
-		
-		m_fsm.AddTransition(new WeaponTransition( D1,			__L__,  SChamber_D1));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_D1,	_fin_,  C1));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_D1,	_abt_,  D1, NULL, new WeaponGuardChamberFiredOut(this)));
-		m_fsm.AddTransition(new WeaponTransition( SChamber_D1,	_abt_,  C1));*/
 		
 //----------------------------------------		
 		
@@ -221,32 +197,7 @@ class Mosin9130_Base extends Weapon_Base
 		m_fsm.AddTransition(new WeaponTransition(Trigger_J1,	_dto_, J1));
 		m_fsm.AddTransition(new WeaponTransition(Trigger_J1,	_abt_, J1));
 		
-//-----------------------------------------	
-
-		// load cartridge
-/*		m_fsm.AddTransition(new WeaponTransition( E_C, __lS_,  lch, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( lch, _fin_,  L_C));
-		
-		m_fsm.AddTransition(new WeaponTransition( E_C, __L__,  lch2));
-		m_fsm.AddTransition(new WeaponTransition( lch2, _fin_,  L_C));
-
-		m_fsm.AddTransition(new WeaponTransition( E_D, __lS_,  lch, NULL, new WeaponGuardChamberEmpty(this)));
-		m_fsm.AddTransition(new WeaponTransition( lch, _fin_,  L_C));
-		
-		m_fsm.AddTransition(new WeaponTransition( E_D, __L__,  lch2));
-		m_fsm.AddTransition(new WeaponTransition( lch2, _fin_,  L_C));
-
-		m_fsm.AddTransition(new WeaponTransition( L_C, __lS_,  psh, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition( psh, _fin_,  L_C));
-		
-	
-		m_fsm.AddTransition(new WeaponTransition( L_C, __L__,  psh2, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition( psh2, _fin_,  L_C));
-
-		// @TODO: chci load z loaded_fired_out - nefunguje mi nejak ten m_eject
-		m_fsm.AddTransition(new WeaponTransition( E_D, __lS_, psh, NULL, new GuardNot(new WeaponGuardChamberFull(this))));
-		m_fsm.AddTransition(new WeaponTransition(psh, _fin_,  L_C));
-	*/	
+//---------------------------------------------	
 		
 		m_fsm.SetInitialState(C0);
 

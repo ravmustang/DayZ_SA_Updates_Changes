@@ -1,6 +1,8 @@
+//checks for critical blood level and kills the character if bellow
 class BleedingCheckMdfr: ModifierBase
 {
 	protected const float		BLOOD_DECREMENT_PER_SEC = -10;
+	PluginAdminLog 				m_AdminLog;
 		
 	override void Init()
 	{
@@ -8,6 +10,7 @@ class BleedingCheckMdfr: ModifierBase
 		m_ID 					= eModifiers.MDF_BLEEDING;
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
+		m_AdminLog 				= PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
 	}
 
 	override bool ActivateCondition(PlayerBase player)
@@ -26,13 +29,17 @@ class BleedingCheckMdfr: ModifierBase
 	{
 		player.SetHealth("","",-1000);
 		
-		if (GetGame().IsServer())
+		/*if (GetGame().IsServer()) // older logging
 		{
 			PlayerIdentity identity = m_Player.GetIdentity();
 			if (identity)
 			{
 				GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).Call(GetGame().AdminLog, "Player '" + identity.GetName() + "' (id=" + identity.GetId() + ") bled out.");
 			}
+		}*/
+		if ( m_AdminLog )
+		{
+			m_AdminLog.BleedingOut( player );
 		}
 	}
 

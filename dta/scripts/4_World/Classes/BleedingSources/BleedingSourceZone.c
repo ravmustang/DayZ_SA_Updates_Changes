@@ -5,14 +5,18 @@ class BleedingSourceZone
 	vector		m_EmitterOffset;
 	vector		m_EmitterOrientation;
 	string		m_Bone;
+	float		m_FlowModifier;
+	int 		m_MaxTime;
 	
-	void BleedingSourceZone(string selection_name, int bit, vector offset, vector orientation, string bone)
+	void BleedingSourceZone(string selection_name, int bit, vector offset, vector orientation, string bone, int max_time, float flow_modifier)
 	{
 		m_FireSelectionName = selection_name;
 		m_Bit = bit;
 		m_EmitterOffset = offset;
 		m_EmitterOrientation = orientation;
 		m_Bone = bone;
+		m_FlowModifier = flow_modifier;
+		m_MaxTime = max_time;
 	}
 
 	void ~BleedingSourceZone()
@@ -25,9 +29,19 @@ class BleedingSourceZone
 		return m_FireSelectionName;
 	}
 	
+	int GetMaxTime()
+	{
+		return m_MaxTime;
+	}
+	
 	int GetBit()
 	{
 		return m_Bit;
+	}
+	
+	float GetFlowModifier()
+	{
+		return m_FlowModifier;
 	}
 	
 	vector GetOrientation()

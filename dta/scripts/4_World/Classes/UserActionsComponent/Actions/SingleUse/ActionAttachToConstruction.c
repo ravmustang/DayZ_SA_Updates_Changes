@@ -60,6 +60,13 @@ class ActionAttachToConstruction: ActionSingleUseBase
 		return false;
 	}
 	
+	override void OnStartClient( ActionData action_data )
+	{
+		//set action initiator
+		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
+		construction_action_data.SetActionInitiator( action_data.m_Player );
+	}	
+	
 	override void OnExecuteServer( ActionData action_data )
 	{
 		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
@@ -91,6 +98,4 @@ class ActionAttachToConstruction: ActionSingleUseBase
 			}
 		}
 	}
-	
-
 }

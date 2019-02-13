@@ -131,7 +131,7 @@ class Hologram
 	{
 		ItemBase item_in_hands = ItemBase.Cast( m_Player.GetHumanInventory().GetEntityInHands() );
 
-		if ( item_in_hands.CanMakeGardenplot() )
+		if ( item_in_hands && item_in_hands.CanMakeGardenplot() )
 		{
 			return "GardenPlot";
 		}
@@ -471,7 +471,7 @@ class Hologram
 				}
 				
 				
-				Print( "Mame obstacle" );
+				//Print( "Mame obstacle" );
 				return true;
 			}
 		}
@@ -647,7 +647,7 @@ class Hologram
 	void CheckPowerSource()
 	{
 		//in range of its power source.
-		if ( m_Player != NULL && m_Parent.HasEnergyManager() && m_Parent.GetCompEM().IsPlugged() )
+		if ( m_Player && m_Parent && m_Parent.HasEnergyManager() && m_Parent.GetCompEM().IsPlugged() )
 		{
 			// Now we know we are working with an electric device which is plugged into a power source.
 			EntityAI placed_entity = m_Parent;
@@ -1141,14 +1141,20 @@ class ProjectionTrigger extends Trigger
 	override void OnEnter( Object obj )
 	{
 		//Print("OnEnter");
-		m_ParentObj.SetIsCollidingPlayer( true );
-		m_TriggerUpdateMs = 50;
+		if ( m_ParentObj )
+		{
+			m_ParentObj.SetIsCollidingPlayer( true );
+			m_TriggerUpdateMs = 50;
+		}
 	}
 
 	override void OnLeave( Object obj )
 	{
 		//Print("OnLeave");
-		m_ParentObj.SetIsCollidingPlayer( false );
+		if ( m_ParentObj )
+		{
+			m_ParentObj.SetIsCollidingPlayer( false );
+		}
 	}
 
 	override protected void UpdateInsiders(int timeout )

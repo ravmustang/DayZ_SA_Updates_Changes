@@ -65,10 +65,18 @@ class PluginTransmissionAgents extends PluginBase
 		target.RemoveAgent( agent_id );
 	}
 	
+	
+	
 	protected float GetAgentTransferabilityIn( int agent_id )
 	{
 		if( !m_AgentList.Get(agent_id) ) return 0;
 		return m_AgentList.Get(agent_id).GetTransferabilityIn();
+	}
+	
+	float GetAgentAntiboticsResistance( int agent_id )
+	{
+		if( !m_AgentList.Get(agent_id) ) return 0;
+		return m_AgentList.Get(agent_id).GetAntiboticsResistance();
 	}
 	
 	protected float GetAgentTransferabilityOut( int agent_id )
@@ -90,8 +98,22 @@ class PluginTransmissionAgents extends PluginBase
 	*/
 	float GetAgentInvasibility( int agent_id )
 	{
-		if( !m_AgentList.Get(agent_id) ) return 0;
+		if( !m_AgentList.Get(agent_id) ) 
+			return 0;
 		return m_AgentList.Get(agent_id).GetInvasibility();
+	}
+	float GetDieOffSpeed( int agent_id )
+	{
+		if( !m_AgentList.Get(agent_id) ) 
+			return 0;
+		return m_AgentList.Get(agent_id).GetDieOffSpeed();
+	}
+	
+	EStatLevels GetPotency( int agent_id )
+	{
+		if( !m_AgentList.Get(agent_id) ) 
+			return 0;
+		return m_AgentList.Get(agent_id).GetPotency();
 	}
 
 	static int GetAgentMaxCount( int agent_id )
@@ -107,12 +129,13 @@ class PluginTransmissionAgents extends PluginBase
 	}
 	*/
 	
+	/*
 	float GetImmunityResistance( int agent_id )
 	{
 		if( !m_AgentList.Get(agent_id) ) return 0;
 		return m_AgentList.Get(agent_id).GetImmunityResistance();
 	}
-	
+	*/
 	
 	void TransmitAgents(EntityAI source, EntityAI target, int pathway, int dose_size = 1000)
 	{
@@ -157,7 +180,10 @@ class PluginTransmissionAgents extends PluginBase
 				break;
 
 			case AGT_AIRBOURNE:
-				InjectAgentsWithPlayer( target, sourceAgents , GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.MASK, Man.Cast( target )), dose_size, InjectTypes.PLAYER_AIR_PLAYER );
+				float prot_level_mask = GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.MASK, Man.Cast( target ));
+				float prot_level_headgear = GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.HEADGEAR, Man.Cast( target ));
+				float prot_level_final = Math.Max(prot_level_mask, prot_level_headgear);//find the bigger of the 2, TODO: should be improved
+				InjectAgentsWithPlayer( target, sourceAgents , prot_level_final, dose_size, InjectTypes.PLAYER_AIR_PLAYER );
 		}
 	}
 	
@@ -171,6 +197,7 @@ class PluginTransmissionAgents extends PluginBase
 	}
 	
 	//! will add agents to a given target
+	/*
 	protected void InjectAgentsWithPlayer(EntityAI target, int agents,float protection, int dose_size, int inject_type)//target,array_of_agents,protection_lvl
 	{
 		if(target && (agents != 0) && target.IsEntityAI() )
@@ -182,6 +209,25 @@ class PluginTransmissionAgents extends PluginBase
 			{
 				float count = CalculateAgentsToTransmit(agents_aray.Get(i), protection, dose_size, inject_type);
 				target.InsertAgent(agents_aray.Get(i),count);
+			}
+		}
+	}
+	*/
+	//! will add agents to a given target
+	protected void InjectAgentsWithPlayer(EntityAI target, int agents,float protection, int dose_size, int inject_type)//target,array_of_agents,protection_lvl
+	{
+		if(target && (agents != 0) && target.IsEntityAI() )
+		{
+			ref array<int> agents_aray = new array<int>;
+			PluginTransmissionAgents.BuildAgentArray(agents, agents_aray);
+			
+			for(int i = 0; i < agents_aray.Count(); i++)
+			{
+				if( DetermineChanceToTransmit(agents_aray.Get(i), protection, inject_type))
+				{
+					target.InsertAgent(agents_aray.Get(i),1);
+				}
+				
 			}
 		}
 	}
@@ -212,7 +258,7 @@ class PluginTransmissionAgents extends PluginBase
 	{
 		EntityAI attachment = player.GetInventory().FindAttachment(slot);
 		if(!attachment) return 0;
-		string subclass_path = "CfgVehicles " + attachment.GetType() + " DamageArmor ";
+		string subclass_path = "CfgVehicles " + attachment.GetType() + " Protection ";
 		string entryName;
 		switch (type)
 		{
@@ -230,6 +276,7 @@ class PluginTransmissionAgents extends PluginBase
 	}
 
 	//------------------------------------------------------------------------------------------------------
+	/*
 	protected float CalculateAgentsToTransmit(int agent_id, float protection, int dose_size, int inject_type)
 	{
 
@@ -257,6 +304,36 @@ class PluginTransmissionAgents extends PluginBase
 		//result = Math.Ceil(result);
 		Debug.Log("result: "+result.ToString(), "Agents");
 		return result;
+	}
+	*/
+	//------------------------------------------------------------------------------------------------------
+	protected bool DetermineChanceToTransmit(int agent_id, float protection, int inject_type)
+	{
+
+		Debug.Log("protection: "+protection.ToString());
+		float prot = 1 - protection; //reverse the value (in config, the higher the value, the higher the protection: 0 - 1) so that we can easily interpolate between 0 and 1 by multiplication
+		Debug.Log("prot: "+prot.ToString(), "Agents");
+		float transf;
+		
+		if( inject_type == InjectTypes.PLAYER_TO_ITEM )
+		{
+			transf = GetAgentTransferabilityOut(agent_id);
+		}
+		if( inject_type == InjectTypes.ITEM_TO_PLAYER )
+		{
+			transf = GetAgentTransferabilityIn(agent_id);
+		}
+		if( inject_type == InjectTypes.PLAYER_AIR_PLAYER )
+		{
+			transf = GetAgentTransferabilityAirOut(agent_id);
+		}
+
+		Debug.Log("transf: "+transf.ToString(), "Agents");
+		//float result =  GetAgentInitialCount(agent_id) * prot * transf * dose_size;//final formula
+		bool dice = Math.RandomFloat01() < (prot * transf);
+		//result = Math.Ceil(result);
+
+		return dice;
 	}
 	//------------------------------------------------------------------------------------------------------
 

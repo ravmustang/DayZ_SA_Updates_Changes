@@ -1,8 +1,8 @@
+/*
 class TShirt_White : Clothing
 {
 	void TShirt_White()
 	{
-		/*
 		string color = GetItemVariableString("varColor"); //SYNCFAIL
 		if ( color != "" )
 		{
@@ -10,7 +10,6 @@ class TShirt_White : Clothing
 			SetObjectTexture (1,color);
 			SetObjectTexture (2,color);
 		}
-		*/
 	}
 	
 	override bool IsClothing()
@@ -18,3 +17,4 @@ class TShirt_White : Clothing
 		return true;
 	}
 }
+*/

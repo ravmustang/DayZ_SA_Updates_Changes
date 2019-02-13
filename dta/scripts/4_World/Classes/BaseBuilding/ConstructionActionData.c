@@ -14,6 +14,7 @@ class ConstructionActionData
 	
 	//attaching
 	int 						m_SlotId;
+	PlayerBase 					m_ActionInitiator;
 	//detaching
 	ref array<EntityAI> 		m_Attachments;
 	int 						m_AttachmentsIndex;
@@ -65,6 +66,17 @@ class ConstructionActionData
 		return m_SlotId;
 	}
 	
+	void SetActionInitiator( PlayerBase action_initiator )
+	{
+		m_ActionInitiator = action_initiator;
+	}
+	
+	PlayerBase GetActionInitiator()
+	{
+		return m_ActionInitiator;
+	}
+	
+	//base building
 	void SetNextIndex()
 	{
 		if ( m_BuildParts.Count() > 1 )
@@ -189,7 +201,7 @@ class ConstructionActionData
 	
 	//************************************************/
 	//  Attach/Detach actions
-	//************************************************/		
+	//************************************************/	
 	int GetAttachmentSlotFromSelection( EntityAI target, ItemBase item_to_attach, string selection )
 	{
 		string cfg_path = "cfgVehicles" + " " + target.GetType() + " "+ "GUIInventoryAttachmentsProps";

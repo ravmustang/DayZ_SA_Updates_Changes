@@ -1,64 +1,14 @@
-PanelWidgetClass ScrollFrame {
+WrapSpacerWidgetClass Content {
  clipchildren 0
  ignorepointer 1
- size 1 310
- valign bottom_ref
+ size 1 0
  hexactpos 1
  vexactpos 1
  hexactsize 0
  vexactsize 1
- scriptclass "ScrollBarContainer"
- style blank
- {
-  PanelWidgetClass Content {
-   clipchildren 0
-   ignorepointer 1
-   position 0 0
-   size 1 0
-   valign bottom_ref
-   hexactpos 1
-   vexactpos 1
-   hexactsize 0
-   vexactsize 1
-   priority 9
-   scriptclass "AutoHeightSpacer"
-   style blank
-   {
-    ScriptParamsClass {
-     AlignChilds 1
-    }
-   }
-  }
-  PanelWidgetClass ScrollBar {
-   clipchildren 1
-   ignorepointer 1
-   color 0.2745 0.2745 0.2745 0.2353
-   size 0.02 1
-   halign right_ref
-   hexactpos 1
-   vexactpos 1
-   hexactsize 0
-   vexactsize 0
-   priority 6
-   style rover_sim_colorable
-  }
-  PanelWidgetClass Scroller {
-   inheritalpha 1
-   color 0.1961 0.1961 0.1961 1
-   position 0 20
-   size 0.02 32
-   halign right_ref
-   hexactpos 1
-   vexactpos 1
-   hexactsize 0
-   vexactsize 1
-   priority 7
-   style rover_sim_colorable
-  }
- }
- {
-  ScriptParamsClass {
-   Invert 1
-  }
- }
+ scriptclass ""
+ style Colorable
+ Padding 0
+ Margin 0
+ "Size To Content V" 1
 }

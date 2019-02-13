@@ -1,4 +1,4 @@
-class GorkaHelmetComplete extends ClothingBase
+class GorkaHelmet extends ClothingBase
 {
 	override bool CanPutAsAttachment( EntityAI parent )
 	{

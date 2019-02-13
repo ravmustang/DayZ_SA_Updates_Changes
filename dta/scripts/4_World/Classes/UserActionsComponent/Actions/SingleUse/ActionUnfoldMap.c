@@ -1,6 +1,7 @@
 class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 {
 	PlayerBase m_player;
+	bool HasReceivedEvent;
 	
 	string closed_map = "ChernarusMap";
 	string opened_map = "ChernarusMap_Open";
@@ -8,6 +9,8 @@ class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 	void ActionUnfoldMapCB()
 	{
 		RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);
+		EnableStateChangeCallback();
+		HasReceivedEvent = false;
 	}
 	
 	void ~ActionUnfoldMapCB()
@@ -32,28 +35,51 @@ class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 		}
 	}
 	
-	/*override void OnFinish(bool pCanceled)
-	{
+	override void OnStateChange(int pOldState, int pCurrentState)
+	{ 		
 		if (!m_player)
 			return;
 		
-		m_player.m_MapOpen = false;
-		
-		if (!GetGame().IsServer())
-			return;
-		
-		ItemBase chernomap = m_player.GetItemInHands();
-		if (m_player.IsAlive() && chernomap && chernomap.GetType() == opened_map)
+		if ( HasReceivedEvent )
 		{
-			MiscGameplayFunctions.TurnItemIntoItem(chernomap, closed_map, m_player); //fallback, if animation event does not fire for any reason
+			return;
 		}
-	}*/
+			
+		ItemBase chernomap = m_player.GetItemInHands();
+		
+		if ( pOldState == 1 && pCurrentState == 2)
+		{
+			if (m_player.IsSwimming() || m_player.IsFalling() || m_player.IsClimbingLadder() || m_player.IsUnconscious() || m_player.IsRestrained())
+					return;
+			
+			if (chernomap && chernomap.GetType() == closed_map)
+			{
+				if (GetGame().IsServer())
+					MiscGameplayFunctions.TurnItemIntoItem(chernomap, opened_map, m_player);
+		
+				if (!GetGame().IsMultiplayer() || GetGame().IsClient())
+				{
+					UIManager 	m_UIManager;
+					m_UIManager = GetGame().GetUIManager();
+					m_UIManager.CloseAll();
+					m_UIManager.EnterScriptedMenu(MENU_MAP, NULL);
+				}
+				m_player.m_MapOpen = true;
+			}
+			else if (chernomap && chernomap.GetType() == opened_map)
+			{
+				if (GetGame().IsServer())
+					MiscGameplayFunctions.TurnItemIntoItem(chernomap, closed_map, m_player);
+			}
+		}
+	}
 	
 	override void OnAnimationEvent(int pEventID)
 	{
 		if (!m_player)
 			return;
 			
+		HasReceivedEvent = true;
 		ItemBase chernomap = m_player.GetItemInHands();
 		
 		switch (pEventID)

@@ -21,12 +21,13 @@ class BurlapSackCover extends ClothingBase
 			//GetGame().GetWorld().SetAperture(100000);
 			PPEffects.Init();
 			PPEffects.EnableBurlapSackBlindness();
-			GetGame().GetSoundScene().SetSoundVolume((g_Game.m_volume_sound/2),1);
-			GetGame().GetSoundScene().SetSpeechExVolume((g_Game.m_volume_speechEX/2),1);
-			GetGame().GetSoundScene().SetMusicVolume((g_Game.m_volume_music/2),1);
-			GetGame().GetSoundScene().SetVOIPVolume((g_Game.m_volume_VOIP/2),1);
-			GetGame().GetSoundScene().SetRadioVolume((g_Game.m_volume_radio/2),1);
+			//GetGame().GetSoundScene().SetSoundVolume((g_Game.m_volume_sound/2),1);
+			//GetGame().GetSoundScene().SetSpeechExVolume((g_Game.m_volume_speechEX/2),1);
+			//GetGame().GetSoundScene().SetMusicVolume((g_Game.m_volume_music/2),1);
+			//GetGame().GetSoundScene().SetVOIPVolume((g_Game.m_volume_VOIP/2),1);
+			//GetGame().GetSoundScene().SetRadioVolume((g_Game.m_volume_radio/2),1);
 			player.SetInventorySoftLock(true);
+			player.SetMasterAttenuation("BurlapSackAttenuation");
 			
 			if ( GetGame().GetUIManager().IsMenuOpen(MENU_INVENTORY) )
 			{
@@ -68,13 +69,14 @@ class BurlapSackCover extends ClothingBase
 		{
 			PPEffects.Init();
 			PPEffects.DisableBurlapSackBlindness();
-			GetGame().GetSoundScene().SetSoundVolume(g_Game.m_volume_sound,1);
-			GetGame().GetSoundScene().SetSpeechExVolume(g_Game.m_volume_speechEX,1);
-			GetGame().GetSoundScene().SetMusicVolume(g_Game.m_volume_music,1);
-			GetGame().GetSoundScene().SetVOIPVolume(g_Game.m_volume_VOIP,1);
-			GetGame().GetSoundScene().SetRadioVolume(g_Game.m_volume_radio,1);
+			//GetGame().GetSoundScene().SetSoundVolume(g_Game.m_volume_sound,1);
+			//GetGame().GetSoundScene().SetSpeechExVolume(g_Game.m_volume_speechEX,1);
+			//GetGame().GetSoundScene().SetMusicVolume(g_Game.m_volume_music,1);
+			//GetGame().GetSoundScene().SetVOIPVolume(g_Game.m_volume_VOIP,1);
+			//GetGame().GetSoundScene().SetRadioVolume(g_Game.m_volume_radio,1);
 			//GetGame().GetWorld().SetAperture(0);
 			player.SetInventorySoftLock(false);
+			player.SetMasterAttenuation("");
 		}
 		/*
 		if ( GetGame().IsServer() )

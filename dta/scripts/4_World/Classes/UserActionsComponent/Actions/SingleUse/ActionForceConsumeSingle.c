@@ -8,6 +8,8 @@ class ActionForceConsumeSingleCB : ActionSingleUseBaseCB
 
 class ActionForceConsumeSingle: ActionSingleUseBase
 {
+	const int DEFAULT_CONSUMED_QUANTITY = 1;
+	
 	void ActionForceConsumeSingle()
 	{
 		m_CallbackClass = ActionForceConsumeSingleCB;
@@ -32,11 +34,26 @@ class ActionForceConsumeSingle: ActionSingleUseBase
 		return "#feed";
 	}
 		
+	int GetConsumedQuantity()
+	{
+		return DEFAULT_CONSUMED_QUANTITY;
+	}
+	
 	override void OnEndServer( ActionData action_data )
 	{
 		if ( action_data.m_MainItem && action_data.m_MainItem.GetQuantity() <= 0 ) 
 		{
 			action_data.m_MainItem.SetQuantity(0);
+		}
+	}
+	
+	override void OnExecuteServer( ActionData action_data )
+	{
+		PlayerBase target = PlayerBase.Cast(action_data.m_Target.GetObject());
+		
+		if ( target && action_data.m_MainItem )
+		{
+			target.Consume(action_data.m_MainItem, GetConsumedQuantity(), EConsumeType.ITEM_SINGLE_TIME);
 		}
 	}
 };

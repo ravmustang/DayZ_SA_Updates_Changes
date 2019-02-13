@@ -246,28 +246,44 @@ class FireplaceBase extends ItemBase
 		ctx.Write( IsBurning() );
 	}
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
 
+		//--- Fireplace data ---
 		//Load ashes state
-		bool has_ashes = false;
-		ctx.Read( has_ashes );
+		bool has_ashes;
+		if ( !ctx.Read( has_ashes ) )
+		{
+			has_ashes = false;		//set default
+		}
 		SetAshesState( has_ashes );	//set loaded value
 		
 		//Load temperature loss MP
-		float temp_loss_mp = 1.0;
-		ctx.Read( temp_loss_mp );
+		float temp_loss_mp;
+		if ( !ctx.Read( temp_loss_mp ) )
+		{
+			temp_loss_mp = 1.0;		//set default
+		}
 		SetTemperatureLossMP( temp_loss_mp );
 		
 		//Load fuel burn rate MP
-		float fuel_burn_rate_mp = 1.0;
-		ctx.Read( fuel_burn_rate_mp );
+		float fuel_burn_rate_mp;
+		if ( !ctx.Read( fuel_burn_rate_mp ) )
+		{
+			fuel_burn_rate_mp = 1.0;		//set default
+		}
 		SetFuelBurnRateMP( fuel_burn_rate_mp );
 
 		//Load burning state, if true start fire
-		bool burning_state = false;
-		ctx.Read( burning_state );
+		bool burning_state;
+		if ( !ctx.Read( burning_state ) )
+		{
+			burning_state = false;		//set default
+		}
+		//---
+		
 		if ( burning_state )
 		{
 			if ( GetGame() && GetGame().IsServer() ) 
@@ -275,6 +291,8 @@ class FireplaceBase extends ItemBase
 				StartFire();			//will be auto-synchronized when starting fire
 			}
 		}
+
+		return true;
 	}
 	
 	//================================================================

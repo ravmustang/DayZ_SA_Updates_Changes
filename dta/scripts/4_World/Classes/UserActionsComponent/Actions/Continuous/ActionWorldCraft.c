@@ -89,7 +89,12 @@ class ActionWorldCraft: ActionContinuousBase
 			}
 			return false;
 		}
-		//Server
+		else //Server
+		{
+			if ( !target.GetObject() || !item )
+				return false;
+		}
+		
 		return true;		
 	}
 	
@@ -202,7 +207,15 @@ class ActionWorldCraft: ActionContinuousBase
 		WorldCraftActionData action_data_wc = WorldCraftActionData.Cast(action_data);
 		
 		action_data_wc.m_MainItem = recive_data_wc.m_MainItem;
-		action_data_wc.m_Target = recive_data_wc.m_Target;
+		if (!action_data_wc.m_Target)
+		{
+			Error("Action WC target not created.");
+			action_data.m_Target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0); 
+		}
+		else
+		{
+			action_data_wc.m_Target = recive_data_wc.m_Target;
+		}
 		action_data_wc.m_RecipeID = recive_data_wc.m_RecipeID;
 	}
 	

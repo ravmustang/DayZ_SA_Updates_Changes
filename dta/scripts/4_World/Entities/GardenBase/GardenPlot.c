@@ -6,7 +6,7 @@ class GardenPlot extends GardenBase
 	
 	void GardenPlot()
 	{
-		SetBaseFertility(1); // TO DO: Change to ~0.75
+		SetBaseFertility(0.75);
 	}
 	
 	override void EEInit()
@@ -14,15 +14,18 @@ class GardenPlot extends GardenBase
 		super.EEInit();
 	}	
 	
-	override void OnStoreLoad( ParamsReadContext ctx, int version )
+	override bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{				
-		super.OnStoreLoad(ctx, version);
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
 
 		if ( !m_ClutterCutter )
 		{		
 			m_ClutterCutter = GetGame().CreateObject( "ClutterCutter6x6", GetPosition(), false );
 			m_ClutterCutter.SetOrientation( GetOrientation() );
 		}
+
+		return true;
 	}
 
 	override void EEDelete(EntityAI parent)

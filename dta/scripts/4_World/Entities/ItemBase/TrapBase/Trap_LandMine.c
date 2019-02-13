@@ -47,10 +47,13 @@ class LandMineTrap extends TrapBase
 	
 	override void OnSteppedOn(EntityAI victim)
 	{
-		this.Explode();
-		
-		m_DeleteTimer = new Timer( CALL_CATEGORY_SYSTEM );
-		m_DeleteTimer.Run( 2, this, "DeleteThis" );
+		if ( GetGame().IsServer() )
+		{
+			this.Explode();
+			
+			m_DeleteTimer = new Timer( CALL_CATEGORY_SYSTEM );
+			m_DeleteTimer.Run( 2, this, "DeleteThis" );
+		}
 	}
 	
 	void DeleteThis()
@@ -65,6 +68,16 @@ class LandMineTrap extends TrapBase
 		if ( g_Game.IsServer() )
 		{
 			
+		}
+	}
+	
+	override void EEKilled( Object killer )
+	{
+		super.EEKilled( killer );
+		
+		if ( IsActive() )
+		{
+			OnSteppedOn(NULL);
 		}
 	}
 	

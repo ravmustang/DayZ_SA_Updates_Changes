@@ -43,8 +43,6 @@ class ActionDisinfectPlantBit: ActionSingleUseBase
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
-		return false; // Plant infestation was temporarily disabled.
-		
 		Object targetObject = target.GetObject();
 		
 		if ( targetObject != NULL && targetObject.IsInherited(PlantBase) && !item.IsDamageDestroyed() )

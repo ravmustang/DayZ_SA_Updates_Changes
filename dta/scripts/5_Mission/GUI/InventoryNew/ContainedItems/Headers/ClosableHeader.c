@@ -11,15 +11,14 @@ class ClosableHeader: Header
 		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( GetMainWidget(),  this, "MouseLeave" );
 		float temp;
 		GetMainWidget().GetScreenSize( temp, m_SquareSize );
+		
+		m_DefaultColor		= GetMainWidget().FindAnyWidget( "PanelWidget" ).GetAlpha();
+		m_DefaultFontSize	= 20;
 	}
 
 	override void SetLayoutName()
 	{
-		#ifdef PLATFORM_XBOX
-		m_LayoutName = WidgetLayoutName.ClosableHeaderXbox;
-		#else
 		m_LayoutName = WidgetLayoutName.ClosableHeader;
-		#endif
 	}
 	
 	void OnDragHeader( Widget w, int x, int y )
@@ -74,12 +73,37 @@ class ClosableHeader: Header
 	{
 		if( m_Entity )
 			ItemManager.GetInstance().PrepareTooltip( EntityAI.Cast( m_Entity ) );
+		ClosableContainer p = ClosableContainer.Cast( m_Parent );
+		if( p )
+		{
+			p.EnterContainer();
+		}
 		return true;
 	}
 
 	bool MouseLeave( Widget w, Widget s, int x, int y	)
 	{
 		ItemManager.GetInstance().HideTooltip();
+		ClosableContainer p = ClosableContainer.Cast( m_Parent );
+		if( p )
+		{
+			p.EnterContainer();
+		}
 		return true;
+	}
+	
+	override void SetActive( bool active )
+	{
+		super.SetActive( active );
+		if( active )
+		{
+			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetAlpha( m_DefaultColor + 0.1 );
+			m_HeaderText.SetTextExactSize( m_DefaultFontSize * 1.1 );
+		}
+		else
+		{
+			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetAlpha( m_DefaultColor );
+			m_HeaderText.SetTextExactSize( m_DefaultFontSize );
+		}
 	}
 }

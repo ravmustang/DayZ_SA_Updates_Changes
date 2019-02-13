@@ -108,12 +108,29 @@ class LightItemOnFire extends RecipeBase
 		if (!item_target.CanBeIgnitedBy(item_source))
 			return false;
 		
+		// Check if target is in cargo. Forbid the action if yes.
 		if ( item_target.GetInventory() )
 		{
 			InventoryLocation loc = new InventoryLocation;
 			item_target.GetInventory().GetCurrentInventoryLocation(loc);
 			
 			if ( loc.GetIdx() > -1 )
+			{
+				return false;
+			}
+		}
+		
+		// Check if target is in cargo. Forbid the action if NO.
+		if ( item_source.GetInventory() )
+		{
+			InventoryLocation loc2 = new InventoryLocation;
+			item_target.GetInventory().GetCurrentInventoryLocation(loc2);
+			
+			int index = loc2.GetIdx();
+			
+			Print(index);
+			
+			if ( index != -1 )
 			{
 				return false;
 			}

@@ -1,0 +1,1 @@
+class SmershVest extends Clothing {};

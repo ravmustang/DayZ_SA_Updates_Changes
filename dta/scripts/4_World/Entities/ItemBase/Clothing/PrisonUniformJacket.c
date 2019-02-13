@@ -1,0 +1,1 @@
+class PrisonUniformJacket extends Clothing {};

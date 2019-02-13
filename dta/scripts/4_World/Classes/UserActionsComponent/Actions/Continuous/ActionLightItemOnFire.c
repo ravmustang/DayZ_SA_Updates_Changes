@@ -39,10 +39,12 @@ class ActionLightItemOnFire: ActionContinuousBase
 		return true;
 	}
 	
-	override bool CanBePerformedFromInventory()
+	// Removed as a fix for igniting Torch by Matchbox through drag&drop in inventory
+	/*override bool CanBePerformedFromInventory()
 	{
 		return true;
-	}
+	}*/
+	
 	// Check if ignite candidate is in cargo of something or not.
 	bool IsItemInCargoOfSomething(ItemBase item)
 	{

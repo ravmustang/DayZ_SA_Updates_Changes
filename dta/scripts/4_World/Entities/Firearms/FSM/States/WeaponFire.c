@@ -119,3 +119,19 @@ class WeaponFireAndChamber extends WeaponFire
 	}
 };
 
+class WeaponFireAndChamberFromInnerMagazine extends WeaponFire
+{
+	override void OnEntry (WeaponEventBase e)
+	{
+		super.OnEntry(e);
+		
+		if (!m_weapon.IsJammed())
+		{
+			wpnDebugPrint("[wpnfsm] ejected fired out casing");
+			int mi = m_weapon.GetCurrentMuzzle();
+			m_weapon.EjectCasing(mi);
+			m_weapon.SelectionBulletHide();
+		}
+	}
+};
+

@@ -41,7 +41,7 @@ WindowWidgetClass TextInputDialogRoot {
    hexactsize 1
    vexactsize 1
    style Bold
-   text "Position in queue:"
+   text "#str_position_in_queue:"
    font "gui/fonts/sdf_MetronBook72"
    "exact text" 0
    "text halign" center

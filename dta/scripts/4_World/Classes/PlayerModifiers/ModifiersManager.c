@@ -8,13 +8,14 @@ enum EActivationType {
 const int DEFAULT_TICK_TIME_ACTIVE = 3;
 const int DEFAULT_TICK_TIME_INACTIVE = 3;
 
+
 class ModifiersManager
 {
 	PlayerBase m_Player;
 	ref map<int, ref ModifierBase> m_ModifierList;
 	ref array<ref Param> m_ParamList;
 	bool m_AllowModifierTick = false;
-	
+	const int STORAGE_VERSION = 101;
 	void ModifiersManager(PlayerBase player)
 	{
 		m_ModifierList 	= new map<int, ref ModifierBase>;
@@ -60,6 +61,9 @@ class ModifiersManager
 		AddModifier(new SalmonellaMdfr);
 		AddModifier(new BrainDiseaseMdfr);
 		AddModifier(new WetMdfr);
+		AddModifier(new ImmunityBoost);
+		AddModifier(new AntibioticsMdfr);
+		AddModifier(new ToxicityMdfr);
 	}
 
 	void SetModifiers(bool enable)
@@ -75,6 +79,11 @@ class ModifiersManager
 		}
 	}
 
+	int GetStorageVersion()
+	{
+		return STORAGE_VERSION;
+	}
+	
 	bool IsModifiersEnable()
 	{
 		return m_AllowModifierTick;
@@ -160,16 +169,18 @@ class ModifiersManager
 		}
 
 	}
-	
-	void OnStoreLoad( ParamsReadContext ctx, int version )
+
+	bool OnStoreLoad( ParamsReadContext ctx, int version )
 	{
 		int modifier_count;
-		ctx.Read(modifier_count);
+		if(!ctx.Read(modifier_count))
+			return false;
 		//PrintString("Loading modifiers count: "+ modifier_count);
 		for(int i = 0; i < modifier_count; i++)
 		{
 			int modifier_id;
-			ctx.Read(modifier_id);
+			if(!ctx.Read(modifier_id))
+				return false;
 			//PrintString( "loading item: "+modifier_id );
 			//int modifier_id = CachedObjectsParams.PARAM1_INT.param1;
 			ModifierBase modifier = GetModifier(modifier_id);
@@ -178,7 +189,8 @@ class ModifiersManager
 				if( modifier.IsTrackAttachedTime() )
 				{
 					int time;
-					ctx.Read(time);//get the attached time
+					if(!ctx.Read(time))//get the attached time
+						return false;
 					modifier.SetAttachedTime( time );
 				}
 				
@@ -192,9 +204,12 @@ class ModifiersManager
 		
 		for (int x = 0; x < m_ParamList.Count(); x++)
 		{
-			m_ParamList.Get(x).Deserializer(ctx);
+			if(!m_ParamList.Get(x).Deserializer(ctx))
+			{
+				return false;
+			}
 		}
-		
+		return true;
 	}
 
 	ModifierBase GetModifier(int modifier_id)

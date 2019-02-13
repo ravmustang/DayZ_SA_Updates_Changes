@@ -75,7 +75,7 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 						int action = cfg_actions.Get(i);
 						
 						if ( action == AT_PLUG_THIS_INTO_TARGET )
-						{						
+						{
 							return true;
 						}
 					}
@@ -134,11 +134,6 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 		{
 			Spotlight spotlight = Spotlight.Cast( target_IB );
 			spotlight.Unfold();
-			vector player_ori = action_data.m_Player.GetOrientation();
-			vector s_pos = spotlight.GetPosition();
-			spotlight.SetOrientation(player_ori);
-			spotlight.SetPosition(s_pos);
-			spotlight.PlaceOnSurface();
 		}
 		
 		target_IB.GetInventory().TakeEntityAsAttachment( InventoryMode.LOCAL, action_data.m_MainItem );

@@ -48,11 +48,11 @@ class PresetsMenu extends UIScriptedMenu
 
 				ref TIntArray keys = new TIntArray;
 
-				for (int i = 0; i < UAN; i++)
+/*				for (int i = 0; i < UAN; i++)
 				{
 					GetGame().GetInput().GetCurrentProfileActionKeys(i, keys);
 					GetGame().GetInput().SetActionKeys(i, keys);
-				}
+				}*/
 
 				Close();
 			}

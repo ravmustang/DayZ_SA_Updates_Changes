@@ -2,15 +2,10 @@ class PPEffects
 {
 	// COLORIZE IDs
 	static const int COLORIZE_NV = 100;
-	static const int COLORIZE_DYNEVENT = 200;
 
 	// FILGRAIN IDs
 	static const int FILMGRAIN_NV = 100;
 	static const int FILMGRAIN_NIGHT = 200;
-
-	// EYEACC IDs
-	static const int EYEACC_NV = 100;
-	static const int EYEACC_UNDERGROUND = 200;
 	
 	//-------------------------------------------------------
 	// BLUR START
@@ -21,7 +16,6 @@ class PPEffects
 	static int 		m_BlurMenu;
 	static int 		m_BlurOptics;
 	
-	static int	 	m_HitColor;
 	static int	 	m_BurlapBlindness;
 	static int 		m_DyingEffect;
 	
@@ -79,7 +73,6 @@ class PPEffects
 		// colorize: r, g, b
 		// colorize effects registration
 		m_ColorizeEffects.Set(PPEffects.COLORIZE_NV, colorizeDefault);
-		m_ColorizeEffects.Set(PPEffects.COLORIZE_DYNEVENT, colorizeDefault);
 
 		// filmgrain: grainsize, intensityx0 (normal intensity driven by lighting config for now!)
 		// filmgrain effects registration
@@ -541,7 +534,6 @@ class PPEffects
 		ResetLensEffect();
 		SetBloodSaturation(1);
 		RemoveUnconsciousnessVignette();
-		
 		ResetColorize();
 		ResetFilmgrain();
 	}	
