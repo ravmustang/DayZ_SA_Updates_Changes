@@ -424,11 +424,7 @@ class array<Class T>
 		{
 			T item = Get(i);
 
-			if ( item )
-			{
-				PrintString( "["+i.ToString()+"] => " + string.ToString(item) );
-				//Print( item );
-			}
+			PrintString( "["+i.ToString()+"] => " + string.ToString(item) );
 		}
 	}
 
@@ -526,6 +522,21 @@ class array<Class T>
 		
 		// move_number is 0
 		return new_index;
+	}
+	
+	void Invert()
+	{
+		int left = 0;
+		int right = Count() - 1;
+		if( right > 1 )
+		{
+			while( left < right )
+			{
+				T temp = Get(left);
+				Set(left++, Get(right));
+				Set(right--, temp);
+			}
+		}
 	}
 };
 

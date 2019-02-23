@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////
 //DeRap: Produced from mikero's Dos Tools Dll version 5.69
-//'now' is Thu Jan 17 07:27:12 2019 : 'file' last modified on Wed Jan 16 10:22:45 2019
+//'now' is Sat Feb 23 09:31:06 2019 : 'file' last modified on Wed Feb 20 16:53:26 2019
 //http://dev-heaven.net/projects/list_files/mikero-pbodll
 ////////////////////////////////////////////////////////////////////
 
@@ -1134,6 +1134,174 @@ class CfgSlots
 		displayName = "BusRightDoors";
 		selection = "BusRightDoors_3";
 		ghostIcon = "busdoor";
+	};
+	class Slot_CivHatchbackWheel_1_1
+	{
+		name = "CivHatchbackWheel_1_1";
+		displayName = "Front Left CivHatchback Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_CivHatchbackWheel_1_2
+	{
+		name = "CivHatchbackWheel_1_2";
+		displayName = "Back Right CivHatchback Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_CivHatchbackWheel_2_1
+	{
+		name = "CivHatchbackWheel_2_1";
+		displayName = "Front Left CivHatchback Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_CivHatchbackWheel_2_2
+	{
+		name = "CivHatchbackWheel_2_2";
+		displayName = "Back Right CivHatchback Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_CivHatchbackHood
+	{
+		name = "CivHatchbackHood";
+		displayName = "CivHatchbackHood";
+		ghostIcon = "hood";
+	};
+	class Slot_CivHatchbackTrunk
+	{
+		name = "CivHatchbackTrunk";
+		displayName = "CivHatchbackTrunk";
+		ghostIcon = "trunk";
+	};
+	class Slot_CivHatchbackDriverDoors
+	{
+		name = "CivHatchbackDriverDoors";
+		displayName = "CivHatchbackDriverDoors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_CivHatchbackCoDriverDoors
+	{
+		name = "CivHatchbackCoDriverDoors";
+		displayName = "CivHatchbackCoDriverDoors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_CivHatchbackCargo1Doors
+	{
+		name = "CivHatchbackCargo1Doors";
+		displayName = "CivHatchbackCargo1Doors";
+		ghostIcon = "doorrear";
+	};
+	class Slot_CivHatchbackCargo2Doors
+	{
+		name = "CivHatchbackCargo2Doors";
+		displayName = "CivHatchbackCargo2Doors";
+		ghostIcon = "doorrear";
+	};
+	class Slot_UtilityVehicleWheel_1_1
+	{
+		name = "UtilityVehicleWheel_1_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleWheel_1_2
+	{
+		name = "UtilityVehicleWheel_1_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleWheel_2_1
+	{
+		name = "UtilityVehicleWheel_2_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleWheel_2_2
+	{
+		name = "UtilityVehicleWheel_2_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleDriverDoors
+	{
+		name = "UtilityVehicleDriverDoors";
+		displayName = "Utility Vehicle Driver Doors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_UtilityVehicleCoDriverDoors
+	{
+		name = "UtilityVehicleCoDriverDoors";
+		displayName = "Utility Vehicle CoDriver Doors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_S120Wheel_1_1
+	{
+		name = "S120Wheel_1_1";
+		displayName = "Front Left s120 Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_S120Wheel_1_2
+	{
+		name = "S120Wheel_1_2";
+		displayName = "Front Right s120 Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_S120Wheel_2_1
+	{
+		name = "S120Wheel_2_1";
+		displayName = "Front Left s120 Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_S120Wheel_2_2
+	{
+		name = "S120Wheel_2_2";
+		displayName = "Front Right s120 Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_S120Hood
+	{
+		name = "S120Hood";
+		displayName = "s120 Hood";
+		ghostIcon = "hood";
+	};
+	class Slot_S120Trunk
+	{
+		name = "S120Trunk";
+		displayName = "s120 Trunk";
+		ghostIcon = "trunk";
+	};
+	class Slot_S120DriverDoors
+	{
+		name = "S120DriverDoors";
+		displayName = "s120 Driver Doors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_S120CoDriverDoors
+	{
+		name = "S120CoDriverDoors";
+		displayName = "s120 CoDriver Doors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_S120Cargo1Doors
+	{
+		name = "S120Cargo1Doors";
+		displayName = "s120 Cargo Doors";
+		ghostIcon = "doorrear";
+	};
+	class Slot_S120Cargo2Doors
+	{
+		name = "S120Cargo2Doors";
+		displayName = "s120 Cargo Doors";
+		ghostIcon = "doorrear";
 	};
 	class Slot_Level_1_Wall_1_Barbedwire_1
 	{
