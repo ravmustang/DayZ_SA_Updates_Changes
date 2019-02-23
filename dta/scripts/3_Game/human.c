@@ -115,6 +115,9 @@ class HumanInputController
 	//!
 	proto native bool			IsZoomIn();
 
+	//! reset zoomin toggle
+	proto native void			ResetZoomIn();
+
 	//!
 	proto native bool			IsZoomOut();
 
@@ -129,6 +132,9 @@ class HumanInputController
 
   	//! holding breath
 	proto native bool			IsHoldBreath();
+
+  	//! reset hold breath toggle
+	proto native void			ResetHoldBreath();
 
 	//--------------------------------------------------------------
 

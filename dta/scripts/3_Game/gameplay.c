@@ -564,6 +564,7 @@ class Mission
 	void OnItemUsed(InventoryItem item, Man owner) {}	
 	void AddDummyPlayerToScheduler(Man player){}
 	void Reset(){}
+	void ResetGUI(){}
 	
 	Hud GetHud()
 	{ 

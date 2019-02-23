@@ -14,7 +14,7 @@ enum ESortType
 enum ESortOrder
 {
 	ASCENDING,		
-	DESCENDING,		
+	DESCENDING,
 };
 
 
@@ -41,7 +41,12 @@ class GetServersResultRow
 	bool	m_IsPasswordProtected;
 	string	m_CreatedAt;
 	string	m_UpdatedAt;
-	bool	m_IsExpanded;
+	
+	//Scripted
+	bool		m_IsExpanded;
+	int 		m_SortName;	
+	int			m_SortTime;
+	bool		m_IsSelected;
 
 	//characters alive
 	string m_CharactersAlive;
@@ -58,6 +63,56 @@ class GetServersResultRow
 	string m_ShardId;
 	int m_SteamQueryPort;
 
+	bool IsSelected()
+	{
+		return m_IsSelected;
+	}
+	
+	string GetValueStr(ESortType sort_type)
+	{
+		switch( sort_type )
+		{
+			case ESortType.HOST:
+			{
+				return m_Name;
+			}
+		}
+		
+		return "";
+	}	
+	
+	int GetValueInt(ESortType sort_type)
+	{
+		switch( sort_type )
+		{
+			case ESortType.TIME:
+			{
+				return m_SortTime;
+			}
+			case ESortType.POPULATION:
+			{
+				return m_CurrentNumberPlayers;
+			}
+			case ESortType.SLOTS:
+			{
+				return m_MaxPlayers;
+			}
+			case ESortType.PING:
+			{
+				return m_Ping;
+			}
+			case ESortType.FAVORITE:
+			{
+			
+			}
+			case ESortType.PASSWORDED:
+			{
+			
+			}
+		}
+		
+		return 0;
+	}
 };
 
 

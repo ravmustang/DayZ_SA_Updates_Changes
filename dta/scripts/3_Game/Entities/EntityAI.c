@@ -11,6 +11,7 @@ class EntityAI extends Entity
 	ref array<EntityAI> m_AttachmentsWithCargo;
 	ref array<EntityAI> m_AttachmentsWithAttachments;
 	ref InventoryLocation m_OldLocation;
+	private bool m_IsDead;
 	
 	void EntityAI ()
 	{
@@ -369,9 +370,11 @@ class EntityAI extends Entity
 		{
 			Man killer = source.GetHierarchyRootPlayer();
 			
-			if( killer && killer.IsPlayer() )
-			{				
-				if ( GetHealth() <= 0 )
+			if ( !m_IsDead && GetHealth() <= 0 )
+			{
+				m_IsDead = true;
+			
+				if( killer && killer.IsPlayer() )
 				{
 					bool is_headshot = false;
 				

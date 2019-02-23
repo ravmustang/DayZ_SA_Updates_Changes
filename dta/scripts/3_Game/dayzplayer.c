@@ -386,7 +386,7 @@ class DayZPlayerType
 		m_DefaultHitPositionComponent = "Pelvis";
 
 		//! register hit components that are selected by probability
-		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_head", 5);
+		//DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_head", 5); // TMP comment out
 		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_leftArm", 50);
 		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_torso", 65);
 		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_rightArm", 50);
