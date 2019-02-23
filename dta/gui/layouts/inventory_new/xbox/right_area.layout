@@ -1,5 +1,5 @@
 PanelWidgetClass DropzoneX {
- visible 0
+ visible 1
  clipchildren 0
  ignorepointer 1
  color 1 1 1 0
@@ -29,6 +29,7 @@ PanelWidgetClass DropzoneX {
    style blank
    "Ignore invisible" 0
    "Scrollbar V" 1
+   "Scrollbar V Left" 1
    {
     PanelWidgetClass DropzoneXa {
      visible 0
@@ -46,8 +47,8 @@ PanelWidgetClass DropzoneX {
     FrameWidgetClass ContentParent {
      clipchildren 0
      ignorepointer 1
-     position 0 0
      size 513 0
+     halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
@@ -71,26 +72,13 @@ PanelWidgetClass DropzoneX {
       }
       PanelWidgetClass Up {
        clipchildren 0
-       size 36 140
+       size 36 150
        hexactpos 1
        vexactpos 1
        hexactsize 1
        vexactsize 1
        {
         ImageWidgetClass LT0 {
-         ignorepointer 1
-         position -60 -5
-         size 29 29
-         halign center_ref
-         hexactpos 1
-         vexactpos 1
-         hexactsize 1
-         vexactsize 1
-         image0 "set:dayz_gui image:icon_minus"
-         mode blend
-         "src alpha" 1
-        }
-        ImageWidgetClass LT1 {
          ignorepointer 1
          position -60 0
          size 29 29
@@ -103,9 +91,22 @@ PanelWidgetClass DropzoneX {
          mode blend
          "src alpha" 1
         }
+        ImageWidgetClass LT1 {
+         ignorepointer 1
+         position -60 5
+         size 29 29
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:dayz_gui image:icon_minus"
+         mode blend
+         "src alpha" 1
+        }
         ImageWidgetClass LT {
          ignorepointer 1
-         position 60 19
+         position 60 24
          size 36 50
          halign right_ref
          hexactpos 1
@@ -118,7 +119,7 @@ PanelWidgetClass DropzoneX {
         }
         ImageWidgetClass RT {
          ignorepointer 1
-         position 60 19
+         position 60 24
          size 36 50
          halign right_ref
          valign bottom_ref
@@ -132,7 +133,7 @@ PanelWidgetClass DropzoneX {
         }
         ImageWidgetClass RT0 {
          ignorepointer 1
-         position -60 -5
+         position -60 0
          size 29 29
          halign center_ref
          valign bottom_ref
@@ -146,7 +147,7 @@ PanelWidgetClass DropzoneX {
         }
         ImageWidgetClass RT1 {
          ignorepointer 1
-         position -60 0
+         position -60 5
          size 29 29
          halign center_ref
          valign bottom_ref

@@ -85,7 +85,7 @@ FrameWidgetClass video_tab_root {
         }
         GridSpacerWidgetClass overall_settings_content {
          ignorepointer 1
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -93,8 +93,8 @@ FrameWidgetClass video_tab_root {
          hexactsize 0
          vexactsize 0
          style Colorable
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1
@@ -227,7 +227,7 @@ FrameWidgetClass video_tab_root {
         }
         GridSpacerWidgetClass screen_settings_content {
          ignorepointer 1
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -236,8 +236,8 @@ FrameWidgetClass video_tab_root {
          vexactsize 0
          style Colorable
          "no focus" 1
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1
@@ -669,7 +669,7 @@ FrameWidgetClass video_tab_root {
         }
         GridSpacerWidgetClass scene_settings_content {
          ignorepointer 1
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -678,8 +678,8 @@ FrameWidgetClass video_tab_root {
          vexactsize 0
          style Colorable
          "no focus" 1
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1
@@ -1111,7 +1111,7 @@ FrameWidgetClass video_tab_root {
         }
         GridSpacerWidgetClass rendering_settings_content {
          ignorepointer 1
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -1120,8 +1120,8 @@ FrameWidgetClass video_tab_root {
          vexactsize 0
          style Colorable
          "no focus" 1
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1

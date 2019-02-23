@@ -30,6 +30,7 @@ PanelWidgetClass DropzoneX {
    style blank
    "Ignore invisible" 0
    "Scrollbar V" 1
+   "Scrollbar V Left" 1
    {
     PanelWidgetClass DropzoneXa {
      visible 0
@@ -46,8 +47,8 @@ PanelWidgetClass DropzoneX {
     }
     FrameWidgetClass ContentParent {
      clipchildren 0
-     position 0 0
      size 409 0
+     halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1

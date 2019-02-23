@@ -1,6 +1,6 @@
 WindowWidgetClass TextInputDialogRoot {
  clipchildren 0
- color 0.0824 0.0824 0.0824 0.7843
+ color 0.1176 0.1176 0.1176 0.9804
  position 0 0
  size 540 223.5
  halign center_ref
@@ -140,7 +140,7 @@ WindowWidgetClass TextInputDialogRoot {
   PanelWidgetClass SeparatorPanel {
    color 0.7569 0.0941 0.0941 0.7843
    position 0 60
-   size 0.85 2.5
+   size 0.85 3
    halign center_ref
    hexactpos 1
    vexactpos 1

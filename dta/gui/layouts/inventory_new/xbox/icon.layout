@@ -14,7 +14,7 @@ FrameWidgetClass Icon {
    clipchildren 0
    ignorepointer 1
    color 0.702 0.702 0.702 1
-   size 1 1
+   size 0.8 0.8
    halign center_ref
    valign center_ref
    hexactpos 1

@@ -1,0 +1,18 @@
+TextWidgetClass RangeText {
+ color 1 0 0 1
+ position 100 50
+ size 100 50
+ halign center_ref
+ valign center_ref
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ text "999"
+ font "gui/fonts/MetronBlack"
+ "exact text" 1
+ "size to text h" 0
+ "size to text v" 0
+ "text halign" center
+ "text valign" center
+}

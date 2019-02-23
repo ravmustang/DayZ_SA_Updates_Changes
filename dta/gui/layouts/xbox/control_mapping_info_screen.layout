@@ -436,7 +436,7 @@ PanelWidgetClass rootFrame {
   }
   FrameWidgetClass InfoTextRight {
    position 80 150
-   size 300 900
+   size 380 900
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -448,7 +448,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -465,7 +465,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget0 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -489,7 +489,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.1
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -506,7 +506,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget1 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -530,7 +530,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.2
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -547,7 +547,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget2 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -571,7 +571,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.3
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -588,7 +588,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget3 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -612,7 +612,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.4
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -629,7 +629,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget4 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -653,7 +653,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.5
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -670,7 +670,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget5 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -694,7 +694,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.6
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -711,7 +711,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget6 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -735,7 +735,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.7
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -752,7 +752,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget7 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -776,7 +776,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.8
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -793,7 +793,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget8 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -817,7 +817,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.9
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -834,7 +834,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget9 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -857,7 +857,7 @@ PanelWidgetClass rootFrame {
   }
   FrameWidgetClass InfoTextLeft {
    position 80 150
-   size 300 900
+   size 380 900
    halign right_ref
    hexactpos 1
    vexactpos 1
@@ -870,7 +870,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -887,7 +887,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget10 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -911,7 +911,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.1
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -928,7 +928,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget11 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -952,7 +952,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.2
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -969,7 +969,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget12 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -993,7 +993,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.3
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1010,7 +1010,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget13 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -1034,7 +1034,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.4
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1051,7 +1051,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget14 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -1075,7 +1075,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.5
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1092,7 +1092,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget15 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -1116,7 +1116,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.6
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1133,7 +1133,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget16 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -1157,7 +1157,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.7
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1174,7 +1174,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget17 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -1198,7 +1198,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.8
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1215,7 +1215,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget18 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -1239,7 +1239,7 @@ PanelWidgetClass rootFrame {
      clipchildren 1
      color 0 0 0 0.8627
      position 0 0.9
-     size 300 80
+     size 380 80
      hexactpos 0
      vexactpos 0
      hexactsize 1
@@ -1256,7 +1256,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget19 {
        visible 1
-       size 280 60
+       size 360 60
        halign center_ref
        valign center_ref
        hexactpos 1

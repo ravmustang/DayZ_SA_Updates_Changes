@@ -2,22 +2,24 @@ GridSpacerWidgetClass height_wrapper {
  clipchildren 0
  ignorepointer 1
  color 0 0 0 0
- size 521 67
+ size 1 67
  hexactpos 1
  vexactpos 1
- hexactsize 1
+ hexactsize 0
  vexactsize 1
  priority 8
  userID -1
  style Colorable
+ "Ignore invisible" 0
  Padding 0
  Margin 0
+ "Size To Content V" 1
  content_valign center
  Columns 8
  Rows 1
  {
   FrameWidgetClass Icon0 {
-   visible 0
+   visible 1
    clipchildren 1
    ignorepointer 0
    color 0.502 0 0 1

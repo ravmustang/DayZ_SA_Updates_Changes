@@ -83,7 +83,7 @@ FrameWidgetClass controls_tab_root {
         }
         GridSpacerWidgetClass mouse_settings_content {
          ignorepointer 1
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -92,8 +92,8 @@ FrameWidgetClass controls_tab_root {
          vexactsize 0
          style Colorable
          "no focus" 1
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1
@@ -386,7 +386,7 @@ FrameWidgetClass controls_tab_root {
         }
         GridSpacerWidgetClass keyboard_settings_content {
          ignorepointer 0
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -395,8 +395,8 @@ FrameWidgetClass controls_tab_root {
          vexactsize 0
          style Colorable
          "no focus" 0
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1
@@ -468,7 +468,7 @@ FrameWidgetClass controls_tab_root {
         }
         GridSpacerWidgetClass controller_settings_content {
          ignorepointer 1
-         color 0 0 0 0.8627
+         color 0 0 0 0.549
          position 0 0
          size 1 1
          hexactpos 1
@@ -477,13 +477,23 @@ FrameWidgetClass controls_tab_root {
          vexactsize 0
          style Colorable
          "no focus" 1
-         Padding 4
-         Margin 8
+         Padding 0
+         Margin 0
          "Size To Content H" 1
          "Size To Content V" 1
          Columns 1
          Rows 1
          {
+          FrameWidgetClass FrameWidget0 {
+           visible 0
+           ignorepointer 1
+           position 10 10
+           size 0.089 5
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+          }
           ButtonWidgetClass controller_invert_container {
            position 0 0
            size 1 30
@@ -496,25 +506,22 @@ FrameWidgetClass controls_tab_root {
            "next up" "hsensitivity_button"
            "next down" "vsensitivity_button"
            {
-            GridSpacerWidgetClass controller_invert_setting {
+            PanelWidgetClass controller_invert_setting {
              ignorepointer 1
+             color 0 0 0 0
              position 0 0
              size 1 30
              hexactpos 1
              vexactpos 1
              hexactsize 0
              vexactsize 1
-             "no focus" 1
-             Padding 0
-             Margin 0
-             "Size To Content H" 1
-             Columns 2
-             Rows 1
+             style rover_sim_colorable
              {
               FrameWidgetClass controller_invert_setting_panel {
+               visible 1
                ignorepointer 1
                position 0 0
-               size 0.5 0.6
+               size 0.5 1
                hexactpos 1
                vexactpos 1
                hexactsize 0
@@ -530,7 +537,7 @@ FrameWidgetClass controls_tab_root {
                  vexactsize 0
                  text "#layout_xbox_controls_ivnert_vertical"
                  font "gui/fonts/sdf_MetronLight24"
-                 "text offset" 8 0
+                 "text offset" 20 0
                  "exact text" 0
                  "exact text size" 18
                  "text valign" center
@@ -539,11 +546,12 @@ FrameWidgetClass controls_tab_root {
               }
               FrameWidgetClass controller_invert_setting_option {
                ignorepointer 1
-               position 0 0
-               size 0.5 1
-               hexactpos 1
+               position 0.5 0
+               size 290 1
+               valign center_ref
+               hexactpos 0
                vexactpos 1
-               hexactsize 0
+               hexactsize 1
                vexactsize 0
               }
              }
@@ -562,19 +570,20 @@ FrameWidgetClass controls_tab_root {
             }
            }
           }
-          ButtonWidgetClass controller_vsensitivity_container {
+          PanelWidgetClass controller_vsensitivity_container {
+           color 0 0 0 0
            position 0 0
            size 1 30
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 1
-           style Colorable
+           style rover_sim_colorable
            "no focus" 0
            "next up" "invert_button"
            "next down" "hsensitivity_button"
            {
-            GridSpacerWidgetClass controller_vsensitivity_setting {
+            FrameWidgetClass controller_vsensitivity_setting {
              ignorepointer 1
              position 0 0
              size 1 30
@@ -582,17 +591,11 @@ FrameWidgetClass controls_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
-             "no focus" 1
-             Padding 0
-             Margin 0
-             "Size To Content H" 1
-             Columns 2
-             Rows 1
              {
               FrameWidgetClass controller_vsensitivity_setting_panel {
                ignorepointer 1
                position 0 0
-               size 0.5 0.6
+               size 0.5 1
                hexactpos 1
                vexactpos 1
                hexactsize 0
@@ -608,7 +611,7 @@ FrameWidgetClass controls_tab_root {
                  vexactsize 0
                  text "#layout_pc_controls_sensitivity_ver"
                  font "gui/fonts/sdf_MetronLight24"
-                 "text offset" 8 0
+                 "text offset" 20 0
                  "exact text" 0
                  "exact text size" 18
                  "text valign" center
@@ -617,11 +620,13 @@ FrameWidgetClass controls_tab_root {
               }
               FrameWidgetClass controller_vsensitivity_setting_option {
                ignorepointer 1
-               position 0 0
-               size 0.5 1
+               position 5 0
+               size 290 1
+               halign right_ref
+               valign center_ref
                hexactpos 1
                vexactpos 1
-               hexactsize 0
+               hexactsize 1
                vexactsize 0
               }
              }
@@ -653,25 +658,21 @@ FrameWidgetClass controls_tab_root {
            "next up" "vsensitivity_button"
            "next down" "invert_button"
            {
-            GridSpacerWidgetClass controller_hsensitivity_setting {
+            PanelWidgetClass controller_hsensitivity_setting {
              ignorepointer 0
+             color 0 0 0 0
              position 0 0
              size 1 30
              hexactpos 1
              vexactpos 1
              hexactsize 0
              vexactsize 1
-             "no focus" 1
-             Padding 0
-             Margin 0
-             "Size To Content H" 1
-             Columns 2
-             Rows 1
+             style rover_sim_colorable
              {
               FrameWidgetClass controller_hsensitivity_setting_panel {
                ignorepointer 1
                position 0 0
-               size 0.5 0.6
+               size 0.5 1
                hexactpos 1
                vexactpos 1
                hexactsize 0
@@ -687,7 +688,7 @@ FrameWidgetClass controls_tab_root {
                  vexactsize 0
                  text "##layout_pc_controls_sensitivity_hor"
                  font "gui/fonts/sdf_MetronLight24"
-                 "text offset" 8 0
+                 "text offset" 20 0
                  "exact text" 0
                  "exact text size" 18
                  "text valign" center
@@ -696,11 +697,13 @@ FrameWidgetClass controls_tab_root {
               }
               FrameWidgetClass controller_hsensitivity_setting_option {
                ignorepointer 1
-               position 0 0
-               size 0.5 1
+               position 5 0
+               size 290 1
+               halign right_ref
+               valign center_ref
                hexactpos 1
                vexactpos 1
-               hexactsize 0
+               hexactsize 1
                vexactsize 0
               }
              }
@@ -718,6 +721,16 @@ FrameWidgetClass controls_tab_root {
              style rover_sim_colorable
             }
            }
+          }
+          FrameWidgetClass FrameWidget1 {
+           visible 0
+           ignorepointer 1
+           position 10 10
+           size 1 5
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
           }
          }
         }

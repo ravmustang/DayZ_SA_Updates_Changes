@@ -1,5 +1,5 @@
 PanelWidgetClass DropzoneX {
- visible 0
+ visible 1
  clipchildren 0
  ignorepointer 1
  color 1 1 1 0
@@ -69,8 +69,7 @@ PanelWidgetClass DropzoneX {
       }
       PanelWidgetClass Up {
        clipchildren 0
-       ignorepointer 1
-       size 36 140
+       size 36 150
        halign right_ref
        hexactpos 1
        vexactpos 1
@@ -79,7 +78,7 @@ PanelWidgetClass DropzoneX {
        {
         ImageWidgetClass LT0 {
          ignorepointer 1
-         position 60 -5
+         position 60 0
          size 29 29
          halign center_ref
          hexactpos 1
@@ -92,7 +91,7 @@ PanelWidgetClass DropzoneX {
         }
         ImageWidgetClass LT1 {
          ignorepointer 1
-         position 60 0
+         position 60 5
          size 29 29
          halign center_ref
          hexactpos 1
@@ -105,7 +104,7 @@ PanelWidgetClass DropzoneX {
         }
         ImageWidgetClass LT {
          ignorepointer 1
-         position 60 19
+         position 60 24
          size 36 50
          hexactpos 1
          vexactpos 1
@@ -117,7 +116,7 @@ PanelWidgetClass DropzoneX {
         }
         ImageWidgetClass RT {
          ignorepointer 1
-         position 60 19
+         position 60 24
          size 36 50
          valign bottom_ref
          hexactpos 1
@@ -128,9 +127,9 @@ PanelWidgetClass DropzoneX {
          mode blend
          "src alpha" 1
         }
-        ImageWidgetClass RT1 {
+        ImageWidgetClass RT0 {
          ignorepointer 1
-         position 60 -5
+         position 60 0
          size 29 29
          halign center_ref
          valign bottom_ref
@@ -142,9 +141,9 @@ PanelWidgetClass DropzoneX {
          mode blend
          "src alpha" 1
         }
-        ImageWidgetClass RT2 {
+        ImageWidgetClass RT1 {
          ignorepointer 1
-         position 60 0
+         position 60 5
          size 29 29
          halign center_ref
          valign bottom_ref

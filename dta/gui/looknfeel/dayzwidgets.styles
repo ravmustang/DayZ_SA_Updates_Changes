@@ -1435,7 +1435,7 @@
                 <Item Name="Top" Image="editorQuadTop" />
             </State>
         </Style>
-        <Style Name="ServerBrowser" Font="gui/fonts/MetronBook22" ImageSet="dayz_gui" Color="4294967295">
+        <Style Name="ServerBrowser" Font="gui/fonts/sdf_MetronLight24" ImageSet="gui_back" Color="4294967295">
             <State Name="Disabled">
                 <Item Name="Bottom" Image="" />
                 <Item Name="Center" Image="" />
@@ -1449,7 +1449,7 @@
             </State>
             <State Name="Focus">
                 <Item Name="Bottom" Image="" />
-                <Item Name="Center" Image="menuButtonCenter" />
+                <Item Name="Center" Image="" />
                 <Item Name="Left" Image="" />
                 <Item Name="LeftBottom" Image="" />
                 <Item Name="LeftTop" Image="" />
@@ -1460,7 +1460,7 @@
             </State>
             <State Name="Normal">
                 <Item Name="Bottom" Image="" />
-                <Item Name="Center" Image="area_7" />
+                <Item Name="Center" Image="" />
                 <Item Name="Left" Image="" />
                 <Item Name="LeftBottom" Image="" />
                 <Item Name="LeftTop" Image="" />
@@ -2770,7 +2770,7 @@
                 <Item Name="Top" Image="Top1" />
             </State>
         </Style>
-        <Style Name="GUI_Black_simple" Font="gui/fonts/AmorSerifPro-Bold" ImageSet="gui_back" Color="4294967295">
+        <Style Name="GUI_Black_simple" Font="gui/fonts/AmorSerifPro-Bold" ImageSet="dayz_gui" Color="4294967295">
             <State Name="Disabled">
                 <Item Name="BarBottom" Image="" />
                 <Item Name="BarCenter" Image="" />
@@ -2812,24 +2812,24 @@
                 <Item Name="Top" Image="" />
             </State>
             <State Name="Normal">
-                <Item Name="BarBottom" Image="TopFill_simple" />
-                <Item Name="BarCenter" Image="CenterFill" />
-                <Item Name="BarLeft" Image="SideFill_simple" />
-                <Item Name="BarLeftBottom" Image="CornersFill" />
-                <Item Name="BarLeftTop" Image="CornersFill" />
-                <Item Name="BarRight" Image="SideFill_simple" />
-                <Item Name="BarRightBottom" Image="CornersFill" />
-                <Item Name="BarRightTop" Image="CornersFill" />
-                <Item Name="BarTop" Image="TopFill_simple" />
-                <Item Name="Bottom" Image="dashedBottom" />
-                <Item Name="Center" Image="dashedCenter" />
-                <Item Name="Left" Image="dashedLeft" />
-                <Item Name="LeftBottom" Image="dashedLeftBottom" />
-                <Item Name="LeftTop" Image="dashedLeftTop" />
-                <Item Name="Right" Image="dashedRight" />
-                <Item Name="RightBottom" Image="dashedRightBottom" />
-                <Item Name="RightTop" Image="dashedRightTop" />
-                <Item Name="Top" Image="dashedTop" />
+                <Item Name="BarBottom" Image="EditorPanelBottom" />
+                <Item Name="BarCenter" Image="ColorableBar" />
+                <Item Name="BarLeft" Image="EditorPanelLeft" />
+                <Item Name="BarLeftBottom" Image="EditorPanelLeftBottom" />
+                <Item Name="BarLeftTop" Image="EditorPanelLeftTop" />
+                <Item Name="BarRight" Image="EditorPanelRight" />
+                <Item Name="BarRightBottom" Image="EditorPanelRightBottom" />
+                <Item Name="BarRightTop" Image="EditorPanelRightTop" />
+                <Item Name="BarTop" Image="EditorPanelTop" />
+                <Item Name="Bottom" Image="menuButtonBottom" />
+                <Item Name="Center" Image="menuButtonCenter" />
+                <Item Name="Left" Image="menuButtonLeft" />
+                <Item Name="LeftBottom" Image="menuButtonLeftBottom" />
+                <Item Name="LeftTop" Image="menuButtonLeftTop" />
+                <Item Name="Right" Image="menuButtonRight" />
+                <Item Name="RightBottom" Image="menuButtonRightBottom" />
+                <Item Name="RightTop" Image="menuButtonRightTop" />
+                <Item Name="Top" Image="menuButtonTop" />
             </State>
         </Style>
         <Style Name="DayZDefault" Font="gui/fonts/sdf_MetronLight24" ImageSet="dayz_gui" Color="16">

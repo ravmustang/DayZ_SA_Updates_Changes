@@ -2,7 +2,7 @@ WindowWidgetClass LogoutDialogRoot {
  visible 1
  clipchildren 1
  inheritalpha 0
- color 0.0824 0.0824 0.0824 0.7843
+ color 0.1176 0.1176 0.1176 0.9804
  position 0 0
  size 540 190
  halign center_ref
