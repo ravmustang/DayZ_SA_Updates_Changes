@@ -427,14 +427,27 @@ class VicinitySlotsContainer: Container
 			WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( panel,  this, "MouseButtonDown" );
 
 			ref map<int, ref Container> showed_items = ( VicinityContainer.Cast( m_Parent ) ).m_ShowedItemsIDs;
-			ClosableContainer conta;
+			
 			int showed = showed_items.Count();
-			conta = ClosableContainer.Cast( showed_items.Get( item.GetID() ) );
+			ClosableContainer conta = ClosableContainer.Cast( showed_items.Get( item.GetID() ) );
+			CollapsibleContainer conta2 = CollapsibleContainer.Cast( showed_items.Get( item.GetID() ) );
+			
 			string config = "CfgVehicles " + item.GetType() + " GUIInventoryAttachmentsProps";
 			string name = item_preview.GetName();
-			if(conta && conta.IsInherited( ClosableContainer ))
+			bool show_radial_icon;
+			if( conta )
 			{
-				bool show_radial_icon = conta.IsOpened() && ( item.GetInventory().GetCargo() || item.GetSlotsCountCorrect() > 0 ) && !GetGame().ConfigIsExisting( config );
+				show_radial_icon = conta.IsOpened() && ( item.GetInventory().GetCargo() || item.GetSlotsCountCorrect() > 0 ) && !GetGame().ConfigIsExisting( config );
+				name.Replace( "Render", "RadialIconPanel" );
+				icon.FindAnyWidget( name ).Show( true );
+				name.Replace( "RadialIconPanel", "RadialIcon" );
+				icon.FindAnyWidget( name ).Show( !show_radial_icon );
+				name.Replace( "RadialIcon", "RadialIconClosed" );
+				icon.FindAnyWidget( name ).Show( show_radial_icon );		
+			}
+			if( conta2 )
+			{
+				show_radial_icon = !conta2.IsHidden();
 				name.Replace( "Render", "RadialIconPanel" );
 				icon.FindAnyWidget( name ).Show( true );
 				name.Replace( "RadialIconPanel", "RadialIcon" );
@@ -524,6 +537,7 @@ class VicinitySlotsContainer: Container
 			#endif
 		}
 		
+		#ifndef PLATFORM_CONSOLE
 		if( visible_items_count % ITEMS_IN_ROW == 0 )
 		{
 			int s = m_Container.Count() - 1;
@@ -531,6 +545,7 @@ class VicinitySlotsContainer: Container
 			icon.Show( true );
 			m_Container.Get( s ).GetMainWidget().Update();
 		}
+		#endif
 	}
 	
 	void DoubleClick(Widget w, int x, int y, int button)
@@ -803,7 +818,6 @@ class VicinitySlotsContainer: Container
 			{
 				for( int g = 0; g < difference; g++ )
 				{
-					Print( "Creating new container." );
 					SlotsContainer con = new SlotsContainer( m_Container );
 					m_Container.Insert( con );
 					for( int j = 0; j < ITEMS_IN_ROW; j++ )
@@ -834,7 +848,6 @@ class VicinitySlotsContainer: Container
 					Widget w = m_Container.m_Body.Get( m_SlotsCount - 1 ).GetMainWidget();
 					delete w;
 					m_Container.m_Body.Remove( m_SlotsCount - 1 );
-					Print( "Removing container." );
 					m_SlotsCount--;
 				}
 			}

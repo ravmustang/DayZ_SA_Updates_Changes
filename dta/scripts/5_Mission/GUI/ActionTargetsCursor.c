@@ -50,7 +50,7 @@ class ATCCachedObject
 	}
 };
 
-class ActionTargetsCursor extends ObjectFollower
+class ActionTargetsCursor extends ScriptedWidgetEventHandler
 {
 	protected PlayerBase 					m_Player;
 	protected ActionTarget 					m_Target;
@@ -67,6 +67,7 @@ class ActionTargetsCursor extends ObjectFollower
 	protected bool							m_FixedOnPosition;
 	protected bool 							m_Hidden;
 
+	protected Widget						m_Root;
 	protected Widget						m_Container;
 	protected Widget 						m_ItemLeft;
 	ref AutoHeightSpacer					m_MainSpacer;
@@ -89,9 +90,9 @@ class ActionTargetsCursor extends ObjectFollower
 		
 		m_CachedObject = new ATCCachedObject;
 		m_Hidden = false;
-		
-		//KeysToUIElements.Init(); // Initialiaze of KeysToUIElements
 	}
+	
+	void ~ActionTargetsCursor() {}
 	
 	// Controls appearance of the builded cursor
 	void SetHealthVisibility( bool state)
@@ -125,12 +126,11 @@ class ActionTargetsCursor extends ObjectFollower
 		w.LoadImageFile( 0, "set:"+ imageset_name + " image:" + image_name );
 	}
 
-	override protected void OnWidgetScriptInit(Widget w)
+	protected void OnWidgetScriptInit(Widget w)
 	{
-		super.OnWidgetScriptInit(w);
-
 		m_Root = w;
 		m_Root.Show(false);
+		m_Root.SetHandler(this);
 
 		m_Container = w.FindAnyWidget("container");
 		m_Container.GetScript(m_MainSpacer);
@@ -253,14 +253,34 @@ class ActionTargetsCursor extends ObjectFollower
 		}
 	}
 	
-	override protected void Update()
+	override bool OnUpdate(Widget w)
 	{
-		//! don't show floating widget if it's disabled in profile
-		if(!g_Game.GetProfileOption(EDayZProfilesOptions.HUD))
+		if (m_Root == w)
+		{
+			Update();
+			return true;
+		}
+		
+		return false;
+	}
+
+	protected void HideWidget()
+	{
+		if (m_Root.IsVisible())
 		{
 			m_Root.Show(false);
+			m_CachedObject.Invalidate();
+		}
+	}
+	
+	void Update()
+	{
+		//! don't show floating widget if it's disabled in profile
+		if(GetGame().GetUIManager().GetMenu() != null || !g_Game.GetProfileOption(EDayZProfilesOptions.HUD))
+		{
+			HideWidget();
 			return;
-		};
+		}
 
 		// TODO: if we choose to have it configurable throught options or from server settings
 		// we need to change setting of these methods;
@@ -272,15 +292,17 @@ class ActionTargetsCursor extends ObjectFollower
 			m_Player = null;
 			m_AM = null;
 		}
+
 		if(!m_Player) GetPlayer();
 		if(!m_AM) GetActionManager();
+
 		GetTarget();
 		GetActions();
 
 #ifdef PLATFORM_CONSOLE
-		if(((m_Target && !m_Hidden) && ((m_Interact || m_Single || m_Continuous)) && m_AM.GetRunningAction() == null) && GetGame().GetUIManager().GetMenu() == null)
+		if((m_Target && !m_Hidden) && (m_Interact || m_Single || m_Continuous) && m_AM.GetRunningAction() == null)
 #else
-		if(((m_Target && !m_Hidden) || ((m_Interact || m_Single || m_Continuous)) && m_AM.GetRunningAction() == null) && GetGame().GetUIManager().GetMenu() == null)
+		if((m_Target && !m_Hidden) || (m_Interact || m_Single || m_Continuous) && m_AM.GetRunningAction() == null)
 #endif
 		{
 			//! cursor with fixed position (environment interaction mainly)
@@ -347,7 +369,6 @@ class ActionTargetsCursor extends ObjectFollower
 					// remove previous backlit
 					GetDayZGame().GetBacklit().HintClear();
 				}
-				
 			}
 		}
 		else
@@ -361,7 +382,6 @@ class ActionTargetsCursor extends ObjectFollower
 				// remove previous backlit
 				GetDayZGame().GetBacklit().HintClear();
 			}
-			
 		}
 		
 		m_MaxWidthChild = 350;
@@ -392,7 +412,7 @@ class ActionTargetsCursor extends ObjectFollower
 		return transformed_pos;
 	}
 
-	override protected void GetOnScreenPosition(out float x, out float y)
+	protected void GetOnScreenPosition(out float x, out float y)
 	{
 		const float 	DEFAULT_HANDLE_OFFSET 	= 0.2;
 		const string 	CE_CENTER_COMP_NAME 	= "ce_center";

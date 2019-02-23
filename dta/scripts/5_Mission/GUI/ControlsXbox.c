@@ -223,7 +223,23 @@ class ControlsXbox extends UIScriptedMenu
 			{
 				group_point_x = group_point_x/element.Count() - 50;
 			}
-			group_point_y = group_point_y/element.Count() + text_widget_height/2;
+
+			if ( element.Count() % 2 == 0 )
+			{
+				group_point_y = ( ( text_widget_pos_y + text_widget_height/2 ) - first_y ) / 2 + first_y;
+			}
+			else
+			{
+				float text_widget_pos_x_center, text_widget_pos_y_center;
+				float text_widget_width_center, text_widget_height_center;
+				
+				panel_widget = layoutRoot.FindAnyWidget( "PanelWidget" + element[1] );
+				
+				panel_widget.GetScreenPos( text_widget_pos_x_center, text_widget_pos_y_center );
+				panel_widget.GetScreenSize( text_widget_width_center, text_widget_height_center );
+				
+				group_point_y = text_widget_pos_y_center + text_widget_height_center / 2;
+			}
 			
 			button_marker_widget.GetScreenPos( dot_pos_x, dot_pos_y );
 			button_marker_widget.GetScreenSize( dot_width, dot_height );

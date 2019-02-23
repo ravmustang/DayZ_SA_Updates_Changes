@@ -1,26 +1,26 @@
 class ItemManager
 {
-	private ref static ItemManager m_Instance;
-	protected bool m_IsDragging;
-	protected EntityAI m_DraggedItem;
-	protected Icon m_DraggedIcon;
-	protected ref Widget m_TooltipWidget;
-	protected ItemPreviewWidget m_ItemPreviewWidget;
-	protected Widget m_RootWidget;
-	protected ref map<string, bool> m_DefautOpenStates;
-	protected ref map<string, bool> m_DefautHeaderOpenStates;
- 	protected int m_HandsDefaultOpenState;
-	protected ref Timer m_ToolTipTimer;
+	private ref static ItemManager		m_Instance;
+	protected bool						m_IsDragging;
+	protected EntityAI					m_DraggedItem;
+	protected Icon						m_DraggedIcon;
+	protected ref Widget				m_TooltipWidget;
+	protected ItemPreviewWidget			m_ItemPreviewWidget;
+	protected Widget					m_RootWidget;
+	protected ref map<string, bool>		m_DefautOpenStates;
+	protected ref map<string, bool>		m_DefautHeaderOpenStates;
+ 	protected int						m_HandsDefaultOpenState;
+	protected ref Timer					m_ToolTipTimer;
 
-	protected EntityAI m_SelectedItem;
-	protected ref Icon m_SelectedIcon;
-	protected Widget m_SelectedWidget;
-	protected ItemPreviewWidget m_Ipw;
+	protected EntityAI					m_SelectedItem;
+	protected Container					m_SelectedContainer;
+	protected Widget					m_SelectedWidget;
+	protected ItemPreviewWidget			m_Ipw;
 	
-	protected HandsPreview m_HandsPreview;
+	protected HandsPreview				m_HandsPreview;
 	
-	protected bool m_ItemMicromanagmentMode;
-	protected bool m_ItemMoving;
+	protected bool						m_ItemMicromanagmentMode;
+	protected bool						m_ItemMoving;
 	
 	#ifndef PLATFORM_CONSOLE
 	protected const float TOOLTIP_DELAY = 0.25; // in seconds
@@ -30,12 +30,18 @@ class ItemManager
 	
 	void ItemManager( Widget root )
 	{
-		m_RootWidget = root;
-		m_DefautOpenStates = new map<string, bool>;
-		m_DefautHeaderOpenStates = new map<string, bool>;
-		m_TooltipWidget = GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip.layout", NULL );
+		m_Instance					= this;
+		m_RootWidget				= root;
+		m_DefautOpenStates			= new map<string, bool>;
+		m_DefautHeaderOpenStates	= new map<string, bool>;
+		
+		#ifdef PLATFORM_CONSOLE
+			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip_xbox.layout", NULL );
+		#else
+			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip.layout", NULL );
+		#endif
 		m_TooltipWidget.Show( false );
-		m_Instance = this;
+		
 	}
 	
 	void SetItemMoving( bool item_moving )
@@ -73,9 +79,9 @@ class ItemManager
 		return m_SelectedItem;
 	}
 
-	Icon GetSelectedIcon()
+	Container GetSelectedContainer()
 	{
-		return m_SelectedIcon;
+		return m_SelectedContainer;
 	}
 	
 	Widget GetSelectedWidget()
@@ -83,11 +89,11 @@ class ItemManager
 		return m_SelectedWidget;
 	}
 
-	void SetSelectedItem( EntityAI selected_item, Icon selected_icon, Widget selected_widget )
+	void SetSelectedItem( EntityAI selected_item, Container selected_container, Widget selected_widget )
 	{
-		m_SelectedItem = selected_item;
-		m_SelectedIcon = selected_icon;
-		m_SelectedWidget = selected_widget;
+		m_SelectedItem		= selected_item;
+		m_SelectedContainer	= selected_container;
+		m_SelectedWidget	= selected_widget;
 	}
 
 	void SetSelectedVicinityItem( ItemPreviewWidget ipw )
@@ -407,12 +413,13 @@ class ItemManager
 		if ( item.IsInherited( InventoryItem ) )
 		{
 			InspectMenuNew.UpdateItemInfo( m_TooltipWidget, item );
+			
+			#ifndef PLATFORM_CONSOLE
 			int screen_w, screen_h;
 			float w, h;
-
-			#ifndef PLATFORM_CONSOLE
+			
 			GetMousePos(x,y);
-			#endif
+			
 			GetScreenSize(screen_w, screen_h);
 			m_TooltipWidget.GetScreenSize(w,h);
 
@@ -433,9 +440,10 @@ class ItemManager
 			{
 				y = y - h - (2*m_normal_item_size);
 			}
-
 			m_TooltipWidget.SetPos(x, y);
 
+			#endif
+			
 			m_ToolTipTimer = new Timer();
 			
 			m_ToolTipTimer.Run( TOOLTIP_DELAY, this, "ShowTooltip" );

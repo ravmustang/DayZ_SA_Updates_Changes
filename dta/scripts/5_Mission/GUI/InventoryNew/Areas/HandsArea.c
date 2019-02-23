@@ -19,6 +19,16 @@ class HandsArea: LayoutHolder
 	override void SetActive( bool active )
 	{
 		m_HandsContainer.SetActive( active );
+		
+		/*
+		#ifdef PLATFORM_CONSOLE
+		Widget bg = GetRootWidget().GetParent().GetParent().GetParent().FindAnyWidget( "CenterBackground" );
+		if( active )
+			bg.SetAlpha( 0.4 );
+		else
+			bg.SetAlpha( 0 );
+		#endif
+		*/
 	}
 
 	override bool IsActive()
@@ -125,6 +135,13 @@ class HandsArea: LayoutHolder
 	{
 		m_Scroller.VScrollToPos01( m_Scroller.GetVScrollPos01() );
 		m_HandsContainer.UpdateInterval();
+		
+		float x, y;
+		float x2, y2;
+		m_Scroller.GetScreenSize( x, y );
+		m_MainWidget.GetScreenSize( x2, y2 );
+		if( y2 != y )
+			m_ShouldChangeSize = true;
 		
 		bool changed_size;
 		if( m_ShouldChangeSize && m_HandsResizer.ResizeParentToChild( changed_size, InventoryMenu.GetHeight() * 0.5 ) )

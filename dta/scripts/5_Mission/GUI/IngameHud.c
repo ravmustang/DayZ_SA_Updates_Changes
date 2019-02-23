@@ -107,6 +107,7 @@ class IngameHud extends Hud
 	protected Widget							m_ActionMultipleItemsFrame;
 	
 	protected Widget							m_ActionTarget;
+	protected ActionTargetsCursor				m_ActionTargetsCursor;
 	
 	// CrossHairs
 	protected ImageWidget						m_PermanentCrossHair;
@@ -222,7 +223,10 @@ class IngameHud extends Hud
 		m_StanceStand					= m_HudPanelWidget.FindAnyWidget("StanceStand");
 		m_StanceCar						= m_HudPanelWidget.FindAnyWidget("StanceCar");
 		m_StancePanel					= m_HudPanelWidget.FindAnyWidget("StancePanel");
+
 		m_ActionTarget					= m_HudPanelWidget.FindAnyWidget("ActionTargetsCursorWidget");
+		//! gets scripted handler from widget
+		m_ActionTarget.GetScript(m_ActionTargetsCursor);
 		
 		// state notifiers
 		m_StatesWidgetNames.Clear();
@@ -1237,9 +1241,9 @@ class IngameHud extends Hud
 	override void Update( float timeslice )
 	{
 		super.Update( timeslice );
-		
-		m_ActionTarget.Update();
-		
+
+		m_ActionTargetsCursor.Update();
+
 		//
 		//modifiers - tendency status (critical)
 		if ( m_BlinkTime > TENDENCY_BLINK_TIME )

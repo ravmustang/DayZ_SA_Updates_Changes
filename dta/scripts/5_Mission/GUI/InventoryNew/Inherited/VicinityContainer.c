@@ -291,6 +291,24 @@ class VicinityContainer: CollapsibleContainer
 		}
 	}
 	
+	override void SetNextActive()
+	{
+		super.SetNextActive();
+		if( m_ActiveIndex == 1 )
+			m_CollapsibleHeader.SetActive( true );
+		else
+			m_CollapsibleHeader.SetActive( false );
+	}
+	
+	override void SetPreviousActive()
+	{
+		super.SetPreviousActive();
+		if( m_ActiveIndex == 1 )
+			m_CollapsibleHeader.SetActive( true );
+		else
+			m_CollapsibleHeader.SetActive( false );
+	}
+	
 	void OnLeftPanelDropReceived( Widget w, int x, int y, Widget receiver )
 	{
 		OnDropReceivedFromHeader( w, x, y, receiver );
@@ -569,6 +587,7 @@ class VicinityContainer: CollapsibleContainer
 				{
 					EntityAI e = c2.GetActiveItem();
 					c = ClosableContainer.Cast( m_ShowedItems.Get( e ) );
+					CollapsibleContainer c3 = CollapsibleContainer.Cast( m_ShowedItems.Get( e ) );
 					if( c )
 					{
 						if( c.IsOpened() )
@@ -579,6 +598,10 @@ class VicinityContainer: CollapsibleContainer
 						{
 							c.Open();
 						}
+					}
+					else if( c3 )
+					{
+						c3.CollapseButtonOnMouseButtonDown( null );
 					}
 				}
 			}

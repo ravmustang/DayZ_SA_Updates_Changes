@@ -12,7 +12,7 @@ class ClosableHeader: Header
 		float temp;
 		GetMainWidget().GetScreenSize( temp, m_SquareSize );
 		
-		m_DefaultColor		= GetMainWidget().FindAnyWidget( "PanelWidget" ).GetAlpha();
+		m_DefaultColor		= GetMainWidget().FindAnyWidget( "PanelWidget" ).GetColor();
 		m_DefaultFontSize	= 20;
 	}
 
@@ -97,13 +97,11 @@ class ClosableHeader: Header
 		super.SetActive( active );
 		if( active )
 		{
-			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetAlpha( m_DefaultColor + 0.1 );
-			m_HeaderText.SetTextExactSize( m_DefaultFontSize * 1.1 );
+			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetColor( ARGBF( 1, 1, 0, 0 ) );
 		}
 		else
 		{
-			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetAlpha( m_DefaultColor );
-			m_HeaderText.SetTextExactSize( m_DefaultFontSize );
+			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetColor( m_DefaultColor );
 		}
 	}
 }

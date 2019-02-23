@@ -57,6 +57,26 @@ class AttachmentCategoriesSlotsContainer: Container
 		return ipw.GetItem();
 	}
 	
+	int GetParentID()
+	{
+		Widget ipw = m_ItemsCont.GetMainWidget();
+		return ipw.GetUserID();
+	}
+	
+	int GetFocusedID()
+	{
+		Widget ipw = m_ItemsCont.GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn );
+		return ipw.GetUserID();
+	}
+	
+	void ExpandCollapseContainer( bool expand )
+	{
+		Widget ipw = m_ItemsCont.GetMainWidget().FindAnyWidget( "RadialIcon" + m_FocusedColumn );
+		Widget ipw2 = m_ItemsCont.GetMainWidget().FindAnyWidget( "RadialIconClosed" + m_FocusedColumn );
+		ipw.Show( expand );
+		ipw2.Show( !expand );
+	}
+	
 	override void MoveGridCursor( int direction )
 	{
 		ItemManager.GetInstance().HideTooltip();
@@ -94,7 +114,7 @@ class AttachmentCategoriesSlotsContainer: Container
 		if( direction == Direction.RIGHT )
 		{
 			m_FocusedColumn++;
-			if( m_FocusedColumn >= m_ItemsCont.GetColumnCount() )
+			if( m_FocusedColumn > m_ItemsCont.GetColumnCount() )
 			{
 				m_FocusedColumn = 0;
 			}

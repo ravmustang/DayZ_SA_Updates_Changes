@@ -99,6 +99,24 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		active_container.MoveGridCursor( direction );
 	}
 	
+	override void SetNextActive()
+	{
+		super.SetNextActive();
+		if( m_ActiveIndex == 1 )
+			m_CollapsibleHeader.SetActive( true );
+		else
+			m_CollapsibleHeader.SetActive( false );
+	}
+	
+	override void SetPreviousActive()
+	{
+		super.SetPreviousActive();
+		if( m_ActiveIndex == 1 )
+			m_CollapsibleHeader.SetActive( true );
+		else
+			m_CollapsibleHeader.SetActive( false );
+	}
+	
 	void LoadAttachmentCategoriesIcon( SlotsContainer items_cont, string icon_name, int slot_number )
 	{
 		Widget item_preview			= items_cont.GetMainWidget().FindAnyWidget( "Icon"+ slot_number );
@@ -110,9 +128,15 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 			ClosableContainer c = ClosableContainer.Cast( m_Body.Get( slot_number + 2 ) );
 			item_preview.FindAnyWidget( "RadialIconPanel" + slot_number ).Show( true );
 			if( c && c.IsOpened() )
+			{
+				item_preview.FindAnyWidget( "RadialIconClosed" + slot_number ).Show( false );
 				item_preview.FindAnyWidget( "RadialIcon" + slot_number ).Show( true );
+			}
 			else
+			{
 				item_preview.FindAnyWidget( "RadialIcon" + slot_number ).Show( false );
+				item_preview.FindAnyWidget( "RadialIconClosed" + slot_number ).Show( true );
+			}
 		}
 	}
 
@@ -188,6 +212,43 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 		}
 	}
 	
+	void ExpandCollapseContainer()
+	{
+		if( m_Body.Count() > m_ActiveIndex )
+		{
+			AttachmentCategoriesSlotsContainer acsc = AttachmentCategoriesSlotsContainer.Cast( m_Body.Get( m_ActiveIndex ) );
+			if( acsc )
+			{
+				int index = acsc.GetParentID() * ITEMS_IN_ROW + acsc.GetFocusedID() + m_SlotsCount + 1;
+				
+				ClosableContainer c = ClosableContainer.Cast( m_Body.Get( index ) );
+				
+				if( c )
+				{
+					string icon_name_open = "RadialIcon" + ( acsc.GetFocusedID() );
+					string icon_name_closed = "RadialIconClosed" + ( acsc.GetFocusedID() );
+					if( c.IsOpened() )
+					{
+						c.Close();
+						acsc.GetRootWidget().FindAnyWidget( icon_name_open ).Show( true );
+						acsc.GetRootWidget().FindAnyWidget( icon_name_closed ).Show( false );
+					}
+					else
+					{
+						c.Open();
+						acsc.GetRootWidget().FindAnyWidget( icon_name_closed ).Show( true );
+						acsc.GetRootWidget().FindAnyWidget( icon_name_open ).Show( false );
+					}
+				}
+			}
+		}
+	}
+	
+	bool IsHeaderActive()
+	{
+		return ( AttachmentCategoriesSlotsContainer.Cast( m_Body.Get( m_ActiveIndex ) ) != null );
+	}
+	
 	void InitIconsContainers( EntityAI entity )
 	{
 		m_SlotsCount = 0;
@@ -260,7 +321,6 @@ class AttachmentCategoriesContainer: CollapsibleContainer
 				else
 				{
 					ar = AttachmentCategoriesRow.Cast( m_Body.Get( i + 2 + attachments_categories_count / ITEMS_IN_ROW ) );
-					ar.Refresh();
 				}
 				
 				ar.Init(attachments_categories_count, i, attachment_category, config_path_attachment_categories, entity,m_Body.Count() );

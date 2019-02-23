@@ -197,18 +197,23 @@ class HandsContainer: Container
 				{
 					if( index == 0 )
 					{
+						GetFocusedContainer().SetActive( false );
 						m_Atts.SetDefaultFocus();
 						SetFocusedContainer( m_Atts.GetWrapper() );
 					}
 					else
 					{
+						GetFocusedContainer().SetActive( false );
 						m_AttachmentAttachments.GetElement( index - 1 ).SetDefaultFocus();
+						m_AttachmentAttachments.GetElement( index - 1 ).SetActive( true );
 						SetFocusedContainer( m_AttachmentAttachments.GetElement( index - 1 ).GetWrapper() );
 					}
 				}
 				else
 				{
+					GetFocusedContainer().SetActive( false );
 					m_AttachmentAttachments.GetElement( index ).SetDefaultFocus();
+					m_AttachmentAttachments.GetElement( index ).SetActive( true );
 					SetFocusedContainer( m_AttachmentAttachments.GetElement( index ).GetWrapper() );
 				}
 			}
@@ -218,18 +223,24 @@ class HandsContainer: Container
 				{
 					if( index == cargo_start_index )
 					{
+						GetFocusedContainer().SetActive( false );
 						m_CargoGrid.SetDefaultFocus();
+						m_CargoGrid.SetActive( true );
 						SetFocusedContainer( m_CargoGrid );
 					}
 					else
 					{
+						GetFocusedContainer().SetActive( false );
 						m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).SetDefaultFocus();
+						m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).SetActive( true );
 						SetFocusedContainer( m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ) );
 					}
 				}
 				else
 				{
+					GetFocusedContainer().SetActive( false );
 					m_AttachmentCargos.GetElement( index - cargo_start_index ).SetDefaultFocus();
+					m_AttachmentCargos.GetElement( index - cargo_start_index ).SetActive( true );
 					SetFocusedContainer( m_AttachmentCargos.GetElement( index - cargo_start_index ) );
 				}
 			}
@@ -309,7 +320,7 @@ class HandsContainer: Container
 				}
 			}
 		}
-		else
+		else if( GetFocusedContainer() )
 		{
 			return GetFocusedContainer().TransferItem();
 		}
@@ -336,10 +347,11 @@ class HandsContainer: Container
 				return false;
 			}
 		}
-		else
+		else if( GetFocusedContainer() )
 		{
 			return GetFocusedContainer().CanEquip();
 		}
+		return false;
 	}
 	
 	override bool EquipItem()
@@ -364,7 +376,7 @@ class HandsContainer: Container
 				}
 			}
 		}
-		else
+		else if( GetFocusedContainer() )
 		{
 			return GetFocusedContainer().EquipItem();
 		}
@@ -450,9 +462,8 @@ class HandsContainer: Container
 				}
 			}
 		}
-		else
+		else if( GetFocusedContainer() )
 		{
-			if( GetFocusedContainer() )
 				return GetFocusedContainer().TransferItemToVicinity();
 		}
 		return false;
@@ -518,7 +529,7 @@ class HandsContainer: Container
 				}
 			}
 		}
-		else
+		else if( GetFocusedContainer() )
 		{
 			return GetFocusedContainer().Select();
 		}
@@ -1180,14 +1191,6 @@ class HandsContainer: Container
 		if( c_x > x && c_y > y && item_in_hands.GetInventory().CanAddEntityInCargoEx( item, 0, x, y ) )
 		{
 			ItemManager.GetInstance().HideDropzones();
-			/*if( item_in_hands.GetHierarchyParent() == GetGame().GetPlayer() )
-			{
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
-			}
-			else
-			{
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
-			}*/
 			ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 			color = ColorManager.GREEN_COLOR;
 		}
@@ -1323,6 +1326,7 @@ class HandsContainer: Container
 			m_CargoGrid = new CargoContainer( this );
 			m_CargoGrid.SetEntity( entity );
 			Insert( m_CargoGrid );
+			m_CollapsibleHeader.GetRootWidget().FindAnyWidget( "CargoCount" ).Show( true );
 		}
 
 		if( entity.GetInventory().IsInventoryLockedForLockType( HIDE_INV_FROM_SCRIPT ) )

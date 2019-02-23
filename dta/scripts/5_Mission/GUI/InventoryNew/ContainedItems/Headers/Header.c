@@ -1,6 +1,6 @@
 class Header: LayoutHolder
 {
-	protected float			m_DefaultColor;
+	protected int			m_DefaultColor;
 	protected int			m_DefaultFontSize;
 	
 	protected EntityAI		m_Entity;
@@ -9,7 +9,9 @@ class Header: LayoutHolder
 	
 	void Header( LayoutHolder parent, string function_name )
 	{
-		#ifndef PLATFORM_CONSOLE
+		#ifdef PLATFORM_CONSOLE
+			GetMainWidget().FindAnyWidget( "collapse_button" ).Show( false );
+		#else
 		WidgetEventHandler.GetInstance().RegisterOnMouseButtonDown( GetMainWidget().FindAnyWidget( "collapse_button" ),  m_Parent, function_name );
 		WidgetEventHandler.GetInstance().RegisterOnDropReceived( GetMainWidget().FindAnyWidget( "collapse_button" ),  m_Parent, "OnDropReceivedFromHeader" );
 		#endif
@@ -18,7 +20,7 @@ class Header: LayoutHolder
 		
 		m_HeaderText		= TextWidget.Cast( GetMainWidget().FindAnyWidget( "TextWidget0" ) );
 		
-		m_DefaultColor		= GetRootWidget().GetAlpha();
+		m_DefaultColor		= GetRootWidget().GetColor();
 	}
 	
 	void SetName( string name )
@@ -30,10 +32,12 @@ class Header: LayoutHolder
 	
 	void SetItemPreview( EntityAI entity_ai )
 	{
+		#ifndef PLATFORM_CONSOLE
 		m_Entity = entity_ai;
 		ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( GetMainWidget().FindAnyWidget( "Render" ) );
 		item_preview.SetItem(entity_ai);
 		item_preview.SetView( entity_ai.GetViewIndex() );
+		#endif
 	}
 	
 	void DraggingOverHeader( Widget w, int x, int y, Widget receiver )
@@ -57,13 +61,11 @@ class Header: LayoutHolder
 		super.SetActive( active );
 		if( active )
 		{
-			GetMainWidget().SetAlpha( m_DefaultColor + 0.1 );
-			m_HeaderText.SetTextExactSize( m_DefaultFontSize * 1.1 );
+			GetMainWidget().SetColor( ARGBF( 1, 1, 0, 0 ) );
 		}
 		else
 		{
-			GetMainWidget().SetAlpha( m_DefaultColor );
-			m_HeaderText.SetTextExactSize( m_DefaultFontSize );
+			GetMainWidget().SetColor( m_DefaultColor );
 		}
 	}
 }

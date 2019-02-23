@@ -133,10 +133,10 @@ class OptionSelectorSlider extends OptionSelectorBase
 			text_label = TextWidget.Cast( m_Parent.FindAnyWidget( m_Parent.GetName() + "_label" ) );
 			if( text_label )
 				text_label.SetColor( ARGB( 255, 255, 0, 0 ) );
-			m_Slider.SetColor( ARGB( 255, 255, 0, 0 ) );
+			m_Slider.SetColor( ARGB( 150, 255, 0, 0 ) );
 			return;
 		}
-		m_Slider.SetColor( ARGB( 255, 255, 0, 0 ) );
+		m_Slider.SetColor( ARGB( 150, 255, 0, 0 ) );
 		
 		text_label = TextWidget.Cast( w.FindAnyWidget( w.GetName() + "_label" ) );
 		if( text_label )
@@ -163,11 +163,11 @@ class OptionSelectorSlider extends OptionSelectorBase
 			text_label = TextWidget.Cast( m_Parent.FindAnyWidget( m_Parent.GetName() + "_label" ) );
 			if( text_label )
 				text_label.SetColor( ARGB( 255, 255, 255, 255 ) );
-			m_Slider.SetColor( ARGB( 255, 255, 255, 255 ) );
+			m_Slider.SetColor( ARGB( 150, 255, 255, 255 ) );
 			return;
 		}
 			
-		m_Slider.SetColor( ARGB( 255, 255, 255, 255 ) );
+		m_Slider.SetColor( ARGB( 150, 255, 255, 255 ) );
 		
 		text_label = TextWidget.Cast( w.FindAnyWidget( w.GetName() + "_label" ) );
 		if( text_label )

@@ -37,6 +37,7 @@ class CargoContainer extends Container
 		m_CargoHeader.Show( is_attachment );
 		
 		m_MainWidget			= m_CargoContainer;
+		m_FocusedItemPosition	= -1;
 	}
 	
 	override void SetLayoutName()
@@ -96,7 +97,8 @@ class CargoContainer extends Container
 		{
 			header = GetParent().GetRootWidget().FindAnyWidget( "closable_header_root" );
 		}
-		TextWidget.Cast( header.FindAnyWidget( "CargoCount" ) ).SetText( text );
+		if( header )
+			TextWidget.Cast( header.FindAnyWidget( "CargoCount" ) ).SetText( text );
 	}
 	
 	void InitGridHeight()
@@ -232,15 +234,16 @@ class CargoContainer extends Container
 	
 	void UpdateSelection()
 	{
-		if( m_FocusedItemPosition > m_Icons.Count() - 1 )
-			m_FocusedItemPosition = m_Icons.Count() - 1;
-		Icon icon = GetIcon( m_FocusedItemPosition );
-		if( icon )
+		if( m_IsActive )
 		{
-			icon.SetActive( true );
+			if( m_FocusedItemPosition >= m_Icons.Count() )
+				m_FocusedItemPosition = m_Icons.Count() - 1;
+			Icon icon = GetIcon( m_FocusedItemPosition );
+			if( icon )
+			{
+				icon.SetActive( true );
+			}
 		}
-		if( m_FocusedItemPosition == -1 )
-			UnfocusAll();
 	}
 	
 	void UpdateRowVisibility( int count )
@@ -319,6 +322,9 @@ class CargoContainer extends Container
 					m_ShowedItemPositions.Insert( item, new Param3<ref Icon, int, int>( icon, x, y ) );
 					cargo_items.Insert( item );
 					UpdateHeaderCount();
+					#ifdef PLATFORM_CONSOLE
+						UpdateSelection();
+					#endif
 				}
 				
 			}
@@ -331,6 +337,9 @@ class CargoContainer extends Container
 					m_Icons.RemoveItem( m_ShowedItemPositions.GetElement( i ).param1 );
 					m_ShowedItemPositions.Remove( item2 );
 					UpdateHeaderCount();
+					#ifdef PLATFORM_CONSOLE
+						UpdateSelection();
+					#endif
 				}
 			}
 			
@@ -392,12 +401,10 @@ class CargoContainer extends Container
 		if( !IsEmpty() )
 		{
 			m_FocusedItemPosition = 0;
-			Icon icon = GetIcon( 0 );
-			if( icon )
-				icon.SetActive( true );
+			UpdateSelection();
 		}
 		else
-			m_FocusedItemPosition = -1;
+			m_FocusedItemPosition = 0;
 	}
 	
 	void Unfocus()
@@ -406,7 +413,7 @@ class CargoContainer extends Container
 		{
 			GetFocusedItem().SetActive( false );
 		}
-		m_FocusedItemPosition = -1;
+		m_FocusedItemPosition = 0;
 	}
 	
 	override void UnfocusAll()
@@ -418,7 +425,7 @@ class CargoContainer extends Container
 				icon.SetActive( false );
 			}
 		}
-		m_FocusedItemPosition = -1;
+		m_FocusedItemPosition = 0;
 	}
 	
 	override EntityAI GetFocusedEntity()
@@ -562,7 +569,7 @@ class CargoContainer extends Container
 		Icon focused_item = GetFocusedItem();
 		if( focused_item )
 		{
-			ItemManager.GetInstance().SetSelectedItem( ItemBase.Cast( focused_item.GetObject() ), focused_item, null );
+			ItemManager.GetInstance().SetSelectedItem( ItemBase.Cast( focused_item.GetObject() ), this, null );
 			return true;
 		}
 		return false;
@@ -587,31 +594,26 @@ class CargoContainer extends Container
 				if( can_add && in_cargo )
 				{
 					player.PredictiveTakeEntityToTargetCargo( m_Entity, selected_item );
-					Icon selected_icon2 = ItemManager.GetInstance().GetSelectedIcon();
-					if( selected_icon2 )
+					Container selected_cont2 = ItemManager.GetInstance().GetSelectedContainer();
+					if( selected_cont2 )
 					{
-						selected_icon2.SetActive( false );
+						selected_cont2.SetActive( false );
 					}
-					Widget selected_widget2 = ItemManager.GetInstance().GetSelectedWidget();
-					if( selected_widget2 )
-					{
-						selected_widget2.Show( false );
-					}
+					
+					SetActive( true );
+					m_FocusedItemPosition = 0;
 					return true;
 				}
 				else
 				{
+					Container selected_cont = ItemManager.GetInstance().GetSelectedContainer();
+					if( selected_cont )
+					{
+						selected_cont.SetActive( false );
+					}
+					
+					SetActive( true );
 					SetDefaultFocus( true );
-					Icon selected_icon = ItemManager.GetInstance().GetSelectedIcon();
-					if( selected_icon )
-					{
-						selected_icon.SetActive( false );
-					}
-					Widget selected_widget = ItemManager.GetInstance().GetSelectedWidget();
-					if( selected_widget )
-					{
-						selected_widget.Show( false );
-					}
 				}
 			}
 		}

@@ -125,6 +125,12 @@ class OptionSelector extends OptionSelectorBase
 		m_OptionChanged.Invoke( m_SelectedOptionIndex );
 	}
 	
+	array<string> GetOptions()
+	{
+		return m_Options;
+	}
+	
+	
 	bool IsSet()
 	{
 		return m_SelectedOptionIndex != 0;
@@ -134,6 +140,18 @@ class OptionSelector extends OptionSelectorBase
 	{
 		return m_SelectedOptionIndex == 1;
 	}
+	
+	/*
+	int GetOptionIndex()
+	{
+		return m_SelectedOptionIndex;
+	}
+	
+	void SetOptionIndex(int option_index)
+	{
+		m_SelectedOptionIndex = option_index;
+	}
+	*/
 	
 	string GetStringValue()
 	{

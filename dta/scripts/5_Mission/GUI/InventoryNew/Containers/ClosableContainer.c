@@ -117,7 +117,7 @@ class ClosableContainer extends Container
 		float x, y;
 		if( contents && GetFocusedContainer() )
 			y = GetFocusedContainer().GetFocusedContainerHeight( contents );
-		else
+		else if( GetRootWidget() )
 			GetRootWidget().GetScreenSize( x, y );
 		return y;
 	}
@@ -127,7 +127,7 @@ class ClosableContainer extends Container
 		float x, y;
 		if( contents && GetFocusedContainer() )
 			y = GetFocusedContainer().GetFocusedContainerYPos( contents );
-		else
+		else if( GetRootWidget() )
 			GetRootWidget().GetPos( x, y );
 		return y;
 	}
@@ -137,7 +137,7 @@ class ClosableContainer extends Container
 		float x, y;
 		if( contents && GetFocusedContainer() )
 			y = GetFocusedContainer().GetFocusedContainerYScreenPos( contents );
-		else
+		else if( GetRootWidget() )
 			GetRootWidget().GetScreenPos( x, y );
 		return y;
 	}

@@ -10,8 +10,6 @@ class MissionGameplay extends MissionBase
 	Widget							m_HudRootWidget;
 	ImageWidget 					m_MicrophoneIcon;
 	
-	private ref WidgetCache 		m_WidgetsCache;
-	
 	ref InventoryMenu				m_InventoryMenu;
 	ref Chat 						m_Chat;
 	ref ActionMenu					m_ActionMenu;
@@ -133,8 +131,6 @@ class MissionGameplay extends MissionBase
 		//AIBehaviourHL.RegAIBehaviour("zombie2",AIBehaviourHLZombie2,AIBehaviourHLDataZombie2);
 		//RegBehaviour("zombie2",AIBehaviourHLZombie2,AIBehaviourHLDataZombie2);
 		
-		m_WidgetsCache				= new WidgetCache;
-		
 		if( GetGame().IsMultiplayer() )
 		{
 			OnlineServices.m_MuteUpdateAsyncInvoker.Insert( SendMuteListToServer );
@@ -162,11 +158,6 @@ class MissionGameplay extends MissionBase
 			m_InventoryMenu = InventoryMenu.Cast( GetUIManager().EnterScriptedMenu(MENU_INVENTORY, NULL) );
 			GetUIManager().HideScriptedMenu( m_InventoryMenu );
 		}
-	}
-
-	WidgetCache GetWidgetCache()
-	{
-		return m_WidgetsCache;
 	}
 	
 	void TickScheduler(float timeslice)
@@ -615,28 +606,11 @@ class MissionGameplay extends MissionBase
 		
 		if ( key == KeyCode.KC_Q )
 		{
-			//SEffectManager.PlaySound("HandCuffs_A_SoundSet", GetGame().GetPlayer().GetPosition(), 0, 0, false);
-			/*
-			PlayerBase player2 = PlayerBase.Cast( GetGame().GetPlayer() );
-		
-			ItemBase item;
-			for ( int i = 0; i < player2.GetInventory().GetAttachmentSlotsCount(); ++i )
-			{
-				int slot_id = player2.GetInventory().GetAttachmentSlotId( i );
-				
-				Print("index: "+ i +"  slot_id: "+ slot_id);
-				
-				EntityAI att_item = player2.GetInventory().FindAttachment( slot_id );
-				
-				Print("Item: "+ att_item);
-			}
-			*/
+			
 			
 		}
 #endif
 	}
-		
-			
 	
 	override void OnKeyRelease(int key)
 	{
@@ -675,10 +649,6 @@ class MissionGameplay extends MissionBase
 			break;
 			
 		case WindowsResizeEventTypeID:
-			if( WidgetCache.GetInstance() )
-			{
-				WidgetCache.GetInstance().Reset();
-			}
 			DestroyAllMenus();
 			m_Hud.OnResizeScreen();
 			
@@ -847,6 +817,11 @@ class MissionGameplay extends MissionBase
 			m_InventoryMenu.Close();
 			m_InventoryMenu = NULL;
 		}
+	}
+	
+	override void ResetGUI()
+	{
+		DestroyInventory();
 	}
 	
 	override void ShowChat()

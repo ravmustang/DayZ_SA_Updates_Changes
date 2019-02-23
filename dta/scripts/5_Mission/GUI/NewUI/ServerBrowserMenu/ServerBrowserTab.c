@@ -19,7 +19,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	protected ScrollWidget									m_ServerListScroller;
 	protected SpacerBaseWidget								m_ServerList;
 	
-	protected ref array<ref GetServersResultRow>			m_Entries;
+	//protected ref array<ref GetServersResultRow>			m_Entries;
 	
 	protected ref map<string, ref ServerBrowserEntry>		m_EntryWidgets;
 
@@ -55,6 +55,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	protected Widget										m_PingSort;
 	protected TextWidget									m_LoadingText;
 	
+	
 	void ServerBrowserTab( Widget parent, ServerBrowserMenuNew menu, TabType type )
 	{
 		Construct(parent, menu, type);
@@ -62,6 +63,9 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	protected void Construct( Widget parent, ServerBrowserMenuNew menu, TabType type )
 	{
+		
+		
+		/*
 		#ifdef PLATFORM_CONSOLE
 			m_Root					= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/xbox/server_browser_tab.layout", parent );
 		#else
@@ -94,9 +98,10 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		m_Filters				= new ServerBrowserFilterContainer( m_Root.FindAnyWidget( "filters_content" ), this );
 		
-		SetSort( ESortType.HOST, ESortOrder.DESCENDING );
+		SetSort( ESortType.HOST, ESortOrder.ASCENDING );
 		
 		m_Root.SetHandler( this );
+		*/
 	}
 	
 	void ~ServerBrowserTab()
@@ -108,6 +113,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			delete m_Root;
 	}
 	
+	/*
 	void LoadFakeData( int entries )
 	{
 		ref GetServersResult result = new GetServersResult;
@@ -159,6 +165,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		}
 		OnLoadServersAsync( result2, EBiosError.OK, "" );
 	}
+	*/
 	
 	override bool OnClick( Widget w, int x, int y, int button )
 	{
@@ -174,59 +181,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				RefreshList();
 				return true;
 			}
-		}
-		return false;
-	}
-	
-	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
-	{
-		if( button == MouseState.LEFT )
-		{
-			if ( w == m_HostSort )
-			{
-				SelectHostSort();
-				return true;
-			}
-			else if ( w == m_TimeSort )
-			{
-				SelectTimeSort();
-				return true;
-			}
-			else if ( w == m_PopulationSort )
-			{
-				SelectPopulationSort();
-				return true;
-			}
-			else if ( w == m_SlotsSort )
-			{
-				SelectSlotSort();
-				return true;
-			}
-			else if ( w == m_PingSort )
-			{
-				SelectPingSort();
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	override bool OnMouseEnter( Widget w, int x, int y )
-	{
-		if( IsFocusable( w ) )
-		{
-			ColorRed( w, x, y );
-			return true;
-		}
-		return false;
-	}
-	
-	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
-	{
-		if( IsFocusable( w ) )
-		{
-			ColorWhite( w, enterW, x, y );
-			return true;
 		}
 		return false;
 	}
@@ -309,7 +263,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorRed( w, x, y );
+			ColorHighlight( w );
 			return true;
 		}
 		return false;
@@ -319,7 +273,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorWhite( w, null, x, y );
+			ColorNormal( w );
 			return true;
 		}
 		return false;
@@ -456,7 +410,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	void ResetFilters()
 	{
 		m_Filters.ResetFilters();
-		ApplyFilters();
 	}
 	
 	void ApplyFilters()
@@ -478,7 +431,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		m_TotalLoadedServers = 0;
 		m_CurrentLoadedPage = 0;
 		
-		m_Entries.Clear();
+		//m_Entries.Clear();
 		m_EntryWidgets.Clear();
 		
 		#ifdef PLATFORM_WINDOWS
@@ -515,7 +468,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				break;
 			}
 		}
-		m_ServerListScroller.VScrollToPos01( 0 );
+		//m_ServerListScroller.VScrollToPos01( 0 );
 	}
 	
 	void GetNextPage()
@@ -542,7 +495,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	}
 	
 	void OnLoadServersAsyncPC( ref GetServersResult result_list, EBiosError error, string response )
-	{		
+	{
+		/*
 		if( result_list )
 		{
 			if( result_list.m_Results.Count() > 0 )
@@ -577,10 +531,12 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			m_LoadingText.SetText( "#server_browser_tab_finished_loading" + " " + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
 			m_Menu.SetRefreshing( TabType.NONE );
 		}
+		*/
 	}
 	
 	void OnLoadServersAsync( ref GetServersResult result_list, EBiosError error, string response )
 	{
+		/*
 		if( m_Menu.IsRefreshing() != m_TabType || !result_list || ( !result_list.m_Results || result_list.m_Results.Count() == 0 ) )
 		{
 			m_Menu.SetRefreshing( TabType.NONE );
@@ -621,6 +577,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		{
 			GetGame().GameScript.Call( this, "LoadEntries", new Param2<int, ref GetServersResultRowArray>( result_list.m_Page, result_list.m_Results ) );
 		}
+		*/
 	}
 	
 	bool IsPingInRange( int ping, string max_ping )
@@ -634,84 +591,44 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 	bool PassFilter( GetServersResultRow result )
 	{	
+		bool pass = true;
+		
 		if ( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
+		{
 			return false;
+		}
 		
-		bool is_fav		= m_Menu.IsFavorited( result.m_Id );
-		bool is_vis		= g_Game.IsVisited( result.m_HostIp, result.m_HostPort );
-		bool is_ping	= IsPingInRange( result.m_Ping, m_Filters.m_PingFilter.GetStringValue() );
-		
-		if( m_Filters.m_FavoritedFilter.IsSet() )
+		if( pass && m_Filters.PingIsSet() )
 		{
+			pass = IsPingInRange( result.m_Ping, m_Filters.m_PingFilter.GetStringValue() );
+		}
+		
+		if( pass && m_Filters.FavoriteIsSet() )
+		{
+			bool is_fav = m_Menu.IsFavorited( result.m_Id );
+			
 			if( is_fav != m_Filters.m_FavoritedFilter.IsEnabled() )
-				return false;
+			{
+				pass = false;
+			}
 		}
-		if( m_Filters.m_PreviouslyPlayedFilter.IsSet() )
+		
+		if( pass && m_Filters.PreviouslyIsSet() )
 		{
+			bool is_vis	= g_Game.IsVisited( result.m_HostIp, result.m_HostPort );
+			
+			if ( is_vis )
+			{
+				Print(result.m_HostIp +":"+ result.m_HostPort);
+			}
+			
 			if( is_vis != m_Filters.m_PreviouslyPlayedFilter.IsEnabled() )
-				return false;
-		}
-		if( m_Filters.m_PingFilter.IsSet() )
-		{
-			if( !is_ping )
-				return false;
-		}
-		return true;
-	}
-	
-	void LoadEntries( Param2<int, ref GetServersResultRowArray> page )
-	{
-		if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
-			return;
-		int index = page.param1 * SERVER_BROWSER_PAGE_SIZE;
-		ref GetServersResultRowArray page_entries = page.param2;
-		if( page_entries )
-		{
-			foreach( GetServersResultRow result : page_entries )
 			{
-				if( PassFilter( result ) )
-				{
-					ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
-					entry.FillInfo( result );
-					entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
-					m_EntryWidgets.Insert( result.m_Id, entry );
-					index++;
-					m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_TotalServers + " " + "#server_browser_servers_desc" );
-				}
-				
-				if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
-					return;
-				
-				if( index % 10 == 0 )
-				{
-					Sleep( 0.01 );
-				}
-			}
-			Sleep( 0.1 );
-			m_ServerList.Update();
-		}
-		
-		if( m_EntryWidgets.Count() > 0 )
-		{
-			if( m_Entries.Count() > 0 )
-			{
-				m_EntryWidgets.Get( m_Entries.Get( 0 ).m_Id ).Focus();
+				pass = false;
 			}
 		}
-		else
-		{
-			m_LoadingText.SetText( "#server_browser_unable_with_filter" );
-			m_Filters.Focus();
-		}
 		
-		if ( !m_Menu )
-			return;
-		
-		if( m_LastLoadedPage == m_TotalPages )
-		{
-			m_LoadingText.SetText( "#server_browser_tab_loaded" + " " + m_EntryWidgets.Count() + "/" + m_EntryWidgets.Count() + " " + "#server_browser_servers_desc" );
-			m_Menu.SetRefreshing( TabType.NONE );
-		}
+		return pass;
 	}
 	
 	void Connect( ServerBrowserEntry server )
@@ -724,86 +641,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		m_SelectedServer = server;
 		m_Menu.Connect( server );
-	}
-	
-	void SelectHostSort()
-	{
-		ESortOrder order = ESortOrder.DESCENDING;
-		if( m_SortType == ESortType.HOST )
-		{
-			order = !m_SortOrder;
-			SetSort( ESortType.HOST, order );
-			InvertSort();
-		}
-		else
-		{
-			SetSort( ESortType.HOST, order );
-			Sort();
-		}
-	}
-	
-	void SelectTimeSort()
-	{
-		ESortOrder order = ESortOrder.DESCENDING;
-		if( m_SortType == ESortType.TIME )
-		{
-			order = !m_SortOrder;
-			SetSort( ESortType.TIME, order );
-			GetGame().GameScript.Call( this, "InvertSort", null );
-		}
-		else
-		{
-			SetSort( ESortType.TIME, order );
-			GetGame().GameScript.Call( this, "Sort", null );
-		}
-	}
-	
-	void SelectPopulationSort()
-	{
-		ESortOrder order = ESortOrder.DESCENDING;
-		if( m_SortType == ESortType.POPULATION )
-		{
-			order = !m_SortOrder;
-			SetSort( ESortType.POPULATION, order );
-			GetGame().GameScript.Call( this, "InvertSort", null );
-		}
-		else
-		{
-			SetSort( ESortType.POPULATION, order );
-			GetGame().GameScript.Call( this, "Sort", null );
-		}
-	}
-	
-	void SelectSlotSort()
-	{
-		ESortOrder order = ESortOrder.DESCENDING;
-		if( m_SortType == ESortType.SLOTS )
-		{
-			order = !m_SortOrder;
-			SetSort( ESortType.SLOTS, order );
-			GetGame().GameScript.Call( this, "InvertSort", null );
-		}
-		else
-		{
-			SetSort( ESortType.SLOTS, order );
-			GetGame().GameScript.Call( this, "Sort", null );
-		}
-	}
-	
-	void SelectPingSort()
-	{
-		ESortOrder order = ESortOrder.DESCENDING;
-		if( m_SortType == ESortType.PING )
-		{
-			order = !m_SortOrder;
-			SetSort( ESortType.PING, order );
-			GetGame().GameScript.Call( this, "InvertSort", null );
-		}
-		else
-		{
-			SetSort( ESortType.PING, order );
-			GetGame().GameScript.Call( this, "Sort", null );
-		}
 	}
 	
 	string GetSortOption()
@@ -834,311 +671,9 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		return "";
 	}
 	
-	void SetSort( ESortType type, ESortOrder order )
-	{
-		m_SortType	= type;
-		m_SortOrder = order;
-
-		#ifdef PLATFORM_WINDOWS
-		m_Root.FindAnyWidget( "host_sort" ).Show( false );
-		m_Root.FindAnyWidget( "population_sort" ).Show( false );
-		m_Root.FindAnyWidget( "slots_sort" ).Show( false );
-		
-		m_Root.FindAnyWidget( "time_sort" ).Show( false );
-		m_Root.FindAnyWidget( "ping_sort" ).Show( false );
-		
-		TextWidget root;
-		root = TextWidget.Cast( m_Root.FindAnyWidget( "host_label" ) );
-		root.SetColor( ARGBF( 1, 1, 1, 1 ) );
-		root = TextWidget.Cast( m_Root.FindAnyWidget( "population_label" ) );
-		root.SetColor( ARGBF( 1, 1, 1, 1 ) );
-		root = TextWidget.Cast( m_Root.FindAnyWidget( "slots_label" ) );
-		root.SetColor( ARGBF( 1, 1, 1, 1 ) );
-		
-		root = TextWidget.Cast( m_Root.FindAnyWidget( "ping_label" ) );
-		root.SetColor( ARGBF( 1, 1, 1, 1 ) );
-		root = TextWidget.Cast( m_Root.FindAnyWidget( "time_label" ) );
-		root.SetColor( ARGBF( 1, 1, 1, 1 ) );
-		
-		string r_name;
-		string w_name;
-		
-		switch( type )
-		{
-			case ESortType.HOST:
-			{
-				r_name = "host_label";
-				w_name = "host_sort";
-				break;
-			}
-			case ESortType.TIME:
-			{
-				r_name = "time_label";
-				w_name = "time_sort";
-				break;
-			}
-			case ESortType.POPULATION:
-			{
-				r_name = "population_label";
-				w_name = "population_sort";
-				break;
-			}
-			case ESortType.SLOTS:
-			{
-				r_name = "slots_label";
-				w_name = "slots_sort";
-				break;
-			}
-			case ESortType.PING:
-			{
-				r_name = "ping_label";
-				w_name = "ping_sort";
-				break;
-			}
-		}
-		
-		root = TextWidget.Cast( m_Root.FindAnyWidget( r_name ) );
-		root.SetColor( ARGBF( 1, 1, 0, 0 ) );
-		
-		m_Root.FindAnyWidget( w_name ).Show( true );
-		m_Root.FindAnyWidget( w_name + "_dsc" ).Show( m_SortOrder );
-		m_Root.FindAnyWidget( w_name + "_asc" ).Show( !m_SortOrder );
-		#endif
-	}
-	
-	void InplaceReverse()
-	{
-		int left = 0;
-		int right = m_Entries.Count() - 1;
-		if( right > 1 )
-		{
-			while( left < right )
-			{
-				GetServersResultRow temp = m_Entries[left];
-				m_Entries[left++] = m_Entries[right];
-				m_Entries[right--] = temp;
-			}
-		}
-	}
-	
-	void InvertSort()
-	{
-		if( m_Entries && m_Entries.Count() > 1 )
-		{
-			InplaceReverse();
-			for( int i = 0; i < m_Entries.Count(); i++ )
-			{
-				if( m_EntryWidgets.Contains( m_Entries.Get( i ).m_Id ) )
-				{
-					m_EntryWidgets.Get( m_Entries.Get( i ).m_Id ).GetRoot().SetSort( i );
-				}
-			}
-		}
-	}
-	
-	void Sort()
-	{
-		if( m_Entries && m_Entries.Count() > 1 )
-		{
-			Sort( m_Entries, 0, m_Entries.Count() - 1 );
-			for( int i = 0; i < m_Entries.Count(); i++ )
-			{
-				if( m_EntryWidgets.Contains( m_Entries.Get( i ).m_Id ) )
-				{
-					m_EntryWidgets.Get( m_Entries.Get( i ).m_Id ).GetRoot().SetSort( i );
-				}
-			}
-		}
-		
-		
-	}
-	
-	void Sort( array<ref GetServersResultRow> entries, int low, int high )
-	{
-		array<int> stack = new array<int>;
-		int stack_size = 2 * Math.Log2( high - low ) + 10;
-  		for( int i = 0; i <= stack_size; i++ )
-		{
-			stack.Insert( 0 );
-		}
-		
-	    int top = -1; 
-	  
-	    stack[ ++top ] = low;
-	    stack[ ++top ] = high; 
-	  
-	    while( top >= 0 ) 
-	    { 
-	        high = stack[ top-- ]; 
-	        low = stack[ top-- ]; 
-	  
-	        int p = Partition( entries, low, high ); 
-	  
-	        if( ( p - 1 ) > low ) 
-	        { 
-	            stack[ ++top ] = low; 
-	            stack[ ++top ] = p - 1; 
-	        } 
-	  
-	        if( ( p + 1 ) < high ) 
-	        { 
-	            stack[ ++top ] = p + 1; 
-	            stack[ ++top ] = high; 
-	        } 
-	    }
-	}
-	
-	int Partition( array<ref GetServersResultRow> entries, int low, int high )
-	{
-		GetServersResultRow pivot = entries.Get( high );
-		int i = low - 1;
-	
-		for( int j = low; j <= high - 1; j++)
-		{
-	        if( Compare( entries.Get( j ), pivot ) )
-	        {
-				i++;
-				entries.SwapItems( i, j );
-			}
-		}
-		entries.SwapItems( i + 1, high );
-		return ( i + 1 );
-	}
-	
-	void InsertSort( array<ref GetServersResultRow> entries )
-	{
-		int i, j;
-		int n = entries.Count();
-		
-		for (i = 1; i < n; i++) 
-		{ 
-			GetServersResultRow key = entries[i];
-			j = i - 1;
-					
-			while( j >= 0 && Compare( entries[j], key ) )
-			{
-				entries[j + 1] = entries[j]; 
-				j = j - 1;
-			}
-			entries[j + 1] = key;
-		} 
-	}
-	
-	bool Compare( GetServersResultRow a, GetServersResultRow b )
-	{
-		GetServersResultRow a1 = a;
-		GetServersResultRow b1 = b;
-		
-		if( m_SortOrder == ESortOrder.ASCENDING )
-		{
-			a1 = b;
-			b1 = a;
-		}
-		
-		switch( m_SortType )
-		{
-			case ESortType.HOST:
-			{
-				return a1.m_Name <= b1.m_Name;
-			}
-			case ESortType.TIME:
-			{
-				return CompareTime( a1.m_TimeOfDay, b1.m_TimeOfDay );
-			}
-			case ESortType.POPULATION:
-			{
-				return a1.m_CurrentNumberPlayers <= b1.m_CurrentNumberPlayers;
-			}
-			case ESortType.SLOTS:
-			{
-				return a1.m_MaxPlayers <= b1.m_MaxPlayers;
-			}
-			case ESortType.PING:
-			{
-				return a1.m_Ping <= b1.m_Ping;
-			}
-		}
-		return false;
-	}
-	
-	bool CompareTime( string t1, string t2 )
-	{
-		TStringArray time1	= new TStringArray;
-		TStringArray time2	= new TStringArray;
-			
-		t1.Split( ":", time1 );
-		t2.Split( ":", time2 );
-		
-		float hour1		= time1.Get( 0 ).ToInt();
-		float hour2		= time2.Get( 0 ).ToInt();
-		
-		int minute1, minute2;
-		
-		if( hour1 == hour2 )
-		{
-			if( time1.Count() == 2 )
-			{
-				minute1		= time1.Get( 1 ).ToInt();
-			}
-			
-			if( time2.Count() == 2 )
-			{
-				minute2		= time2.Get( 1 ).ToInt();
-			}
-			
-			hour1 += minute1 / 60;
-			hour2 += minute2 / 60;
-		}
-		
-		bool in_night1 = ( hour1 >= 19 || hour1 <= 5 );
-		bool in_night2 = ( hour2 >= 19 || hour2 <= 5 );
-
-		if( in_night1 == in_night2 )
-		{
-			if( hour1 <= hour2 )
-			{
-				Print( "" + hour1 + " <= " + hour2 );
-			}
-			else
-			{
-				Print( "" + hour1 + " > " + hour2 );
-			}
-			return hour1 <= hour2;
-		}
-		else
-		{
-			if( in_night1 == false )
-			{
-				Print( "" + hour1 + " > " + hour2 );
-			}
-			else
-			{
-				Print( "" + hour1 + " < " + hour2 );
-			}
-			return in_night1 == false;
-		}
-	}
-	
-	void AddSorted( GetServersResultRow entry )
-	{
-		ref GetServersResultRow row = entry;
-		if( m_Entries )
-		{
-			m_Entries.Insert( row );
-			if( m_Entries.Count() > 1 )
-				InsertSort( m_Entries );
-			int index = m_Entries.Find( row );
-			if( index > 0 )
-			{
-				ServerBrowserEntry curr = m_EntryWidgets.Get( m_Entries.Get( index ).m_Id );
-				ServerBrowserEntry prev = m_EntryWidgets.Get( m_Entries.Get( index - 1 ).m_Id );
-				if( prev && curr )
-				{
-					m_ServerList.AddChildAfter( curr.GetRoot(), prev.GetRoot(), false );
-					curr.GetRoot().Show( true );
-				}
-			}
-		}
+	int AddSorted( GetServersResultRow entry )
+	{	
+		return -1;
 	}
 	
 	void SetFavorite( string uid, bool favorite )
@@ -1160,19 +695,35 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		return m_TabType;
 	}
 	
+	void ButtonEnable( Widget w )
+	{
+		w.ClearFlags( WidgetFlags.IGNOREPOINTER );
+		ColorNormal(w);
+	}
+	
+	void ButtonDisable( Widget w )
+	{
+		w.SetFlags( WidgetFlags.IGNOREPOINTER );
+		ColorDisable(w);
+	}
+	
 	//Coloring functions (Until WidgetStyles are useful)
-	void ColorRed( Widget w, int x, int y )
+	void ColorHighlight( Widget w )
 	{
 		if( w.IsInherited( ButtonWidget ) )
 		{
 			ButtonWidget button = ButtonWidget.Cast( w );
-			button.SetTextColor( ARGB( 255, 255, 0, 0 ) );
+			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
 		}
+		
+		w.SetColor( ARGB( 255, 0, 0, 0) );
 		
 		TextWidget text1	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
 		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
 		TextWidget text3	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
 		ImageWidget image	= ImageWidget.Cast( w.FindAnyWidget( w.GetName() + "_image" ) );
+		
+		Widget option	= Widget.Cast( w.FindAnyWidget( w.GetName() + "_option_wrapper" ) );
 		
 		if( text1 )
 		{
@@ -1192,12 +743,25 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		if( image )
 		{
-			image.SetColor( ARGB( 255, 255, 0, 0 ) );
+			image.SetColor( ARGB( 255, 200, 0, 0 ) );
+		}
+		
+		if ( option )
+		{
+			option.SetColor( ARGB( 255, 255, 0, 0 ) );
 		}
 	}
 	
-	void ColorWhite( Widget w, Widget enterW, int x, int y )
+	void ColorNormal( Widget w )
 	{
+		//Print("ColorNormal -> "+ w.GetName());
+		//DumpStack();
+		
+		if ( (w.GetFlags() & WidgetFlags.IGNOREPOINTER) == WidgetFlags.IGNOREPOINTER )
+		{
+			return;
+		}
+		
 		if( w.IsInherited( ButtonWidget ) )
 		{
 			ButtonWidget button = ButtonWidget.Cast( w );
@@ -1208,6 +772,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
 		TextWidget text3	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
 		ImageWidget image	= ImageWidget.Cast( w.FindAnyWidget( w.GetName() + "_image" ) );
+		
+		Widget option	= Widget.Cast( w.FindAnyWidget( w.GetName() + "_option_wrapper" ) );
 		
 		if( text1 )
 		{
@@ -1228,6 +794,24 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		if( image )
 		{
 			image.SetColor( ARGB( 255, 255, 255, 255 ) );
+		}
+		
+		if ( option )
+		{
+			option.SetColor( ARGB( 150, 255, 255, 255 ) );
+		}
+	}
+	
+	void ColorDisable( Widget w )
+	{
+		#ifdef PLATFORM_WINDOWS
+		SetFocus( null );
+		#endif
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button )
+		{
+			button.SetTextColor( ColorManager.COLOR_DISABLED_TEXT );
 		}
 	}
 }

@@ -58,6 +58,8 @@ class TabberUI extends ScriptedWidgetEventHandler
 				toolbar_lb.LoadImageFile( 0, "set:playstation_buttons image:L1" );
 				toolbar_rb.LoadImageFile( 0, "set:playstation_buttons image:R1" );
 			#endif
+			
+			SelectTabControl( 0 );
 		}
 	}
 	
@@ -150,6 +152,43 @@ class TabberUI extends ScriptedWidgetEventHandler
 		return m_Tabs.Count();
 	}
 	
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		int index = m_TabControls.GetKeyByValue( w );
+		if( m_SelectedIndex == index )
+		{
+			return false;
+		}
+		
+		Widget tab_control = m_TabControls.Get( index );
+		if( tab_control )
+		{			
+			Widget tab_title = TextWidget.Cast(tab_control.FindAnyWidget( tab_control.GetName() + "_Title" ));
+			tab_title.SetColor( ARGB(255, 255, 0, 0) );
+			tab_control.SetColor( ARGB(255, 0, 0 ,0) );
+		}
+		
+		return false;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		int index = m_TabControls.GetKeyByValue( w );
+		if( m_SelectedIndex == index )
+		{
+			return false;
+		}
+		
+		Widget tab_control = m_TabControls.Get( index );
+		if( tab_control )
+		{			
+			Widget tab_title = TextWidget.Cast(tab_control.FindAnyWidget( tab_control.GetName() + "_Title" ));
+			tab_title.SetColor( ARGB(255, 255, 255, 255) );
+			tab_control.SetColor( ARGB(140, 0, 0 ,0) );
+		}
+		return false;
+	}
+	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
 	{
 		if( button == MouseState.LEFT )
@@ -204,11 +243,17 @@ class TabberUI extends ScriptedWidgetEventHandler
 		Widget tab_control = m_TabControls.Get( index );
 		if( tab_control )
 		{
+			/*
 			Widget tab_bg = tab_control.FindAnyWidget( tab_control.GetName() + "_Background" );
 			if( tab_bg )
 			{
 				tab_bg.Show( true );
 			}
+			*/
+			
+			Widget tab_title = TextWidget.Cast(tab_control.FindAnyWidget( tab_control.GetName() + "_Title" ));
+			tab_title.SetColor( ARGB(255, 255, 255, 255) );
+			tab_control.SetColor( ARGB(255, 200, 0 ,0) );
 		}
 	}
 	
@@ -226,11 +271,16 @@ class TabberUI extends ScriptedWidgetEventHandler
 		Widget tab_control = m_TabControls.Get( index );
 		if( tab_control )
 		{
+			/*
 			Widget tab_bg = tab_control.FindAnyWidget( tab_control.GetName() + "_Background" );
 			if( tab_bg )
 			{
 				tab_bg.Show( false );
 			}
+			*/
+			Widget tab_title = TextWidget.Cast(tab_control.FindAnyWidget( tab_control.GetName() + "_Title" ));
+			tab_title.SetColor( ARGB(255, 255, 255,255) );
+			tab_control.SetColor( ARGB(140, 0, 0 ,0) );
 		}
 	}
 	

@@ -81,6 +81,8 @@ class OptionsMenu extends UIScriptedMenu
 			toolbar_y.LoadImageFile( 0, "set:playstation_buttons image:triangle" );
 		#endif
 		
+		OnChanged();
+		
 		return layoutRoot;
 	}
 	
@@ -168,10 +170,12 @@ class OptionsMenu extends UIScriptedMenu
 			layoutRoot.FindAnyWidget( "Apply" ).Show( false );
 		#else
 		#ifdef PLATFORM_WINDOWS
-			m_Apply.Enable( false );
+			//m_Apply.Enable( false );
 			m_Apply.SetFlags( WidgetFlags.IGNOREPOINTER );
-			m_Reset.Enable( false );
-			m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
+			ColorDisable(m_Apply);
+			//m_Reset.Enable( false );
+			//m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
+			//ColorDisable(m_Reset);
 		#endif
 		#endif
 		
@@ -238,18 +242,23 @@ class OptionsMenu extends UIScriptedMenu
 			layoutRoot.FindAnyWidget( "Reset" ).Show( changed );
 		#else
 		#ifdef PLATFORM_WINDOWS
-			m_Apply.Enable( changed );
-			m_Reset.Enable( changed );
-			
+			//m_Apply.Enable( changed );
+			//m_Reset.Enable( changed );
+		
 			if( changed )
 			{
+				//m_Reset.ClearFlags( WidgetFlags.IGNOREPOINTER );
+				//ColorNormal( m_Reset );
 				m_Apply.ClearFlags( WidgetFlags.IGNOREPOINTER );
-				m_Reset.ClearFlags( WidgetFlags.IGNOREPOINTER );
+				ColorNormal( m_Apply );
 			}
 			else
 			{
 				m_Apply.SetFlags( WidgetFlags.IGNOREPOINTER );
-				m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
+				ColorDisable( m_Apply );
+				//m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
+				//ColorDisable( m_Reset );
+				
 			}
 		#endif
 		#endif
@@ -280,11 +289,11 @@ class OptionsMenu extends UIScriptedMenu
 			layoutRoot.FindAnyWidget( "Reset" ).Show( false );
 		#else
 		#ifdef PLATFORM_WINDOWS
-			m_Apply.Enable( false );
-			m_Apply.SetFlags( WidgetFlags.IGNOREPOINTER );
+			//m_Apply.Enable( false );
+			//m_Apply.SetFlags( WidgetFlags.IGNOREPOINTER );
 		
-			m_Reset.Enable( false );
-			m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
+			//m_Reset.Enable( false );
+			//m_Reset.SetFlags( WidgetFlags.IGNOREPOINTER );
 		#endif
 		#endif
 	}
@@ -344,7 +353,7 @@ class OptionsMenu extends UIScriptedMenu
 	{
 		if( w && IsFocusable( w ) )
 		{
-			ColorRed( w );
+			ColorHighlight( w );
 			return true;
 		}
 		return false;
@@ -354,7 +363,7 @@ class OptionsMenu extends UIScriptedMenu
 	{
 		if( w && IsFocusable( w ) )
 		{
-			ColorWhite( w, enterW );
+			ColorNormal( w );
 			return true;
 		}
 		return false;
@@ -364,7 +373,7 @@ class OptionsMenu extends UIScriptedMenu
 	{
 		if( w && IsFocusable( w ) )
 		{
-			ColorRed( w );
+			ColorHighlight( w );
 			return true;
 		}
 		if( x == -1 && y == 1 )
@@ -382,7 +391,7 @@ class OptionsMenu extends UIScriptedMenu
 	{
 		if( w && IsFocusable( w ) )
 		{
-			ColorWhite( w, null );
+			ColorNormal( w );
 			return true;
 		}
 		return false;
@@ -446,27 +455,45 @@ class OptionsMenu extends UIScriptedMenu
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)
-	void ColorRed( Widget w )
+	void ColorHighlight( Widget w )
 	{
 		SetFocus( w );
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button && button != m_Apply )
+		if( button )
 		{
-			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+			button.SetTextColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 	}
 	
-	void ColorWhite( Widget w, Widget enterW )
+	void ColorNormal( Widget w )
+	{
+		if ( (w.GetFlags() & WidgetFlags.IGNOREPOINTER) == WidgetFlags.IGNOREPOINTER )
+		{
+			return;
+		}
+		
+		#ifdef PLATFORM_WINDOWS
+		SetFocus( null );
+		#endif
+		
+		ButtonWidget button = ButtonWidget.Cast( w );
+		if( button )
+		{
+			button.SetTextColor( ColorManager.COLOR_NORMAL_TEXT );
+		}
+	}
+	
+	void ColorDisable( Widget w )
 	{
 		#ifdef PLATFORM_WINDOWS
 		SetFocus( null );
 		#endif
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button && button != m_Apply )
+		if( button )
 		{
-			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+			button.SetTextColor( ColorManager.COLOR_DISABLED_TEXT );
 		}
 	}
 }

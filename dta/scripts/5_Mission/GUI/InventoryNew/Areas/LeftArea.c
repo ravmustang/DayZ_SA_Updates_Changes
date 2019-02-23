@@ -2,6 +2,7 @@ class LeftArea: Container
 {
 	protected Widget					m_UpIcon;
 	protected Widget					m_DownIcon;
+	protected Widget					m_ContentParent;
 	protected ref VicinityContainer		m_VicinityContainer;
 	protected ScrollWidget				m_ScrollWidget;
 	protected ref SizeToChild			m_ContentResize;
@@ -10,7 +11,9 @@ class LeftArea: Container
 	void LeftArea( LayoutHolder parent )
 	{
 		m_MainWidget.Show( true );
-		m_MainWidget.FindAnyWidget( "ContentParent" ).GetScript( m_ContentResize );
+		
+		m_ContentParent	= m_MainWidget.FindAnyWidget( "ContentParent" );
+		m_ContentParent.GetScript( m_ContentResize );
 		
 		m_ScrollWidget	= ScrollWidget.Cast( m_MainWidget.FindAnyWidget( "Scroller" ) );
 		m_MainWidget	= m_MainWidget.FindAnyWidget( "Content" );
@@ -59,6 +62,8 @@ class LeftArea: Container
 			amount = active_container.GetFocusedContainerYScreenPos() - y;
 			m_ScrollWidget.VScrollToPos( m_ScrollWidget.GetVScrollPos() + amount - 2 );
 		}
+		
+		UpdateSelectionIcons();
 	}
 	
 	override bool TransferItemToVicinity()
@@ -241,11 +246,14 @@ class LeftArea: Container
 		if( m_IsActive )
 		{
 			float x, y;
-			float x2, y2;
 			m_UpIcon.GetScreenSize( x, y );
-			m_DownIcon.GetScreenSize( x2, y2 );
 			
 			float top_y		= GetCurrentContainerTopY();
+			m_UpIcon.SetPos( 0, Math.Clamp( top_y, 0, 99999 ) );
+			
+			#ifndef PLATFORM_CONSOLE
+			float x2, y2;
+			m_DownIcon.GetScreenSize( x2, y2 );
 			float bottom_y	= GetCurrentContainerBottomY() - y2;
 			
 			float diff		= bottom_y - ( top_y + y );
@@ -254,9 +262,8 @@ class LeftArea: Container
 				top_y += diff / 2;
 				bottom_y -= diff / 2;
 			}
-			
-			m_UpIcon.SetPos( 0, top_y );
 			m_DownIcon.SetPos( 0, bottom_y );
+			#endif
 		}
 	}
 	
@@ -281,7 +288,13 @@ class LeftArea: Container
 	
 	void ExpandCollapseContainer()
 	{
-		m_VicinityContainer.ExpandCollapseContainer();
+		if( m_VicinityContainer == GetFocusedContainer() )
+			m_VicinityContainer.ExpandCollapseContainer();
+		else
+		{
+			AttachmentCategoriesContainer cont = AttachmentCategoriesContainer.Cast( GetFocusedContainer() );
+			cont.ExpandCollapseContainer();
+		}
 		
 		Refresh();
 	}
@@ -355,10 +368,16 @@ class LeftArea: Container
 	override void UpdateInterval()
 	{
 		super.UpdateInterval();
+		float x, y;
+		float x2, y2;
+		m_ContentParent.GetScreenSize( x, y );
+		m_MainWidget.GetScreenSize( x2, y2 );
+		if( y2 != y )
+			m_ShouldChangeSize = true;
 		bool changed_size;
 		if( m_ShouldChangeSize )
 			m_ContentResize.ResizeParentToChild( changed_size );
-		if( changed_size )
+		if( changed_size || m_ShouldChangeSize )
 		{
 			CheckScrollbarVisibility();
 			m_ShouldChangeSize = false;

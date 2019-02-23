@@ -1,5 +1,7 @@
 class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 {
+	protected ref map<string, string>		m_Options = new map<string, string>;
+	
 	protected EditBoxWidget					m_SearchByName;
 	protected EditBoxWidget					m_SearchByIP;
 			ref OptionSelectorMultistate	m_CharacterAliveFilter;
@@ -16,9 +18,9 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 			ref OptionSelector				m_ThirdPersonFilter;
 			ref OptionSelector				m_PublicFilter;
 			ref OptionSelector				m_AcceleratedTimeFilter;
-	protected ServerBrowserTab				m_Tab;
+	protected ServerBrowserTabPage			m_Tab;
 	
-	void ServerBrowserFilterContainer( Widget root, ServerBrowserTab parent )
+	void ServerBrowserFilterContainer( Widget root, ServerBrowserTabPage parent )
 	{
 		string player_name;
 		GetGame().GetPlayerName( player_name );
@@ -89,42 +91,119 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 	{
 		string data;
 		GetGame().GetProfileString( "SB_Filter_" + m_Tab.GetTabType(), data );
-		ref map<string, string> options = new map<string, string>;
+		
+		m_Options.Clear();
+		
 		if( data != "" )
 		{
-			JsonFileLoader<ref map<string, string>>.JsonLoadData( data, options );
+			JsonFileLoader<ref map<string, string>>.JsonLoadData( data, m_Options );
 		}
 		
-		if( options && options.Count() >= 6 )
+		if( m_Options && m_Options.Count() >= 6 )
 		{
-			m_RegionFilter.SetStringOption( options.Get( "m_RegionFilter" ), false );
-			m_PingFilter.SetStringOption( options.Get( "m_PingFilter" ), false );
-			m_FavoritedFilter.SetStringOption( options.Get( "m_FavoritedFilter" ), false );
-			m_FriendsPlayingFilter.SetStringOption( options.Get( "m_FriendsPlayingFilter" ), false );
-			m_PreviouslyPlayedFilter.SetStringOption( options.Get( "m_PreviouslyPlayedFilter" ), false );
-			m_FullServerFilter.SetStringOption( options.Get( "m_FullServerFilter" ), false );
+			m_RegionFilter.SetStringOption( m_Options.Get( "m_RegionFilter" ), false );
+			m_PingFilter.SetStringOption( m_Options.Get( "m_PingFilter" ), false );
+			m_FavoritedFilter.SetStringOption( m_Options.Get( "m_FavoritedFilter" ), false );
+			m_FriendsPlayingFilter.SetStringOption( m_Options.Get( "m_FriendsPlayingFilter" ), false );
+			m_PreviouslyPlayedFilter.SetStringOption( m_Options.Get( "m_PreviouslyPlayedFilter" ), false );
+			m_FullServerFilter.SetStringOption( m_Options.Get( "m_FullServerFilter" ), false );
 			
 			#ifdef PLATFORM_CONSOLE
-				m_SortingFilter.SetStringOption( options.Get( "m_SortingFilter" ), false );
+				m_SortingFilter.SetStringOption( m_Options.Get( "m_SortingFilter" ), false );
 			#endif
 			
-			if( options.Count() >= 12 )
+			if( m_Options.Count() >= 12 )
 			{
 				#ifdef PLATFORM_WINDOWS
 					#ifndef PLATFORM_CONSOLE
-						m_SearchByName.SetText( options.Get( "m_SearchByName" ) );
-						m_SearchByIP.SetText( options.Get( "m_SearchByIP" ) );
-						m_CharacterAliveFilter.SetStringOption( options.Get( "m_CharacterAliveFilter" ), false );
-						m_BattleyeFilter.SetStringOption( options.Get( "m_BattleyeFilter" ), false );
-						m_PasswordFilter.SetStringOption( options.Get( "m_PasswordFilter" ), false );
-						m_VersionMatchFilter.SetStringOption( options.Get( "m_VersionMatchFilter" ), false );
-						m_ThirdPersonFilter.SetStringOption( options.Get( "m_ThirdPersonFilter" ), false );
-						m_PublicFilter.SetStringOption( options.Get( "m_PublicFilter" ), false );
-						m_AcceleratedTimeFilter.SetStringOption( options.Get( "m_AcceleratedTimeFilter" ), false );
+						m_SearchByName.SetText( m_Options.Get( "m_SearchByName" ) );
+						m_SearchByIP.SetText( m_Options.Get( "m_SearchByIP" ) );
+						m_CharacterAliveFilter.SetStringOption( m_Options.Get( "m_CharacterAliveFilter" ), false );
+						m_BattleyeFilter.SetStringOption( m_Options.Get( "m_BattleyeFilter" ), false );
+						m_PasswordFilter.SetStringOption( m_Options.Get( "m_PasswordFilter" ), false );
+						m_VersionMatchFilter.SetStringOption( m_Options.Get( "m_VersionMatchFilter" ), false );
+						m_ThirdPersonFilter.SetStringOption( m_Options.Get( "m_ThirdPersonFilter" ), false );
+						m_PublicFilter.SetStringOption( m_Options.Get( "m_PublicFilter" ), false );
+						m_AcceleratedTimeFilter.SetStringOption( m_Options.Get( "m_AcceleratedTimeFilter" ), false );
 					#endif
 				#endif
 			}
 		}
+	}
+	
+		void SaveFilters()
+	{
+		m_Options.Clear();
+		
+		m_Options.Insert( "m_RegionFilter", m_RegionFilter.GetStringValue() );
+		m_Options.Insert( "m_PingFilter", m_PingFilter.GetStringValue() );
+		m_Options.Insert( "m_FavoritedFilter", m_FavoritedFilter.GetStringValue() );
+		m_Options.Insert( "m_FriendsPlayingFilter", m_FriendsPlayingFilter.GetStringValue() );
+		m_Options.Insert( "m_PreviouslyPlayedFilter", m_PreviouslyPlayedFilter.GetStringValue() );
+		m_Options.Insert( "m_FullServerFilter", m_FullServerFilter.GetStringValue() );
+		
+		#ifdef PLATFORM_CONSOLE
+			m_Options.Insert( "m_SortingFilter", m_SortingFilter.GetStringValue() );
+		#endif
+		
+		#ifdef PLATFORM_WINDOWS
+			#ifndef PLATFORM_CONSOLE
+				m_Options.Insert( "m_SearchByName", m_SearchByName.GetText() );
+				m_Options.Insert( "m_SearchByIP", m_SearchByIP.GetText() );
+				m_Options.Insert( "m_CharacterAliveFilter", m_CharacterAliveFilter.GetStringValue() );
+				m_Options.Insert( "m_BattleyeFilter", m_BattleyeFilter.GetStringValue() );
+				m_Options.Insert( "m_PasswordFilter", m_PasswordFilter.GetStringValue() );
+				m_Options.Insert( "m_VersionMatchFilter", m_VersionMatchFilter.GetStringValue() );
+				m_Options.Insert( "m_ThirdPersonFilter", m_ThirdPersonFilter.GetStringValue() );
+				m_Options.Insert( "m_PublicFilter", m_PublicFilter.GetStringValue() );
+				m_Options.Insert( "m_AcceleratedTimeFilter", m_AcceleratedTimeFilter.GetStringValue() );
+			#endif
+		#endif
+		string data = JsonFileLoader<ref map<string, string>>.JsonMakeData( m_Options );
+		GetGame().SetProfileString( "SB_Filter_" + m_Tab.GetTabType(), data );
+	}
+	
+	void ResetFilters()
+	{
+		m_RegionFilter.Reset();
+		m_PingFilter.Reset();
+		m_FavoritedFilter.Reset();
+		m_FriendsPlayingFilter.Reset();
+		m_PreviouslyPlayedFilter.Reset();
+		m_FullServerFilter.Reset();
+		
+		#ifdef PLATFORM_CONSOLE
+			m_SortingFilter.Reset();
+		#endif
+		
+		#ifdef PLATFORM_WINDOWS
+			#ifndef PLATFORM_CONSOLE
+				m_SearchByName.SetText( "" );
+				m_SearchByIP.SetText( "" );
+				m_CharacterAliveFilter.Reset();
+				m_BattleyeFilter.Reset();
+				m_PasswordFilter.Reset();
+				m_VersionMatchFilter.Reset();
+				m_ThirdPersonFilter.Reset();
+				m_PublicFilter.Reset();
+				m_AcceleratedTimeFilter.Reset();
+			#endif
+		#endif
+	}
+	
+	bool PingIsSet()
+	{
+		return ( m_Options["m_PingFilter"] != m_PingFilter.GetOptions()[0] );
+	}
+	
+	bool FavoriteIsSet()
+	{
+		return ( m_Options["m_FavoritedFilter"] != m_FavoritedFilter.GetOptions()[0] );
+	}
+	
+	bool PreviouslyIsSet()
+	{
+		return ( m_Options["m_PreviouslyPlayedFilter"] != m_PreviouslyPlayedFilter.GetOptions()[0] );
 	}
 	
 	//! Removes all characters from the given string whirh are NOT a number, '.' or ':'. Returns true if any change was done to the input text.
@@ -243,66 +322,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		return LimitTextBoxCharacterCount( potential_filter, 16 );
 	}
 	
-	void SaveFilters()
-	{
-		ref map<string, string> options = new map<string, string>;
-		
-		options.Insert( "m_RegionFilter", m_RegionFilter.GetStringValue() );
-		options.Insert( "m_PingFilter", m_PingFilter.GetStringValue() );
-		options.Insert( "m_FavoritedFilter", m_FavoritedFilter.GetStringValue() );
-		options.Insert( "m_FriendsPlayingFilter", m_FriendsPlayingFilter.GetStringValue() );
-		options.Insert( "m_PreviouslyPlayedFilter", m_PreviouslyPlayedFilter.GetStringValue() );
-		options.Insert( "m_FullServerFilter", m_FullServerFilter.GetStringValue() );
-		
-		#ifdef PLATFORM_CONSOLE
-			options.Insert( "m_SortingFilter", m_SortingFilter.GetStringValue() );
-		#endif
-		
-		#ifdef PLATFORM_WINDOWS
-			#ifndef PLATFORM_CONSOLE
-				options.Insert( "m_SearchByName", m_SearchByName.GetText() );
-				options.Insert( "m_SearchByIP", m_SearchByIP.GetText() );
-				options.Insert( "m_CharacterAliveFilter", m_CharacterAliveFilter.GetStringValue() );
-				options.Insert( "m_BattleyeFilter", m_BattleyeFilter.GetStringValue() );
-				options.Insert( "m_PasswordFilter", m_PasswordFilter.GetStringValue() );
-				options.Insert( "m_VersionMatchFilter", m_VersionMatchFilter.GetStringValue() );
-				options.Insert( "m_ThirdPersonFilter", m_ThirdPersonFilter.GetStringValue() );
-				options.Insert( "m_PublicFilter", m_PublicFilter.GetStringValue() );
-				options.Insert( "m_AcceleratedTimeFilter", m_AcceleratedTimeFilter.GetStringValue() );
-			#endif
-		#endif
-		string data = JsonFileLoader<ref map<string, string>>.JsonMakeData( options );
-		GetGame().SetProfileString( "SB_Filter_" + m_Tab.GetTabType(), data );
-	}
-	
-	void ResetFilters()
-	{
-		m_RegionFilter.Reset();
-		m_PingFilter.Reset();
-		m_FavoritedFilter.Reset();
-		m_FriendsPlayingFilter.Reset();
-		m_PreviouslyPlayedFilter.Reset();
-		m_FullServerFilter.Reset();
-		
-		#ifdef PLATFORM_CONSOLE
-			m_SortingFilter.Reset();
-		#endif
-		
-		#ifdef PLATFORM_WINDOWS
-			#ifndef PLATFORM_CONSOLE
-				m_SearchByName.SetText( "" );
-				m_SearchByIP.SetText( "" );
-				m_CharacterAliveFilter.Reset();
-				m_BattleyeFilter.Reset();
-				m_PasswordFilter.Reset();
-				m_VersionMatchFilter.Reset();
-				m_ThirdPersonFilter.Reset();
-				m_PublicFilter.Reset();
-				m_AcceleratedTimeFilter.Reset();
-			#endif
-		#endif
-	}
-	
 	void OnSortChanged( int value )
 	{
 		switch( value )
@@ -353,6 +372,8 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 					m_SearchByName.SetText( input_name ); // Warning! Using SetText() causes the cursor to move at the end of the text box!
 				
 				OnFilterChanged();
+				SetFocus( m_SearchByName );
+	
 				return true;
 			}
 			else if( w == m_SearchByIP )
@@ -363,6 +384,8 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 					m_SearchByIP.SetText( input_ip ); // Warning! Using SetText() causes the cursor to move at the end of the text box!
 				
 				OnFilterChanged();
+				SetFocus( m_SearchByIP );
+				
 				return true;
 			}
 		}

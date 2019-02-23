@@ -136,7 +136,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorRed( w, x, y );
+			ColorHighlight( w, x, y );
 			return true;
 		}
 		return false;
@@ -146,7 +146,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorWhite( w, enterW, x, y );
+			ColorNormal( w, enterW, x, y );
 			return true;
 		}
 		return false;
@@ -167,7 +167,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 
 	bool IsFavorited( string uid )
 	{
-		int index = m_Favorites.Find( uid );
+		int index = m_Favorites.Find( uid );		
 		return ( index >= 0 );
 	}
 	
@@ -260,7 +260,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorRed( w, x, y );
+			ColorHighlight( w, x, y );
 			return true;
 		}
 		return false;
@@ -270,7 +270,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorWhite( w, null, x, y );
+			ColorNormal( w, null, x, y );
 			return true;
 		}
 		return false;
@@ -477,14 +477,14 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)
-	void ColorRed( Widget w, int x, int y )
+	void ColorHighlight( Widget w, int x, int y )
 	{
 		SetFocus( w );
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button && button != m_Play )
+		if( button )
 		{
-			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+			button.SetTextColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 		
 		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
@@ -493,30 +493,30 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		
 		if( text )
 		{
-			text.SetColor( ARGB( 255, 255, 0, 0 ) );
+			text.SetColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 		
 		if( text2 )
 		{
-			text2.SetColor( ARGB( 255, 255, 0, 0 ) );
+			text2.SetColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 		
 		if( image )
 		{
-			image.SetColor( ARGB( 255, 255, 0, 0 ) );
+			image.SetColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 	}
 	
-	void ColorWhite( Widget w, Widget enterW, int x, int y )
+	void ColorNormal( Widget w, Widget enterW, int x, int y )
 	{
 		#ifdef PLATFORM_WINDOWS
 		SetFocus( null );
 		#endif
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button && button != m_Play )
+		if( button )
 		{
-			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+			button.SetTextColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 		
 		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
@@ -525,17 +525,17 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		
 		if( text )
 		{
-			text.SetColor( ARGB( 255, 255, 255, 255 ) );
+			text.SetColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 		
 		if( text2 )
 		{
-			text2.SetColor( ARGB( 255, 255, 255, 255 ) );
+			text2.SetColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 		
 		if( image )
 		{
-			image.SetColor( ARGB( 255, 255, 255, 255 ) );
+			image.SetColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 	}
 }

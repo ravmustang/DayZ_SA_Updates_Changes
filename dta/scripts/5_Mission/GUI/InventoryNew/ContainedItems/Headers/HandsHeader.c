@@ -12,7 +12,10 @@ class HandsHeader: Header
 		m_HeaderText		= TextWidget.Cast( GetMainWidget().FindAnyWidget( "hands_title" ) );
 		
 		m_MainWidget		= GetMainWidget().FindAnyWidget( "height_wrapper" );
-		m_DefaultColor		= GetMainWidget().GetAlpha();
+		m_DefaultColor		= GetMainWidget().GetColor();
+		#ifdef PLATFORM_CONSOLE
+		ShowCollapseButtons( false, true )
+		#endif
 	}
 	
 	override void SetLayoutName()

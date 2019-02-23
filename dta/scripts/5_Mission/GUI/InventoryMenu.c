@@ -17,8 +17,7 @@ class InventoryMenu extends UIScriptedMenu
 	protected static ScreenWidthType	m_WidthType;
 	protected static int				m_Width;
 	protected static int				m_Height;
-	
-	
+	static int							m_Counter;
 	
 	void InventoryMenu()
 	{
@@ -95,16 +94,17 @@ class InventoryMenu extends UIScriptedMenu
 	
 	override void Update( float timeslice )
 	{
+		m_Counter = 0;
 		if( m_Inventory )
 			m_Inventory.UpdateInterval();
 		
 		m_RefreshTimer += timeslice;
-		if( m_RefreshTimer > 10 )
+		if( m_RefreshTimer > 1 )
 		{
-			m_Inventory.Refresh();
+			//m_Inventory.Refresh();
 			m_RefreshTimer = timeslice;
-			Print( "Refresh" );
 		}
+		//Print( m_Counter );
 	}
 
 	override void OnShow()
@@ -124,6 +124,8 @@ class InventoryMenu extends UIScriptedMenu
 		ItemManager.GetInstance().SetItemMicromanagmentMode( false );
 		ItemManager.GetInstance().SetItemMoving( false );
 		ItemManager.GetInstance().SetSelectedItem( null, null, null );
+
+		m_Inventory.Refresh();
 	}
 	
 	//#ifdef PLATFORM_CONSOLE

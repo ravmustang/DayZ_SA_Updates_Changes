@@ -247,6 +247,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 		{
 			m_PrimaryBindButton.SetColor( ARGBF( 1, 1, 0, 0 ) );
 			m_PrimaryClear.Show( true );
+			m_PrimaryClear.Update();
 			m_AlternativeClear.Show( false );
 			return true;
 		}
@@ -255,6 +256,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 			m_AlternativeBindButton.SetColor( ARGBF( 1, 1, 0, 0 ) );
 			m_PrimaryClear.Show( false );
 			m_AlternativeClear.Show( true );
+			m_AlternativeClear.Update();
 			return true;
 		}
 		else

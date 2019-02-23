@@ -87,6 +87,8 @@ class MissionMainMenu extends MissionBase
 
 	override void OnUpdate(float timeslice)
 	{
+		//Print("("+ GetGame().GetTime() +") ____OnUpdate: " + timeslice);
+		
 		if ( g_Game.IsLoading() )
 		{
 			return;

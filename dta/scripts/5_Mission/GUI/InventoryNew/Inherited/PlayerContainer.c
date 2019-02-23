@@ -212,6 +212,10 @@ class PlayerContainer: CollapsibleContainer
 				next.SetActive( true );
 				active = next;
 				SetFocusedContainer( next );
+				if( m_ActiveIndex == 1 )
+					m_CollapsibleHeader.SetActive( true );
+				else
+					m_CollapsibleHeader.SetActive( false );
 			}
 			else
 			{
@@ -223,7 +227,12 @@ class PlayerContainer: CollapsibleContainer
 					first.SetActive( true );
 					active = first;
 					SetFocusedContainer( first );
+					m_CollapsibleHeader.SetActive( true );
 					m_ScrollWidget.VScrollToPos01( 0 );
+					if( m_ActiveIndex == 1 )
+						m_CollapsibleHeader.SetActive( true );
+					else
+						m_CollapsibleHeader.SetActive( false );
 				}
 			}
 		}
@@ -273,11 +282,15 @@ class PlayerContainer: CollapsibleContainer
 			prev.SetActive( true );
 			active = prev;
 			SetFocusedContainer( prev );
-			
+			m_CollapsibleHeader.SetActive( false );
 			if( active.IsInherited( CollapsibleContainer ) )
 			{
 				CollapsibleContainer.Cast( active ).SetLastActive();
 			}
+			if( m_ActiveIndex == 1 )
+				m_CollapsibleHeader.SetActive( true );
+			else
+				m_CollapsibleHeader.SetActive( false );
 		}
 		else
 		{
@@ -291,6 +304,10 @@ class PlayerContainer: CollapsibleContainer
 				SetFocusedContainer( first );
 				m_ScrollWidget.VScrollToPos01( 1 );
 			}
+			if( m_ActiveIndex == 1 )
+				m_CollapsibleHeader.SetActive( true );
+			else
+				m_CollapsibleHeader.SetActive( false );
 		}
 		
 		ScrollToActiveContainer( active );
@@ -321,11 +338,14 @@ class PlayerContainer: CollapsibleContainer
 		if( m_IsActive )
 		{
 			float x, y;
-			float x2, y2;
 			m_UpIcon.GetScreenSize( x, y );
-			m_DownIcon.GetScreenSize( x2, y2 );
 			
 			float top_y		= GetCurrentContainerTopY();
+			m_UpIcon.SetPos( 0, Math.Clamp( top_y, 0, 99999 ) );
+			
+			#ifndef PLATFORM_CONSOLE
+			float x2, y2;
+			m_DownIcon.GetScreenSize( x2, y2 );
 			float bottom_y	= GetCurrentContainerBottomY() - y2;
 			
 			float diff		= bottom_y - ( top_y + y );
@@ -334,9 +354,8 @@ class PlayerContainer: CollapsibleContainer
 				top_y += diff / 2;
 				bottom_y -= diff / 2;
 			}
-			
-			m_UpIcon.SetPos( 0, top_y );
 			m_DownIcon.SetPos( 0, bottom_y );
+			#endif
 		}
 	}
 	
@@ -495,8 +514,11 @@ class PlayerContainer: CollapsibleContainer
 	
 	void ExpandCollapseContainer()
 	{
-		ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( m_PlayerAttachmentsContainer.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Render" + m_FocusedColumn ) );
-		ToggleWidget( item_preview.GetParent() );
+		if( m_PlayerAttachmentsContainer.IsActive() )
+		{
+			ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( m_PlayerAttachmentsContainer.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Render" + m_FocusedColumn ) );
+			ToggleWidget( item_preview.GetParent() );
+		}
 	}
 	
 	bool IsContainerWithCargoActive()
@@ -690,6 +712,15 @@ class PlayerContainer: CollapsibleContainer
 							GetGame().GetPlayer().PredictiveSwapEntities( item_in_hands, item );
 							return true;
 						}
+						else
+						{
+							InventoryLocation il_hands_dst = new InventoryLocation;
+							if( GetGame().GetPlayer().GetHumanInventory().FindFreeLocationFor( item_in_hands, FindInventoryLocationType.ANY, il_hands_dst ) )
+							{
+								GetGame().GetPlayer().GetHumanInventory().ForceSwapEntities( InventoryMode.PREDICTIVE, item, item_in_hands, il_hands_dst );
+								return true;
+							}
+						}
 					}
 					else
 					{
@@ -825,6 +856,8 @@ class PlayerContainer: CollapsibleContainer
 			
 			ScrollToActiveContainer( Container.Cast( cnt.Get( m_FocusedRow ) ) );
 		}
+		
+		UpdateSelectionIcons();
 	}
 	
 	void ScrollToActiveContainer( Container active_container )
@@ -1401,7 +1434,6 @@ class PlayerContainer: CollapsibleContainer
 	override void Refresh()
 	{
 		super.Refresh();
-		
 		m_MainWidget.Update();
 		m_RootWidget.Update();
 		m_ScrollWidget.Update();
@@ -1420,6 +1452,8 @@ class PlayerContainer: CollapsibleContainer
 		m_RootWidget.GetScreenSize( x, y );
 		m_ScrollWidget.GetScreenSize( x2, y2 );
 		m_ScrollWidget.SetAlpha( ( y > y2 ) );
+		
+		UpdateSelectionIcons();
 	}
 	
 	override bool OnChildRemove( Widget w, Widget child )

@@ -62,6 +62,7 @@ class MainMenu extends UIScriptedMenu
 		m_CharacterRotationFrame	= layoutRoot.FindAnyWidget( "character_rotation_frame" );
 		
 		m_LastPlayedTooltip			= layoutRoot.FindAnyWidget( "last_server_info" );
+		m_LastPlayedTooltip.Show(false);
 		m_LastPlayedTooltipLabel	= m_LastPlayedTooltip.FindAnyWidget( "last_server_info_label" );
 		m_LastPlayedTooltipIP		= TextWidget.Cast( m_LastPlayedTooltip.FindAnyWidget( "last_server_info_ip" ) );
 		m_LastPlayedTooltipPort		= TextWidget.Cast( m_LastPlayedTooltip.FindAnyWidget( "last_server_info_port" ) );
@@ -137,13 +138,29 @@ class MainMenu extends UIScriptedMenu
 		Refresh();
 		
 		UpdateNewsFeed();
-		
+		LoadMods();
 		return layoutRoot;
 	}
 	
 	void ~MainMenu()
 	{
 		
+	}
+	
+	void LoadMods()
+	{
+		array<ref ModStructure> mods	= ModLoader.GetMods();
+		int count						= Math.Min( mods.Count(), 4 );
+		for( int i = 0; i < count; i++ )
+		{
+			ModStructure mod	= mods.Get( i );
+			ImageWidget image	= ImageWidget.Cast( layoutRoot.FindAnyWidget( "Mod" + i ) );
+			image.LoadImageFile( 0, mod.GetModLogo() );
+			image.Show( true );
+		}
+		
+		if( mods.Count() > 4 )
+			layoutRoot.FindAnyWidget( "ModMore" ).Show( true );
 	}
 	
 	void UpdateNewsFeed()
@@ -296,17 +313,18 @@ class MainMenu extends UIScriptedMenu
 			if(!m_ScenePC.GetIntroCharacter().IsDefaultCharacter())
 			{
 				int charID = m_ScenePC.GetIntroCharacter().GetCharacterID();
-				m_ScenePC.GetIntroCharacter().GetLastPlayedServer(charID,ip,port);
-
-				m_LastPlayedTooltipIP.SetText( "#main_menu_IP" + " " + ip );
-				m_LastPlayedTooltipPort.SetText( "#main_menu_port" + " " + port.ToString() );
+				m_ScenePC.GetIntroCharacter().GetLastPlayedServer(charID, ip, port);
+				
+				m_LastPlayedTooltipIP.SetText( "#main_menu_IP " + ip );
+				m_LastPlayedTooltipPort.SetText( "#main_menu_port " + port );
+				
 				m_LastPlayedTooltipTimer.FadeIn( m_LastPlayedTooltip, 0.3, true );
 			}
 		}
 		#endif
 		if( IsFocusable( w ) )
 		{
-			ColorRed( w );
+			ColorHighlight( w );
 			return true;
 		}
 		return false;
@@ -317,12 +335,12 @@ class MainMenu extends UIScriptedMenu
 		#ifdef PLATFORM_WINDOWS
 		if( w == m_Play )
 		{
-			m_LastPlayedTooltipTimer.FadeOut( m_LastPlayedTooltip, 5, true );
+			m_LastPlayedTooltipTimer.FadeOut( m_LastPlayedTooltip, 0.3, true );
 		}
 		#endif
 		if( IsFocusable( w ) )
 		{
-			ColorWhite( w, enterW );
+			ColorNormal( w, enterW );
 			return true;
 		}
 		return false;
@@ -332,7 +350,7 @@ class MainMenu extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorRed( w );
+			ColorHighlight( w );
 			return true;
 		}
 		return false;
@@ -342,7 +360,7 @@ class MainMenu extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorWhite( w, null );
+			ColorNormal( w, null );
 			return true;
 		}
 		return false;
@@ -414,6 +432,8 @@ class MainMenu extends UIScriptedMenu
 		{
 			m_ScenePC.GetIntroCamera().LookAt( m_ScenePC.GetIntroCharacter().GetPosition() + Vector( 0, 1, 0 ) );
 		}
+		
+		LoadMods();
 	}
 	
 	override void OnHide()
@@ -668,7 +688,7 @@ class MainMenu extends UIScriptedMenu
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)
-	void ColorRed( Widget w )
+	void ColorHighlight( Widget w )
 	{
 		if( !w )
 			return;
@@ -676,9 +696,9 @@ class MainMenu extends UIScriptedMenu
 		SetFocus( w );
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button && button != m_Play )
+		if( button )
 		{
-			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+			button.SetTextColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 		
 		TextWidget text		= TextWidget.Cast(w.FindWidget( w.GetName() + "_text" ) );
@@ -687,21 +707,21 @@ class MainMenu extends UIScriptedMenu
 		
 		if( text )
 		{
-			text.SetColor( ARGB( 255, 255, 0, 0 ) );
+			text.SetColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 		
 		if( text2 )
 		{
-			text2.SetColor( ARGB( 255, 255, 0, 0 ) );
+			text2.SetColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 		
 		if( image )
 		{
-			image.SetColor( ARGB( 255, 255, 0, 0 ) );
+			image.SetColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
 		}
 	}
 	
-	void ColorWhite( Widget w, Widget enterW )
+	void ColorNormal( Widget w, Widget enterW )
 	{
 		if( !w )
 			return;
@@ -711,9 +731,9 @@ class MainMenu extends UIScriptedMenu
 		#endif
 		
 		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button && button != m_Play )
+		if( button )
 		{
-			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+			button.SetTextColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 		
 		TextWidget text		= TextWidget.Cast( w.FindWidget( w.GetName() + "_text" ) );
@@ -722,17 +742,17 @@ class MainMenu extends UIScriptedMenu
 		
 		if( text )
 		{
-			text.SetColor( ARGB( 255, 255, 255, 255 ) );
+			text.SetColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 		
 		if( text2 )
 		{
-			text2.SetColor( ARGB( 255, 255, 255, 255 ) );
+			text2.SetColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 		
 		if( image )
 		{
-			image.SetColor( ARGB( 255, 255, 255, 255 ) );
+			image.SetColor( ColorManager.COLOR_NORMAL_TEXT );
 		}
 	}
 	
@@ -744,7 +764,7 @@ class MainMenu extends UIScriptedMenu
 				GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(g_Game.RequestExit, IDC_MAIN_QUIT);
 			#ifdef PLATFORM_WINDOWS
 			if( result == 3 )
-				ColorWhite( GetFocus(), null );
+				ColorNormal( GetFocus(), null );
 			#endif
 			return true;
 		}

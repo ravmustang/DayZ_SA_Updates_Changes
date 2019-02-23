@@ -32,6 +32,7 @@ enum ConsoleToolbarType
 	VICINITY_CONTAINER_LIST_ITEM,
 	VICINITY_CONTAINER_LIST_ITEM_NO_EQUIP,
 	VICINITY_CONTAINER_LIST_ITEM_WITH_QUANTITY,
+	VICINITY_CONTAINER_LIST_HEADER,
 	VICINITY_CONTAINER_LIST_EMPTY_ITEM,
 	
 	VICINITY_CONTAINER_DETAILS_EMPTY,
@@ -265,8 +266,6 @@ class Inventory: LayoutHolder
 			{
 				if( m_ControllerRightStickTimerEnd )
 				{
-					m_RightArea.MoveGridCursor(m_ControllerAngle);
-					m_LeftArea.MoveGridCursor(m_ControllerAngle);
 					m_ControllerRightStickTimerEnd = false;
 					m_ControllerRightStickTimer.Run( 0.1, this, "TimerEnd" );
 				}
@@ -281,9 +280,12 @@ class Inventory: LayoutHolder
 				EnableMicromanagement();
 			}
 			
-			m_RightArea.MoveGridCursor(Direction.RIGHT);
-			m_LeftArea.MoveGridCursor(Direction.RIGHT);
-			m_HandsArea.MoveGridCursor(Direction.RIGHT);
+			if( m_RightArea.IsActive() )
+				m_RightArea.MoveGridCursor(Direction.RIGHT);
+			if( m_LeftArea.IsActive() )
+				m_LeftArea.MoveGridCursor(Direction.RIGHT);
+			if( m_HandsArea.IsActive() )
+				m_HandsArea.MoveGridCursor(Direction.RIGHT);
 		}
 		else if ( control == ControlID.CID_LEFT && value == 1 )
 		{
@@ -292,9 +294,12 @@ class Inventory: LayoutHolder
 				EnableMicromanagement();
 			}
 			
-			m_RightArea.MoveGridCursor(Direction.LEFT);
-			m_LeftArea.MoveGridCursor(Direction.LEFT);
-			m_HandsArea.MoveGridCursor(Direction.LEFT);
+			if( m_RightArea.IsActive() )
+				m_RightArea.MoveGridCursor(Direction.LEFT);
+			if( m_LeftArea.IsActive() )
+				m_LeftArea.MoveGridCursor(Direction.LEFT);
+			if( m_HandsArea.IsActive() )
+				m_HandsArea.MoveGridCursor(Direction.LEFT);
 		}
 		else if ( control == ControlID.CID_UP && value == 1 )
 		{
@@ -303,9 +308,12 @@ class Inventory: LayoutHolder
 				EnableMicromanagement();
 			}
 			
-			m_RightArea.MoveGridCursor(Direction.UP);
-			m_LeftArea.MoveGridCursor(Direction.UP);
-			m_HandsArea.MoveGridCursor(Direction.UP);
+			if( m_RightArea.IsActive() )
+				m_RightArea.MoveGridCursor(Direction.UP);
+			if( m_LeftArea.IsActive() )
+				m_LeftArea.MoveGridCursor(Direction.UP);
+			if( m_HandsArea.IsActive() )
+				m_HandsArea.MoveGridCursor(Direction.UP);
 		}
 		else if ( control == ControlID.CID_DOWN && value == 1 )
 		{
@@ -314,9 +322,12 @@ class Inventory: LayoutHolder
 				EnableMicromanagement();
 			}
 			
-			m_RightArea.MoveGridCursor(Direction.DOWN);
-			m_LeftArea.MoveGridCursor(Direction.DOWN);
-			m_HandsArea.MoveGridCursor(Direction.DOWN);
+			if( m_RightArea.IsActive() )
+				m_RightArea.MoveGridCursor(Direction.DOWN);
+			if( m_LeftArea.IsActive() )
+				m_LeftArea.MoveGridCursor(Direction.DOWN);
+			if( m_HandsArea.IsActive() )
+				m_HandsArea.MoveGridCursor(Direction.DOWN);
 		}
 		
 		UpdateConsoleToolbar();
@@ -339,7 +350,6 @@ class Inventory: LayoutHolder
 	void DraggingOverHandsPanel( Widget w, int x, int y, Widget receiver )
 	{
 		ItemManager.GetInstance().HideDropzones();
-		//GetMainWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
 		m_HandsArea.DraggingOverHandsPanel( w, x, y, receiver );
 	}
 	
@@ -533,7 +543,7 @@ class Inventory: LayoutHolder
 				if( m_LeftArea.EquipItem() )
 				{
 					//m_LeftArea.SetActive( false );
-					//m_LeftArea.UnfocusAll();
+					//m_LeftArea.UnfocusGrid();
 					//m_RightArea.SetActive( true );
 				}
 			}
@@ -548,7 +558,7 @@ class Inventory: LayoutHolder
 				if( m_RightArea.Select() && !ItemManager.GetInstance().IsMicromanagmentMode() )
 				{
 					m_RightArea.SetActive( false );
-					m_RightArea.UnfocusAll();
+					m_RightArea.UnfocusGrid();
 					m_HandsArea.SetActive( true );
 				}
 			}
@@ -557,7 +567,7 @@ class Inventory: LayoutHolder
 				if( m_LeftArea.Select() && !ItemManager.GetInstance().IsMicromanagmentMode() )
 				{
 					//m_LeftArea.SetActive( false );
-					//m_LeftArea.UnfocusAll();
+					//m_LeftArea.UnfocusGrid();
 					//m_RightArea.SetActive( true );
 				}
 			}
@@ -591,7 +601,7 @@ class Inventory: LayoutHolder
 				if( m_RightArea.TransferItemToVicinity() )
 				{
 					//m_RightArea.SetActive( false );
-					//m_RightArea.UnfocusAll();
+					//m_RightArea.UnfocusGrid();
 					//m_LeftArea.SetActive( true );
 					m_HadFastTransferred = true;
 				}
@@ -623,7 +633,7 @@ class Inventory: LayoutHolder
 				if( m_LeftArea.TransferItem() )
 				{
 					//m_LeftArea.SetActive( false );
-					//m_LeftArea.UnfocusAll();
+					//m_LeftArea.UnfocusGrid();
 					//m_RightArea.SetActive( true );
 				}
 			}
@@ -1010,6 +1020,7 @@ class Inventory: LayoutHolder
 		m_LeftArea.Refresh();
 		m_HandsArea.Refresh();
 		m_RightArea.Refresh();
+		UpdateConsoleToolbar();
 	}
 	
 	void RefreshQuickbar()
@@ -1102,6 +1113,8 @@ class Inventory: LayoutHolder
 			return to_hands_swap + to_inventory  + micromanagment;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_ITEM_WITH_QUANTITY:
 			return to_hands_swap + to_inventory  + micromanagment;
+			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_HEADER:
+			return open_close_container ;
 			case ConsoleToolbarType.VICINITY_CONTAINER_LIST_EMPTY_ITEM:
 			return "";
 			
@@ -1171,6 +1184,10 @@ class Inventory: LayoutHolder
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY );
 				}
+				else if( iwc.IsItemWithQuantityActive() )
+				{
+						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
+				}
 				else if( iwc.IsItemActive() )
 				{
 					if( iwc.CanEquip() )
@@ -1181,10 +1198,6 @@ class Inventory: LayoutHolder
 					{
 						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_NO_EQUIP );
 					}
-				}
-				else if( iwc.IsItemWithQuantityActive() )
-				{
-						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
 				}
 				
 				if( iwc.CanCombine() )
@@ -1204,6 +1217,10 @@ class Inventory: LayoutHolder
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY );
 				}
+				else if( iwca.IsItemWithQuantityActive() )
+				{
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
+				}
 				else if( iwca.IsItemActive() )
 				{
 					if( iwca.CanEquip() )
@@ -1214,10 +1231,6 @@ class Inventory: LayoutHolder
 					{
 						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_NO_EQUIP );
 					}
-				}
-				else if( iwca.IsItemWithQuantityActive() )
-				{
-					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
 				}
 				
 				if( iwca.CanCombine() )
@@ -1232,6 +1245,10 @@ class Inventory: LayoutHolder
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_EMPTY );
 				}
+				else if( acc.IsItemWithQuantityActive() )
+				{
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
+				}
 				else if( acc.IsItemActive() )
 				{
 					if( acc.CanEquip() )
@@ -1243,9 +1260,9 @@ class Inventory: LayoutHolder
 						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_NO_EQUIP );
 					}
 				}
-				else if( acc.IsItemWithQuantityActive() )
+				else if( acc.IsHeaderActive() )
 				{
-					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_DETAILS_ITEM_WITH_QUANTITY );
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.VICINITY_CONTAINER_LIST_HEADER );
 				}
 				
 				if( acc.CanCombine() )
@@ -1284,6 +1301,10 @@ class Inventory: LayoutHolder
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_EMPTY_CONTAINER );
 				}
+				else if( iwc1.IsItemWithQuantityActive() )
+				{
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_ITEM_WITH_QUANTITY );
+				}
 				else if( iwc1.IsItemActive() )
 				{
 					if( iwc1.CanEquip() )
@@ -1294,10 +1315,6 @@ class Inventory: LayoutHolder
 					{
 						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_ITEM_NO_EQUIP );
 					}
-				}
-				else if( iwc1.IsItemWithQuantityActive() )
-				{
-					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_ITEM_WITH_QUANTITY );
 				}
 				
 				if( iwc1.CanCombine() )
@@ -1317,6 +1334,10 @@ class Inventory: LayoutHolder
 				{
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_EMPTY_CONTAINER );
 				}
+				else if( iwca1.IsItemWithQuantityActive() )
+				{
+					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_ITEM_WITH_QUANTITY );
+				}
 				else if( iwca1.IsItemActive() )
 				{
 					if( iwca1.CanEquip() )
@@ -1328,10 +1349,6 @@ class Inventory: LayoutHolder
 						context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_ITEM_NO_EQUIP );
 					}
 				}
-				else if( iwca1.IsItemWithQuantityActive() )
-				{
-					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.PLAYER_CARGO_CONTAINER_ITEM_WITH_QUANTITY );
-				}
 				
 				if( iwca1.CanCombine() )
 				{
@@ -1341,7 +1358,11 @@ class Inventory: LayoutHolder
 		}
 		else if ( m_HandsArea.IsActive() )
 		{
-			if( m_HandsArea.IsItemActive() )
+			if( m_HandsArea.IsItemWithQuantityActive() )
+			{
+				context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.HANDS_ITEM_WITH_QUANTITY );
+			}
+			else if( m_HandsArea.IsItemActive() )
 			{
 				if( m_HandsArea.CanEquip() )
 				{
@@ -1352,11 +1373,7 @@ class Inventory: LayoutHolder
 					context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.HANDS_ITEM_NO_EQUIP );
 				}
 			}
-			else if( m_HandsArea.IsItemWithQuantityActive() )
-			{
-				context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.HANDS_ITEM_WITH_QUANTITY );
-			}
-			else if( m_HandsArea.IsEmpty() )
+			else  if( m_HandsArea.IsEmpty() )
 			{
 				context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.HANDS_ITEM_EMPTY );
 			}

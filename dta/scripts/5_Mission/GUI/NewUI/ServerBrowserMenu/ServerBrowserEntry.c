@@ -57,6 +57,11 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerIP				= TextWidget.Cast( m_Root.FindAnyWidget( "ip_text" ) );
 		m_ServerAcceleration	= TextWidget.Cast( m_Root.FindAnyWidget( "server_acceleration_text" ) );
 		
+		m_Root.FindAnyWidget( "basic_info" ).Show( true );
+		
+		m_Root.FindAnyWidget( "favorite_image" ).Update();
+		m_Root.FindAnyWidget( "unfavorite_image" ).Update();
+		
 		m_Index					= index;
 		m_Tab					= tab;
 		
@@ -65,12 +70,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerTime.LoadImageFile( 2, "set:dayz_gui image:icon_moon" );
 		m_ServerTime.LoadImageFile( 3, "set:dayz_gui image:icon_moon_accel" );
 		
-		float alpha = 0.1;
-		if( m_Index % 2 )
-		{
-			alpha = 0.3;
-		}
-		m_Root.SetAlpha( alpha );
+		UpdateColors();
 		m_Root.SetHandler( this );
 	}
 	
@@ -130,7 +130,9 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 			}
 			else if( w == m_Root )
 			{
+				Darken(w, x, y);
 				Select();
+				SetFocus( m_Root );
 				return true;
 			}
 		}
@@ -141,7 +143,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	{
 		if( IsFocusable( w ) )
 		{
-			Darken( w, x, y );
+			Preview( w, x, y );
+			
 			return true;
 		}
 		return false;
@@ -219,7 +222,9 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	{
 		m_ServerData = server_info;
 		
-		SetName( /*"("+ m_Index +") "+*/ server_info.m_Name );
+		m_Root.FindAnyWidget( "detailed_info" ).Show( server_info.m_IsExpanded );
+		
+		SetName( server_info.m_Name );
 		SetPasswordLocked( server_info.m_IsPasswordProtected );
 		SetPopulation( server_info.m_CurrentNumberPlayers, server_info.m_MaxPlayers );
 		SetSlots( server_info.m_MaxPlayers );
@@ -409,7 +414,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	void SetFavorite( bool favorite )
 	{
 		m_IsFavorited = favorite;
-		m_Root.FindAnyWidget( "unfavorite_image" ).Show( m_IsFavorited );
+		m_Root.FindAnyWidget( "favorite_image" ).Show( favorite );
+		m_Root.FindAnyWidget( "unfavorite_image" ).Show( !favorite );		
 	}
 	
 	void SetAcceleration( float mult )
@@ -428,7 +434,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	bool ToggleFavorite()
 	{
 		m_IsFavorited = !m_IsFavorited;
-		m_Root.FindAnyWidget( "unfavorite_image" ).Show( m_IsFavorited );
+		m_Root.FindAnyWidget( "unfavorite_image" ).Show( !m_IsFavorited );
+		m_Root.FindAnyWidget( "favorite_image" ).Show( m_IsFavorited );
 		m_Tab.SetFavorite( GetServerID(), m_IsFavorited );
 		return m_IsFavorited;
 	}
@@ -461,6 +468,9 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 			{
 				m_Tab.SelectServer( this );
 			}
+			
+			m_ServerData.m_IsSelected = true;
+			
 			m_Selected = true;
 			#ifdef PLATFROM_XBOX
 				m_Root.SetColor( ARGB( 1, 50, 50, 50 ) );
@@ -472,6 +482,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	{
 		if( m_Selected )
 		{
+			m_ServerData.m_IsSelected = false;
+			
 			m_Selected = false;
 			float alpha = 0.1;
 			if( m_Index % 2 )
@@ -484,15 +496,42 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		}
 	}
 	
+	void UpdateColors()
+	{
+		float alpha = 0.15;
+		if( m_Index % 2 )
+		{
+			alpha = 0;
+		}
+		
+		m_Root.SetAlpha( alpha );
+	}
+	
 	//Coloring functions (Until WidgetStyles are useful)
 	void Darken( Widget w, int x, int y )
 	{
-		SetFocus( m_Root );
-		
 		if( m_Selected )
 			return;
+		
+		Print("w: "+ w.GetName());
+		
 		if( w == m_Root || w == m_Favorite || w == m_Expand )
 		{
+			m_Root.SetColor( ARGB( 255, 200, 0, 0) );
+			m_Root.SetAlpha( 1 );
+			m_ServerName.SetColor( ARGB( 255, 255, 255, 255 ) );
+		}
+	}
+	
+	//Coloring functions (Until WidgetStyles are useful)
+	void Preview( Widget w, int x, int y )
+	{		
+		if( m_Selected )
+			return;
+		
+		if( w == m_Root || w == m_Favorite || w == m_Expand )
+		{
+			m_Root.SetColor( ARGB( 255, 0, 0, 0) );
 			m_Root.SetAlpha( 1 );
 			m_ServerName.SetColor( ARGB( 255, 255, 0, 0 ) );
 		}
@@ -500,21 +539,18 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	void Lighten( Widget w, Widget enterW, int x, int y )
 	{
-		if( GetFocus() == w )
+		if( GetFocus() == w || m_Selected )
+		{
 			return;
-		if( m_Selected )
-			return;
+		}
+		
 		if( w == m_Root && ( ( m_Favorite && enterW == m_Favorite ) || ( m_Expand && enterW == m_Expand ) ) )
 		{
 			return;
 		}
 		
-		float alpha = 0.1;
-		if( m_Index % 2 )
-		{
-			alpha = 0.2;
-		}
-		m_Root.SetAlpha( alpha );
+		m_Root.SetColor( ARGB( 255, 0, 0, 0) );
 		m_ServerName.SetColor( ARGB( 255, 255, 255, 255 ) );
+		UpdateColors();
 	}
 }

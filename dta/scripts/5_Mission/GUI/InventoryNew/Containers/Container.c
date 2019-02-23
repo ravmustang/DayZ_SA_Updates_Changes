@@ -41,7 +41,7 @@ class Container extends LayoutHolder
 		float x, y;
 		if( GetFocusedContainer() )
 			y = GetFocusedContainer().GetFocusedContainerHeight( contents );
-		else
+		else if( GetRootWidget() )
 			GetRootWidget().GetScreenSize( x, y );
 		return y;
 	}
@@ -51,7 +51,7 @@ class Container extends LayoutHolder
 		float x, y;
 		if( GetFocusedContainer() )
 			y = GetFocusedContainer().GetFocusedContainerYPos( contents );
-		else
+		else if( GetRootWidget() )
 			GetRootWidget().GetPos( x, y );
 		return y;
 	}
@@ -61,7 +61,7 @@ class Container extends LayoutHolder
 		float x, y;
 		if( GetFocusedContainer() )
 			y = GetFocusedContainer().GetFocusedContainerYScreenPos( contents );
-		else
+		else if( GetRootWidget() )
 			GetRootWidget().GetScreenPos( x, y );
 		return y;
 	}
@@ -157,7 +157,9 @@ class Container extends LayoutHolder
 	
 	EntityAI GetFocusedEntity()
 	{
-		EntityAI item = GetFocusedContainer().GetFocusedEntity();
+		EntityAI item;
+		if( GetFocusedContainer() )
+			item = GetFocusedContainer().GetFocusedEntity();
 		return item;
 	}
 	
@@ -539,6 +541,7 @@ class Container extends LayoutHolder
 			if( m_Body.Get( i ) )
 				m_Body.Get( i ).Refresh();
 		}
+		InventoryMenu.m_Counter++;
 	}
 
 	void UpdateBodySpacers()

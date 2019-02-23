@@ -1,13 +1,14 @@
 class RightArea: Container
 {
-	ref PlayerContainer m_PlayerContainer;
+	ref PlayerContainer	m_PlayerContainer;
+	protected Widget	m_ContentParent;
 	
 	void RightArea( LayoutHolder parent )
 	{
 		m_MainWidget.Show( true );
-		m_MainWidget = m_MainWidget.FindAnyWidget( "Content" );
-		
-		m_PlayerContainer = new PlayerContainer( this );
+		m_MainWidget		= m_MainWidget.FindAnyWidget( "Content" );
+		m_ContentParent		= m_RootWidget.FindAnyWidget( "ContentParent" );
+		m_PlayerContainer	= new PlayerContainer( this );
 		m_PlayerContainer.SetPlayer( PlayerBase.Cast( GetGame().GetPlayer() ) );
 		m_Body.Insert( m_PlayerContainer );
 		m_ActiveIndex = 0;
@@ -169,5 +170,18 @@ class RightArea: Container
 	{
 		super.OnShow();
 		Refresh();
+	}
+	
+	override void UpdateInterval()
+	{
+		super.UpdateInterval();
+		m_PlayerContainer.UpdateInterval();
+		float x, y;
+		float x2, y2;
+		m_ContentParent.GetScreenSize( x, y );
+		m_MainWidget.GetScreenSize( x2, y2 );
+
+		if( y2 != y && y2 < 99999 )
+			m_PlayerContainer.Refresh();
 	}
 }
