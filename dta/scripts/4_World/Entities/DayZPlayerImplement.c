@@ -48,6 +48,7 @@ class DayZPlayerImplement extends DayZPlayer
 	protected bool										m_IsFireWeaponRaised;
 	protected bool										m_ShouldReload;
 	protected bool										m_Camera3rdPerson;
+	protected bool										m_CameraZoomToggle;
 	protected bool										m_CameraEyeZoom;
 	protected bool										m_CameraIronsighs;
 	protected bool										m_CameraOptics;
@@ -63,7 +64,7 @@ class DayZPlayerImplement extends DayZPlayer
 	ref WeaponDebug										m_WeaponDebug;
 	ref Timer 											m_DeathEffectTimer;
 	protected bool 										m_ShouldReturnToOptics;
-	protected bool 										m_ForceHandleOptics;
+	//protected bool 										m_ForceHandleOptics;
 	protected bool										m_ProcessFirearmMeleeHit;
 	protected bool 										m_LiftWeapon_player;
 	protected bool 										m_ProcessLiftWeapon;
@@ -512,7 +513,7 @@ class DayZPlayerImplement extends DayZPlayer
 				weapon.StepZeroingDown();
 		}
 		
-		if (!m_LiftWeapon_player && (m_CameraIronsighs || !weapon.CanEnterIronsights() || m_ForceHandleOptics)) 	// HACK straight to optics, if ironsights not allowed
+		if (!m_LiftWeapon_player && (m_CameraIronsighs || !weapon.CanEnterIronsights() || m_CameraOptics/*m_ForceHandleOptics*/)) 	// HACK straight to optics, if ironsights not allowed
 		{
 			if (optic)
 				HandleOptic(optic, false, pInputs, pExitIronSights);
@@ -625,12 +626,13 @@ class DayZPlayerImplement extends DayZPlayer
 		}
 		else if (weapon)
 		{
+			Input input = GetGame().GetInput();
 			/*if (pInputs.IsWeaponRaised() && m_ShouldReturnToOptics && !m_CameraOptics && optic)
 			{
 				SwitchOptics(optic,true);
 			}*/
 			
-			if (pInputs.IsZoomIn())
+			if (input.GetActionDown("UAZoomInOptics",true)/*pInputs.IsZoomIn()*/)
 			{
 				if (!m_CameraOptics && (weapon.CanEnterIronsights() && m_CameraIronsighs))
 				{
@@ -642,7 +644,7 @@ class DayZPlayerImplement extends DayZPlayer
 				}
 			}
 	
-			if (pInputs.IsZoomOut())
+			if (input.GetActionDown("UAZoomOutOptics",true)/*pInputs.IsZoomOut()*/)
 			{
 				if (m_CameraOptics)
 				{
@@ -656,7 +658,7 @@ class DayZPlayerImplement extends DayZPlayer
 						ExitSights();
 						m_CameraIronsighs = true;
 						m_ShouldReturnToOptics = false;
-						m_ForceHandleOptics = false;
+						//m_ForceHandleOptics = false;
 					}
 				}
 			}
@@ -1089,12 +1091,22 @@ class DayZPlayerImplement extends DayZPlayer
 		if (m_LiftWeapon_player && (IsInOptics() || IsInIronsights()))
 			ExitSights();
 
-		if ((input.GetActionDown("UAADSToggle",false) || input.GetActionDown("UAZoomIn",false)) && !m_LiftWeapon_player && IsFireWeaponRaised()) // || sightChange)
+	
+		bool bZoomInUp = input.GetActionUp("UAZoomIn",false);	
+		bool bZoomInDown = input.GetActionDown("UAZoomIn",false);	
+		bool bZoomToggle = input.GetActionDown("UAZoomInToggle",false);
+		if( bZoomToggle )
 		{
+			m_CameraZoomToggle = !m_CameraZoomToggle;
+		}
+		
+		if ((input.GetActionDown("UAADSToggle",false) || bZoomInDown) && !m_LiftWeapon_player && IsFireWeaponRaised()) // || sightChange)
+		{
+			m_CameraZoomToggle = false;
 			HumanItemAccessor 	hia = GetItemAccessor();
 			HumanCommandWeapons	hcw = GetCommandModifier_Weapons();
 			PlayerBase playerPB = PlayerBase.Cast(this);
-			if (hia.IsItemInHandsWeapon() && playerPB.GetWeaponManager() && !playerPB.GetWeaponManager().IsRunning())
+			if (hia.IsItemInHandsWeapon() && playerPB.GetItemInHands() && playerPB.GetItemInHands().IsWeapon() && playerPB.GetWeaponManager() && !playerPB.GetWeaponManager().IsRunning() )
 			{
 				Weapon_Base weapon = Weapon_Base.Cast(GetHumanInventory().GetEntityInHands());
 				ItemOptics optic = weapon.GetAttachedOptics();
@@ -1143,6 +1155,9 @@ class DayZPlayerImplement extends DayZPlayer
 						ExitSights();
 					}
 				}
+				
+				if ( !GetWeaponManager().CanFire(weapon) ) //fixes camera switching during item transitions
+					ExitSights();
 			}
 		}
 		else if ( m_CameraIronsighs || m_CameraOptics )
@@ -1160,6 +1175,12 @@ class DayZPlayerImplement extends DayZPlayer
 					if (hcw) hcw.SetADS(false);
 					ExitSights();
 				}
+			}
+			else
+			{
+				if (hcw)
+					hcw.SetADS(false);
+				ExitSights();
 			}
 		}
 
@@ -1195,17 +1216,32 @@ class DayZPlayerImplement extends DayZPlayer
 
 		////////////////////////////////////////////////
 		// Eye Zoom logic
-
-		if( !m_CameraEyeZoom && input.GetActionDown("UAZoomIn",false) && !m_MovementState.IsRaised() )
+		
+		if( !m_CameraEyeZoom && bZoomInDown && !m_MovementState.IsRaised() )
 		{
 			m_CameraEyeZoom = true;
+			m_CameraZoomToggle = false;
 			//Print( "To EyeZoom " +  m_CameraEyeZoom.ToString() );
 		}
-		else if( m_CameraEyeZoom && ( input.GetActionUp("UAZoomIn",false) || m_MovementState.IsRaised() ) )
+		else if( m_CameraEyeZoom && ( bZoomInUp || m_MovementState.IsRaised() ) )
 		{
 			m_CameraEyeZoom = false;
+			m_CameraZoomToggle = false;
 			//Print( "From EyeZoom " +  m_CameraEyeZoom.ToString() );
 		}
+		else if( m_CameraEyeZoom && bZoomInDown )
+		{
+			m_CameraZoomToggle = false;
+		}
+		else if( m_CameraZoomToggle )
+		{
+			m_CameraEyeZoom = !m_MovementState.IsRaised();
+		}
+		else if( bZoomToggle )
+		{
+			m_CameraEyeZoom = false;
+		}
+		
 
 		//--------------------------------------------
 		// vehicle handling
@@ -1477,7 +1513,7 @@ class DayZPlayerImplement extends DayZPlayer
 				optic.GetCompEM().SwitchOn();
 			optic.HideSelection("hide");
 			optic.EnterOptics();
-			m_ForceHandleOptics = true;
+			//m_ForceHandleOptics = true;
 		}
 		else
 		{
@@ -2190,23 +2226,26 @@ class DayZPlayerImplement extends DayZPlayer
 
 	void OnParticleEvent(string pEventType, string pUserString, int pUserInt)
 	{
-		if ( pUserInt == 123456 ) // 123456 is ID for vomiting effect. The current implementation is WIP.
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{
+			if ( pUserInt == 123456 ) // 123456 is ID for vomiting effect. The current implementation is WIP.
 			{
-			/*Print(pEventType);
-			Print(pUserString);
-			Print(pUserInt);*/
-			
-			PlayerBase player = PlayerBase.Cast(this);
-			int boneIdx = player.GetBoneIndexByName("Head");
-			
-			if( boneIdx != -1 )
-			{
-				EffVomit eff = new EffVomit();
-				vector player_pos = player.GetPosition();
-				eff.SetDecalOwner( player );
-				SEffectManager.PlayInWorld( eff, "0 0 0" );
-				Particle p = eff.GetParticle();
-				player.AddChild(p, boneIdx);
+				/*Print(pEventType);
+				Print(pUserString);
+				Print(pUserInt);*/
+				
+				PlayerBase player = PlayerBase.Cast(this);
+				int boneIdx = player.GetBoneIndexByName("Head");
+				
+				if( boneIdx != -1 )
+				{
+					EffVomit eff = new EffVomit();
+					vector player_pos = player.GetPosition();
+					eff.SetDecalOwner( player );
+					SEffectManager.PlayInWorld( eff, "0 0 0" );
+					Particle p = eff.GetParticle();
+					player.AddChild(p, boneIdx);
+				}
 			}
 		}
 	}

@@ -3,8 +3,8 @@ class Rangefinder extends ItemOptics
 	static const float RANGEFINDER_MAX_DISTANCE = 913.4856; //TODO adjust maximal distance to match real life rangefinder
 	
 	protected ref Timer 				m_Timer;
-	protected ref Param1<string> 		m_MessageParam;
 	protected PlayerBase 				m_Player;
+	protected TextWidget				m_RangeText;
 	
 	void Rangefinder()
 	{
@@ -23,7 +23,7 @@ class Rangefinder extends ItemOptics
 	// How frequently the measurement should be taken
 	float GetMeasurementUpdateInterval()
 	{
-		return 1;
+		return 0.5;
 	}
 	
 	override void OnWorkStart()
@@ -31,6 +31,7 @@ class Rangefinder extends ItemOptics
 		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			StartPeriodicMeasurement();
+			m_RangeText = TextWidget.Cast( GetGame().GetWorkspace().CreateWidgets( "gui/layouts/gameplay/rangefinder_hud.layout" ) );
 		}
 	}
 	
@@ -39,6 +40,7 @@ class Rangefinder extends ItemOptics
 		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			StopPeriodicMeasurement();
+			delete m_RangeText;
 		}
 	}
 	
@@ -48,9 +50,6 @@ class Rangefinder extends ItemOptics
 		{
 			m_Timer = new Timer;
 		}
-		
-		if( !m_MessageParam )
-			m_MessageParam = new Param1<string>( "" );
 		
 		m_Timer.Run( GetMeasurementUpdateInterval(), this, "DoMeasurement", null, true );
 	}
@@ -84,14 +83,17 @@ class Rangefinder extends ItemOptics
 			
 			if (dist < RANGEFINDER_MAX_DISTANCE)
 			{
-				m_MessageParam.param1 = "#range_finder_distance" + ": " + dist.ToString() + " #meters";
+				if( dist < 10 )
+					m_RangeText.SetText( "00" + dist.ToString() );
+				else if( dist < 100 )
+					m_RangeText.SetText( "0" + dist.ToString() );
+				else
+					m_RangeText.SetText( dist.ToString() );
 			}
 			else
 			{
-				m_MessageParam.param1 = "#range_finder_too_far";
+				m_RangeText.SetText( "- - -" );
 			}
-			
-			player.MessageAction(m_MessageParam.param1);
 		}
 	}
 }

@@ -194,7 +194,7 @@ class ActionConstructor
 		actions.Insert(new ActionPourLiquid);
 		actions.Insert(new ActionDrainLiquid);
 		actions.Insert(new ActionStartEngine);
-		actions.Insert(new ActionViewCompass);
+		//actions.Insert(new ActionViewCompass);
 		actions.Insert(new ActionRaiseMegaphone);
 		actions.Insert(new ActionActivateTrap);
 		actions.Insert(new ActionEmptyBottleBase);
@@ -202,7 +202,7 @@ class ActionConstructor
 		actions.Insert(new ActionViewOptics);
 		actions.Insert(new ActionViewBinoculars);
 		actions.Insert(new ActionFoldBaseBuildingObject);
-		actions.Insert(new ActionUseRangefinder);
+		//actions.Insert(new ActionUseRangefinder);
 		//actions.Insert(new ActionAttached);
 		actions.Insert(new ActionMountBarbedWire);
 		actions.Insert(new ActionUnmountBarbedWire);
@@ -215,6 +215,7 @@ class ActionConstructor
 		actions.Insert(new ActionGagTarget);
 		actions.Insert(new ActionUngagSelf);
 		actions.Insert(new ActionUngagTarget);
+		//actions.Insert(new ActionEmptyBarrel);
 		
 		// Interact actions
 		actions.Insert(new ActionPullOutPlug);

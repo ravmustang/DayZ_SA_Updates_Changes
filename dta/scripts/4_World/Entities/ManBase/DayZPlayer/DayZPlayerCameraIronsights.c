@@ -327,6 +327,11 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 	
 	override float HoldBreathFOVEffect(float pDt)
 	{
+		//hotfix; two cameras exist and update simultaneously during transition, even if optics/weapons is no longer present!
+		/*PlayerBase player = PlayerBase.Cast(m_pPlayer);
+		if (player && player.GetCurrentCamera() != this)
+			return 0.6;*/
+		
 		ItemOptics optics = ItemOptics.Cast( GetCurrentSightEntity() );
 		if (optics)
 		{
@@ -348,7 +353,7 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 		}
 		else
 		{
-			Error("optic camera, but there is no optic item or optic on weapon");
+			//Error("optic camera, but there is no optic item or optic on weapon"); //camera update ticks on transitions as well, caused problems
 			return 0.6;  //TODO figure some other way to get original FOV here!
 		}
 	}

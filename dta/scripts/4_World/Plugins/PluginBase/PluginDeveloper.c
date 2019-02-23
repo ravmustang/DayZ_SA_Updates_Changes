@@ -555,4 +555,12 @@ class PluginDeveloper extends PluginBase
 	{
 		QuickSort( arr, 0, arr.Count() - 1 );
 	}
+	
+	void ResetGUI()
+	{
+		if( GetGame() && GetGame().GetMission() )
+		{
+			GetGame().GetMission().ResetGUI();
+		}
+	}
 }

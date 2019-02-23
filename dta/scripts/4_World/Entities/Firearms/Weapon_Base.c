@@ -24,6 +24,7 @@ class Weapon_Base extends Weapon
 	protected bool m_canEnterIronsights = true; /// if false, weapon goes straight into optics view
 	protected int m_weaponAnimState = -1; /// animation state the weapon is in, -1 == uninitialized
 	protected float m_DmgPerShot;
+	protected float m_WeaponLength;
 	protected ref array<string> m_ironsightsExcludingOptics = new array<string>; /// optics that go straight into optics view (skip ironsights)
 	ref array<float> m_DOFProperties = new array<float>;
 	ref array<float> m_ChanceToJam = new array<float>;
@@ -35,6 +36,7 @@ class Weapon_Base extends Weapon
 	{
 		m_DmgPerShot = ConfigGetFloat("damagePerShot");
 		
+		InitWeaponLength();
 		InitExcludedScopesArray(m_ironsightsExcludingOptics);
 		InitDOFProperties(m_DOFProperties);
 		if(GetGame().IsServer())
@@ -554,6 +556,18 @@ class Weapon_Base extends Weapon
 		return false;
 	}
 	
+	//!gets weapon length from config for weaponlift raycast
+	bool InitWeaponLength()
+	{
+		if (ConfigIsExisting("WeaponLength"))
+		{
+			m_WeaponLength = ConfigGetFloat("WeaponLength");
+			return true;
+		}
+		m_WeaponLength = 0;
+		return false;
+	}
+	
 	ref array<float> GetWeaponDOF ()
 	{
 		return m_DOFProperties;
@@ -562,6 +576,17 @@ class Weapon_Base extends Weapon
 	// lifting weapon on obstcles
 	bool LiftWeaponCheck (PlayerBase player)
 	{
+		int idx;
+		float distance;
+		float hit_fraction; //junk
+		vector start, end;
+		vector direction;
+		vector usti_hlavne_position;
+		vector trigger_axis_position;
+		vector hit_pos, hit_normal; //junk
+		Object obj;
+		ItemBase attachment;
+		
 		m_LiftWeapon = false;
 		// not a gun, no weap.raise for now
 		if ( HasSelection("Usti hlavne") )
@@ -577,16 +602,10 @@ class Weapon_Base extends Weapon
 		if ( player.GetInputController() && !player.GetInputController().IsWeaponRaised() )
 			return false;
 		
-		vector usti_hlavne_position = GetSelectionPositionLS( "Usti hlavne" ); 	// Usti hlavne
+		usti_hlavne_position = GetSelectionPositionLS( "Usti hlavne" ); 	// Usti hlavne
 		//vector weapon_back_position = GetSelectionPosition( "Weapon back" ); 	// back of weapon; barrel length
-		vector trigger_axis_position = GetSelectionPositionLS("trigger_axis");
+		trigger_axis_position = GetSelectionPositionLS("trigger_axis");
 		//usti_hlavne_position = ModelToWorld(usti_hlavne_position);
-		
-		vector hit_pos, hit_normal; //junk
-		float hit_fraction; //junk
-		Object obj;
-		vector start, end;
-		vector direction;
 		
 		// freelook raycast
 		if (player.GetInputController().CameraIsFreeLook())
@@ -606,24 +625,17 @@ class Weapon_Base extends Weapon
 			direction = GetGame().GetCurrentCameraDirection(); // exception for freelook. Much better this way!
 		}
 		
-		// TODO cast from "Head" in prone?
-		int idx = player.GetBoneIndexByName("Neck");
+		idx = player.GetBoneIndexByName("Neck");
 		if ( idx == -1 )
 			{ start = player.GetPosition()[1] + 1.5; }
 		else
 			{ start = player.GetBonePositionWS(idx); }
 		
-		float distance;
-		// used to get razcast distance from weapon config; may be needed, if universal calculation fails?
-		/*if (m_ItemModelLength != 0)
-			distance = m_ItemModelLength; //TODO
-		else
-			distance = 1;
-		*/
-		distance = vector.Distance(usti_hlavne_position,trigger_axis_position) + 0.1;
-		if (distance < 0.65) // approximate minimal cast distance for short pistols
-			distance = 0.65;
-		ItemBase attachment;
+		//distance = vector.Distance(usti_hlavne_position,trigger_axis_position) + 0.1;
+		//usti_hlavne_position = ModelToWorld(usti_hlavne_position);
+		//distance = vector.Distance(start,usti_hlavne_position);
+		distance = m_WeaponLength - 0.05; //adjusted raycast length
+
 		// if weapon has battel attachment, does longer cast
 		if (ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonet")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetAK")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetMosin")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetSKS")) || ItemBase.CastTo(attachment,GetAttachedSuppressor()))
 		{

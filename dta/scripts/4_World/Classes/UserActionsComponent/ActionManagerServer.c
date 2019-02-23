@@ -281,7 +281,7 @@ class ActionManagerServer: ActionManagerBase
 			
 				case UA_AM_ACCEPTED:
 					// check pCurrentCommandID before start or reject 
-					if( ActionPossibilityCheck(pCurrentCommandID) && pCurrentCommandID != DayZPlayerConstants.COMMANDID_SWIM && pCurrentCommandID != DayZPlayerConstants.COMMANDID_LADDER )
+					if( ActionPossibilityCheck(pCurrentCommandID) )
 					{
 						if(!m_Player.IsRestrained() || m_CurrentActionData.m_Action.CanBeUsedInRestrain() )
 						{

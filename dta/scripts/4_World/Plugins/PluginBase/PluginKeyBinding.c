@@ -46,6 +46,7 @@ class PluginKeyBinding extends PluginBase
 		//					|MENU_***						|KeyCode.KC_***			|KeyCode.KC_***		|						|in plugin						|								|
 		//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 		RegisterKeyBind(	 MENU_ANY						,KeyCode.KC_LCONTROL	,KeyCode.KC_F1		,"PluginDeveloper"		,"ToggleHelpScreen" 			,"[LCTRL]+[F1]"					,"Show/Hide help screen");
+		RegisterKeyBind(	 MENU_ANY						,KeyCode.KC_LCONTROL	,KeyCode.KC_F2		,"PluginDeveloper"		,"ResetGUI" 					,"[LCTRL]+[F2]"					,"Resets shown UI for testing purposes");
 		RegisterKeyBind(	 MENU_NONE|MENU_SCRIPTCONSOLE	,KeyCode.KC_LCONTROL	,KeyCode.KC_GRAVE	,"PluginDeveloper"		,"ToggleScriptConsole" 			,"[LCTRL]+[~]"					,"Show/Hide this script console");
 		RegisterKeyBind(	 MENU_NONE|MENU_SCRIPTCONSOLE	,KeyCode.KC_RCONTROL	,KeyCode.KC_GRAVE	,"PluginDeveloper"		,"ToggleScriptConsole" 			,"[RCTRL]+[~]"					,"Show/Hide this script console");
 		RegisterKeyBind(	 MENU_NONE|MENU_SCENE_EDITOR	,KeyCode.KC_LCONTROL	,KeyCode.KC_TAB		,"PluginSceneManager"	,"EditorToggle"					,"[LCTRL]+[TAB]"				,"Show/Hide Scripted Scene Editor");
