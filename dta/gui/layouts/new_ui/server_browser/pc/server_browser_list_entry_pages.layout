@@ -355,6 +355,7 @@ GridSpacerWidgetClass server_browser_list_entry_root {
    {
     FrameWidgetClass spacer_left {
      clipchildren 0
+     ignorepointer 1
      position 0 0
      size 60 1
      hexactpos 1
@@ -385,7 +386,6 @@ GridSpacerWidgetClass server_browser_list_entry_root {
         TextWidgetClass shard_label {
          clipchildren 0
          ignorepointer 1
-         color 0.8627 0.8627 0.8627 1
          position 0 0
          size 140 1
          hexactpos 1
@@ -429,7 +429,6 @@ GridSpacerWidgetClass server_browser_list_entry_root {
         TextWidgetClass character_alive_label {
          clipchildren 0
          ignorepointer 1
-         color 0.8627 0.8627 0.8627 1
          position 0 0
          size 140 1
          hexactpos 0
@@ -474,7 +473,6 @@ GridSpacerWidgetClass server_browser_list_entry_root {
         TextWidgetClass ip_label {
          clipchildren 0
          ignorepointer 1
-         color 0.8627 0.8627 0.8627 1
          position 0 0
          size 140 1
          hexactpos 0
@@ -519,7 +517,6 @@ GridSpacerWidgetClass server_browser_list_entry_root {
         TextWidgetClass mode_label {
          clipchildren 0
          ignorepointer 1
-         color 0.8627 0.8627 0.8627 1
          position 0 0
          size 140 1
          hexactpos 0
@@ -564,7 +561,6 @@ GridSpacerWidgetClass server_browser_list_entry_root {
         TextWidgetClass battlleye_label {
          clipchildren 0
          ignorepointer 1
-         color 0.8627 0.8627 0.8627 1
          position 0 0
          size 140 1
          hexactpos 0
@@ -611,7 +607,6 @@ GridSpacerWidgetClass server_browser_list_entry_root {
         TextWidgetClass steam_friends_label {
          clipchildren 0
          ignorepointer 1
-         color 0.8627 0.8627 0.8627 1
          position 0 0
          size 140 1
          hexactpos 0
@@ -647,6 +642,7 @@ GridSpacerWidgetClass server_browser_list_entry_root {
     }
     FrameWidgetClass spacer_right {
      clipchildren 0
+     ignorepointer 1
      position 0 0
      size 365 1
      hexactpos 0
@@ -656,6 +652,7 @@ GridSpacerWidgetClass server_browser_list_entry_root {
      {
       TextWidgetClass server_acceleration_text {
        clipchildren 0
+       ignorepointer 1
        position 0 0
        size 100 30
        hexactpos 1

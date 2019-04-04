@@ -10,7 +10,7 @@ GridSpacerWidgetClass height_wrapper {
  priority 8
  userID -1
  style Colorable
- Padding 1
+ Padding 0
  Margin 0
  "Size To Content V" 1
  Columns 8

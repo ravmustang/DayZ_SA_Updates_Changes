@@ -277,6 +277,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed0 {
@@ -329,12 +330,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel0 {
@@ -351,13 +353,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -466,7 +468,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -643,6 +645,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed1 {
@@ -694,12 +697,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel1 {
@@ -716,13 +720,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -828,7 +832,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -1005,6 +1009,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed2 {
@@ -1056,12 +1061,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel2 {
@@ -1078,13 +1084,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -1190,7 +1196,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -1367,6 +1373,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed3 {
@@ -1418,12 +1425,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel3 {
@@ -1440,13 +1448,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -1552,7 +1560,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -1729,6 +1737,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed4 {
@@ -1780,12 +1789,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel4 {
@@ -1802,13 +1812,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -1914,7 +1924,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -2091,6 +2101,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed5 {
@@ -2142,12 +2153,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel5 {
@@ -2164,13 +2176,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -2276,7 +2288,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -2453,6 +2465,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed6 {
@@ -2504,12 +2517,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel6 {
@@ -2526,13 +2540,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light
@@ -2638,7 +2652,7 @@ GridSpacerWidgetClass height_wrapper {
          vexactpos 1
          hexactsize 0
          vexactsize 0
-         priority 306
+         priority 200
          draggable 0
          style blank
          {
@@ -2814,6 +2828,7 @@ GridSpacerWidgetClass height_wrapper {
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       ImageWidgetClass RadialIconClosed7 {
@@ -2865,12 +2880,13 @@ GridSpacerWidgetClass height_wrapper {
      ignorepointer 1
      color 0 0 0 1
      position 1 1
-     size 17 17
+     size 20 20
      halign right_ref
      hexactpos 1
      vexactpos 1
      hexactsize 1
      vexactsize 1
+     priority 200
      style rover_sim_colorable
      {
       PanelWidgetClass SizePanel7 {
@@ -2887,13 +2903,13 @@ GridSpacerWidgetClass height_wrapper {
          visible 1
          inheritalpha 0
          ignorepointer 1
-         size 15 15
+         size 1 0.8
          halign center_ref
          valign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
-         vexactsize 1
+         hexactsize 0
+         vexactsize 0
          fixaspect inside
          priority 500
          style Light

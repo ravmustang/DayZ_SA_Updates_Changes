@@ -29,6 +29,97 @@ FrameWidgetClass closable_header_root {
    "no wrap" 1
    stretch 1
    {
+    FrameWidgetClass LeftSpacer {
+     ignorepointer 1
+     position 0 0
+     size 94 48
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     {
+      PanelWidgetClass MovePanel {
+       visible 0
+       ignorepointer 1
+       color 0 0 0 0.7843
+       position 10 0
+       size 48 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 0
+       priority 200
+       style rover_sim_colorable
+       {
+        ButtonWidgetClass MoveUp {
+         visible 1
+         ignorepointer 0
+         size 30 24
+         halign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         style Empty
+         {
+          ImageWidgetClass LTArrow {
+           ignorepointer 1
+           size 1 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           image0 "set:dayz_gui image:icon_plus"
+           mode blend
+           "src alpha" 1
+           "flip v" 1
+          }
+         }
+        }
+        ButtonWidgetClass MoveDown {
+         visible 1
+         ignorepointer 0
+         size 30 24
+         halign center_ref
+         valign bottom_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         style Empty
+         {
+          ImageWidgetClass RTArrow {
+           ignorepointer 1
+           size 1 1
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 0
+           image0 "set:dayz_gui image:icon_plus"
+           mode blend
+           "src alpha" 1
+          }
+         }
+        }
+       }
+      }
+      ItemPreviewWidgetClass Render {
+       clipchildren 1
+       ignorepointer 1
+       color 0.702 0.702 0.702 1
+       position 10 0
+       size 48 48
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       fixaspect inside
+       priority 150
+       draggable 0
+      }
+     }
+    }
     ImageWidgetClass collapse_button {
      visible 1
      clipchildren 0
@@ -48,24 +139,24 @@ FrameWidgetClass closable_header_root {
      "no wrap" 0
      stretch 0
     }
-    TextWidgetClass TextWidget0 {
+    RichTextWidgetClass TextWidget0 {
      ignorepointer 1
-     position 0 0
-     size 0.85 0.6
+     size 0.9 0.9
      halign center_ref
      valign center_ref
      hexactpos 1
-     vexactpos 1
+     vexactpos 0
      hexactsize 0
      vexactsize 0
-     style Normal
-     text "CLOSABLE CONTAINER"
+     style DayZNormal
+     text "CLOSABLE HEADER"
      font "gui/fonts/sdf_MetronLight24"
      "text offset" 10 0
      "exact text" 1
      "exact text size" 20
      "text halign" center
      "text valign" center
+     wrap 1
     }
     PanelWidgetClass Dropzone {
      ignorepointer 1
@@ -118,43 +209,6 @@ FrameWidgetClass closable_header_root {
        stretch 1
       }
      }
-    }
-    ItemPreviewWidgetClass Render {
-     clipchildren 1
-     ignorepointer 1
-     color 0.702 0.702 0.702 1
-     size 1 1
-     valign center_ref
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 0
-     fixaspect inside
-     priority 150
-     draggable 0
-    }
-    TextWidgetClass CargoCount {
-     visible 0
-     disabled 1
-     clipchildren 0
-     ignorepointer 1
-     position 50 0
-     size 0.1 0.6
-     halign right_ref
-     valign center_ref
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 0
-     style Normal
-     text "10/50"
-     font "gui/fonts/sdf_MetronLight24"
-     "exact text" 1
-     "exact text size" 20
-     "size to text h" 0
-     "size to text v" 0
-     "text halign" right
-     "text valign" center
     }
    }
   }

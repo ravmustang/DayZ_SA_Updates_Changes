@@ -491,7 +491,7 @@ FrameWidgetClass server_browser_tab_root {
       }
       ScrollWidgetClass server_list_scroller {
        ignorepointer 0
-       color 1 1 1 0.0196
+       color 0 0 0 0.1961
        position 0 0
        size 1 720
        halign center_ref
@@ -794,6 +794,42 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
       }
+      PanelWidgetClass loading_bar {
+       visible 0
+       ignorepointer 1
+       size 1 30
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       {
+        ImageWidgetClass loading_icon {
+         ignorepointer 1
+         position 10 0
+         size 30 30
+         halign right_ref
+         valign center_ref
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+         image0 "set:dayz_gui image:icon_refresh"
+         mode blend
+         "src alpha" 1
+        }
+        PanelWidgetClass cancel_button {
+         ignorepointer 1
+         position 10 10
+         size 48 48
+         hexactpos 1
+         vexactpos 1
+         hexactsize 1
+         vexactsize 1
+        }
+       }
+      }
      }
     }
     PanelWidgetClass separator0 {
@@ -878,7 +914,7 @@ FrameWidgetClass server_browser_tab_root {
      Rows 18
      {
       FrameWidgetClass search_name_setting_container {
-       ignorepointer 0
+       ignorepointer 1
        size 1 30
        hexactpos 1
        vexactpos 1
@@ -910,7 +946,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass search_name_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -919,7 +955,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_search_name_setting_container_search_name_setting_search_name_setting_panel_search_name_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -937,6 +973,7 @@ FrameWidgetClass server_browser_tab_root {
            vexactsize 0
            {
             PanelWidgetClass search_name_setting_option_wrapper {
+             clipchildren 1
              ignorepointer 1
              color 1 1 1 0.3922
              position 0 0
@@ -949,6 +986,7 @@ FrameWidgetClass server_browser_tab_root {
              style Outline
              {
               EditBoxWidgetClass search_name_setting_option {
+               clipchildren 0
                ignorepointer 1
                position 0 -1
                size 0.96 0.8
@@ -1022,7 +1060,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass search_ip_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1031,7 +1069,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_search_ip_setting_container_search_ip_setting_search_ip_setting_panel_search_ip_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1283,7 +1321,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass ping_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1292,7 +1330,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_ping_setting_container_ping_setting_ping_setting_panel_ping_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1359,7 +1397,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass favorites_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1368,7 +1406,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_favorites_setting_container_favorites_setting_favorites_setting_panel_favorites_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1435,7 +1473,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass friends_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1444,7 +1482,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_friends_setting_container_friends_setting_friends_setting_panel_friends_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1511,7 +1549,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass battleye_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1520,7 +1558,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_battleye_setting_container_battleye_setting_battleye_setting_panel_battleye_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1587,7 +1625,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass password_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1596,7 +1634,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_password_setting_container_password_setting_password_setting_panel_password_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1663,7 +1701,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass prev_played_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1672,7 +1710,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_prev_played_setting_container_prev_played_setting_prev_played_setting_panel_prev_played_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1739,7 +1777,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass ver_match_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1748,7 +1786,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_ver_match_setting_container_ver_match_setting_ver_match_setting_panel_ver_match_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1815,7 +1853,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass full_server_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1824,7 +1862,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_full_server_setting_container_full_server_setting_full_server_setting_panel_full_server_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1891,7 +1929,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass tps_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1900,7 +1938,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_tps_setting_container_tps_setting_tps_setting_panel_tps_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -1967,7 +2005,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass public_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -1976,7 +2014,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_public_setting_container_public_setting_public_setting_panel_public_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -2016,6 +2054,7 @@ FrameWidgetClass server_browser_tab_root {
        vexactpos 1
        hexactsize 0
        vexactsize 1
+       priority 100
        {
         GridSpacerWidgetClass accelerated_time_setting {
          ignorepointer 0
@@ -2025,7 +2064,8 @@ FrameWidgetClass server_browser_tab_root {
          vexactpos 1
          hexactsize 0
          vexactsize 1
-         "no focus" 1
+         priority 1000
+         "no focus" 0
          Padding 0
          Margin 0
          "Size To Content H" 1
@@ -2034,7 +2074,7 @@ FrameWidgetClass server_browser_tab_root {
          {
           FrameWidgetClass accelerated_time_setting_panel {
            ignorepointer 1
-           size 0.5 0.6
+           size 0.5 1
            valign center_ref
            hexactpos 1
            vexactpos 1
@@ -2043,7 +2083,7 @@ FrameWidgetClass server_browser_tab_root {
            {
             TextWidgetClass accelerated_time_setting_label {
              ignorepointer 1
-             position 5 0
+             position 0 0
              size 1 0.55
              valign center_ref
              hexactpos 1
@@ -2052,7 +2092,7 @@ FrameWidgetClass server_browser_tab_root {
              vexactsize 0
              text "#STR_server_browser_tab_root_filters_root_filters_content_accelerated_time_setting_container_accelerated_time_setting_accelerated_time_setting_panel_accelerated_time_setting_label0"
              font "gui/fonts/sdf_MetronLight24"
-             "text offset" 8 0
+             "text offset" 15 0
              "exact text" 0
              "exact text size" 18
              "text valign" center
@@ -2062,8 +2102,9 @@ FrameWidgetClass server_browser_tab_root {
           FrameWidgetClass accelerated_time_setting_option {
            visible 1
            ignorepointer 1
-           position 0 0
            size 0.5 1
+           halign right_ref
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -2071,7 +2112,7 @@ FrameWidgetClass server_browser_tab_root {
           }
          }
         }
-        PanelWidgetClass accelerated_time_setting_disable {
+        PanelWidgetClass accelerated_time_setting_panel_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902

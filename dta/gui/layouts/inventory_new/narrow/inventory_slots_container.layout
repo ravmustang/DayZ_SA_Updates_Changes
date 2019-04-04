@@ -2,7 +2,7 @@ GridSpacerWidgetClass height_wrapper {
  clipchildren 0
  ignorepointer 1
  color 0 0 0 0
- size 1 56
+ size 1 43
  hexactpos 1
  vexactpos 1
  hexactsize 0
@@ -23,7 +23,7 @@ GridSpacerWidgetClass height_wrapper {
    ignorepointer 0
    color 0.502 0 0 1
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -330,7 +330,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -635,7 +635,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -937,7 +937,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -1239,7 +1239,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -1541,7 +1541,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -1843,7 +1843,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -2145,7 +2145,7 @@ GridSpacerWidgetClass height_wrapper {
    clipchildren 1
    ignorepointer 0
    position 0 0
-   size 54 54
+   size 43 43
    hexactpos 1
    vexactpos 1
    hexactsize 1

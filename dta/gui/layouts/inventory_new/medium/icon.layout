@@ -28,7 +28,7 @@ FrameWidgetClass Icon {
   PanelWidgetClass Color {
    clipchildren 0
    ignorepointer 1
-   color 0.8824 0.8824 0.8824 0.098
+   color 0.8824 0.8824 0.8824 0.0392
    position 0 0
    size 1 1
    halign center_ref

@@ -8,6 +8,24 @@ FrameWidgetClass settings_menu_root {
  vexactsize 0
  priority 951
  {
+  TextWidgetClass SettingsTextWidget {
+   ignorepointer 1
+   position 0.05 80
+   size 0.3 50
+   halign right_ref
+   hexactpos 0
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   priority 1
+   style Normal
+   text "#STR_settings_menu_root_SettingsTextWidget0"
+   font "gui/fonts/sdf_MetronLight72"
+   "text color" 0.8157 0.1255 0.7843 1
+   "exact text" 0
+   "text halign" right
+   "text valign" center
+  }
   FrameWidgetClass Tabber {
    ignorepointer 1
    position 0 0
@@ -68,6 +86,7 @@ FrameWidgetClass settings_menu_root {
         }
         GridSpacerWidgetClass Tab_Control_Container {
          ignorepointer 1
+         color 0 0 0 0.549
          position 0 0
          size 710 1
          hexactpos 1
@@ -75,6 +94,7 @@ FrameWidgetClass settings_menu_root {
          hexactsize 1
          vexactsize 0
          priority 1
+         style DayZDefaultPanel
          "no focus" 1
          Padding 0
          Margin 0
@@ -94,7 +114,7 @@ FrameWidgetClass settings_menu_root {
            vexactsize 0
            priority 200
            userID 0
-           style rover_sim_colorable
+           style DayZDefaultPanel
            "no focus" 1
            "next down" "XComboBoxWidget1"
            {
@@ -142,7 +162,7 @@ FrameWidgetClass settings_menu_root {
           PanelWidgetClass Tab_Control_1 {
            visible 1
            clipchildren 1
-           color 0 0 0 0.549
+           color 0 0 0 0
            position 0 0
            size 170 1
            hexactpos 1
@@ -151,7 +171,7 @@ FrameWidgetClass settings_menu_root {
            vexactsize 0
            priority 200
            userID 0
-           style rover_sim_colorable
+           style DayZDefaultPanel
            "no focus" 1
            "next down" "XComboBoxWidget1"
            {
@@ -199,7 +219,7 @@ FrameWidgetClass settings_menu_root {
           PanelWidgetClass Tab_Control_2 {
            visible 1
            clipchildren 1
-           color 0 0 0 0.549
+           color 0 0 0 0
            position 0 0
            size 160 1
            hexactpos 1
@@ -208,7 +228,7 @@ FrameWidgetClass settings_menu_root {
            vexactsize 0
            priority 200
            userID 0
-           style rover_sim_colorable
+           style DayZDefaultPanel
            "no focus" 1
            "next down" "XComboBoxWidget1"
            {
@@ -256,7 +276,7 @@ FrameWidgetClass settings_menu_root {
           PanelWidgetClass Tab_Control_3 {
            visible 1
            clipchildren 1
-           color 0 0 0 0.549
+           color 0 0 0 0
            position 0 0
            size 220 1
            hexactpos 1
@@ -265,7 +285,7 @@ FrameWidgetClass settings_menu_root {
            vexactsize 0
            priority 200
            userID 0
-           style rover_sim_colorable
+           style DayZDefaultPanel
            "no focus" 1
            "next down" "XComboBoxWidget1"
            {
@@ -331,7 +351,7 @@ FrameWidgetClass settings_menu_root {
          clipchildren 1
          ignorepointer 1
          position -45 0
-         size 38 40
+         size 40 32
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -348,7 +368,7 @@ FrameWidgetClass settings_menu_root {
          clipchildren 1
          ignorepointer 1
          position -45 0
-         size 38 40
+         size 40 32
          halign right_ref
          valign center_ref
          hexactpos 1
@@ -406,24 +426,6 @@ FrameWidgetClass settings_menu_root {
      vexactsize 1
     }
    }
-  }
-  TextWidgetClass SettingsTextWidget {
-   ignorepointer 1
-   position 0.05 80
-   size 0.3 50
-   halign right_ref
-   hexactpos 0
-   vexactpos 1
-   hexactsize 0
-   vexactsize 1
-   priority 1
-   style Normal
-   text "#STR_settings_menu_root_SettingsTextWidget0"
-   font "gui/fonts/sdf_MetronLight72"
-   "text color" 0.8157 0.1255 0.7843 1
-   "exact text" 0
-   "text halign" right
-   "text valign" center
   }
   WrapSpacerWidgetClass play_panel_root {
    visible 1
@@ -620,49 +622,79 @@ FrameWidgetClass settings_menu_root {
    hexactsize 1
    vexactsize 1
    priority 3
+   style DayZDefaultPanel
    "no focus" 1
-   Padding 8
-   Margin 16
+   Padding 0
+   Margin 0
    "Size To Content V" 1
    Columns 1
    Rows 2
    {
-    TextWidgetClass details_label {
-     clipchildren 0
+    PanelWidgetClass settings_details_header {
      ignorepointer 1
-     position 0 0
-     size 1 22
+     color 0 0 0 1
+     size 0.08 36
      hexactpos 1
      vexactpos 1
      hexactsize 0
      vexactsize 1
-     text "This is Sparta"
-     font "gui/fonts/sdf_MetronLight72"
-     text_proportion 0.9
+     style DayZDefaultPanel
+     {
+      TextWidgetClass details_label {
+       clipchildren 0
+       ignorepointer 1
+       size 0.95 0.5
+       halign center_ref
+       valign center_ref
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 0
+       text "This is Sparta"
+       font "gui/fonts/sdf_MetronLight72"
+       text_proportion 0.9
+      }
+     }
     }
-    RichTextWidgetClass details_content {
-     clipchildren 0
+    GridSpacerWidgetClass settings_details_body {
      ignorepointer 1
      position 0 0
-     size 1 1
-     hexactpos 1
-     vexactpos 1
+     size 0.9 0.571
+     hexactpos 0
+     vexactpos 0
      hexactsize 0
-     vexactsize 1
-     text "this is details"
-     font "gui/fonts/sdf_MetronLight24"
-     "exact text" 1
-     "exact text size" 16
-     "size to text h" 0
-     "size to text v" 1
-     wrap 1
-     "condense whitespace" 1
+     vexactsize 0
+     Padding 0
+     Margin 15
+     "Size To Content V" 1
+     Columns 1
+     Rows 1
+     {
+      RichTextWidgetClass details_content {
+       clipchildren 0
+       ignorepointer 1
+       position 0 0
+       size 1 1
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       text "this is details"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 16
+       "size to text h" 0
+       "size to text v" 1
+       wrap 1
+       "condense whitespace" 1
+      }
+     }
     }
    }
   }
   ImageWidgetClass vignette {
    visible 1
-   ignorepointer 0
+   ignorepointer 1
    color 0 0 0 0.7843
    position 0 0
    size 1.6 0.9
@@ -682,6 +714,7 @@ FrameWidgetClass settings_menu_root {
   }
   WrapSpacerWidgetClass Licensing {
    clipchildren 0
+   ignorepointer 1
    position 0.05 0.062
    size 0.45 30
    valign bottom_ref
@@ -716,6 +749,7 @@ FrameWidgetClass settings_menu_root {
     TextWidgetClass copyright {
      visible 1
      clipchildren 0
+     ignorepointer 1
      position 80 40
      size 1 0.5
      valign bottom_ref

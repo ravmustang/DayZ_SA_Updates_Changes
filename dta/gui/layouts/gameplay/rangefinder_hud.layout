@@ -1,7 +1,8 @@
 TextWidgetClass RangeText {
+ clipchildren 0
  color 1 0 0 1
  position 100 50
- size 100 50
+ size 100 40
  halign center_ref
  valign center_ref
  hexactpos 1
@@ -10,9 +11,9 @@ TextWidgetClass RangeText {
  vexactsize 1
  text "999"
  font "gui/fonts/MetronBlack"
- "exact text" 1
- "size to text h" 0
- "size to text v" 0
+ "exact text" 0
+ "size to text h" 1
+ "size to text v" 1
  "text halign" center
  "text valign" center
 }
