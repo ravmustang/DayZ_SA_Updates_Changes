@@ -59,6 +59,7 @@ class RBF_JAM_BU1_MA0 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 class RBF_JAM_BU1_MA1 extends WeaponStateJammed
 {
@@ -68,6 +69,7 @@ class RBF_JAM_BU1_MA1 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 
 

@@ -47,6 +47,9 @@ class Bottle_Base extends Edible_Base
 	const string SOUND_DRYING_DONE 			= "dryDone";	
 	//Burning
 	const string SOUND_BURNING_DONE 		= "burned";
+	
+	float m_LiquidEmptyRate;
+	private const float QUANTITY_EMPTIED_PER_SEC_DEFAULT = 200; //default
 		
 	void Bottle_Base()
 	{
@@ -57,6 +60,8 @@ class Bottle_Base extends Edible_Base
 		RegisterNetSyncVariableBool("m_CookingIsDone");
 		RegisterNetSyncVariableBool("m_CookingIsEmpty");
 		RegisterNetSyncVariableBool("m_CookingIsBurned");
+		
+		m_LiquidEmptyRate = QUANTITY_EMPTIED_PER_SEC_DEFAULT;
 	}
 	
 	void ~Bottle_Base()
@@ -253,8 +258,7 @@ class Bottle_Base extends Edible_Base
 				vector local_pos = GetSteamPosition();
 				//TODO set steam position to pot (proxy) memory point (new hierarchy needed)
 				//m_ParticleCooking = Particle.Create( particle_id, this, local_pos );
-				m_ParticleCooking = Particle.Create( particle_id, local_pos );
-				m_ParticleCooking.Play();
+				m_ParticleCooking = Particle.PlayInWorld( particle_id, local_pos );
 				m_ParticlePlaying = particle_id;
 			}
 		}
@@ -420,4 +424,9 @@ class Bottle_Base extends Edible_Base
 	string GetEmptyingEndSoundsetSoft() {};
 	
 	string GetEmptyingEndSoundsetWater() {};
+	
+	float GetLiquidEmptyRate()
+	{
+		return m_LiquidEmptyRate;
+	}
 }

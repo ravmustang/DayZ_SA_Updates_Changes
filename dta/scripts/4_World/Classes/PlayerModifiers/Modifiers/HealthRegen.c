@@ -34,8 +34,10 @@ class HealthRegenMdfr: ModifierBase
 		blood_scale_normalized = Math.Clamp(blood_scale_normalized,0,1);
 		float regen_speed = Math.Lerp(PlayerConstants.HEALTH_REGEN_MIN, PlayerConstants.HEALTH_REGEN_MAX, blood_scale_normalized);
 		regen_speed = regen_speed * deltaT;
-		player.AddHealth("GlobalHealth", "Health" ,  regen_speed );
-		
+		if( player.GetHealth("GlobalHealth", "Health") > 0.001 )//hotfix for a bug in damage system
+		{
+			player.AddHealth("GlobalHealth", "Health" ,  regen_speed );
+		}
 		player.AddHealth("RightArm","Health",regen_speed * PlayerConstants.DAMAGE_ZONE_BLOOD_REGEN_MODIFIER );
 		player.AddHealth("RightHand","Health",regen_speed * PlayerConstants.DAMAGE_ZONE_BLOOD_REGEN_MODIFIER);
 		player.AddHealth("LeftArm","Health",regen_speed * PlayerConstants.DAMAGE_ZONE_BLOOD_REGEN_MODIFIER);

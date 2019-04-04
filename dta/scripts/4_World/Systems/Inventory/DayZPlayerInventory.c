@@ -241,7 +241,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	{
 		int tmp = -1;
 		ctx.Read(tmp);
-		syncDebugPrint("[syncinv] store Juncture packet");
+		syncDebugPrint("[syncinv] store Juncture packet STS=" + GetDayZPlayerOwner().GetSimulationTimeStamp());
 		StoreJunctureData(ctx);
 		return true;
 	}
@@ -254,7 +254,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	{
 		int tmp = -1;
 		ctx.Read(tmp);
-		syncDebugPrint("[syncinv] handle JunctureData packet");
+		syncDebugPrint("[syncinv] handle JunctureData packet STS=" + GetDayZPlayerOwner().GetSimulationTimeStamp());
 		HandleInputData(true, false, ctx);
 	}
 
@@ -275,7 +275,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	 **/
 	override bool OnInputUserDataProcess (ParamsReadContext ctx)
 	{
-		syncDebugPrint("[syncinv] store InputUserData packet");
+		syncDebugPrint("[syncinv] store InputUserData packet STS=" + GetDayZPlayerOwner().GetSimulationTimeStamp());
 		StoreInputUserData(ctx);
 		return true;
 	}
@@ -288,7 +288,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	{
 		int tmp = -1;
 		ctx.Read(tmp);
-		syncDebugPrint("[syncinv] handle InputUserData packet");
+		syncDebugPrint("[syncinv] handle InputUserData packet STS=" + GetDayZPlayerOwner().GetSimulationTimeStamp());
 		HandleInputData(false, false, ctx);
 	}
 
@@ -550,6 +550,62 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		return super.TakeToDst(mode, src, dst);
 	}
 
+	override void HandEvent (InventoryMode mode, HandEventBase e)
+	{
+		switch (mode)
+		{
+			case InventoryMode.SERVER:
+			{
+				hndDebugPrint("[inv] DZPI::HandEvent(" + typename.EnumToString(InventoryMode, mode) + ")");
+				if (!e.IsServerSideOnly())
+                	SendServerHandEventViaJuncture(GetDayZPlayerOwner(), e);
+                PostHandEvent(e);
+                return;
+			}
+		}
+
+		super.HandEvent(mode, e);
+	}
+	
+	static void SendServerHandEventViaJuncture (notnull DayZPlayer player, HandEventBase e)
+	{
+		if (GetGame().IsServer())
+		{
+			if (e.IsServerSideOnly())
+				Error("[syncinv] SendServerHandEventViaJuncture - called on server side event only, e=" + e);
+			
+			if (player.IsAlive())
+			{
+				InventoryLocation dst = e.GetDst();
+				InventoryLocation src = new InventoryLocation;
+				if (e.m_Entity.GetInventory().GetCurrentInventoryLocation(src))
+				{
+					if (player.NeedInventoryJunctureFromServer(src.GetItem(), src.GetParent(), dst.GetParent()))
+					{
+						syncDebugPrint("[syncinv] SendServerHandEventViaJuncture(" + typename.EnumToString(InventoryMode, InventoryMode.SERVER) + ") need juncture src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+						
+						if (GetGame().AddInventoryJuncture(player, src.GetItem(), dst, true, GameInventory.c_InventoryReservationTimeoutMS))
+							syncDebugPrint("[syncinv] SendServerHandEventViaJuncture(" + typename.EnumToString(InventoryMode, InventoryMode.SERVER) + ") got juncture");
+						else
+							syncDebugPrint("[syncinv] SendServerHandEventViaJuncture(" + typename.EnumToString(InventoryMode, InventoryMode.SERVER) + ") !got juncture");
+					}
+	
+					syncDebugPrint("[syncinv] SendServerHandEventViaJuncture(" + typename.EnumToString(InventoryMode, InventoryMode.SERVER) + " server hand event src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+					
+					ScriptInputUserData ctx = new ScriptInputUserData;
+					InventoryInputUserData.SerializeHandEvent(ctx, e);
+					player.SendSyncJuncture(DayZPlayerSyncJunctures.SJ_INVENTORY, ctx);
+					syncDebugPrint("[syncinv] store input for remote - SendServerHandEventViaJuncture(" + typename.EnumToString(InventoryMode, InventoryMode.SERVER) + " server hand event src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+					player.StoreInputForRemotes(ctx); // @TODO: is this right place? maybe in HandleInputData(server=true, ...)
+				}
+			}
+			else
+			{
+				Error("[syncinv] SendServerHandEventViaJuncture - called on dead player, juncture is for living only");
+			}
+		}
+	}
+
 	/**@fn			NetSyncCurrentStateID
 	 * @brief		Engine callback - network synchronization of FSM's state. not intended to direct use.
 	 **/
@@ -568,7 +624,7 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	 **/
 	override void OnAfterStoreLoad ()
 	{
-		GetDayZPlayerOwner().GetItemAccessor().OnItemInHandsChanged();
+		GetDayZPlayerOwner().GetItemAccessor().OnItemInHandsChanged(true);
 	}
 
 	/**@fn			OnEventFromRemoteWeapon
@@ -665,6 +721,5 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 	{
 		return !m_FSM.GetCurrentState().IsIdle();
 	}
-
 };
 

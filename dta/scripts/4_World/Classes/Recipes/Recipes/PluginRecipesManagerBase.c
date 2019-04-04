@@ -1,4 +1,9 @@
-
+enum Ingredient
+{
+	FIRST = 1,
+	SECOND = 2,
+	BOTH = 3;
+}
 
 class PluginRecipesManagerBase extends PluginBase
 {	

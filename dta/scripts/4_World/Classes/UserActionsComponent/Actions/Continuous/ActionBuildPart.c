@@ -79,7 +79,7 @@ class ActionBuildPart: ActionContinuousBase
 				}
 				*/
 	
-				if ( constrution_part && base_building.IsFacingBack( player, constrution_part.GetMainPartName() ) )
+				if ( constrution_part && !base_building.IsFacingPlayer( player, constrution_part.GetMainPartName() ) )
 				{
 					return true;
 				}
@@ -99,7 +99,7 @@ class ActionBuildPart: ActionContinuousBase
 		if ( !construction.IsColliding( part_name ) && construction.CanBuildPart( part_name, action_data.m_MainItem ) )
 		{
 			//build
-			construction.BuildPart( part_name, GetType() );
+			construction.BuildPartServer( part_name, GetType() );
 			
 			//add damage to tool
 			action_data.m_MainItem.DecreaseHealth( UADamageApplied.BUILD, false );

@@ -64,6 +64,10 @@ enum DiagMenuIDs
 	DM_ACTIVATE_ALL_BS,
 	DM_BS_RELOAD,
 	DM_QUICK_RESTRAIN,
+	DM_HAIR_MENU,
+	DM_HAIR_LEVEL,
+	DM_HAIR_LEVEL_HIDE,
+	DM_HAIR_HIDE_ALL
 	
 };
 
@@ -94,6 +98,7 @@ class PluginDiagMenu extends PluginBase
 	bool m_ToggleHud				= false;
 	bool m_ShowingWeaponDebug		= false;
 	bool m_AimNoiseEnabled			= true;
+	bool m_HairHidden 				= false;
 	int m_DisplayPlayerInfo			= false;
 	bool m_ProceduralRecoilEnabled 	= true;
 	bool m_EnableQuickRestrain 		= false;
@@ -107,6 +112,7 @@ class PluginDiagMenu extends PluginBase
 	float m_LifespanLevel			= 0;
 	int  m_DayzPlayerDebugMenu		= -1;
 	int m_BleedingSourceRequested;
+	int m_HairLevelSelected 		= 0;
 	
 	override void OnInit()
 	{
@@ -133,6 +139,7 @@ class PluginDiagMenu extends PluginBase
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_ACTIVATE_ALL_BS, "", "Activate All Sources", "Bleeding");
 				
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_BS_RELOAD, "", "Client Reload", "Bleeding");
+		
 			//---------------------------------------------------------------
 			// LEVEL 1
 			//---------------------------------------------------------------
@@ -235,12 +242,16 @@ class PluginDiagMenu extends PluginBase
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_GO_UNCONSCIOUS, "", "Go Unconscious", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_GO_UNCONSCIOUS_DELAYED, "", "Uncons. in 10sec", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_QUICK_RESTRAIN, "ralt+0", "Quick Restrain", "Misc");
+				DiagMenu.RegisterMenu(DiagMenuIDs.DM_HAIR_MENU, "Hair Hiding", "Misc");
 					//---------------------------------------------------------------
 					// LEVEL 3
 					//---------------------------------------------------------------
 					DiagMenu.RegisterBool(DiagMenuIDs.DM_ACTION_TARGETS_NEW, "", "New AT Selection", "Action Targets", true);
 					DiagMenu.RegisterBool(DiagMenuIDs.DM_ACTION_TARGETS_DEBUG, "", "Show Debug", "Action Targets");
 					DiagMenu.RegisterBool(DiagMenuIDs.DM_ACTION_TARGETS_SELPOS_DEBUG, "", "Show selection pos debug", "Action Targets");
+					DiagMenu.RegisterRange(DiagMenuIDs.DM_HAIR_LEVEL, "", "Hair Level#", "Hair Hiding","0,44,0,1");
+					DiagMenu.RegisterBool(DiagMenuIDs.DM_HAIR_LEVEL_HIDE, "", "Hide Selected Level", "Hair Hiding");
+					DiagMenu.RegisterBool(DiagMenuIDs.DM_HAIR_HIDE_ALL, "", "Hide/Show All", "Hair Hiding");
 
 			//---------------------------------------------------------------
 			// LEVEL 1
@@ -319,6 +330,8 @@ class PluginDiagMenu extends PluginBase
 		CheckReloadBS();
 		CheckActivateBleedingSource();
 		CheckQuickRestrain();
+		CheckHairLevel();
+		CheckHairHide();
 
 	}
 	//---------------------------------------------
@@ -464,6 +477,34 @@ class PluginDiagMenu extends PluginBase
 		{
 			SendGoUnconsciousRPC(true);
 			DiagMenu.SetValue(DiagMenuIDs.DM_GO_UNCONSCIOUS_DELAYED, false);//to prevent constant RPC calls, switch back to false
+		}
+	}
+	
+	void CheckHairLevel()
+	{
+		int value = DiagMenu.GetRangeValue(DiagMenuIDs.DM_HAIR_LEVEL);
+		if (value != m_HairLevelSelected)
+		{
+			m_HairLevelSelected = value;
+			//SendSetHairLevelRPC();
+			DiagMenu.SetRangeValue(DiagMenuIDs.DM_HAIR_LEVEL, value);//to prevent constant RPC calls, switch back to false
+		}
+	}
+	
+	void CheckHairHide()
+	{
+		int value = DiagMenu.GetBool(DiagMenuIDs.DM_HAIR_LEVEL_HIDE);
+		bool hide_all = DiagMenu.GetBool(DiagMenuIDs.DM_HAIR_HIDE_ALL);
+		if (hide_all)
+		{
+			SendSetHairLevelHideRPC(-1,value);
+			DiagMenu.SetValue(DiagMenuIDs.DM_HAIR_HIDE_ALL, false);//to prevent constant RPC calls, switch back to false
+		}
+		else if (value != m_HairHidden)
+		{
+			m_HairHidden = !m_HairHidden;
+			SendSetHairLevelHideRPC(m_HairLevelSelected,value);
+			DiagMenu.SetValue(DiagMenuIDs.DM_HAIR_LEVEL_HIDE, value);//to prevent constant RPC calls, switch back to false
 		}
 	}
 	
@@ -1074,7 +1115,8 @@ class PluginDiagMenu extends PluginBase
 	void SendDebugActionsRPC()
 	{
 		CachedObjectsParams.PARAM1_INT.param1 = ItemBase.GetDebugActionsMask();
-		if( GetGame() && GetGame().GetPlayer() ) GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ITEM_DEBUG_ACTIONS, CachedObjectsParams.PARAM1_INT, true, GetGame().GetPlayer().GetIdentity() );
+		if( GetGame() && GetGame().GetPlayer() ) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ITEM_DEBUG_ACTIONS, CachedObjectsParams.PARAM1_INT, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	
 	//---------------------------------------------
@@ -1083,114 +1125,133 @@ class PluginDiagMenu extends PluginBase
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
 		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
 		if(player) player.SetQuickRestrain(enable);
-		if( GetGame() && GetGame().GetPlayer() ) GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_QUICK_RESTRAIN, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if( GetGame() && GetGame().GetPlayer() ) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_QUICK_RESTRAIN, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	
 	//---------------------------------------------
 	void SendActivateAllBSRPC()
 	{
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_ACTIVATE_ALL_BS, NULL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_ACTIVATE_ALL_BS, NULL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendKillPlayerRPC()
 	{
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_KILL_PLAYER, NULL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_KILL_PLAYER, NULL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendInvincibilityRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_INVINCIBILITY, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_ENABLE_INVINCIBILITY, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendLogPlayerStatsRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LOG_PLAYER_STATS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LOG_PLAYER_STATS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendModifiersRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_DISABLE_MODIFIERS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_DISABLE_MODIFIERS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendUnlimitedRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_UNLIMITED_AMMO, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_UNLIMITED_AMMO, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendDisableBloodLossRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_DISABLE_BLOODLOOS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_DISABLE_BLOODLOOS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendDebugCraftingRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_CRAFTING_DEBUG, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_CRAFTING_DEBUG, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsShowDebugRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_DEBUG_WINDOW, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_DEBUG_WINDOW, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsToggleStateRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_STATE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_STATE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void GunParticlesToggleStateRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_GUN_PARTICLES_TOGGLE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_GUN_PARTICLES_TOGGLE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsToggleModelRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_MODEL, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_TOGGLE_MODEL, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SoftSkillsSetSpecialtyRPC( float specialty_value )
 	{
 		CachedObjectsParams.PARAM1_FLOAT.param1 = specialty_value;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_SET_SPECIALTY, CachedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_SOFT_SKILLS_SET_SPECIALTY, CachedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void LifespanBloodyHandsRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_BLOODY_HANDS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_BLOODY_HANDS, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void LifespanPlaytimeUpdateRPC( float playtime )
 	{
 		CachedObjectsParams.PARAM1_FLOAT.param1 = playtime;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_PLAYTIME_UPDATE, CachedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.RPC_LIFESPAN_PLAYTIME_UPDATE, CachedObjectsParams.PARAM1_FLOAT, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendMeleeBlockStanceRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_BLOCK_STANCE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_BLOCK_STANCE, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	//---------------------------------------------
 	void SendMeleeFightRPC(bool enable)
 	{
 		CachedObjectsParams.PARAM1_BOOL.param1 = enable;
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_FIGHT, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_RPC_MELEE_FIGHT, CachedObjectsParams.PARAM1_BOOL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	//---------------------------------------------
 	void SendGoUnconsciousRPC(bool is_delayed)
 	{
 		Param1<bool> p1 = new Param1<bool>(is_delayed);
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_GO_UNCONSCIOUS, p1, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_GO_UNCONSCIOUS, p1, true, GetGame().GetPlayer().GetIdentity() );
  	}
 	//---------------------------------------------
 	void SendSimulateNULLPointer()
@@ -1200,24 +1261,41 @@ class PluginDiagMenu extends PluginBase
 	//---------------------------------------------
 	void SendSimulateDivisionByZero()
 	{
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_DIVISION_BY_ZERO, NULL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_DIVISION_BY_ZERO, NULL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	//---------------------------------------------
 	void SendSimulateInfiniteLoop()
 	{
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_INFINITE_LOOP, NULL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_INFINITE_LOOP, NULL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	//---------------------------------------------
 	void SendSimulateErrorFunction()
 	{
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_ERROR_FUNCTION, NULL, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_SIMULATE_ERROR_FUNCTION, NULL, true, GetGame().GetPlayer().GetIdentity() );
 	}
 	
 	void SendActivateBleedingSource(int bleeding_source)
 	{
 		Param1<int> p1 = new Param1<int>(bleeding_source);
-		GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_ACTIVATE_BS, p1, true, GetGame().GetPlayer().GetIdentity() );
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_ACTIVATE_BS, p1, true, GetGame().GetPlayer().GetIdentity() );
 	}
+	//---------------------------------------------
+	void SendSetHairLevelRPC()
+	{
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_HAIR_LEVEL, NULL, true, GetGame().GetPlayer().GetIdentity() );
+ 	}
+	
+	void SendSetHairLevelHideRPC(int level, bool value)
+	{
+		Param2<int,bool> p2 = new Param2<int,bool>(level,value);
+		if(GetGame() && GetGame().GetPlayer()) 
+			GetGame().RPCSingleParam( GetGame().GetPlayer(),ERPCs.DEV_HAIR_LEVEL_HIDE, p2, true, GetGame().GetPlayer().GetIdentity() );
+ 	}
 	
 	//---------------------------------------------
 	void OnRPC(PlayerBase player, int rpc_type, ParamsReadContext ctx)
@@ -1393,6 +1471,7 @@ class PluginDiagMenu extends PluginBase
 					}
 					else
 					{
+						player.m_UnconsciousEndTime = -60;
 						player.SetHealth("","Shock",0);
 					}
 				}
@@ -1402,8 +1481,19 @@ class PluginDiagMenu extends PluginBase
 				}
 			//DayZPlayerSyncJunctures.SendPlayerUnconsciousness(player, !player.IsUnconscious() );
 			break;
+			/*case ERPCs.DEV_HAIR_LEVEL:
+				player.HideHair(!m_HairHidden);
+				m_HairHidden = !m_HairHidden;
+			break;*/
+			case ERPCs.DEV_HAIR_LEVEL_HIDE:
+				ctx.Read( CachedObjectsParams.PARAM2_INT_INT ); //PARAM2_INT_INT.param2 is BOOL here
+				player.HideHairLevel(CachedObjectsParams.PARAM2_INT_INT.param1,CachedObjectsParams.PARAM2_INT_INT.param2);
+				
+				//Print("CachedObjectsParams.PARAM2_INT_INT.param1 " + CachedObjectsParams.PARAM2_INT_INT.param1);
+				//Print("CachedObjectsParams.PARAM2_INT_INT.param2 " + CachedObjectsParams.PARAM2_INT_INT.param2);
+			
+			break;
 		}
-		
 	}
 	// Helper diag functions
 	void GoUnconsciousDelayed(Param1<PlayerBase> p1)
@@ -1415,6 +1505,7 @@ class PluginDiagMenu extends PluginBase
 		}
 		else
 		{
+			player.m_UnconsciousEndTime = -60;
 			player.SetHealth("","Shock",0);
 		}
 	}

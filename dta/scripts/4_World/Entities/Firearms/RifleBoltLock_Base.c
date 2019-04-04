@@ -63,6 +63,7 @@ class RBL_OPN_BU0_MA1 extends WeaponStableState
 	override bool HasBullet () { return false; }
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return false; }
+	override bool IsBoltOpen () { return true; }
 };
 class RBL_OPN_BU0_MA0 extends WeaponStableState
 {
@@ -72,6 +73,7 @@ class RBL_OPN_BU0_MA0 extends WeaponStableState
 	override bool HasBullet () { return false; }
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
+	override bool IsBoltOpen () { return true; }
 };
 class RBL_JAM_BU1_MA0 extends WeaponStateJammed
 {
@@ -81,6 +83,7 @@ class RBL_JAM_BU1_MA0 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 class RBL_JAM_BU1_MA1 extends WeaponStateJammed
 {
@@ -90,6 +93,7 @@ class RBL_JAM_BU1_MA1 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 
 

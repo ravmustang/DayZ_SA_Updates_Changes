@@ -27,7 +27,7 @@ class ActionUngagTarget: ActionContinuousBase
 	
 	override string GetText()
 	{
-		return "#ungag";
+		return "#ungag_person";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -35,7 +35,7 @@ class ActionUngagTarget: ActionContinuousBase
 		PlayerBase targetPlayer;
 		if( Class.CastTo(targetPlayer, target.GetObject()) )
 		{
-			if ( IsWearingGag(targetPlayer) ) 
+			if ( IsWearingGag(targetPlayer) && null == player.GetHumanInventory().GetEntityInHands()) 
 			{
 				return true;
 			}
@@ -52,9 +52,9 @@ class ActionUngagTarget: ActionContinuousBase
 		
 		if ( attachment && attachment.GetType() == "MouthRag" )
 		{
-			/*attachment.Delete();
-			action_data.m_Player.GetInventory().CreateInInventory("Rag");*/
-			ntarget.DropItem(ItemBase.Cast(attachment));
+			UngagSelfLambda lamb = new UngagSelfLambda(attachment, "Rag", action_data.m_Player);
+			lamb.SetTransferParams(true, true, true, false, 1);
+			action_data.m_Player.ServerReplaceItemElsewhereWithNewInHands(lamb);
 			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		}
 	}

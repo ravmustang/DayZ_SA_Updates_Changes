@@ -68,57 +68,48 @@ class Construction
 	}
 	
 	//BuildPart
-	void BuildPart( string part_name, int action_id )
+	void BuildPartServer( string part_name, int action_id )
 	{
-		if ( GetGame().IsServer() )
-		{
-			//add part to constructed parts
-			AddToConstructedParts( part_name );
+		//add part to constructed parts
+		AddToConstructedParts( part_name );
 
-			//on action
-			TakeMaterials( part_name );
+		//on action
+		TakeMaterialsServer( part_name );
 
-			//destroy build collision check trigger
-			DestroyCollisionTrigger();
-		}
-		
+		//destroy build collision check trigger
+		DestroyCollisionTrigger();
+
 		//call event
 		GetParent().OnPartBuiltServer( part_name, action_id );
 	}
 	
 	//DismantlePart
-	void DismantlePart( string part_name, int action_id )
+	void DismantlePartServer( string part_name, int action_id )
 	{
-		if ( GetGame().IsServer() )
-		{
-			//add part to constructed parts
-			RemoveFromConstructedParts( part_name );
+		//add part to constructed parts
+		RemoveFromConstructedParts( part_name );
 
-			//receive materials
-			ReceiveMaterials( part_name );
+		//receive materials
+		ReceiveMaterialsServer( part_name );
 			
-			//drop non-usable materials
-			DropNonUsableMaterials( part_name );
-		}
+		//drop non-usable materials
+		DropNonUsableMaterialsServer( part_name );
 		
 		//call event
 		GetParent().OnPartDismantledServer( part_name, action_id );
 	}
 	
 	//DestroyPart
-	void DestroyPart( string part_name, int action_id )
+	void DestroyPartServer( string part_name, int action_id )
 	{
-		if ( GetGame().IsServer() )
-		{
-			//add part to constructed parts
-			RemoveFromConstructedParts( part_name );
-			
-			//destroy attached materials (if locked)
-			DestroyMaterials( part_name );
-			
-			//drop non-usable materials
-			DropNonUsableMaterials( part_name );			
-		}
+		//add part to constructed parts
+		RemoveFromConstructedParts( part_name );
+		
+		//destroy attached materials (if locked)
+		DestroyMaterialsServer( part_name );
+		
+		//drop non-usable materials
+		DropNonUsableMaterialsServer( part_name );			
 		
 		//call event
 		GetParent().OnPartDestroyedServer( part_name, action_id );
@@ -478,7 +469,7 @@ class Construction
 	}
 	
 	//take materials when building
-	protected void TakeMaterials( string part_name )
+	protected void TakeMaterialsServer( string part_name )
 	{
 		string main_part_name = GetConstructionPart( part_name ).GetMainPartName();
 		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "Materials";
@@ -528,7 +519,7 @@ class Construction
 	}
 	
 	//receive materials when dismantling
-	protected void ReceiveMaterials( string part_name )
+	protected void ReceiveMaterialsServer( string part_name )
 	{
 		ConstructionPart construction_part = GetConstructionPart( part_name );
 		string main_part_name = construction_part.GetMainPartName();
@@ -537,9 +528,6 @@ class Construction
 		if ( GetGame().ConfigIsExisting( cfg_path ) )
 		{
 			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
-			
-			//1. client update
-			GetGame().RemoteObjectTreeDelete(GetParent());
 			
 			for ( int i = 0; i < child_count; i++ )
 			{
@@ -575,9 +563,7 @@ class Construction
 						//detach if base
 						if ( construction_part.IsBase() )
 						{
-							GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
-							// restore network for dropped attachment (@NOTE: won't be restored by 2. as it's not in hierarchy anymore) 
-							GetGame().RemoteObjectTreeCreate( attachment );
+							GetParent().GetInventory().DropEntity( InventoryMode.PREDICTIVE, GetParent(), attachment );
 						}
 					}
 				}
@@ -618,7 +604,7 @@ class Construction
 						slot_id = InventorySlots.GetSlotIdFromString( slot_name );
 						InventoryLocation attLoc = new InventoryLocation;
 						attLoc.SetAttachment(GetParent(), null, slot_id);
-						attachment = ItemBase.Cast( GetParent().GetInventory().LocationCreateLocalEntity( attLoc, type, ECE_IN_INVENTORY, RF_DEFAULT ) ); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
+						attachment = ItemBase.Cast( GetParent().GetInventory().LocationCreateEntity( attLoc, type, ECE_IN_INVENTORY, RF_DEFAULT ) ); // @NOTE: cannot create non-local vehicle here, this would collide with RemoteObjectTreeDel/Cre
 						if ( attachment && quantity > 0 ) 					//object was deleted or the quantity is ignored
 						{
 							attachment.SetQuantity( quantity );
@@ -626,14 +612,64 @@ class Construction
 					}
 				}
 			}
-			
-			//2. client update
-			GetGame().RemoteObjectTreeCreate( GetParent() );	
 		}
 	}
 	
+	//receive materials when dismantling
+	void ReceiveMaterialsClient( string part_name )
+	{
+		ConstructionPart construction_part = GetConstructionPart( part_name );
+		string main_part_name = construction_part.GetMainPartName();
+		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "Materials";
+		
+		if ( GetGame().ConfigIsExisting( cfg_path ) )
+		{
+			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
+			
+			for ( int i = 0; i < child_count; i++ )
+			{
+				string child_name;
+				GetGame().ConfigGetChildName( cfg_path, i, child_name );
+				
+				//get type, quantity from material
+				string config_path;
+				string type;
+				string slot_name;
+				config_path = cfg_path + " " + child_name + " " + "type";
+				GetGame().ConfigGetText( config_path, type );
+				config_path = cfg_path + " " + child_name + " " + "slot_name";
+				GetGame().ConfigGetText( config_path, slot_name );
+				config_path = cfg_path + " " + child_name + " " + "quantity";
+				float quantity = GetGame().ConfigGetFloat( config_path );
+				config_path = cfg_path + " " + child_name + " " + "lockable";
+				bool lockable = GetGame().ConfigGetInt( config_path );
+				
+				//receive material quantity
+				ItemBase attachment = ItemBase.Cast( GetParent().FindAttachmentBySlotName( slot_name ) );
+				int slot_id;
+				
+				//material still attached
+				if ( lockable )			//if lockable 
+				{
+					if ( attachment )
+					{
+						InventoryLocation inventory_location = new InventoryLocation;
+						attachment.GetInventory().GetCurrentInventoryLocation( inventory_location );
+						GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
+						
+						//detach if base
+						if ( construction_part.IsBase() )
+						{
+							GetParent().GetInventory().DropEntity( InventoryMode.PREDICTIVE, GetParent(), attachment );
+						}
+					}
+				}
+			}
+		}
+	}	
+		
 	//destroy lockable materials when destroying
-	protected void DestroyMaterials( string part_name )
+	protected void DestroyMaterialsServer( string part_name )
 	{
 		string main_part_name = GetConstructionPart( part_name ).GetMainPartName();
 		string cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "Construction" + " " + main_part_name + " " + part_name + " " + "Materials";
@@ -641,9 +677,6 @@ class Construction
 		if ( GetGame().ConfigIsExisting( cfg_path ) )
 		{
 			int	child_count = GetGame().ConfigGetChildrenCount( cfg_path );
-			
-			//1. client update
-			GetGame().RemoteObjectTreeDelete(GetParent());
 			
 			for ( int i = 0; i < child_count; i++ )
 			{
@@ -679,13 +712,20 @@ class Construction
 					}
 				}
 			}
-			
-			//2. client update
-			GetGame().RemoteObjectTreeCreate(GetParent());	
 		}
 	}
 	
 	//drop materials when dismantling part that will prevent other parts to be built
+	void DropNonUsableMaterialsServer( string part_name )
+	{
+		DropNonUsableMaterials( part_name );
+	}
+	
+	void DropNonUsableMaterialsClient( string part_name )
+	{
+		DropNonUsableMaterials( part_name );
+	}	
+	
 	protected void DropNonUsableMaterials( string part_name )
 	{
 		ConstructionPart construction_part = GetConstructionPart( part_name );
@@ -700,9 +740,6 @@ class Construction
 		
 		if ( platform_support.Length() > 0 )
 		{
-			//1. client update
-			GetGame().RemoteObjectTreeDelete( GetParent() );
-
 			string at_cfg_path = "cfgVehicles" + " " + GetParent().GetType() + " "+ "GUIInventoryAttachmentsProps";
 			
 			if ( GetGame().ConfigIsExisting( at_cfg_path ) )
@@ -733,18 +770,12 @@ class Construction
 								GetParent().GetInventory().SetSlotLock( inventory_location.GetSlot() , false );
 								
 								//detach if base
-								GetParent().GetInventory().DropEntity( InventoryMode.LOCAL, GetParent(), attachment );
-								
-								//restore network for dropped attachment (@NOTE: won't be restored by 2. as it's not in hierarchy anymore) 
-								GetGame().RemoteObjectTreeCreate( attachment );
+								GetParent().GetInventory().DropEntity( InventoryMode.PREDICTIVE, GetParent(), attachment );
 							}
 						}
 					}
 				}
 			}
-
-			//2. client update
-			GetGame().RemoteObjectTreeCreate( GetParent() );
 		}
 	}
 	

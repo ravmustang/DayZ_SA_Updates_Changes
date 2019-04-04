@@ -21,11 +21,9 @@ class Weapon_Base extends Weapon
 	protected ref WeaponFSM m_fsm;	/// weapon state machine
 	protected bool m_isJammed = false;
 	protected bool m_LiftWeapon = false;
-	protected bool m_canEnterIronsights = true; /// if false, weapon goes straight into optics view
 	protected int m_weaponAnimState = -1; /// animation state the weapon is in, -1 == uninitialized
 	protected float m_DmgPerShot;
 	protected float m_WeaponLength;
-	protected ref array<string> m_ironsightsExcludingOptics = new array<string>; /// optics that go straight into optics view (skip ironsights)
 	ref array<float> m_DOFProperties = new array<float>;
 	ref array<float> m_ChanceToJam = new array<float>;
 	protected float m_ChanceToJamSync = 0;
@@ -37,7 +35,6 @@ class Weapon_Base extends Weapon
 		m_DmgPerShot = ConfigGetFloat("damagePerShot");
 		
 		InitWeaponLength();
-		InitExcludedScopesArray(m_ironsightsExcludingOptics);
 		InitDOFProperties(m_DOFProperties);
 		if(GetGame().IsServer())
 		{
@@ -138,7 +135,7 @@ class Weapon_Base extends Weapon
 
 	bool CanChamberBullet (int muzzleIndex, Magazine mag)
 	{
-		return CanChamberFromMag(muzzleIndex, mag) && (!IsChamberFull(muzzleIndex) || IsChamberFiredOut(muzzleIndex)) );
+		return CanChamberFromMag(muzzleIndex, mag) && (!IsChamberFull(muzzleIndex) || IsChamberFiredOut(muzzleIndex) || !IsInternalMagazineFull(muzzleIndex)) );
 	}
 
 	void SetWeaponAnimState (int state)
@@ -405,7 +402,6 @@ class Weapon_Base extends Weapon
 		super.EEItemAttached(item, slot_name);
 
 		if ( GetPropertyModifierObject() ) 	GetPropertyModifierObject().UpdateModifiers();
-		if ( ItemOptics.Cast(item) ) 		OpticsAllowsIronsightsCheck(ItemOptics.Cast(item));
 	}
 
 	override void EEItemDetached (EntityAI item, string slot_name)
@@ -413,7 +409,6 @@ class Weapon_Base extends Weapon
 		super.EEItemDetached(item, slot_name);
 
 		if ( GetPropertyModifierObject() ) 	GetPropertyModifierObject().UpdateModifiers();
-		if ( ItemOptics.Cast(item) ) 		m_canEnterIronsights = true;
 	}
 	
 	override void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner)
@@ -498,41 +493,14 @@ class Weapon_Base extends Weapon
 		
 		return Math.Round((item_wetness + 1) * (ConfWeight + AttachmentWeight));
 	}
-	
-	//! Initializes list of optics, that do not allow ironsights camera for the weapon
-	bool InitExcludedScopesArray (out array<string> temp_array)
-	{
-		if (GetGame().ConfigIsExisting("cfgWeapons " + GetType() + " ironsightsExcludingOptics"))
-		{
-			GetGame().ConfigGetTextArray("cfgWeapons " + GetType() + " ironsightsExcludingOptics",temp_array);
-			return true;
-		}
-		return false;
-	}
-	
-	//! Checks if attached optic allows ironsights, sets m_canEnterIronsights accordingly
-	void OpticsAllowsIronsightsCheck (ItemOptics optic)
-	{
-		if (!optic)
-		{
-			m_canEnterIronsights = true;
-			return;
-		}
-		string type = optic.GetType();
-		int can;
-		can = m_ironsightsExcludingOptics.Find(type);
-		if (can > -1)
-		{
-			m_canEnterIronsights = false;
-			return;
-		}
-		
-		m_canEnterIronsights = true;
-	}
-	
+			
 	bool CanEnterIronsights ()
 	{
-		return m_canEnterIronsights;
+		ItemOptics optic = GetAttachedOptics();
+		if( !optic )
+			return true;
+		
+		return optic.HasWeaponIronsightsOverride();
 	}
 	
 	//! Initializes DOF properties for weapon's ironsight/optics cameras
@@ -625,16 +593,17 @@ class Weapon_Base extends Weapon
 			direction = GetGame().GetCurrentCameraDirection(); // exception for freelook. Much better this way!
 		}
 		
-		idx = player.GetBoneIndexByName("Neck");
+		idx = player.GetBoneIndexByName("Neck"); //RightHandIndex1
 		if ( idx == -1 )
 			{ start = player.GetPosition()[1] + 1.5; }
 		else
 			{ start = player.GetBonePositionWS(idx); }
 		
 		//distance = vector.Distance(usti_hlavne_position,trigger_axis_position) + 0.1;
-		//usti_hlavne_position = ModelToWorld(usti_hlavne_position);
-		//distance = vector.Distance(start,usti_hlavne_position);
-		distance = m_WeaponLength - 0.05; //adjusted raycast length
+		//! snippet below measures distance from "RightHandIndex1" bone for lifting calibration
+		/*usti_hlavne_position = ModelToWorld(usti_hlavne_position);
+		distance = vector.Distance(start,usti_hlavne_position);*/
+		distance = m_WeaponLength;// - 0.05; //adjusted raycast length
 
 		// if weapon has battel attachment, does longer cast
 		if (ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonet")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetAK")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetMosin")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetSKS")) || ItemBase.CastTo(attachment,GetAttachedSuppressor()))
@@ -666,6 +635,62 @@ class Weapon_Base extends Weapon
 	void SetSyncJammingChance( float jamming_chance )
 	{
 		m_ChanceToJamSync = jamming_chance;
+	}
+	
+	/**@fn		EjectCartridge
+	 * @brief	unload bullet from chamber or internal magazine
+	 *
+	 * @NOTE: 	EjectCartridge = GetCartridgeInfo + PopCartridge
+	 *
+	 * @param[in] muzzleIndex
+	 * @param[out] ammoDamage \p  damage of the ammo
+	 * @param[out] ammoTypeName \p	 type name of the ejected ammo
+	 * @return	true if bullet removed from chamber
+	 **/
+	bool EjectCartridge (int muzzleIndex, out float ammoDamage, out string ammoTypeName)
+	{
+		if (IsChamberEjectable(muzzleIndex))
+		{
+			if (PopCartridgeFromChamber(muzzleIndex, ammoDamage, ammoTypeName))
+				return true;
+		}
+		else if (GetInternalMagazineCartridgeCount(muzzleIndex) > 0)
+		{
+			if (PopCartridgeFromInternalMagazine(muzzleIndex, ammoDamage, ammoTypeName))
+				return true;
+		}
+		return false;
+	}
+	
+	bool CopyWeaponStateFrom (notnull Weapon_Base src)
+	{
+		float damage = 0.0;
+		string type;
+
+		for (int mi = 0; mi < src.GetMuzzleCount(); ++mi)
+		{
+			if (!src.IsChamberEmpty(mi))
+			{
+				if (src.GetCartridgeInfo(mi, damage, type))
+				{
+					PushCartridgeToChamber(mi, damage, type);
+				}
+			}
+			
+			for (int ci = 0; ci < src.GetInternalMagazineCartridgeCount(mi); ++ci)
+			{
+				if (src.GetInternalMagazineCartridgeInfo(mi, ci, damage, type))
+				{
+					PushCartridgeToInternalMagazine(mi, damage, type);
+				}
+			}
+		}
+		
+		int dummy_version = int.MAX;
+		ScriptReadWriteContext ctx = new ScriptReadWriteContext;
+		src.OnStoreSave(ctx.GetWriteContext());
+		OnStoreLoad(ctx.GetReadContext(), dummy_version);
+		return true;
 	}
 };
 

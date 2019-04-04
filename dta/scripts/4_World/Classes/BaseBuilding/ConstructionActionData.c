@@ -151,23 +151,9 @@ class ConstructionActionData
 		m_CombinationLock = CombinationLock.Cast( combination_lock );
 	}
 		
-	void SetNextDialIndex()
+	void SetNextCombinationLockDial()
 	{
-		if ( m_CombinationLock.COMBINATION_LENGTH > 1 )
-		{
-			if ( m_DialIndex <= m_CombinationLock.COMBINATION_LENGTH - 2 )
-			{
-				m_DialIndex++;
-			}
-			else if ( m_DialIndex >= m_CombinationLock.COMBINATION_LENGTH >  - 1 )
-			{
-				m_DialIndex = 0;
-			}
-		}
-		else
-		{
-			m_DialIndex = 0;
-		}
+		m_CombinationLock.SetNextDial( m_DialIndex );
 	}
 
 	string GetDialNumberText()
@@ -202,7 +188,7 @@ class ConstructionActionData
 	//************************************************/
 	//  Attach/Detach actions
 	//************************************************/	
-	int GetAttachmentSlotFromSelection( EntityAI target, ItemBase item_to_attach, string selection )
+	int GetAttachmentSlotFromSelection( PlayerBase player, EntityAI target, ItemBase item_to_attach, string selection )
 	{
 		string cfg_path = "cfgVehicles" + " " + target.GetType() + " "+ "GUIInventoryAttachmentsProps";
 		
@@ -231,10 +217,14 @@ class ConstructionActionData
 						for ( int k = 0; k < item_slot_count; ++k )
 						{
 							int item_slot_id = item_to_attach.GetInventory().GetSlotId( k );
+							ItemBase attachment_item = ItemBase.Cast( target.GetInventory().FindAttachment( item_slot_id ) );
 							
 							if ( target_slot_id == item_slot_id )
 							{
-								return item_slot_id;
+								if (  target.GetInventory().CanAddAttachmentEx( item_to_attach, item_slot_id ) && target.CanReceiveAttachment( item_to_attach, item_slot_id ) || attachment_item && attachment_item.CanBeCombined( item_to_attach, player ) )
+								{
+									return item_slot_id;
+								}								
 							}
 						}
 					}

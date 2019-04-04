@@ -1,5 +1,6 @@
 class CacheObject
 {
+	
 	ref array<int> m_Recipes;
 	ref array<int> m_RecipeMasks;
 	ref array<int> m_RecipeBitCount;
@@ -11,11 +12,17 @@ class CacheObject
 		m_RecipeBitCount = new array<int>;
 	}
 
-	void AddRecipe(int recipe, int mask)
+	bool AddRecipe(int recipe, int mask)
 	{
+		if(IsContainRecipe(recipe))
+		{
+			UpdateMask( recipe, mask );
+			return false;
+		}
 		m_Recipes.Insert(recipe);
 		m_RecipeMasks.Insert(mask);
 		m_RecipeBitCount.Insert(GetNumberOfSetBits(mask));
+		return true;
 	}
 
 	void UpdateMask(int recipe_id, int new_mask)

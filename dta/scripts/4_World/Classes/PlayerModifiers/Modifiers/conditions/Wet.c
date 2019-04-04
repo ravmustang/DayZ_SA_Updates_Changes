@@ -23,6 +23,7 @@ class WetMdfr: ModifierBase
 		return false;
 	}
 
+
 	override void OnActivate(PlayerBase player)
 	{
 		if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(eNotifiers.NTF_WETNESS);
@@ -37,5 +38,17 @@ class WetMdfr: ModifierBase
 	override void OnDeactivate(PlayerBase player)
 	{
 		if( player.m_NotifiersManager ) player.m_NotifiersManager.DetachByType(eNotifiers.NTF_WETNESS);
+	}
+	
+	override string GetDebugText()
+	{
+		string wetness = m_Player.GetStatWet().Get().ToString();
+		string wetness_min = m_Player.GetStatWet().GetMin().ToString();
+		return "wetness:"+wetness+" | " +"wetness min:"+wetness_min;
+	}
+	
+	override string GetDebugTextSimple()
+	{
+		return "";
 	}
 };

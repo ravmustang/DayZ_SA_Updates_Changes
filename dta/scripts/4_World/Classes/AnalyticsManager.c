@@ -20,7 +20,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionEat()
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnActionEat();
 		#endif
 	}
@@ -30,7 +30,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionDrink()
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnActionDrink();
 		#endif
 	}
@@ -40,7 +40,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionCookedSteak()
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnCookedSteak();
 		#endif
 	}
@@ -50,7 +50,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionFinishedShaveSelf()
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnActionShave();
 		#endif
 	}
@@ -60,7 +60,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionFinishedGutDeer()
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnActionGutDeer();
 		#endif
 	}
@@ -70,7 +70,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionRestrain()
 	{		
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnActionHandcuff();
 		#endif
 	}
@@ -80,7 +80,7 @@ class AnalyticsManager
 	//===================================
 	static void OnActionBandageTarget()
 	{		
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 			AchievementsXbox.OnActionMedsSurvivor();
 		#endif
 	}
@@ -103,7 +103,7 @@ class AnalyticsManager
 				for ( int i = 0; i < GEAR_COUNT; ++i )
 				{
 					int slot_id = InventorySlots.GetSlotIdFromString(m_FullGear[i]);
-					EntityAI att_item = player.GetInventory().FindAttachment( slot_id );
+					EntityAI att_item = player.GetInventory().FindAttachment( slot_id ); // Boris V [27.2.2019]: Consider using player.GetItemOnSlot(m_FullGear[i]) instead.
 					
 					if ( !att_item )
 					{
@@ -148,7 +148,7 @@ class AnalyticsManager
 	//===================================
 	static void Event_OnEntityKilled(EntityAI victim, EntityAI killer, EntityAI source, bool is_headshot)
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 		// Xbox Achievement
 		if ( killer != null && killer.IsPlayer() && killer.GetID() == GetGame().GetPlayer().GetID() )
 		{

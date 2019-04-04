@@ -258,10 +258,11 @@ void DayZPlayerTypeRegisterSounds(DayZPlayerType pType)
 	if(GetGame().IsClient() || !GetGame().IsMultiplayer())//attachments don't generate noise, so we can ignore them on server
 		pType.RegisterSoundEvent("SoundAttachment", 0.2);
 	
-	pType.RegisterParticleEvent("Particle", -1);
+	
 
 	if(GetGame().IsClient() || !GetGame().IsMultiplayer())//sounds are unnecessary on server
 	{
+		pType.RegisterParticleEvent("Particle", -1);
 		//! load and register step sound lookup table
 		DayZPlayerTypeStepSoundLookupTableImpl stepTable = DayZPlayerTypeStepSoundLookupTableImpl.GetInstance();
 		pType.RegisterStepSoundLookupTable(stepTable);

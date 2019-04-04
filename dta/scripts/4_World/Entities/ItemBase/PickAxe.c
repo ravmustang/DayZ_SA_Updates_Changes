@@ -4,4 +4,9 @@ class PickAxe extends ItemBase
 	{
 		return true;
 	}
+
+	override bool IsMeleeFinisher()
+	{
+		return true;
+	}
 }	

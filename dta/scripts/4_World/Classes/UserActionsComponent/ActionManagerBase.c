@@ -227,7 +227,7 @@ class ActionManagerBase
 	//------------------------------------------------------
 	bool ActionPossibilityCheck(int pCurrentCommandID)
 	{
-		if ( m_Player.IsSprinting() || m_Player.IsUnconscious() || m_Player.GetCommandModifier_Action() || m_Player.GetCommand_Action() || m_Player.IsPlayingEmote() || ( m_Player.GetCommand_Move() && m_Player.GetCommand_Move().IsOnBack() ) )
+		if ( m_Player.IsSprinting() || m_Player.IsUnconscious() || m_Player.GetCommandModifier_Action() || m_Player.GetCommand_Action() || m_Player.IsPlayingEmote() )
 			return false;
 		
 		if (pCurrentCommandID == DayZPlayerConstants.COMMANDID_ACTION || pCurrentCommandID == DayZPlayerConstants.COMMANDID_MOVE || pCurrentCommandID == DayZPlayerConstants.COMMANDID_SWIM || pCurrentCommandID == DayZPlayerConstants.COMMANDID_LADDER || pCurrentCommandID == DayZPlayerConstants.COMMANDID_VEHICLE)

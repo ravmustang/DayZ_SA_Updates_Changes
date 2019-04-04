@@ -11,6 +11,7 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 	protected 	bool 			m_isEntering 	= false;
 	protected 	Weapon_Base		m_weaponUsed;
 	protected 	ItemOptics 		m_opticsUsed;
+	protected	bool			m_opticsHasWeaponOverride = false;
 	protected ref array<float> 	temp_array;
 
 	//! camera dynamics
@@ -35,6 +36,7 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 			Print("DayZPlayerCamera1stPerson: main bone not found");
 		}
 
+		SetupSightEntities();
 		GetCurrentSightInfo(m_OpticsCamPos, m_OpticsCamDir);
 		m_isEntering = true;
 		m_WeaponSwayModifier = 0.2;
@@ -49,6 +51,27 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		m_movementFrequencyY = 2;
 	}
 	
+	void SetupSightEntities()
+	{		
+		EntityAI inHands = m_pPlayer.GetHumanInventory().GetEntityInHands();
+		if (inHands)
+		{
+			m_weaponUsed = Weapon_Base.Cast(inHands);
+			if( m_weaponUsed )
+			{
+				m_opticsUsed = m_weaponUsed.GetAttachedOptics();
+				if( m_opticsUsed )
+				{
+					m_opticsHasWeaponOverride = m_opticsUsed.HasWeaponIronsightsOverride();
+				}
+			}
+			else
+			{
+				m_opticsUsed = ItemOptics.Cast(inHands);
+			}
+		}
+	}
+	
 	//
 	override void OnActivate (DayZPlayerCamera pPrevCamera, DayZPlayerCameraResult pPrevCameraResult)
 	{
@@ -61,22 +84,24 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 
 	EntityAI GetCurrentSightEntity ()
 	{
-		EntityAI inHands = m_pPlayer.GetHumanInventory().GetEntityInHands();
-		if (inHands)
-		{
-			m_weaponUsed = Weapon_Base.Cast(inHands);
-			return m_weaponUsed;
-		}
-		return null;
+		if( m_opticsHasWeaponOverride )
+			return m_opticsUsed;
+		
+		return m_weaponUsed;
 	}
 
 	bool GetCurrentSightInfo (out vector camPos, out vector camDir)
 	{
 		EntityAI e = GetCurrentSightEntity();
-		if (e)
+		if( e == m_weaponUsed )
 		{
-			m_weaponUsed = Weapon_Base.Cast(e);
 			m_weaponUsed.GetCameraPoint(m_weaponUsed.GetCurrentMuzzle(), camPos, camDir);
+			return true;
+		}
+		else if( e == m_opticsUsed )
+		{
+			m_opticsUsed.UseWeaponIronsightsOverride(m_opticsHasWeaponOverride);
+			m_opticsUsed.GetCameraPoint(camPos, camDir);
 			return true;
 		}
 		return false;
@@ -198,11 +223,16 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 			PPEffects.ResetPPMask();
 			//PPEffects.AddPPMask(0.5, 0.5, 0.3, 0.05);
 			PPEffects.SetLensEffect(0, 0, 0, 0);
-			if (m_weaponUsed.GetWeaponDOF())
+			if (m_weaponUsed.GetWeaponDOF() || (m_opticsUsed && m_opticsUsed.GetOpticsDOF()))
 			{
-				//temp_array = new array<float>;
-				//temp_array.Clear();
-				temp_array = m_weaponUsed.GetWeaponDOF();
+				if (m_opticsUsed && m_opticsUsed.GetOpticsDOF().Count() == 6)
+				{
+					temp_array = m_opticsUsed.GetOpticsDOF();
+				}
+				else
+				{
+					temp_array = m_weaponUsed.GetWeaponDOF();
+				}
 				if (temp_array.Count() == 6)
 					PPEffects.OverrideDOF(temp_array[0],temp_array[1],temp_array[2],temp_array[3],temp_array[4],temp_array[5]);
 			}
@@ -226,6 +256,10 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		{
 			//Print("---ironsights---DayZPlayerCamera1stPerson");
 			m_CameraPPDelay = DayZPlayerCameras.TIME_CAMERACHANGE_01;
+		}
+		else if (pPrevCamera.GetCameraName() == "DayZPlayerCameraOptics")
+		{
+			m_CameraPPDelay = 0;
 		}
 		else
 		{
@@ -265,39 +299,20 @@ class DayZPlayerCameraOptics : DayZPlayerCameraIronsights
 	
 	override EntityAI GetCurrentSightEntity ()
 	{
-		EntityAI inHands = m_pPlayer.GetHumanInventory().GetEntityInHands();
-		if (inHands)
-		{
-			m_opticsUsed = ItemOptics.Cast(inHands);
-			if (m_opticsUsed)
-				return m_opticsUsed;
-			else
-			{
-				m_weaponUsed = Weapon_Base.Cast(inHands);
-				if (m_weaponUsed)
-				{
-					m_opticsUsed = m_weaponUsed.GetAttachedOptics();
-					return m_opticsUsed;
-				}
-			}
-		}
-		return null;
+		return m_opticsUsed;
 	}
 
 	override bool GetCurrentSightInfo (out vector camPos, out vector camDir)
 	{
-		//super.GetCurrentSightInfo(inout camPos, inout CamDir);		
-		
-		EntityAI e = GetCurrentSightEntity();
-		if (e)
+		if (m_opticsUsed)
 		{
-			m_opticsUsed = ItemOptics.Cast(e);
+			m_opticsUsed.UseWeaponIronsightsOverride(false);
 			m_opticsUsed.GetCameraPoint(camPos, camDir);
 			return true;
 		}
 		return false;
 	}
-	
+
 	override void OnActivate (DayZPlayerCamera pPrevCamera, DayZPlayerCameraResult pPrevCameraResult)
 	{
 		super.OnActivate(pPrevCamera,pPrevCameraResult);

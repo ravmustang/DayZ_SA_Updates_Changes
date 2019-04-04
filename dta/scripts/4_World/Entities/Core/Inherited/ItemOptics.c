@@ -10,6 +10,7 @@ class ItemOptics extends InventoryItemSuper
 	string 				m_optic_sight_material;
 	ref array<float> 	m_mask_array;
 	ref array<float> 	m_lens_array;
+	ref array<float> 	m_OpticsDOFProperties = new array<float>;
 		
 	void ItemOptics()
 	{
@@ -17,43 +18,69 @@ class ItemOptics extends InventoryItemSuper
 		m_lens_array = new array<float>;
 		InitReddotData();
 		InitOpticsPPInfo();
+		InitOpticsDOFProperties(m_OpticsDOFProperties);
 	}
+	
 	/**@fn		EnterOptics
 	 * @brief	switches to optics mode if possible
 	 * @return true if success, false otherwise
 	 **/
 	proto native bool EnterOptics ();
+	
 	/**@fn		IsInOptics
 	 * @brief	is weapon in optics mode or not
 	 * @return true if in optics mode, false otherwise
 	 **/
 	proto native bool IsInOptics ();
+	
 	/**@fn		ExitOptics
 	 * @brief	switches out of optics mode (if possible)
 	 * @return true if success, false otherwise
 	 **/
 	proto native bool ExitOptics ();
 
-	/**@fn		GetStepFOVCount
+	/**@fn		HasWeaponIronsightsOverride
+	 * @brief	is weapon in optics mode or not
+	 * @return true if optics has defined override optics info for weapon
+	 **/
+	proto native bool HasWeaponIronsightsOverride ();
+	
+	/**@fn		UseWeaponIronsightsOverride
+	 * @brief	switches into ironsights override settings
+	 * @return  true if switching was successful
+	 **/
+	proto native bool UseWeaponIronsightsOverride(bool state);
+
+	/**@fn		IsUsingWeaponIronsightsOverride
+	 * @brief	is optics using ironsights override settings or not
+	 * @return  true if optics is using ironsights override settings
+	 **/
+	proto native bool IsUsingWeaponIronsightsOverride();
+
+		/**@fn		GetStepFOVCount
 	 * @brief	returns number of configured steps
 	 **/
 	proto native int GetStepFOVCount ();
+	
 	/**@fn		GetStepZoom
 	 * @brief	returns position of currently used value in discreteFov config array
 	 * @return	position of currently used value in discreteFov config array
 	 **/
 	proto native int GetStepFOVIndex ();
+	
 	/**@fn		SetStepZoom
 	 * @brief sets zoom to fov value defined at given position in discreteFov config array
 	 * @param[in] index of configured step, range [0..cfg_max]
 	 * @return	true if zoom set
 	 **/
 	proto native bool SetStepFOVIndex (int step);
+	
 	/**@fn		StepZoomIn
 	 * @brief sets zoom to next defined (respective to current) value in zoom fov config array
 	 * @return	true if zoom set
 	 **/
 	proto native bool StepFOVUp ();
+	
 	/**@fn		StepZoomOut
 	 * @brief	sets zoom to previous (respective to current) defined value in zoom fov config array
 	 * @return	true if zoom set
@@ -70,18 +97,21 @@ class ItemOptics extends InventoryItemSuper
 	 * @return	 position of currently used value in zeroing config array
 	 **/
 	proto native int GetStepZeroing ();
+	
 	/**@fn		SetZeroing
 	 * @brief sets zeroing to value defined at given position in zeroing config array
 	 * @param[in] index of zeroing to set [0..cfg_max]
 	 * @return	true if zeroing set
 	 **/
 	proto native bool SetStepZeroing (int step);
+	
 	/**
 	 * @fn		StepZeroingUp
 	 * @brief sets zeroing to next defined (respective to current) value in zeroing config array
 	 * @return true if zeroing set
 	 **/
 	proto native bool StepZeroingUp ();
+	
 	/**
 	 * @fn		StepZeroingDown
 	 * @brief	sets zeroing to previous (respective to current) defined value in zeroing config array
@@ -89,7 +119,43 @@ class ItemOptics extends InventoryItemSuper
 	 **/
 	proto native bool StepZeroingDown ();
 	
+	/**
+	 * @fn		GetCameraPoint
+	 * @brief	gets camera position & direction in model space of optics entity
+	 **/
 	proto native void GetCameraPoint (out vector pos, out vector dir);
+	
+	/**
+	 * @fn		GetZoomInit
+	 * @brief	gets FOV value, when entering optics
+	 **/
+	proto native float GetZoomInit();
+
+	/**
+	 * @fn		GetZoomMin
+	 * @brief	gets FOV minimum
+	 **/
+	proto native float GetZoomMin();
+
+	/**
+	 * @fn		GetZoomMax
+	 * @brief	gets FOV maximum
+	 **/
+	proto native float GetZoomMax();
+
+	/**
+	 * @fn		GetZeroingDistanceZoomMin
+	 * @brief	Gets Zeroing distance at opticsZoomMin
+	 **/
+	proto native float GetZeroingDistanceZoomMin();
+	
+	/**
+	 * @fn		GetZeroingDistanceZoomMax
+	 * @brief	Gets Zeroing distance at opticsZoomMax
+	 **/
+	proto native float GetZeroingDistanceZoomMax();
+
+
 	
 	/*override void EEItemAttached(EntityAI item, string slot_name)
 	{
@@ -260,6 +326,17 @@ class ItemOptics extends InventoryItemSuper
 		blur_float = GetGame().ConfigGetFloat(path + " PPBlurProperties");
 	}
 	
+	//! Initializes DOF properties for optic's alternate ironsights (ACOG etc.)
+	bool InitOpticsDOFProperties (out array<float> temp_array)
+	{
+		if (GetGame().ConfigIsExisting("cfgVehicles " + GetType() + " OpticsInfoWeaponOverride PPDOFProperties"))
+		{
+			GetGame().ConfigGetFloatArray("cfgVehicles " + GetType() + " OpticsInfoWeaponOverride PPDOFProperties", temp_array);
+			return true;
+		}
+		return false;
+	}
+	
 	bool AllowsDOF()
 	{
 		return m_allowsDOF;
@@ -270,6 +347,10 @@ class ItemOptics extends InventoryItemSuper
 		return m_isNVOptic;
 	}
 	
+	ref array<float> GetOpticsDOF ()
+	{
+		return m_OpticsDOFProperties;
+	}
 	ref array<float> GetOpticsPPMask()
 	{
 		return m_mask_array;

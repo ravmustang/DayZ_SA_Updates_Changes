@@ -79,6 +79,7 @@ class CZ527_JAM_BU1_MA0 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 class CZ527_JAM_BU1_MA1 extends WeaponStateJammed
 {
@@ -88,10 +89,11 @@ class CZ527_JAM_BU1_MA1 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 
 
-class CZ527 : BoltRifle_Base
+class CZ527_Base : BoltActionRifle_Base
 {
 	ref WeaponStateBase C00;
 	ref	WeaponStateBase C10;
@@ -416,8 +418,4 @@ class CZ527 : BoltRifle_Base
 
 		m_fsm.Start();
 	}
-	
-	
-	
-	
 };

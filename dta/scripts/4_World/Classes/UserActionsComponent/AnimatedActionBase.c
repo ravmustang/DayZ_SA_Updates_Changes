@@ -34,10 +34,7 @@ class ActionBaseCB : HumanCommandActionCallback
 			
 			if(action)
 				action.End(m_ActionData);
-			
 		}
-
-		
 	}
 	
 	void SetCommand( int command_uid )

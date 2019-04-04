@@ -78,6 +78,16 @@ class CarWheel extends InventoryItemSuper
 	}
 */
 
+	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
+	{
+		Print("CarWheel>>> EEHitBy");
+		Print( dmgZone );
+		Print( damageResult );
+		Print( source );
+		Print( component );
+		Print( damageResult.GetDamage(dmgZone, "Health") );
+	}
+	
 	override void EEKilled(Object killer)
 	{
 		string newWheel = "";
@@ -133,15 +143,25 @@ class HatchbackWheel extends CarWheel {};
 
 class CarDoor extends InventoryItemSuper
 {
-/*
-	override bool CanDetachAttachment(EntityAI attachment)
+
+	override bool CanDetachAttachment(EntityAI parent)
 	{
-		if ( GetCarDoorsState( "Driver" ) == CarDoorState.DOORS_OPEN )
+		//parent.FindAtt
+		InventoryLocation loc = new InventoryLocation();
+		
+		bool isPresent = GetInventory().GetCurrentInventoryLocation( loc );
+		
+		if ( !isPresent )
+		 return false;
+		
+		string slotName = InventorySlots.GetSlotName( loc.GetSlot() );
+
+		if ( slotName && CarScript.Cast( parent ).GetCarDoorsState( slotName ) == CarDoorState.DOORS_OPEN )
 			return true;
 		
 		return false;
 	}
-*/
+
 
 /*
 	override void OnWasAttached( EntityAI parent, int slot_name )
@@ -290,4 +310,36 @@ typedef ItemGrenade GrenadeBase;
 //-----------------------------------------------------------------------------
 class ItemMap extends InventoryItemSuper
 {
+	
+	override void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner)
+	{
+		super.OnItemLocationChanged(old_owner,new_owner);
+		
+		SetMapStateOpen(false, PlayerBase.Cast(old_owner));
+	}
+	
+	//! displays open/closed selections; 1 == opened
+	void SetMapStateOpen(bool state, PlayerBase player)
+	{
+		if (state)
+		{
+			ShowSelection("map_opened");
+			HideSelection("map_closed");
+		}
+		else
+		{
+			ShowSelection("map_closed");
+			HideSelection("map_opened");
+		}
+		
+		if (player)
+			player.SetMapOpen(state);
+	}
+	
+	bool GetMapStateAnimation()
+	{
+		if (GetAnimationPhase("map_opened") == 0)
+			return true;
+		return false;
+	}
 };

@@ -42,12 +42,9 @@ class ActionGetInTransport: ActionInteractBase
 
 		if ( player.GetCommand_Vehicle() )
 			return false;
-		
-		//if ( !IsInReach(player, target, UAMaxDistances.DEFAULT) )
-		//	return false;
 
 		int componentIndex = target.GetComponentIndex();
-
+		
 		m_crewIdx = m_transport.CrewPositionIndex(componentIndex);
 		if ( m_crewIdx < 0 )
 			return false;
@@ -58,8 +55,18 @@ class ActionGetInTransport: ActionInteractBase
 		
 		if ( !m_transport.CrewCanGetThrough( m_crewIdx ) )
 			return false;
+
+		array<string> selections = new array<string>();
+
+		m_transport.GetActionComponentNameList( componentIndex, selections );
 		
-		return true;
+		for ( int i = 0; i < selections.Count(); i++ )
+		{
+			if ( m_transport.CanReachSeatFromDoors(selections[i], player.GetPosition(), 1.0) )
+				return true;
+		}
+
+		return false;
 	}
 
 	override void Start( ActionData action_data )

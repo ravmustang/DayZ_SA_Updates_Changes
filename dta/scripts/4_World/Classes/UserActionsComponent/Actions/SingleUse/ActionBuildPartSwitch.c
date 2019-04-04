@@ -34,7 +34,7 @@ class ActionBuildPartSwitch: ActionSingleUseBase
 				string main_part_name = targetObject.GetActionComponentName( target.GetComponentIndex() );
 				construction_action_data.RefreshPartsToBuild( main_part_name, item );
 				
-				if ( construction_action_data.GetConstructionPartsCount() > 1 && base_building.IsFacingBack( player, main_part_name ) )
+				if ( construction_action_data.GetConstructionPartsCount() > 1 && !base_building.IsFacingPlayer( player, main_part_name ) )
 				{
 					return true;
 				}

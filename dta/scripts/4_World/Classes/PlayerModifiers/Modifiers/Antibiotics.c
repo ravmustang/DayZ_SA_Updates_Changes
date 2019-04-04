@@ -1,7 +1,5 @@
 class AntibioticsMdfr: ModifierBase
 {
-	float 			m_LastWaterLevel;
-	ref HumanMovementState		m_MovementState	= new HumanMovementState();
 	float m_RegenTime;
 	const int ANTIBIOTICS_LIFETIME = 300;
 	const float ANTIBIOTICS_STRENGTH = 4;
@@ -25,6 +23,12 @@ class AntibioticsMdfr: ModifierBase
 	{
 		OnActivate(player);
 	}
+	
+	override string GetDebugText()
+	{
+		return (ANTIBIOTICS_LIFETIME - GetAttachedTime()).ToString();
+	}
+
 	
 	override void OnActivate(PlayerBase player)
 	{

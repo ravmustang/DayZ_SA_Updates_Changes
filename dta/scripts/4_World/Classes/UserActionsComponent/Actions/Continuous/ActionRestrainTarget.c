@@ -117,25 +117,13 @@ class ActionRestrainTarget: ActionContinuousBase
 		string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands_source);
 		if (item_in_hands_target)
 		{
-			Print("Restraining player with item in hands");
-			source_player.LocalDestroyEntityInHands();
-			
-			vector m4[4];
-			Math3D.MatrixIdentity4(m4);
-			GameInventory.PrepareDropEntityPos(source_player, item_in_hands_target, m4);
-			InventoryLocation target_gnd = new InventoryLocation;
-			target_gnd.SetGround(null, m4);
-		
-			EntityAI hcuff_locked = GameInventory.LocationCreateEntity(target_gnd, new_item_name,ECE_IN_INVENTORY,RF_DEFAULT);
-			target_player.ServerSwapEntities(hcuff_locked, item_in_hands_target);
-			target_player.SetRestrained(true);
+			Print("Restraining player with item in hands, drop first");
+			target_player.ServerDropEntity(item_in_hands_target);				
 		}
-		else
-		{
-			Print("Restraining player with empty hands");
-			RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player);
-			source_player.LocalReplaceItemInHandsWithNewElsewhere(lambda);
-		}		
+
+		Print("Restraining player with empty hands");
+		RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player);
+		source_player.LocalReplaceItemInHandsWithNewElsewhere(lambda);
 		
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}

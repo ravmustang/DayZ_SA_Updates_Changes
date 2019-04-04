@@ -114,7 +114,7 @@ class WeaponFireAndChamber extends WeaponFire
 			m_weapon.EjectCasing(mi);
 			m_weapon.SelectionBulletHide();
 
-			chamberFromAttachedMagazine(m_weapon, mi);
+			pushToChamberFromAttachedMagazine(m_weapon, mi);
 		}
 	}
 };
@@ -131,6 +131,8 @@ class WeaponFireAndChamberFromInnerMagazine extends WeaponFire
 			int mi = m_weapon.GetCurrentMuzzle();
 			m_weapon.EjectCasing(mi);
 			m_weapon.SelectionBulletHide();
+			
+			pushToChamberFromInnerMagazine(m_weapon, mi);
 		}
 	}
 };

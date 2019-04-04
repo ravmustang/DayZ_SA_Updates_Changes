@@ -12,6 +12,11 @@ class Fence extends BaseBuildingBase
 	const string SOUND_GATE_OPEN_START			= "DoorWoodTowerOpen_SoundSet";
 	const string SOUND_GATE_CLOSE_START			= "DoorWoodTowerClose_start_SoundSet";
 	const string SOUND_GATE_CLOSE_END			= "DoorWoodTowerClose_end_SoundSet";
+
+	//gate openining
+	const float GATE_ROTATION_ANGLE_DEG 			= 100;
+	
+	const float MIN_ACTION_DETECTION_ANGLE_RAD 		= 0.35;		//0.35 RAD = 20 DEG
 	
 	protected EffectSound m_SoundGate_Start;
 	protected EffectSound m_SoundGate_End;
@@ -113,10 +118,8 @@ class Fence extends BaseBuildingBase
 	{   
 		super.OnStoreSave( ctx );
 		
-		//has gate
-		ctx.Write( m_HasGate );		
-		
 		//write
+		ctx.Write( m_HasGate );
 		ctx.Write( m_IsOpened );
 	}
 	
@@ -127,27 +130,37 @@ class Fence extends BaseBuildingBase
 
 		//--- Fence data ---
 		//has gate
-		ConstructionPart gate_part = GetConstruction().GetGateConstructionPart();
 		if ( !ctx.Read( m_HasGate ) )
 		{
-			m_HasGate = gate_part.IsBuilt();
-		}		
+			m_HasGate = false;
+			return false;
+		}
 		
 		//is opened
 		if ( !ctx.Read( m_IsOpened ) )
 		{
 			m_IsOpened = false;
+			return false;
 		}
 		//---
 		
+		return true;
+	}
+	
+	override void AfterStoreLoad()
+	{	
+		super.AfterStoreLoad();
+		
+		//set gate state
+		ConstructionPart gate_part = GetConstruction().GetGateConstructionPart();
+		SetGateState( gate_part.IsBuilt() );
+		
 		//update gate state visual
-		if ( m_IsOpened )
+		if ( IsOpened() )
 		{
 			OpenFence();
 		}
-		
-		return true;
-	}
+	}	
 	
 	override void OnVariablesSynchronized()
 	{
@@ -228,10 +241,13 @@ class Fence extends BaseBuildingBase
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
 			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-			ConstructionActionData construction_action_data = player.GetConstructionActionData();
-			
-			//reset action initiator
-			construction_action_data.SetActionInitiator( NULL );
+			if ( player )
+			{
+				ConstructionActionData construction_action_data = player.GetConstructionActionData();
+				
+				//reset action initiator
+				construction_action_data.SetActionInitiator( NULL );				
+			}
 		}
 		//			
 		
@@ -309,9 +325,10 @@ class Fence extends BaseBuildingBase
 		//server or single player
 		if ( GetGame().IsServer() )
 		{
-			float value = 100;
+			float value = GATE_ROTATION_ANGLE_DEG;
 			SetAnimationPhase( "Wall_Interact_Rotate", 				value );
-			SetAnimationPhase( "Wall_Barbedwire_Mounted_Rotate", 	value );
+			SetAnimationPhase( "Wall_Barbedwire_1_Mounted_Rotate", 	value );
+			SetAnimationPhase( "Wall_Barbedwire_2_Mounted_Rotate", 	value );
 			SetAnimationPhase( "Wall_Camonet_Rotate", 				value );
 			SetAnimationPhase( "Wall_Gate_Rotate", 					value );
 			SetAnimationPhase( "Wall_Base_Down_Rotate", 			value );
@@ -342,7 +359,8 @@ class Fence extends BaseBuildingBase
 		{		
 			float value = 0;
 			SetAnimationPhase( "Wall_Interact_Rotate", 				value );
-			SetAnimationPhase( "Wall_Barbedwire_Mounted_Rotate", 	value );
+			SetAnimationPhase( "Wall_Barbedwire_1_Mounted_Rotate", 	value );
+			SetAnimationPhase( "Wall_Barbedwire_2_Mounted_Rotate", 	value );
 			SetAnimationPhase( "Wall_Camonet_Rotate", 				value );
 			SetAnimationPhase( "Wall_Gate_Rotate", 					value );
 			SetAnimationPhase( "Wall_Base_Down_Rotate", 			value );
@@ -381,22 +399,36 @@ class Fence extends BaseBuildingBase
 		}
 	}
 	
+	//Damage triggers
+	override void CreateAreaDamage( string slot_name, float rotation_angle = 0 )
+	{
+		if ( IsOpened() )
+		{
+			rotation_angle = 100;
+		}
+		
+		super.CreateAreaDamage( slot_name, rotation_angle );
+	}	
+	
 	//--- ACTION CONDITIONS
-	override bool IsFacingFront( PlayerBase player, string selection )
+	override bool IsFacingPlayer( PlayerBase player, string selection )
 	{
 		vector fence_pos = GetPosition();
 		vector player_pos = player.GetPosition();
-		vector fence_dir = GetDirection();
+		vector ref_dir = GetDirection();
 		
 		vector fence_player_dir = player_pos - fence_pos;
 		fence_player_dir.Normalize();
-		fence_dir.Normalize();
+		fence_player_dir[1] = 0; 	//ignore height
 		
-		if ( fence_dir.Length() != 0 )
+		ref_dir.Normalize();
+		ref_dir[1] = 0;			//ignore height
+		
+		if ( ref_dir.Length() != 0 )
 		{
-			float dot = vector.Dot( fence_player_dir, fence_dir );
+			float dot = vector.Dot( fence_player_dir, ref_dir );
 			
-			if ( dot > 0 )
+			if ( dot > 0 && Math.AbsFloat( dot ) > MIN_ACTION_DETECTION_ANGLE_RAD )
 			{
 				return true;
 			}
@@ -405,9 +437,28 @@ class Fence extends BaseBuildingBase
 		return false;
 	}
 	
-	override bool IsFacingBack( PlayerBase player, string selection )
+	override bool IsFacingCamera( string selection )
 	{
-		return !IsFacingFront( player, selection );
+		vector fence_pos = GetPosition();
+		vector cam_dir = GetGame().GetCurrentCameraDirection();
+		vector ref_dir = GetDirection();
+		
+		ref_dir.Normalize();
+		ref_dir[1] = 0;		//ignore height
+		
+		cam_dir[1] = 0;			//ignore height
+		
+		if ( ref_dir.Length() > 0.5 )		//if the distance (m) is too low, ignore this check
+		{
+			float dot = vector.Dot( cam_dir, ref_dir );
+		
+			if ( dot < 0 )	
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 	
 	//================================================================

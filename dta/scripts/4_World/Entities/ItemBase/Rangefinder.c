@@ -30,8 +30,13 @@ class Rangefinder extends ItemOptics
 	{
 		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
-			StartPeriodicMeasurement();
-			m_RangeText = TextWidget.Cast( GetGame().GetWorkspace().CreateWidgets( "gui/layouts/gameplay/rangefinder_hud.layout" ) );
+			PlayerBase player_this = PlayerBase.Cast( GetGame().GetPlayer() );
+			PlayerBase player_owner = PlayerBase.Cast( GetHierarchyRootPlayer() );
+			
+			if ( player_this == player_owner )
+			{
+				StartPeriodicMeasurement();
+			}
 		}
 	}
 	
@@ -39,8 +44,13 @@ class Rangefinder extends ItemOptics
 	{
 		if( GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
-			StopPeriodicMeasurement();
-			delete m_RangeText;
+			PlayerBase player_this = PlayerBase.Cast( GetGame().GetPlayer() );
+			PlayerBase player_owner = PlayerBase.Cast( GetHierarchyRootPlayer() );
+			
+			if ( player_this == player_owner )
+			{
+				StopPeriodicMeasurement();
+			}
 		}
 	}
 	
@@ -48,8 +58,10 @@ class Rangefinder extends ItemOptics
 	{
 		if( !m_Timer )
 		{
-			m_Timer = new Timer;
+			m_Timer = new Timer( CALL_CATEGORY_GAMEPLAY );
 		}
+		
+		m_RangeText = TextWidget.Cast( GetGame().GetWorkspace().CreateWidgets( "gui/layouts/gameplay/rangefinder_hud.layout" ) );
 		
 		m_Timer.Run( GetMeasurementUpdateInterval(), this, "DoMeasurement", null, true );
 	}
@@ -59,6 +71,11 @@ class Rangefinder extends ItemOptics
 		if( m_Timer )
 		{
 			m_Timer.Stop();
+		}
+		
+		if (m_RangeText)
+		{
+			delete m_RangeText;
 		}
 	}
 	

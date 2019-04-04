@@ -2,7 +2,7 @@ class CanisterGasoline extends Bottle_Base
 {
 	void CanisterGasoline()
 	{
-		
+		m_LiquidEmptyRate = 2000;
 	}
 	
 	void ~CanisterGasoline()
@@ -59,5 +59,10 @@ class CanisterGasoline extends Bottle_Base
 		}
 		
 		return false;
+	}
+	
+	override bool IsOpen()
+	{
+		return true;
 	}
 }

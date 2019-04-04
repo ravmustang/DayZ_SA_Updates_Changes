@@ -59,12 +59,25 @@ class ActionDismantlePart: ActionContinuousBase
 				Construction construction = base_building.GetConstruction();		
 				ConstructionPart construction_part = construction.GetConstructionPartToDismantle( part_name, item );
 				
-				if ( construction_part && base_building.IsFacingBack( player, construction_part.GetPartName() ) )
+				if ( construction_part )
 				{
-					ConstructionActionData construction_action_data = player.GetConstructionActionData();
-					construction_action_data.SetTargetPart( construction_part );
+					//camera and position checks
+					if ( !base_building.IsFacingPlayer( player, part_name ) && !player.GetInputController().CameraIsFreeLook() )
+					{
+						//Camera check (client-only)
+						if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+						{
+							if ( base_building.IsFacingCamera( part_name ) )
+							{
+								return false;
+							}
+						}
+
+						ConstructionActionData construction_action_data = player.GetConstructionActionData();
+						construction_action_data.SetTargetPart( construction_part );
 					
-					return true;
+						return true;
+					}
 				}
 			}
 		}
@@ -82,7 +95,7 @@ class ActionDismantlePart: ActionContinuousBase
 		if ( construction.CanDismantlePart( construction_part.GetPartName(), action_data.m_MainItem ) )
 		{
 			//build
-			construction.DismantlePart( construction_part.GetPartName(), GetType() );
+			construction.DismantlePartServer( construction_part.GetPartName(), GetType() );
 			
 			//add damage to tool
 			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DISMANTLE, false );

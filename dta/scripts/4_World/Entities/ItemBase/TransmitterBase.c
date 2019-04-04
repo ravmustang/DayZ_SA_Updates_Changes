@@ -25,7 +25,8 @@ class TransmitterBase extends ItemTransmitter
 		int tuned_frequency_idx;
 		if ( !ctx.Read( tuned_frequency_idx ) )
 		{
-			tuned_frequency_idx = 0;		//set default
+			SetFrequencyByIndex( 0 );		//set default
+			return false;
 		}
 		SetFrequencyByIndex( tuned_frequency_idx );
 		//---

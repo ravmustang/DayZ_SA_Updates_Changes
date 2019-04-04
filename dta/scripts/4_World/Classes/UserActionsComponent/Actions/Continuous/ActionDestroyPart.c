@@ -53,18 +53,31 @@ class ActionDestroyPart: ActionContinuousBase
 			Object targetObject = target.GetObject();
 			if ( targetObject && targetObject.CanUseConstruction() )
 			{
-				string part_name = targetObject.GetActionComponentName(target.GetComponentIndex());
+				string part_name = targetObject.GetActionComponentName( target.GetComponentIndex() );
 				
 				BaseBuildingBase base_building = BaseBuildingBase.Cast( targetObject );
 				Construction construction = base_building.GetConstruction();		
 				ConstructionPart construction_part = construction.GetConstructionPartToDestroy( part_name );
 				
-				if ( construction_part && base_building.IsFacingFront( player, construction_part.GetPartName() ) )
+				if ( construction_part )
 				{
-					ConstructionActionData construction_action_data = player.GetConstructionActionData();
-					construction_action_data.SetTargetPart( construction_part );
-					
-					return true;
+					//camera and position checks
+					if ( base_building.IsFacingPlayer( player, part_name ) && !player.GetInputController().CameraIsFreeLook() )
+					{
+						//Camera check (client-only)
+						if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+						{
+							if ( !base_building.IsFacingCamera( part_name ) )
+							{
+								return false;
+							}
+						}
+
+						ConstructionActionData construction_action_data = player.GetConstructionActionData();
+						construction_action_data.SetTargetPart( construction_part );
+						
+						return true;				
+					}
 				}
 			}
 		}
@@ -82,7 +95,7 @@ class ActionDestroyPart: ActionContinuousBase
 		if ( construction.CanDestroyPart( construction_part.GetPartName() ) )
 		{
 			//build
-			construction.DestroyPart( construction_part.GetPartName(), GetType() );
+			construction.DestroyPartServer( construction_part.GetPartName(), GetType() );
 			
 			//add damage to tool
 			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DESTROY, false );

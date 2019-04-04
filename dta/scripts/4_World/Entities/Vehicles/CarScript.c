@@ -111,7 +111,7 @@ class CarScript extends Car
 	}
 
 /*
-	here we should handle the damage dealt in OnContact event, but maybe we will react even in that event 
+	//here we should handle the damage dealt in OnContact event, but maybe we will react even in that event 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
 		Print("CarScript>>> EEHitBy");
@@ -119,24 +119,40 @@ class CarScript extends Car
 		Print( damageResult );
 		Print( source );
 		Print( component );
-		Print( damageResult.GetDamage("", "health") );
-	
-		if ( dmgZone == "Engine" && GetHealth("Engine","") < 0.1 )
+		Print( damageResult.GetDamage(dmgZone, "Health") );
+
+		//if ( dmgZone == "Engine" && GetHealth("Engine","") < 0.1 )
+		//{
+		//	if ( GetHealth01("engine", "") <= 0.1 )
+		//	{
+		//		if ( !m_EngineSmoke )
+		//		{
+		//			Print("Smoke");
+		//			EffVehicleSmoke engSmk = new EffEngineSmoke();
+		//			SEffectManager.PlayOnObject(engSmk, this, "0 0.95 1.25" );
+		//			// Particle is now playing on oject 'this'
+		//		}
+		//	}
+		//}
+
+	}
+*/	
+
+	override void EEDelete(EntityAI parent)
+	{
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
-			if ( GetHealth01("engine", "") <= 0.1 )
-			{
-				if ( !m_EngineSmoke )
-				{
-					Print("Smoke");
-					EffVehicleSmoke engSmk = new EffEngineSmoke();
-					SEffectManager.PlayOnObject(engSmk, this, "0 0.95 1.25" );
-					// Particle is now playing on oject 'this'
-				}
-			}
+			if ( SEffectManager.IsEffectExist( m_coolantPtcFx ) )
+				SEffectManager.Stop(m_coolantPtcFx);
+
+			if ( SEffectManager.IsEffectExist( m_exhaustPtcFx ) )
+				SEffectManager.Stop( m_exhaustPtcFx );
+
+			if ( SEffectManager.IsEffectExist( m_enginePtcFx ) )
+				SEffectManager.Stop( m_enginePtcFx );
 		}
 	}
-*/
-	
+
 	override void OnVariablesSynchronized()
 	{
 		super.OnVariablesSynchronized();
@@ -168,6 +184,8 @@ class CarScript extends Car
 			
 			if ( slot_name == "GlowPlug" )
 				m_PlugHealth = item.GetHealth01();
+			
+			Synchronize();
 		}
 	}
 
@@ -224,7 +242,34 @@ class CarScript extends Car
 				LeakAll( CarFluid.COOLANT );
 				SetHealth( "Radiator", "Health", 0);
 			}
+
+			Synchronize();
 		}
+	}
+	
+	override bool CanReleaseAttachment( EntityAI attachment )
+	{
+
+		if ( GetSpeedometer() > 0.5 )
+			return false;
+
+		//GetInventoryOwner()
+				
+		//if ( !GetGame().IsServer() || !GetGame().IsMultiplayer() )
+		//{
+			for( int i =0; i < CrewSize(); i++ )
+			{
+				Human crew = CrewMember( i );
+				if ( !crew )
+					continue;
+
+				PlayerBase player;
+				if ( Class.CastTo(player, crew ) )
+					return false;
+			}
+		//}
+		
+		return true;
 	}
 
 	override void EOnPostSimulate(IEntity other, float timeSlice)
@@ -326,7 +371,7 @@ class CarScript extends Car
 						if ( !SEffectManager.IsEffectExist( m_coolantPtcFx ) )
 						{
 							m_coolantFx = new EffCoolantSteam();
-							m_coolantPtcFx = SEffectManager.PlayOnObject( m_coolantFx, this, m_coolantPtcPos );
+							m_coolantPtcFx = SEffectManager.PlayOnObject( m_coolantFx, this, m_coolantPtcPos, Vector(0,0,0), true );
 						}
 
 						if ( GetFluidFraction( CarFluid.COOLANT ) > 0 )
@@ -382,7 +427,7 @@ class CarScript extends Car
 				if ( !SEffectManager.IsEffectExist( m_enginePtcFx ) )
 				{
 					m_engineFx = new EffEngineSmoke();
-					m_enginePtcFx = SEffectManager.PlayOnObject( m_engineFx, this, m_enginePtcPos );
+					m_enginePtcFx = SEffectManager.PlayOnObject( m_engineFx, this, m_enginePtcPos, Vector(0,0,0), true );
 					//m_engineFx.SetParticleStateLight();
 					m_engineFx.SetParticleStateHeavy();
 				}
@@ -783,10 +828,39 @@ class CarScript extends Car
 	{
 		return "";
 	}
+
+	string GetDoorConditionPointFromSelection( string selection )
+	{
+		return "";
+	}
 	
 	int GetCrewIndex( string selection )
 	{
 		return -1;
+	}
+
+	override bool CanReachSeatFromDoors( string pSeatSelection, vector pFromPos, float pDistance = 1.0 )
+	{
+		string conPointName = GetDoorConditionPointFromSelection(pSeatSelection);
+		if (conPointName.Length() > 0)
+		{
+			if( MemoryPointExists(conPointName) )
+			{
+				vector conPointMS = GetMemoryPointPos(conPointName);
+				vector conPointWS = ModelToWorld(conPointMS);
+				
+				//! skip the height for now
+				conPointWS[1] = 0;
+				pFromPos[1] = 0;
+				
+				if (vector.Distance(pFromPos, conPointWS) <= pDistance)
+				{
+					return true;
+				}
+			}
+		}
+
+		return false;		
 	}
 
 	bool IsVitalCarBattery()
@@ -829,5 +903,25 @@ class CarScript extends Car
 	int GetCarDoorsState( string slotType )
 	{
 		return -1;
+	}
+
+	string GetActionCompNameCoolant()
+	{
+		return "radiator";
+	}
+
+	float GetActionDistanceCoolant()
+	{
+		return 3.0;
+	}
+
+	string GetActionCompNameFuel()
+	{
+		return "refill";
+	}
+
+	float GetActionDistanceFuel()
+	{
+		return 3.2;
 	}
 };

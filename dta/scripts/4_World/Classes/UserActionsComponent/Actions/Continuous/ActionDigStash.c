@@ -113,7 +113,7 @@ class ActionDigStash: ActionContinuousBase
 	void SpawnParticleShovelRaise( ActionData action_data )
 	{
 		PlayerBase player = action_data.m_Player;
-		Particle.Play( ParticleList.DIGGING_STASH, player );
+		Particle.PlayOnObject( ParticleList.DIGGING_STASH, player );
 	}
 	
 	

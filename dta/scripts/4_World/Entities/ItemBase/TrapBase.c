@@ -27,9 +27,7 @@ class TrapBase extends ItemBase
 	protected ref Timer m_Timer;
 	protected TrapTrigger m_TrapTrigger;
 
-	ref protected EffectSound 	m_DeployLoopSound;
-	
-	PluginAdminLog 				m_AdminLog;
+	ref protected EffectSound 	m_DeployLoopSound;	
 	
 	void TrapBase()
 	{
@@ -55,11 +53,20 @@ class TrapBase extends ItemBase
 		m_InfoDamage =				"#STR_TrapBase3";
 		m_InfoActivationTime = 		"#STR_TrapBase4" + m_InitWaitTime.ToString() + "#STR_TrapBase5";
 		
+		m_DeployLoopSound = new EffectSound;
+		
 		RegisterNetSyncVariableBool("m_IsActive");
 		RegisterNetSyncVariableBool("m_IsInProgress");
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
-		
-		m_AdminLog = PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
+		RegisterNetSyncVariableBool("m_IsDeploySound");		
+	}
+	
+	void ~TrapBase()
+	{
+		if ( m_DeployLoopSound )
+		{
+			SEffectManager.DestroySound( m_DeployLoopSound );
+		}
 	}
 	
 	//! this event is called all variables are synchronized on client
@@ -617,30 +624,28 @@ class TrapBase extends ItemBase
 		if ( GetGame().IsServer() )
 		{
 			SetupTrapPlayer( PlayerBase.Cast( player ), false );
-			
-			if ( m_AdminLog )
-			{
-				m_AdminLog.OnPlacementComplete( player, this );
-			}
+						
+			SetIsDeploySound( true );
 		}	
-		
-		SetIsDeploySound( true );
 	}
 		
 	void PlayDeployLoopSound()
 	{		
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() || !GetGame().IsMultiplayer() )
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
 		{		
-			m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			if ( !m_DeployLoopSound.IsSoundPlaying() )
+			{
+				m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			}
 		}
 	}
 	
 	void StopDeployLoopSound()
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() || !GetGame().IsMultiplayer() )
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
 		{	
+			m_DeployLoopSound.SetSoundFadeOut(0.5);
 			m_DeployLoopSound.SoundStop();
-			delete m_DeployLoopSound;
 		}
 	}
 }

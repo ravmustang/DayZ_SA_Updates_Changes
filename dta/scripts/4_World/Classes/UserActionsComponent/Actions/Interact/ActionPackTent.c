@@ -82,7 +82,7 @@ class ActionPackTent: ActionInteractBase
 			targetObject.GetActionComponentNameList(action_data.m_Target.GetComponentIndex(), selections);
 			
 			TentBase tent = TentBase.Cast( targetParent );
-			tent.Pack();
+			tent.Pack( true );
 			tent.SetPosition( targetParent.CoordToParent( target_object_pos ) );
 			tent.SetOrientation( action_data.m_Player.GetOrientation() );
 			tent.PlaceOnSurface();

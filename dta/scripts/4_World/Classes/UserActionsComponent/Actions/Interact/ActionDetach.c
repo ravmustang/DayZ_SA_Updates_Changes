@@ -46,16 +46,10 @@ class ActionDetach: ActionInteractBase
 		if ( player.GetCommand_Vehicle() )
 			return false;
 
-		if ( player.GetInventory().CanAddEntityIntoHands(tgt_entity) && !player.GetInventory().CanAddEntityIntoInventory(tgt_entity) )
+		if ( player.GetInventory().CanAddEntityIntoHands(tgt_entity) ) //&& !player.GetInventory().CanAddEntityIntoInventory(tgt_entity) )
 		{
 			if ( tgt_entity.GetHierarchyRootPlayer() != player )
 			{
-				InventoryLocation inv = new InventoryLocation;
-				if (tgt_entity.GetInventory().GetCurrentInventoryLocation(inv) )
-				{
-					int slot = inv.GetSlot();
-				}
-
 				if ( tgt_entity.CanDetachAttachment( tgt_parent ) && tgt_parent.CanReleaseAttachment( tgt_entity ) )
 					return true;
 			}		

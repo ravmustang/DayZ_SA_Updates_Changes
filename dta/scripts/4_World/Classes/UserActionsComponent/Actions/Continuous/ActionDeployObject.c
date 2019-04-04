@@ -49,7 +49,7 @@ class ActiondeployObjectCB : ActionContinuousBaseCB
 			
 				if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
 				{		
-						m_ActionData.m_MainItem.SoundSynchRemote();
+					m_ActionData.m_MainItem.SoundSynchRemote();
 				}
 			
 				if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
@@ -283,6 +283,7 @@ class ActionDeployObject: ActionContinuousBase
 			if ( GetGame().IsMultiplayer() )
 			{	
 				action_data.m_Player.PlacingCancelServer();
+				
 				action_data.m_MainItem.SoundSynchRemoteReset();
 			}
 			else
@@ -299,6 +300,10 @@ class ActionDeployObject: ActionContinuousBase
 			{
 				GetGame().ObjectDelete(  action_data.m_MainItem );
 			}
+			
+			action_data.m_MainItem.SetIsDeploySound( false );
+			action_data.m_MainItem.SetIsPlaceSound( false );
+			action_data.m_MainItem.SoundSynchRemoteReset();
 		}
 	}
 

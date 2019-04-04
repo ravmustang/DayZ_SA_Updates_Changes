@@ -2,12 +2,12 @@ typedef ItemBase Inventory_Base;
 
 class DummyItem extends ItemBase {};
 
-const bool QUANTITY_DEBUG_REMOVE_ME = false;
+//const bool QUANTITY_DEBUG_REMOVE_ME = false;
 
 class ItemBase extends InventoryItem
 {
 	static int		m_DebugActionsMask;
-	
+	bool	m_RecipesInitialized;
 	// ============================================
 	// Variable Manipulation System
 	// ============================================
@@ -50,8 +50,9 @@ class ItemBase extends InventoryItem
 	
 	
 	// Weapons & suppressors particle effects
-	ref static map<int, ref array<ref WeaponParticlesOnFire>> m_OnFireEffect;
-	ref map<int, ref array<ref WeaponParticlesOnOverheating>> m_OnOverheatingEffect;
+	ref static map<int, ref array<ref WeaponParticlesOnFire>> 				m_OnFireEffect;
+	ref static map<int, ref array<ref WeaponParticlesOnBulletCasingEject>> 	m_OnBulletCasingEjectEffect;
+	ref map<int, ref array<ref WeaponParticlesOnOverheating>> 				m_OnOverheatingEffect;
 	ref static map<string, int> m_WeaponTypeToID;
 	static int m_LastRegisteredWeaponID = 0;
 	
@@ -66,6 +67,9 @@ class ItemBase extends InventoryItem
 	
 	// inventory location management
 	//ref InventoryLocation m_OldLocation;
+	
+	// Admin Log
+	PluginAdminLog			m_AdminLog;
 	
 	// -------------------------------------------------------------------------
 	void ItemBase()
@@ -91,8 +95,17 @@ class ItemBase extends InventoryItem
 		if (GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			PreLoadSoundAttachmentType();
+			/*
+			if( !m_RecipesInitializedItem.Contains(Type()))
+				InitializeRecipes();
+			*/
 		}
 		m_OldLocation = null;
+		
+		if ( GetGame().IsServer() )
+		{
+			m_AdminLog = PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
+		}
 	}
 	
 	void InitItemVariables()
@@ -136,30 +149,66 @@ class ItemBase extends InventoryItem
 		if (!m_OnFireEffect)
 			m_OnFireEffect = new map<int, ref array<ref WeaponParticlesOnFire>>;
 		
+		if (!m_OnBulletCasingEjectEffect)
+			m_OnBulletCasingEjectEffect = new map<int, ref array<ref WeaponParticlesOnBulletCasingEject>>;
+		
+		string config_to_search = "CfgVehicles";
+		string muzzle_owner_config;
+		
 		if ( !m_OnFireEffect.Contains(id) )
 		{
-			string config_to_search = "CfgVehicles";
-			
 			if (IsInherited(Weapon))
 				config_to_search = "CfgWeapons";	
 			
-			string muzzle_owner_config = config_to_search + " " + GetType() + " ";
+			muzzle_owner_config = config_to_search + " " + GetType() + " ";
+			
 			string config_OnFire_class = muzzle_owner_config + "Particles " + "OnFire ";
 			
 			int config_OnFire_subclass_count = GetGame().ConfigGetChildrenCount(config_OnFire_class);
-			ref array<ref WeaponParticlesOnFire> WPOF_array = new array<ref WeaponParticlesOnFire>;
 			
-			for (int i = 0; i < config_OnFire_subclass_count; i++)
+			if (config_OnFire_subclass_count > 0)
 			{
-				string particle_class = "";
-				GetGame().ConfigGetChildName(config_OnFire_class, i, particle_class);
-				string config_OnFire_entry = config_OnFire_class + particle_class;
-				WeaponParticlesOnFire WPOF = new WeaponParticlesOnFire(this, config_OnFire_entry);
-				WPOF_array.Insert(WPOF);
+				ref array<ref WeaponParticlesOnFire> WPOF_array = new array<ref WeaponParticlesOnFire>;
+				
+				for (int i = 0; i < config_OnFire_subclass_count; i++)
+				{
+					string particle_class = "";
+					GetGame().ConfigGetChildName(config_OnFire_class, i, particle_class);
+					string config_OnFire_entry = config_OnFire_class + particle_class;
+					WeaponParticlesOnFire WPOF = new WeaponParticlesOnFire(this, config_OnFire_entry);
+					WPOF_array.Insert(WPOF);
+				}
+				
+				
+				m_OnFireEffect.Insert(id, WPOF_array);
 			}
+		}
+		
+		if ( !m_OnBulletCasingEjectEffect.Contains(id) )
+		{
+			config_to_search = "CfgWeapons"; // Bullet Eject efect is supported on weapons only.
+			muzzle_owner_config = config_to_search + " " + GetType() + " ";
 			
+			string config_OnBulletCasingEject_class = muzzle_owner_config + "Particles " + "OnBulletCasingEject ";
 			
-			m_OnFireEffect.Insert(id, WPOF_array);
+			int config_OnBulletCasingEject_count = GetGame().ConfigGetChildrenCount(config_OnBulletCasingEject_class);
+			
+			if (config_OnBulletCasingEject_count > 0  &&  IsInherited(Weapon))
+			{
+				ref array<ref WeaponParticlesOnBulletCasingEject> WPOBE_array = new array<ref WeaponParticlesOnBulletCasingEject>;
+				
+				for (i = 0; i < config_OnBulletCasingEject_count; i++)
+				{
+					string particle_class2 = "";
+					GetGame().ConfigGetChildName(config_OnBulletCasingEject_class, i, particle_class2);
+					string config_OnBulletCasingEject_entry = config_OnBulletCasingEject_class + particle_class2;
+					WeaponParticlesOnBulletCasingEject WPOBE = new WeaponParticlesOnBulletCasingEject(this, config_OnBulletCasingEject_entry);
+					WPOBE_array.Insert(WPOBE);
+				}
+				
+				
+				m_OnBulletCasingEjectEffect.Insert(id, WPOBE_array);
+			}
 		}
 	}
 	
@@ -218,6 +267,11 @@ class ItemBase extends InventoryItem
 				m_OnOverheatingEffect.Insert(id, WPOOH_array);
 			}
 		}
+	}
+	
+	float GetOverheatingValue()
+	{
+		return m_OverheatingShots;
 	}
 	
 	void IncreaseOverheating(ItemBase weapon, string ammoType, ItemBase muzzle_owner, ItemBase suppressor, string config_to_search)
@@ -773,7 +827,7 @@ class ItemBase extends InventoryItem
 			if( !GetGame().IsServer() )
 			return;
 			
-			if (this.ConfigIsExisting("ChangeIntoOnDetach"))
+			/*if (this.ConfigIsExisting("ChangeIntoOnDetach"))
 			{
 				string str = ChangeIntoOnDetach(slot_id);
 				if (str  != "")
@@ -783,7 +837,7 @@ class ItemBase extends InventoryItem
 					lamb.SetTransferParams(true, true, true, false,1);
 					MiscGameplayFunctions.TurnItemIntoItemEx(player, lamb);
 				}
-			}
+			}*/
 		}
 	}
 	
@@ -793,10 +847,10 @@ class ItemBase extends InventoryItem
 		TStringArray inventory_slots = new TStringArray;
 		TStringArray attach_types = new TStringArray;
 		
-		ConfigGetTextArray("inventorySlot",inventory_slots);
+		ConfigGetTextArray("ChangeInventorySlot",inventory_slots);
 		if (inventory_slots.Count() < 1) //is string
 		{
-			inventory_slots.Insert(ConfigGetString("inventorySlot"));
+			inventory_slots.Insert(ConfigGetString("ChangeInventorySlot"));
 			attach_types.Insert(ConfigGetString("ChangeIntoOnAttach"));
 		}
 		else //is array
@@ -811,7 +865,7 @@ class ItemBase extends InventoryItem
 		return attach_types.Get(idx);
 	}
 	
-	override string ChangeIntoOnDetach(int slot_id)
+	override string ChangeIntoOnDetach()
 	{
 		int idx = -1;
 		string slot;
@@ -819,10 +873,10 @@ class ItemBase extends InventoryItem
 		TStringArray inventory_slots = new TStringArray;
 		TStringArray detach_types = new TStringArray;
 		
-		this.ConfigGetTextArray("inventorySlot",inventory_slots);
+		this.ConfigGetTextArray("ChangeInventorySlot",inventory_slots);
 		if (inventory_slots.Count() < 1) //is string
 		{
-			inventory_slots.Insert(this.ConfigGetString("inventorySlot"));
+			inventory_slots.Insert(this.ConfigGetString("ChangeInventorySlot"));
 			detach_types.Insert(this.ConfigGetString("ChangeIntoOnDetach"));
 		}
 		else //is array
@@ -834,11 +888,7 @@ class ItemBase extends InventoryItem
 		
 		for (int i = 0; i < inventory_slots.Count(); i++)
 		{
-			if (InventorySlots.GetSlotIdFromString(inventory_slots.Get(i)) == slot_id)
-			{
-				slot = inventory_slots.Get(i);
-				break;
-			}
+			slot = inventory_slots.Get(i);
 		}
 		
 		if (slot != "")
@@ -1133,7 +1183,7 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
-	void SplitItem(PlayerBase player)
+	void SplitItem( PlayerBase player )
 	{
 		if ( !CanBeSplit() )
 		{
@@ -1192,22 +1242,22 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
-	bool CanBeCombined(ItemBase other_item, PlayerBase player = NULL)
+	bool CanBeCombined( EntityAI other_item, PlayerBase player = null )
 	{
-		bool can_this_be_combined =  ConfigGetBool("canBeSplit");
+		bool can_this_be_combined = ConfigGetBool("canBeSplit");
 		
-		if (GetInventory().HasInventoryReservation(this, NULL) || other_item.GetInventory().HasInventoryReservation(other_item,NULL))
+		if ( GetInventory().HasInventoryReservation( this, null ) || other_item.GetInventory().HasInventoryReservation( other_item, null ))
 			return false;
 		
-		if(CastTo(player,GetHierarchyRootPlayer())) //false when attached to player's attachment slot
+		if( CastTo( player, GetHierarchyRootPlayer() ) ) //false when attached to player's attachment slot
 		{
-			if(player.GetInventory().HasAttachment(this))
+			if( player.GetInventory().HasAttachment( this ) )
 			{
 				return false;
 			}
 		}
 		
-		if(!can_this_be_combined || !other_item) 
+		if( !can_this_be_combined || !other_item ) 
 		{
 			return false;
 		}
@@ -1222,9 +1272,9 @@ class ItemBase extends InventoryItem
 		return ( this.GetType() == other_item.GetType() );
 	}
 	
-	bool IsCombineAll(ItemBase other_item, bool use_stack_max = false)
+	bool IsCombineAll( ItemBase other_item, bool use_stack_max = false )
 	{
-		return ComputeQuantityUsed(other_item,use_stack_max) == other_item.GetQuantity();
+		return ComputeQuantityUsed( other_item, use_stack_max ) == other_item.GetQuantity();
 	}
 	
 	int ComputeQuantityUsed( ItemBase other_item, bool use_stack_max = false )
@@ -1264,7 +1314,7 @@ class ItemBase extends InventoryItem
 		if( !CanBeCombined(other_item) )
 			return;
 		
-		if( !IsMagazine() )
+		if( !IsMagazine() && other_item )
 		{
 			int quantity_used = ComputeQuantityUsed(other_item,use_stack_max);
 			if( quantity_used != 0 )
@@ -1277,7 +1327,7 @@ class ItemBase extends InventoryItem
 	// -------------------------------------------------------------------------
 	// Mirek: whole user action system moved to script
 	// -------------------------------------------------------------------------	
-	void GetRecipesActions(Man player, out TSelectableActionInfoArray outputList)
+	void GetRecipesActions( Man player, out TSelectableActionInfoArray outputList )
 	{
 		PlayerBase p = PlayerBase.Cast( player );
 			
@@ -1286,13 +1336,13 @@ class ItemBase extends InventoryItem
 		if( module_recipes_manager )
 		{
 			EntityAI item_in_hands = player.GetHumanInventory().GetEntityInHands();
-			module_recipes_manager.GetValidRecipes(ItemBase.Cast( this ),ItemBase.Cast( item_in_hands ),recipes_ids, PlayerBase.Cast( player ) );
+			module_recipes_manager.GetValidRecipes( ItemBase.Cast( this ), ItemBase.Cast( item_in_hands ),recipes_ids, PlayerBase.Cast( player ) );
 		}
 		for(int i = 0;i < recipes_ids.Count();i++)
 		{
 			int key = recipes_ids.Get(i);
 			string recipe_name = module_recipes_manager.GetRecipeName(key);
-			outputList.Insert(new TSelectableActionInfo(SAT_CRAFTING, key, recipe_name));
+			outputList.Insert( new TSelectableActionInfo( SAT_CRAFTING, key, recipe_name ) );
 		}
 	}
 	
@@ -1500,246 +1550,11 @@ class ItemBase extends InventoryItem
 				}
 			}
 		}
-		/*
-		if( action_id == USE_ENUM_HERE )
-		{
-			int id_1;
-			int id_2;
-			GetPersistentID(id_1,id_2);
-			Debug.Log("id1: "+id_1.ToString());
-			Debug.Log("id2: "+id_2.ToString());
-		}
-		
 
-		if( action_id == USE_ENUM_HERE )//PrintQuantityMax
-		{
-			Debug.Log("max quantity for item " + this.ToString() + " is: " + GetQuantityMax().ToString(),"ItemVars");
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			Debug.Log("classname:"+this.GetType(),"recipes");
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			if( player.HasEntityInCargo(this) )
-			{
-				Debug.Log("+this item is in player's cargo space","recipes");
-			}
-			else
-			{
-				Debug.Log("-this item is NOT player's cargo space","recipes");
-			}
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			Debug.Log(this.GetHealth("","").ToString());
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			this.AddQuantity(-1,false,true);
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			Debug.Log("IsMagazine:"+this.IsMagazine().ToString(),"recipes");
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			if( IsMagazine() )
-			{
-				Magazine mag = this;
-				mag.SetAmmoCount(mag.GetAmmoCount() + 1);
-			}
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			this.SetHealth("","",1);
-		}
-		
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			if( IsMagazine() )
-			{
-				Magazine mgz = this;
-				mgz.AddAmmoCount(-1);
-			}
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			if( IsMagazine() )
-			{
-				Magazine mgz2 = this;
-				mgz2.SetAmmoCount(mgz2.GetAmmoMax());
-			}
-		}
-
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			PluginTransmissionAgents m_mta = GetPlugin(PluginTransmissionAgents);
-			m_mta.TransmitAgents(this, player, AGT_UACTION_CONSUME);
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			Debug.Log(this.IsEmpty().ToString() );
-		}
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			Debug.Log( "Has any cargo = "+this.HasAnyCargo().ToString() );
-		}
-
-		if( action_id == USE_ENUM_HERE ) 
-		{	
-			if (HasEnergyManager())
-			{
-				GetCompEM().SwitchOn();
-			}
-		}
-		
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			this.SetHealth("","",200);
-		}
-		
-		if( action_id == USE_ENUM_HERE ) 
-		{
-			if (HasEnergyManager())
-			{
-				GetCompEM().SwitchOff();
-			}
-		}
-		
-		if( action_id == USE_ENUM_HERE ) //Ineract
-		{
-			PlayerBase nplayer = player;
-			nplayer.OnInteractMenu();
-		}
-		*/
 		
 		return false;
 	}
-	// -------------------------------------------------------------------------
-	/**
-	\brief Returns \p bool by whether that item can be put together with other item
-		\param other_item \p ItemBase for check to combine
-		\return \p bool Can combined with \p other_item
-		@code
-			item_stone.CanQuantityCombine(item_rags);		// returns false
-			item_stone.CanQuantityCombine(item_stone);		// returns true
-		@endcode
-	*/
-	/*
-	bool CanQuantityCombine( ItemBase other_item )
-	{
-		if ( other_item == NULL || m_QuantityCanCombine == false )
-		{
-			return false;
-		}
-		
-		string a = this.GetType();
-		string b = other_item.GetType();
 
-		if ( a != b )
-		{
-			return false;
-		}
-		
-		return true;
-	}*/
-
-	// -------------------------------------------------------------------------
-	/**
-	\brief Quantity of this item will be moved to \p other_item, but only to maximum quantity of \p other_item
-		\return \p bool from CanQuantityCombine()
-		@code
-			item_shovel.CanQuantitySplit();					// returns false, becouse shovel has quantity 1
-			item_stone.CanQuantityCombine(item_stone);		// returns true, becouse stone has quantity 5
-		@endcode
-	*/
-	/*
-	bool QuantityCombine( ItemBase other_item )
-	{
-		if ( other_item == NULL )
-		{
-			return false;
-		}
-		
-		if ( !CanQuantityCombine(other_item) )
-		{
-			MessageToOwnerAction("You can not combine these two items.");
-			
-			return false;
-		}
-		
-		float can_move_quantity = other_item.GetQuantityMax() - other_item.GetQuantity();
-		
-		if ( can_move_quantity <= 0 )
-		{
-			MessageToOwnerAction("You can not combine, stack is maximum.");
-			
-			return false;
-		}
-		
-		float keep_quantity = this.GetQuantity() - can_move_quantity;
-		
-		if ( keep_quantity > 0 ) 
-		{
-			other_item.AddQuantity(can_move_quantity, true);
-		}
-		else
-		{
-			other_item.AddQuantity(this.GetQuantity(), true);
-		}
-		
-		SetQuantity( keep_quantity, true );
-		
-		return true;
-	}
-*/
-	// -------------------------------------------------------------------------
-	/**
-	\brief Returns \p bool by whether that item can be split to two items by quantity. If quantity is 1 or 0, item can not be split.
-		\return \p bool ItemBase can be split to two items
-		@code
-			item_shovel.CanQuantitySplit();		// returns false, becouse shovel has quantity 1
-			item_stone.CanQuantitySplit();		// returns true, becouse stone has quantity 5
-		@endcode
-	*/
-/*
-	bool CanQuantitySplit()
-	{
-		if ( GetQuantityMax() <= 1 || GetQuantity() <= 1 || m_QuantityCanSplit == false )
-		{
-			return false;
-		}
-		
-		return true;
-	}
-*/
-	// -------------------------------------------------------------------------
-	/**
-	\brief Half of quantity from this item will be moved to new item object. New item object will be copy of this. Extends damamge.
-		\return \p ItemBase Instance of this object with half quantity
-		@code
-			ItemBase item_stone_new = item_stone.QuantitySplit();	// If this item has 2 or more quantity, will be splitted		
-		@endcode
-	*/
-	/*
-	ItemBase QuantitySplit()
-	{
-		if ( !CanQuantitySplit() )
-		{
-			return NULL;
-		}
-		
-		float split_quantity = Math.Floor( GetQuantity() / 2 );
-		
-		AddQuantity(-split_quantity);
-		PlayerBase player = GetGame().GetPlayer();
-		ItemBase new_item = player.CopyInventoryItem( this );
-		new_item.SetQuantity( split_quantity, true );
-		
-		return new_item;
-	}
-*/
 	// -------------------------------------------------------------------------
 	
 	
@@ -2218,6 +2033,7 @@ class ItemBase extends InventoryItem
 
 	override void OnVariablesSynchronized()
 	{
+		/*
 		if(QUANTITY_DEBUG_REMOVE_ME)
 		{
 			PrintString("==================== CLIENT ==========================");
@@ -2226,6 +2042,7 @@ class ItemBase extends InventoryItem
 			PrintString("entity:"+low.ToString()+"| high:"+high.ToString());
 			PrintString("getting quantity, current:"+m_VarQuantity.ToString());
 		}
+		*/
 		super.OnVariablesSynchronized();
 		RefreshHud();
 	}
@@ -2284,7 +2101,7 @@ class ItemBase extends InventoryItem
 		
 		float min = GetQuantityMin();
 		float max = GetQuantityMax();
-		
+		/*
 		if(QUANTITY_DEBUG_REMOVE_ME)
 		{
 			PrintString("======================== SERVER ========================");
@@ -2293,7 +2110,7 @@ class ItemBase extends InventoryItem
 			PrintString("entity:"+low.ToString()+"| high:"+high.ToString());
 			PrintString("setting quantity, current:"+m_VarQuantity.ToString());
 			PrintString("setting quantity, new:"+value.ToString());
-		}
+		}*/
 		
 		m_VarQuantity = Math.Clamp(value, min, max);
 		SetVariableMask(VARIABLE_QUANTITY);
@@ -2759,7 +2576,17 @@ class ItemBase extends InventoryItem
 		
 		SetTakeable(false);
 	}
-
+	
+	override void OnPlacementComplete( Man player ) 
+	{
+		if ( m_AdminLog )
+		{
+			m_AdminLog.OnPlacementComplete( player, this );
+		}
+		
+		super.OnPlacementComplete( player );
+	}
+		
 	//-----------------------------
 	// AGENT SYSTEM
 	//-----------------------------
@@ -2845,7 +2672,7 @@ class ItemBase extends InventoryItem
 	//! Implementations only
 	void Open() {}
 	void Close() {}
-	bool IsOpen() {}
+	bool IsOpen() {return false;}
 	
 	
 	// ------------------------------------------------------------
@@ -2892,6 +2719,26 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
+	// Plays bullet eject particle effects (usually just smoke, the bullet itself is a 3D model and is not part of this function)
+	static void PlayBulletCasingEjectParticles(ItemBase weapon, string ammoType, ItemBase muzzle_owner, ItemBase suppressor, string config_to_search)
+	{
+		int id = muzzle_owner.GetMuzzleID();
+		array<ref WeaponParticlesOnBulletCasingEject> WPOBE_array = m_OnBulletCasingEjectEffect.Get(id);
+		
+		if (WPOBE_array)
+		{
+			for (int i = 0; i < WPOBE_array.Count(); i++)
+			{
+				WeaponParticlesOnBulletCasingEject WPOBE = WPOBE_array.Get(i);
+				
+				if (WPOBE)
+				{
+					WPOBE.OnActivate(weapon, ammoType, muzzle_owner, suppressor, config_to_search);
+				}
+			}
+		}
+	}
+	
 	// Plays all weapon overheating particles
 	static void PlayOverheatingParticles(ItemBase weapon, string ammoType, ItemBase muzzle_owner, ItemBase suppressor, string config_to_search)
 	{
@@ -2932,7 +2779,7 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
-	// Plays all muzzle flash particle effect
+	// Stops overheating particles
 	static void StopOverheatingParticles(ItemBase weapon, string ammoType, ItemBase muzzle_owner, ItemBase suppressor, string config_to_search)
 	{
 		int id = muzzle_owner.GetMuzzleID();
@@ -3139,8 +2986,6 @@ class ItemBase extends InventoryItem
 		{		
 			EffectSound sound =	SEffectManager.PlaySound( GetDeploySoundset(), GetPosition() );
 			sound.SetSoundAutodestroy( true );
-			
-			SetIsDeploySound( false );
 		}
 	}
 	
@@ -3150,8 +2995,6 @@ class ItemBase extends InventoryItem
 		{		
 			EffectSound sound =	SEffectManager.PlaySound( GetPlaceSoundset(), GetPosition() );
 			sound.SetSoundAutodestroy( true );
-				
-			SetIsPlaceSound( false );
 		}
 	}
 	
@@ -3159,11 +3002,33 @@ class ItemBase extends InventoryItem
 	{		
 		return IsBeingPlaced() && IsSoundSynchRemote();
 	}
+	
+	//! adds this item to a recipe specified by the 'recipe_classname' parameter, as ingredient number specified by the 'mask' parameter(Ingredient.FIRST,Ingredient.SECOND, Ingredient.BOTH as options)
+	//! returns if adding succeeded(repetetive addition of the same item to the same recipe will fail)
+	bool AddToRecipe(string recipe_classname, int mask)
+	{
+		int recipe_id = PluginRecipesManager.RecipeIDFromClassname(recipe_classname);
+		string name = this.GetType();
+		if( !PluginRecipesManager.m_RecipeCache.Contains( name ) )
+		{
+			PluginRecipesManager.m_RecipeCache.Insert(name, new CacheObject );
+		}
+
+		return PluginRecipesManager.m_RecipeCache.Get(name).AddRecipe(recipe_id,mask);
+	}
+
+	void InitializeRecipes()
+	{
+		OnInitializeRecipes();
+		PluginRecipesManager.m_RecipesInitializedItem.Insert( this.Type(), false);
+	}
+	
+	void OnInitializeRecipes();
 }
 
 EntityAI SpawnItemOnLocation (string object_name, notnull InventoryLocation loc, bool full_quantity)
 {
-	EntityAI entity = SpawnEntity(object_name, loc);
+	EntityAI entity = SpawnEntity(object_name, loc, ECE_IN_INVENTORY, RF_DEFAULT);
 	if (entity)
 	{
 		bool is_item = entity.IsInherited( ItemBase );

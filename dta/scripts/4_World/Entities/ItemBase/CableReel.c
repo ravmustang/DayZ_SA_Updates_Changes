@@ -9,6 +9,7 @@ class CableReel extends ItemBase
 	{
 		m_ForceIntoHands = false;
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
+		RegisterNetSyncVariableBool("m_IsPlaceSound");
 	}
 	
 	void ForceIntoHandsNow ( PlayerBase player ) 

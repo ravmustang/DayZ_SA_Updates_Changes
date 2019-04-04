@@ -2,13 +2,13 @@
 
 class ParticleTest extends ItemBase
 {
-	protected const int	PARTICLE_PATH = ParticleList.SMOKING_CAR_ENGINE;
+	protected const int	PARTICLE_PATH = ParticleList.SMOKE_GENERIC_WRECK;
 	protected Particle 	m_Particle;
 	
 	// Constructor
 	void ParticleTest()
 	{
-		m_Particle = Particle.Play( PARTICLE_PATH, this, GetPosition());
+		m_Particle = Particle.PlayOnObject( PARTICLE_PATH, this, GetPosition());
 	}
 
 	// Destructor

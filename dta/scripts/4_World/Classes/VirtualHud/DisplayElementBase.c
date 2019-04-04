@@ -9,13 +9,15 @@ class DisplayElementBase extends MessageReceiverBase
 	int		m_Pos = 1;
 	int		NUM_OF_BITS;
 	bool 	m_IsClientOnly = false;
+	PlayerBase m_Player;
 	
 	PluginPlayerStatus 	m_ModulePlayerStatus;
 
-	void DisplayElementBase()
+	void DisplayElementBase(PlayerBase player)
 	{
 		m_System = "VirtualHud";
 		m_ModulePlayerStatus = PluginPlayerStatus.Cast(GetPlugin(PluginPlayerStatus));
+		m_Player = player;
 		//SetMaxValue();
 	}
 	

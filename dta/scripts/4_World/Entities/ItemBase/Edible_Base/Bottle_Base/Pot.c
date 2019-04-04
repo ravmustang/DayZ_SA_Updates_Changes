@@ -87,4 +87,9 @@ class Pot extends Bottle_Base
 			}
 		}
 	}
+	
+	override bool IsOpen()
+	{
+		return true;
+	}
 }

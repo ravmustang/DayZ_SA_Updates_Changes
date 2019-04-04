@@ -27,6 +27,7 @@ class PowerGenerator extends ItemBase
 		m_FuelPercentage = 50;
 		RegisterNetSyncVariableInt("m_FuelPercentage");
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
+		RegisterNetSyncVariableBool("m_IsPlaceSound");
 	}
 
 	override void EOnInit( IEntity other, int extra)
@@ -285,7 +286,7 @@ class PowerGenerator extends ItemBase
 	{
 		if ( m_SparkPlug )
 		{
-			if ( !m_SparkPlug.IsRuined() > 0 )
+			if ( !m_SparkPlug.IsRuined() )
 			{
 				return true;
 			}

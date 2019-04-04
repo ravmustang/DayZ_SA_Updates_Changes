@@ -13,6 +13,7 @@ const int INPUT_UDT_USER_MUTE_XBOX				= 11;
 const int INPUT_UDT_USER_SYNC_PERMISSIONS		= 12;
 const int INPUT_UDT_HAND_REMOTE_EVENT			= 13;
 const int INPUT_UDT_WEAPON_LIFT_EVENT 			= 14;
+const int INPUT_UDT_RESET_ADS					= 15;
 
 const int AC_UNCATEGORIZED						= 0;
 const int AC_SINGLE_USE							= 1;
@@ -165,6 +166,7 @@ const int AT_GAG_TARGET = 240;
 const int AT_GAG_SELF = 241;
 const int AT_UNGAG_TARGET = 242;
 const int AT_UNGAG_SELF = 243;
+const int AT_EMPTY_BARREL = 244;
 
 //SingleUse Actions
 const int AT_OPEN = 501;
@@ -245,6 +247,9 @@ const int AT_TURN_ON_WEAPON_FLASHLIGHT = 579;
 const int AT_TURN_OFF_WEAPON_FLASHLIGHT = 580;
 const int AT_VEH_SWITCH_SEATS = 581;
 const int AT_NEXT_COMBINATION_LOCK_DIAL = 582;
+const int AT_BANDANA_TO_MASK = 583;
+const int AT_BANDANA_TO_HEAD = 584;
+const int AT_BANDANA_UNFOLD = 585;
 
 //Interact Actions
 const int AT_PULL_OUT_PLUG = 1001;

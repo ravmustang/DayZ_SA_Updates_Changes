@@ -726,7 +726,9 @@ class WeaponManager
 		
 				if(m_InIronSight || m_InOptic)
 				{
+					m_player.GetInputController().ResetADS();
 					m_player.ExitSights();
+					//Print("exitsights");
 				}
 				
 				m_justStart = false;

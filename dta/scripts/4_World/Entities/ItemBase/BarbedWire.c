@@ -34,13 +34,21 @@ class BarbedWire extends ItemBase
 		m_SparkEvent 	= new Timer( CALL_CATEGORY_SYSTEM );
 		m_TriggerActive = false;
 		m_IsPlaced 		= false;
+		m_DeployLoopSound = new EffectSound;
 		
 		//synchronized variables
 		RegisterNetSyncVariableBool( "m_IsMounted" );	
 		RegisterNetSyncVariableBool( "m_IsSoundSynchRemote" );	
+		RegisterNetSyncVariableBool("m_IsDeploySound");
 	}
 	
-	void ~BarbedWire() {}
+	void ~BarbedWire()
+	{
+		if ( m_DeployLoopSound )
+		{
+			SEffectManager.DestroySound( m_DeployLoopSound );
+		}
+	}
 	
 	bool IsMounted()
 	{
@@ -113,7 +121,10 @@ class BarbedWire extends ItemBase
 	{		
 		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
 		{		
-			m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			if ( !m_DeployLoopSound.IsSoundPlaying() )
+			{
+				m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			}
 		}
 	}
 	
@@ -121,8 +132,8 @@ class BarbedWire extends ItemBase
 	{
 		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
 		{	
+			m_DeployLoopSound.SetSoundFadeOut(0.5);
 			m_DeployLoopSound.SoundStop();
-			delete m_DeployLoopSound;
 		}
 	}
 	
@@ -143,7 +154,7 @@ class BarbedWire extends ItemBase
 	{   
 		super.OnStoreSave( ctx );
 		
-		//sync parts 01
+		//is mounted
 		ctx.Write( m_IsMounted );
 	}
 	
@@ -153,10 +164,11 @@ class BarbedWire extends ItemBase
 			return false;
 		
 		//--- Barbed wire data ---
-		//Restore synced parts data
+		//is mounted
 		if ( !ctx.Read( m_IsMounted ) )
 		{
-			m_IsMounted = false;		//set default
+			m_IsMounted = false;
+			return false;
 		}
 		//---
 		
@@ -165,8 +177,10 @@ class BarbedWire extends ItemBase
 
 	override void AfterStoreLoad()
 	{	
+		super.AfterStoreLoad();
+				
 		// m_IsMounted is already set during Load - but not Active! this is done here because hierarchy
-		SetMountedState(m_IsMounted);
+		SetMountedState( m_IsMounted );
 	}
 
 	// ---
@@ -267,7 +281,7 @@ class BarbedWire extends ItemBase
 	// Spawns spark particle effect and plays sound.
 	void Spark()
 	{
-		Particle.Play( ParticleList.BARBED_WIRE_SPARKS, this);
+		Particle.PlayOnObject( ParticleList.BARBED_WIRE_SPARKS, this);
 		SoundSpark();
 	}
 	
@@ -374,9 +388,9 @@ class BarbedWire extends ItemBase
 					{ CreateDamageTrigger(); }
 				m_IsPlaced = true;
 			}
+			
+			SetIsDeploySound( true );
 		}	
-		
-		SetIsDeploySound( true );
 	}
 	
 	override string GetDeploySoundset()

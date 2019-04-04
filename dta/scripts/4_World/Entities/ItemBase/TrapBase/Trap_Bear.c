@@ -66,9 +66,10 @@ class BearTrap extends TrapBase
 						if ( victim_MB.IsInherited(Man) ) // Do not damage OLD player through new damage system! Otherwise the game might crash!
 						{
 							string dmg_zone_hit = victim_MB.GetDamageZoneNameByComponentIndex(contactComponent);
-							Print(dmg_zone_hit);
-							victim_MB.ProcessDirectDamage(DT_CLOSE_COMBAT, this, dmg_zone_hit, "MeleeFist", "0 0 0", 1);
-							victim_MB.ProcessDirectDamage(DT_FIRE_ARM, this, dmg_zone_hit, "Bullet_556x45", "0 0 0", 1);
+							//Print(dmg_zone_hit);
+							victim_MB.ProcessDirectDamage(DT_CLOSE_COMBAT, this, dmg_zone_hit, "BearTrapHit", "0 0 0", 1);
+							
+							CauseVictimToStartLimping( victim_MB );
 
 							//debug
 							/* 
@@ -89,10 +90,11 @@ class BearTrap extends TrapBase
 					if ( Math.RandomIntInclusive(0, 1) == 1 )
 						dmg_zone_rnd = "RightFoot";
 					
-					Print(dmg_zone_rnd);
-					victim_MB.ProcessDirectDamage(DT_CLOSE_COMBAT, this, dmg_zone_rnd, "MeleeFist", "0 0 0", 1);
-					victim_MB.ProcessDirectDamage(DT_FIRE_ARM, this, dmg_zone_rnd, "Bullet_556x45", "0 0 0", 1);
+					//Print(dmg_zone_rnd);
+					victim_MB.ProcessDirectDamage(DT_CLOSE_COMBAT, this, dmg_zone_rnd, "BearTrapHit", "0 0 0", 1);
 
+					CauseVictimToStartLimping( victim_MB );
+					
 					//debug
 					/* 
 					PlayerBase player2 = PlayerBase.Cast( victim );
@@ -116,6 +118,18 @@ class BearTrap extends TrapBase
 		else
 		{
 			PlaySoundBiteEmpty();
+		}
+	}
+	
+	// Causes the player to start limping. Temporal solution until broken limbs are properly simulated.
+	void CauseVictimToStartLimping( ManBase player_MB )
+	{
+		PlayerBase player_PB = PlayerBase.Cast(player_MB);
+		
+		if (player_PB)
+		{
+			float target_health = player_PB.GetHealth() * 0.2;
+			player_PB.SetHealth(target_health);
 		}
 	}
 		

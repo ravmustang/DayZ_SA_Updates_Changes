@@ -527,6 +527,7 @@ class ActionManagerClient: ActionManagerBase
 	{
 		if ( !m_CurrentActionData && action ) 
 		{	
+			Print("Action=" + action.Type() + " started, STS=" + m_Player.GetSimulationTimeStamp());
 			m_Interrupted = false;
 			if ( GetGame().IsMultiplayer() && !action.IsLocal() )
 			{

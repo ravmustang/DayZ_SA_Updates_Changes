@@ -1,6 +1,6 @@
 class ElementStance extends DisplayElementBase 
 {
-	void ElementStance()
+	void ElementStance(PlayerBase player)
 	{
 		NUM_OF_BITS = 2;
 		m_Type		=	eDisplayElements.DELM_STANCE;

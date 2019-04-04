@@ -47,7 +47,7 @@ class ActionBase
 
 	//RUNTIME DATA
 	protected ref Param1<string> 	m_MessageParam; //used for passing messages from server to client
-	protected ref Param2<int,int>	m_MessagesParam; 	
+	protected ref Param2<int,int>	m_MessagesParam;
 	
 	//SOFT SKILLS
 	protected float					m_SpecialtyWeight;
@@ -215,6 +215,11 @@ class ActionBase
 		return false;
 	}
 	
+	bool CanBeUsedOnBack()
+	{
+		return false;
+	}
+	
 	protected bool ActionConditionContinue( ActionData action_data ) //condition for action
 	{
 		return ActionCondition(action_data.m_Player,action_data.m_Target,action_data.m_MainItem);
@@ -348,7 +353,7 @@ class ActionBase
 			else
 			{
 				Error("Action target not created.");
-				action_data.m_Target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0); 
+				action_data.m_Target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0);
 			}
 		}
 	}
@@ -400,7 +405,7 @@ class ActionBase
 		{
 			OnStartClient(action_data);
 		}	
-		InformPlayers(action_data.m_Player,action_data.m_Target,UA_START);	
+		InformPlayers(action_data.m_Player,action_data.m_Target,UA_START);
 	}
 	
 	void End( ActionData action_data )
@@ -417,7 +422,12 @@ class ActionBase
 
 	bool Can( PlayerBase player, ActionTarget target, ItemBase item )
 	{
-		if ( !m_FullBody && (!player || !player.IsPlayerInStance(GetStanceMask(player))) )
+		if(  !CanBeUsedOnBack() && player.GetCommand_Move() && player.GetCommand_Move().IsOnBack())
+		{
+			return false;
+		}
+		
+		if ( !IsFullBody(player) && !player.IsPlayerInStance(GetStanceMask(player)) )
 		{
 			return false;
 		}
@@ -425,7 +435,7 @@ class ActionBase
 		if ( player.IsRestrained() && !CanBeUsedInRestrain() )
 			return false;
 		
-		if (player.GetCommand_Vehicle() && !CanBeUsedInVehicle() )
+		if ( !CanBeUsedInVehicle() && player.GetCommand_Vehicle() )
 			return false;
 		
 		if ( HasTarget() )
@@ -441,8 +451,8 @@ class ActionBase
 			}
 		}
 		
-		if ( m_ConditionItem && m_ConditionItem.Can(player, item) && m_ConditionTarget && m_ConditionTarget.Can(player, target) && ActionCondition(player, target, item) ) 
-		{	
+		if ( m_ConditionItem && m_ConditionItem.Can(player, item) && m_ConditionTarget && m_ConditionTarget.Can(player, target) && ActionCondition(player, target, item) )
+		{
 			return true;
 		}
 		return false;
@@ -768,7 +778,7 @@ class ActionBase
 		}
 
 		return false;
-	}	
+	}
 	// ------------------------------------------------------
 	
 	

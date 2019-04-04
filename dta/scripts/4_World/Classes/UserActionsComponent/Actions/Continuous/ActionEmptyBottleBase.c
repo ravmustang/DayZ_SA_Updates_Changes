@@ -1,10 +1,12 @@
 class ActionEmptyBottleBaseCB : ActionContinuousBaseCB
-{
-	private const float QUANTITY_EMPTIED_PER_SEC = 200;
-	
+{	
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousEmpty(QUANTITY_EMPTIED_PER_SEC);
+		float EmptiedQuantity;// = QUANTITY_EMPTIED_PER_SEC;
+		Bottle_Base bottle = Bottle_Base.Cast(m_ActionData.m_MainItem);
+		if (bottle)
+			EmptiedQuantity = bottle.GetLiquidEmptyRate();
+		m_ActionData.m_ActionComponent = new CAContinuousEmpty(EmptiedQuantity);
 	}
 	
 	override void OnAnimationEvent(int pEventID)	

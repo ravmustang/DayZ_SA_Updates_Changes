@@ -19,11 +19,13 @@ class TentBase extends ItemBase
 		m_ToggleAnimations = new map<ref ToggleAnimations, bool>;
 		m_ShowAnimationsWhenPitched = new array<string>;
 		m_ShowAnimationsWhenPacked = new array<string>;
+		m_DeployLoopSound = new EffectSound;
 		RegisterNetSyncVariableBool("m_State");
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 		RegisterNetSyncVariableBool("m_IsEntrance");
-		RegisterNetSyncVariableBool("m_IsWindow");
+		RegisterNetSyncVariableBool("m_IsWindow");	
 		RegisterNetSyncVariableBool("m_IsToggle");
+		RegisterNetSyncVariableBool("m_IsDeploySound");
 	}
 	
 	void ~TentBase()
@@ -31,6 +33,11 @@ class TentBase extends ItemBase
 		if ( GetGame() )
 		{
 			DestroyClutterCutter();
+		}
+		
+		if ( m_DeployLoopSound )
+		{
+			SEffectManager.DestroySound( m_DeployLoopSound );
 		}
 	}
 	
@@ -50,7 +57,7 @@ class TentBase extends ItemBase
 		
 		if ( GetState() == PITCHED )
 		{
-			Pitch();
+			Pitch( false );
 						
 			if ( GetGame().IsServer() )
 			{
@@ -65,7 +72,7 @@ class TentBase extends ItemBase
 		}
 		else
 		{
-			Pack();
+			Pack( false );
 		}
 		return true;
 	}
@@ -76,11 +83,11 @@ class TentBase extends ItemBase
 		
 		if ( GetState() == PITCHED )
 		{
-			Pitch();
+			Pitch( false );
 		}
 		else
 		{
-			Pack();
+			Pack( false );
 		}
 	}
 	
@@ -90,14 +97,14 @@ class TentBase extends ItemBase
 		
 		if ( new_owner || old_owner )
 		{
-			Pack();
+			Pack( false );
 		}
 	}
 	
 	override void OnVariablesSynchronized()
 	{
 		super.OnVariablesSynchronized();
-			
+					
 		if ( IsDeploySound() )
 		{
 			PlayDeploySound();
@@ -130,12 +137,12 @@ class TentBase extends ItemBase
 				}
 				else
 				{
-					Pitch();	
+					Pitch( false );	
 				}
 			}
 			else
 			{
-				Pack();
+				Pack( false );
 			}		
 		}
 		
@@ -335,7 +342,7 @@ class TentBase extends ItemBase
 		return false;
 	}
 	
-	void Pack( bool update_navmesh = true )
+	void Pack( bool update_navmesh )
 	{	
 		HideAllAnimationsAndProxyPhysics();
 		
@@ -360,7 +367,7 @@ class TentBase extends ItemBase
 		SetSynchDirty();
 	}
 
-	void Pitch( bool update_navmesh = true )
+	void Pitch( bool update_navmesh )
 	{		
 		HideAllAnimationsAndProxyPhysics();
 		
@@ -617,17 +624,20 @@ class TentBase extends ItemBase
 		
 		if ( GetGame().IsServer() )
 		{
-			Pitch( true );
+			Pitch( false );
+			
+			SetIsDeploySound( true );
 		}
-		
-		SetIsDeploySound( true );
 	}
 	
 	void PlayDeployLoopSound()
 	{		
 		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
 		{		
-			m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			if ( !m_DeployLoopSound.IsSoundPlaying() )
+			{
+				m_DeployLoopSound = SEffectManager.PlaySound( GetLoopDeploySoundset(), GetPosition() );
+			}
 		}
 	}
 	
@@ -635,8 +645,8 @@ class TentBase extends ItemBase
 	{
 		if ( GetGame().IsMultiplayer() && GetGame().IsClient() || !GetGame().IsMultiplayer() )
 		{	
+			m_DeployLoopSound.SetSoundFadeOut(0.5);
 			m_DeployLoopSound.SoundStop();
-			delete m_DeployLoopSound;
 		}
 	}
 };

@@ -4,4 +4,9 @@ class Shovel extends ItemBase
 	{
 		return true;
 	}
+
+	override bool IsMeleeFinisher()
+	{
+		return true;
+	}
 }

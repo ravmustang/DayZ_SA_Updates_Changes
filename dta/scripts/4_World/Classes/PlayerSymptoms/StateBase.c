@@ -290,7 +290,13 @@ class SymptomBase
 		AnimationFinish();
 	}
 	
+	void AnimationStart()
+	{
+		OnAnimationStart();
+	}
+	
 	protected void OnAnimationFinish();
+	protected void OnAnimationStart();
 	protected void OnAnimationPlayFailed();
 
 	

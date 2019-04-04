@@ -59,6 +59,7 @@ class Pistol_CLO_JAM_BU1_MA0 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 class Pistol_OPE_DIS_BU0_MA0 extends WeaponStableState
 {
@@ -68,6 +69,7 @@ class Pistol_OPE_DIS_BU0_MA0 extends WeaponStableState
 	override bool HasBullet () { return false; }
 	override bool HasMagazine () { return false; }
 	override bool IsJammed () { return false; }
+	override bool IsBoltOpen () { return true; }
 };
 class Pistol_CLO_CHG_BU0_MA1 extends WeaponStableState
 {
@@ -95,6 +97,7 @@ class Pistol_CLO_JAM_BU1_MA1 extends WeaponStateJammed
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return true; }
+	override bool IsBoltOpen () { return true; }
 };
 class Pistol_CLO_CHG_BU1_MA1 extends WeaponStableState
 {
@@ -113,6 +116,7 @@ class Pistol_OPE_DIS_BU0_MA1 extends WeaponStableState
 	override bool HasBullet () { return false; }
 	override bool HasMagazine () { return true; }
 	override bool IsJammed () { return false; }
+	override bool IsBoltOpen () { return true; }
 };
 
 
@@ -444,7 +448,7 @@ class Pistol_Base extends Weapon_Base
 			Attach_OD00.AddTransition(new WeaponTransition(Attach_OD00.m_start,   _abt_,   OD00));
 			Attach_OD00.AddTransition(new WeaponTransition(Attach_OD00.m_getNew,  _abt_,   OD00));
 			Attach_OD00.AddTransition(new WeaponTransition(Attach_OD00.m_attach,  _abt_,   OD01));
-			Attach_OD00.AddTransition(new WeaponTransition(Attach_OD00.m_onCK, 	  _abt_,      CC01));
+			Attach_OD00.AddTransition(new WeaponTransition(Attach_OD00.m_onCK, 	  _abt_,   CC01));
 			Attach_OD00.AddTransition(new WeaponTransition(Attach_OD00.m_chamber, _abt_,   CC11));
 
 		m_fsm.AddTransition(new WeaponTransition(  CC00, __A__, Attach_CC00, NULL, new WeaponGuardCanAttachMag(this))); // attach from CLO/b0/m0 charged

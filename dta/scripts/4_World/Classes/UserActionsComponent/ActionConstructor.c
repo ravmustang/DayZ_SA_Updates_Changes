@@ -69,6 +69,9 @@ class ActionConstructor
 		actions.Insert(new ActionNextCombinationLockDial);
 		actions.Insert(new ActionAttachToConstruction);
 		actions.Insert(new ActionTakeMaterialToHandsSwitch);
+		actions.Insert(new ActionFoldBandanaToMask);
+		actions.Insert(new ActionFoldBandanaToHead);
+		actions.Insert(new ActionUnfoldBandana);
 		
 		//actions.Insert(new ActionLoadMagazineToWeapon);
 		//actions.Insert(new ActionLoadBulletToWeapon);

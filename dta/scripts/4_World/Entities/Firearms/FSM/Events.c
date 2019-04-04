@@ -275,7 +275,29 @@ class WeaponEventAnimAttachmentShow extends WeaponEventAnimation
 
 class WeaponEventAnimBulletEject extends WeaponEventAnimation
 {
-	void WeaponEventAnimBulletEject (DayZPlayer p = NULL, Magazine m = NULL) { m_type = WeaponEvents.BULLET_EJECT; }
+	void WeaponEventAnimBulletEject (DayZPlayer p = NULL, Magazine m = NULL) 
+	{ 
+		m_type = WeaponEvents.BULLET_EJECT; 
+		
+		// Particles for ejecting bullet casings
+		PlayerBase player = PlayerBase.Cast(p);
+		
+		if (player)
+		{
+			ItemBase weapon = player.GetItemInHands();
+			
+			if (weapon  &&  weapon.GetOverheatingValue() > 0)
+			{
+				Weapon_Base weapon_base = Weapon_Base.Cast(weapon);
+				ItemBase suppressor;
+				
+				if (weapon_base)
+					suppressor = weapon_base.GetAttachedSuppressor();
+				
+				ItemBase.PlayBulletCasingEjectParticles(weapon, "", weapon, suppressor, "CfgWeapons" );
+			}
+		}
+	}
 };
 
 class WeaponEventAnimBulletHide extends WeaponEventAnimation

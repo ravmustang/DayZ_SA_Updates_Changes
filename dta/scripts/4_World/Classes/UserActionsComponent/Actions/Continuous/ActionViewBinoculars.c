@@ -34,6 +34,7 @@ class ActionViewBinoculars : ActionViewOptics
 	
 	override void EnterOptics(ItemOptics optic, PlayerBase player)
 	{
+		player.SetHandheldOpticsInUse(true);
 		optic.EnterOptics();
 		optic.HideSelection("hide");
 		if ( optic.HasEnergyManager() )
@@ -56,6 +57,7 @@ class ActionViewBinoculars : ActionViewOptics
 	{
 		optic.ShowSelection("hide");
 		optic.ExitOptics();
+		player.SetHandheldOpticsInUse(false);
 		if ( optic.HasEnergyManager() )
 		{
 			if ( GetGame().IsServer() )

@@ -29,6 +29,7 @@ class DayZPlayerImplementAiming
 	protected int m_ShakeCount;
 	protected float m_SwayWeight;
 	protected float m_MaxVelocity;
+	protected ref KuruShake m_KuruShake;
 
 	protected static float	m_AimXClampRanges[] = { -180, -20, 90, 	0, -50, 90,  180, -20, 90 };
 
@@ -45,6 +46,12 @@ class DayZPlayerImplementAiming
 		{
 			m_CurrentRecoil = weapon.SpawnRecoilObject();
 		}
+	}
+	
+	void RequestKuruShake(float amount)
+	{
+		if(!m_KuruShake)
+			m_KuruShake = new KuruShake(m_PlayerPb, amount);
 	}
 	
 	float GetSwayWeight()
@@ -79,6 +86,8 @@ class DayZPlayerImplementAiming
 		float recoil_offset_hands_x;
 		float recoil_offset_hands_y;
 		
+		float kuru_offset_x;
+		float kuru_offset_y;
 	
 		float player_stamina = m_PlayerPb.GetStaminaHandler().GetStaminaNormalized();
 		float speed = ((1.0 - player_stamina) * 4.0) + 1.0;
@@ -107,13 +116,18 @@ class DayZPlayerImplementAiming
 			m_CurrentRecoil.Update(recoil_offset_mouse_x, recoil_offset_mouse_y, recoil_offset_hands_x, recoil_offset_hands_y, pDt);
 		}
 		
+		if( m_KuruShake )
+		{
+			m_KuruShake.Update(pDt, kuru_offset_x, kuru_offset_y);
+		}
+		
 		//! hands offset
-		pModel.m_fAimXHandsOffset = breathing_offset_x + noise_offset_x + recoil_offset_hands_x + shake_offset_x;
-		pModel.m_fAimYHandsOffset = breathing_offset_y + noise_offset_y + recoil_offset_hands_y + shake_offset_y;
+		pModel.m_fAimXHandsOffset = breathing_offset_x + noise_offset_x + recoil_offset_hands_x + shake_offset_x + kuru_offset_x;
+		pModel.m_fAimYHandsOffset = breathing_offset_y + noise_offset_y + recoil_offset_hands_y + shake_offset_y + kuru_offset_y;
 
 		//! cam offset
-		pModel.m_fAimXCamOffset = -shake_offset_x - recoil_offset_hands_x;// + shake_offset_x;
-		pModel.m_fAimYCamOffset	= -shake_offset_y - recoil_offset_hands_y;// + shake_offset_y;
+		pModel.m_fAimXCamOffset = -shake_offset_x - recoil_offset_hands_x - kuru_offset_x;
+		pModel.m_fAimYCamOffset	= -shake_offset_y - recoil_offset_hands_y - kuru_offset_y;
 		/*
 		pModel.m_fAimXCamOffset = -shake_offset_y - recoil_offset_hands_y;// + shake_offset_x;
 		pModel.m_fAimYCamOffset	= shake_offset_x + recoil_offset_hands_x;// + shake_offset_y;
@@ -126,9 +140,13 @@ class DayZPlayerImplementAiming
 			pModel.m_fAimYHandsOffset += newVal - pModel.m_fCurrentAimY;
 		}
 		
+		if( m_PlayerDpi.IsInOptics() && m_KuruShake )
+		{
+			//TODO - do not offset mouse
+		}
 		//! mouse offset
-		pModel.m_fAimXMouseShift = recoil_offset_mouse_x;
-		pModel.m_fAimYMouseShift = recoil_offset_mouse_y;
+		pModel.m_fAimXMouseShift = recoil_offset_mouse_x -kuru_offset_x / 10;
+		pModel.m_fAimYMouseShift = recoil_offset_mouse_y + kuru_offset_y / 10;
 		
 		return true;
 	}

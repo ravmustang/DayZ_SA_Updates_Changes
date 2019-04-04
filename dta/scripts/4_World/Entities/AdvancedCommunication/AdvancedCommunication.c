@@ -96,6 +96,10 @@ class AdvancedCommunication extends EntityAI
 
 class PASReceiver extends AdvancedCommunication
 {
+	override bool IsInventoryVisible()
+	{
+		return false;
+	}
 };
 
 class PASBroadcaster extends AdvancedCommunication

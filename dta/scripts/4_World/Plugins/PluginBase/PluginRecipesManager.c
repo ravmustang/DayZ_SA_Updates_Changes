@@ -7,9 +7,13 @@ enum ERecipeSanityCheck
 
 const float ACCEPTABLE_DISTANCE = 5;
 
-const int SANITY_CHECK_ACCEPTABLE_RESULT = ERecipeSanityCheck.NOT_OWNED_BY_ANOTHER_LIVE_PLAYER + ERecipeSanityCheck.CLOSE_ENOUGH;
+const int SANITY_CHECK_ACCEPTABLE_RESULT = ERecipeSanityCheck.NOT_OWNED_BY_ANOTHER_LIVE_PLAYER | ERecipeSanityCheck.CLOSE_ENOUGH;
+
 class PluginRecipesManager extends PluginRecipesManagerBase
 {
+	static ref map<string,ref CacheObject > m_RecipeCache = new map<string,ref CacheObject >;
+	static ref map<typename, bool> m_RecipesInitializedItem = new ref map<typename, bool>;
+	
 	ref Timer m_TestTimer;
 	const string KEYWORD_NEW_ITEM = "Item:";
 	const string PATH_CACHE_FILE = "Scripts/Data/cache_recipes.cache";
@@ -39,19 +43,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	
 	ref array<int> m_RecipesMatched = new array<int>;
 	
-	RecipeBase m_Recipe;//member variable for max perf
-	 
-	CacheObject co_item_a;
-	CacheObject co_item_b;
-	
-	array<int> item_a_recipes;
-	array<int> item_b_recipes;
-	
-	array<int> item_a_masks;
-	array<int> item_b_masks;
-	
-	
-	ref map<string,ref CacheObject> m_CacheItemMap;//this is the final result of caching
+	//ref map<string,ref CacheObject > m_CacheItemMap;//this is the final result of caching
 	ref map<string,ref CacheObject> m_CacheBasesMap;//this is an optimization base map, used as an intermediary to speed up the cache generation by not looking up the already resolved base classes in recipes
 	
 	ref array<string> m_CachedItems;
@@ -63,6 +55,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	
 	//ref RecipeBase m_RecipeList[MAX_NUMBER_OF_RECIPES];//all recipes
 	ref array<ref RecipeBase> m_RecipeList = new array<ref RecipeBase>;//all recipes
+	static ref map<string, int> m_RecipeNamesList = new map<string, int>;//all recipes
 	
 	ref Timer myTimer1;
 	
@@ -74,16 +67,13 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	void PluginRecipesManager()
 	{
 		
-		m_CacheItemMap = new map<string,ref CacheObject>;
+		//m_CacheItemMap = new map<string,ref CacheObject >;
 		m_CacheBasesMap = new map<string,ref CacheObject>;
 		
 		m_NumberOfRecipes = 0;
-		/*
-		for(int i = 0; i < MAX_NUMBER_OF_RECIPES; i++)
-		{
-			m_RecipeList[i] = NULL;
-		}
-		*/
+		
+
+		
 		CreateAllRecipes();
 		
 		myTimer1 = new Timer();
@@ -121,6 +111,12 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			return 0;
 		}
 		
+		if( !PluginRecipesManager.m_RecipesInitializedItem.Contains(item1.Type()))
+			item1.InitializeRecipes();
+		
+		if( !PluginRecipesManager.m_RecipesInitializedItem.Contains(item2.Type()))
+			item2.InitializeRecipes();
+		
 		m_Ingredients[0] = item1;
 		m_Ingredients[1] = item2;
 		
@@ -130,7 +126,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	int GetValidRecipesProper(int num_of_items, ItemBase items[], array<int> ids, PlayerBase player)
 	{
 		if(ids) ids.Clear();
-		GetRecipeIntersection(num_of_items,items, m_RecipesMatched);
+		GetRecipeIntersection(num_of_items,items);
 		int numOfRecipes = SortIngredients(num_of_items,items,m_ResolvedRecipes);
 		//will return number of cached recipes for the 2 items being considered, 
 		//and save their indexes in m_ResolvedRecipes, please note the m_ResolvedRecipes is a static array, 
@@ -190,10 +186,10 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 
 	protected void GenerateRecipeCache(array<string> cached_items)
 	{
-		GetGame().ProfilerStart("RECIPE_CACHE");
+		GetGame().ProfilerStart("m_RecipeCache");
 		
 		m_CacheBasesMap.Clear();
-		m_CacheItemMap.Clear();
+		PluginRecipesManager.m_RecipeCache.Clear();
 		
 		ref TStringArray all_config_paths = new TStringArray;
 		
@@ -220,21 +216,22 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 				if ( scope == 2 )
 				{
 					GetGame().ConfigGetFullPath(config_path +" "+ child_name,/*out*/ full_path);
-					EvaluateFullPathAgainstRecipes(full_path, cached_items);
+					EvaluateFullPathAgainstRecipes(full_path);
 				}
 			}
 		}
-		SortRecipesOrderInCache();
-		GetGame().ProfilerStop("RECIPE_CACHE");
+		//SortRecipesOrderInCache();
+		GetGame().ProfilerStop("m_RecipeCache");
 	}
 
-	protected void EvaluateFullPathAgainstRecipes(TStringArray full_path, array<string> cached_items)
+	protected void EvaluateFullPathAgainstRecipes(TStringArray full_path)
 	{
 		ResolveBaseClasses(full_path);
 		ResolveItemClasses(full_path);
 		LeechRecipesFromBases(full_path);
 	}
 	
+	/*
 	protected void SortRecipesOrderInCache()
 	{
 		for(int i = 0; i < m_CacheItemMap.Count(); i++)
@@ -245,7 +242,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			//Sort( value.GetRecipes(), value.GetRecipes().Count() ); //use the sort here
 		}
 	}
-
+*/
 	protected void ResolveBaseClasses(TStringArray full_path)
 	{
 		int mask;
@@ -300,11 +297,11 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			{
 				temp_base_rcps_array = m_CacheBasesMap.Get(base_name).GetRecipes();
 				temp_base_msks_array = m_CacheBasesMap.Get(base_name).GetMasks();
-				if( !m_CacheItemMap.Get(item_name) )
+				if( !PluginRecipesManager.m_RecipeCache.Get(item_name) )
 				{
 					CreateNewCacheItem(item_name);
 				}
-				co_item = m_CacheItemMap.Get(item_name);
+				co_item = PluginRecipesManager.m_RecipeCache.Get(item_name);
 				for( int x = 0; x < temp_base_rcps_array.Count(); x++ )//base recipes
 				{
 					int recipe_id = temp_base_rcps_array.Get(x);
@@ -342,14 +339,14 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	
 				if( mask > 0)
 				{
-					if( m_CacheItemMap.Contains( item_name ) )//this should not happen as every item should be unique
+					if( PluginRecipesManager.m_RecipeCache.Contains( item_name ) )//this should not happen as every item should be unique
 					{
-						m_CacheItemMap.Get(item_name).AddRecipe(i,mask);
+						PluginRecipesManager.m_RecipeCache.Get(item_name).AddRecipe(i,mask);
 					}
 					else
 					{
 						CreateNewCacheItem(item_name);
-						m_CacheItemMap.Get(item_name).AddRecipe(i,mask);
+						PluginRecipesManager.m_RecipeCache.Get(item_name).AddRecipe(i,mask);
 					}
 				}
 			}
@@ -358,7 +355,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 
 	protected void CreateNewCacheItem(string item_name)
 	{
-		m_CacheItemMap.Insert(item_name, new CacheObject);
+		PluginRecipesManager.m_RecipeCache.Insert(item_name, new CacheObject);
 		m_CachedItems.Insert(item_name);
 	}
 
@@ -374,6 +371,13 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			Error("PerformRecipeServer - one of the items null !!");
 			return;
 		}
+		
+		if( !PluginRecipesManager.m_RecipesInitializedItem.Contains(item_a.Type()))
+			item_a.InitializeRecipes();
+		
+		if( !PluginRecipesManager.m_RecipesInitializedItem.Contains(item_b.Type()))
+			item_b.InitializeRecipes();
+		
 		SortIngredientsInRecipe(id, 2,m_Ingredients, m_sortedIngredients);
 
 		bool is_recipe_valid = CheckRecipe(id,m_sortedIngredients[0],m_sortedIngredients[1],player);
@@ -405,10 +409,10 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			return;
 		}
 		array<int> recipes = new array<int>;
-		for(int i = 0; i < m_CacheItemMap.Count(); i++)
+		for(int i = 0; i < PluginRecipesManager.m_RecipeCache.Count(); i++)
 		{
-			string key = m_CacheItemMap.GetKey(i);
-			CacheObject value = m_CacheItemMap.GetElement(i);
+			string key = PluginRecipesManager.m_RecipeCache.GetKey(i);
+			CacheObject value = PluginRecipesManager.m_RecipeCache.GetElement(i);
 			
 			string line = key;
 			recipes.Clear();
@@ -483,9 +487,17 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		
 		recipe.SetID(m_RegRecipeIndex);
 		m_RecipeList.Insert(recipe);
+		m_RecipeNamesList.Insert(recipe.ClassName(), recipe.GetID());
 		m_RegRecipeIndex++;
 	}
 
+	static int RecipeIDFromClassname(string classname)
+	{
+		if(m_RecipeNamesList.Contains(classname))
+			return m_RecipeNamesList.Get(classname);
+		return -1;
+	}
+	
 	protected bool CheckRecipe(int id, ItemBase item1, ItemBase item2, PlayerBase player)//requires ordered items
 	{
 		RecipeBase p_recipe = m_RecipeList[id];
@@ -513,10 +525,10 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	
 	protected void PrintCache()
 	{
-		for(int i = 0; i < m_CacheItemMap.Count(); i++)
+		for(int i = 0; i < PluginRecipesManager.m_RecipeCache.Count(); i++)
 		{
-			string key = m_CacheItemMap.GetKey(i);
-			CacheObject value = m_CacheItemMap.GetElement(i);
+			string key = PluginRecipesManager.m_RecipeCache.GetKey(i);
+			CacheObject value = PluginRecipesManager.m_RecipeCache.GetElement(i);
 			ref array<int> recipes = new array<int>;
 
 			recipes.InsertAll( value.GetRecipes() );
@@ -535,7 +547,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		
 		for(int i = 0; i < num_of_ingredients; i++)
 		{
-			CacheObject co_item = m_CacheItemMap.Get( ingredients_unsorted[i].GetType() );
+			CacheObject co_item = PluginRecipesManager.m_RecipeCache.Get( ingredients_unsorted[i].GetType() );
 			m_IngredientBitMask[i] = co_item.GetMaskByRecipeID(id);
 			m_IngredientBitMaskSize[i] = co_item.GetBitCountByRecipeID(id);
 		}
@@ -622,13 +634,13 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		}
 	}
 	
-	//!fills an array given as a parameter with recipe IDs which 'item_a' and 'item_b' share and where they can function as different ingredients, will return number of recipes in this array
-	protected int GetRecipeIntersection(int num_of_ingredients, ItemBase items[], array<int> matches)
+	//!fills an array with recipe IDs which 'item_a' and 'item_b' share
+	protected int GetRecipeIntersection(int num_of_ingredients, ItemBase items[])
 	{
 		int count = 0;
 		int smallest = 9999;
 		int smallest_index = 0;
-		matches.Clear();
+		m_RecipesMatched.Clear();
 		
 		/*
 		m_Ingredients[0] = item_a;
@@ -639,7 +651,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		
 		for(int i = 0; i < num_of_ingredients; i++)
 		{
-			CacheObject cobject = m_CacheItemMap.Get( items[i].GetType() );
+			CacheObject cobject = PluginRecipesManager.m_RecipeCache.Get( items[i].GetType() );
 			if(!cobject) 
 			{
 				return 0;
@@ -654,19 +666,17 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		
 		//look for matches
 		array<int> recipes = co_least_recipes.GetRecipes();
-		bool fail;
 		for(int x = 0; x < recipes.Count(); x++)
 		{
 			int id = recipes.Get(x);
-			fail = false;
 			for(int z = 0; z < num_of_ingredients; z++)
 			{
 				if( z!= smallest_index)
 				{
-					CacheObject cobject2 = m_CacheItemMap.Get( items[z].GetType() );
+					CacheObject cobject2 = PluginRecipesManager.m_RecipeCache.Get( items[z].GetType() );
 					if( cobject2.IsContainRecipe(id) )
 					{
-						matches.Insert(id);
+						m_RecipesMatched.Insert(id);
 						count++;
 					}
 				}
@@ -717,8 +727,8 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			for(int i = 0; i < m_CachedItems.Count(); i++)
 			{
 				string cache_key = m_CachedItems.Get(i);
-				array<int> recipe_array = m_CacheItemMap.Get(cache_key).GetRecipes();
-				array<int> mask_array = m_CacheItemMap.Get(cache_key).GetMasks();
+				array<int> recipe_array = PluginRecipesManager.m_RecipeCache.Get(cache_key).GetRecipes();
+				array<int> mask_array = PluginRecipesManager.m_RecipeCache.Get(cache_key).GetMasks();
 				
 				
 				FPrintln(file, KEYWORD_NEW_ITEM);
@@ -745,7 +755,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	
 	protected void ReadCacheFromFile(string filename)
 	{
-		GetGame().ProfilerStart("RECIPE_CACHE_READ");
+		GetGame().ProfilerStart("m_RecipeCache_READ");
 		Debug.Log("Reading cache from file","recipes");
 		FileHandle file = OpenFile(filename, FileMode.READ);
 //		Print(file);
@@ -753,7 +763,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 		int num_of_items = 0;
 		string cache_key;
 		string curr_line;
-		m_CacheItemMap.Clear();
+		//PluginRecipesManager.m_RecipeCache.Clear();
 		
 		while(true)
 		{
@@ -765,7 +775,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 			{
 				FGets(file,curr_line);//skip the keyword to get to the classname
 				cache_key = curr_line;
-				m_CacheItemMap.Insert(cache_key, new CacheObject);
+				PluginRecipesManager.m_RecipeCache.Insert(cache_key, new CacheObject );
 			}
 			else
 			{
@@ -774,11 +784,11 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 				FGets(file,curr_line);//skip keyword for mask
 				FGets(file,curr_line);//get the mask
 				int mask = curr_line.ToInt();
-				m_CacheItemMap.Get(cache_key).AddRecipe(item, mask);
+				PluginRecipesManager.m_RecipeCache.Get(cache_key).AddRecipe(item, mask);
 			}
 		}
 		//PrintCache();
 		CloseFile(file);
-		GetGame().ProfilerStop("RECIPE_CACHE_READ");
+		GetGame().ProfilerStop("m_RecipeCache_READ");
 	}
 }

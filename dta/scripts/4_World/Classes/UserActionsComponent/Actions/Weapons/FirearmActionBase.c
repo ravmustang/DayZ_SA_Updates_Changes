@@ -36,6 +36,11 @@ class FirearmActionBase : ActionBase
 		return true;
 	}
 	
+	override bool CanBeUsedOnBack()
+	{
+		return true;
+	}
+	
 	override void OnUpdate( ActionData action_data )
 	{
 		super.OnUpdate( action_data );

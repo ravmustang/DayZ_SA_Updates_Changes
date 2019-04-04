@@ -39,6 +39,7 @@ class BatteryCharger extends ItemBase
 		SwitchLightOff();
 		RegisterNetSyncVariableInt("m_BatteryEnergy0To100");
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
+		RegisterNetSyncVariableBool("m_IsPlaceSound");
 	}
 	
 	/*override bool IsHeavyBehaviour()

@@ -6,7 +6,7 @@ enum EPlayerSoundEventType
 	DAMAGE 		= 0x00000008,
 	DUMMY 		= 0x00000010,
 	INJURY 		= 0x00000020,
-	FREEZING	= 0x00000040,
+	//HEAT_COMFORT	= 0x00000040,
 }
 
 class PlayerSoundEventBase extends SoundEventBase

@@ -209,6 +209,7 @@ class BleedingSourcesManagerBase
 		if(m_BleedingSources.Contains(bit))
 		{
 			m_BleedingSources.Remove(bit);
+			m_Player.OnBleedingSourceRemoved();
 			return true;
 		}
 		return false;

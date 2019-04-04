@@ -140,4 +140,9 @@ class SmallFishTrap extends Trap_SmallFish
 			}
 		}
 	}
+	
+	override bool IsOpen()
+	{
+		return true;
+	}
 }
