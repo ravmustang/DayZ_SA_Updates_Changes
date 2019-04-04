@@ -1,4 +1,4 @@
-![DayZ SA](https://img.shields.io/badge/DayZ%20SA-0.63+-blue.svg) ![Build Status](https://img.shields.io/badge/Custom%20Build-passing-38AA38.svg) ![DPCG](https://img.shields.io/badge/DonkeyPunch%20Love-red.svg)
+![DayZ SA](https://img.shields.io/badge/DayZ%20SA-1.02+-blue.svg) ![Build Status](https://img.shields.io/badge/Custom%20Build-passing-38AA38.svg) ![DPCG](https://img.shields.io/badge/DonkeyPunch%20Love-red.svg)
 
 # DayZ_SA_Updates_Changes
 DayZ SA repo tracking BI updates and changes to the scripts.pbo and the mission file. This can be expanded as we realize more that we can modify
@@ -30,4 +30,12 @@ Check out any commit marked with the words "Update" in it, as it will be the upd
 
 **YouTube Channel:** https://www.youtube.com/channel/UCKNb5T58qZjb76mijG42t5A
 
-**PlaysTV** https://plays.tv/u/rav_mustang
+**PlaysTV:** https://plays.tv/u/rav_mustang
+
+## Epoch Mod for DayZ SA
+
+**Discord:** https://discord.gg/e2NebE7
+
+**Website:** https://epochmod.com/
+
+**GitHub:** https://github.com/EpochModTeam/DayZ_SA_Epoch/tree/experimental
