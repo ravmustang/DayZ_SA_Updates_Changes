@@ -69,12 +69,14 @@ class ReplaceItemWithNewLambdaBase
 			Error("[inv] ReplaceItemWithNewLambdaBase Step B) failed to remove old_item rom current inventory location");
 			m_RemoveFromLocationPassed = false;
 		}
+		Print("[inv] ReplaceItemWithNewLambdaBase Step B) remove OK, loc=" + m_OldLocation.DumpToString());
 		m_RemoveFromLocationPassed = true;
 	}
 	protected void UndoRemoveOldItemFromLocation ()
 	{
 		if (!GameInventory.LocationAddEntity(m_OldLocation)) // B) undo
-			Error("[inv] ReplaceItemWithNewLambdaBase Step B) failed to undo");
+			Error("[inv] ReplaceItemWithNewLambdaBase Step B) failed to undo remove");
+		Print("[inv] ReplaceItemWithNewLambdaBase Step B) undo remove OK, loc=" + m_OldLocation.DumpToString());
 	}
 
 	/**@fn		RemoveNetworkObjectInfo
@@ -183,7 +185,7 @@ class ReplaceItemWithNewLambdaBase
 		Print("Error [inv] ReplaceItemWithNewLambdaBase OnAbort");
 	}
 
-	void Execute ()
+	void Execute (HumanInventoryWithFSM fsm_to_notify = null)
 	{
 		int t = GetGame().GetTime();
 		hndDebugPrint("[syncinv] t=" + t + " lambda.Execute start ");
@@ -199,6 +201,8 @@ class ReplaceItemWithNewLambdaBase
 			{
 				Error("[inv] ReplaceItemWithNewLambdaBase Step B) ABORT - failed while rm old item from loc=" + m_OldLocation.DumpToString());
 
+				if (fsm_to_notify)
+					fsm_to_notify.ProcessHandAbortEvent(new HandEventHumanCommandActionAborted(fsm_to_notify.GetManOwner()));
 				OnAbort();
 				return;
 			}
@@ -218,6 +222,8 @@ class ReplaceItemWithNewLambdaBase
 					UndoRemoveNetworkObjectInfo();
 
 				OnAbort();
+				if (fsm_to_notify)
+					fsm_to_notify.ProcessHandAbortEvent(new HandEventHumanCommandActionAborted(fsm_to_notify.GetManOwner()));
 				return;
 			}
 

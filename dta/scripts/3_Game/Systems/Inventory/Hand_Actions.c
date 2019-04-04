@@ -81,6 +81,35 @@ class HandActionDrop extends HandActionBase
 	}
 };
 
+class HandActionThrow extends HandActionBase
+{
+	override void Action (HandEventBase e)
+	{
+		hndDebugPrint("[hndfsm] action=throw");
+		HandActionThrow action = HandActionThrow.Cast(e);
+		Man player = e.m_Player;
+		EntityAI item = e.m_Entity;
+
+		InventoryLocation src = new InventoryLocation;
+		if (item.GetInventory().GetCurrentInventoryLocation(src))
+		{
+			vector mat[4];
+			e.m_Entity.GetTransform(mat);
+
+			InventoryLocation dst = new InventoryLocation;
+			dst.SetGround(item, mat);
+			GameInventory.LocationSyncMoveEntity(src, dst);
+
+			item.CreateDynamicPhysics(PhxInteractionLayers.DYNAMICITEM);
+			dBodyApplyImpulse(item, vector.Up * 20);
+
+			player.OnItemInHandsChanged();
+		}
+		else
+			Error("[hndfsm] HandActionThrow - item " + item + " has no Inventory or Location, inv=" + item.GetInventory());
+	}
+};
+
 class HandActionMoveTo extends HandActionBase
 {
 	override void Action (HandEventBase e)

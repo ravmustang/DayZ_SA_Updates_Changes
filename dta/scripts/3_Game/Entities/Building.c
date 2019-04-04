@@ -10,6 +10,7 @@ class Building extends EntityAI
 	proto native int GetDoorIndex(int componentIndex);
 	proto native bool IsDoorOpen(int index);
 	proto native bool IsDoorLocked(int index);
+	proto native void PlayDoorSound(int index);
 	proto native void OpenDoor(int index);
 	proto native void CloseDoor(int index);
 	proto native void LockDoor(int index);
@@ -43,5 +44,10 @@ class Building extends EntityAI
 				actions.Insert(m_InteractActions.Get(i));
 			}
 		}
+	}
+	
+	override bool IsInventoryVisible()
+	{
+		return false;
 	}
 };

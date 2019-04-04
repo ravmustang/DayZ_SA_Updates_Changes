@@ -1,6 +1,8 @@
 class Man extends EntityAI
 {
 	proto native void DisableSimulation(bool disable);
+	//! Returns player's input interface
+	proto native UAInterface GetInputInterface();
 	//! Returns player's identity
 	proto native PlayerIdentity GetIdentity();
 	//! Returns vehicle which this Man object is driving. If this Man object isn't as driver of any vehicle it will return NULL.
@@ -129,11 +131,10 @@ class Man extends EntityAI
 		if (!GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{
 			InventoryLocation il = new InventoryLocation;
-			il.SetHands(this,item);
-			GetInventory().AddInventoryReservation(item,il,3000);
+			il.SetHands(this, item);
+			GetInventory().AddInventoryReservation(item, il ,3000);
 		}
-		
-		
+			
 		syncDebugPrint("[inv] " + GetSimulationTimeStamp() + " Man@" + this + "::Take2Hands(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item);
 		EntityAI itemInHands = GetHumanInventory().GetEntityInHands();
 		if (itemInHands == null)
@@ -182,7 +183,7 @@ class Man extends EntityAI
 		UpdateInventoryMenu();
 	}
 
-	///@{ !hand replace
+	///@{ !hand -> !hand replace
 	protected bool ReplaceItemWithNewImpl (InventoryMode mode, ReplaceItemWithNewLambdaBase lambda)
 	{
 		syncDebugPrint("[inv] (" + GetSimulationTimeStamp() + " Man@" + this + ") Replace !HND lambda=" + lambda.DumpToString());
@@ -200,7 +201,27 @@ class Man extends EntityAI
 	{
 		return ReplaceItemWithNewImpl(InventoryMode.SERVER, lambda);
 	}
-	///@} !hand replace
+	///@} !hand -> !hand replace
+	
+	///@{ !hand replace -> hand
+	protected bool ReplaceItemElsewhereWithNewInHandsImpl (InventoryMode mode, ReplaceItemWithNewLambdaBase lambda)
+	{
+		syncDebugPrint("[inv] (" + GetSimulationTimeStamp() + " Man@" + this + ") Replace !HND->HND lambda=" + lambda.DumpToString());
+		bool code = GetHumanInventory().ReplaceItemElsewhereWithNewInHands(mode, lambda);
+		UpdateInventoryMenu();
+		return code;
+	}
+
+	bool LocalReplaceItemElsewhereWithNewInHands (ReplaceItemWithNewLambdaBase lambda)
+	{
+		return ReplaceItemElsewhereWithNewInHandsImpl(InventoryMode.LOCAL, lambda);
+	}
+
+	bool ServerReplaceItemElsewhereWithNewInHands (ReplaceItemWithNewLambdaBase lambda)
+	{
+		return ReplaceItemElsewhereWithNewInHandsImpl(InventoryMode.SERVER, lambda);
+	}
+	///@} !hand replace -> hand
 
 	///@{ hand replace
 	protected bool ReplaceItemInHandsWithNewImpl (InventoryMode mode, ReplaceItemWithNewLambdaBase lambda)
@@ -519,7 +540,7 @@ class Man extends EntityAI
 	protected bool TakeEntityToTargetInventoryImpl (InventoryMode mode, notnull EntityAI target, FindInventoryLocationType flags, notnull EntityAI item)
 	{
 		syncDebugPrint("[inv] " + GetSimulationTimeStamp() + " Man@" + this + "::Take2TargetInv(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item);
-		bool code = GetInventory().TakeEntityToTargetInventory(mode, target, FindInventoryLocationType.ANY, item);
+		bool code = GetInventory().TakeEntityToTargetInventory(mode, target, flags, item);
 		UpdateInventoryMenu();
 		return code;
 	}

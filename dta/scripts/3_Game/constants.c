@@ -593,3 +593,12 @@ const int CARS_LEAK_TICK_MAX 	= 0.05;
 const int CARS_LEAK_THRESHOLD	= 0.5;
 
 /** @}*/
+
+const int HAIR_SELECTION_COUNT = 45;
+/**
+* \ input exclude types
+*/
+const int INPUT_EXCLUDE_ALL = 0;
+const int INPUT_EXCLUDE_INVENTORY = 1;
+const int INPUT_EXCLUDE_MOUSE_ALL = 2;
+const int INPUT_EXCLUDE_MOUSE_RADIAL = 3;

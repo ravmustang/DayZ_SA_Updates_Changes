@@ -107,6 +107,9 @@ class BiosSessionService
 		@return EBiosError indicating if the async operation is pending.
 	*/
 	proto native EBiosError ShowInviteToGameplaySessionAsync(string session_address, int session_port);
+
+	//! Notifiy about interactive multiplayer state
+	proto native void SetMultiplayState(bool is_active);
 	
 	//! Callback function
 	/*!

@@ -15,7 +15,12 @@ class RadialMenu : ScriptedWidgetEventHandler
 	static const string 				RADIAL_ITEM_CARD_CONTAINER 	= "RadialItemCardContainer";
 
 	//controls
+	#ifdef PLATFORM_CONSOLE
 	protected bool 						m_UsingMouse;
+	#else
+	protected bool 						m_UsingMouse = true;
+	#endif
+	
 	protected int 						m_ControllerAngle;
 	protected int 						m_ControllerTilt;
 	protected bool						m_IsViewInverted;
@@ -563,13 +568,13 @@ class RadialMenu : ScriptedWidgetEventHandler
 		
 		//Controller buttons
 		//Select (A,cross)
-		if ( GetGame().GetInput().GetActionDown( "UAUISelect", false ) )
+		if ( GetGame().GetInput().LocalPress( "UAUISelect", false ) )
 		{
 			GetGame().GameScript.CallFunction( m_RegisteredClass, "OnControllerPressSelect", NULL, m_SelectedObject );
 		}
 		
 		//Back (B,circle)
-		if ( GetGame().GetInput().GetActionDown( "UAUIBack", false ) )
+		if ( GetGame().GetInput().LocalPress( "UAUIBack", false ) )
 		{
 			GetGame().GameScript.CallFunction( m_RegisteredClass, "OnControllerPressBack", NULL, m_SelectedObject );
 		}

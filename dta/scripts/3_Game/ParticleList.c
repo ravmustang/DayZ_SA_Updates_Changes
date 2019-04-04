@@ -10,13 +10,14 @@ modded class ParticleList
 
 class ParticleList
 {
-	ref static map<int, string> m_ParticlePaths;
+	ref static map<int, string> m_ParticlePaths; // Contains paths to all particles. WARNING: Paths are without the '.ptc' suffix!
 	static int m_lastID = 0;
 	
 	// REGISTER ALL PARTICLES BELOW:
 	
 	static const int INVALID						= -1;
 	static const int PARTICLE_TEST					= RegisterParticle("_test_orientation");
+	static const int DEBUG_DOT						= RegisterParticle("debug_dot");
 	
 	// FIREPLACE
 	// Normal fireplace
@@ -106,6 +107,7 @@ class ParticleList
 	static const int GUN_UMP45						= RegisterParticle("weapon_shot_ump45_01");
 	static const int GUN_M4A1						= RegisterParticle("weapon_shot_m4a1_01");
 	static const int GUN_MP133						= RegisterParticle("weapon_shot_mp133_01");
+	static const int GUN_MOSIN_COMPENSATOR			= RegisterParticle("weapon_shot_mosin_compensator_01");
 	
 	static const int GUN_CZ61						= RegisterParticle("weapon_shot_cz61_01");
 	static const int GUN_LONG_WINDED_SMOKE			= RegisterParticle("weapon_shot_winded_smoke");
@@ -240,5 +242,30 @@ class ParticleList
 	static string GetPathToParticles()
 	{
 		return "graphics/particles/";
+	}
+	
+	//! Preloads all particles
+	static void PreloadParticles()
+	{
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
+		{
+			int count = m_ParticlePaths.Count();
+			
+			//Print("START PRELOAD OF PARTICLES");
+			//Print(count);
+			
+			for (int i = 0; i < count; ++i)
+			{
+				string path = m_ParticlePaths.Get(i);
+				path = path + ".ptc";
+				//Print(path);
+				vobject vobj;
+				vobj = GetObject( path );
+				//Print(vobj);
+				ReleaseObject(vobj);
+			}
+			
+			//Print("END PARTICLE PRELOAD");
+		}
 	}
 }

@@ -58,8 +58,17 @@ class HumanInputController
 
 	//--------------------------------------------------------------
 
+	//! returns true if weapon click perfomed recently (before raise specifically)
+	proto native bool			WeaponWasRaiseClick();
+
 	//! returns true if weapon is raised
 	proto native bool			IsWeaponRaised();
+
+	//! returns true if weapon ADS mode
+	proto native bool			WeaponADS();
+
+	//! resets ADS mode to default
+	proto native void			ResetADS();
 
 	//--------------------------------------------------------------
 	
@@ -109,14 +118,17 @@ class HumanInputController
 	//! zooming 
 	proto native bool			IsZoom();
 
+	//! zooming toggle
+	proto native bool			IsZoomToggle();
+
+	//! reset zoom toggle
+	proto native void			ResetZoomToggle();
+
 	//! sight has been changed (in/out ironsights)
 	proto native bool			IsSightChange();
 
 	//!
 	proto native bool			IsZoomIn();
-
-	//! reset zoomin toggle
-	proto native void			ResetZoomIn();
 
 	//!
 	proto native bool			IsZoomOut();
@@ -572,22 +584,6 @@ class HumanCommandFullBodyDamage
 }
 
 
-// *************************************************************************************
-// ! HumanCommandModifierAdditive - additive modifiers
-// *************************************************************************************
-class HumanCommandModifierAdditive
-{	
-	// nothing here for now 
-}
-
-// *************************************************************************************
-// ! HumanCommandModifierFullbody - fullbody modifiers
-// *************************************************************************************
-class HumanCommandModifierFullbody
-{	
-	// nothing here for now 
-}
-
 //! actions
 enum WeaponActions
 {
@@ -858,6 +854,15 @@ class HumanCommandAdditives
 
 	//! sets talking
 	proto native void 	SetTalking(bool pValue);
+
+	//! starts modifier
+	proto native void	StartModifier(int pType);
+
+	//! cancels modifier
+	proto native void	CancelModifier();
+
+	//! is modifier active
+	proto native bool	IsModifierActive();
 }
 
 
@@ -1089,20 +1094,6 @@ class Human extends Man
 	proto native 	void 						DeleteCommandModifier_Damage(HumanCommandDamage pDamage);
 
 	proto native 	HumanCommandDamage			GetCommandModifier_Damage();
-
-
-
-	//!--- modifier animations - fullbody
-	
-	proto native	HumanCommandModifierFullbody	StartCommand_Modifier(int pType);
-	proto native 	HumanCommandModifierFullbody	GetCommand_Modifier();
-
-	//! starts additive modifier
-	//!--- modifier animations - additive
-	proto native	HumanCommandModifierAdditive	AddCommandModifier_Modifier(int pType);
-	proto native	HumanCommandModifierAdditive	GetCommandModifier_Modifier();
-	proto native	void							DeleteCommandModifier_Modifier(HumanCommandModifierAdditive pModifier);
-
 
 
 	//---------------------------------------------------------

@@ -1,5 +1,6 @@
 class PlayerConstants 
 {
+	static const float WEAPON_RAISE_BLEND_DELAY = 0.16;
 	static const float BAREFOOT_MOVEMENT_BLEED_MODIFIER = 0.1;
 	//-------------------------------------------------------
 	static const float NORMAL_TEMPERATURE_L = 35.2;
@@ -18,17 +19,17 @@ class PlayerConstants
 	//static const float DAMAGE_PER_SEC 						= 1;	//not used? (was how much HP is lowered while low on energy/water)
 	//static const float DAMAGE_BLOOD_PER_SEC 					= 10; 	//not used?
 	//--------------------------------------------------------
-	static const float METABOLIC_SPEED_ENERGY_BASAL		= 0.02;		//energy loss per second while idle
+	static const float METABOLIC_SPEED_ENERGY_BASAL		= 0.01;		//energy loss per second while idle
 	
-	static const float METABOLIC_SPEED_ENERGY_WALK		= 0.1; 		//energy loss per second
-	static const float METABOLIC_SPEED_ENERGY_JOG		= 0.25; 	//energy loss per second
-	static const float METABOLIC_SPEED_ENERGY_SPRINT	= 0.5; 		//energy loss per second
+	static const float METABOLIC_SPEED_ENERGY_WALK		= 0.075; 		//energy loss per second
+	static const float METABOLIC_SPEED_ENERGY_JOG		= 0.2; 	//energy loss per second
+	static const float METABOLIC_SPEED_ENERGY_SPRINT	= 0.4; 		//energy loss per second
 	
-	static const float METABOLIC_SPEED_WATER_BASAL		= 0.04; 	//water loss per second while idle
+	static const float METABOLIC_SPEED_WATER_BASAL		= 0.02; 	//water loss per second while idle
 	
-	static const float METABOLIC_SPEED_WATER_WALK		= 0.2; 		//water loss per second
-	static const float METABOLIC_SPEED_WATER_JOG		= 0.5; 		//water loss per second
-	static const float METABOLIC_SPEED_WATER_SPRINT		= 1.0; 		//water loss per second
+	static const float METABOLIC_SPEED_WATER_WALK		= 0.1; 		//water loss per second
+	static const float METABOLIC_SPEED_WATER_JOG		= 0.35; 		//water loss per second
+	static const float METABOLIC_SPEED_WATER_SPRINT		= 0.8; 		//water loss per second
 	//--------------------------------------------------------
 	
 	/*
@@ -64,12 +65,12 @@ class PlayerConstants
 	//--------------------------------------------------------
 	static const int BLOOD_THRESHOLD_FATAL 					= 2500;	//fatal blood level
 	
-	static const float BLOOD_REGEN_RATE_PER_SEC				= 1; 	//base amount of blood regenerated per second
-	static const float DAMAGE_ZONE_BLOOD_REGEN_MODIFIER 	= 1;
+	static const float BLOOD_REGEN_RATE_PER_SEC				= 0.5; 	//base amount of blood regenerated per second
+	static const float DAMAGE_ZONE_BLOOD_REGEN_MODIFIER 	= 0.5;
 	
 	//static const int BLOOD_REGEN_THRESHOLD_ENERGY_LOW		= 200;
 	//static const int BLOOD_REGEN_THRESHOLD_ENERGY_MID		= 400;
-	//static const int BLOOD_REGEN_THRESHOLD_ENERGY_HIGH		= 2000;
+	//static const int BLOOD_REGEN_THRESHOLD_ENERGY_HIGH	= 2000;
 	
 	static const float BLOOD_REGEN_MODIFIER_ENERGY_LOW		= 0; 	//multiplier for blood regen rate 
 	static const float BLOOD_REGEN_MODIFIER_ENERGY_MID		= 0.5;
@@ -87,7 +88,7 @@ class PlayerConstants
 	static const float SALINE_LIQUID_AMOUNT					= 250;
 	
 	static const float HEMOLYTIC_BLOOD_DRAIN_PER_SEC		= 2;	//hemolytic reaction blood drain per second
-	static const float HEMOLYTIC_BLOODLOSS_AMOUNT			= 250;
+	static const float HEMOLYTIC_BLOODLOSS_AMOUNT			= 1000;
 	
 	static const float WATER_LOSS_THRESHOLD_HC_PLUS_LOW		= THRESHOLD_HEAT_COMFORT_PLUS_WARNING;
 	static const float WATER_LOSS_THRESHOLD_HC_PLUS_HIGH	= THRESHOLD_HEAT_COMFORT_MINUS_CRITICAL;
@@ -96,23 +97,23 @@ class PlayerConstants
 	static const float ENERGY_LOSS_THRESHOLD_HC_MINUS_HIGH	= THRESHOLD_HEAT_COMFORT_MINUS_CRITICAL;
 	
 	static const float WATER_LOSS_HC_PLUS_LOW				= 0;
-	static const float WATER_LOSS_HC_PLUS_HIGH				= 0.15;
+	static const float WATER_LOSS_HC_PLUS_HIGH				= 0.4;
 
 	static const float ENERGY_LOSS_HC_MINUS_LOW				= 0;
-	static const float ENERGY_LOSS_HC_MINUS_HIGH			= 0.15;
+	static const float ENERGY_LOSS_HC_MINUS_HIGH			= 0.3;
 	
-	static const float HEALTH_LOSS_HC_PLUS_LOW				= 0.01;
-	static const float HEALTH_LOSS_HC_PLUS_HIGH				= 0.1;		
+	static const float HEALTH_LOSS_HC_PLUS_LOW				= 0.05;
+	static const float HEALTH_LOSS_HC_PLUS_HIGH				= 0.15;		
 	
-	static const float HEALTH_LOSS_HC_MINUS_LOW				= 0.01;
-	static const float HEALTH_LOSS_HC_MINUS_HIGH 			= 0.1;	
+	static const float HEALTH_LOSS_HC_MINUS_LOW				= 0.05;
+	static const float HEALTH_LOSS_HC_MINUS_HIGH 			= 0.15;	
 	
 	//--------------------------------------------------------
 	static const float LOW_ENERGY_DAMAGE_PER_SEC			= 0.125;	//health loss per second while low on energy
 	static const float LOW_WATER_DAMAGE_PER_SEC				= 0.2;		//health loss per second while low on water
 	
-	static const float HEALTH_REGEN_MIN						= 0.015;	//health regen rate at BLOOD_THRESHOLD_FATAL blood level
-	static const float HEALTH_REGEN_MAX						= 0.1;		//health regen rate at MAXIMUM blood level
+	static const float HEALTH_REGEN_MIN						= 0.01;	//health regen rate at BLOOD_THRESHOLD_FATAL blood level
+	static const float HEALTH_REGEN_MAX						= 0.07;		//health regen rate at MAXIMUM blood level
 	
 	static const float UNCONSCIOUS_THRESHOLD				= 25.0;		//player goes unconscious when we get under this threshold
 	static const float CONSCIOUS_THRESHOLD					= 50.0;		//player regains consciousness when he gets above this threshold
@@ -132,7 +133,7 @@ class PlayerConstants
 	//----------------------------------------------------------
 	static const float BLEEDING_SOURCE_BLOODLOSS_PER_SEC 	= -6; 		// amount of blood loss per second from one bleeding source 
 	static const float BLEEDING_SOURCE_FLOW_MODIFIER_MEDIUM = 0.6; 	// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
-	static const float BLEEDING_SOURCE_FLOW_MODIFIER_LOW	= 0.1; 	// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
+	static const float BLEEDING_SOURCE_FLOW_MODIFIER_LOW	= 0.2; 	// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
 	static const int BLEEDING_SOURCE_DURATION_NORMAL = 300; 	// in seconds, how long will bleeding source exist until disapearing
 	
 	 

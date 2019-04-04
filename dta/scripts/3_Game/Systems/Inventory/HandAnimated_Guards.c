@@ -2,6 +2,7 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 {
 	if (src.GetType() == InventoryLocationType.ATTACHMENT)
 	{
+		//return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK;
 		switch (src.GetSlot())
 		{
 			case InventorySlots.SHOULDER:
@@ -34,7 +35,9 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 				Man owner;
 				if (parent_item)
 					owner = parent_item.GetHierarchyRootPlayer(); 		// player
-				if (owner && owner.GetInventory().FindAttachment(InventorySlots.HIPS) == parent_item) // is the pistol in a belt holster?
+				EntityAI item1 = owner.GetInventory().FindAttachment(InventorySlots.HIPS);
+				EntityAI item2 = parent_item.GetHierarchyParent();
+				if (owner && owner.GetInventory().FindAttachment(InventorySlots.HIPS) == parent_item.GetHierarchyParent()) // is the pistol in a belt holster?
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_PISTOLBELT;
 				}

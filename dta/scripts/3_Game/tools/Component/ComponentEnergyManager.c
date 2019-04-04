@@ -441,7 +441,14 @@ class ComponentEnergyManager : Component
 	{
 		if (GetGame().IsServer()) // Client can't change energy value.
 		{
+			float old_energy = m_Energy;
 			m_Energy = new_energy;
+			
+			if (old_energy - GetEnergyUsage() <= 0)
+			{
+				Print("UpdateCanWork - SetEnergy");
+				UpdateCanWork();
+			}
 		}
 	}
 
@@ -1058,13 +1065,26 @@ class ComponentEnergyManager : Component
 	//! Energy manager: Adds energy to this device and clamps it within its min/max storage limits. Returns the amount of energy that was clamped. Negative value is supported, but you should still use ConsumeEnergy(...) for propper substraction of energy.
 	float AddEnergy(float added_energy)
 	{
-		float energy_to_clamp = GetEnergy() + added_energy;
-		float clamped_energy = Math.Clamp( energy_to_clamp, 0, GetEnergyMax() );
-		SetEnergy(clamped_energy);
-		StartUpdates();
-		return energy_to_clamp - clamped_energy;
+		if (added_energy != 0)
+		{
+			bool energy_was_added = (added_energy > 0);
+			
+			float energy_to_clamp = GetEnergy() + added_energy;
+			float clamped_energy = Math.Clamp( energy_to_clamp, 0, GetEnergyMax() );
+			SetEnergy(clamped_energy);
+			StartUpdates();
+			
+			if (energy_was_added)
+				OnEnergyAdded();
+			else
+				OnEnergyConsumed();
+			
+			return energy_to_clamp - clamped_energy;
+		}
+		
+		return 0;
 	}
-
+	
 	//! Energy manager: Returns the maximum amount of energy this device can curently store. If parameter 'reduceMaxEnergyByDamageCoef' is used in the config of this device then the returned value will be reduced by damage.
 	float GetEnergyMax()
 	{
@@ -1283,6 +1303,18 @@ class ComponentEnergyManager : Component
 				m_UpdateTimer.Run( GetUpdateInterval() , this, "DeviceUpdate", NULL, true);
 			}
 		}
+	}
+	
+	//! Energy manager: Called when energy was consumed on this device
+	void OnEnergyConsumed()
+	{
+		m_ThisEntityAI.OnEnergyConsumed();
+	}
+	
+	//! Energy manager: Called when energy was added on this device
+	void OnEnergyAdded()
+	{
+		m_ThisEntityAI.OnEnergyAdded();
 	}
 
 

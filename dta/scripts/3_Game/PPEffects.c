@@ -288,8 +288,8 @@ class PPEffects
 		color[2] = B;
 		color[3] = 0;
 
-                matHDR.SetParam("Vignette", intensity);
-                matHDR.SetParam("VignetteColor", color);
+		matHDR.SetParam("Vignette", intensity);
+		matHDR.SetParam("VignetteColor", color);
 	}
 
 

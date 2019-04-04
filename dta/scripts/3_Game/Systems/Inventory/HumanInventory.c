@@ -95,7 +95,7 @@ class HumanInventory : GameInventory
 			
 			case InventoryMode.SERVER:
 				if (!e.IsServerSideOnly())
-                	InventoryInputUserData.SendServerHandEvent(GetManOwner(), e);
+                	InventoryInputUserData.SendServerHandEventViaInventoryCommand(GetManOwner(), e);
                 PostHandEvent(e);
                 break;
 
@@ -123,28 +123,45 @@ class HumanInventory : GameInventory
 		return false;
 	}
 	
+	bool ThrowEntity (EntityAI item, vector dir, float force)
+	{
+		InventoryLocation src = new InventoryLocation;
+		if (item && item.GetInventory() && item.GetInventory().GetCurrentInventoryLocation(src))
+		{
+			switch (src.GetType())
+			{
+				case InventoryLocationType.HANDS:
+					hndDebugPrint("[inv] HumanInventory::ThrowEntity item=" + item);
+					HandEvent(InventoryMode.PREDICTIVE, new HandEventThrow(GetManOwner(), item));
+					return true;
+
+				default: return super.DropEntity(InventoryMode.PREDICTIVE, src.GetParent(), item);
+			}
+		}
+		Error("No inventory location");
+		return false;
+
+		
+		
+		return true;
+	}
+		
 	bool RedirectToHandEvent (InventoryMode mode, notnull InventoryLocation src, notnull InventoryLocation dst)
 	{
 		if (src.GetType() == InventoryLocationType.HANDS)
 		{
 			Man man_src = Man.Cast(src.GetParent());
-			if (man_src.IsAlive())
-			{
-				hndDebugPrint("[inv] HI::RedirectToHandEvent - source location == HANDS, player has to handle this");
-				man_src.GetHumanInventory().HandEvent(mode, new HandEventMoveTo(man_src, src.GetItem(), dst));
-				return true;
-			}
+			hndDebugPrint("[inv] HI::RedirectToHandEvent - source location == HANDS, player has to handle this");
+			man_src.GetHumanInventory().HandEvent(mode, new HandEventMoveTo(man_src, src.GetItem(), dst));
+			return true;
 		}
 		
 		if (dst.GetType() == InventoryLocationType.HANDS)
 		{
+			hndDebugPrint("[inv] HI::RedirectToHandEvent - dst location == HANDS, player has to handle this");
 			Man man_dst = Man.Cast(dst.GetParent());
-			if (man_dst.IsAlive())
-			{
-				hndDebugPrint("[inv] HI::RedirectToHandEvent - dst location == HANDS, player has to handle this");
-				man_dst.GetHumanInventory().HandEvent(mode, new HandEventTake(man_dst, src.GetItem()));
-				return true;
-			}
+			man_dst.GetHumanInventory().HandEvent(mode, new HandEventTake(man_dst, src.GetItem()));
+			return true;
 		}
 		return false;
 	}
@@ -347,6 +364,46 @@ class HumanInventory : GameInventory
 		if (itemInHands == lambda.m_OldItem)
 			return ReplaceItemInHandsWithNew(mode, lambda);
 		return super.ReplaceItemWithNew(mode, lambda);
+	}
+	
+	bool ReplaceItemElsewhereWithNewInHands (InventoryMode mode, ReplaceItemWithNewLambdaBase lambda)
+	{
+		return ReplaceItemInElsewhereWithNewinHandsImpl(mode, new HandEventDestroyElsewhereAndReplaceWithNewInHands(GetManOwner(), null, lambda));
+	}
+	
+	protected bool ReplaceItemInElsewhereWithNewinHandsImpl (InventoryMode mode, HandEventBase e)
+	{
+		if (GetEntityInHands())
+		{
+			Error("[inv] HumanInventory::ReplaceItemInElsewhereWithNewinHandsImpl Item in hands, event=" + e.DumpToString());
+			return false;
+		}
+
+		InventoryLocation dst = e.GetDst();
+		if (dst)
+		{
+			switch (dst.GetType())
+			{
+				case InventoryLocationType.HANDS:
+				{
+					if (GetInventoryOwner().IsAlive())
+					{
+						hndDebugPrint("[inv] HumanInventory::ReplaceItemInElsewhereWithNewinHandsImpl event=" + e);
+						HandEvent(mode, e);
+						return true;
+					}
+
+					hndDebugPrint("[inv] HumanInventory::ReplaceItemInElsewhereWithNewinHandsImpl DEAD_owner=" + GetInventoryOwner().GetName() +"="+ GetInventoryOwner());
+					Error("HumanInventory::ReplaceItemInElsewhereWithNewinHandsImpl TODO"); // replace-with-new in corpse's hands, not implemented
+					return false;
+				}
+				default:
+					Error("[inv] HumanInventory::ReplaceItemInElsewhereWithNewinHandsImpl src has to be hands");
+					return false;
+			}
+		}
+		Error("[inv] HumanInventory::ReplaceItemInElsewhereWithNewinHandsImpl no dst in event, event=" + e.DumpToString());
+		return false;
 	}
 
 	protected bool ReplaceItemInHandsWithNewImpl (InventoryMode mode, HandEventBase e)

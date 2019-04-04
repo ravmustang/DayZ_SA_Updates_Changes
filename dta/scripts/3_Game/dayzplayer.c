@@ -385,6 +385,10 @@ class DayZPlayerType
 		//! registers default hit position for entity
 		m_DefaultHitPositionComponent = "Pelvis";
 
+		//! list of components suitable for melee finisher attacks (used in fight logic)
+		m_SuitableFinisherHitComponents = new array<string>;
+		m_SuitableFinisherHitComponents.Insert("Head");
+
 		//! register hit components that are selected by probability
 		//DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_head", 5); // TMP comment out
 		DayZAIHitComponentHelpers.RegisterHitComponent(m_HitComponentsForAI, "dmgZone_leftArm", 50);
@@ -414,6 +418,11 @@ class DayZPlayerType
 	string GetDefaultHitPositionComponent()
 	{
 		return m_DefaultHitPositionComponent;
+	}
+	
+	array<string> GetSuitableFinisherHitComponents()
+	{
+		return m_SuitableFinisherHitComponents;
 	}
 	
 	private void DayZPlayerType()
@@ -479,6 +488,8 @@ class DayZPlayerType
 	protected ref array<ref DayZAIHitComponent> m_HitComponentsForAI;
 	protected string m_DefaultHitComponent;
 	protected string m_DefaultHitPositionComponent;
+
+	protected ref array<string> m_SuitableFinisherHitComponents;
 	
 	ref array<ref AnimSoundEvent> m_animSoundEventsAttack;
 }
@@ -570,7 +581,6 @@ enum DayZPlayerConstants
 	COMMANDID_UNCONSCIOUS,	// type is int (overridden from C++) - unconscious
 	COMMANDID_SWIM,			// type is int (overridden from C++) - swimming
 	COMMANDID_VEHICLE,		// type is int (overridden from C++) - vehicle
-	COMMANDID_MODIFIER,		// type is int (overridden from C++) - modifier
 
 
 	//! modifier commands - additive behaviour 
@@ -578,7 +588,6 @@ enum DayZPlayerConstants
 	COMMANDID_MOD_WEAPONS,   	// weapons - always on 
     COMMANDID_MOD_ACTION,		// action - additive action 
 	COMMANDID_MOD_DAMAGE,		// damage - additive damage 
-	COMMANDID_MOD_MODIFIER,		// modifier - additive modifier
 
 
 
@@ -650,6 +659,8 @@ enum DayZPlayerConstants
 	CMD_ACTIONMOD_INTERACTONCE			= 521,		// erc,cro
 	CMD_ACTIONMOD_ATTACHITEM			= 522,		// erc,cro
 	CMD_ACTIONMOD_CLOSEITEM_ONCE		= 523,		// erc,cro,pne
+	CMD_ACTIONMOD_FOLDITEM_ONCE			= 524,		// erc,cro
+	CMD_ACTIONMOD_UNFOLDITEM_ONCE		= 525,		// erc,cro
 	
 	CMD_ACTIONMOD_DROPITEM_HANDS		= 900,		// erc, cro
 	CMD_ACTIONMOD_DROPITEM_INVENTORY	= 901,		// erc, cro

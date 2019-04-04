@@ -62,6 +62,8 @@ class World: Managed
 
 	proto native void	LoadNewLightingCfg(string path);
 	
+	proto native AIWorld GetAIWorld();
+	
 	/*!
 	@code
 	Material matColors = GetGame().GetWorld().GetMaterial("postprocess/glow");

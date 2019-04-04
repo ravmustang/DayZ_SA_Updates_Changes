@@ -10,6 +10,7 @@ class BiosUser
 	proto native owned string GetName();
 	proto native owned string GetUid();
 	proto native BiosClientServices GetClientServices();
+	proto native bool IsOnline();
 };
 
 class BiosUserManager
@@ -30,6 +31,9 @@ class BiosUserManager
 	*/
 	proto native EBiosError GetUserList(ref array<ref BiosUser> user_list);
 	
+	//! Display a system dependant ui for log-on
+	proto native EBiosError LogOnUserAsync(BiosUser user);
+
 	//! Display a system dependant account picket
 	/*!
 		Xbox: The async result is returned in the OnUserPicked callback.
@@ -83,6 +87,15 @@ class BiosUserManager
 			g_Game.SetDatabaseID( dbID );
 		}
 	}
+
+	//! Callback function.
+	/*!
+		@param error error indicating success or fail of the async operation.
+	*/
+	void OnUserLoggedOn(EBiosError error)
+	{
+
+	}
 	
 	//! Callback function.
 	/*!
@@ -104,6 +117,18 @@ class BiosUserManager
 			OnGameNameChanged( user );
 			g_Game.SelectUser();
 		}
+	}
+
+	//! Callback function.
+	void OnLoggedOn(BiosUser user)
+	{
+
+	}
+
+	//! Callback function.
+	void OnLoggedOff(BiosUser user)
+	{
+
 	}
 	
 	//! Callback function.
@@ -129,8 +154,22 @@ class BiosUserManager
 		{
 			SelectUser( null );
 			
-			GetGame().GetUIManager().CloseAllSubmenus();
-			GetGame().GetMission().AbortMission();
+			if (GetGame().GetUIManager() != null)
+			{
+				GetGame().GetUIManager().CloseAllSubmenus();
+				
+				if ( GetGame().GetUIManager().IsDialogVisible() )
+				{
+					GetGame().GetUIManager().CloseDialog();
+				}
+				
+				g_Game.DeleteGamepadDisconnectMenu();
+			}
+			
+			if ( GetGame().GetMission() != null )
+			{
+				GetGame().GetMission().AbortMission();
+			}
 			
 			GetGame().GetInput().ResetActiveGamepad();
 			

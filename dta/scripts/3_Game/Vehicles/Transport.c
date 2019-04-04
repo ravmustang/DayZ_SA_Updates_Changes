@@ -45,7 +45,12 @@ class Transport extends EntityAI
 			actions.Insert(m_InteractActions.Get(i));
 		}
 	}
-	
+
+
+	//! Synchronizes car's state in case the simulation is not running.
+	proto native void Synchronize();
+
+
 	//! Returns crew capacity of this vehicle.
 	proto native int CrewSize();
 
@@ -117,6 +122,11 @@ class Transport extends EntityAI
 	bool CanReachSeatFromSeat( int currentSeat, int nextSeat )
 	{
 		return false;
+	}
+	
+	bool CanReachSeatFromDoors( string pSeatSelection, vector pFromPos, float pDistance = 1.0 )
+	{
+		return false;		
 	}
 
 	bool CanReachDoorsFromSeat( string pDoorsSelection, int pCurrentSeat )

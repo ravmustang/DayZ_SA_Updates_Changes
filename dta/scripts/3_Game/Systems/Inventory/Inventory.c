@@ -274,6 +274,33 @@ class GameInventory
 	 **/
 	static proto native EntityAI LocationGetEntity (notnull InventoryLocation inv_loc);
 
+	
+	//! Returns true if this Inventory owner is in cargo of something
+	bool IsInCargo()
+	{
+		InventoryLocation lcn = new InventoryLocation;
+		GetCurrentInventoryLocation(lcn);
+		if ( lcn.GetType() == InventoryLocationType.CARGO)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
+	//! Returns true if this Inventory owner is an attachment of something
+	bool IsAttachment()
+	{
+		InventoryLocation lcn = new InventoryLocation;
+		GetCurrentInventoryLocation(lcn);
+		if ( lcn.GetType() == InventoryLocationType.ATTACHMENT)
+		{
+			return true;
+		}
+		
+		return false;
+	}
+	
 	static void OnServerInventoryCommandStatic (ParamsReadContext ctx)
 	{
 		int tmp = -1;
@@ -501,6 +528,7 @@ class GameInventory
 	static proto native bool CheckTakeItemRequest (notnull Man requestingPlayer, EntityAI item, EntityAI target, float radius);
 	static proto native bool CheckMoveToDstRequest (notnull Man requestingPlayer, EntityAI item, notnull InventoryLocation dst, float radius);
 	static proto native bool CheckSwapItemsRequest (notnull Man requestingPlayer, EntityAI item1, EntityAI item2, float radius);
+	static proto native bool CheckManipulatedObjectsDistances (notnull EntityAI e0, notnull EntityAI e1, float radius);
 	///@} anti-cheats
 
 ///@} Engine native functions

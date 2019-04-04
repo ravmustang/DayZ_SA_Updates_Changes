@@ -140,6 +140,26 @@ class OnlineServices
 		}
 	}
 	
+	static void SetServerFavorited(string ipAddress, int port, int steamQueryPort, bool is_favorited )
+	{
+		GetClientServices();
+		if( m_ClientServices )
+		{
+			if ( is_favorited )
+			{
+				m_ClientServices.GetLobbyService().AddServerFavorite( ipAddress, port, steamQueryPort );
+			}
+			else
+			{
+				m_ClientServices.GetLobbyService().RemoveServerFavorite( ipAddress, port, steamQueryPort );
+			}
+		}
+		else
+		{
+			DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Service reference does not exist." );
+		}
+	}
+	
 	static void GetCurrentServerInfo( string ip, int port )
 	{
 		GetClientServices();

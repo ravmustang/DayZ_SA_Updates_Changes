@@ -87,7 +87,7 @@ class Object extends IEntity
 		
 		if (particle_ID > 0)
 		{
-			Particle.Play(particle_ID, GetPosition());
+			Particle.PlayInWorld(particle_ID, GetPosition());
 		}
 		
 		// Handle spawn of Effect, which allows more complex behavior
@@ -276,6 +276,8 @@ class Object extends IEntity
 	proto native vector GetMemoryPointPos(string memoryPointName);
 	proto native vector GetMemoryPointPosByIndex(int pointIndex);
 	proto native bool MemoryPointExists(string memoryPoint);
+	
+	proto native void CreateDynamicPhysics(PhxInteractionLayers layer);
 
 	//! Called when tree is chopped down.
 	void OnTreeCutDown( EntityAI cutting_tool )
@@ -465,6 +467,18 @@ class Object extends IEntity
 	//! Returns low and high bits of networkID.
 	//! This id is shared between client and server for whole server-client session.
 	proto void GetNetworkID( out int lowBits, out int highBits );
+	
+	string GetNetworkIDString()
+	{
+		int low, high;
+		GetNetworkID( low, high );
+		return high.ToString() + low.ToString();
+	}
+	
+	string GetDebugName()
+	{
+		return GetType() + ":" + GetNetworkIDString();
+	}
 	
 	//! Remote procedure call shortcut, see CGame.RPC / CGame.RPCSingleParam
 	void RPC(int rpc_type, array<ref Param> params, bool guaranteed, PlayerIdentity recipient = NULL)
@@ -733,7 +747,6 @@ class Object extends IEntity
 	/**
   \brief Enable or disable object to receive damage
 	@param enable or disable
-	@warning works only in internal version
 	*/
 	proto native void SetAllowDamage(bool val);
 	

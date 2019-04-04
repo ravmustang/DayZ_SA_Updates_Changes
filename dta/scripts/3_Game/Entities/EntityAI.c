@@ -248,6 +248,11 @@ class EntityAI extends Entity
 
 	override bool IsEntityAI() { return true; }
 	
+	bool IsInventoryVisible()
+	{
+		return !( GetParent() || GetHierarchyParent() );
+	}
+	
 	bool IsPlayer()
 	{
 		return false;
@@ -297,7 +302,27 @@ class EntityAI extends Entity
 	void EEInit()
 	{
 		if (GetInventory())
+		{
 			GetInventory().EEInit();
+			m_AttachmentsWithCargo.Clear();
+			m_AttachmentsWithAttachments.Clear();
+			for( int i = 0; i < GetInventory().AttachmentCount(); i++ )
+			{
+				EntityAI attachment = GetInventory().GetAttachmentFromIndex( i );
+				if( attachment )
+				{
+					if( attachment.GetInventory().GetCargo() )
+					{
+						m_AttachmentsWithCargo.Insert( attachment );
+					}
+					
+					if( attachment.GetInventory().GetAttachmentSlotsCount() > 0 )
+					{
+						m_AttachmentsWithAttachments.Insert( attachment );
+					}
+				}
+			}
+		}
 	}
 	
 	//! Called right before object deleting
@@ -824,7 +849,8 @@ class EntityAI extends Entity
 		if ( GetGame() )
 		{
 			int slot_id = InventorySlots.GetSlotIdFromString(slot_name);
-			return GetInventory().FindAttachment(slot_id); 
+			if (slot_id != InventorySlots.INVALID)
+				return GetInventory().FindAttachment(slot_id); 
 		}
 		return null;
 	}
@@ -1024,7 +1050,7 @@ class EntityAI extends Entity
 		Math3D.MatrixIdentity4(mat);
 		mat[3] = pos;
 		il.SetGround(NULL, mat);
-		return SpawnEntity(object_name, il);
+		return SpawnEntity(object_name, il,ECE_PLACE_ON_SURFACE,RF_DEFAULT);
 	}
 	/**
 	 **/
@@ -1032,7 +1058,7 @@ class EntityAI extends Entity
 	{
 		InventoryLocation il = new InventoryLocation;
 		il.SetGround(NULL, mat);
-		return SpawnEntity(object_name, il);
+		return SpawnEntity(object_name, il,ECE_PLACE_ON_SURFACE,RF_DEFAULT);
 	}
 
 	// Returns wetness value. This is just a necesarry forward declaration for Energy Manager which works with EntityAI. This function itself works in ItemBase where its overwritten.
@@ -1430,6 +1456,12 @@ class EntityAI extends Entity
 	//! Energy manager event: Object's initialization. Energy Manager is fully initialized by this point.
 	void OnInitEnergy() {}
 
+	//! Energy manager event: Called when energy was consumed on this device
+	void OnEnergyConsumed() {}
+
+	//! Energy manager event: Called when energy was added on this device
+	void OnEnergyAdded() {}
+	
 	override void OnRPC(PlayerIdentity sender, int rpc_type, ParamsReadContext ctx)
 	{
 		super.OnRPC(sender, rpc_type, ctx);
@@ -1485,13 +1517,52 @@ class EntityAI extends Entity
 	//! Returns item preview index
 	int GetViewIndex()
 	{
-		return m_ViewIndex;
+		if( MemoryPointExists( "invView2" ) )
+		{
+			#ifdef PLATFORM_WINDOWS
+			InventoryLocation il = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( il );
+			InventoryLocationType type = il.GetType();
+			switch( type )
+			{
+				case InventoryLocationType.CARGO:
+				{
+					return 0;
+				}
+				case InventoryLocationType.ATTACHMENT:
+				{
+					return 1;
+				}
+				case InventoryLocationType.HANDS:
+				{
+					return 0;
+				}
+				case InventoryLocationType.GROUND:
+				{
+					return 1;
+				}
+				case InventoryLocationType.PROXYCARGO:
+				{
+					return 0;
+				}
+				default:
+				{
+					return 0;
+				}
+			}
+			#ifdef PLATFORM_CONSOLE
+			return 1;
+			#endif
+			#endif
+		}
+		return 0;
 	}
 	///@} view index
 	
 	//! Returns hit component for the Entity (overriden for each Type - PlayerBase, DayZInfected, DayZAnimal, etc.)
 	string GetHitComponentForAI()
 	{
+		Debug.LogError("EntityAI: HitComponentForAI not set properly for that entity (" + GetType() + ")");
 		//! returns Global so it is obvious you need to configure that properly on entity
 		return "";
 	}
@@ -1499,6 +1570,7 @@ class EntityAI extends Entity
 	//! returns default hit component for the Entity (overriden for each Type - PlayerBase, DayZInfected, DayZAnimal, etc.)
 	string GetDefaultHitComponent()
 	{
+		Debug.LogError("EntityAI: DefaultHitComponent not set properly for that entity (" + GetType() + ")");
 		//! returns Global so it is obvious you need to configure that properly on entity
 		return "";
 	}
@@ -1506,12 +1578,20 @@ class EntityAI extends Entity
 	//! returns default hit position component name for the Entity (overriden by type if needed - used mainly as support for impact particles)
 	string GetDefaultHitPositionComponent()
 	{
+		Debug.LogError("EntityAI: DefaultHitPositionComponent not set for that entity (" + GetType() + ")");
 		return "";
+	}
+	
+	array<string> GetSuitableFinisherHitComponents()
+	{
+		Debug.LogError("EntityAI: SuitableFinisherHitComponents not set for that entity (" + GetType() + ")");
+		return null;
 	}
 	
 	vector GetDefaultHitPosition()
 	{
-		return GetPosition();
+		Debug.LogError("EntityAI: DefaultHitPosition not set for that entity (" + GetType() + ")");
+		return vector.Zero;
 	}
 	
 	//! returns sound type of attachment (used for clothing and weapons on DayZPlayerImplement, paired with Anim*Type enum from DayZAnimEvents)
@@ -1538,8 +1618,8 @@ class EntityAI extends Entity
 		return false;
 	}
 	
-	string ChangeIntoOnAttach(string slot) {};
-	string ChangeIntoOnDetach(int slot_id) {};
+	string ChangeIntoOnAttach(string slot) {}
+	string ChangeIntoOnDetach() {}
 	
 	void OnDebugSpawn() {};
 };

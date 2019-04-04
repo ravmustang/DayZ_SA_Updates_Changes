@@ -16,6 +16,7 @@ class LoadingScreen
 	ImageWidget m_ImageLogoCorner;
 	ImageWidget m_ImageLoadingIcon;
 	float m_ImageLoadingIconRotation;
+	TextWidget m_ProgressText;
 	
 	//ref Timer m_Timer = new Timer(CALL_CATEGORY_SYSTEM);
 	
@@ -38,7 +39,16 @@ class LoadingScreen
 		Class.CastTo(m_TextWidgetError, m_WidgetRoot.FindAnyWidget("ErrorText"));
 		Class.CastTo(m_ImageWidgetBackground, m_WidgetRoot.FindAnyWidget("ImageBackground"));
 		Class.CastTo(m_ImageLoadingIcon, m_WidgetRoot.FindAnyWidget("ImageLoadingIcon"));
-	
+		
+		string tmp;
+		m_ProgressText = TextWidget.Cast(m_WidgetRoot.FindAnyWidget("ProgressText"));
+		if (GetGame())
+		{
+			m_ProgressText.Show( GetGame().CommandlineGetParam("loadingTest", tmp) );
+		}
+		
+		
+			
 		m_ImageLogoMid.Show(true);
 		m_ImageLogoCorner.Show(false);
 		
@@ -87,8 +97,8 @@ Print("Loading Inc: "+ m_Counter);
 			m_WidgetRoot.Show( false );
 			m_Counter = 0;
 			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call( g_Game.CheckDialogs );
+			}
 		}
-	}
 	
 	bool IsLoading()
 	{
@@ -123,6 +133,8 @@ Print("Loading Inc: "+ m_Counter);
 	
 	void SetProgress( float val )
 	{
+		m_ProgressText.SetText("99%");
+		
 		float time_delta = m_DayZGame.GetTickTime() - m_LastProgressUpdate;
 		
 //Print("SetProgress delta: "+ time_delta);
@@ -248,7 +260,7 @@ class LoginQueueMenu extends UIScriptedMenu
 			}
 		}
 		
-		if ( GetGame().GetInput().GetActionDown("UAUIBack",false) )
+		if ( GetGame().GetInput().LocalPress("UAUIBack",false) )
 		{
 			LeaveConnectQueue();
 		}
@@ -789,6 +801,13 @@ class DayZGame extends CGame
 				GetPlayer().GetNetworkID( low, high );
 				Print( "NetID: " + high.ToString() + low.ToString() );
 			}
+			
+			#ifdef PLATFORM_PS4
+				//PSN Set multiplay state - NOT ACTIVE	
+				GetGame().SetMultiplayState( false );
+				//Print("=== PLATFORM_PS4 - SetMultiplayState NOT ACTIVE [MPSessionEndEventTypeID]");
+				//
+			#endif				
 			break;
 		
 		case MPSessionFailEventTypeID:
@@ -828,17 +847,14 @@ class DayZGame extends CGame
 			spawnData.m_DaytimeHour = 0;
 			spawnData.m_Population = 0;
 			ScriptAnalytics.PlayerSpawned(spawnData);
+
+			#ifdef PLATFORM_PS4
+				//PSN Set multiplay state - ACTIVE	
+				GetGame().SetMultiplayState( true );
+				//Print("=== PLATFORM_PS4 - SetMultiplayState ACTIVE [MPSessionPlayerReadyEventTypeID]");
+				//
+			#endif
 			
-#ifdef PLATFORM_CONSOLE
-	#ifndef PLATFORM_WINDOWS // if app is not on Windows with -XBOX parameter
-			if( null != GetUserManager().GetSelectedUser() )
-			{
-				SetGameState( DayZGameState.IN_GAME );
-				OnlineServices.EnterGameplaySession();
-				OnlineServices.LoadVoicePrivilege();
-			}
-	#endif
-#endif
 			break;
 
 		//-----------------------------------------------------------------------------
@@ -849,6 +865,22 @@ class DayZGame extends CGame
 				int duration = conLost_params.param1;
 				OnMPConnectionLostEvent(duration);
 			}
+			
+			#ifdef PLATFORM_PS4
+				//PSN Set multiplay state	
+				if ( duration < 0 )	
+				{
+					GetGame().SetMultiplayState( true );
+					//Print("=== PLATFORM_PS4 - SetMultiplayState ACTIVE [MPConnectionLostEventTypeID]");
+				}
+				else
+				{
+					GetGame().SetMultiplayState( false );
+					//Print("=== PLATFORM_PS4 - SetMultiplayState NOT ACTIVE [MPConnectionLostEventTypeID]");
+				}
+				//
+			#endif
+			
 			break;
 			
 		case WorldCleaupEventTypeID:
@@ -969,8 +1001,18 @@ class DayZGame extends CGame
 			//m_loading.SetTitle("Loading...");
 			m_loading.SetTitle("#dayz_game_loading");
 			m_IsPlayerSpawning = false;
+			
+			#ifdef PLATFORM_CONSOLE
+				#ifndef PLATFORM_WINDOWS // if app is not on Windows with -XBOX parameter
+				if( null != GetUserManager().GetSelectedUser() )
+				{
+					SetGameState( DayZGameState.IN_GAME );
+					OnlineServices.EnterGameplaySession();
+					OnlineServices.LoadVoicePrivilege();
+				}
+				#endif
+			#endif
 		}
-
 	}
 	
 	// ------------------------------------------------------------
@@ -1103,6 +1145,9 @@ class DayZGame extends CGame
 	// ------------------------------------------------------------
 	override bool OnInitialize()
 	{
+		ParticleList.PreloadParticles();
+		
+		
 		m_Visited = new TStringArray;
 		GetGame().GetProfileStringList( "SB_Visited", m_Visited );
 		
@@ -1300,12 +1345,10 @@ class DayZGame extends CGame
 		BiosUserManager user_manager = GetGame().GetUserManager();
 		if( user_manager )
 		{
-			string uid;
 			BiosUser selected_user;
 			if( gamepad > -1 )
 			{
-				GetGame().GetInput().GetGamepadUser( gamepad, uid );
-				selected_user = user_manager.GetUser( uid );
+				GetGame().GetInput().GetGamepadUser( gamepad, selected_user );
 				user_manager.SelectUser( selected_user );
 			}
 			
@@ -1767,6 +1810,11 @@ class DayZGame extends CGame
 		#endif
 	}
 	
+	/*bool IsConnecting()
+	{
+		return m_IsConnecting;
+	}*/
+	
 	// ------------------------------------------------------------
 	bool IsLoading()
 	{
@@ -1889,7 +1937,7 @@ class DayZGame extends CGame
 	}
 	
 	// ------------------------------------------------------------
-	void ExplosionEffects(Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
+	void ExplosionEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
 		float energyFactor, float explosionFactor, bool isWater, string ammoType)
 	{
 		/*
@@ -1931,7 +1979,7 @@ class DayZGame extends CGame
 	}
 	
 	// ------------------------------------------------------------
-	void FirearmEffects(Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
+	void FirearmEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
 		 vector exitPos, vector inSpeed, vector outSpeed, bool isWater, bool deflected, string ammoType) 
 	{
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
@@ -1945,10 +1993,20 @@ class DayZGame extends CGame
 			
 			ImpactMaterials.EvaluateImpactEffect(directHit, componentIndex, surface, pos, ImpactTypes.UNKNOWN, surfNormal, exitPos, inSpeed, outSpeed, deflected, ammoType, isWater);
 		}	
+		
+		// add hit noise
+		if ( GetGame().IsServer() )
+		{
+			ref NoiseParams npar = new NoiseParams();
+			npar.LoadFromPath("cfgAmmo " + ammoType + " NoiseHit");
+			
+			float surfaceCoef = GetGame().SurfaceGetNoiseMultiplier(pos[0], pos[2]);
+			GetGame().GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
+		}
 	}
 	
 	// ------------------------------------------------------------
-	void CloseCombatEffects(Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
+	void CloseCombatEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
 		 bool isWater, string ammoType) 
 	{
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
@@ -1961,6 +2019,16 @@ class DayZGame extends CGame
 			}
 			
 			ImpactMaterials.EvaluateImpactEffect(directHit, componentIndex, surface, pos, ImpactTypes.MELEE, "0 0 0", "0 0 0", "0 0 0", "0 0 0", false, ammoType, isWater);
+		}
+		
+		// add hit noise
+		if ( GetGame().IsServer() )
+		{
+			ref NoiseParams npar = new NoiseParams();
+			npar.LoadFromPath("cfgAmmo " + ammoType + " NoiseHit");
+			
+			float surfaceCoef = GetGame().SurfaceGetNoiseMultiplier(pos[0], pos[2]);
+			GetGame().GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
 		}
 	}
 	

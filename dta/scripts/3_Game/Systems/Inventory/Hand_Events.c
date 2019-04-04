@@ -9,6 +9,7 @@ enum HandEventID
 	TAKE,
 	MOVETO,
 	DROP,
+	THROW,
 	SWAP,
 	FORCESWAP,
 	DESTROY,
@@ -16,6 +17,7 @@ enum HandEventID
 	DESTROYED,
 	REPLACE,
 	REPLACE2,
+	REPLACE3,
 	REPLACED,
 	HUMANCOMMAND_ACTION_FINISHED,
 	HUMANCOMMAND_ACTION_ABORTED,
@@ -54,7 +56,6 @@ class HandEventBase
 
 	InventoryLocation GetDst () { return null; }
 	int GetAnimationID () { return m_AnimationID; }
-	bool IsSwapEvent () { return false; }
 	bool AcquireInventoryJunctureFromServer (notnull Man player) { return false; }
 	bool CheckRequest () { return true; }
 	bool IsServerSideOnly () { return false; }
@@ -67,6 +68,7 @@ class HandEventBase
 			case HandEventID.TAKE: return new HandEventTake(p, e);
 			case HandEventID.MOVETO: return new HandEventMoveTo(p, e);
 			case HandEventID.DROP: return new HandEventDrop(p, e);
+			case HandEventID.THROW: return new HandEventThrow(p, e);
 			case HandEventID.SWAP: return new HandEventSwap(p, e);
 			case HandEventID.FORCESWAP: return new HandEventForceSwap(p, e);
 			case HandEventID.DESTROY: return new HandEventDestroy(p, e);
@@ -74,6 +76,7 @@ class HandEventBase
 			case HandEventID.DESTROYED: return new HandEventDestroyed(p, e);
 			case HandEventID.REPLACE: return new HandEventDestroyAndReplaceWithNew(p, e);
 			case HandEventID.REPLACE2: return new HandEventDestroyAndReplaceWithNewElsewhere(p, e);
+			case HandEventID.REPLACE3: return new HandEventDestroyElsewhereAndReplaceWithNewInHands(p, e);
 			case HandEventID.REPLACED: return new HandEventReplaced(p, e);
 			case HandEventID.ANIMEVENT_CHANGE_HIDE: return HandAnimEventChanged(p, e);
 			case HandEventID.HUMANCOMMAND_ACTION_FINISHED : return HandEventHumanCommandActionFinished(p, e);
@@ -227,6 +230,41 @@ class HandEventDrop extends HandEventBase
 	}
 };
 
+class HandEventThrow extends HandEventBase
+{
+	void HandEventThrow (Man p = null, EntityAI e = null) 
+	{ 
+		m_EventID = HandEventID.THROW; 
+	}
+
+/*	override InventoryLocation GetDst ()
+	{
+		vector mat[4];
+		m_Entity.GetTransform(mat);
+
+		InventoryLocation dst = new InventoryLocation;
+		dst.SetGround(m_Entity, mat);
+		return dst;
+	}
+	
+	override bool CheckRequest ()
+	{
+		return GameInventory.CheckMoveToDstRequest(m_Player, m_Entity, GetDst(), GameInventory.c_MaxItemDistanceRadius);
+	}
+
+	override bool AcquireInventoryJunctureFromServer (notnull Man player)
+	{
+		InventoryLocation src = new InventoryLocation;
+		if (m_Entity.GetInventory().GetCurrentInventoryLocation(src))
+		{
+			InventoryLocation dst = GetDst();
+			return TryAcquireInventoryJunctureFromServer(player, src, dst);
+		}
+		Error("[hndfsm] HandEventDrop.AcquireInventoryJunctureFromServer: no inv loc for entity=" + m_Entity.GetName() + "@" + m_Entity + " ev=" + DumpToString());
+		return JunctureRequestResult.ERROR;
+	}*/
+};
+
 class HandEventSwap extends HandEventBase
 {
 	int m_Animation2ID = -1;
@@ -261,8 +299,6 @@ class HandEventSwap extends HandEventBase
 		Error("[hndfsm] HandEventSwap - cannot create Dst");
 		return null;
 	}
-	
-	override bool IsSwapEvent () { return true; }
 	
 	override bool CheckRequest ()
 	{
@@ -326,7 +362,6 @@ class HandEventForceSwap extends HandEventBase
 	}
 
 	override InventoryLocation GetDst () { return m_Dst; }
-	override bool IsSwapEvent () { return true; }
 	
 	override bool CheckRequest ()
 	{
@@ -382,12 +417,12 @@ class HandEventDestroyed extends HandEventBase
 	void HandEventDestroyed (Man p = null, EntityAI e = NULL) { m_EventID = HandEventID.DESTROYED; }
 };
 
-class HandEventDestroyAndReplaceWithNew extends HandEventBase
+class HandEvenReplaceWithNewBase extends HandEventBase
 {
 	string m_Type;
 	ref ReplaceItemWithNewLambdaBase m_Lambda;
 
-	void HandEventDestroyAndReplaceWithNew (Man p = null, EntityAI e = NULL, ReplaceItemWithNewLambdaBase lambda = NULL) { m_EventID = HandEventID.REPLACE; m_Lambda = lambda; }
+	void HandEvenReplaceWithNewBase (Man p = null, EntityAI e = NULL, ReplaceItemWithNewLambdaBase lambda = NULL) { m_EventID = HandEventID.REPLACE; m_Lambda = lambda; }
 
 	override void ReadFromContext (ParamsReadContext ctx)
 	{
@@ -401,14 +436,30 @@ class HandEventDestroyAndReplaceWithNew extends HandEventBase
 		ctx.Write(m_Type);
 		Error("[hndfsm] HandEventDestroyAndReplaceWithNew - Cannot serialize lambda (write)");
 	}
-	override bool IsSwapEvent () { return true; }
+
 	override bool IsServerSideOnly () { return true; }
+	
+	override InventoryLocation GetDst ()
+	{
+		InventoryLocation dst = new InventoryLocation;
+		dst.SetHands(m_Player, m_Entity);
+		return dst;
+	}
+};
+
+class HandEventDestroyAndReplaceWithNew extends HandEvenReplaceWithNewBase
+{
+	void HandEventDestroyAndReplaceWithNew (Man p = null, EntityAI e = NULL, ReplaceItemWithNewLambdaBase lambda = NULL) { m_EventID = HandEventID.REPLACE; m_Lambda = lambda; }
 };
 
 class HandEventDestroyAndReplaceWithNewElsewhere extends HandEventDestroyAndReplaceWithNew
 {
-	void HandEventDestroyAndReplaceWithNewElsewhere (Man p = null, EntityAI e = NULL, ReplaceItemWithNewLambdaBase lambda = NULL) { m_EventID = HandEventID.REPLACE2; m_Lambda = lambda; }
-	override bool IsServerSideOnly () { return true; }
+	void HandEventDestroyAndReplaceWithNewElsewhere (Man p = null, EntityAI e = NULL, ReplaceItemWithNewLambdaBase lambda = NULL) { m_EventID = HandEventID.REPLACE3; m_Lambda = lambda; }
+};
+
+class HandEventDestroyElsewhereAndReplaceWithNewInHands extends HandEvenReplaceWithNewBase
+{
+	void HandEventDestroyElsewhereAndReplaceWithNewInHands (Man p = null, EntityAI e = NULL, ReplaceItemWithNewLambdaBase lambda = NULL) { m_EventID = HandEventID.REPLACE3; m_Lambda = lambda; }
 };
 
 class HandEventReplaced extends HandEventBase

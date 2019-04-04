@@ -654,7 +654,7 @@ class CGame
 	proto void					FormatString( string format, string params[], out string output);
 	proto void					GetVersion( out string version );
 	proto native UIManager	GetUIManager();
-	proto native Man		GetPlayer();
+	proto native DayZPlayer		GetPlayer();
 	proto native void		GetPlayers( out array<Man> players );
 	
 	//! Returns the direction where the mouse points, from the camera view
@@ -1225,4 +1225,18 @@ class CGame
 		
 		return false;
 	}
+	
+	//! Set multiplay state (PSN)
+	void SetMultiplayState( bool state )
+	{
+		BiosUserManager user_manager = GetGame().GetUserManager();
+		if( user_manager )
+		{
+			BiosUser user = user_manager.GetSelectedUser();
+			if ( user )
+			{
+				user.GetClientServices().GetSessionService().SetMultiplayState( state );
+			}
+		}		
+	}	
 };

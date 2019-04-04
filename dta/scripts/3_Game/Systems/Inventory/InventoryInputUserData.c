@@ -117,12 +117,15 @@ class InventoryInputUserData
 		}
 	}
 
-	static void SendServerHandEvent (notnull Man player, HandEventBase e)
+	static void SendServerHandEventViaInventoryCommand (notnull Man player, HandEventBase e)
 	{
+		// Warning: this uses NetworkMessageInventoryCommand
 		if (GetGame().IsServer())
 		{
 			if (e.IsServerSideOnly())
 				Error("[syncinv] SendServerHandEvent - called on server side event only, e=" + e);
+			if (player.IsAlive())
+				Error("[syncinv] SendServerHandEvent - called on living thing.. server hand command is only for dead people, e=" + e);
 			syncDebugPrint("[syncinv] SendInputUserDataHandEvent e=" + e);
 			ScriptInputUserData ctx = new ScriptInputUserData;
 			SerializeHandEvent(ctx, e);
