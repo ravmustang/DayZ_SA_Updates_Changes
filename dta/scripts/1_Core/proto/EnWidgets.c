@@ -159,6 +159,8 @@ class WorkspaceWidget: Widget
 };
 
 proto native Widget GetWidgetUnderCursor();
+proto native Widget CancelWidgetDragging();
+proto native Widget GetDragWidget();
 proto native void ReportMouse(int mousex, int mousey, Widget rootWidget);
 
 class TextWidget extends Widget
@@ -444,6 +446,7 @@ class VideoWidget extends Widget
 {
 	proto native int Play(VideoCommand cmd);
 	proto native bool LoadVideo(string name, int soundScene);
+	proto native void DisableSubtitles(bool disable);
 };
 
 /*! sets Widget typu RTTextureWidgetTypeID, to which it is possible to reference in shader as $rendertarget

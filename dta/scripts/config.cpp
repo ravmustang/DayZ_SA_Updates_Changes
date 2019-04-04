@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////
 //DeRap: Produced from mikero's Dos Tools Dll version 5.69
-//'now' is Sat Feb 23 09:31:06 2019 : 'file' last modified on Wed Feb 20 16:53:26 2019
+//'now' is Wed Apr 03 22:17:07 2019 : 'file' last modified on Wed Apr 03 12:18:09 2019
 //http://dev-heaven.net/projects/list_files/mikero-pbodll
 ////////////////////////////////////////////////////////////////////
 
 #define _ARMA_
 
-//Class C:\Program Files (x86)\Steam\steamapps\common\DayZServer\dta\scripts\config.bin{
+//Class E:\Documents\GitHub\DayZ_SA_Scripts_Original\dta\scripts\config.bin{
 class CfgPatches
 {
 	class DZ_Scripts
@@ -339,13 +339,13 @@ class CfgSlots
 		displayName = "weaponMuzzleMosin";
 		ghostIcon = "weaponmuzzlemosin";
 	};
-	class Slot_weaponUngerSlugM4
+	class Slot_weaponUnderSlugM4
 	{
 		name = "weaponUnderSlugM4";
 		displayName = "weaponUnderSlugM4";
 		ghostIcon = "weaponunderslungm4";
 	};
-	class Slot_weaponUngerSlugAK
+	class Slot_weaponUnderSlugAK
 	{
 		name = "weaponUnderSlugAK";
 		displayName = "weaponUnderSlugAK";
@@ -1764,6 +1764,12 @@ class CfgSlots
 		displayName = "LargeBattery";
 		selection = "battery";
 		ghostIcon = "carbattery";
+	};
+	class Slot_Knife_Holster
+	{
+		name = "KnifeHolster";
+		displayName = "KnifeHolster";
+		ghostIcon = "muzzle";
 	};
 };
 //};
