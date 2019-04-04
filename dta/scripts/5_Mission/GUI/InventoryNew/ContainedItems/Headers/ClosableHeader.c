@@ -1,19 +1,43 @@
 class ClosableHeader: Header
 {
-	protected float		m_SquareSize;
-	protected int		m_DefaultSort;
+	protected float			m_SquareSize;
+	protected int			m_DefaultSort;
+	
+	protected Widget		m_MovePanel;
+	protected ButtonWidget	m_MoveUp;
+	protected ButtonWidget	m_MoveDown;
+	
+	protected bool			m_IsInLocalEquipment;
 	
 	void ClosableHeader( LayoutHolder parent, string function_name )
 	{
+		m_MovePanel	= GetMainWidget().FindAnyWidget( "MovePanel" );
+		m_MoveUp	= ButtonWidget.Cast( GetMainWidget().FindAnyWidget( "MoveUp" ) );
+		m_MoveDown	= ButtonWidget.Cast( GetMainWidget().FindAnyWidget( "MoveDown" ) );
+		
+		#ifdef PLATFORM_WINDOWS
+		#ifndef PLATFORM_CONSOLE
+		WidgetEventHandler.GetInstance().RegisterOnClick( m_MoveUp,  m_Parent, "EquipmentMoveUp" );
+		WidgetEventHandler.GetInstance().RegisterOnClick( m_MoveDown,  m_Parent, "EquipmentMoveDown" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( m_MoveUp,  this, "MouseLeave" );
+		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( m_MoveDown,  this, "MouseLeave" );
+		#endif
+		#endif
+		
 		WidgetEventHandler.GetInstance().RegisterOnDrag( GetMainWidget() ,  this, "OnDragHeader" );
 		WidgetEventHandler.GetInstance().RegisterOnDrop( GetMainWidget() ,  this, "OnDropHeader" );
+		
 		WidgetEventHandler.GetInstance().RegisterOnMouseEnter( GetMainWidget(),  this, "MouseEnter" );
 		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( GetMainWidget(),  this, "MouseLeave" );
+		
 		float temp;
 		GetMainWidget().GetScreenSize( temp, m_SquareSize );
 		
-		m_DefaultColor		= GetMainWidget().FindAnyWidget( "PanelWidget" ).GetColor();
-		m_DefaultFontSize	= 20;
+		m_DefaultColor			= GetMainWidget().FindAnyWidget( "PanelWidget" ).GetColor();
+		m_DefaultFontSize		= 20;
+		
+		if( GetParent() && GetParent().GetParent() && GetParent().GetParent().GetParent() )
+			m_IsInLocalEquipment	= GetParent().GetParent().GetParent().IsInherited( RightArea );
 	}
 
 	override void SetLayoutName()
@@ -71,23 +95,21 @@ class ClosableHeader: Header
 	
 	bool MouseEnter(Widget w, int x, int y)
 	{
-		if( m_Entity )
-			ItemManager.GetInstance().PrepareTooltip( EntityAI.Cast( m_Entity ) );
-		ClosableContainer p = ClosableContainer.Cast( m_Parent );
-		if( p )
+		if( m_IsInLocalEquipment && !GetDragWidget() )
 		{
-			p.EnterContainer();
+			m_MovePanel.Show( true );
 		}
 		return true;
 	}
 
-	bool MouseLeave( Widget w, Widget s, int x, int y	)
+	bool MouseLeave( Widget w, Widget enter_w, int x, int y	)
 	{
-		ItemManager.GetInstance().HideTooltip();
-		ClosableContainer p = ClosableContainer.Cast( m_Parent );
-		if( p )
+		if( enter_w != m_MoveUp && enter_w != m_MoveDown && enter_w != m_CollapseButton )
 		{
-			p.EnterContainer();
+			if( m_IsInLocalEquipment )
+			{
+				m_MovePanel.Show( false );
+			}
 		}
 		return true;
 	}

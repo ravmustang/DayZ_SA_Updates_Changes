@@ -2,6 +2,7 @@ class ItemManager
 {
 	private ref static ItemManager		m_Instance;
 	protected bool						m_IsDragging;
+	protected EntityAI					m_HoveredItem;
 	protected EntityAI					m_DraggedItem;
 	protected Icon						m_DraggedIcon;
 	protected ref Widget				m_TooltipWidget;
@@ -22,6 +23,10 @@ class ItemManager
 	protected bool						m_ItemMicromanagmentMode;
 	protected bool						m_ItemMoving;
 	
+	protected Widget					m_LeftDropzone;
+	protected Widget					m_CenterDropzone;
+	protected Widget					m_RightDropzone;
+	
 	#ifndef PLATFORM_CONSOLE
 	protected const float TOOLTIP_DELAY = 0.25; // in seconds
 	#else
@@ -41,7 +46,6 @@ class ItemManager
 			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip.layout", NULL );
 		#endif
 		m_TooltipWidget.Show( false );
-		
 	}
 	
 	void SetItemMoving( bool item_moving )
@@ -234,9 +238,9 @@ class ItemManager
 
 	void HideDropzones()
 	{
-		GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 0 );
-		GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 0 );
-		GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 0 );
+		GetRightDropzone().SetAlpha( 0 );
+		GetLeftDropzone().SetAlpha( 0 );
+		GetCenterDropzone().SetAlpha( 0 );
 	}
 
 	void ShowSourceDropzone( EntityAI item )
@@ -254,22 +258,44 @@ class ItemManager
 			HideDropzones();
 			if( loc_type == InventoryLocationType.GROUND )
 			{
-				GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				GetLeftDropzone().SetAlpha( 1 );
 			}
 			else if( loc_type == InventoryLocationType.HANDS )
 			{
-				GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				GetCenterDropzone().SetAlpha( 1 );
 			}
 			else
 			{
-				GetRootWidget().FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				GetRightDropzone().SetAlpha( 1 );
 			}
 		}
 	}
 
-	Widget GetRootWidget()
+	Widget GetLeftDropzone()
 	{
-		return m_RootWidget;
+		if( !m_LeftDropzone )
+			m_LeftDropzone	= m_RootWidget.FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" );
+		
+		return m_LeftDropzone;
+	}
+	
+	Widget GetRightDropzone()
+	{
+		if( !m_RightDropzone )
+			m_RightDropzone	= m_RootWidget.FindAnyWidget( "RightPanel" ).FindAnyWidget( "DropzoneX" );
+		return m_RightDropzone;
+	}
+	
+	Widget GetCenterDropzone()
+	{
+		if( !m_CenterDropzone )
+			m_CenterDropzone = m_RootWidget.FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" );
+		return m_CenterDropzone;
+	}
+	
+	EntityAI GetHoveredItem()
+	{
+		return m_HoveredItem;
 	}
 
 	void SetDraggedItem( EntityAI dragged_item )
@@ -305,6 +331,7 @@ class ItemManager
 	void HideTooltip()
 	{
 		m_TooltipWidget.Show( false );
+		m_HoveredItem = null;
 		delete m_ToolTipTimer;
 	}
 	
@@ -412,6 +439,7 @@ class ItemManager
 
 		if ( item.IsInherited( InventoryItem ) )
 		{
+			m_HoveredItem = item;
 			InspectMenuNew.UpdateItemInfo( m_TooltipWidget, item );
 			
 			#ifndef PLATFORM_CONSOLE
@@ -476,5 +504,80 @@ class ItemManager
 		{
 			m_TooltipWidget.Show( true );
 		}
+	}
+	
+	static int GetCombinationFlags( EntityAI entity1, EntityAI entity2 )
+	{
+		int flags = 0;
+		PlayerBase m_player = PlayerBase.Cast( GetGame().GetPlayer() );
+
+		if( !entity1 || !entity2 )
+			return flags;
+		
+		if( entity1.IsInherited( ItemBase ) && entity2.IsInherited( ItemBase ) )
+		{
+			ItemBase ent1 = ItemBase.Cast( entity1 );
+			if( ent1.CanBeCombined( ItemBase.Cast( entity2 ) ) ) flags = flags | InventoryCombinationFlags.COMBINE_QUANTITY2;
+		}
+
+		Weapon_Base wpn;
+		Magazine mag;
+		if( Class.CastTo(wpn,  entity1 ) && Class.CastTo(mag,  entity2 ) )
+		{
+			
+		}
+		else if( entity1.GetInventory().CanAddAttachment( entity2 ) )
+		{
+			if( !entity1.IsInherited( ZombieBase ) && !entity1.IsInherited( Car ) && !entity2.IsInherited( ZombieBase ) && !entity2.IsInherited( Car ) )
+			{
+				flags = flags | InventoryCombinationFlags.ADD_AS_ATTACHMENT;
+			}
+		}
+		if( entity1.GetInventory().CanAddEntityInCargo( entity2 ) ) flags = flags | InventoryCombinationFlags.ADD_AS_CARGO;
+
+		if( entity1 == m_player.GetHumanInventory().GetEntityInHands() || entity2 == m_player.GetHumanInventory().GetEntityInHands())
+		{
+			if( GetRecipeCount( false, entity1, entity2 ) > 0 )
+			{
+				flags = flags | InventoryCombinationFlags.RECIPE_HANDS;
+			}
+
+			ActionManagerClient amc;
+			Class.CastTo(amc, m_player.GetActionManager());
+			if( entity1 == m_player.GetHumanInventory().GetEntityInHands() )
+			{
+				if( amc.CanPerformActionFromInventory( ItemBase.Cast( entity1 ), ItemBase.Cast( entity2 ) ) )
+				{
+					flags = flags | InventoryCombinationFlags.PERFORM_ACTION;
+				}
+				else if( amc.CanSetActionFromInventory( ItemBase.Cast( entity1 ), ItemBase.Cast( entity2 ) ) )
+				{
+					flags = flags | InventoryCombinationFlags.SET_ACTION;
+				}
+			}
+			else
+			{
+				if( amc.CanPerformActionFromInventory( ItemBase.Cast( entity2 ), ItemBase.Cast( entity1 ) ) )
+				{
+					flags = flags | InventoryCombinationFlags.PERFORM_ACTION;
+				}
+				else if( amc.CanSetActionFromInventory( ItemBase.Cast( entity2 ), ItemBase.Cast( entity1 ) ) )
+				{
+					flags = flags | InventoryCombinationFlags.SET_ACTION;
+				}
+			}
+		}
+
+		if( GetRecipeCount( true, entity1, entity2 ) > 0 )
+		{
+			flags = flags | InventoryCombinationFlags.RECIPE_ANYWHERE;
+		}
+		return flags;
+	}
+	
+	static int GetRecipeCount( bool recipe_anywhere, EntityAI entity1, EntityAI entity2 )
+	{
+		PluginRecipesManager plugin_recipes_manager = PluginRecipesManager.Cast( GetPlugin( PluginRecipesManager ) );
+		return plugin_recipes_manager.GetValidRecipes( ItemBase.Cast( entity1 ), ItemBase.Cast( entity2 ), NULL, PlayerBase.Cast( GetGame().GetPlayer() ) );
 	}
 }

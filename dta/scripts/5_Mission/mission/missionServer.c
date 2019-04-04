@@ -56,6 +56,8 @@ class MissionServer extends MissionBase
 	
 	override void OnInit()
 	{
+		super.OnInit();
+
 		/*
 		// example
 		Print("This is Server mission");

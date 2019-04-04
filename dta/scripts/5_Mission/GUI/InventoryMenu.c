@@ -12,12 +12,9 @@ class InventoryMenu extends UIScriptedMenu
 	protected bool						m_IsOpened;
 	protected bool						m_OnlyFirstTime;
 	
-	protected float						m_RefreshTimer;
-	
 	protected static ScreenWidthType	m_WidthType;
 	protected static int				m_Width;
 	protected static int				m_Height;
-	static int							m_Counter;
 	
 	void InventoryMenu()
 	{
@@ -50,6 +47,15 @@ class InventoryMenu extends UIScriptedMenu
 			else
 				m_WidthType = ScreenWidthType.NARROW;
 		}
+		/*
+		for( int i = 0; i < 100; i++ )
+		{
+			int x = ( 10 * i + 11 );
+			if( ( x + 9 ) % 8 == 0 )
+			{
+				Print( "Grid = " + i + ", slot = " + ( x / 8 ) + ", total = " + x );
+			}
+		}*/
 	}
 	
 	static ScreenWidthType GetWidthType()
@@ -94,27 +100,20 @@ class InventoryMenu extends UIScriptedMenu
 	
 	override void Update( float timeslice )
 	{
-		m_Counter = 0;
 		if( m_Inventory )
 			m_Inventory.UpdateInterval();
-		
-		m_RefreshTimer += timeslice;
-		if( m_RefreshTimer > 1 )
-		{
-			//m_Inventory.Refresh();
-			m_RefreshTimer = timeslice;
-		}
-		//Print( m_Counter );
 	}
 
 	override void OnShow()
 	{
 		super.OnShow();
 		m_IsOpened = true;
-		PPEffects.SetBlurInventory(1);
+		PPEffects.SetBlurInventory(0.5);
 		if(m_Inventory)
 			m_Inventory.OnShow();
+		
 		SetFocus( layoutRoot );
+		
 		MissionGameplay mission = MissionGameplay.Cast( GetGame().GetMission() );
 		if( mission )
 		{
@@ -128,17 +127,9 @@ class InventoryMenu extends UIScriptedMenu
 		m_Inventory.Refresh();
 	}
 	
-	//#ifdef PLATFORM_CONSOLE
 	override bool OnController( Widget w, int control, int value )
 	{
 		return m_Inventory.Controller( w, control, value );
-	}
-	//#endif
-	
-	int Reset()
-	{
-		m_Inventory.Reset();
-		return 1;
 	}
 	
 	bool IsOpened()

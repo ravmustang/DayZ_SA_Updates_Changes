@@ -6,7 +6,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	protected Widget						m_DetailsRoot;
 	protected TextWidget					m_DetailsLabel;
 	protected RichTextWidget				m_DetailsText;
-	protected ButtonWidget					m_Keybindings;
+	protected GridSpacerWidget				m_Keybindings;
 	
 	protected GameOptions					m_Options;
 	protected OptionsMenu					m_Menu;
@@ -40,10 +40,15 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_DetailsRoot								= details_root;
 		m_DetailsLabel								= TextWidget.Cast( m_DetailsRoot.FindAnyWidget( "details_label" ) );
 		m_DetailsText								= RichTextWidget.Cast( m_DetailsRoot.FindAnyWidget( "details_content" ) );
-		m_Keybindings								= ButtonWidget.Cast( m_Root.FindAnyWidget( "keybinding_setting_container" ) );
+		m_Keybindings								= GridSpacerWidget.Cast( m_Root.FindAnyWidget( "keyboard_settings_content" ) );
 		
 		m_Options 									= options;
 		m_Menu										= menu;
+		
+		#ifdef PLATFORM_PS4
+		TextWidget text_controller = TextWidget.Cast(m_Root.FindAnyWidget( "controller_text" ));
+		text_controller.SetText( "#layout_PS4_controls_controller" );
+		#endif
 		
 		SetOptions( options );
 		
@@ -53,7 +58,6 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "hsensitivity_setting_option" ).SetUserID( AT_CONFIG_XAXIS );
 		m_Root.FindAnyWidget( "invert_setting_option" ).SetUserID( AT_CONFIG_YREVERSED );
 		m_Keybindings.SetUserID( 777 );
-		m_Keybindings.SetHandler( this );
 		#endif
 		#endif
 		
@@ -90,6 +94,8 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "controls_settings_root" ).GetScreenSize( x, y2 );
 		int f = ( y2 > y );
 		m_Root.FindAnyWidget( "controls_settings_scroll" ).SetAlpha( f );
+		
+		m_Root.SetHandler( this );
 	}
 	
 	void EnterKeybindingMenu()
@@ -104,7 +110,30 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		#endif
 	}
 	
-	override bool OnClick( Widget w, int x, int y, int button )
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		if ( w && w.IsInherited( ScrollWidget ) )
+		{
+			return false;
+		}
+		
+		m_Menu.ColorHighlight( w );
+		
+		return true;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		if ( w && w.IsInherited( ScrollWidget ) )
+		{
+			return false;
+		}
+		
+		m_Menu.ColorNormal( w );
+		return true;
+	}
+	
+	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
 	{
 		if( button == MouseState.LEFT )
 		{
@@ -125,10 +154,14 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	{
 		OptionsMenu menu = OptionsMenu.Cast( GetGame().GetUIManager().GetMenu() );
 		if( menu )
+		{
 			menu.OnFocus( w, x, y );
+		}
+		
 		if( w )
 		{
 			Param2<string, string> p = m_TextMap.Get( w.GetUserID() );
+			
 			if( p )
 			{
 				m_DetailsRoot.Show( true );
@@ -163,7 +196,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		}
 		return false;
 	}
-	
+	/*
 	override bool OnMouseEnter( Widget w, int x, int y )
 	{
 		if( IsFocusable( w ) )
@@ -183,7 +216,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		}
 		return false;
 	}
-	
+	*/
 	bool IsFocusable( Widget w )
 	{
 		if( w )

@@ -27,6 +27,14 @@ class LeftArea: Container
 		
 		WidgetEventHandler.GetInstance().RegisterOnChildAdd( m_MainWidget, this, "OnChildAdd" );
 		WidgetEventHandler.GetInstance().RegisterOnChildRemove( m_MainWidget, this, "OnChildRemove" );
+		
+		#ifdef PLATFORM_PS4
+		ImageWidget lt = ImageWidget.Cast( m_RootWidget.FindAnyWidget( "LTIcon" ) );
+		ImageWidget rt = ImageWidget.Cast( m_RootWidget.FindAnyWidget( "RTIcon" ) );
+		
+		lt.LoadImageFile( 0, "set:playstation_buttons image:L2" );
+		rt.LoadImageFile( 0, "set:playstation_buttons image:R2" );
+		#endif
 	}
 	
 	override void RefreshItemPosition( EntityAI item_to_refresh )
@@ -64,11 +72,6 @@ class LeftArea: Container
 		}
 		
 		UpdateSelectionIcons();
-	}
-	
-	override bool TransferItemToVicinity()
-	{
-		return m_VicinityContainer.TransferItemToVicinity();
 	}
 	
 	override bool SelectItem()
@@ -153,6 +156,12 @@ class LeftArea: Container
 		UpdateSelectionIcons();
 	}
 	
+	override void SetLastActive()
+	{
+		UnfocusAll();
+		UpdateSelectionIcons();
+	}
+	
 	override void SetNextActive()
 	{
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
@@ -197,7 +206,7 @@ class LeftArea: Container
 		UpdateSelectionIcons();
 	}
 	
-	override void SetPreviousActive()
+	override void SetPreviousActive( bool force = false )
 	{
 		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
 		if( !active_container.IsActive() )
@@ -205,7 +214,7 @@ class LeftArea: Container
 			return;
 		}
 		
-		if( active_container.IsFirstIndex() )
+		if( active_container.IsFirstIndex() || force )
 		{
 			--m_ActiveIndex;
 			if ( m_ActiveIndex < 0 )
@@ -217,11 +226,8 @@ class LeftArea: Container
 			active_container.SetActive( false );
 			active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
 			active_container.SetActive( true );
+			active_container.SetLastActive();
 			SetFocusedContainer( active_container );
-			if( active_container.IsInherited( CollapsibleContainer ) )
-			{
-				CollapsibleContainer.Cast( active_container ).SetLastActive();
-			}
 		}
 		else
 		{
@@ -269,20 +275,25 @@ class LeftArea: Container
 	
 	float GetCurrentContainerTopY()
 	{
-		float x, y;
+		float x, y, cont_screen_pos;
 		m_MainWidget.GetScreenPos( x, y );
-		float cont_screen_pos = Container.Cast( m_Body.Get( m_ActiveIndex ) ).GetFocusedContainerYScreenPos();
-		
+		if( m_Body.IsValidIndex( m_ActiveIndex ) )
+			cont_screen_pos = Container.Cast( m_Body.Get( m_ActiveIndex ) ).GetFocusedContainerYScreenPos();
+
 		return cont_screen_pos - y;
 	}
 	
 	float GetCurrentContainerBottomY()
 	{
-		float x, y;
+		float x, y, cont_screen_pos, cont_screen_height;
 		m_MainWidget.GetScreenPos( x, y );
 		
-		float cont_screen_pos = Container.Cast( m_Body.Get( m_ActiveIndex ) ).GetFocusedContainerYScreenPos();
-		float cont_screen_height = Container.Cast( m_Body.Get( m_ActiveIndex ) ).GetFocusedContainerHeight();
+		if( m_Body.IsValidIndex( m_ActiveIndex ) )
+		{
+			cont_screen_pos = Container.Cast( m_Body.Get( m_ActiveIndex ) ).GetFocusedContainerYScreenPos();
+			cont_screen_height = Container.Cast( m_Body.Get( m_ActiveIndex ) ).GetFocusedContainerHeight();
+		}
+			
 		return cont_screen_pos - y + cont_screen_height;
 	}
 	
@@ -292,8 +303,16 @@ class LeftArea: Container
 			m_VicinityContainer.ExpandCollapseContainer();
 		else
 		{
-			AttachmentCategoriesContainer cont = AttachmentCategoriesContainer.Cast( GetFocusedContainer() );
-			cont.ExpandCollapseContainer();
+			AttachmentCategoriesContainer acc = AttachmentCategoriesContainer.Cast( GetFocusedContainer() );
+			PlayerContainer pc = PlayerContainer.Cast( GetFocusedContainer() );
+			ZombieContainer zc = ZombieContainer.Cast( GetFocusedContainer() );
+			
+			if( acc )
+				acc.ExpandCollapseContainer();
+			else if( pc )
+				pc.ExpandCollapseContainer();
+			else if( zc )
+				zc.ExpandCollapseContainer();
 		}
 		
 		Refresh();

@@ -8,7 +8,7 @@ class ColorManager
 	static int COLOR_HIGHLIGHT_PANEL	= ARGB( 255, 0, 0, 0 );
 	static int COLOR_SELECTED_TEXT		= ARGB( 255, 255, 255, 255 );
 	static int COLOR_SELECTED_PANEL		= ARGB( 255, 200, 0, 0 );
-	static int COLOR_DISABLED_TEXT		= ARGB( 100, 255, 255, 255 );
+    static int COLOR_DISABLED_TEXT		= ARGB( 100, 255, 255, 255 );
 	static int COLOR_DISABLED_PANEL		= ARGB( 140, 0, 0, 0 );
 	
 	static int ITEM_BACKGROUND_COLOR = ARGB( 50, 255, 255, 255 );

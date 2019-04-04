@@ -376,14 +376,15 @@ class OptionsMenu extends UIScriptedMenu
 			ColorHighlight( w );
 			return true;
 		}
-		if( x == -1 && y == 1 )
+		else if( y == 1 )
 		{
 			SliderFocus();
 		}
-		if( x == -1 && y == 2 )
+		else
 		{
 			ToggleFocus();
 		}
+		
 		return false;
 	}
 	
@@ -427,28 +428,28 @@ class OptionsMenu extends UIScriptedMenu
 	override void Update( float timeslice )
 	{
 		super.Update( timeslice );
-		if( GetGame().GetInput().GetActionDown("UAUITabLeft",false) )
+		if( GetGame().GetInput().LocalPress("UAUITabLeft",false) )
 		{
 			m_Tabber.PreviousTab();
 		}
 		
 		//RIGHT BUMPER - TAB RIGHT
-		if( GetGame().GetInput().GetActionDown("UAUITabRight",false) )
+		if( GetGame().GetInput().LocalPress("UAUITabRight",false) )
 		{
 			m_Tabber.NextTab();
 		}
 		
-		if( GetGame().GetInput().GetActionDown("UAUICtrlX",false) )
+		if( GetGame().GetInput().LocalPress("UAUICtrlX",false) )
 		{
 			Apply();
 		}
 		
-		if( GetGame().GetInput().GetActionDown("UAUICtrlY",false) )
+		if( GetGame().GetInput().LocalPress("UAUICtrlY",false) )
 		{
 			Reset();
 		}
 		
-		if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
+		if( GetGame().GetInput().LocalPress("UAUIBack",false) )
 		{
 			Back();
 		}
@@ -457,30 +458,105 @@ class OptionsMenu extends UIScriptedMenu
 	//Coloring functions (Until WidgetStyles are useful)
 	void ColorHighlight( Widget w )
 	{
-		SetFocus( w );
-		
-		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button )
+		if( w.IsInherited( ButtonWidget ) )
 		{
-			button.SetTextColor( ColorManager.COLOR_HIGHLIGHT_TEXT );
+			ButtonWidget button = ButtonWidget.Cast( w );
+			button.SetTextColor( ARGB( 255, 200, 0, 0 ) );
+		}
+		
+		w.SetColor( ARGB( 255, 0, 0, 0) );
+		
+		TextWidget text1	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
+		TextWidget text3	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
+		ImageWidget image	= ImageWidget.Cast( w.FindAnyWidget( w.GetName() + "_image" ) );
+		Widget option		= Widget.Cast( w.FindAnyWidget( w.GetName() + "_option_wrapper" ) );
+		Widget option_label = w.FindAnyWidget( "option_label" );
+		
+		if( text1 )
+		{
+			text1.SetColor( ARGB( 255, 255, 0, 0 ) );
+		}
+		
+		if( text2 )
+		{
+			text2.SetColor( ARGB( 255, 255, 0, 0 ) );
+		}
+		
+		if( text3 )
+		{
+			text3.SetColor( ARGB( 255, 255, 0, 0 ) );
+			w.SetAlpha(1);
+		}
+		
+		if( image )
+		{
+			image.SetColor( ARGB( 255, 200, 0, 0 ) );
+		}
+		
+		if ( option )
+		{
+			option.SetColor( ARGB( 255, 255, 0, 0 ) );
+		}
+		
+		if ( option_label )
+		{
+			option_label.SetColor( ARGB( 255, 255, 0, 0 ) );
 		}
 	}
 	
 	void ColorNormal( Widget w )
 	{
+		//Print("ColorNormal -> "+ w.GetName());
+		//DumpStack();
+		
 		if ( (w.GetFlags() & WidgetFlags.IGNOREPOINTER) == WidgetFlags.IGNOREPOINTER )
 		{
 			return;
 		}
 		
-		#ifdef PLATFORM_WINDOWS
-		SetFocus( null );
-		#endif
-		
-		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button )
+		if( w.IsInherited( ButtonWidget ) )
 		{
-			button.SetTextColor( ColorManager.COLOR_NORMAL_TEXT );
+			ButtonWidget button = ButtonWidget.Cast( w );
+			button.SetTextColor( ARGB( 255, 255, 255, 255 ) );
+		}
+		
+		TextWidget text1	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
+		TextWidget text3	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
+		ImageWidget image	= ImageWidget.Cast( w.FindAnyWidget( w.GetName() + "_image" ) );
+		Widget option		= w.FindAnyWidget( w.GetName() + "_option_wrapper" );
+		Widget option_label = w.FindAnyWidget( "option_label" );
+		
+		if( text1 )
+		{
+			text1.SetColor( ARGB( 255, 255, 255, 255 ) );
+		}
+		
+		if( text2 )
+		{
+			text2.SetColor( ARGB( 255, 255, 255, 255 ) );
+		}
+		
+		if( text3 )
+		{
+			text3.SetColor( ARGB( 255, 255, 255, 255 ) );
+			w.SetAlpha(0);
+		}
+		
+		if( image )
+		{
+			image.SetColor( ARGB( 255, 255, 255, 255 ) );
+		}
+		
+		if ( option )
+		{
+			option.SetColor( ARGB( 150, 255, 255, 255 ) );
+		}
+		
+		if ( option_label )
+		{
+			option_label.SetColor( ARGB( 255, 255, 255, 255 ) );
 		}
 	}
 	
@@ -490,10 +566,13 @@ class OptionsMenu extends UIScriptedMenu
 		SetFocus( null );
 		#endif
 		
-		ButtonWidget button = ButtonWidget.Cast( w );
-		if( button )
+		if ( w )
 		{
-			button.SetTextColor( ColorManager.COLOR_DISABLED_TEXT );
+			ButtonWidget button = ButtonWidget.Cast( w );
+			if( button )
+			{
+				button.SetTextColor( ColorManager.COLOR_DISABLED_TEXT );
+			}
 		}
 	}
 }

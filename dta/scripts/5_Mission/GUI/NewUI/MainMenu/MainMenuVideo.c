@@ -67,11 +67,11 @@ class MainMenuVideo extends UIScriptedMenu
 	
 	override void Update(float timeslice)
 	{
-		if( GetGame().GetInput().GetActionDown("UAUICtrlX",false) )
+		if( GetGame().GetInput().LocalPress("UAUICtrlX",false) )
 		{
 			//PlayPauseVideo();
 		}
-		if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
+		if( GetGame().GetInput().LocalPress("UAUIBack",false) )
 		{
 			StopVideo();
 		}

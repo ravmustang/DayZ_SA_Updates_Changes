@@ -39,12 +39,12 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		#ifdef PLATFORM_CONSOLE
 			layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/xbox/server_browser.layout" );
-			m_OfficialTab	= new ServerBrowserTab( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
+			m_OfficialTab	= new ServerBrowserTabConsole( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
 		#else
 			layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/pc/server_browser.layout" );
-			m_OfficialTab	= new ServerBrowserTabPage( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
-			m_CommunityTab	= new ServerBrowserTabPage( layoutRoot.FindAnyWidget( "Tab_1" ), this, TabType.COMMUNITY );
-			m_LANTab		= new ServerBrowserTabPage( layoutRoot.FindAnyWidget( "Tab_2" ), this, TabType.LAN );
+			m_OfficialTab	= new ServerBrowserTabPc( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
+			m_CommunityTab	= new ServerBrowserTabPc( layoutRoot.FindAnyWidget( "Tab_1" ), this, TabType.COMMUNITY );
+			m_LANTab		= new ServerBrowserTabPc( layoutRoot.FindAnyWidget( "Tab_2" ), this, TabType.LAN );
 		#endif
 			
 		layoutRoot.FindAnyWidget( "Tabber" ).GetScript( m_Tabber );
@@ -136,7 +136,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorHighlight( w, x, y );
+			ColorHighlight( w );
 			return true;
 		}
 		return false;
@@ -146,13 +146,13 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorNormal( w, enterW, x, y );
+			ColorNormal( w );
 			return true;
 		}
 		return false;
 	}
 	
-	void SetRefreshing( bool refreshing )
+	void SetServersLoadingTab( TabType refreshing )
 	{
 		m_IsRefreshing = refreshing;
 		
@@ -160,7 +160,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		OnlineServices.m_ServersAsyncInvoker.Insert( OnLoadServersAsync );
 	}
 
-	TabType IsRefreshing()
+	TabType GetServersLoadingTab()
 	{
 		return m_IsRefreshing;
 	}
@@ -217,14 +217,17 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		Widget reset_frame	= layoutRoot.FindAnyWidget( "Reset" );
 		
 		if( focus )
-		{
-			con_text.SetText( "#str_settings_menu_root_toolbar_bg_consoletoolbar_toggle_toggletext0" );
+		{			
+			//con_text.SetText( "#str_settings_menu_root_toolbar_bg_consoletoolbar_toggle_toggletext0" );
+			con_text.SetText( "#dialog_change" );
 			ref_text.SetText( "#server_browser_menu_refresh" );
 			res_text.SetText( "#server_browser_menu_reset_filters" );
+		
 			con_text.Update();
 			ref_text.Update();
 			res_text.Update();
-		}
+		}		
+		
 		#endif
 	}
 	
@@ -237,7 +240,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		Widget reset_frame	= layoutRoot.FindAnyWidget( "Reset" );
 		
 		if( focus )
-		{
+		{			
 			con_text.SetText( "#server_browser_menu_connect" );
 			
 			float x, y;
@@ -260,7 +263,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorHighlight( w, x, y );
+			ColorHighlight( w );
 			return true;
 		}
 		return false;
@@ -270,7 +273,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( IsFocusable( w ) )
 		{
-			ColorNormal( w, null, x, y );
+			ColorNormal( w );
 			return true;
 		}
 		return false;
@@ -309,54 +312,56 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	
 	override void Update( float timeslice )
 	{
-		if( !GetGame().GetUIManager().IsDialogVisible() )
+		if( !GetGame().GetUIManager().IsDialogVisible() /*&& !GetDayZGame().IsConnecting()*/ )
 		{
-			if( GetGame().GetInput().GetActionDown("UAUITabLeft",false) )
+			if( GetGame().GetInput().LocalPress("UAUITabLeft",false) )
 			{
-				m_Tabber.PreviousTab();
+				//m_Tabber.PreviousTab();
+				GetSelectedTab().PressSholderLeft();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUITabRight",false) )
+			if( GetGame().GetInput().LocalPress("UAUITabRight",false) )
 			{
-				m_Tabber.NextTab();
+				//m_Tabber.NextTab();
+				GetSelectedTab().PressSholderRight();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUISelect",false) )
+			if( GetGame().GetInput().LocalPress("UAUISelect",false) )
 			{
 				GetSelectedTab().PressA();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUICtrlX",false) )
+			if( GetGame().GetInput().LocalPress("UAUICtrlX",false) )
 			{
 				GetSelectedTab().PressX();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUICtrlY",false) )
+			if( GetGame().GetInput().LocalPress("UAUICtrlY",false) )
 			{
 				GetSelectedTab().PressY();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUILeft",false) )
+			if( GetGame().GetInput().LocalPress("UAUILeft",false) )
 			{
 				GetSelectedTab().Left();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUIRight",false) )
+			if( GetGame().GetInput().LocalPress("UAUIRight",false) )
 			{
 				GetSelectedTab().Right();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUIUp",false) )
+			if( GetGame().GetInput().LocalPress("UAUIUp",false) )
 			{
 				GetSelectedTab().Up();
 			}
 			
-			if( GetGame().GetInput().GetActionDown("UAUIDown",false) )
+			if( GetGame().GetInput().LocalPress("UAUIDown",false) )
 			{
 				GetSelectedTab().Down();
 			}
 	
-			if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
+			if( GetGame().GetInput().LocalPress("UAUIBack",false) )
 			{
 				Back();
 			}
@@ -401,6 +406,8 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		SelectServer( server );
 		SaveData();
 		Play();
+		
+		//server.
 	}
 	
 	void Play()
@@ -461,21 +468,30 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	
 	void OnTabSwitch()
 	{
-		SetRefreshing( TabType.NONE );
+		SetServersLoadingTab( TabType.NONE );
+		
 		if( GetSelectedTab().IsNotInitialized() )
+		{
 			GetSelectedTab().RefreshList();
+		}
+		
 		GetSelectedTab().Focus();
 	}
 	
 	void OnLoadServersAsync( ref GetServersResult result_list, EBiosError error, string response )
 	{
 		#ifdef PLATFORM_WINDOWS
-			GetSelectedTab().OnLoadServersAsyncPC( result_list, error, response );
+			#ifdef PLATFORM_CONSOLE
+				GetSelectedTab().OnLoadServersAsyncConsole( result_list, error, response );
+			#else
+				GetSelectedTab().OnLoadServersAsyncPC( result_list, error, response );
+			#endif
 		#else
-			GetSelectedTab().OnLoadServersAsync( result_list, error, response );
+			GetSelectedTab().OnLoadServersAsyncConsole( result_list, error, response );
 		#endif
 	}
 	
+	/*
 	//Coloring functions (Until WidgetStyles are useful)
 	void ColorHighlight( Widget w, int x, int y )
 	{
@@ -536,6 +552,91 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		if( image )
 		{
 			image.SetColor( ColorManager.COLOR_NORMAL_TEXT );
+		}
+	}
+	*/
+	
+	//Coloring functions (Until WidgetStyles are useful)
+	void ColorHighlight( Widget w )
+	{
+		if( !w )
+			return;
+		
+		//SetFocus( w );
+		
+		int color_pnl = ARGB(255, 0, 0, 0);
+		int color_lbl = ARGB(255, 255, 0, 0);
+		
+		#ifdef PLATFORM_CONSOLE
+			color_pnl = ARGB(255, 200, 0, 0);
+			color_lbl = ARGB(255, 255, 255, 255);
+		#endif
+		
+		ButtonSetColor(w, color_pnl);
+		ButtonSetTextColor(w, color_lbl);
+	}
+	
+	void ColorNormal( Widget w )
+	{
+		if( !w )
+			return;
+		
+		int color_pnl = ARGB(0, 0, 0, 0);
+		int color_lbl = ARGB(255, 255, 255, 255);
+		
+		ButtonSetColor(w, color_pnl);
+		ButtonSetTextColor(w, color_lbl);
+	}
+	
+	void ButtonSetText( Widget w, string text )
+	{
+		if( !w )
+			return;
+				
+		TextWidget label = TextWidget.Cast(w.FindWidget( w.GetName() + "_label" ) );
+		
+		if( label )
+		{
+			label.SetText( text );
+		}
+		
+	}
+	
+	void ButtonSetColor( Widget w, int color )
+	{
+		if( !w )
+			return;
+		
+		Widget panel = w.FindWidget( w.GetName() + "_panel" );
+		
+		if( panel )
+		{
+			panel.SetColor( color );
+		}
+	}
+	
+	void ButtonSetTextColor( Widget w, int color )
+	{
+		if( !w )
+			return;
+
+		TextWidget label	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
+		TextWidget text		= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
+				
+		if( label )
+		{
+			label.SetColor( color );
+		}
+		
+		if( text )
+		{
+			text.SetColor( color );
+		}
+		
+		if( text2 )
+		{
+			text2.SetColor( color );
 		}
 	}
 }

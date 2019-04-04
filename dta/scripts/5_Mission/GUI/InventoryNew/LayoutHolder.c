@@ -8,6 +8,9 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 	
 	protected bool					m_IsActive;
 
+	void UpdateInterval();
+	void SetLayoutName();
+	
 	void LayoutHolder( LayoutHolder parent )
 	{		
 		m_Parent = parent;
@@ -15,7 +18,7 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 		this.SetLayoutName();
 		this.SetParentWidget();
 		
-		if( m_LayoutName )
+		if( m_LayoutName != "" )
 		{
 			m_MainWidget = GetGame().GetWorkspace().CreateWidgets( m_LayoutName );
 			m_MainWidget.Show( true );
@@ -52,10 +55,6 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 			return this;
 		}
 	}
-	
-	void UpdateInterval() {}
-
-	void SetLayoutName() {}
 	
 	void SetParentWidget()
 	{

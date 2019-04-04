@@ -136,7 +136,11 @@ class MissionBase extends Mission
 		switch (id)
 		{
 		case MENU_MAIN:
+#ifdef PLATFORM_CONSOLE			
+			menu = new MainMenuConsole;
+#else
 			menu = new MainMenu;
+#endif
 			break;
 		case MENU_INGAME:
 #ifdef PLATFORM_CONSOLE
@@ -299,6 +303,7 @@ class MissionBase extends Mission
 	{
 		super.OnKeyPress(key);
 		
+#ifdef DEVELOPER
 		if ( GetGame().IsDebug() )
 		{
 			if ( PluginKeyBinding.instance != NULL )
@@ -306,7 +311,82 @@ class MissionBase extends Mission
 				PluginKeyBinding.instance.OnKeyPress(key);
 			}
 		}
+		/*
+		if ( key == KeyCode.KC_Q )
+		{
+			DumpCurrentUILayout();
+			
+		}
+		*/
+#endif
 	}
+	
+	int m_WidgetsTotal;
+	int m_WidgetsInvisible;
+	
+	void DumpCurrentUILayout()
+	{
+		UIScriptedMenu current_menu = GetGame().GetUIManager().GetMenu();
+		
+		if ( current_menu )
+		{
+			Widget widget_root = current_menu.GetLayoutRoot();
+			
+			if ( widget_root )
+			{
+				m_WidgetsTotal = 0;
+				m_WidgetsInvisible = 0;
+				
+				Print( widget_root.GetName() +" ("+ widget_root.GetTypeName() +")");
+				
+				DumpWidget(widget_root.GetChildren(), 1);
+				
+				Print( "Widgets TOTAL: "+ m_WidgetsTotal.ToString() +" INVISIBLE: "+ m_WidgetsInvisible.ToString() +" VISIBLE: "+ (m_WidgetsTotal - m_WidgetsInvisible).ToString() );
+			}
+		}
+	}
+	
+	void DumpWidget(Widget w, int tabs)
+	{
+		if ( !w )
+		{
+			return;
+		}
+	
+		m_WidgetsTotal++;
+		
+		string tmp;
+		for (int i = 0; i < tabs; i++)
+		{
+			tmp += "  ";
+		}
+		
+		string invisible = "";
+		
+		if ( !w.IsVisibleHierarchy() )
+		{
+			invisible = "[invisible]";
+			m_WidgetsInvisible++;
+		}
+		
+		Print( tmp +"- "+ w.GetName() +" ("+ w.GetTypeName() +") "+ invisible );
+		
+		bool collapse = false;
+		if ( w.GetChildren() )
+		{
+			collapse = true;
+			Print(tmp +"{");
+		}
+		
+		DumpWidget(w.GetChildren(), tabs + 1);
+			
+		if ( collapse )
+		{
+			Print(tmp +"}");
+		}
+			
+		DumpWidget(w.GetSibling(), tabs);
+	}	
 
 	override void OnKeyRelease(int key)
 	{

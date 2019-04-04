@@ -618,35 +618,6 @@ class AttachmentCategoriesRow: ClosableContainer
 			m_AttachmentCargos.GetElement( i ).SetActive( false );
 		}
 	}
-	
-	void ShowTooltip( Widget w, int x, int y )
-	{
-		if( w == null )
-		{
-			return;
-		}
-		ItemPreviewWidget iw = ItemPreviewWidget.Cast( w.FindAnyWidget("Render") );
-		if( !iw )
-		{
-		  string name = w.GetName();
-		  name.Replace("PanelWidget", "Render");
-		  iw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		}
-		if( !iw )
-		{
-		  iw = ItemPreviewWidget.Cast( w );
-		}
-		
-		if( iw && iw.GetItem() )
-		{
-			ItemManager.GetInstance().PrepareTooltip( iw.GetItem(), x, y );
-		}
-	}
-	
-	void HideTooltip( Widget w, Widget enterW, int x, int y )
-	{
-		ItemManager.GetInstance().HideTooltip();
-	}
 
 	override void DraggingOverHeader( Widget w, int x, int y, Widget receiver )
 	{
@@ -687,13 +658,13 @@ class AttachmentCategoriesRow: ClosableContainer
 			if( receiver_item.CanBeCombined( ItemBase.Cast( iw.GetItem() ) ) )
 			{
 				ItemManager.GetInstance().HideDropzones();
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				ItemManager.GetInstance().GetLeftDropzone().SetAlpha( 1 );
 				ColorManager.GetInstance().SetColor( w, ColorManager.COMBINE_COLOR );
 			}
 			else if( stack_max == 0 && GameInventory.CanSwapEntities( receiver_item, iw.GetItem() ) )
 			{
 				ItemManager.GetInstance().HideDropzones();
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				ItemManager.GetInstance().GetLeftDropzone().SetAlpha( 1 );
 				ColorManager.GetInstance().SetColor( w, ColorManager.SWAP_COLOR );
 			}
 			else
@@ -709,7 +680,7 @@ class AttachmentCategoriesRow: ClosableContainer
 			if( m_Entity.GetInventory().CanAddAttachmentEx( item, receiver.GetUserID() ) )
 			{
 				ItemManager.GetInstance().HideDropzones();
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				ItemManager.GetInstance().GetLeftDropzone().SetAlpha( 1 );
 				ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
 			}
 			else
@@ -729,7 +700,7 @@ class AttachmentCategoriesRow: ClosableContainer
 			if( inv_loc_dst.IsValid() )
 			{
 				ItemManager.GetInstance().HideDropzones();
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "LeftPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				ItemManager.GetInstance().GetLeftDropzone().SetAlpha( 1 );
 				ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
 			}
 			else
@@ -787,6 +758,7 @@ class AttachmentCategoriesRow: ClosableContainer
 		w.FindAnyWidget( name ).Show( false );
 		name.Replace( "Col", "Selected" );
 		w.FindAnyWidget( name ).Show( false );
+		w.FindAnyWidget( name ).SetColor( ARGBF( 1, 1, 1, 1 ) );
 		name.Replace( "Selected", "Temperature" );
 		w.FindAnyWidget( name ).Show( false );
 		name.Replace( "Temperature", "GhostSlot" );
@@ -1210,9 +1182,6 @@ class AttachmentCategoriesRow: ClosableContainer
 					
 					WidgetEventHandler.GetInstance().RegisterOnDrop( ic.GetMainWidget().FindAnyWidget( "Icon" + k ),  this, "OnIconDrop" );
 					WidgetEventHandler.GetInstance().RegisterOnDrop( ic.GetMainWidget().FindAnyWidget( "PanelWidget" + k ),  this, "OnIconDrop" );
-					
-					WidgetEventHandler.GetInstance().RegisterOnMouseEnter( ic.GetMainWidget().FindAnyWidget( "PanelWidget" + k ),  this, "ShowTooltip" );
-					WidgetEventHandler.GetInstance().RegisterOnMouseLeave( ic.GetMainWidget().FindAnyWidget( "PanelWidget" + k ),  this, "HideTooltip" );
 				}
 			}
 		}

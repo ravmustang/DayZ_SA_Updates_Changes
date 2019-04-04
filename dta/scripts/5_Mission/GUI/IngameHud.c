@@ -184,7 +184,7 @@ class IngameHud extends Hud
 		
 		//Panels
 		Class.CastTo(m_Stamina, m_HudPanelWidget.FindAnyWidget("StaminaBar"));
-		m_SpecializationPanel			= m_HudPanelWidget.FindAnyWidget("SpecializationPanel");
+		m_SpecializationPanel			= m_HudPanelWidget.FindAnyWidget("SpecializationPanelPanel");
 		m_SpecializationIcon			= m_HudPanelWidget.FindAnyWidget("SpecializationIcon");
 		m_Presence						= m_HudPanelWidget.FindAnyWidget("PresencePanel");
 		m_Badges						= hud_panel_widget.FindAnyWidget("BadgesPanel");
@@ -234,7 +234,6 @@ class IngameHud extends Hud
 		m_StatesWidgetNames.Set( NTFKEY_THIRSTY, "Thirsty" );
 		m_StatesWidgetNames.Set( NTFKEY_HUNGRY, "Hungry" );
 		m_StatesWidgetNames.Set( NTFKEY_SICK, "Health" );
-		m_StatesWidgetNames.Set( NTFKEY_BACTERIA, "Bacteria" );
 		m_StatesWidgetNames.Set( NTFKEY_BLEEDISH, "Blood" );
 		m_StatesWidgetNames.Set( NTFKEY_FEVERISH, "Temperature" );
 
@@ -327,7 +326,6 @@ class IngameHud extends Hud
 	{
 		float x, y;
 		m_HudPanelWidget.GetScreenSize( x, y );
-		Print( "m_HudPanelWidget: " + x.ToString() + "x" + y.ToString() );
 		m_HudPanelWidget.Update();
 		m_Badges.Update();
 		m_Notifiers.SetPos( 0, 0 );
@@ -478,16 +476,19 @@ class IngameHud extends Hud
 		for ( int x = 1; x < 4; x++ )
 		{ 
 			Class.CastTo(w,  m_Notifiers.FindAnyWidget( String(  m_StatesWidgetNames.Get( key ) + "ArrowUp" + x.ToString() ) ) );
-			w.Show( false );
+			if( w )
+				w.Show( false );
 			Class.CastTo(w,  m_Notifiers.FindAnyWidget( String(  m_StatesWidgetNames.Get( key ) + "ArrowDown" + x.ToString() ) ) );
-			w.Show( false );
+			if( w )
+				w.Show( false );
 		}
 		
 		if( tendency > 0 )
 		{
 			string widget_name = m_StatesWidgetNames.Get( key ) + arrow_name + Math.Clamp( tendency, 1, 3 );
-			Class.CastTo(w,  m_Notifiers.FindAnyWidget( widget_name ) );
-			w.Show( true );
+			Class.CastTo(w, m_Notifiers.FindAnyWidget( widget_name ) );
+			if( w )
+				w.Show( true );
 		}
 	}
 	
@@ -495,30 +496,34 @@ class IngameHud extends Hud
 	{
 		ImageWidget w;
 		Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
-		w.SetImage( Math.Clamp( status - 1, 0, 4 ) );
-		float alpha = w.GetAlpha();
 		
-		switch( status )
+		if( w )
 		{
-			case 3:
-				w.SetColor( ARGB( alpha * 255, 220, 220, 0 ) );		//yellow
-				m_TendencyStatusCritical.Remove( w );				//remove from blinking group
-				break;
-			case 4:
-				w.SetColor( ARGB( alpha * 255, 220, 0, 0 ) );		//red
-				m_TendencyStatusCritical.Remove( w );				//remove from blinking group
-				break;
-			case 5:
-				if ( !m_TendencyStatusCritical.Contains( w ) )
-				{
-					m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 220, 0, 0 ) );	//add to blinking group
-				}
-				break;
-			default:
-				w.SetColor( ARGB( alpha * 255, 220, 220, 220 ) );	//white
-				m_TendencyStatusCritical.Remove( w );				//remove from blinking group
-				break;
-		}
+			w.SetImage( Math.Clamp( status - 1, 0, 4 ) );
+			float alpha = w.GetAlpha();
+			
+			switch( status )
+			{
+				case 3:
+					w.SetColor( ARGB( alpha * 255, 220, 220, 0 ) );		//yellow
+					m_TendencyStatusCritical.Remove( w );				//remove from blinking group
+					break;
+				case 4:
+					w.SetColor( ARGB( alpha * 255, 220, 0, 0 ) );		//red
+					m_TendencyStatusCritical.Remove( w );				//remove from blinking group
+					break;
+				case 5:
+					if ( !m_TendencyStatusCritical.Contains( w ) )
+					{
+						m_TendencyStatusCritical.Insert( w, ARGB( alpha * 255, 220, 0, 0 ) );	//add to blinking group
+					}
+					break;
+				default:
+					w.SetColor( ARGB( alpha * 255, 220, 220, 220 ) );	//white
+					m_TendencyStatusCritical.Remove( w );				//remove from blinking group
+					break;
+			}
+		}	
 	}
 	
 	void DisplayTendencyTemp( int key, int tendency, int status )
@@ -583,9 +588,9 @@ class IngameHud extends Hud
 			Class.CastTo(badge_widget,  m_Badges.FindAnyWidget( badge_name ) );
 			if ( badge_widget )
 			{
-				if ( m_BadgesWidgetDisplay.Get( badge_key ) == true )
+				if ( m_BadgesWidgetDisplay.Get( badge_key ) )
 				{
-					badge_widget.SetPos ( x*0.2, 0.0, true);
+					badge_widget.SetPos ( x * 0.2, 0.0, true);
 					badge_widget.Show( true );
 					x = x + 1;
 					m_AnyBadgeVisible = true;
@@ -596,7 +601,7 @@ class IngameHud extends Hud
 				}
 			}
 		}
-		m_BadgeNotifierDivider.Show( m_AnyBadgeVisible );
+		m_BadgeNotifierDivider.Show( m_HudState && m_AnyBadgeVisible );
 	}
 	
 	// state 0 = empty
@@ -815,12 +820,10 @@ class IngameHud extends Hud
 	override void DisplayPresence()
 	{
 		PlayerBase player;
-		Class.CastTo(player, GetGame().GetPlayer() );
-		if ( player != NULL )
+
+		if ( Class.CastTo(player, GetGame().GetPlayer()) )
 		{
-			// TODO: rrada
-			//float presence_level = player.GetPresenceInAI();
-			float presence_level = 0; // tmp until we have working the GetPresenceInAI() method above
+			int presence_level = player.GetNoisePresenceInAI();
 			m_PresenceLevel0.Show( false );
 			m_PresenceLevel1.Show( false );
 			m_PresenceLevel2.Show( false );
@@ -831,19 +834,19 @@ class IngameHud extends Hud
 			{
 				m_PresenceLevel0.Show( true );
 			}
-			if ( presence_level > 0.2 )
+			if ( presence_level > 1 )
 			{
 				m_PresenceLevel1.Show( true );
 			}
-			if ( presence_level > 0.4 )
+			if ( presence_level > 2 )
 			{
 				m_PresenceLevel2.Show( true );
 			}
-			if ( presence_level > 0.6 )
+			if ( presence_level > 3 )
 			{
 				m_PresenceLevel3.Show( true );
 			}
-			if ( presence_level > 0.8 )
+			if ( presence_level > 4 )
 			{
 				m_PresenceLevel4.Show( true );
 			}
@@ -889,6 +892,10 @@ class IngameHud extends Hud
 						m_VehicleOilLight.Show( false );
 					}
 					
+					//float optimal_rpm = car.
+					float redline_rpm = car.EngineGetRPMRedline();
+					
+					m_HudPanelWidget.FindAnyWidget("RPMDialRedline").SetRotation( 0, 0, redline_rpm );
 					m_HudPanelWidget.FindAnyWidget("PlayerPanel").Show( false );
 					m_Presence.Show( false );
 					m_StancePanel.Show( false );
@@ -918,7 +925,7 @@ class IngameHud extends Hud
 		{
 			m_VehiclePanel.Show( true );
 			float rpm_value = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMMax() ) ;
-			float rpm_value_red = ( m_CurrentVehicle.EngineGetRPM() / m_CurrentVehicle.EngineGetRPMRedline() ) ;
+			float rpm_value_red = ( m_CurrentVehicle.EngineGetRPMRedline() / m_CurrentVehicle.EngineGetRPMMax() ) ;
 			float speed_value = ( m_CurrentVehicle.GetSpeedometer() / 200 );
 			
 			m_VehicleRPMPointer.SetRotation( 0, 0, rpm_value * 290 - 130, true );
@@ -941,12 +948,17 @@ class IngameHud extends Hud
 				next_gear = CarGear.NEUTRAL;
 			}
 			
+			
+			rpm_value_red = rpm_value_red * 360 - 180;
+			m_HudPanelWidget.FindAnyWidget("RPMDialRedline").SetRotation( 0, 0, rpm_value_red );
+			
 			bool newHealth = false;
 			
 			int health = m_CurrentVehicle.GetHealthLevel( "Engine" );
 			int color;
-			if( rpm_value_red > 1 )
+			if( m_CurrentVehicle.EngineGetRPM() > m_CurrentVehicle.EngineGetRPMRedline() )
 			{
+				Print( m_CurrentVehicle.EngineGetRPMRedline() );
 				if( m_TimeSinceLastEngineLightChange > 0.35 )
 				{
 					m_VehicleEngineLight.Show( !m_VehicleEngineLight.IsVisible() );
@@ -1053,10 +1065,6 @@ class IngameHud extends Hud
 
 		if ( m_QuickbarWidget && player.GetQuickBarSize() != 0 )
 		{
-				InventoryGrid quickbarGrid;
-				m_QuickbarWidget.GetScript(quickbarGrid);
-				Widget child = quickbarGrid.GetRoot().GetChildren();
-				float alpha = quickbarGrid.GetRoot().GetAlpha();
 				RefreshQuickbar();
 
 				m_FadeTimers.Clear();
@@ -1065,15 +1073,6 @@ class IngameHud extends Hud
 				if ( !ignore_state )
 				{
 					m_QuickbarState = true;
-				}
-				
-				while (child)
-				{
-					child.Show(true);
-					child.GetChildren().Show(true);
-					child.SetAlpha(alpha);
-					child.GetChildren().SetAlpha(1);
-					child = child.GetSibling();
 				}
 		}
 	}
@@ -1243,7 +1242,7 @@ class IngameHud extends Hud
 		super.Update( timeslice );
 
 		m_ActionTargetsCursor.Update();
-
+		DisplayPresence();
 		//
 		//modifiers - tendency status (critical)
 		if ( m_BlinkTime > TENDENCY_BLINK_TIME )

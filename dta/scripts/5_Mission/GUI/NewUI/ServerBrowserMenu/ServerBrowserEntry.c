@@ -162,7 +162,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	void Focus()
 	{
-		OnFocus( m_Root, 0, 0 );
+		SetFocus( m_Root );
 	}
 	
 	void ServerListFocus( bool focus )
@@ -222,7 +222,11 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	{
 		m_ServerData = server_info;
 		
+		//Print( server_info.m_Priority );
+		
+#ifndef PLATFORM_CONSOLE
 		m_Root.FindAnyWidget( "detailed_info" ).Show( server_info.m_IsExpanded );
+#endif
 		
 		SetName( server_info.m_Name );
 		SetPasswordLocked( server_info.m_IsPasswordProtected );
@@ -230,17 +234,20 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		SetSlots( server_info.m_MaxPlayers );
 		SetPing( server_info.m_Ping );
 		SetTime( server_info.m_TimeOfDay, server_info.m_EnvironmentTimeMul );
-		#ifdef PLATFORM_WINDOWS
-		#ifndef PLATFORM_CONSOLE
-			SetShard( server_info.m_ShardId.ToInt() );
-			SetCharacterAlive( server_info.m_CharactersAlive );
-			SetFriends( server_info.m_SteamFriends );
-			SetMode( server_info.m_Disable3rdPerson );
-			SetBattleye( server_info.m_AntiCheat );
-			SetIP( server_info.m_Id );
-			SetAcceleration( server_info.m_EnvironmentTimeMul );
-		#endif
-		#endif
+		SetFavorite( server_info.m_Favorite );
+		
+#ifdef PLATFORM_WINDOWS
+#ifndef PLATFORM_CONSOLE
+		SetExpand( server_info.m_IsExpanded );
+		SetShard( server_info.m_ShardId.ToInt() );
+		SetCharacterAlive( server_info.m_CharactersAlive );
+		SetFriends( server_info.m_SteamFriends );
+		SetMode( server_info.m_Disable3rdPerson );
+		SetBattleye( server_info.m_AntiCheat );
+		SetIP( server_info.m_Id );
+		SetAcceleration( server_info.m_EnvironmentTimeMul );
+#endif
+#endif
 	}
 	
 	void SetName( string name )
@@ -255,7 +262,6 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	
 	void SetPopulation( int population, int slots )
 	{
-		
 		string pop_text	= "#server_browser_entry_empty";
 		
 		if ( slots > 0 )
@@ -272,8 +278,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 			else
 				pop_text	= "#server_browser_entry_full";
 		}
-		
-		//m_ServerPopulation.SetText( population.ToString() );
+
 		m_ServerPopulation.SetText( pop_text );
 	}
 	
@@ -436,7 +441,12 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_IsFavorited = !m_IsFavorited;
 		m_Root.FindAnyWidget( "unfavorite_image" ).Show( !m_IsFavorited );
 		m_Root.FindAnyWidget( "favorite_image" ).Show( m_IsFavorited );
-		m_Tab.SetFavorite( GetServerID(), m_IsFavorited );
+		
+		GetServersResultRow data = m_ServerData;
+		TStringArray server_id = new TStringArray;
+		data.m_Id.Split(":", server_id);
+		OnlineServices.SetServerFavorited(server_id[0], data.m_HostPort, data.m_SteamQueryPort, m_IsFavorited);
+		
 		return m_IsFavorited;
 	}
 	

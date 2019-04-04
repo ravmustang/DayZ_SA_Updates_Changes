@@ -70,8 +70,6 @@ class ActionTargetsCursor extends ScriptedWidgetEventHandler
 	protected Widget						m_Root;
 	protected Widget						m_Container;
 	protected Widget 						m_ItemLeft;
-	ref AutoHeightSpacer					m_MainSpacer;
-	ref AutoHeightSpacer					m_HealthQuantitySpacer;
 
 	//! widget width
 	protected float m_MaxWidthChild;
@@ -133,12 +131,8 @@ class ActionTargetsCursor extends ScriptedWidgetEventHandler
 		m_Root.SetHandler(this);
 
 		m_Container = w.FindAnyWidget("container");
-		m_Container.GetScript(m_MainSpacer);
 		m_ItemLeft = w.FindAnyWidget("item_left");
-		m_ItemLeft.GetScript(m_HealthQuantitySpacer);
 		m_Root.Update();
-		m_MainSpacer.Update();
-		m_HealthQuantitySpacer.Update();
 
 #ifdef PLATFORM_XBOX		
 		SetSingleXboxIcon("xbox_buttons", "RT");
@@ -188,10 +182,6 @@ class ActionTargetsCursor extends ScriptedWidgetEventHandler
 		y = h/2 + 32;
 
 		m_Root.SetPos(x, y);
-
-		UpdateWidth();
-		m_MainSpacer.Update();
-		m_HealthQuantitySpacer.Update();	
 	}
 	
 	protected void BuildFloatingCursor(bool forceRebuild)
@@ -218,39 +208,6 @@ class ActionTargetsCursor extends ScriptedWidgetEventHandler
 		pos_y = Math.Ceil(pos_y);
 
 		m_Root.SetPos(pos_x, pos_y);
-
-		UpdateWidth();
-		m_MainSpacer.Update();
-		m_HealthQuantitySpacer.Update();
-	}
-
-	protected void UpdateWidth()
-	{
-		m_Root.GetSize(m_RootWidth, m_RootHeight);
-		Widget child = m_Root.GetChildren();
-		int index = 0;
-		int width;
-
-		if (m_MaxWidthChild > 100 && m_MaxWidthChild < m_RootWidth)
-		{
-			m_Root.SetSize(m_MaxWidthChild + 60, 0);
-			while (child)
-			{
-				child.SetSize(m_MaxWidthChild + 60, 40);
-				index++;
-				child = child.GetSibling();
-			}
-		}
-		else
-		{
-			m_Root.SetSize(350, 170);
-			while (child)
-			{
-				child.SetSize(290, 40);
-				index++;
-				child = child.GetSibling();
-			}
-		}
 	}
 	
 	override bool OnUpdate(Widget w)
@@ -306,7 +263,7 @@ class ActionTargetsCursor extends ScriptedWidgetEventHandler
 #endif
 		{
 			//! cursor with fixed position (environment interaction mainly)
-			if ( m_Target.GetObject() == null && m_Interact)
+			if ( m_Target.GetObject() == null && (m_Interact || m_Single || m_Continuous))
 			{
 				//Print(">> fixed widget");
 				m_CachedObject.Invalidate();

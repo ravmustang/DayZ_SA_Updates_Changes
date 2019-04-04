@@ -191,24 +191,33 @@ class HandsArea: LayoutHolder
 		
 		if( !ipw )
 		{
-		  string name = w.GetName();
-		  name.Replace( "PanelWidget", "Render" );
-		  ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
+			string name = w.GetName();
+			name.Replace( "PanelWidget", "Render" );
+			ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
 		}
 		
 		if( !ipw )
 		{
-		  ipw = ItemPreviewWidget.Cast( w );
+			ipw = ItemPreviewWidget.Cast( w );
 		}
 		
 		if( !ipw || !ipw.IsInherited( ItemPreviewWidget ) )
 		{
 			return;
 		}
-
-		ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
-		ItemManager.GetInstance().HideDropzones();
-		ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+		
+		if( ipw.GetItem() && GetGame().GetPlayer().GetHumanInventory().CanAddEntityIntoHands( ipw.GetItem() ) )
+		{
+			ColorManager.GetInstance().SetColor( w, ColorManager.GREEN_COLOR );
+			ItemManager.GetInstance().HideDropzones();
+			ItemManager.GetInstance().GetCenterDropzone().SetAlpha( 1 );
+		}
+		else
+		{
+			ColorManager.GetInstance().SetColor( w, ColorManager.RED_COLOR );
+			ItemManager.GetInstance().HideDropzones();
+			ItemManager.GetInstance().GetCenterDropzone().SetAlpha( 1 );
+		}
 	}
 	
 	void OnHandsPanelDropReceived( Widget w, int x, int y, Widget receiver )
@@ -234,7 +243,7 @@ class HandsArea: LayoutHolder
 		if( !ipw.GetItem().GetInventory().CanRemoveEntity() )
 			return;
 		
-		if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( ipw.GetItem() ) )
+		if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityIntoHands( ipw.GetItem() ) )
 		{
 			ItemBase item_base = ItemBase.Cast( ipw.GetItem() );
 			float stackable = item_base.ConfigGetFloat("varStackMax");

@@ -15,7 +15,7 @@ class HandsPreview: LayoutHolder
 	{
 		if( m_Icon )
 		{
-			m_Icon.RefreshQuantity();
+			m_Icon.SetQuantity();
 		}
 	}
 
@@ -77,24 +77,21 @@ class HandsPreview: LayoutHolder
 		}
 
 		HandsContainer parent = HandsContainer.Cast( m_Parent );
-		Header header = parent.GetHeader();
+		HandsHeader header = HandsHeader.Cast( parent.GetHeader() );
 
-		if( m_Item )
+		if( m_Item && !m_Item.GetInventory().GetCargo() )
 		{
 			string display_name = m_Item.GetDisplayName();
 			display_name.ToUpper();
 			header.SetName( display_name );
-		}
-		else
-		{
-			header.SetName( "#str_widget_textwidget00" );
 		}
 	}
 
 	protected void CreateNewIcon()
 	{
 		float y;
-		GetMainWidget().GetScreenSize( m_IconSize, y );
+		GetRootWidget().GetParent().GetParent().GetParent().GetParent().GetScreenSize( m_IconSize, y );
+		Print( GetRootWidget().GetParent().GetParent().GetParent().GetParent().GetName() );
 		m_IconSize = m_IconSize / 10;
 		
 		m_Icon = new Icon( this, true );

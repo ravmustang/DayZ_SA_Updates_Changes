@@ -105,7 +105,7 @@ class IconsContainer: Container
 		Icon icon = GetIcon( item_to_refresh.GetID() );
 		if( icon )
 		{
-			icon.RefreshQuantity();
+			icon.SetQuantity();
 		}
 	}
 	

@@ -156,21 +156,32 @@ class CrossHairSelector extends ScriptedWidgetEventHandler
 	{
 		HumanInputController hic = m_Player.GetInputController();
 		ActionBase action = m_AM.GetRunningAction();
+		
+		bool firearmInHands = m_Player.GetItemInHands() && m_Player.GetItemInHands().IsWeapon();
 
-		if ( m_Player.IsFireWeaponRaised() && !m_Player.IsInIronsights() && !m_Player.IsInOptics() && !hic.CameraIsFreeLook() )	// Firearms
+		//! firearms
+		if ( firearmInHands && m_Player.IsRaised() && !m_Player.IsInIronsights() && !m_Player.IsInOptics() && !hic.CameraIsFreeLook() )
+		{
 			ShowCrossHair(GetCrossHairByName("crossT_128x128"));
-			//ShowCrossHair(GetCrossHairByName("cross_128x128"));
-		else if (action && action.GetActionCategory() == AC_CONTINUOUS) // On Continuous Actions
+		}
+		//! On Continuous Actions
+		else if (action && action.GetActionCategory() == AC_CONTINUOUS)
 		{
 			int actionState = m_AM.GetActionState(action);
 
 			if ( actionState != UA_NONE )
 				ShowCrossHair(null);
 		}
+		//! raised hands(bare + non-firearm) + melee cmd
 		else if ( m_Player.IsRaised() || m_Player.GetCommand_Melee() || GetGame().GetUIManager().GetMenu() != null )
+		{
 			ShowCrossHair(null);
+		}
+		//! default
 		else
+		{
 			ShowCrossHair(GetCrossHairByName("dot"));
+		}
 	}
 	
 	protected void ShowCrossHair(CrossHair crossHair)

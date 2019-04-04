@@ -58,12 +58,13 @@ class TutorialsMenu extends UIScriptedMenu
 		float draw_pos_x, draw_pos_y;
 		
 		CanvasWidget canvas_widget = CanvasWidget.Cast( layoutRoot.FindAnyWidget("CanvasWidget_" + index) );
+		canvas_widget.Clear();
 		control_mapping_info  = GetControlMappingInfo();
 		
-		for( int i = 0; i < 5; i++ )
+		for( int i = 0; i < m_TabScript.GetTabCount(); i++ )
 		{
 			tab_array.Insert( new array<ref JsonControlMappingInfo> );
-			for( int j = 0; j < 20; j++ )
+			for( int j = 0; j < 30; j++ )
 			{
 				tab_array[i].Insert( NULL );
 			}
@@ -134,7 +135,7 @@ class TutorialsMenu extends UIScriptedMenu
 					
 					draw_pos_y = text_widget_pos_y + text_widget_height / 2;
 					
-					if( l < 10 )
+					if( l < 15 )
 					{
 						draw_pos_x = text_widget_pos_x + text_widget_width - 1;
 					}
@@ -177,7 +178,7 @@ class TutorialsMenu extends UIScriptedMenu
 				
 				if( g == 0 )
 				{
-					if( element[0] < 10 )
+					if( element[0] < 15 )
 					{
 						first_x = text_widget_pos_x + text_widget_width +50;
 					}
@@ -192,7 +193,7 @@ class TutorialsMenu extends UIScriptedMenu
 				group_point_x += text_widget_pos_x;
 				group_point_y += text_widget_pos_y;
 				
-				if( element[0] < 10 )
+				if( element[0] < 15 )
 				{
 					canvas_widget.DrawLine( text_widget_pos_x + text_widget_width - 1, text_widget_pos_y + text_widget_height/2, text_widget_pos_x + text_widget_width +50, text_widget_pos_y + text_widget_height/2, 2, ARGBF( 0.6, 1, 1, 1 ) );
 				}
@@ -202,7 +203,7 @@ class TutorialsMenu extends UIScriptedMenu
 				}
 			}
 			
-			if( element[0] < 10 )
+			if( element[0] < 15 )
 			{
 				group_point_x = group_point_x/element.Count() + text_widget_width + 50;
 			}
@@ -219,7 +220,7 @@ class TutorialsMenu extends UIScriptedMenu
 			canvas_widget.DrawLine( group_point_x, group_point_y, dot_pos_x+dot_width/2, group_point_y, 2, ARGBF( 0.6, 1, 1, 1 ) );
 			canvas_widget.DrawLine( dot_pos_x+dot_width/2, group_point_y, dot_pos_x+dot_width/2, dot_pos_y, 2, ARGBF( 0.6, 1, 1, 1 ) );
 			
-			if( element[0] < 10 )
+			if( element[0] < 15 )
 			{
 				canvas_widget.DrawLine( first_x, first_y, text_widget_pos_x + text_widget_width +50, text_widget_pos_y + text_widget_height/2, 2, ARGBF( 0.6, 1, 1, 1 ) );
 			}
@@ -269,20 +270,20 @@ class TutorialsMenu extends UIScriptedMenu
 	
 	override void Update( float timeslice )
 	{
-		if( GetGame().GetInput().GetActionDown("UAUITabLeft",false) )
+		if( GetGame().GetInput().LocalPress("UAUITabLeft",false) )
 		{
 			m_TabScript.PreviousTab();
 			DrawConnectingLines( m_TabScript.GetSelectedIndex() );
 		}
 		
 		//RIGHT BUMPER - TAB RIGHT
-		if( GetGame().GetInput().GetActionDown("UAUITabRight",false) )
+		if( GetGame().GetInput().LocalPress("UAUITabRight",false) )
 		{
 			m_TabScript.NextTab();
 			DrawConnectingLines( m_TabScript.GetSelectedIndex() );
 		}
 		
-		if( GetGame().GetInput().GetActionDown("UAUIBack",false) )
+		if( GetGame().GetInput().LocalPress("UAUIBack",false) )
 		{
 			Back();
 		}

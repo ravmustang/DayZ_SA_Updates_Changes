@@ -64,13 +64,17 @@ class HandsContainer: Container
 		
 		if( !IsLastIndex() )
 		{
+			if( GetFocusedContainer() )
+				GetFocusedContainer().SetActive( false );
 			++m_ActiveIndex;
+			if( GetFocusedContainer() )
+				GetFocusedContainer().SetActive( true );
 		}
 		
 		SetFocusToIndex();
 	}
 
-	override void SetPreviousActive()
+	override void SetPreviousActive( bool force = false )
 	{
 		if( ItemManager.GetInstance().IsMicromanagmentMode() )
 		{
@@ -79,7 +83,11 @@ class HandsContainer: Container
 		
 		if( !IsFirstIndex() )
 		{
+			if( GetFocusedContainer() )
+				GetFocusedContainer().SetActive( false );
 			m_ActiveIndex--;
+			if( GetFocusedContainer() )
+				GetFocusedContainer().SetActive( true );
 		}
 		
 		SetFocusToIndex();
@@ -111,7 +119,7 @@ class HandsContainer: Container
 		
 		if( index == -1 )
 		{
-		
+			
 		}
 		else if( index.InRange( 0, attachment_end_index ) )
 		{
@@ -197,23 +205,18 @@ class HandsContainer: Container
 				{
 					if( index == 0 )
 					{
-						GetFocusedContainer().SetActive( false );
 						m_Atts.SetDefaultFocus();
 						SetFocusedContainer( m_Atts.GetWrapper() );
 					}
 					else
 					{
-						GetFocusedContainer().SetActive( false );
 						m_AttachmentAttachments.GetElement( index - 1 ).SetDefaultFocus();
-						m_AttachmentAttachments.GetElement( index - 1 ).SetActive( true );
 						SetFocusedContainer( m_AttachmentAttachments.GetElement( index - 1 ).GetWrapper() );
 					}
 				}
 				else
 				{
-					GetFocusedContainer().SetActive( false );
 					m_AttachmentAttachments.GetElement( index ).SetDefaultFocus();
-					m_AttachmentAttachments.GetElement( index ).SetActive( true );
 					SetFocusedContainer( m_AttachmentAttachments.GetElement( index ).GetWrapper() );
 				}
 			}
@@ -223,27 +226,22 @@ class HandsContainer: Container
 				{
 					if( index == cargo_start_index )
 					{
-						GetFocusedContainer().SetActive( false );
 						m_CargoGrid.SetDefaultFocus();
-						m_CargoGrid.SetActive( true );
 						SetFocusedContainer( m_CargoGrid );
 					}
 					else
 					{
-						GetFocusedContainer().SetActive( false );
 						m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).SetDefaultFocus();
-						m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ).SetActive( true );
 						SetFocusedContainer( m_AttachmentCargos.GetElement( index - 1 - cargo_start_index ) );
 					}
 				}
 				else
 				{
-					GetFocusedContainer().SetActive( false );
 					m_AttachmentCargos.GetElement( index - cargo_start_index ).SetDefaultFocus();
-					m_AttachmentCargos.GetElement( index - cargo_start_index ).SetActive( true );
 					SetFocusedContainer( m_AttachmentCargos.GetElement( index - cargo_start_index ) );
 				}
 			}
+			
 			if( m_MainWidget.FindAnyWidget("Selected") )
 				m_MainWidget.FindAnyWidget("Selected").Show( false );
 			ScrollToActiveContainer( GetFocusedContainer() );
@@ -359,13 +357,13 @@ class HandsContainer: Container
 		if( m_ActiveIndex == 1 )
 		{
 			ItemBase item_in_hands = ItemBase.Cast( GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
-			if( item_in_hands && !item_in_hands.IsInherited( Magazine )  )
+			if( item_in_hands )
 			{
 				if( item_in_hands.CanBeSplit() )
 				{
 					item_in_hands.OnRightClick();
 				}
-				if( GetGame().GetPlayer().GetHumanInventory().CanRemoveEntityInHands() )
+				else if( GetGame().GetPlayer().GetHumanInventory().CanRemoveEntityInHands() )
 				{
 					if( GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, item_in_hands ) )
 					{
@@ -389,13 +387,14 @@ class HandsContainer: Container
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		EntityAI item_in_hands = player.GetHumanInventory().GetEntityInHands();
 		GetHeader().SetActive( active );
+		m_ActiveIndex = 1;
 		if( item_in_hands )
 		{
-			if( !m_MainWidget.FindAnyWidget( "Selected" ) )
+			if( m_MainWidget.FindAnyWidget( "Selected" ) )
 			{
-				return;
+				m_MainWidget.FindAnyWidget( "Selected" ).Show( active );
 			}
-			m_MainWidget.FindAnyWidget( "Selected" ).Show( active );
+			
 			if( active )
 			{
 				float x, y;
@@ -531,7 +530,8 @@ class HandsContainer: Container
 		}
 		else if( GetFocusedContainer() )
 		{
-			return GetFocusedContainer().Select();
+			GetFocusedContainer().Select();
+			return false;
 		}
 		
 		return false;
@@ -591,7 +591,7 @@ class HandsContainer: Container
 		{
 			ColorManager.GetInstance().SetColor( w, ColorManager.SWAP_COLOR );
 			ItemManager.GetInstance().HideDropzones();
-			ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+			ItemManager.GetInstance().GetCenterDropzone().SetAlpha( 1 );
 		}
 		else
 		{
@@ -599,7 +599,7 @@ class HandsContainer: Container
 			{
 				ColorManager.GetInstance().SetColor( w, ColorManager.SWAP_COLOR );
 				ItemManager.GetInstance().HideDropzones();
-				ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+				ItemManager.GetInstance().GetCenterDropzone().SetAlpha( 1 );
 			}
 			/*else
 			{
@@ -816,9 +816,7 @@ class HandsContainer: Container
 		w.FindAnyWidget( name ).Show( false );
 		name.Replace( "Col", "Selected" );
 		w.FindAnyWidget( name ).Show( false );
-		name.Replace( "Selected", "Render" );
-		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
-		ipw.SetItem( null );
+		w.FindAnyWidget( name ).SetColor( ARGBF( 1, 1, 1, 1 ) );
 		ItemManager.GetInstance().SetDraggedItem( null );
 
 		return false;
@@ -1191,7 +1189,7 @@ class HandsContainer: Container
 		if( c_x > x && c_y > y && item_in_hands.GetInventory().CanAddEntityInCargoEx( item, 0, x, y ) )
 		{
 			ItemManager.GetInstance().HideDropzones();
-			ItemManager.GetInstance().GetRootWidget().FindAnyWidget( "HandsPanel" ).FindAnyWidget( "DropzoneX" ).SetAlpha( 1 );
+			ItemManager.GetInstance().GetCenterDropzone().SetAlpha( 1 );
 			color = ColorManager.GREEN_COLOR;
 		}
 		else
@@ -1326,7 +1324,6 @@ class HandsContainer: Container
 			m_CargoGrid = new CargoContainer( this );
 			m_CargoGrid.SetEntity( entity );
 			Insert( m_CargoGrid );
-			m_CollapsibleHeader.GetRootWidget().FindAnyWidget( "CargoCount" ).Show( true );
 		}
 
 		if( entity.GetInventory().IsInventoryLockedForLockType( HIDE_INV_FROM_SCRIPT ) )

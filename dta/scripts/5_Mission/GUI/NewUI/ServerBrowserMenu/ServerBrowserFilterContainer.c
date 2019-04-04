@@ -1,6 +1,6 @@
 class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 {
-	protected ref map<string, string>		m_Options = new map<string, string>;
+	ref map<string, string>		m_Options = new map<string, string>;
 	
 	protected EditBoxWidget					m_SearchByName;
 	protected EditBoxWidget					m_SearchByIP;
@@ -18,9 +18,9 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 			ref OptionSelector				m_ThirdPersonFilter;
 			ref OptionSelector				m_PublicFilter;
 			ref OptionSelector				m_AcceleratedTimeFilter;
-	protected ServerBrowserTabPage			m_Tab;
+	protected ServerBrowserTab				m_Tab;
 	
-	void ServerBrowserFilterContainer( Widget root, ServerBrowserTabPage parent )
+	void ServerBrowserFilterContainer( Widget root, ServerBrowserTab parent )
 	{
 		string player_name;
 		GetGame().GetPlayerName( player_name );
@@ -28,7 +28,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		
 		ref array<string> character_name_options ={ "#server_browser_disabled", player_name };
 		ref array<string> region_options = { "#server_browser_all", "#server_browser_americas", "#server_browser_europe", "#server_browser_asia" };
-		ref array<string> sort_options = { "#server_browser_name_descending", "#server_browser_name_ascending", "#server_browser_slots_descending", "#server_browser_slots_ascending" };
+		ref array<string> sort_options = { "#server_browser_column_host A-Z", "#server_browser_column_host Z-A", "#server_browser_entry_empty - #server_details_popularity_full", "#server_details_popularity_full - #server_browser_entry_empty" };
 		ref array<string> ping_options = { "#server_browser_disabled", "<30", "<50", "<100", "<200", "<300", "<500" };
 		ref array<string> three_options = { "#server_browser_disabled", "#server_browser_show", "#server_browser_hide" };
 		
@@ -131,7 +131,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		}
 	}
 	
-		void SaveFilters()
+	void SaveFilters()
 	{
 		m_Options.Clear();
 		
@@ -305,7 +305,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 			
 			if ( port >= 0 )
 				correct_ip_format = correct_ip_format + ":" + port.ToString();
-			;
+			
 		}
 		else
 		{
@@ -328,12 +328,12 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		{
 			case 0:
 			{
-				m_Tab.SetSort( ESortType.HOST, ESortOrder.DESCENDING );
+				m_Tab.SetSort( ESortType.HOST, ESortOrder.ASCENDING );
 				break;
 			}
 			case 1:
 			{
-				m_Tab.SetSort( ESortType.HOST, ESortOrder.ASCENDING );
+				m_Tab.SetSort( ESortType.HOST, ESortOrder.DESCENDING );
 				break;
 			}
 			case 2:
@@ -394,11 +394,119 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 	
 	override bool OnFocus( Widget w, int x, int y )
 	{
-		m_Tab.FilterFocus( ( w != null ) );
+		m_Tab.OnFilterFocus( w );
 		return false;
 	}
 	
-	GetServersInput GetFilterOptions()
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		return m_Tab.OnMouseEnter( w, x, y );
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		return m_Tab.OnMouseLeave( w, enterW, x, y );
+	}
+	
+	GetServersInput GetFilterOptionsPC()
+	{
+		ref GetServersInput input = new GetServersInput;
+		
+		input.m_RowsPerPage = SERVER_BROWSER_PAGE_SIZE;
+		input.m_Platform = 1;
+		
+		//1 Search by Name
+		if( m_SearchByName )
+		{
+			string name_text = m_SearchByName.GetText();
+			if( name_text != "" )
+			{
+				input.SetNameFilter( name_text );
+			}
+		}
+		
+		//2 Search by IP & Port
+		if( m_SearchByIP )
+		{
+			string ip_text = m_SearchByIP.GetText();
+			if( ip_text != "" )
+			{				
+				input.SetHostIp( ip_text );
+			}
+		}
+		
+		//3 Search by Ping
+		if( m_PingFilter.IsSet() )
+		{
+			string str_ping = m_PingFilter.GetStringValue();
+			int ping = str_ping.Substring(1, str_ping.Length() - 1).ToInt();
+			input.SetPingFilter( ping );
+		}
+		
+		//4 Search by Favorited
+		if( m_FavoritedFilter.IsSet() )
+		{
+			input.SetFavorited( m_FavoritedFilter.IsEnabled() );
+		}
+		
+		//5 Search by Friends Playing
+		if( m_FriendsPlayingFilter.IsSet() )
+		{
+			input.SetFriendsPlaying( m_FriendsPlayingFilter.IsEnabled() );
+		}
+		
+		//6 Search by Battleye Protection
+		if( m_BattleyeFilter.IsSet() )
+		{
+			input.SetBattleyeProtection( m_BattleyeFilter.IsEnabled() );
+		}
+		
+		//7 Search by Passworded
+		if( m_PasswordFilter.IsSet() )
+		{
+			input.SetPassworded( m_PasswordFilter.IsEnabled() );
+		}
+		
+		//8 Search by Previously Played
+		if( m_PreviouslyPlayedFilter.IsSet() )
+		{
+			input.SetPreviouslyPlayed( m_PreviouslyPlayedFilter.IsEnabled() );
+		}
+		
+		//9 Search by Proper Version
+		if( m_VersionMatchFilter.IsSet() )
+		{
+			input.SetProperVersionMatch( m_VersionMatchFilter.IsEnabled() );
+		}
+				
+		//10 Search by Full Server
+		if( m_FullServerFilter.IsSet() )
+		{
+			input.SetFullServer( m_FullServerFilter.IsEnabled() );
+		}
+		
+		//11 Search by Third Person
+		if( m_ThirdPersonFilter.IsSet() )
+		{
+			input.SetThirdPerson( m_ThirdPersonFilter.IsEnabled() );
+		}
+		
+		//12 Search by Public
+		if( m_PublicFilter.IsSet() )
+		{
+			input.SetPublic( m_PublicFilter.IsEnabled() );
+		}
+		
+		//13 Search by Accelerated Time
+		if( m_AcceleratedTimeFilter.IsSet() )
+		{
+			input.SetAcceleratedTime( m_AcceleratedTimeFilter.IsEnabled() );
+		}
+		
+		return input;
+	}
+	
+	GetServersInput GetFilterOptionsConsoles()
 	{
 		ref GetServersInput input = new GetServersInput;
 		
@@ -428,11 +536,19 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		#endif
 		if( m_PingFilter.IsSet() )
 		{
-			//Character filter
+			input.SetPingFilter( m_PingFilter.GetStringValue().ToInt() );
 		}
 		if( m_FavoritedFilter.IsSet() )
 		{
-			//Character filter
+			Print("m_FavoritedFilter: "+ m_FavoritedFilter.GetStringValue());
+			if ( m_FavoritedFilter.GetStringValue() == "Show" )
+			{
+				input.SetFavorited( true );
+			}
+			else
+			{
+				input.SetFavorited( false );
+			}
 		}
 		if( m_FriendsPlayingFilter.IsSet() )
 		{
@@ -501,11 +617,13 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				}
 				if( m_PasswordFilter.IsSet() )
 				{
-					input.SetIsPasswordProtectedFilter( m_PasswordFilter.IsEnabled() );
+					//input.SetIsPasswordProtectedFilter( m_PasswordFilter.IsEnabled() );
+					input.SetPassworded( m_PasswordFilter.IsEnabled() );
 				}
 				if( m_BattleyeFilter.IsSet() )
 				{
-					input.SetAntiCheatFilter( m_BattleyeFilter.IsEnabled() );
+					input.SetBattleyeProtection( m_BattleyeFilter.IsEnabled() );
+					//input.SetAntiCheatFilter( m_BattleyeFilter.IsEnabled() );
 				}
 				if( m_PublicFilter.IsSet() )
 				{
@@ -514,6 +632,13 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				if( m_AcceleratedTimeFilter.IsSet() )
 				{
 					input.SetAcceleratedTime( m_AcceleratedTimeFilter.IsEnabled() );
+				}
+				if( m_PingFilter.IsSet() )
+				{
+					string aa = m_PingFilter.GetOptions()[m_PingFilter.GetValue()];
+					int aaa = aa.Substring(1, aa.Length() - 1).ToInt();
+			
+					input.SetPingFilter( aaa );
 				}
 			#endif
 		#endif

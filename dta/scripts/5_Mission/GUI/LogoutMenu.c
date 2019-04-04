@@ -5,6 +5,7 @@ class LogoutMenu extends UIScriptedMenu
 	private TextWidget m_Info;
 	private ButtonWidget m_bLogoutNow;
 	private ButtonWidget m_bCancel;
+	private ButtonWidget m_bCancelConsole;
 	private int m_iTime;
 
 	void LogoutMenu()
@@ -26,6 +27,18 @@ class LogoutMenu extends UIScriptedMenu
 		m_Info = TextWidget.Cast( layoutRoot.FindAnyWidget("txtInfo") );
 		m_bLogoutNow = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bLogoutNow") );
 		m_bCancel = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bCancel") );
+		
+#ifdef PLATFORM_CONSOLE
+		m_bCancel.Show( false );
+		m_bLogoutNow.Show( false );
+		
+		m_bCancel = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bCancelConsole") );
+		m_bCancel.Show( true );
+#else
+		m_bCancel.Show( true );
+		m_bLogoutNow.Show( true );
+		layoutRoot.FindAnyWidget("bCancelConsole").Show( false );
+#endif
 		
 		UpdateInfo();
 		

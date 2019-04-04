@@ -117,8 +117,8 @@ class GesturesMenu extends UIScriptedMenu
 		
 		//set controller toolbar icons
 		#ifdef PLATFORM_CONSOLE
-				ImageWidget toolbar_select = layoutRoot.FindAnyWidget( "SelectIcon" );
-				ImageWidget toolbar_back = layoutRoot.FindAnyWidget( "BackIcon" );
+				ImageWidget toolbar_select = ImageWidget.Cast(layoutRoot.FindAnyWidget( "SelectIcon" ));
+				ImageWidget toolbar_back = ImageWidget.Cast(layoutRoot.FindAnyWidget( "BackIcon" ));
 			#ifdef PLATFORM_XBOX
 				toolbar_select.LoadImageFile( 0, "set:xbox_buttons image:A" );
 				toolbar_back.LoadImageFile( 0, "set:xbox_buttons image:B" );
@@ -357,9 +357,9 @@ class GesturesMenu extends UIScriptedMenu
 			if ( gesture_item && gesture_item.GetCategory() != GestureCategories.CATEGORIES )
 			{	
 				//alter item visual
-				TextWidget text_widget = TextWidget.Cast( gesture_item.GetRadialItemCard().FindAnyWidget( RADIAL_TEXT ) );
-				text_widget.SetColor( ARGB( 255, 66, 175, 95 ) );
-			}		
+				//TextWidget text_widget = TextWidget.Cast( gesture_item.GetRadialItemCard().FindAnyWidget( RADIAL_TEXT ) );
+				//text_widget.SetColor( ARGB( 255, 66, 175, 95 ) );
+			}	
 		}
 	}
 	
@@ -376,8 +376,8 @@ class GesturesMenu extends UIScriptedMenu
 			if ( gesture_item && gesture_item.GetCategory() != GestureCategories.CATEGORIES )
 			{			
 				//alter item visual
-				TextWidget text_widget = TextWidget.Cast( gesture_item.GetRadialItemCard().FindAnyWidget( RADIAL_TEXT ) );
-				text_widget.SetColor( ARGB( 255, 255, 255, 255 ) );
+				//TextWidget text_widget = TextWidget.Cast( gesture_item.GetRadialItemCard().FindAnyWidget( RADIAL_TEXT ) );
+				//text_widget.SetColor( ARGB( 255, 255, 255, 255 ) );
 			}
 		}
 	}	

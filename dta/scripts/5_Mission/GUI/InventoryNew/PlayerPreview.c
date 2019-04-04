@@ -69,19 +69,17 @@ class PlayerPreview: LayoutHolder
 	
 	override void UpdateInterval()
 	{
-		SetItemInHands( GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
-	}
-	
-	Man GetPlayerInstance()
-	{
-		return m_CharacterPanelWidget.GetPlayer();
-	}
-	
-	void SetItemInHands( EntityAI new_item )
-	{
-		if( m_CharacterPanelWidget.GetItemInHands() != new_item )
+		// item in hands update
+		m_CharacterPanelWidget.UpdateItemInHands(GetGame().GetPlayer().GetHumanInventory().GetEntityInHands());
+		
+		PlayerBase realPlayer = PlayerBase.Cast(GetGame().GetPlayer());
+		DayZPlayer dummyPlayer = m_CharacterPanelWidget.GetDummyPlayer();
+		if( realPlayer && dummyPlayer )
 		{
-			//m_CharacterPanelWidget.SetItemInHands( InventoryItem.Cast( new_item ) );
+			// injury animation update
+			HumanCommandAdditives hca = dummyPlayer.GetCommandModifier_Additives();
+			if( hca && realPlayer.m_InjuryHandler )
+				hca.SetInjured(realPlayer.m_InjuryHandler.GetInjuryAnimValue(), realPlayer.m_InjuryHandler.IsInjuryAnimEnabled());
 		}
 	}
 }

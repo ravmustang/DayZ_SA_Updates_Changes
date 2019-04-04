@@ -12,6 +12,14 @@ class RightArea: Container
 		m_PlayerContainer.SetPlayer( PlayerBase.Cast( GetGame().GetPlayer() ) );
 		m_Body.Insert( m_PlayerContainer );
 		m_ActiveIndex = 0;
+		
+		#ifdef PLATFORM_PS4
+		ImageWidget lt = ImageWidget.Cast( m_RootWidget.FindAnyWidget( "LTIcon" ) );
+		ImageWidget rt = ImageWidget.Cast( m_RootWidget.FindAnyWidget( "RTIcon" ) );
+		
+		lt.LoadImageFile( 0, "set:playstation_buttons image:L2" );
+		rt.LoadImageFile( 0, "set:playstation_buttons image:R2" );
+		#endif
 	}
 	
 	override Container GetFocusedContainer()
@@ -85,6 +93,16 @@ class RightArea: Container
 		m_PlayerContainer.ResetFocusedContainer();
 	}
 	
+	bool HasEntityContainerVisible( EntityAI entity )
+	{
+		return m_PlayerContainer.HasEntityContainerVisible( entity );
+	}
+	
+	void SwapItemsInOrder( int slot1, int slot2 )
+	{
+		m_PlayerContainer.SwapItemsInOrder( slot1, slot2 );
+	}
+	
 	bool IsPlayerEquipmentActive()
 	{
 		return m_PlayerContainer.IsPlayerEquipmentActive();
@@ -114,9 +132,9 @@ class RightArea: Container
 		m_PlayerContainer.SetNextActive();
 	}
 	
-	override void SetPreviousActive()
+	override void SetPreviousActive( bool force = false )
 	{
-		m_PlayerContainer.SetPreviousActive();
+		m_PlayerContainer.SetPreviousActive( force );
 	}
 	
 	override bool IsActive()

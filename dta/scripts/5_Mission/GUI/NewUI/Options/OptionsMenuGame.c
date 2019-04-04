@@ -109,6 +109,8 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "game_settings_root" ).GetScreenSize( x, y2 );
 		int f = ( y2 > y );
 		m_Root.FindAnyWidget( "game_settings_scroll" ).SetAlpha( f );
+		
+		m_Root.SetHandler( this );
 	}
 	
 	void ~OptionsMenuGame()
@@ -150,7 +152,7 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 		g_Game.SetProfileOption( EDayZProfilesOptions.ADMIN_MESSAGES, m_ShowAdminSelector.GetValue() );
 		g_Game.SetProfileOption( EDayZProfilesOptions.PLAYER_MESSAGES, m_ShowPlayerSelector.GetValue() );
 		
-		#ifdef PLATFORM_WINDOWS
+		#ifndef PLATFORM_CONSOLE
 			g_Game.SetProfileOption( EDayZProfilesOptions.QUICKBAR, m_ShowQuickbarSelector.GetValue() );
 			if( hud )
 			{
@@ -286,10 +288,41 @@ class OptionsMenuGame extends ScriptedWidgetEventHandler
 	}
 #endif
 	
-	override bool OnFocus( Widget w, int x, int y )
+	override bool OnMouseEnter( Widget w, int x, int y )
 	{
+		if ( w && w.IsInherited( ScrollWidget ) )
+		{
+			return false;
+		}
+		
+		if ( w && w.IsInherited( SliderWidget ) )
+		{
+			return false;
+		}
+		
+		m_Menu.ColorHighlight( w );
+		
+		return true;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		if ( w && w.IsInherited( ScrollWidget ) )
+		{
+			return false;
+		}
+		
+		m_Menu.ColorNormal( w );
+		return true;
+	}
+	
+	override bool OnFocus( Widget w, int x, int y )
+	{		
 		if( m_Menu )
+		{
 			m_Menu.OnFocus( w, x, y );
+		}
+		
 		if( w )
 		{
 			if ( TextMapUpdateWidget( w.GetUserID() ) ) 

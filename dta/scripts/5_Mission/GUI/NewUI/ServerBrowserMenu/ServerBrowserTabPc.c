@@ -1,4 +1,4 @@
-class ServerBrowserTabPage extends ServerBrowserTab
+class ServerBrowserTabPc extends ServerBrowserTab
 {
 	protected const int SERVERS_VISIBLE_COUNT	= 24;
 	protected const int PAGES_BUTTONS_COUNT		= 10;
@@ -9,10 +9,7 @@ class ServerBrowserTabPage extends ServerBrowserTab
 	protected int									m_PageEndNum;
 	protected int									m_PagesCount;
 	protected int									m_ServersEstimateCount;
-	protected bool									m_LoadingFinished;
-	protected ref map<ESortType, ref array<ref GetServersResultRow>> m_EntriesSorted;
-	protected ref map<ESortType, ESortOrder>		m_SortInverted;
-	
+		
 	protected Widget								m_PnlPagesPanel;
 	protected TextWidget							m_PnlPagesLoadingText;
 	protected ButtonWidget							m_BtnPagesFirst;
@@ -24,6 +21,8 @@ class ServerBrowserTabPage extends ServerBrowserTab
 	protected Widget								m_FilterSearchTextBox;
 	protected Widget								m_FilterSearchIP;
 	protected Widget								m_FilterSearchIPBox;
+	protected Widget								m_FilterPanelPing;
+	protected Widget								m_FilterPanelAccTime;
 	
 	protected ButtonWidget							m_BtnFilterReset;
 	
@@ -46,12 +45,11 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		m_ServerList			= SpacerBaseWidget.Cast( m_ServerListScroller.FindAnyWidget( "server_list_content" ) );
 		m_ServerListScroller.VScrollToPos01( 0 );
 				
-		//m_Entries				= new array<ref GetServersResultRow>;
+		m_ServerListEntiers		= new array<ref ServerBrowserEntry>;		
 		m_EntryWidgets			= new map<string, ref ServerBrowserEntry>;
-		m_ServerListEntiers		= new array<ref ServerBrowserEntry>;
+		m_SortInverted			= new map<ESortType, ESortOrder>;
+		m_EntriesSorted			= new map<ESortType, ref array<ref GetServersResultRow>>;
 		
-		m_SortInverted = new map<ESortType, ESortOrder>;
-		m_EntriesSorted = new map<ESortType, ref array<ref GetServersResultRow>>;
 		m_EntriesSorted[ESortType.HOST] 		= new array<ref GetServersResultRow>;
 		m_EntriesSorted[ESortType.TIME]			= new array<ref GetServersResultRow>;
 		m_EntriesSorted[ESortType.POPULATION]	= new array<ref GetServersResultRow>;
@@ -76,6 +74,10 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		m_FilterSearchTextBox	= m_Root.FindAnyWidget( "search_name_setting_option" );
 		m_FilterSearchIP		= m_Root.FindAnyWidget( "search_ip_setting" );
 		m_FilterSearchIPBox		= m_Root.FindAnyWidget( "search_ip_setting_option" );
+		
+		m_FilterPanelAccTime	= m_Root.FindAnyWidget( "accelerated_time_setting" );
+		m_FilterPanelPing		= m_Root.FindAnyWidget( "ping_setting" );
+		//m_FilterPanelPing.SetHandler( this );
 		
 		m_LoadingText			= TextWidget.Cast( m_Root.FindAnyWidget( "loading_servers_info" ) );
 		
@@ -129,30 +131,30 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		UpdatePageButtons();
 	}
 	
-	void ~ServerBrowserTabPage()
+	void ~ServerBrowserTabPc()
 	{
 		
 	}
 	
 	override void RefreshList()
 	{
-		OnlineServices.m_ServersAsyncInvoker.Remove( OnLoadServersAsync );
-		
 		for ( int i = 0; i < m_EntriesSorted.Count(); i++ )
 		{
 			m_EntriesSorted.GetElement(i).Clear();
 		}
 		
-		//m_Entries.Clear();
+		OnlineServices.m_ServersAsyncInvoker.Insert( m_Menu.OnLoadServersAsync );
 		
 		m_LoadingFinished = false;
+		m_Loading = true;
 		m_TotalServersCount = 0;
 		m_ServersEstimateCount = 0;
-		m_PageIndex = 0;
+		m_PageIndex = 0;		
 		
 		super.RefreshList();
 		
 		m_ServerListScroller.VScrollToPos01( 0 );
+		ButtonRefreshToCancel();
 		UpdateServerList();
 		UpdatePageButtons();
 		UpdateStatusBar();
@@ -163,26 +165,44 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		m_Filters.ResetFilters();
 		
 		ButtonEnable( m_ApplyFilter );
-		ButtonDisable( m_RefreshList );
+		
+		if ( !m_Loading )
+		{
+			ButtonDisable( m_RefreshList );
+		}
 	}
 	
 	override void ApplyFilters()
 	{
 		m_Filters.SaveFilters();
-		//m_FiltersChanged.Show( false );
-		m_CurrentFilterInput = m_Filters.GetFilterOptions();		
+		//m_CurrentFilterInput = m_Filters.GetFilterOptionsPC();		
 		RefreshList();
 		ButtonDisable( m_ApplyFilter );
 		ButtonEnable( m_RefreshList );
 	}
 	
-	override void OnLoadServersAsyncPC( ref GetServersResult result_list, EBiosError error, string response )
+	void LoadingServersStop()
 	{
+		OnlineServices.m_ServersAsyncInvoker.Remove( m_Menu.OnLoadServersAsync );
+		
+		m_LoadingFinished = true;
+		m_Loading = false;
+		
+		ButtonCancelToRefresh();		
+		
+		UpdateStatusBar();
+		UpdateServerList();
+	}
+	
+	override void OnLoadServersAsyncPC( ref GetServersResult result_list, EBiosError error, string response )
+	{		
 		if( result_list )
 		{
-			//Print("("+ GetGame().GetTime() +") ____OnLoadServersAsyncPC: " + result_list.m_Results.Count());
+		//Print("("+ GetGame().GetTime() +") ____OnLoadServersAsyncPC: " + result_list.m_Results.Count());
 			
 			int count = result_list.m_Results.Count();
+			
+			//Print("OnLoadServersAsyncPC: "+ result_list.m_Page +" / "+ result_list.m_Pages);
 			
 			if( count > 0 )
 			{				
@@ -205,7 +225,7 @@ class ServerBrowserTabPage extends ServerBrowserTab
 						}
 					}
 					
-					if( !m_Menu || m_Menu.IsRefreshing() != m_TabType )
+					if( !m_Menu || m_Menu.GetServersLoadingTab() != m_TabType )
 					{
 						return;
 					}
@@ -214,14 +234,14 @@ class ServerBrowserTabPage extends ServerBrowserTab
 			else
 			{
 				m_LoadingText.SetText( "#servers_count "+ m_TotalServersCount );
-				m_Menu.SetRefreshing( TabType.NONE );
+				m_Menu.SetServersLoadingTab( TabType.NONE );
 			}
 
 		}
 		else
 		{
 			m_LoadingText.SetText( "#servers_count "+ m_TotalServersCount );
-			m_Menu.SetRefreshing( TabType.NONE );
+			m_Menu.SetServersLoadingTab( TabType.NONE );
 		}
 		
 		if ( response == "thelastone" )
@@ -234,12 +254,12 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		}
 		
 		UpdateStatusBar();
-		UpdateServerList();
+		UpdateServerList();	
 	}
 	
 	void OnLoadServersAsyncPCFinished()
 	{
-		m_LoadingFinished = true;
+		LoadingServersStop();
 	}
 	
 	override bool OnClick( Widget w, int x, int y, int button )
@@ -252,21 +272,43 @@ class ServerBrowserTabPage extends ServerBrowserTab
 			{
 				ResetFilters();
 			}
+			else if( w == m_ApplyFilter )
+			{
+				ApplyFilters();
+				return true;
+			}
+			else if ( w == m_RefreshList )
+			{
+				if ( m_Loading && !m_LoadingFinished )
+				{
+					LoadingServersStop();
+				}
+				else
+				{
+					RefreshList();
+				}
+				
+				return true;
+			}
 			else if ( w == m_BtnPagePrev )
 			{
 				OnClickPagePrev();
+				return true;
 			}
 			else if ( w == m_BtnPageNext )
 			{
 				OnClickPageNext();
+				return true;
 			}
 			else if ( w == m_BtnPagesLast )
 			{
 				OnClickPageEnd();
+				return true;
 			}
 			else if ( w == m_BtnPagesFirst )
 			{
 				OnClickPageFirst();
+				return true;
 			}
 			else
 			{
@@ -284,7 +326,7 @@ class ServerBrowserTabPage extends ServerBrowserTab
 	}
 	
 	override bool OnMouseEnter( Widget w, int x, int y )
-	{
+	{		
 		if( IsFocusable( w ) )
 		{
 			ColorHighlight( w );
@@ -306,7 +348,7 @@ class ServerBrowserTabPage extends ServerBrowserTab
 	}
 	
 	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
-	{
+	{		
 		if( IsFocusable( w ) )
 		{
 			ColorNormal( w );
@@ -323,6 +365,8 @@ class ServerBrowserTabPage extends ServerBrowserTab
 	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
 	{
+		Print("SG OnMouseButtonUp: "+ w.GetName());
+		
 		if( button == MouseState.LEFT )
 		{
 			if ( w == m_HostSort )
@@ -364,7 +408,11 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		//m_FiltersChanged.Show( true );
 		
 		ButtonEnable( m_ApplyFilter );
-		ButtonDisable( m_RefreshList );
+		
+		if ( !m_Loading )
+		{
+			ButtonDisable( m_RefreshList );
+		}
 	}
 	
 	void OnClickPagePrev()
@@ -453,11 +501,10 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		SetSort( type, order );
 	}
 	
-	void SetSort( ESortType type, ESortOrder order )
+	override void SetSort( ESortType type, ESortOrder order )
 	{
 		//Print("m_SortType: "+ type +" m_SortOrder: "+ order +" m_SortInverted[type]: "+ m_SortInverted[type]);
-		m_SortOrder = order;
-		m_SortType	= type;
+		super.SetSort( type, order);
 		
 		#ifdef PLATFORM_WINDOWS
 		m_Root.FindAnyWidget( "host_sort" ).Show( false );
@@ -957,8 +1004,6 @@ class ServerBrowserTabPage extends ServerBrowserTab
 				
 				entry.Show( true );
 				entry.FillInfo( server_info );
-				entry.SetFavorite( m_Menu.IsFavorited( server_info.m_Id ) );
-				entry.SetExpand( server_info.m_IsExpanded );
 				
 				m_TotalLoadedServers++;
 			}
@@ -984,8 +1029,10 @@ class ServerBrowserTabPage extends ServerBrowserTab
 		}
 		else
 		{
+			/*
 			if ( m_ServersEstimateCount > 0 )
 			{
+				Print("m_TotalServersCount: "+ m_TotalServersCount + " m_ServersEstimateCount: "+ m_ServersEstimateCount);
 				int loading_percentage = Math.Round((m_TotalServersCount / m_ServersEstimateCount) * 100);
 				m_LoadingText.SetText( "#server_browser_tab_loaded "+ loading_percentage.ToString() +"%" );
 			}
@@ -993,6 +1040,9 @@ class ServerBrowserTabPage extends ServerBrowserTab
 			{
 				m_LoadingText.SetText( "#dayz_game_loading" );
 			}
+			*/
+			
+			m_LoadingText.SetText( "#dayz_game_loading" );
 		}
 	}
 	
@@ -1044,8 +1094,25 @@ class ServerBrowserTabPage extends ServerBrowserTab
 				return true;
 			}
 			
+			if ( w == m_FilterPanelAccTime || m_FilterPanelPing )
+			{				
+				return true;
+			}
+			
 			return false;
 		}
 		return false;
+	}
+	
+	void ButtonRefreshToCancel()
+	{
+		ButtonWidget btn = ButtonWidget.Cast( m_RefreshList );
+		btn.SetText( "#menu_cancel" );
+	}
+	
+	void ButtonCancelToRefresh()
+	{
+		ButtonWidget btn = ButtonWidget.Cast( m_RefreshList );
+		btn.SetText( "#STR_server_browser_tab_root_filters_root_filters_content_refresh_list_button0" );
 	}
 }

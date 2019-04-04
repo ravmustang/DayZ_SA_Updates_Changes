@@ -123,8 +123,8 @@ class RadialQuickbarMenu extends UIScriptedMenu
 		
 		//set controller toolbar icons
 		#ifdef PLATFORM_CONSOLE
-				ImageWidget toolbar_select = layoutRoot.FindAnyWidget( "SelectIcon" );
-				ImageWidget toolbar_back = layoutRoot.FindAnyWidget( "CombineIcon" );
+				ImageWidget toolbar_select = ImageWidget.Cast(layoutRoot.FindAnyWidget( "SelectIcon" ));
+				ImageWidget toolbar_back = ImageWidget.Cast(layoutRoot.FindAnyWidget( "CombineIcon" ));
 			#ifdef PLATFORM_XBOX
 				toolbar_select.LoadImageFile( 0, "set:xbox_buttons image:A" );
 				toolbar_back.LoadImageFile( 0, "set:xbox_buttons image:B" );
@@ -201,6 +201,7 @@ class RadialQuickbarMenu extends UIScriptedMenu
 				//item preview
 				ItemPreviewWidget item_preview = ItemPreviewWidget.Cast( item_card_widget.FindAnyWidget( "ItemPreview" ) );
 				item_preview.SetItem( item );
+				item_preview.SetView( item.GetViewIndex() );
 				item_preview.SetModelOrientation( Vector( 0,0,0 ) );
 				
 				//item quantity
@@ -337,15 +338,19 @@ class RadialQuickbarMenu extends UIScriptedMenu
 			{	
 				if ( quickbar_item.GetItem() )
 				{	
+					/*
 					//alter item visual
 					TextWidget text_widget = TextWidget.Cast( quickbar_item.GetRadialItemCard().FindAnyWidget( TEXT_ITEM_NAME ) );
 					text_widget.SetColor( ARGB( 255, 66, 175, 95 ) );
+					*/
 				}
 				else
 				{
+					/*
 					//alter item visual
 					TextWidget title_widget = TextWidget.Cast( quickbar_item.GetRadialItemCard().FindAnyWidget( TEXT_ITEM_TITLE ) );
-					title_widget.SetColor( ARGB( 255, 66, 175, 95 ) );					
+					title_widget.SetColor( ARGB( 255, 66, 175, 95 ) );		
+					*/			
 				}				
 			}		
 		}

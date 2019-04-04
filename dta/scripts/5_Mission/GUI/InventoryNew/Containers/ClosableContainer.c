@@ -9,8 +9,6 @@ class ClosableContainer extends Container
 		m_Body				= new array<ref LayoutHolder>;
 		m_ClosableHeader	= new ClosableHeader( this, "CloseButtonOnMouseButtonDown" );
 		
-		WidgetEventHandler.GetInstance().RegisterOnMouseEnter( GetRootWidget(),  this, "EnterContainer" );
-		WidgetEventHandler.GetInstance().RegisterOnMouseLeave( GetRootWidget(),  this, "LeaveContainer" );
 		m_Body.Insert( m_ClosableHeader );
 		
 		if( sort > -1 )
@@ -51,24 +49,6 @@ class ClosableContainer extends Container
 	bool IsOpened()
 	{
 		return !m_Closed;
-	}
-	
-	void EnterContainer()
-	{
-		PlayerContainer p = PlayerContainer.Cast( m_Parent );
-		if( p )
-		{
-			p.EnterContainer( this );
-		}
-	}
-	
-	void LeaveContainer()
-	{
-		PlayerContainer p = PlayerContainer.Cast( m_Parent );
-		if( p )
-		{
-			p.LeaveContainer( this );
-		}
 	}
 
 	override void SetLayoutName()
