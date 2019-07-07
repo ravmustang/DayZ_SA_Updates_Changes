@@ -330,7 +330,7 @@ FrameWidgetClass sound_tab_root {
            }
           }
           ButtonWidgetClass music_setting_container {
-           visible 0
+           visible 1
            position 0 0
            size 1 30
            hexactpos 1

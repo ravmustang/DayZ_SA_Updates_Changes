@@ -59,7 +59,7 @@ GridSpacerWidgetClass closable_header_root {
      visible 0
      clipchildren 0
      position 10 0
-     size 30 30
+     size 29 29
      halign right_ref
      valign center_ref
      hexactpos 1
@@ -74,6 +74,7 @@ GridSpacerWidgetClass closable_header_root {
        visible 1
        clipchildren 0
        ignorepointer 1
+       color 0 0 0 1
        position 0 0
        size 1 1
        halign right_ref
@@ -91,6 +92,7 @@ GridSpacerWidgetClass closable_header_root {
        visible 0
        clipchildren 0
        ignorepointer 1
+       color 0 0 0 1
        position 0 0
        size 1 1
        halign right_ref

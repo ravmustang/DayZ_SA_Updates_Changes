@@ -1,6 +1,6 @@
 FrameWidgetClass FrameWidget {
  position 0 0
- size 0.9 0.87178
+ size 0.9 0.9
  halign center_ref
  valign center_ref
  hexactsize 0
@@ -10,7 +10,7 @@ FrameWidgetClass FrameWidget {
   PanelWidgetClass InputEditBoxWidget0 {
    visible 1
    color 0.1569 0.1569 0.1569 0.7843
-   position 0 40
+   position 0 80
    size 0.4 28
    halign center_ref
    valign bottom_ref

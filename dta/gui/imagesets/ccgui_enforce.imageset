@@ -940,8 +940,8 @@ ImageSetClass {
   }
   ImageSetDefClass XCombo2ArrowRightHighlight {
    Name "XCombo2ArrowRightHighlight"
-   Pos 354 208
-   Size 36 26
+   Pos 353 208
+   Size 37 26
    Flags 0
   }
   ImageSetDefClass XCombo2LeftTopHighlight {

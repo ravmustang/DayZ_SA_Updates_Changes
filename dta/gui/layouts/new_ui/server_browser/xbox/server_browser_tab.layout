@@ -1,4 +1,4 @@
-FrameWidgetClass server_browser_tab_root {
+WindowWidgetClass server_browser_tab_root {
  ignorepointer 1
  position 0 0
  size 1 1
@@ -40,7 +40,7 @@ FrameWidgetClass server_browser_tab_root {
        clipchildren 0
        ignorepointer 1
        color 0 0 0 0.549
-       size 45 35
+       size 0 35
        halign center_ref
        hexactpos 1
        vexactpos 1
@@ -78,12 +78,12 @@ FrameWidgetClass server_browser_tab_root {
         ImageWidgetClass server_list_root_nav_img_lb_xbox {
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:xbox_buttons image:LB"
+         image0 "set:xbox_buttons image:LT"
          mode blend
          "src alpha" 1
         }
@@ -91,7 +91,7 @@ FrameWidgetClass server_browser_tab_root {
          visible 0
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
@@ -112,12 +112,12 @@ FrameWidgetClass server_browser_tab_root {
         ImageWidgetClass server_list_root_nav_img_rb_xbox {
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:xbox_buttons image:RB"
+         image0 "set:xbox_buttons image:RT"
          mode blend
          "src alpha" 1
         }
@@ -125,7 +125,7 @@ FrameWidgetClass server_browser_tab_root {
          visible 0
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
@@ -583,12 +583,12 @@ FrameWidgetClass server_browser_tab_root {
         ImageWidgetClass filters_root_nav_img_lb_xbox {
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:xbox_buttons image:LB"
+         image0 "set:xbox_buttons image:LT"
          mode blend
          "src alpha" 1
         }
@@ -596,12 +596,12 @@ FrameWidgetClass server_browser_tab_root {
          visible 0
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:playstation_buttons image:L1"
+         image0 "set:playstation_buttons image:L2"
          mode blend
          "src alpha" 1
         }
@@ -617,25 +617,27 @@ FrameWidgetClass server_browser_tab_root {
         ImageWidgetClass filters_root_nav_img_rb_xbox {
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:xbox_buttons image:RB"
+         image0 "set:xbox_buttons image:RT"
          mode blend
          "src alpha" 1
+         "no wrap" 0
+         stretch 0
         }
         ImageWidgetClass filters_root_nav_img_r1_ps4 {
          visible 0
          ignorepointer 1
          position 10 10
-         size 40 32
+         size 25.2 35
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:playstation_buttons image:R1"
+         image0 "set:playstation_buttons image:R2"
          mode blend
          "src alpha" 1
         }
@@ -733,8 +735,10 @@ FrameWidgetClass server_browser_tab_root {
        vexactsize 1
        style Colorable
        "no focus" 0
-       "next up" "full_server_button"
-       "next down" "region_button"
+       "next left" "sort_button"
+       "next right" "sort_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass sort_button_panel {
          ignorepointer 1
@@ -811,8 +815,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "sort_button"
-       "next down" "ping_button"
+       "next left" "region_button"
+       "next right" "region_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass region_button_panel {
          ignorepointer 1
@@ -890,8 +896,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "accelerated_time_button"
-       "next down" "favorites_button"
+       "next left" "ping_button"
+       "next right" "ping_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass ping_button_button {
          ignorepointer 1
@@ -967,8 +975,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "region_button"
-       "next down" "friends_button"
+       "next left" "favorites_button"
+       "next right" "favorites_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass favorites_button_panel {
          ignorepointer 1
@@ -1046,8 +1056,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "favorites_button"
-       "next down" "prev_played_button"
+       "next left" "friends_button"
+       "next right" "friends_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass friends_button_panel {
          ignorepointer 1
@@ -1124,8 +1136,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "friends_button"
-       "next down" "full_server_button"
+       "next left" "prev_played_button"
+       "next right" "prev_played_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass prev_played_button_panel {
          ignorepointer 1
@@ -1202,8 +1216,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "prev_played_button"
-       "next down" "sort_button"
+       "next left" "full_server_button"
+       "next right" "full_server_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass full_server_button_panel {
          ignorepointer 1
@@ -1281,8 +1297,10 @@ FrameWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next up" "full_server_button"
-       "next down" "ping_button"
+       "next left" "accelerated_time_button"
+       "next right" "accelerated_time_button"
+       "next up" ""
+       "next down" ""
        {
         GridSpacerWidgetClass accelerated_time_setting {
          ignorepointer 1

@@ -1,4 +1,4 @@
-FrameWidgetClass server_browser_tab_root {
+WindowWidgetClass server_browser_tab_root {
  ignorepointer 0
  position 0 0
  size 1 1

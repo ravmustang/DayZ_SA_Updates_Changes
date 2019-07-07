@@ -48,8 +48,8 @@ FrameWidgetClass HudDebugFrameWidget {
    }
   }
   WindowWidgetClass wdw_CharacterModifiers {
-   position 4.01487 0.41983
-   size 300.14902 500
+   position 4.01487 0.35857
+   size 300.14902 668.617
    halign right_ref
    hexactpos 1
    vexactpos 0
@@ -223,7 +223,8 @@ FrameWidgetClass HudDebugFrameWidget {
     }
     TextListboxWidgetClass txl_CharLevels_Values {
      disabled 1
-     clipchildren 0
+     clipchildren 1
+     ignorepointer 0
      position 15.4041 42.7892
      size 467.85199 481.60602
      hexactpos 1
@@ -234,6 +235,61 @@ FrameWidgetClass HudDebugFrameWidget {
      "title visible" 0
      colums "text;55;text2;5;text3;0;"
      lines 0
+    }
+   }
+  }
+  WindowWidgetClass wdw_CharacterStomach {
+   disabled 0
+   clipchildren 1
+   ignorepointer 0
+   position 13.8735 18.1423
+   size 1042.13 418
+   valign bottom_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   scaled 1
+   style rover_sim_black_2
+   {
+    TextWidgetClass TextWidget0 {
+     disabled 0
+     ignorepointer 0
+     position 343.88498 12.4673
+     size 238.013 38.2199
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     scaled 1
+     text "Player Stomach"
+    }
+    TextListboxWidgetClass txl_StomachContents {
+     disabled 1
+     clipchildren 1
+     position 0.00614 53.3597
+     size 0.98749 0.76322
+     hexactpos 0
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     scaled 1
+     draggable 0
+     style GUI_black
+     "title visible" 1
+     colums "class;13;amount;8;stage;8;(agent_types) names;0;"
+     lines 0
+     "highlight row" 1
+     font "gui/fonts/Metron"
+    }
+    TextWidgetClass InfoOverall {
+     ignorepointer 1
+     position 7.95257 376.08899
+     size 1025.55005 36.2609
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
     }
    }
   }

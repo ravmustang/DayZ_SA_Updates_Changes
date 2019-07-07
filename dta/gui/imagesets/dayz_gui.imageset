@@ -452,8 +452,8 @@ ImageSetClass {
   }
   ImageSetDefClass mic {
    Name "mic"
-   Pos 797 826
-   Size 32 32
+   Pos 796 823
+   Size 36 36
    Flags 0
   }
   ImageSetDefClass left_mouse {
@@ -708,6 +708,30 @@ ImageSetClass {
    Size 1 1
    Flags 0
   }
+  ImageSetDefClass area_focus2 {
+   Name "area_focus2"
+   Pos 159 257
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass area_focus3 {
+   Name "area_focus3"
+   Pos 161 257
+   Size 1 1
+   Flags 0
+  }
+  ImageSetDefClass red {
+   Name "red"
+   Pos 151 260
+   Size 2 2
+   Flags 0
+  }
+  ImageSetDefClass mod_more {
+   Name "mod_more"
+   Pos 597 29
+   Size 60 60
+   Flags 0
+  }
  }
  Groups {
   ImageSetGroupClass UI {
@@ -883,7 +907,7 @@ ImageSetClass {
     }
     ImageSetDefClass iconPill {
      Name "iconPill"
-     Pos 612 161
+     Pos 607 161
      Size 38 38
      Flags 3
     }
@@ -901,7 +925,7 @@ ImageSetClass {
     }
     ImageSetDefClass stance_walk {
      Name "stance_walk"
-     Pos 625 375
+     Pos 825 375
      Size 50 50
      Flags 0
     }
@@ -1067,52 +1091,28 @@ ImageSetClass {
      Size 22 19
      Flags 3
     }
-    ImageSetDefClass iconBlood0+ {
-     Name "iconBlood0+"
-     Pos 869 341
-     Size 38 38
+    ImageSetDefClass iconBlood0 {
+     Name "iconBlood0"
+     Pos 803 158
+     Size 20 10
      Flags 3
     }
-    ImageSetDefClass iconBlood0- {
-     Name "iconBlood0-"
-     Pos 869 380
-     Size 38 38
+    ImageSetDefClass iconBloodA {
+     Name "iconBloodA"
+     Pos 803 143
+     Size 20 10
      Flags 3
     }
-    ImageSetDefClass iconBloodA+ {
-     Name "iconBloodA+"
-     Pos 908 341
-     Size 38 38
+    ImageSetDefClass iconBloodB {
+     Name "iconBloodB"
+     Pos 803 113
+     Size 20 10
      Flags 3
     }
-    ImageSetDefClass iconBloodA- {
-     Name "iconBloodA-"
-     Pos 908 380
-     Size 38 38
-     Flags 3
-    }
-    ImageSetDefClass iconBloodB+ {
-     Name "iconBloodB+"
-     Pos 947 341
-     Size 38 38
-     Flags 3
-    }
-    ImageSetDefClass iconBloodB- {
-     Name "iconBloodB-"
-     Pos 947 380
-     Size 38 38
-     Flags 3
-    }
-    ImageSetDefClass iconBloodAB+ {
-     Name "iconBloodAB+"
-     Pos 986 341
-     Size 38 38
-     Flags 3
-    }
-    ImageSetDefClass iconBloodAB- {
-     Name "iconBloodAB-"
-     Pos 986 380
-     Size 38 38
+    ImageSetDefClass iconBloodAB {
+     Name "iconBloodAB"
+     Pos 803 128
+     Size 20 10
      Flags 3
     }
     ImageSetDefClass specialization_arrow {
@@ -1186,6 +1186,18 @@ ImageSetClass {
      Pos 80 772
      Size 152 42
      Flags 3
+    }
+    ImageSetDefClass iconPoisoned {
+     Name "iconPoisoned"
+     Pos 612 200
+     Size 38 38
+     Flags 0
+    }
+    ImageSetDefClass stance_stand {
+     Name "stance_stand"
+     Pos 625 375
+     Size 50 50
+     Flags 0
     }
    }
   }
@@ -1482,14 +1494,14 @@ ImageSetClass {
     }
     ImageSetDefClass arrow_left {
      Name "arrow_left"
-     Pos 614 299
-     Size 42 64
+     Pos 614 289
+     Size 28 44
      Flags 0
     }
     ImageSetDefClass arrow_right {
      Name "arrow_right"
-     Pos 654 299
-     Size 42 64
+     Pos 643 289
+     Size 28 44
      Flags 0
     }
    }
@@ -1618,6 +1630,118 @@ ImageSetClass {
      Name "InventoryButtonRight"
      Pos 60 668
      Size 7 138
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass Notifications {
+   Name "Notifications"
+   Images {
+    ImageSetDefClass notification_friend {
+     Name "notification_friend"
+     Pos 834 823
+     Size 36 36
+     Flags 0
+    }
+   }
+  }
+  ImageSetGroupClass InventoryIcons {
+   Name "InventoryIcons"
+   Images {
+    ImageSetDefClass scope {
+     Name "scope"
+     Pos 802 265
+     Size 20 20
+     Flags 0
+    }
+    ImageSetDefClass ironsight {
+     Name "ironsight"
+     Pos 822 265
+     Size 20 20
+     Flags 0
+    }
+    ImageSetDefClass tracer {
+     Name "tracer"
+     Pos 845 265
+     Size 10 10
+     Flags 0
+    }
+    ImageSetDefClass armor_piercing {
+     Name "armor_piercing"
+     Pos 845 275
+     Size 10 10
+     Flags 0
+    }
+    ImageSetDefClass cartridge_fp {
+     Name "cartridge_fp"
+     Pos 950 258
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass cartridge_pistol {
+     Name "cartridge_pistol"
+     Pos 968 258
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass cartridge_int {
+     Name "cartridge_int"
+     Pos 986 258
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass cartridge_shell {
+     Name "cartridge_shell"
+     Pos 1004 258
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass shell_fp {
+     Name "shell_fp"
+     Pos 950 293
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass shell_pistol {
+     Name "shell_pistol"
+     Pos 968 293
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass shell_int {
+     Name "shell_int"
+     Pos 986 293
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass shell_shell {
+     Name "shell_shell"
+     Pos 1004 293
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass jam_fp {
+     Name "jam_fp"
+     Pos 950 328
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass jam_pistol {
+     Name "jam_pistol"
+     Pos 968 328
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass jam_int {
+     Name "jam_int"
+     Pos 986 328
+     Size 17 35
+     Flags 0
+    }
+    ImageSetDefClass jam_shell {
+     Name "jam_shell"
+     Pos 1004 328
+     Size 17 35
      Flags 0
     }
    }

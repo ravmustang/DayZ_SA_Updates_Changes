@@ -101,6 +101,88 @@ FrameWidgetClass controls_tab_root {
          Columns 1
          Rows 1
          {
+          ButtonWidgetClass aimhelper_button {
+           ignorepointer 1
+           position 0 0
+           size 1 38
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "next left" "language_button"
+           "next right" "language_button"
+           "next up" "player_button"
+           "next down" "fov_button"
+           {
+            GridSpacerWidgetClass aimhelper_button_panel {
+             ignorepointer 0
+             color 0 0 0 0
+             size 1 30
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             style DayZDefaultPanel
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass aimhelper_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass aimhelper_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_aimhelper"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass aimhelper_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass aimhelper_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             size 1 1
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
           ButtonWidgetClass controller_invert_button {
            disabled 0
            position 0 0
@@ -113,7 +195,7 @@ FrameWidgetClass controls_tab_root {
            "no focus" 0
            "next left" "controller_invert_button"
            "next right" "controller_invert_button"
-           "next up" "controller_hsensitivity_button"
+           "next up" "aimhelper_button"
            "next down" "controller_vsensitivity_button"
            {
             GridSpacerWidgetClass controller_invert_button_panel {
@@ -277,7 +359,7 @@ FrameWidgetClass controls_tab_root {
            "next left" "controller_hsensitivity_button"
            "next right" "controller_hsensitivity_button"
            "next up" "controller_vsensitivity_button"
-           "next down" "controller_invert_button"
+           "next down" "aimhelper_button"
            {
             GridSpacerWidgetClass controller_hsensitivity_button_panel {
              ignorepointer 0

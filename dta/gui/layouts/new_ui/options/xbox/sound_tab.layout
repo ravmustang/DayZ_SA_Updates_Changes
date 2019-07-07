@@ -100,18 +100,9 @@ FrameWidgetClass sound_tab_root {
          Columns 1
          Rows 1
          {
-          FrameWidgetClass FrameWidget0 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
-          }
           ButtonWidgetClass master_button {
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -125,8 +116,8 @@ FrameWidgetClass sound_tab_root {
            {
             GridSpacerWidgetClass master_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -179,8 +170,8 @@ FrameWidgetClass sound_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -191,7 +182,7 @@ FrameWidgetClass sound_tab_root {
           }
           ButtonWidgetClass effects_button {
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -205,8 +196,8 @@ FrameWidgetClass sound_tab_root {
            {
             GridSpacerWidgetClass effects_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -259,8 +250,8 @@ FrameWidgetClass sound_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -271,7 +262,7 @@ FrameWidgetClass sound_tab_root {
           }
           ButtonWidgetClass voip_button {
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -285,8 +276,8 @@ FrameWidgetClass sound_tab_root {
            {
             GridSpacerWidgetClass voip_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -339,8 +330,8 @@ FrameWidgetClass sound_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -350,22 +341,24 @@ FrameWidgetClass sound_tab_root {
            }
           }
           ButtonWidgetClass music_button {
-           visible 0
+           visible 1
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 1
            style Colorable
            "no focus" 0
+           "next left" "music_button"
+           "next right" "music_button"
            "next up" "voip_button"
            "next down" "master_button"
            {
             GridSpacerWidgetClass music_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -418,8 +411,8 @@ FrameWidgetClass sound_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -427,15 +420,6 @@ FrameWidgetClass sound_tab_root {
              style rover_sim_colorable
             }
            }
-          }
-          FrameWidgetClass FrameWidget1 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
           }
          }
         }

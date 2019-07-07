@@ -410,6 +410,7 @@ FrameWidgetClass FrameWidget {
        vexactpos 1
        hexactsize 0
        vexactsize 1
+       userID 105
        style Empty
        "no focus" 0
        "next left" ""
@@ -441,7 +442,7 @@ FrameWidgetClass FrameWidget {
            vexactpos 1
            hexactsize 0
            vexactsize 0
-           text "#main_menu_restart"
+           text "#main_menu_respawn"
            font "gui/fonts/sdf_MetronLight24"
            "text halign" center
            "text valign" center

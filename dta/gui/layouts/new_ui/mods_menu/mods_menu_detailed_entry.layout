@@ -1,0 +1,222 @@
+GridSpacerWidgetClass Mod {
+ visible 1
+ clipchildren 1
+ ignorepointer 1
+ position 0 0
+ size 1 56
+ hexactpos 1
+ vexactpos 1
+ hexactsize 0
+ vexactsize 1
+ style Colorable
+ Padding 0
+ Margin 0
+ "Size To Content H" 1
+ "Size To Content V" 1
+ Columns 1
+ {
+  ImageWidgetClass Header {
+   clipchildren 1
+   ignorepointer 1
+   color 0 0 0 0.8627
+   position 0 0
+   size 1 48
+   halign center_ref
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   scriptclass ""
+   image0 "set:dayz_gui image:inv_header_1"
+   mode blend
+   "src alpha" 1
+   "no wrap" 1
+   stretch 1
+   {
+    ImageWidgetClass IconSmall {
+     clipchildren 1
+     ignorepointer 1
+     color 0.702 0.702 0.702 1
+     position 10 0
+     size 1 1
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     fixaspect fixwidth
+     priority 150
+     draggable 0
+     mode blend
+     "src alpha" 1
+     "no wrap" 1
+     stretch 1
+    }
+    RichTextWidgetClass Name {
+     clipchildren 0
+     ignorepointer 1
+     position 0 0
+     size 0.9 46
+     halign center_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 1
+     style DayZNormal
+     text "CLOSABLE HEADER"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 1
+     "exact text size" 20
+     "size to text h" 0
+     "size to text v" 1
+     "text halign" center
+     "text valign" center
+     wrap 1
+    }
+    ImageWidgetClass collapse_button {
+     visible 1
+     clipchildren 0
+     position 10 0
+     size 29 29
+     halign right_ref
+     valign center_ref
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     priority 500
+     image0 "set:dayz_gui image:icon_close"
+     mode additive
+     "src alpha" 1
+     "no wrap" 0
+     stretch 0
+     filter 1
+    }
+   }
+  }
+  GridSpacerWidgetClass DetailContainer {
+   visible 0
+   ignorepointer 1
+   color 0 0 0 0.7059
+   position 0 0
+   size 1 0
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 1
+   Padding 8
+   Margin 8
+   "Size To Content H" 1
+   "Size To Content V" 1
+   Columns 2
+   Rows 1
+   {
+    GridSpacerWidgetClass LeftSpacer {
+     ignorepointer 1
+     position 0 0
+     size 127 1
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 0
+     Padding 0
+     Margin 0
+     "Size To Content H" 1
+     "Size To Content V" 1
+     Columns 1
+     Rows 4
+     {
+      ImageWidgetClass IconBig {
+       clipchildren 1
+       ignorepointer 1
+       position 0 0
+       size 128 128
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       mode blend
+       "src alpha" 1
+       "no wrap" 1
+       stretch 1
+      }
+      FrameWidgetClass Space {
+       ignorepointer 1
+       position 0 0
+       size 1 6
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+      }
+      MultilineTextWidgetClass Author {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 128 30
+       hexactpos 1
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 20
+       "size to text h" 1
+       "size to text v" 1
+       "text halign" center
+       wrap 1
+      }
+      TextWidgetClass Version {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 30
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 20
+       "text halign" center
+       "text valign" center
+      }
+      RichTextWidgetClass Link {
+       visible 1
+       ignorepointer 0
+       position 0 0
+       size 1 30
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       text "Website"
+       font "gui/fonts/sdf_MetronLight24"
+       "exact text" 1
+       "exact text size" 20
+       "text halign" center
+       "text valign" center
+      }
+     }
+    }
+    RichTextWidgetClass Description {
+     visible 1
+     clipchildren 1
+     ignorepointer 1
+     position 0 0
+     size 1 0
+     hexactpos 1
+     vexactpos 1
+     hexactsize 0
+     vexactsize 0
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 1
+     "exact text size" 20
+     "size to text v" 1
+     wrap 1
+    }
+   }
+  }
+ }
+}

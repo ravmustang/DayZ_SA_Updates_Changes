@@ -38,6 +38,155 @@ FrameWidgetClass game_tab_root {
      Columns 1
      Rows 2
      {
+      WrapSpacerWidgetClass general_settings_root {
+       visible 1
+       ignorepointer 1
+       position 0 0
+       size 1 473
+       hexactpos 1
+       vexactpos 1
+       hexactsize 0
+       vexactsize 1
+       "no focus" 1
+       Padding 0
+       Margin 0
+       "Size To Content H" 1
+       "Size To Content V" 1
+       {
+        PanelWidgetClass general_settings_header {
+         visible 1
+         ignorepointer 1
+         color 0 0 0 1
+         position 0 0
+         size 1 36
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 1
+         style DayZDefaultPanel
+         {
+          TextWidgetClass general_text {
+           visible 1
+           ignorepointer 1
+           position 0 0
+           size 1 22
+           valign center_ref
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Normal
+           text "#layout_options_pc_general"
+           font "gui/fonts/sdf_MetronLight72"
+           "exact text" 0
+           "text halign" center
+           "text valign" center
+          }
+         }
+        }
+        GridSpacerWidgetClass general_settings_content {
+         ignorepointer 1
+         color 0 0 0 0.549
+         position 0 0
+         size 1 1
+         hexactpos 1
+         vexactpos 1
+         hexactsize 0
+         vexactsize 0
+         style DayZDefaultPanel
+         Padding 0
+         Margin 0
+         "Size To Content H" 1
+         "Size To Content V" 1
+         Columns 1
+         Rows 1
+         {
+          ButtonWidgetClass language_button {
+           ignorepointer 1
+           position 0 0
+           size 1 38
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "next left" "language_button"
+           "next right" "language_button"
+           "next up" "player_button"
+           "next down" "fov_button"
+           {
+            GridSpacerWidgetClass language_button_panel {
+             ignorepointer 0
+             color 0 0 0 0
+             size 1 30
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             style DayZDefaultPanel
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass language_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass language_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "#layout_options_pc_language"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass language_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass language_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             size 1 1
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
+         }
+        }
+       }
+      }
       WrapSpacerWidgetClass camera_settings_root {
        visible 1
        ignorepointer 1
@@ -102,20 +251,10 @@ FrameWidgetClass game_tab_root {
          Columns 1
          Rows 1
          {
-          FrameWidgetClass FrameWidget0 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
-          }
           ButtonWidgetClass fov_button {
            ignorepointer 0
-           color 0 0 0 0
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -123,13 +262,15 @@ FrameWidgetClass game_tab_root {
            userID 42
            style Colorable
            "no focus" 0
+           "next left" "fov_button"
+           "next right" "fov_button"
            "next up" "player_button"
            "next down" "brightness_button"
            {
             GridSpacerWidgetClass fov_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -182,8 +323,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -197,7 +338,7 @@ FrameWidgetClass game_tab_root {
            visible 0
            ignorepointer 0
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -205,13 +346,15 @@ FrameWidgetClass game_tab_root {
            userID 42
            style Colorable
            "no focus" 0
+           "next left" "brightness_button"
+           "next right" "brightness_button"
            "next up" "fov_button"
            "next down" "hud_button"
            {
             GridSpacerWidgetClass brightness_setting {
              ignorepointer 0
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -264,8 +407,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -274,15 +417,6 @@ FrameWidgetClass game_tab_root {
              "no focus" 1
             }
            }
-          }
-          FrameWidgetClass FrameWidget1 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
           }
          }
         }
@@ -351,18 +485,9 @@ FrameWidgetClass game_tab_root {
          "Size To Content V" 1
          Columns 1
          {
-          FrameWidgetClass FrameWidget2 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
-          }
           ButtonWidgetClass hud_button {
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -376,8 +501,8 @@ FrameWidgetClass game_tab_root {
            {
             GridSpacerWidgetClass hud_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -431,8 +556,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -444,7 +569,7 @@ FrameWidgetClass game_tab_root {
           }
           ButtonWidgetClass crosshair_button {
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -458,8 +583,8 @@ FrameWidgetClass game_tab_root {
            {
             GridSpacerWidgetClass crosshair_button_panel {
              ignorepointer 1
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -512,8 +637,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -522,15 +647,6 @@ FrameWidgetClass game_tab_root {
              "no focus" 1
             }
            }
-          }
-          FrameWidgetClass FrameWidget3 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
           }
          }
         }
@@ -599,20 +715,11 @@ FrameWidgetClass game_tab_root {
          "Size To Content V" 1
          Columns 1
          {
-          FrameWidgetClass FrameWidget4 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
-          }
           ButtonWidgetClass game_button {
            ignorepointer 1
            color 0 0 0 0
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -626,8 +733,8 @@ FrameWidgetClass game_tab_root {
             GridSpacerWidgetClass game_button_panel {
              ignorepointer 0
              color 0 0 0 0
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -680,8 +787,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -694,7 +801,7 @@ FrameWidgetClass game_tab_root {
            ignorepointer 1
            color 0 0 0 0
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -708,8 +815,8 @@ FrameWidgetClass game_tab_root {
             GridSpacerWidgetClass admin_button_panel {
              ignorepointer 0
              color 0 0 0 0
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -762,8 +869,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -776,7 +883,7 @@ FrameWidgetClass game_tab_root {
            ignorepointer 1
            color 0 0 0 0
            position 0 0
-           size 1 30
+           size 1 38
            hexactpos 1
            vexactpos 1
            hexactsize 0
@@ -785,13 +892,13 @@ FrameWidgetClass game_tab_root {
            "next left" "player_button"
            "next right" "player_button"
            "next up" "admin_button"
-           "next down" "fov_button"
+           "next down" "language_button"
            {
             GridSpacerWidgetClass player_button_panel {
              ignorepointer 0
              color 0 0 0 0
-             position 0 0
              size 1 30
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -844,8 +951,8 @@ FrameWidgetClass game_tab_root {
              visible 0
              ignorepointer 1
              color 0.1569 0.1569 0.1569 0.902
-             position 0 0
              size 1 1
+             valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
@@ -853,15 +960,6 @@ FrameWidgetClass game_tab_root {
              style rover_sim_colorable
             }
            }
-          }
-          FrameWidgetClass FrameWidget5 {
-           ignorepointer 1
-           position 10 10
-           size 1 5
-           hexactpos 1
-           vexactpos 1
-           hexactsize 0
-           vexactsize 1
           }
          }
         }

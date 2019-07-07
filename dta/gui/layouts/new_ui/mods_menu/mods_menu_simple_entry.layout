@@ -1,0 +1,26 @@
+ImageWidgetClass Icon {
+ position 0 0
+ size 60 60
+ hexactpos 1
+ vexactpos 1
+ hexactsize 1
+ vexactsize 1
+ imageTexture ""
+ mode blend
+ "src alpha" 1
+ "no wrap" 1
+ stretch 1
+ {
+  PanelWidgetClass Overlay {
+   visible 0
+   ignorepointer 1
+   position 0 0
+   size 60 60
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   style Outline
+  }
+ }
+}
