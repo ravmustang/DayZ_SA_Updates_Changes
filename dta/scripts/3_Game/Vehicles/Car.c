@@ -151,49 +151,13 @@ class Car extends Transport
 	proto native int GetGearsCount();
 
 	/*!
-		Is called every time when the game wants to change
-		vehicle's current gear level.
+		Is called every time when the simulation changed gear.
 
 		\param[in] newGear new gear level
 		\param[in] oldGear previous gear level before gear shift
-		\return new gear level that will be applied.
 	*/
-	//int OnBeforeGearChange( int newGear, int oldGear )
-	//{
-	//	// by default, you can't switch between reverse
-	//	// and positive gears and vice versa while the vehicle is moving
-	//	if ( GetSpeedometer() > 0.1 )
-	//	{
-	//		bool newG = ( newGear < CarGear.NEUTRAL );
-	//		bool oldG = ( oldGear < CarGear.NEUTRAL );
-	//		if ( newG != oldG )
-	//			return oldGear;
-	//	}
-	//
-	//	return newGear;
-	//}
-//-----------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------
-// lights
-
-	//! Returns true when lights are on, false otherwise.
-	proto native bool IsLightsOn();
-
-	//! Toggles the vehicle's lights state (on / off).
-	proto native void SwitchLights();
-
-	/*!
-		Is called every time the game wants to switch the lights.
-
-		\param[in] toOn true when lights should be switched on, false otherwise
-		\return true when lights can be switched, false otherwise.
-	*/
-	bool OnBeforeSwitchLights( bool toOn )
+	void OnGearChanged( int newGear, int oldGear )
 	{
-		// lights can be always switched by default
-		return true;
 	}
 //-----------------------------------------------------------------------------
 
@@ -276,5 +240,6 @@ class CarController
 	proto native int GetGear();
 
 	proto native void ShiftUp();
+	proto native void ShiftTo( CarGear gear );
 	proto native void ShiftDown();
 };

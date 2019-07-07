@@ -5,4 +5,5 @@ enum EStaminaModifiers
 	MELEE_LIGHT,
 	MELEE_HEAVY,
 	MELEE_EVADE,
+	OVERALL_DRAIN,
 }

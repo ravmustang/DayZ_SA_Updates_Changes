@@ -1,17 +1,36 @@
-int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
+int SlotToAnimType (notnull Man player, notnull InventoryLocation src, InventoryLocation dst = null)
 {
-	if (src.GetType() == InventoryLocationType.ATTACHMENT)
+	//Print("src.GetType() " + src.GetType());
+	InventoryLocation invloc1 = new InventoryLocation;
+	//InventoryLocation invloc2 = new InventoryLocation;
+	
+	if (dst && (dst.GetType() == InventoryLocationType.ATTACHMENT || dst.GetType() == InventoryLocationType.CARGO))
+	{
+		invloc1.Copy(dst);
+		//invloc2.Copy(src);
+	}
+	else if (src.GetType() == InventoryLocationType.ATTACHMENT || src.GetType() == InventoryLocationType.CARGO)
+	{
+		invloc1.Copy(src);
+		//invloc2.Copy(dst);
+	}
+	else
+	{
+		return -1;
+	}
+	
+	if (invloc1.GetType() == InventoryLocationType.ATTACHMENT /*|| src.GetType() == InventoryLocationType.HANDS*/)
 	{
 		//return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK;
-		switch (src.GetSlot())
+		switch (invloc1.GetSlot())
 		{
 			case InventorySlots.SHOULDER:
 			{
-				if (src.GetItem() && src.GetItem().IsWeapon())
+				if (invloc1.GetItem() && invloc1.GetItem().IsWeapon())
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_RFLLEFTBACK;
 				}
-				else if (src.GetItem() && src.GetItem().IsOneHandedBehaviour())
+				else if (invloc1.GetItem() && invloc1.GetItem().IsOneHandedBehaviour())
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_1HDLEFTBACK;
 				}
@@ -19,11 +38,11 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 			}
 			case InventorySlots.MELEE:
 			{
-				if (src.GetItem() && src.GetItem().IsWeapon())
+				if (invloc1.GetItem() && invloc1.GetItem().IsWeapon())
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_RFLRIGHTBACK;
 				}
-				else if (src.GetItem() && src.GetItem().IsOneHandedBehaviour())
+				else if (invloc1.GetItem() && invloc1.GetItem().IsOneHandedBehaviour())
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_1HDRIGHTBACK;
 				}
@@ -31,7 +50,7 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 			}
 			case InventorySlots.PISTOL:
 			{
-				EntityAI parent_item = src.GetParent(); 		// belt
+				EntityAI parent_item = invloc1.GetParent(); 		// belt
 				Man owner;
 				if (parent_item)
 					owner = parent_item.GetHierarchyRootPlayer(); 		// player
@@ -54,12 +73,12 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src)
 				return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;
 			
 			default:
-				Print("[hndfsm] SlotToAnimType -  not animated slot in src_loc=" + src.DumpToString());
+				Print("[hndfsm] SlotToAnimType -  not animated slot in src_loc=" + InventoryLocation.DumpToStringNullSafe(invloc1));
 		};
 		//
 		//if (InventorySlots.GetSlotIdFromString("Pistol"))
 	}
-	else if (src.GetType() == InventoryLocationType.CARGO)
+	else if (invloc1.GetType() == InventoryLocationType.CARGO)
 	{
 		return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;
 	}
@@ -104,15 +123,19 @@ bool SelectAnimationOfMoveFromHands (notnull Man player, notnull InventoryLocati
 	return false;
 }
 
-bool SelectAnimationOfForceSwapInHands (notnull Man player, notnull InventoryLocation old_src, notnull InventoryLocation old_dst, notnull InventoryLocation new_src, notnull InventoryLocation new_dst, out int animType1, out int animType2)
+bool SelectAnimationOfForceSwapInHands (notnull Man player, notnull InventoryLocation old_src, notnull InventoryLocation new_src, notnull InventoryLocation old_dst, notnull InventoryLocation new_dst, out int animType1, out int animType2)
 {
 	if (player.IsInTransport())
 		return false;
 
 	if (old_src.GetItem().GetHierarchyRootPlayer() == player && new_src.GetItem().GetHierarchyRootPlayer() == player)
 	{
-		animType1 = SlotToAnimType(player, old_dst);
-		animType2 = SlotToAnimType(player, new_src);
+		hndDebugPrint("[hndfsm] SlotToAnimType - old_src=" + InventoryLocation.DumpToStringNullSafe(old_src) + " new_src=" + InventoryLocation.DumpToStringNullSafe(new_src) + " old_dst=" + InventoryLocation.DumpToStringNullSafe(old_dst) + " new_dst=" + InventoryLocation.DumpToStringNullSafe(new_dst));
+		
+		animType1 = SlotToAnimType(player, new_dst, new_src);
+		animType2 = SlotToAnimType(player, old_src, old_dst);
+		//Print("animType1 = " + animType1);
+		//Print("animType2 = " + animType2);
 		if (animType1 != -1 || animType2 != -1)
 		{
 			hndDebugPrint("[hndfsm] SelectAnimationOfForceSwapInHands guard - selected animType1=" + animType1 + " animType2=" + animType2 + " for old_item=" + old_src.GetItem() + " for new_item=" + new_src.GetItem());
@@ -130,24 +153,12 @@ class HandSelectAnimationOfTakeToHandsEvent extends HandGuardBase
 
 	override bool GuardCondition (HandEventBase e)
 	{
-		EntityAI eai = e.m_Entity;
-		if (eai != NULL)
+		int animType = -1;
+		if (SelectAnimationOfTakeToHands(e.m_Player, e.GetSrc(), e.GetDst(), animType))
 		{
-			InventoryLocation src = new InventoryLocation;
-			if (eai.GetInventory().GetCurrentInventoryLocation(src))
-			{
-				InventoryLocation dst = new InventoryLocation;
-				dst.SetHands(e.m_Player, src.GetItem());
-				int animType = -1;
-				if (SelectAnimationOfTakeToHands(e.m_Player, src, dst, animType))
-				{
-					e.m_AnimationID = animType;
-					return true;
-				}
-				return false;
-			}
+			e.m_AnimationID = animType;
+			return true;
 		}
-		hndDebugPrint("[hndfsm] HandGuardHasAnimatedAtachmentInEvent guard - no entity in event");
 		return false;
 	}
 };
@@ -186,51 +197,16 @@ class HandSelectAnimationOfMoveFromHandsEvent extends HandGuardBase
 class HandSelectAnimationOfForceSwapInHandsEvent extends HandGuardBase
 {
 	protected Man m_Player;
-	ref HandGuardHasRoomForItem m_HasRoomGuard = new HandGuardHasRoomForItem;
 
 	void HandSelectAnimationOfForceSwapInHandsEvent (Man p = NULL) { m_Player = p; }
 
-	bool ProcessSwapEvent (notnull HandEventBase e, notnull InventoryLocation old_dst, out int animType1, out int animType2)
+	bool ProcessSwapEvent (notnull HandEventBase e, out int animType1, out int animType2)
 	{
-		EntityAI old_e = e.m_Player.GetHumanInventory().GetEntityInHands();
-		EntityAI new_e = e.m_Entity;
-
-		if (!old_e)
-		{
-			Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - old_e (in hands) is null!");
-			return false;
-		}
-		
-		if (!new_e)
-		{
-			Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - new_e (in hands) is null!");
-			return false;
-		}
-
-		if (!old_dst || !old_dst.IsValid())
-		{
-			Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - old_dst (dst of item in hands) is null (or invalid)!");
-			return false;
-		}
-
-		InventoryLocation old_src = new InventoryLocation;
-		if (!old_e.GetInventory().GetCurrentInventoryLocation(old_src))
-		{
-			Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - old_e has no inv location");
-			return false;
-		}
-
-		InventoryLocation new_src = new InventoryLocation;
-		if (!new_e.GetInventory().GetCurrentInventoryLocation(new_src))
-		{
-			Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - new_e has no inv location");
-			return false;
-		}
-
-		InventoryLocation new_dst = new InventoryLocation;
-		new_dst.SetHands(e.m_Player, new_src.GetItem());
-
-		return SelectAnimationOfForceSwapInHands(e.m_Player, old_src, old_dst, new_src, new_dst, animType1, animType2);
+		HandEventSwap es = HandEventSwap.Cast(e);
+		if (es)
+			return SelectAnimationOfForceSwapInHands(e.m_Player, es.m_Src, es.m_Src2, es.m_Dst, es.m_Dst2, animType1, animType2);
+		Error("HandSelectAnimationOfForceSwapInHandsEvent - not an swap event");
+		return false;
 	}
 
 	override bool GuardCondition (HandEventBase e)
@@ -238,11 +214,23 @@ class HandSelectAnimationOfForceSwapInHandsEvent extends HandGuardBase
 		HandEventForceSwap es = HandEventForceSwap.Cast(e);
 		if (es)
 		{
-			if (m_HasRoomGuard.GuardCondition(e))
+			hndDebugPrint("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent FSwap e=" + e.DumpToString());
+			
+			bool allow = false;
+			if (GameInventory.CanSwapEntities(es.GetSrc().GetItem(), es.m_Src2.GetItem()))
+				allow = true; // allow if ordinary swap
+			else if (es.m_Dst2)
+			{
+				if (!GameInventory.LocationTestAddEntity(es.m_Dst2, false, true, true, true, true))
+					Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - no room at dst=" + InventoryLocation.DumpToStringNullSafe(e.GetDst()));
+				allow = true;
+			}
+			
+			if (allow)
 			{
 				int animType1 = -1;
 				int animType2 = -1;
-				if (ProcessSwapEvent(e, es.GetDst(), animType1, animType2))
+				if (ProcessSwapEvent(e, animType1, animType2))
 				{
 					e.m_AnimationID = animType1;
 					es.m_Animation2ID = animType2;
@@ -267,7 +255,7 @@ class HandSelectAnimationOfSwapInHandsEvent extends HandSelectAnimationOfForceSw
 		{
 			int animType1 = -1;
 			int animType2 = -1;
-			if (ProcessSwapEvent(e, es.GetDst(), animType1, animType2))
+			if (ProcessSwapEvent(e, animType1, animType2))
 			{
 				e.m_AnimationID = animType1;
 				es.m_Animation2ID = animType2;

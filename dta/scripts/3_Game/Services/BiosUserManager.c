@@ -54,6 +54,18 @@ class BiosUserManager
 		@return EBiosError indicating if the async operation is pending.
 	*/
 	proto native EBiosError ParseJoinAsync(string join_data);
+
+	//! Parse the party data from from command line parameters.
+	/*!
+		The async result is returned in the OnPartyHost callback.
+		The OnPartyHost callback is called also during runtime when a player hosts a game for the party.
+		Expected errors:
+			BAD_PARAMETER -	join_data could not be parsed, 
+	
+		@param party_data the startup party data from command line parameters.
+		@return EBiosError indicating if the async operation is pending.
+	*/
+	proto native EBiosError ParsePartyAsync(string party_data);
 	
 	//! Informs the engine about the current selected user.
 	/*!
@@ -94,67 +106,9 @@ class BiosUserManager
 	*/
 	void OnUserLoggedOn(EBiosError error)
 	{
-
-	}
-	
-	//! Callback function.
-	/*!
-		@param user picked user. NULL on fail.
-		@param error error indicating success or fail of the async operation.
-	*/
-	void OnUserPicked(BiosUser user, EBiosError error)
-	{
-		if( !user )
+		if( OnlineServices.ErrorCaught( error ) )
 		{
-			GetGame().GetInput().ResetActiveGamepad();
-			g_Game.GamepadCheck();
-		}
-		else if( !OnlineServices.ErrorCaught( error ) )
-		{
-			SelectUser( user );
-			if( GetGame().GetMission() )
-				GetGame().GetMission().Reset();
-			OnGameNameChanged( user );
-			g_Game.SelectUser();
-		}
-	}
-
-	//! Callback function.
-	void OnLoggedOn(BiosUser user)
-	{
-
-	}
-
-	//! Callback function.
-	void OnLoggedOff(BiosUser user)
-	{
-
-	}
-	
-	//! Callback function.
-	/*!
-		Called when a new user signed in
-	
-		@param user the user that signed in. Cannot be NULL.
-	*/
-	void OnSignedIn(BiosUser user)
-	{
-		
-	}
-	
-	//! Callback function.
-	/*!
-		Called when a new user signed out
-	
-		@param user the user that signed out. Cannot be NULL.
-	*/
-	void OnSignedOut(BiosUser user)
-	{
-		if( user == GetSelectedUser() || !GetSelectedUser() )
-		{
-			SelectUser( null );
-			
-			if (GetGame().GetUIManager() != null)
+			if (GetGame().GetUIManager())
 			{
 				GetGame().GetUIManager().CloseAllSubmenus();
 				
@@ -181,6 +135,97 @@ class BiosUserManager
 	
 	//! Callback function.
 	/*!
+		@param user picked user. NULL on fail.
+		@param error error indicating success or fail of the async operation.
+	*/
+	void OnUserPicked(BiosUser user, EBiosError error)
+	{
+		if ( !user )
+		{
+			GetGame().GetInput().ResetActiveGamepad();
+			g_Game.GamepadCheck();
+		}
+		else if ( !OnlineServices.ErrorCaught( error ) )
+		{
+			SelectUser( user );
+			if ( GetGame().GetMission() )
+				GetGame().GetMission().Reset();
+			OnGameNameChanged( user );
+			g_Game.SelectUser();
+		}
+	}
+
+	//! Callback function.
+	void OnLoggedOn(BiosUser user)
+	{
+		if ( user && GetSelectedUser() == user )
+			g_Game.SelectUser();
+	}
+
+	//! Callback function.
+	void OnLoggedOff(BiosUser user)
+	{
+		OnSignedOut( user );
+	}
+	
+	//! Callback function.
+	/*!
+		Called when a new user signed in
+	
+		@param user the user that signed in. Cannot be NULL.
+	*/
+	void OnSignedIn(BiosUser user)
+	{
+		
+	}
+	
+	//! Callback function.
+	/*!
+		Called when a new user signed out
+	
+		@param user the user that signed out. Cannot be NULL.
+	*/
+	void OnSignedOut(BiosUser user)
+	{
+		Print("OnSignedOut(): selectedUser: " + GetSelectedUser());
+		bool isSelectedUser  = (GetSelectedUser() != null);
+		
+		if ( user == GetSelectedUser() )
+		{
+			SelectUser( null );
+			
+			if (GetGame().GetUIManager())
+			{
+				GetGame().GetUIManager().CloseAllSubmenus();
+				
+				if ( GetGame().GetUIManager().IsDialogVisible() )
+				{
+					GetGame().GetUIManager().CloseDialog();
+				}
+				
+				g_Game.DeleteGamepadDisconnectMenu();
+			}
+			
+			if ( GetGame().GetMission() != null )
+			{
+				Print("OnSignedOut(): AbortMission");
+				GetGame().GetMission().AbortMission();
+			}
+			
+			GetGame().GetInput().ResetActiveGamepad();
+			
+			g_Game.SetGameState( DayZGameState.MAIN_MENU );
+			g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+			g_Game.GamepadCheck();
+		}
+		else if ( !isSelectedUser )
+		{
+			Print("OnSignedOut(): before TitleScreen");
+		}
+	}
+	
+	//! Callback function.
+	/*!
 		Called when a join is parsed or when a runtime join is accepted from the system UI.
 	
 		@param type the type of join. Undefined on error.
@@ -193,17 +238,98 @@ class BiosUserManager
 	{
 		if( !OnlineServices.ErrorCaught( error ) )
 		{
-			BiosUserManager user_manager = GetGame().GetUserManager();
-			user_manager.SelectUser( joiner );
-			
+			if(GetSelectedUser())
+				OnlineServices.SetBiosUser( GetSelectedUser() );
+			else
+				OnlineServices.SetBiosUser( joiner );
+			SelectUser( joiner );
 			OnlineServices.SetSessionHandle( handle );
 			
-			g_Game.SetGameState( DayZGameState.JOIN );
-			g_Game.SetLoadState( DayZLoadState.JOIN_START );
-			g_Game.GamepadCheck();
+			if( g_Game.GetGameState() == DayZGameState.IN_GAME )
+			{
+				g_Game.SetLoadState( DayZLoadState.JOIN_START );
+				OnlineServices.GetSession();
+			}
+			else
+			{
+				if( GetGame().GetUIManager() )
+				{
+					GetGame().GetUIManager().CloseMenu( MENU_TITLE_SCREEN );
+					GetGame().GetInput().IdentifyGamepad( GamepadButton.BUTTON_NONE );
+				}
+				g_Game.SetLoadState( DayZLoadState.JOIN_START );
+				g_Game.GamepadCheck();
+			}
+		}
+		else
+		{
+			if( g_Game.GetGameState() != DayZGameState.IN_GAME )
+			{
+				if( GetGame().GetMission() )
+				{
+					if( g_Game.GetGameState() != DayZGameState.MAIN_MENU )
+					{
+						GetGame().GetUIManager().CloseAllSubmenus();
+						GetGame().GetMission().AbortMission();
+						if (g_Game.GetGameState() == DayZGameState.JOIN)
+							NotificationSystem.AddNotification(NotificationType.JOIN_FAIL_GET_SESSION, 6);
+						g_Game.SetGameState( DayZGameState.MAIN_MENU );
+						g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+						g_Game.GamepadCheck();
+						return;
+					}
+				}
+				else
+				{
+					g_Game.MainMenuLaunch();
+				}
+			}
+			NotificationSystem.AddNotification( NotificationType.JOIN_FAIL_GET_SESSION, 6 );
 		}
 	}
 	
+	//! Callback function.
+	/*!
+		Called when a party is parsed or when a party is hosted from the system UI.
+	
+		@param host the user that is hosting the party. NULL on error.
+		@param invitee_list list of party members.
+		@param error indicating if parsing failed. OK if not a result of ParsePartyAsync.
+	*/
+	void OnPartyHost(BiosUser host, array<string> invitee_list, EBiosError error)
+	{
+		#ifdef PLATFORM_PS4
+		if( host && host.IsOnline() )
+		#endif
+		{
+			SelectUser(host);
+		}
+		#ifdef PLATFORM_PS4
+		else if( host )
+		{
+			SelectUser( host );
+			LogOnUserAsync( host );
+		}
+		#endif
+
+		if (GetGame().GetUIManager())
+		{
+			GetGame().GetUIManager().CloseMenu(MENU_TITLE_SCREEN);
+		}
+		
+		OnlineServices.SetPendingInviteList( invitee_list );
+		if(g_Game.GetGameState() != DayZGameState.IN_GAME && g_Game.GetGameState() != DayZGameState.CONNECTING)
+		{
+			if (!GetGame().GetUIManager().GetMenu() || GetGame().GetUIManager().GetMenu().GetID() != MENU_MAIN)
+			{
+				GetGame().GetUIManager().EnterScriptedMenu(MENU_MAIN, GetGame().GetUIManager().GetMenu());
+			}
+			g_Game.SetGameState( DayZGameState.PARTY );
+			g_Game.SetLoadState( DayZLoadState.PARTY_START );
+			g_Game.GamepadCheck();
+		}
+	}
+
 	//! Callback function.
 	/*!
 		Called when display info of a signed in user changed.

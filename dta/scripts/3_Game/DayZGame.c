@@ -1,3 +1,229 @@
+class LoginQueueBase extends UIScriptedMenu
+{
+	protected TextWidget m_txtPosition;
+	protected TextWidget m_txtNote;
+	protected ButtonWidget m_btnLeave;
+	
+	protected int m_iPosition; // position in login queue
+	protected bool m_IsStatic;
+	
+	void LoginQueueBase()
+	{
+		m_iPosition = -1;
+		m_IsStatic = false;
+		g_Game.SetKeyboardHandle(this);	
+	}
+
+	void ~LoginQueueBase()
+	{
+		g_Game.SetKeyboardHandle(NULL);	
+	}
+	
+	override Widget Init()
+	{	
+		layoutRoot = GetGame().GetWorkspace().CreateWidgets("gui/layouts/dialog_queue_position.layout");
+		
+		m_txtPosition = TextWidget.Cast( layoutRoot.FindAnyWidget("txtPosition") );
+		m_txtNote = TextWidget.Cast( layoutRoot.FindAnyWidget("txtNote") );
+		m_btnLeave = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btnLeave") );
+		#ifdef PLATFORM_CONSOLE
+		m_btnLeave.Show(false);
+		layoutRoot.FindAnyWidget("toolbar_bg").Show(true);
+		#ifdef PLATFORM_PS4
+			string back = "circle";
+			if( GetGame().GetInput().GetEnterButton() == GamepadButton.A )
+			{
+				back = "circle";
+			}
+			else
+			{
+				back = "cross";
+			}
+			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
+			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:" + back );
+		#endif
+		#endif
+		return layoutRoot;
+	}
+	
+	override void Update(float timeslice)
+	{
+		if ( GetGame().GetInput().LocalPress("UAUIBack", false) )
+		{
+			Leave();
+		}
+	}
+	
+	override bool OnClick(Widget w, int x, int y, int button)
+	{
+		super.OnClick(w, x, y, button);
+		if ( w == m_btnLeave )
+		{
+			Leave();
+			return true;
+		}
+		return false;
+	}
+	
+	void Show()
+	{
+		if (layoutRoot)
+			layoutRoot.Show(true);
+	}
+	
+	void Hide()
+	{
+		if (layoutRoot)
+			layoutRoot.Show(false);
+	}
+	
+	void SetPosition(int position)
+	{
+		if ( position != m_iPosition )
+		{
+			m_iPosition = position;
+			m_txtPosition.SetText(position.ToString());
+		}
+	}
+	
+	bool IsStatic()
+	{
+		return m_IsStatic;
+	}
+	
+	void Leave()
+	{
+		g_Game.SetGameState( DayZGameState.MAIN_MENU );
+		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
+		
+		Close();
+	}
+};
+
+
+//! LoginQueue position when using -connect since mission is not created yet 
+class LoginQueueStatic extends LoginQueueBase
+{
+	void LoginQueueStatic()
+	{
+		Init();
+		//! hide leave button and show note text
+		#ifndef PLATFORM_CONSOLE
+		m_btnLeave.Show(false);
+		m_txtNote.Show(true);
+		#endif
+		
+		m_IsStatic = true;
+	}
+	
+	void ~LoginQueueStatic()
+	{
+	}
+};
+
+class LoginTimeBase extends UIScriptedMenu
+{
+	protected TextWidget m_txtDescription;
+	protected TextWidget m_txtLabel;
+	protected ButtonWidget m_btnLeave;
+	protected bool m_IsStatic;
+	
+	void LoginTimeBase()
+	{
+		g_Game.SetKeyboardHandle(this);
+		m_IsStatic = false;	
+	}
+
+	void ~LoginTimeBase()
+	{
+		g_Game.SetKeyboardHandle(NULL);	
+	}
+	
+	override Widget Init()
+	{	
+		layoutRoot = GetGame().GetWorkspace().CreateWidgets("gui/layouts/dialog_login_time.layout");
+		
+		m_txtDescription = TextWidget.Cast( layoutRoot.FindAnyWidget("txtDescription") );
+		m_txtLabel = TextWidget.Cast( layoutRoot.FindAnyWidget("txtLabel") );
+		m_btnLeave = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btnLeave") );
+
+		return layoutRoot;
+	}
+	
+	override void Update(float timeslice)
+	{
+		if ( GetGame().GetInput().LocalPress("UAUIBack", false) )
+		{
+			Leave();
+		}
+	}
+	
+	override bool OnClick(Widget w, int x, int y, int button)
+	{
+		super.OnClick(w, x, y, button);
+		if ( w == m_btnLeave )
+		{
+			Leave();
+			return true;
+		}
+		return false;
+	}
+	
+	void Show()
+	{
+		if (layoutRoot)
+			layoutRoot.Show(true);
+	}
+	
+	void Hide()
+	{
+		if (layoutRoot)
+			layoutRoot.Show(false);
+	}
+	
+	void SetTime(int time)
+	{
+		m_txtLabel.SetText("#menu_loading_in " + time.ToString() + " #dayz_game_seconds");
+	}
+		
+	void SetStatus(string status)
+	{
+		m_txtDescription.SetText(status);
+	}
+	
+	bool IsStatic()
+	{
+		return m_IsStatic;
+	}
+	
+	void Leave()
+	{
+		g_Game.SetGameState( DayZGameState.MAIN_MENU );
+		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
+		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
+		
+		Close();
+	}
+};
+
+//! LoginTime when using -connect since mission is not created yet 
+class LoginTimeStatic extends LoginTimeBase
+{
+	void LoginTimeStatic()
+	{
+		Init();
+		//! hide leave button and show note text
+		m_btnLeave.Show(false);
+		
+		m_IsStatic = true;
+	}
+	
+	void ~LoginTimeStatic()
+	{
+	}
+};
+
 class LoadingScreen
 {
 	ref Widget m_WidgetRoot;
@@ -7,7 +233,7 @@ class LoadingScreen
 	//ProgressBarWidget m_ProgressBarLarge;
 	//ProgressBarWidget m_ProgressBar;
 	TextWidget m_TextWidgetTitle;
-	TextWidget m_TextWidgetError;
+	TextWidget m_TextWidgetStatus;
 	ImageWidget m_ImageWidgetBackground;
 	DayZGame m_DayZGame;
 	float m_LastProgressUpdate;
@@ -15,19 +241,22 @@ class LoadingScreen
 	ImageWidget m_ImageLogoMid;
 	ImageWidget m_ImageLogoCorner;
 	ImageWidget m_ImageLoadingIcon;
+	ImageWidget m_ImageBackground;
+	ProgressBarWidget m_ProgressLoading;
 	float m_ImageLoadingIconRotation;
 	TextWidget m_ProgressText;
 	
 	//ref Timer m_Timer = new Timer(CALL_CATEGORY_SYSTEM);
 	
 	int m_Counter;
+	ref Timer m_Timer;
 	
 	void LoadingScreen(DayZGame game)
 	{
 		
 		m_DayZGame = game;
 		
-		m_WidgetRoot = game.GetWorkspace().CreateWidgets("gui/layouts/loading.layout");
+		m_WidgetRoot = game.GetLoadingWorkspace().CreateWidgets("gui/layouts/loading.layout");
 		//m_FrameWidgetSmall = m_WidgetRoot.FindAnyWidget("ProgressBarFrameSmall");
 		//m_FrameWidgetLarge = m_WidgetRoot.FindAnyWidget("ProgressBarFrameLarge");
 		//Class.CastTo(m_ProgressBarSmall, m_WidgetRoot.FindAnyWidget("ProgressBarWidgetSmall"));
@@ -36,9 +265,12 @@ class LoadingScreen
 		Class.CastTo(m_ImageLogoCorner, m_WidgetRoot.FindAnyWidget("ImageLogoCorner"));
 		
 		Class.CastTo(m_TextWidgetTitle, m_WidgetRoot.FindAnyWidget("TextWidget"));
-		Class.CastTo(m_TextWidgetError, m_WidgetRoot.FindAnyWidget("ErrorText"));
+		Class.CastTo(m_TextWidgetStatus, m_WidgetRoot.FindAnyWidget("StatusText"));
 		Class.CastTo(m_ImageWidgetBackground, m_WidgetRoot.FindAnyWidget("ImageBackground"));
 		Class.CastTo(m_ImageLoadingIcon, m_WidgetRoot.FindAnyWidget("ImageLoadingIcon"));
+		
+		m_ImageBackground = ImageWidget.Cast( m_WidgetRoot.FindAnyWidget("ImageBackground") );
+		m_ProgressLoading = ProgressBarWidget.Cast( m_WidgetRoot.FindAnyWidget("LoadingBar") );
 		
 		string tmp;
 		m_ProgressText = TextWidget.Cast(m_WidgetRoot.FindAnyWidget("ProgressText"));
@@ -52,16 +284,21 @@ class LoadingScreen
 		m_ImageLogoMid.Show(true);
 		m_ImageLogoCorner.Show(false);
 		
+		//m_ImageLoadingIcon.Show(true);
+		//m_ProgressText.Show(true);
+		
 		//m_ProgressBar = m_ProgressBarLarge;
 		//m_ProgressBar.SetCurrent(0);
 		//m_FrameWidgetSmall.Show( false );
-		m_ImageWidgetBackground.LoadImageFile( 0, GetRandomLoadingBackground() );
-		m_ImageWidgetBackground.Show( false );		
+		//m_ImageWidgetBackground.LoadImageFile( 0, GetRandomLoadingBackground() );
+		m_ImageWidgetBackground.Show( true );		
 		m_Counter = 0;
 				
 		// lighten up your desktop
 		game.GetBacklit().LoadingAnim();
-	
+		
+		ProgressAsync.SetProgressData(m_ProgressLoading);
+		ProgressAsync.SetUserData(m_ImageBackground);
 	}
 	
 	void OnTimer()
@@ -94,11 +331,28 @@ Print("Loading Inc: "+ m_Counter);
 	
 		if ( m_Counter <= 0 )
 		{
-			m_WidgetRoot.Show( false );
 			m_Counter = 0;
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call( g_Game.CheckDialogs );
+			
+			if ( m_Timer )
+			{
+				delete m_Timer;
 			}
+			
+			/*
+			m_Timer = new Timer();
+			m_Timer.Run(2, this,"EndLoading", NULL, false);
+			*/
+			EndLoading();
 		}
+	}
+	
+	void EndLoading()
+	{
+		ProgressAsync.SetProgressData(null);
+		ProgressAsync.SetUserData(null);
+		m_WidgetRoot.Show( false );
+		GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call( g_Game.CheckDialogs );
+	}
 	
 	bool IsLoading()
 	{
@@ -114,7 +368,7 @@ Print("Loading Inc: "+ m_Counter);
 	{
 		m_TextWidgetTitle.SetText( title );
 	}
-	
+	/*
 	void HideTitle()
 	{
 		m_TextWidgetTitle.Show(false);
@@ -124,25 +378,28 @@ Print("Loading Inc: "+ m_Counter);
 	{
 		m_TextWidgetTitle.Show(true);
 	}
+	*/
 	
-	void SetError( string error )
+	void SetStatus( string status )
 	{
-		Print("Received DB Error: " + error);
-		m_TextWidgetError.SetText( error );
+		m_TextWidgetStatus.SetText( status );
 	}
 	
 	void SetProgress( float val )
 	{
-		m_ProgressText.SetText("99%");
+		//m_ProgressText.SetText(val.ToString() + " %");
 		
 		float time_delta = m_DayZGame.GetTickTime() - m_LastProgressUpdate;
+		
+		//m_ProgressLoading.SetCurrent( val * 100 );
+		//m_ImageBackground.SetMaskProgress( val );
 		
 //Print("SetProgress delta: "+ time_delta);
 		
 		if ( m_Counter > 0 )
 		{
-			m_ImageLoadingIconRotation += 15;
-			m_ImageLoadingIcon.SetRotation(0, 0, m_ImageLoadingIconRotation);
+			//m_ImageLoadingIconRotation += 15;
+			//m_ImageLoadingIcon.SetRotation(0, 0, m_ImageLoadingIconRotation);
 			
 			//m_ProgressBar.SetCurrent( val * 100 );
 		}
@@ -157,22 +414,30 @@ Print("Loading Inc: "+ m_Counter);
 	
 	void Show()
 	{
+		Widget lIcon = m_ImageBackground;
+		Widget pText = m_ProgressLoading;
+		m_ProgressText.SetText("");
+		m_ProgressLoading.SetCurrent( 0.0 );
+		m_ImageBackground.SetMaskProgress( 0.0 );
+		
 		if ( !m_WidgetRoot.IsVisible() )
 		{
-			if ( g_Game.GetUIManager().IsDialogVisible() )
+			if ( m_DayZGame.GetUIManager().IsDialogVisible() )
 			{
-				g_Game.GetUIManager().HideDialog();
+				m_DayZGame.GetUIManager().HideDialog();
 			}
 			
-			if ( g_Game.GetMissionState() == DayZGame.MISSION_STATE_MAINMENU )
+			if ( m_DayZGame.GetMissionState() == DayZGame.MISSION_STATE_MAINMENU )
 			{
 				//m_ProgressBar = m_ProgressBarSmall;
 				m_ImageLogoMid.Show(false);
-				m_ImageLogoCorner.Show(true);				
+				m_ImageLogoCorner.Show(false);				
 				//m_FrameWidgetSmall.Show( true );
 				//m_FrameWidgetLarge.Show( false );
 				m_ImageWidgetBackground.Show( true );		
-				m_TextWidgetError.Show(true);
+				m_TextWidgetStatus.Show(true);
+				//lIcon = null;
+				//pText = null;
 			}
 			else
 			{
@@ -181,126 +446,41 @@ Print("Loading Inc: "+ m_Counter);
 				m_ImageLogoCorner.Show(false);
 				//m_FrameWidgetSmall.Show( false );
 				//m_FrameWidgetLarge.Show( true );
-				m_ImageWidgetBackground.Show( false );
-				m_TextWidgetError.Show(false);
+				m_ImageWidgetBackground.Show( true );
+				m_TextWidgetStatus.Show(false);
 			}
 			
 			m_WidgetRoot.Show( true );
 			//m_ProgressBar.SetCurrent( 0 );
 			m_TextWidgetTitle.SetText( "" );
-			m_TextWidgetError.SetText( "" );
+			m_TextWidgetStatus.SetText( "" );
 		}
+		
+		ProgressAsync.SetProgressData(pText);
+		ProgressAsync.SetUserData(lIcon);
 	}
 	
-	void Hide()
+	void Hide(bool force)
 	{
-		if ( m_Counter <= 0 && m_WidgetRoot.IsVisible() )
+		if (force)
+		{
+			while (m_Counter > 0)
+			{
+				Dec();
+			}
+		}
+
+		if ( m_Counter <= 0 /*&& m_WidgetRoot.IsVisible()*/ )
 		{
 			m_WidgetRoot.Show( false );
+			
+			//Print("***** m_WidgetRoot.Show false");
+			
+			ProgressAsync.SetUserData(null);
+			ProgressAsync.SetProgressData(null);
 		}
 	}
 };
-
-
-class LoginQueueMenu extends UIScriptedMenu
-{	
-	protected TextWidget m_messageText;
-	protected int m_iPosition; // position in login queue
-	protected ButtonWidget m_ButtonLeave;
-	 
-	void LoginQueueMenu()
-	{
-		g_Game.SetKeyboardHandle(this);
-	}
-
-	void ~LoginQueueMenu()
-	{
-		g_Game.SetKeyboardHandle(NULL);
-		
-		// enable creating next loginq queue dialog
-		g_Game.GetCallQueue(CALL_CATEGORY_GUI).Call(GetGame().GetUIManager().SetLoginQueueDialog, false);	
-	}
-	
-	override Widget Init()
-	{	
-		layoutRoot = GetGame().GetWorkspace().CreateWidgets("gui/layouts/dialog_queue_position.layout");
-		
-		m_messageText = TextWidget.Cast( layoutRoot.FindAnyWidget("MessageText") );
-		m_ButtonLeave = ButtonWidget.Cast( layoutRoot.FindAnyWidget("ButtonLeave") ); 
-
-		return layoutRoot;
-	}
-
-	void Show()
-	{
-		if (layoutRoot)
-			layoutRoot.Show(true);
-	}
-	
-	void Hide()
-	{
-		if (layoutRoot)
-			layoutRoot.Show(false);
-	}
-	
-	override void Update(float timeslice)
-	{
-		int pos = g_Game.GetUIManager().GetLoginQueuePosition();
-		if (pos != m_iPosition)
-		{
-			if (pos == 0)
-			{	
-				// show loading screen
-				g_Game.LoadProgressUpdate(PROGRESS_START, 0, "");	
-				Close();
-			}
-			else
-			{
-				m_messageText.SetText(pos.ToString());
-			}
-		}
-		
-		if ( GetGame().GetInput().LocalPress("UAUIBack",false) )
-		{
-			LeaveConnectQueue();
-		}
-	}
-	
-	override bool OnClick(Widget w, int x, int y, int button)
-	{
-		super.OnClick(w, x, y, button);
-		if ( w == m_ButtonLeave )
-		{
-			LeaveConnectQueue();
-			return true;
-		}
-
-		return false;
-	}
-	
-	void LeaveConnectQueue()
-	{
-#ifdef PLATFORM_CONSOLE
-		g_Game.SetGameState( DayZGameState.MAIN_MENU );
-		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
-#endif
-		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
-	}
-	
-	override bool OnKeyDown(Widget w, int x, int y, int key)
-	{
-		super.OnKeyDown( w, x, y, key);
-		
-		switch(key)
-		{
-			// TODO: just temporary until new inputs are done
-		case KeyCode.KC_ESCAPE:
-			LeaveConnectQueue();
-			return true;
-		}
-		return false;
-	}
-}
 
 class ConnectionLost
 {
@@ -434,6 +614,7 @@ enum DayZGameState
 	UNDEFINED,
 	MAIN_MENU,
 	JOIN,
+	PARTY,
 	CONNECT,
 	CONNECTING,
 	IN_GAME
@@ -448,8 +629,9 @@ enum DayZLoadState
 	JOIN_START,
 	JOIN_CONTROLLER_SELECT,
 	JOIN_USER_SELECT,
-	JOIN_SESSION_SELECT,
-	JOIN_ACTIVITY_SELECT,
+	PARTY_START,
+	PARTY_CONTROLLER_SELECT,
+	PARTY_USER_SELECT,
 	CONNECT_START,
 	CONNECT_USER_SELECT,
 	CONNECT_CONTROLLER_SELECT,
@@ -466,11 +648,18 @@ class DayZGame extends CGame
 	
 	private int m_MissionState;
 	
-	protected DayZGameState	m_GameState;
-	protected DayZLoadState	m_LoadState;
-
+	//HK stuff
+	protected DayZGameState						m_GameState;
+	protected DayZLoadState						m_LoadState;
+	protected ref NotificationUI				m_Notifications;
+	protected bool								m_FirstConnect = true;
+	//End HK stuff
+	
 	ref LoadingScreen m_loading;
-	ref LoginQueueMenu m_loginQueue;
+	private ref LoginTimeBase m_LoginTimeScreen;
+	private ref LoginQueueBase m_LoginQueue;
+	private int m_LoginTime;
+	
 	private ref ConnectionLost m_connectionLost;
 	private ref TimerQueue m_timerQueue[CALL_CATEGORY_COUNT];
 	private ref ScriptCallQueue m_callQueue[CALL_CATEGORY_COUNT];
@@ -487,12 +676,11 @@ class DayZGame extends CGame
 	private bool	m_IsLeftAltHolding;
 	private bool	m_IsRightAltHolding;
 	
-	private int 	m_queueTime;
-	bool			m_IsPlayerSpawning;
 	private bool	m_IsStressTest;
 	int 			m_OriginalCharactersCount;
 	private string 	m_PlayerName;
 	private bool 	m_IsNewCharacter;
+	private bool 	m_IsConnecting;
 	
 	private float	m_UserFOV;
 	float 	m_volume_sound;
@@ -531,7 +719,7 @@ class DayZGame extends CGame
 		
 		m_dragQueue = new DragQueue;
 		
-		m_queueTime 		= 0;	
+		m_LoginTime 		 = 0;
 		
 		string tmp;
 		if ( CommandlineGetParam("stresstest", tmp) )
@@ -549,8 +737,12 @@ class DayZGame extends CGame
 		m_Backlit = new Backlit();
 		m_Backlit.OnInit(this);
 		
-	#ifndef NO_GUI	
-		m_loading = new LoadingScreen(this);
+	#ifndef NO_GUI
+		if (m_loading == null)
+		{
+			m_loading = new LoadingScreen(this);
+		}
+		
 		m_loading.Show();
 	#endif
 			
@@ -563,7 +755,7 @@ class DayZGame extends CGame
 		m_DayZProfileOptions = new DayZProfilesOptions;
 		GetCallQueue(CALL_CATEGORY_GUI).Call(DeferredInit);
 		//m_isTileSet = true;
-		
+		m_IsConnecting = false;
 	}
 	
 	// ------------------------------------------------------------
@@ -574,22 +766,17 @@ class DayZGame extends CGame
 		Print("~DayZGame()");
 	}
 	
-	bool IsPlayerSpawning()
-	{
-		return m_IsPlayerSpawning;
-	}
-	
 	// ------------------------------------------------------------
 	void DeferredInit()
 	{
 		RegisterProfilesOptions();
 		m_UserFOV = GetUserFOVFromConfig();
 		
-		m_volume_sound = GetGame().GetSoundScene().GetSoundVolume();
-		m_volume_speechEX = GetGame().GetSoundScene().GetSpeechExVolume();
-		m_volume_music = GetGame().GetSoundScene().GetMusicVolume();
-		m_volume_VOIP = GetGame().GetSoundScene().GetVOIPVolume();
-		m_volume_radio = GetGame().GetSoundScene().GetRadioVolume();
+		m_volume_sound = GetSoundScene().GetSoundVolume();
+		m_volume_speechEX = GetSoundScene().GetSpeechExVolume();
+		m_volume_music = GetSoundScene().GetMusicVolume();
+		m_volume_VOIP = GetSoundScene().GetVOIPVolume();
+		m_volume_radio = GetSoundScene().GetRadioVolume();
 	}
 	
 	void RegisterProfilesOptions()
@@ -752,10 +939,39 @@ class DayZGame extends CGame
 	#endif
 	}
 	
-	// ------------------------------------------------------------
-	void CancelQueueTime()
+		// ------------------------------------------------------------
+	void CancelLoginQueue()
 	{
-		GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(this.ClientSpawning);
+		if (m_LoginQueue)
+		{
+			if (m_LoginQueue.IsStatic())
+			{
+				m_LoginQueue.Hide();
+				delete m_LoginQueue;
+			}
+			else
+			{
+				m_LoginQueue.Close();
+			}
+		}
+	}
+	// ------------------------------------------------------------
+	void CancelLoginTimeCountdown()
+	{
+		GetCallQueue(CALL_CATEGORY_SYSTEM).Remove(this.LoginTimeCountdown);
+		
+		if (m_LoginTimeScreen)
+		{
+			if (m_LoginTimeScreen.IsStatic())
+			{
+				m_LoginTimeScreen.Hide();
+				delete m_LoginTimeScreen;
+			}
+			else
+			{
+				m_LoginTimeScreen.Close();
+			}
+		}
 	}
 	
 	// ------------------------------------------------------------
@@ -768,50 +984,45 @@ class DayZGame extends CGame
 		switch(eventTypeId)
 		{
 		case StartupEventTypeID:
+		{
 			break;
-		
-		//-----------------------------------------------------------------------------
+		}
 		case MPSessionStartEventTypeID:
-			//LoadingShow();
+		{
+			m_FirstConnect = true;
+			ClientData.ResetClientData();
 			break;
-		
+		}
 		case MPSessionEndEventTypeID:
-			CancelQueueTime();
-#ifdef PLATFORM_CONSOLE
-			if( null != GetUserManager().GetSelectedUser() )
-			{
-				OnlineServices.LeaveGameplaySession();
-				OnlineServices.ClearCurrentServerInfo();
-				if ( GetGameState() == DayZGameState.IN_GAME )
+		{
+			LoadingHide();
+			CancelLoginTimeCountdown();
+			m_FirstConnect = true;
+			#ifdef PLATFORM_CONSOLE
+				if( GetUserManager().GetSelectedUser() )
 				{
-					SetGameState( DayZGameState.MAIN_MENU );
-					SetLoadState( DayZLoadState.MAIN_MENU_START );
+					OnlineServices.LeaveGameplaySession();
+					OnlineServices.ClearCurrentServerInfo();
+					if ( GetGameState() == DayZGameState.IN_GAME )
+					{
+						SetGameState( DayZGameState.MAIN_MENU );
+						SetLoadState( DayZLoadState.MAIN_MENU_START );
+					}
 				}
-			}
-#endif
+				m_Notifications.ClearVoiceNotifications();
+			#endif
 			
 			// analytics - disconnected player
 			ref StatsEventDisconnectedData discData = new StatsEventDisconnectedData();
 			discData.m_CharacterId = g_Game.GetDatabaseID();
 			discData.m_Reason = "quit";
-			ScriptAnalytics.PlayerDisconnected(discData);
-			
-			if( GetPlayer() )
-			{
-				GetPlayer().GetNetworkID( low, high );
-				Print( "NetID: " + high.ToString() + low.ToString() );
-			}
-			
-			#ifdef PLATFORM_PS4
-				//PSN Set multiplay state - NOT ACTIVE	
-				GetGame().SetMultiplayState( false );
-				//Print("=== PLATFORM_PS4 - SetMultiplayState NOT ACTIVE [MPSessionEndEventTypeID]");
-				//
-			#endif				
+			Analytics.PlayerDisconnected(discData);
 			break;
-		
+		}
 		case MPSessionFailEventTypeID:
-			LoadingHide();
+		{
+			LoadingHide(true);
+			ProgressAsync.DestroyAllPendingProgresses();
 			
 			if ( GetGameState() == DayZGameState.CONNECTING )
 			{
@@ -819,9 +1030,13 @@ class DayZGame extends CGame
 			}
 			
 			break;
-			
+		}
 		case MPSessionPlayerReadyEventTypeID:
-			LoadingHide();
+		{
+			LoadingHide(true);
+			ProgressAsync.DestroyAllPendingProgresses();
+			
+			SetGameState( DayZGameState.IN_GAME );
 
 			// fade out from the black screen
 			#ifndef NO_GUI
@@ -830,10 +1045,6 @@ class DayZGame extends CGame
 				GetUIManager().ScreenFadeOut(0.5);
 			}
 			#endif
-			if( GetGame().GetHostAddress( address, port ) )
-			{
-				AddVisitedServer( address, port );
-			}
 			
 			// analytics - spawned
 			ref StatsEventSpawnedData spawnData = new StatsEventSpawnedData();
@@ -846,96 +1057,161 @@ class DayZGame extends CGame
 			}
 			spawnData.m_DaytimeHour = 0;
 			spawnData.m_Population = 0;
-			ScriptAnalytics.PlayerSpawned(spawnData);
-
-			#ifdef PLATFORM_PS4
-				//PSN Set multiplay state - ACTIVE	
-				GetGame().SetMultiplayState( true );
-				//Print("=== PLATFORM_PS4 - SetMultiplayState ACTIVE [MPSessionPlayerReadyEventTypeID]");
-				//
+			Analytics.PlayerSpawned(spawnData);
+			
+			#ifdef PLATFORM_CONSOLE
+			m_Notifications.ClearVoiceNotifications();
+			OnlineServices.SetMultiplayState( true );
 			#endif
+			if( m_FirstConnect )
+			{
+				m_FirstConnect = false;
+				if( GetHostAddress( address, port ) )
+				{
+					AddVisitedServer( address, port );
+				}
+				
+				#ifdef PLATFORM_CONSOLE
+					#ifndef PLATFORM_WINDOWS // if app is not on Windows with -XBOX parameter
+						if( null != GetUserManager().GetSelectedUser() )
+						{
+							OnlineServices.EnterGameplaySession();
+							OnlineServices.LoadVoicePrivilege();
+						}
+					#endif
+				#endif
+			}
 			
 			break;
-
-		//-----------------------------------------------------------------------------
+		}
 		case MPConnectionLostEventTypeID:
+		{
 			MPConnectionLostEventParams conLost_params;
 			if (Class.CastTo(conLost_params, params))
 			{
 				int duration = conLost_params.param1;
 				OnMPConnectionLostEvent(duration);
-			}
 			
-			#ifdef PLATFORM_PS4
+				#ifdef PLATFORM_PS4
 				//PSN Set multiplay state	
-				if ( duration < 0 )	
+				if ( duration < 0 && GetGameState() == DayZGameState.IN_GAME )
 				{
-					GetGame().SetMultiplayState( true );
+					OnlineServices.SetMultiplayState( true );
 					//Print("=== PLATFORM_PS4 - SetMultiplayState ACTIVE [MPConnectionLostEventTypeID]");
 				}
 				else
 				{
-					GetGame().SetMultiplayState( false );
+					OnlineServices.SetMultiplayState( false );
 					//Print("=== PLATFORM_PS4 - SetMultiplayState NOT ACTIVE [MPConnectionLostEventTypeID]");
 				}
-				//
-			#endif
-			
+				#endif
+			}
 			break;
-			
+		}
 		case WorldCleaupEventTypeID:
+		{
 			LoadingShow();
 			break;
-		
+		}
 		case DialogQueuedEventTypeID:
-			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(g_Game.CheckDialogs);
+		{
+			GetCallQueue(CALL_CATEGORY_SYSTEM).Call(g_Game.CheckDialogs);
 			break;
-	
+		}
 		case ChatMessageEventTypeID:
+		{
 			ChatMessageEventParams chat_params;
 			if (Class.CastTo(chat_params, params))
 			{
 				
 			}
 			break;
-	
+		}
 		case ProgressEventTypeID:
+		{
 			ProgressEventParams prog_params;
 			if (Class.CastTo(prog_params, params))
 				LoadProgressUpdate(prog_params.param1, prog_params.param2, prog_params.param3);
 			break;
-	
-		case ClientSpawningEventTypeID:
-			ClientSpawningEventParams spawningParams;
-			if (Class.CastTo(spawningParams, params))
+		}
+		case LoginTimeEventTypeID:
+		{
+			LoginTimeEventParams loginTimeParams;
+			if (Class.CastTo(loginTimeParams, params))
 			{
-				m_queueTime = spawningParams.param1;
-				OnClientSpawningEvent(m_queueTime, spawningParams.param2);
+				OnLoginTimeEvent(loginTimeParams.param1);
+			}
+			break;
+		}	
+		case PreloadEventTypeID:
+		{
+			PreloadEventParams preloadParams;
+			if (Class.CastTo(preloadParams, params))
+			{
+				OnPreloadEvent(preloadParams.param1);
 			}	
 			break;
+		}
 		case LogoutEventTypeID:
+		{
 			LogoutEventParams logoutParams;
 			if (Class.CastTo(logoutParams, params))
 			{
-				GetGame().GetCallQueue(CALL_CATEGORY_GUI).Call(GetGame().GetMission().StartLogoutMenu, logoutParams.param1);						
-			}	
-			break;
-		case DatabaseErrorEventTypeID:
-			DatabaseErrorEventParams databaseErrorParams;
-			Class.CastTo(databaseErrorParams, params);
-		
-			string error = databaseErrorParams.param1;
-			if (m_loading)
-			{
-				m_loading.HideTitle();
-				m_loading.SetError(error);
+				GetCallQueue(CALL_CATEGORY_GUI).Call( GetMission().StartLogoutMenu, logoutParams.param1 );						
 			}
 			break;
+		}
+		case LoginStatusEventTypeID:
+		{
+			LoginStatusEventParams loginStatusParams;
+			Class.CastTo(loginStatusParams, params);
+
+			string msg1 = loginStatusParams.param1;
+			string msg2 = loginStatusParams.param2;
+			string finalMsg;
+				
+			// write either to login time screen or loading screen
+			if (m_LoginTimeScreen)
+			{
+				finalMsg = msg1;
+				// login time screen supports two lines
+				if (msg2.Length() > 0)
+					finalMsg += "\n" + msg2;
+					
+				m_LoginTimeScreen.SetStatus(finalMsg);
+			}
+			else if (m_loading)
+			{
+				// loading only one line, but it's a long one
+				finalMsg = msg1 + " " + msg2;
+				m_loading.SetStatus(finalMsg);
+			}
+			break;
+		}
 		case ConnectingAbortEventTypeID:
+		{
 			g_Game.SetGameState(DayZGameState.MAIN_MENU);
 			break;
 		}
-	
+		case VONStartSpeakingEventTypeID:
+		{
+			VONStartSpeakingEventParams vonStartParams;
+			if (Class.CastTo(vonStartParams, params))
+			{
+				m_Notifications.AddVoiceNotification( vonStartParams.param2, vonStartParams.param1 );
+			}
+			break;
+		}
+		case VONStopSpeakingEventTypeID:
+		{
+			VONStopSpeakingEventParams vonStopParams;
+			if (Class.CastTo(vonStopParams, params))
+			{
+				m_Notifications.RemoveVoiceNotification( vonStopParams.param2 );
+			}
+			break;
+		}
+		}
 		Mission mission = GetMission();
 		if (mission)
 		{
@@ -943,81 +1219,98 @@ class DayZGame extends CGame
 		}
 	}
 	
-	// ------------------------------------------------------------
-	void OnClientSpawningEvent(int queueTime, bool newChar)
+	// ------------------------------------------------------------	
+	void UpdateLoginQueue(float timeslice)
 	{
-		/* NOTE: StoreLoginData must be called for game to continue !!! */
+		int pos = GetUIManager().GetLoginQueuePosition();
 		
-		// turn the lights off
-		SetEVValue(-5);
+		//! Display login queue position dialog
+		if (!m_LoginQueue && pos > 0)
+		{		
+			GetUIManager().CloseAll();
+			
+			if(GetMission())
+			{
+				UIScriptedMenu parent = GetUIManager().GetMenu();
+				EnterLoginQueue(parent);
+			}
+			else
+			{
+				//! Without cancel button
+				m_LoginQueue = new LoginQueueStatic();
+			}
+		}
+		if (m_LoginQueue)
+		{
+			m_LoginQueue.SetPosition(pos);
+		
+			//! manually update static login queue dialog
+			ref LoginQueueStatic loginQueue;
+			if (LoginQueueBase.CastTo(loginQueue, m_LoginQueue))
+			{
+				loginQueue.Update(timeslice);
+			}
+		}
+	}
+	
+	// ------------------------------------------------------------
+	void OnLoginTimeEvent(int loginTime)
+	{
+		// remove login queue if exits	
+		CancelLoginQueue();	
 		
 		// timer for spawning screen
-		GetGame().GetUserManager().GetUserDatabaseIdAsync();
+		GetUserManager().GetUserDatabaseIdAsync();
 		
-		if (queueTime > 0)
-		{
-			GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(this.ClientSpawning, 1000, true, newChar);
-		}
-		else
-		{
-			// no spawning screen needed
-			ClientSpawningFinished(newChar);
-		}
-	}
-	
-	// ------------------------------------------------------------
-	void ClientSpawning(bool newChar)
-	{
-		// countdown on the spawning screen
-		if (m_queueTime >= 0) // count all the way to zero
-		{
-		#ifndef NO_GUI	
-			string text = "#dayz_game_spawning_in" + " " + m_queueTime.ToString() + " " + "#dayz_game_seconds";
-			GetUIManager().ScreenFadeIn(0, text, FadeColors.BLACK, FadeColors.WHITE);
-		#endif
-			m_queueTime--;
-		}
-		else
-		{
-			// hide spawning text
-			CancelQueueTime();
-			ClientSpawningFinished(newChar);
-		}
-	}
-	
-	// ------------------------------------------------------------
-	void ClientSpawningFinished(bool newChar)
-	{		
-		// tell game to continue
-		StoreLoginData();
+		m_LoginTime = loginTime;
 		
-		//Toggles logo (loading screen)
-		Mission mission = GetMission();
-		
-		if ( mission && m_IsPlayerSpawning )
-		{
-			m_loading = new LoadingScreen(this);
-			m_loading.Show();
-			//m_loading.SetTitle("Loading...");
-			m_loading.SetTitle("#dayz_game_loading");
-			m_IsPlayerSpawning = false;
-			
-			#ifdef PLATFORM_CONSOLE
-				#ifndef PLATFORM_WINDOWS // if app is not on Windows with -XBOX parameter
-				if( null != GetUserManager().GetSelectedUser() )
+		// timer for login
+		if (m_LoginTime > 0)
+		{	
+			if (!m_LoginTimeScreen)
+			{
+				GetUIManager().CloseAll();
+				
+				if (GetMission())
 				{
-					SetGameState( DayZGameState.IN_GAME );
-					OnlineServices.EnterGameplaySession();
-					OnlineServices.LoadVoicePrivilege();
+					UIScriptedMenu parent = GetUIManager().GetMenu();
+					EnterLoginTime(parent);
 				}
-				#endif
-			#endif
+				else
+				{
+					//! Without cancel button
+					m_LoginTimeScreen = new LoginTimeStatic();
+				}
+			}
+			
+			m_LoginTimeScreen.SetTime(m_LoginTime);
+			m_LoginTimeScreen.Show();
+			
+			GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(this.LoginTimeCountdown, 1000, true);
+		}			
+	}
+	
+	// ------------------------------------------------------------
+	void LoginTimeCountdown()
+	{
+		// countdown on the login screen
+		if (m_LoginTimeScreen && m_LoginTime > 0)
+		{
+			m_LoginTimeScreen.SetTime(m_LoginTime);
+			m_LoginTime--;
 		}
 	}
 	
 	// ------------------------------------------------------------
-	// send additional information to server (must be called)
-	void StoreLoginData()
+	void OnPreloadEvent(vector pos)
+	{
+		// stop the call loop
+		CancelLoginTimeCountdown();
+	}
+	
+	// ------------------------------------------------------------
+	// send additional information about your character to the server
+ 	ref array<ref Param> GetLoginData(  )
 	{
 		int top = -1;
 		int bottom = -1;
@@ -1031,7 +1324,7 @@ class DayZGame extends CGame
 			shoes = demounit.Get(2);
 			skin = demounit.Get(3);
 		}
-		
+			
 		ref array<ref Param> params = new array<ref Param>;
 			
 		ref Param topParam = new Param1<int>(top);
@@ -1045,8 +1338,20 @@ class DayZGame extends CGame
 		
 		ref Param skinParam = new Param1<int>(skin);
 		params.Insert(skinParam);
-					
-		GetGame().StoreLoginData(params);
+		
+		return params;
+	}
+	
+	// ------------------------------------------------------------
+	void EnterLoginQueue(UIMenuPanel parent)
+	{			 	
+		m_LoginQueue = LoginQueueBase.Cast( GetUIManager().EnterScriptedMenu(MENU_LOGIN_QUEUE, parent) ); 		
+	}
+	
+	// ------------------------------------------------------------
+	void EnterLoginTime(UIMenuPanel parent)
+	{			 	
+		m_LoginTimeScreen = LoginTimeBase.Cast( GetUIManager().EnterScriptedMenu(MENU_LOGIN_TIME, parent) ); 		
 	}
 	
 	// ------------------------------------------------------------
@@ -1147,9 +1452,9 @@ class DayZGame extends CGame
 	{
 		ParticleList.PreloadParticles();
 		
-		
+		InitNotifications();
 		m_Visited = new TStringArray;
-		GetGame().GetProfileStringList( "SB_Visited", m_Visited );
+		GetProfileStringList( "SB_Visited", m_Visited );
 		
 		if( GetLoadState() == DayZLoadState.UNDEFINED )
 		{
@@ -1158,7 +1463,9 @@ class DayZGame extends CGame
 			if ( GetCLIParam("join", param) )
 			{
 				JoinLaunch();
+				#ifndef PLATFORM_PS4
 				CreateTitleScreen();
+				#endif
 			}
 			else if ( GetCLIParam("connect", param) )
 			{
@@ -1168,6 +1475,10 @@ class DayZGame extends CGame
 			{
 				MissionLaunch();
 			}
+			else if ( GetCLIParam("party", param) )
+			{
+				PartyLaunch();
+			}
 			else
 			{
 				MainMenuLaunch();
@@ -1175,6 +1486,12 @@ class DayZGame extends CGame
 			return true;
 		}
 		return false;
+	}
+	
+	void InitNotifications()
+	{
+		new NotificationSystem;
+		m_Notifications = new NotificationUI;
 	}
 	
 	protected ref Widget		m_IntroMenu;
@@ -1207,23 +1524,32 @@ class DayZGame extends CGame
 	void CreateTitleScreen()
 	{
 		DeleteTitleScreen();
-		m_IntroMenu = GetGame().GetWorkspace().CreateWidgets("gui/layouts/xbox/day_z_title_screen.layout");
+		m_IntroMenu = GetWorkspace().CreateWidgets("gui/layouts/xbox/day_z_title_screen.layout");
 		RichTextWidget text_widget = RichTextWidget.Cast( m_IntroMenu.FindAnyWidget("InputPromptText") );
 		if (text_widget)
 		{
 			#ifdef PLATFORM_XBOX
-				BiosUserManager user_manager = GetGame().GetUserManager();
+				BiosUserManager user_manager = GetUserManager();
 				if( user_manager )
 				{
 					if( user_manager.GetSelectedUser() )
-						text_widget.SetText("#dayz_game_press" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "#dayz_game_to_start");
+						text_widget.SetText( string.Format( "#console_start_game", "<image set=\"xbox_buttons\" name=\"A\" />" ) );
 					else
-						text_widget.SetText("#dayz_game_press" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "to log in");
+						text_widget.SetText( string.Format( "#console_log_in", "<image set=\"xbox_buttons\" name=\"A\" />" ) );
 				}
 			#endif
 					
 			#ifdef PLATFORM_PS4
-				text_widget.SetText("Press <image set=\"playstation_buttons\" name=\"cross\" /> to start the game");
+				string confirm = "cross";
+				if( GetInput().GetEnterButton() == GamepadButton.A )
+				{
+					confirm = "cross";
+				}
+				else
+				{
+					confirm = "circle";
+				}
+				text_widget.SetText( string.Format( "#console_start_game", "<image set=\"playstation_buttons\" name=\"" + confirm + "\" />" ) );
 			#endif
 		}
 	}
@@ -1240,16 +1566,29 @@ class DayZGame extends CGame
 	{
 		DeleteGamepadDisconnectMenu();
 		PPEffects.SetBlurMenu( 1 );
-		m_GamepadDisconnectMenu = GetGame().GetWorkspace().CreateWidgets("gui/layouts/xbox/day_z_gamepad_connect.layout");
+		m_GamepadDisconnectMenu = GetWorkspace().CreateWidgets("gui/layouts/xbox/day_z_gamepad_connect.layout");
 		RichTextWidget text_widget = RichTextWidget.Cast( m_GamepadDisconnectMenu.FindAnyWidget("Text") );
+		TextWidget caption_widget = TextWidget.Cast( m_GamepadDisconnectMenu.FindAnyWidget("Caption") );
 		if (text_widget)
 		{
+			string text = Widget.TranslateString( "#console_reconect" );
 			#ifdef PLATFORM_XBOX
-					text_widget.SetText("#dayz_game_reconnect" + "" + "<image set=\"xbox_buttons\" name=\"A\" />" + "" + "#dayz_game_to_continue");
+				text_widget.SetText( string.Format( text, "<image set=\"xbox_buttons\" name=\"A\" />" ) );
+				caption_widget.SetText("#STR_TitleScreenLayout_Caption0");
 			#endif
 					
 			#ifdef PLATFORM_PS4
-					text_widget.SetText("#dayz_game_reconnect" + "" + "<image set=\"playstation_buttons\" name=\"cross\" />" + "" + "#dayz_game_to_continue");
+				string confirm = "cross";
+				if( GetInput().GetEnterButton() == GamepadButton.A )
+				{
+					confirm = "cross";
+				}
+				else
+				{
+					confirm = "circle";
+				}
+				text_widget.SetText( string.Format( text, "<image set=\"playstation_buttons\" name=\"" + confirm + "\" />" ) );
+				caption_widget.SetText("#ps4_STR_TitleScreenLayout_Caption0");
 			#endif
 		}
 	}
@@ -1259,8 +1598,8 @@ class DayZGame extends CGame
 		PPEffects.SetBlurMenu( 0 );
 		if( m_GamepadDisconnectMenu )
 			delete m_GamepadDisconnectMenu;
-		if( GetGame().GetUIManager().IsDialogVisible() )
-			GetGame().GetUIManager().CloseDialog();
+		if( GetUIManager().IsDialogVisible() )
+			GetUIManager().CloseDialog();
 		
 	}
 	
@@ -1273,7 +1612,7 @@ class DayZGame extends CGame
 			string join_param;
 			if( GetCLIParam("join", join_param) )
 			{
-				BiosUserManager user_manager = GetGame().GetUserManager();
+				BiosUserManager user_manager = GetUserManager();
 				user_manager.ParseJoinAsync( join_param );
 			}
 		#endif
@@ -1281,7 +1620,7 @@ class DayZGame extends CGame
 	
 	void ConnectLaunch()
 	{
-		BiosUserManager user_manager = GetGame().GetUserManager();
+		BiosUserManager user_manager = GetUserManager();
 		if( user_manager.GetTitleInitiator() )
 		{
 			user_manager.SelectUser( user_manager.GetTitleInitiator() );
@@ -1300,6 +1639,20 @@ class DayZGame extends CGame
 		#endif
 	}
 	
+	void PartyLaunch()
+	{
+		SetGameState( DayZGameState.PARTY );
+		SetLoadState( DayZLoadState.PARTY_START );
+		BiosUserManager user_manager = GetGame().GetUserManager();
+		
+		string param;
+		if ( GetCLIParam("party", param) )
+		{
+			user_manager.ParsePartyAsync( param );
+			StartRandomCutscene(GetMainMenuWorld());
+		}
+	}
+	
 	void MainMenuLaunch()
 	{
 		SetGameState( DayZGameState.MAIN_MENU );
@@ -1316,7 +1669,7 @@ class DayZGame extends CGame
 	
 	void MissionLaunch()
 	{
-		BiosUserManager user_manager = GetGame().GetUserManager();
+		BiosUserManager user_manager = GetUserManager();
 		if( user_manager )
 		{
 			if( user_manager.GetTitleInitiator() )
@@ -1342,14 +1695,34 @@ class DayZGame extends CGame
 	
 	void SelectUser( int gamepad = -1 )
 	{
-		BiosUserManager user_manager = GetGame().GetUserManager();
+		BiosUserManager user_manager = GetUserManager();
 		if( user_manager )
 		{
 			BiosUser selected_user;
 			if( gamepad > -1 )
 			{
-				GetGame().GetInput().GetGamepadUser( gamepad, selected_user );
-				user_manager.SelectUser( selected_user );
+				GetInput().GetGamepadUser( gamepad, selected_user );
+				#ifdef PLATFORM_PS4
+				if( selected_user && selected_user.IsOnline() )
+				#endif
+				{
+					GetGame().GetInput().IdentifyGamepad(GamepadButton.BUTTON_NONE);
+					GetInput().SelectActiveGamepad( gamepad );
+					user_manager.SelectUser( selected_user );
+				}
+				#ifdef PLATFORM_PS4
+				else if( selected_user )
+				{
+					user_manager.SelectUser( selected_user );
+					user_manager.LogOnUserAsync( selected_user ); 
+					return;
+				}
+				else
+				{
+					GetInput().ResetActiveGamepad();
+					GamepadCheck();
+				}
+				#endif
 			}
 			
 			if( !selected_user )
@@ -1360,6 +1733,14 @@ class DayZGame extends CGame
 				case DayZLoadState.JOIN_START:
 				{
 					SetLoadState( DayZLoadState.JOIN_USER_SELECT );
+					
+					OnlineServices.Init();
+					SelectGamepad();
+					return;
+				}
+				case DayZLoadState.PARTY_START:
+				{
+					SetLoadState( DayZLoadState.PARTY_USER_SELECT );
 					
 					OnlineServices.Init();
 					SelectGamepad();
@@ -1376,7 +1757,6 @@ class DayZGame extends CGame
 					SetLoadState( DayZLoadState.MAIN_MENU_USER_SELECT );
 					
 					OnlineServices.Init();
-					
 					SelectGamepad();
 					return;
 				}
@@ -1424,28 +1804,38 @@ class DayZGame extends CGame
 	
 	void GamepadCheck()
 	{
-		if( GetGame().GetInput().IsActiveGamepadSelected() )
+		if( GetInput().IsActiveGamepadSelected() )
 		{
 			DeleteTitleScreen();
 			SelectUser();
 		}
 		else
 		{
-			#ifdef PLATFORM_XBOX
+			#ifdef PLATFORM_CONSOLE
 			#ifndef PLATFORM_WINDOWS
-			if( !m_IntroMenu && !( GetGame().GetUIManager().GetMenu() && GetGame().GetUIManager().GetMenu().GetID() == MENU_TITLE_SCREEN ) )
-				CreateTitleScreen();
-			GetGame().GetInput().IdentifyGamepad( GamepadButton.A );
-			#endif
-			#endif
-			
 			#ifdef PLATFORM_PS4
-			BiosUserManager user_manager = GetGame().GetUserManager();
-			if( user_manager )
+			if( GetUserManager().GetSelectedUser() )
 			{
-				user_manager.SelectUser( user_manager.GetTitleInitiator() );
+				int gamepad = GetInput().GetUserGamepad( GetUserManager().GetSelectedUser() );
+				if (gamepad > -1)
+				{
+					SelectUser(gamepad);
+				}
+				else
+				{
+					if (!m_IntroMenu && !(GetGame().GetUIManager().GetMenu() && GetGame().GetUIManager().GetMenu().GetID() == MENU_TITLE_SCREEN))
+						CreateTitleScreen();
+					GetGame().GetInput().IdentifyGamepad(GetGame().GetInput().GetEnterButton());
+				}
 			}
-			g_Game.SelectUser();
+			else
+			#endif
+			{
+				if( !m_IntroMenu && !( GetUIManager().GetMenu() && GetUIManager().GetMenu().GetID() == MENU_TITLE_SCREEN ) )
+					CreateTitleScreen();
+				GetInput().IdentifyGamepad( GetInput().GetEnterButton() );
+			}
+			#endif
 			#endif
 		}
 	}
@@ -1453,17 +1843,18 @@ class DayZGame extends CGame
 	void SelectGamepad()
 	{
 		m_DayZProfileOptions.ResetOptions();
-		BiosUserManager user_manager = GetGame().GetUserManager();
+		BiosUserManager user_manager = GetUserManager();
 		
 		if( user_manager )
 		{
 			BiosUser selected_user = user_manager.GetSelectedUser();
 			if( selected_user )
 			{
+				OnlineServices.SetBiosUser(selected_user);
 				SetPlayerName( selected_user.GetName() );
 				#ifdef PLATFORM_CONSOLE
 				SetPlayerGameName( selected_user.GetName() );
-				GetGame().GetUserManager().GetUserDatabaseIdAsync();
+				user_manager.GetUserDatabaseIdAsync();
 				#endif
 			}
 			
@@ -1481,6 +1872,13 @@ class DayZGame extends CGame
 				OnlineServices.LoadMPPrivilege();
 				break;
 			}
+			case DayZLoadState.PARTY_USER_SELECT:
+			{
+				SetLoadState(DayZLoadState.PARTY_CONTROLLER_SELECT);
+				DeleteTitleScreen();
+				GetUIManager().EnterScriptedMenu(MENU_SERVER_BROWSER, GetUIManager().GetMenu());
+				break;
+			}
 			case DayZLoadState.CONNECT_USER_SELECT:
 			{
 				SetLoadState(DayZLoadState.CONNECT_CONTROLLER_SELECT );
@@ -1491,7 +1889,7 @@ class DayZGame extends CGame
 			{
 				SetLoadState( DayZLoadState.MAIN_MENU_CONTROLLER_SELECT );
 				DeleteTitleScreen();
-				GetGame().GetUIManager().EnterScriptedMenu( MENU_MAIN, GetGame().GetUIManager().GetMenu() );
+				GetUIManager().EnterScriptedMenu( MENU_MAIN, GetUIManager().GetMenu() );
 				break;
 			}
 			case DayZLoadState.MISSION_USER_SELECT:
@@ -1508,30 +1906,34 @@ class DayZGame extends CGame
 	
 	void TryConnect()
 	{
-		switch( GetLoadState() )
+		if( GetGameState() != DayZGameState.CONNECTING )
 		{
-			case DayZLoadState.JOIN_CONTROLLER_SELECT:
+			switch( GetLoadState() )
 			{
-				SetGameState( DayZGameState.CONNECTING );
-				OnlineServices.GetSession();
-				break;
-			}
-			case DayZLoadState.CONNECT_CONTROLLER_SELECT:
-			{
-				SetGameState( DayZGameState.CONNECTING );
-				ConnectFromCLI();
-				break;
-			}
-			#ifdef PLATFORM_PS4
-			// HACK(kroslakmar): PS4 seems to be in wrong state when selecting server to connect
-			// to in server browser.
-			case DayZLoadState.MAIN_MENU_START:
-			#endif
-			case DayZLoadState.MAIN_MENU_CONTROLLER_SELECT:
-			{
-				SetGameState( DayZGameState.CONNECTING );
-				Connect();
-				break;
+				case DayZLoadState.JOIN_CONTROLLER_SELECT:
+				{
+					SetGameState( DayZGameState.CONNECTING );
+					OnlineServices.GetSession();
+					break;
+				}
+				case DayZLoadState.CONNECT_CONTROLLER_SELECT:
+				{
+					SetGameState( DayZGameState.CONNECTING );
+					ConnectFromCLI();
+					break;
+				}
+				case DayZLoadState.PARTY_CONTROLLER_SELECT:
+				{
+					SetGameState( DayZGameState.CONNECTING );
+					Connect();
+					break;
+				}
+				case DayZLoadState.MAIN_MENU_CONTROLLER_SELECT:
+				{
+					SetGameState( DayZGameState.CONNECTING );
+					Connect();
+					break;
+				}
 			}
 		}
 	}
@@ -1575,8 +1977,8 @@ class DayZGame extends CGame
 					m_Visited.Insert( uid );
 				}
 			}
-			GetGame().SetProfileStringList( "SB_Visited", m_Visited );
-			GetGame().SaveProfile();
+			SetProfileStringList( "SB_Visited", m_Visited );
+			SaveProfile();
 		}
 	}
 	
@@ -1594,18 +1996,48 @@ class DayZGame extends CGame
 	
 	void Connect()
 	{
+		SetConnecting(true);
+		
 		DeleteTitleScreen();
 		string addr;
 		int port;
-		if( GetGame().GetHostAddress( addr, port ) )
+		if( GetHostAddress( addr, port ) )
 		{
 			if( m_ConnectAddress == addr && m_ConnectPort == port )
 				return;
 		}
-		bool test = Connect( GetGame().GetUIManager().GetMenu(), m_ConnectAddress, m_ConnectPort, m_ConnectPassword );
-		if( test )
+		
+		int res = Connect( GetUIManager().GetMenu(), m_ConnectAddress, m_ConnectPort, m_ConnectPassword );
+		if( !res )
 		{
-			OnlineServices.GetCurrentServerInfo( m_ConnectAddress, m_ConnectPort );
+			if( OnlineServices.GetBiosUser() )
+				GetGame().GetUserManager().SelectUser( OnlineServices.GetBiosUser() );
+			if( g_Game.GetGameState() != DayZGameState.IN_GAME )
+			{
+				if( GetGame().GetMission() )
+				{
+					if( g_Game.GetGameState() != DayZGameState.MAIN_MENU )
+					{
+					//	GetGame().GetUIManager().CloseAllSubmenus();
+						GetGame().GetMission().AbortMission();
+						if (g_Game.GetGameState() == DayZGameState.JOIN)
+							NotificationSystem.AddNotification(NotificationType.JOIN_FAIL_GET_SESSION, 6);
+						g_Game.SetGameState( DayZGameState.MAIN_MENU );
+						g_Game.SetLoadState( DayZLoadState.MAIN_MENU_CONTROLLER_SELECT );
+					
+						g_Game.GamepadCheck();
+						return;
+					}
+				}
+				else
+				{
+					g_Game.MainMenuLaunch();
+				}
+			}
+			if( g_Game.GetGameState() == DayZGameState.JOIN )
+				NotificationSystem.AddNotification( NotificationType.JOIN_FAIL_GET_SESSION, 6 );
+			else
+				NotificationSystem.AddNotification( NotificationType.CONNECT_FAIL_GENERIC, 6 );
 		}
 	}
 	
@@ -1759,9 +2191,16 @@ class DayZGame extends CGame
 		GetTimerQueue(CALL_CATEGORY_SYSTEM).Tick(timeslice);
 	
 	#ifndef NO_GUI	
+		if (m_IsConnecting)
+			UpdateLoginQueue(timeslice);
+		
 		if (m_loading && m_loading.IsLoading())
 		{
 			m_loading.OnUpdate(timeslice);
+		}
+		else if (m_LoginTimeScreen && m_LoginTimeScreen.IsStatic())
+		{
+			m_LoginTimeScreen.Update(timeslice);
 		}
 		else
 		{
@@ -1769,6 +2208,12 @@ class DayZGame extends CGame
 			GetUpdateQueue(CALL_CATEGORY_GUI).Invoke(timeslice);
 			GetTimerQueue(CALL_CATEGORY_GUI).Tick(timeslice);
 			GetDragQueue().Tick();
+		}
+		
+		NotificationSystem.Update( timeslice );
+		if( m_Notifications )
+		{
+			m_Notifications.Update( timeslice );
 		}
 	#endif
 	
@@ -1793,6 +2238,36 @@ class DayZGame extends CGame
 		}
 		else
 		{
+			switch( rpc_type )
+			{
+				case ERPCs.RPC_SEND_NOTIFICATION:
+				{
+					NotificationType type;
+					float show_time;
+					string detail_text;
+					
+					ctx.Read(type);
+					ctx.Read(show_time);
+					ctx.Read(detail_text);
+					
+					NotificationSystem.AddNotification( type, show_time, detail_text );
+					break;
+				}
+				case ERPCs.RPC_SEND_NOTIFICATION_EXTENDED:
+				{
+					float show_time_ext;
+					string title_text_ext;
+					string detail_text_ext;
+					string icon_ext;
+					
+					ctx.Read(show_time_ext);
+					ctx.Read(title_text_ext);
+					ctx.Read(detail_text_ext);
+					ctx.Read(icon_ext);
+					
+					NotificationSystem.AddNotificationExtended( show_time_ext, title_text_ext, detail_text_ext, icon_ext );
+				}
+			}
 			// global rpc's handling
 		}
 	}
@@ -1810,10 +2285,16 @@ class DayZGame extends CGame
 		#endif
 	}
 	
-	/*bool IsConnecting()
+	//! Returns true when connecting to server
+	void SetConnecting(bool value)
+	{
+		m_IsConnecting = value;
+	}
+	
+	bool IsConnecting()
 	{
 		return m_IsConnecting;
-	}*/
+	}
 	
 	// ------------------------------------------------------------
 	bool IsLoading()
@@ -1841,27 +2322,29 @@ class DayZGame extends CGame
 	}
 	
 	// ------------------------------------------------------------
-	void LoadingHide()
+	void LoadingHide(bool force = false)
 	{
-		#ifndef NO_GUI	
-			m_loading.Hide();
+		#ifndef NO_GUI
+			m_loading.Hide(force);
 			// turn the lights back on
 			SetEVValue(0);
-			
+			#ifdef PLATFORM_CONSOLE
+			if( !GetInput().IsActiveGamepadSelected() )
+			{
+				if( !IsLoading() )
+				{
+					if( m_LoadState != DayZLoadState.MAIN_MENU_START && m_LoadState != DayZLoadState.MAIN_MENU_USER_SELECT )
+					{
+						CreateGamepadDisconnectMenu();
+					}
+					
+					#ifdef PLATFORM_XBOX
+					GetInput().IdentifyGamepad( GetInput().GetEnterButton() );
+					#endif
+				}
+			}
+			#endif
 		#endif
-	}
-	
-	// ------------------------------------------------------------
-    void EnterLoginQueue(UIMenuPanel parent)
-	{			
-		if (parent)
-		{
-			// hide loading screen
-			LoadProgressUpdate(PROGRESS_FINISH, 0, "");
-			
-			// create login queue screen
-			m_loginQueue = LoginQueueMenu.Cast( GetUIManager().EnterScriptedMenu(MENU_LOGIN_QUEUE, parent) ); 			
-		}
 	}
 
 	// ------------------------------------------------------------
@@ -1869,14 +2352,14 @@ class DayZGame extends CGame
 	{				
 		string path = "cfgVehicles";
 		string child_name = ""; 
-		int count = GetGame().ConfigGetChildrenCount ( path );
+		int count = ConfigGetChildrenCount ( path );
 		//array<string> char_class_names = new array<string>;
 		
 		for (int p = 0; p < count; p++)
 		{
-			GetGame().ConfigGetChildName ( path, p, child_name );
+			ConfigGetChildName ( path, p, child_name );
 			
-			if (GetGame().ConfigGetInt(path + " " + child_name + " scope") == 2 && GetGame().IsKindOf(child_name,"SurvivorBase"))
+			if (ConfigGetInt(path + " " + child_name + " scope") == 2 && IsKindOf(child_name,"SurvivorBase"))
 			{
 				//char_class_names.Insert(child_name);
 				return child_name;
@@ -1891,14 +2374,14 @@ class DayZGame extends CGame
 	{
 		string path = "cfgVehicles";
 		string child_name = "";
-		int count = GetGame().ConfigGetChildrenCount ( path );
+		int count = ConfigGetChildrenCount ( path );
 		array<string> char_class_names = new array<string>;
 		
 		for (int p = 0; p < count; p++)
 		{
-			GetGame().ConfigGetChildName ( path, p, child_name );
+			ConfigGetChildName ( path, p, child_name );
 			
-			if (GetGame().ConfigGetInt(path + " " + child_name + " scope") == 2 && GetGame().IsKindOf(child_name,"SurvivorBase"))
+			if(ConfigGetInt(path + " " + child_name + " scope") == 2 && IsKindOf(child_name,"SurvivorBase"))
 			{
 				char_class_names.Insert(child_name);
 			}
@@ -1911,14 +2394,14 @@ class DayZGame extends CGame
 	{
 		string path = "cfgVehicles";
 		string child_name = "";
-		int count = GetGame().ConfigGetChildrenCount ( path );
+		int count = ConfigGetChildrenCount ( path );
 		array<string> char_class_names = new array<string>;
 		
 		for (int p = 0; p < count; p++)
 		{
-			GetGame().ConfigGetChildName ( path, p, child_name );
+			ConfigGetChildName ( path, p, child_name );
 			
-			if (GetGame().ConfigGetInt(path + " " + child_name + " scope") == 2 && GetGame().IsKindOf(child_name,"SurvivorBase"))
+			if (ConfigGetInt(path + " " + child_name + " scope") == 2 && IsKindOf(child_name,"SurvivorBase"))
 			{
 				char_class_names.Insert(child_name);
 			}
@@ -1940,6 +2423,13 @@ class DayZGame extends CGame
 	void ExplosionEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
 		float energyFactor, float explosionFactor, bool isWater, string ammoType)
 	{
+		if( !IsServer() || !IsMultiplayer() )
+		{
+			if( source )
+			{
+				source.OnExplosionEffects(source, directHit, componentIndex, surface, pos, surfNormal, energyFactor, explosionFactor, isWater, ammoType);
+			}
+		}
 		/*
 		Print("ExplosionEffects");
 		Print("##################################");
@@ -1954,7 +2444,7 @@ class DayZGame extends CGame
 		Print(ammoType);
 		*/
 		/*
-		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
+		if ( !IsServer() || !IsMultiplayer() )
 		{
 			if ( directHit  &&  !directHit.IsInherited(Man)  &&  !directHit.IsInherited(DayZCreature) )
 			{
@@ -1976,32 +2466,42 @@ class DayZGame extends CGame
 			}
 		}
 		*/
+
+		// add explosion noise
+		if( IsServer() )
+		{
+			ref NoiseParams npar = new NoiseParams();
+			npar.LoadFromPath("cfgAmmo " + ammoType + " NoiseExplosion");
+			
+			float surfaceCoef = SurfaceGetNoiseMultiplier(pos[0], pos[2]);
+			GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
+		}
 	}
 	
 	// ------------------------------------------------------------
 	void FirearmEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
 		 vector exitPos, vector inSpeed, vector outSpeed, bool isWater, bool deflected, string ammoType) 
 	{
-		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
+		if ( !IsServer() || !IsMultiplayer() )
 		{
 			// if local player was hit
-			Object player = GetGame().GetPlayer();
+			Object player = GetPlayer();
 			if (directHit && player && directHit == player)
 			{
-				player.SpawnDamageDealtEffect();
+				player.OnPlayerRecievedHit();
 			}
 			
 			ImpactMaterials.EvaluateImpactEffect(directHit, componentIndex, surface, pos, ImpactTypes.UNKNOWN, surfNormal, exitPos, inSpeed, outSpeed, deflected, ammoType, isWater);
 		}	
 		
 		// add hit noise
-		if ( GetGame().IsServer() )
+		if ( IsServer() )
 		{
 			ref NoiseParams npar = new NoiseParams();
 			npar.LoadFromPath("cfgAmmo " + ammoType + " NoiseHit");
 			
-			float surfaceCoef = GetGame().SurfaceGetNoiseMultiplier(pos[0], pos[2]);
-			GetGame().GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
+			float surfaceCoef = SurfaceGetNoiseMultiplier(pos[0], pos[2]);
+			GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
 		}
 	}
 	
@@ -2009,10 +2509,10 @@ class DayZGame extends CGame
 	void CloseCombatEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal,
 		 bool isWater, string ammoType) 
 	{
-		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() )
+		if ( !IsServer()  ||  !IsMultiplayer() )
 		{
 			// if local player was hit
-			Object player = GetGame().GetPlayer();
+			Object player = GetPlayer();
 			if (directHit && player && directHit == player)
 			{
 				player.SpawnDamageDealtEffect();
@@ -2022,13 +2522,13 @@ class DayZGame extends CGame
 		}
 		
 		// add hit noise
-		if ( GetGame().IsServer() )
+		if ( IsServer() )
 		{
 			ref NoiseParams npar = new NoiseParams();
 			npar.LoadFromPath("cfgAmmo " + ammoType + " NoiseHit");
 			
-			float surfaceCoef = GetGame().SurfaceGetNoiseMultiplier(pos[0], pos[2]);
-			GetGame().GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
+			float surfaceCoef = SurfaceGetNoiseMultiplier(pos[0], pos[2]);
+			GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
 		}
 	}
 	

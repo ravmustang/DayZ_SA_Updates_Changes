@@ -14,18 +14,27 @@ class CGame
 
 	private ref array<ref Param> m_ParamCache;
 	
+	//analytics	
+	ref AnalyticsManagerServer 	m_AnalyticsManagerServer;
+	ref AnalyticsManagerClient 	m_AnalyticsManagerClient;	
+	
 	void CGame()
 	{
 		m_ParamCache = new array<ref Param>;
 		m_ParamCache.Insert(NULL);
 		
+		//analytics
+		m_AnalyticsManagerServer = new AnalyticsManagerServer;
+		m_AnalyticsManagerClient = new AnalyticsManagerClient;
+		
 		// actual script version - increase by one when you make changes
-		StorageVersion(103);
+		StorageVersion(106);
 	}
 	
 	private void ~CGame();
 	
 	proto native WorkspaceWidget GetWorkspace();
+	proto native WorkspaceWidget GetLoadingWorkspace();
 	
 	//! 
 	/**
@@ -475,6 +484,8 @@ class CGame
 
 	proto native void		ConfigGetFullPath(string path, out TStringArray full_path);
 	proto native void		ConfigGetObjectFullPath(Object obj, out TStringArray full_path);
+	
+	proto native void		GetModInfos(notnull out array<ref ModInfo> modArray);
 
 /**
 \brief Converts array of strings into single string.
@@ -663,10 +674,7 @@ class CGame
 	proto native vector		GetScreenPos(vector world_pos);
 	//! Transforms position in world to position in screen in percentage (0.0 - 1.0) as x, y component of vector, z parameter represents distance between camera and world_pos
 	proto native vector		GetScreenPosRelative(vector world_pos);
-	
-	//! Stores login userdata as parameters which are sent to server	
-	proto native void		StoreLoginData(notnull array<ref Param> params);
-		
+			
 	//! Return singleton of MenuData class - at main menu contains characters played with current profile.
 	proto native MenuData	GetMenuData();
 	/**
@@ -744,6 +752,12 @@ class CGame
 	*/
 	proto native void		MutePlayer(string sourceVoice, string targetVoice, bool mute);
 	
+	/**
+	 \brief Mute all players for listenerId
+	@param listenerId uid of player
+	@param mute true, if player can not listen anybody. Otherwise false.
+	*/
+	proto native void		MuteAllPlayers(string listenerId, bool mute);
 	
 	/**
 	 \brief Enable/disable VoN for target player
@@ -1032,6 +1046,13 @@ class CGame
 	*/
 	proto native void 	OverrideInventoryLights(vector diffuse, vector ambient, vector ground, vector dir);
 
+	/*!
+	set night vission parameters (set to zero when to disable it) 
+	\param lightIntensityMul	multiplicator of lights intensity
+	\param noiseIntensity		intensity of noise PP
+	*/
+	proto native void 	NightVissionLightParams(float lightIntensityMul, float noiseIntensity);
+
 
 	proto native void OpenURL(string url);
 	
@@ -1052,7 +1073,7 @@ class CGame
 		after server restarts, all data related to this function are deleted
 		when server initialization is done.
 	*/
-	proto native EntityAI GetEntityByPersitentID( int low, int high );
+	proto native EntityAI GetEntityByPersitentID( int b1, int b2, int b3, int b4 );
 
 //-----------------------------------------------------------------------------
 
@@ -1226,17 +1247,14 @@ class CGame
 		return false;
 	}
 	
-	//! Set multiplay state (PSN)
-	void SetMultiplayState( bool state )
+	//Analytics Manager
+	AnalyticsManagerServer GetAnalyticsServer()
 	{
-		BiosUserManager user_manager = GetGame().GetUserManager();
-		if( user_manager )
-		{
-			BiosUser user = user_manager.GetSelectedUser();
-			if ( user )
-			{
-				user.GetClientServices().GetSessionService().SetMultiplayState( state );
-			}
-		}		
-	}	
+		return m_AnalyticsManagerServer;
+	}
+	
+	AnalyticsManagerClient GetAnalyticsClient()
+	{
+		return m_AnalyticsManagerClient;
+	}		
 };

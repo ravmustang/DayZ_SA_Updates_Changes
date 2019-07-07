@@ -6,6 +6,11 @@ void hndDebugSpam (string s)
 {
 	//Print("" + s); // comment/uncomment to hide/see debug spam
 }
+void hndDebugSpamALot (string s)
+{
+	//Print("" + s); // comment/uncomment to hide/see debug spam
+}
+
 
 
 typedef FSMTransition<HandStateBase, HandEventBase, HandActionBase, HandGuardBase> HandTransition;

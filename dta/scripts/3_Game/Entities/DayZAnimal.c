@@ -5,6 +5,10 @@ class DayZCreature extends EntityAI
 	#endif
 	
 	proto native bool RegisterAnimationEvent(string event_name, string function_name);
+	
+	proto native void SetAnimationInstanceByName(string animation_instance_name, int instance_uuid, float duration);
+	proto native int GetCurrentAnimationInstanceUUID();
+	
 	proto native void UpdateSimulationPrecision(int simLOD);
 	
 	override bool IsDayZCreature()
@@ -27,7 +31,7 @@ class DayZCreatureAI extends DayZCreature
 	proto native void DebugDisableAIControl();
 	proto native void DebugRestoreAIControl();
 #endif
-	proto native void AddDamageSphere(string bone_name, string ammo_name, float radius, float duration);
+	proto native void AddDamageSphere(string bone_name, string ammo_name, float radius, float duration, bool invertTeams);
 	
 	proto native DayZCreatureAIType GetCreatureAIType();
 	/*!
@@ -44,7 +48,7 @@ class DayZCreatureAI extends DayZCreature
 	
 	void AddDamageSphere(AnimDamageParams damage_params)
 	{ 
-		AddDamageSphere(damage_params.m_sBoneName, damage_params.m_sAmmoName, damage_params.m_fRadius, damage_params.m_fDuration); 
+		AddDamageSphere(damage_params.m_sBoneName, damage_params.m_sAmmoName, damage_params.m_fRadius, damage_params.m_fDuration, damage_params.m_bInvertTeams); 
 	}
 	
 	override void EEKilled(Object killer)
@@ -383,7 +387,7 @@ class DayZAnimal extends DayZCreatureAI
 		
 		int type = 0;
 		int direction = 0;
-		if (ComputeDamageHitParams(source, dmgZone, type, direction) == true)
+		if (ComputeDamageHitParams(source, dmgZone, ammo, type, direction) == true)
 		{
 			QueueDamageHit(type, direction);
 		}
@@ -397,7 +401,7 @@ class DayZAnimal extends DayZCreatureAI
 		m_DamageHitDirection = direction;
 	}
 	
-	bool ComputeDamageHitParams(EntityAI source, string dmgZone, out int type, out int direction)
+	bool ComputeDamageHitParams(EntityAI source, string dmgZone, string ammo, out int type, out int direction)
 	{
 		type = 0; // not used right now
 		
@@ -493,30 +497,29 @@ class DayZAnimal extends DayZCreatureAI
 	vector m_TransportHitVelocity;
 	
 	void RegisterTransportHit(Transport transport)
-	{	
+	{
 		if( !m_TransportHitRegistered )
 		{	
 			m_TransportHitRegistered = true; 
 			m_TransportHitVelocity = GetVelocity(transport);
-			
-			// compute impulse
-			if (m_TransportHitVelocity.Length() > 0.3)
-			{
-				vector impulse = 40 * m_TransportHitVelocity;
-				impulse[1] = 40 * 1.5;
-				//Print("Impulse: " + impulse.ToString());
-				dBodyApplyImpulse(this, impulse);
-			}
-			
+		
 			// avoid damage because of small movements
-			if (m_TransportHitVelocity.Length() > 1.5)
+			if (m_TransportHitVelocity.Length() > 0.1)
 			{
-				float damage = 15 * m_TransportHitVelocity.Length();
+				float damage = m_TransportHitVelocity.Length();
 				//Print("Transport damage: " + damage.ToString() + " velocity: " +  m_TransportHitVelocity.Length().ToString());
 				ProcessDirectDamage( 3, transport, "", "TransportHit", "0 0 0", damage );
 			}
 			else
-				m_TransportHitRegistered = false; // EEHitBy is not called if no damage
+				m_TransportHitRegistered = false; // EEHitBy is not called if no damage	
+			
+			// compute impulse and apply only if the body dies
+			if (IsDamageDestroyed() && m_TransportHitVelocity.Length() > 0.3)
+			{
+				vector impulse = 40 * m_TransportHitVelocity;
+				impulse[1] = 40 * 1.5;
+				dBodyApplyImpulse(this, impulse);
+			}
 		}
 	}
 

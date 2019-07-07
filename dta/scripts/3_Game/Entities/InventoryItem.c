@@ -5,9 +5,11 @@ class InventoryItem extends EntityAI
 	//! Some inventoryItem devices can be switched on/off (radios, transmitters)
 	proto native void SwitchOn(bool onOff);
 	//! Some inventoryItem devices can be switched on/off (radios, transmitters)
-	proto native bool	IsOn();	
+	proto native bool IsOn();	
 	
 	proto native MeleeCombatData GetMeleeCombatData();	
+	
+	proto native void ThrowPhysically(DayZPlayer player, vector force);
 	
 	void OnRightClick()
 	{

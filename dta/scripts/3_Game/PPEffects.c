@@ -2,10 +2,6 @@ class PPEffects
 {
 	// COLORIZE IDs
 	static const int COLORIZE_NV = 100;
-
-	// FILGRAIN IDs
-	static const int FILMGRAIN_NV = 100;
-	static const int FILMGRAIN_NIGHT = 200;
 	
 	//-------------------------------------------------------
 	// BLUR START
@@ -15,6 +11,7 @@ class PPEffects
 	static int		m_BlurFever;
 	static int 		m_BlurMenu;
 	static int 		m_BlurOptics;
+	static int 		m_BlurFlashbang;
 	
 	static int	 	m_BurlapBlindness;
 	static int 		m_DyingEffect;
@@ -25,7 +22,6 @@ class PPEffects
 	static ref map<int, ref array<float>> m_ColorValues;
 	static ref array<float> m_ColorEffect;
 	static ref map<int, ref array<float>> m_ColorizeEffects;
-	static ref map<int, ref array<float>> m_FilmgrainEffects;
 	
 	static float m_UnconsciousVignetteColor[4];
 	static float m_UnconsciousVignetteIntesity;
@@ -37,6 +33,7 @@ class PPEffects
 	
 	static void Init()
 	{
+		//Print("---Init PPEffects---");
 		if ( m_BlurValues )
 		{
 			delete m_BlurValues;
@@ -51,6 +48,7 @@ class PPEffects
 		m_BlurFever			= RegisterBlurEffect();
 		m_BlurMenu			= RegisterBlurEffect();
 		m_BlurOptics 		= RegisterBlurEffect();
+		m_BlurFlashbang		= RegisterBlurEffect();
 		
 		if ( m_ColorEffect )
 		{
@@ -66,18 +64,12 @@ class PPEffects
 		
 		// ------------------------NV-related stuff below------------------------
 		ref array<float> colorizeDefault = {0.0, 0.0, 0.0};
-		ref array<float> filmgrainDefault = {0.0, 0.0};
 		m_ColorizeEffects = new map<int, ref array<float>>;
-		m_FilmgrainEffects = new map<int, ref array<float>>;
 		
 		// colorize: r, g, b
 		// colorize effects registration
 		m_ColorizeEffects.Set(PPEffects.COLORIZE_NV, colorizeDefault);
-
-		// filmgrain: grainsize, intensityx0 (normal intensity driven by lighting config for now!)
-		// filmgrain effects registration
-		m_FilmgrainEffects.Set(PPEffects.FILMGRAIN_NV, filmgrainDefault);
-		m_FilmgrainEffects.Set(PPEffects.FILMGRAIN_NIGHT, filmgrainDefault);
+		SetNVParams(1.0, 0.0, 2.35, 2.75); //default values
 		// ------------------------End of NV-related stuff------------------------
 	}
 	
@@ -176,6 +168,14 @@ class PPEffects
 	}
 	
 	//-------------------------------------------------------
+	//! Set blur flashbang hit effect to a specified 'value' between 0..1
+	static void SetBlurFlashbang(float value)
+	{
+		SetBlurValue(m_BlurFlashbang, value);
+		UpdateBlur();
+	}
+	
+	//-------------------------------------------------------
 	// BLUR END
 	//-------------------------------------------------------
 	/*
@@ -264,13 +264,24 @@ class PPEffects
 	*/
 	static void SetLensEffect(float lens, float chromAbb, float centerX, float centerY)
 	{
-		Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
+		PerformSetLensEffect(lens, chromAbb, centerX, centerY);
+		/*Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
                 matHDR.SetParam("LensDistort", lens);
                 matHDR.SetParam("MaxChromAbberation", chromAbb);
                 matHDR.SetParam("LensCenterX", centerX);
-                matHDR.SetParam("LensCenterY", centerY);
+                matHDR.SetParam("LensCenterY", centerY);*/
 	}
 
+	//!added for convenience
+	static void PerformSetLensEffect(float lens, float chromAbb, float centerX, float centerY)
+	{
+		//Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
+        m_MatColors.SetParam("LensDistort", lens);
+        m_MatColors.SetParam("MaxChromAbberation", chromAbb);
+        m_MatColors.SetParam("LensCenterX", centerX);
+        m_MatColors.SetParam("LensCenterY", centerY);
+	}
+	
 	/*!
 	set vignette
 	\param intensity <0, 1>, intensity of effect, 0 = disable
@@ -280,7 +291,7 @@ class PPEffects
 	*/
 	static void SetVignette(float intensity, float R, float G, float B)
 	{
-		Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
+		//Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
 
 		float color[4];
 		color[0] = R;
@@ -288,8 +299,8 @@ class PPEffects
 		color[2] = B;
 		color[3] = 0;
 
-		matHDR.SetParam("Vignette", intensity);
-		matHDR.SetParam("VignetteColor", color);
+		m_MatColors.SetParam("Vignette", intensity);
+		m_MatColors.SetParam("VignetteColor", color);
 	}
 
 
@@ -344,6 +355,18 @@ class PPEffects
 		m_MatColors.SetParam("OverlayFactor", 0.05);
 	}
 	
+	static void FlashbangEffect(float value)
+	{
+		float hitEffectColor[4];
+		hitEffectColor[0] = 0.95;
+		hitEffectColor[1] = 0.95;
+		hitEffectColor[2] = 0.95;
+		hitEffectColor[3] = Math.Lerp(Math.Clamp(m_ColorValueTotal[0],0,1), 1, value);
+
+		m_MatColors.SetParam("OverlayColor", hitEffectColor);
+		m_MatColors.SetParam("OverlayFactor", 0.75);
+	}
+	
 	static void EnableBurlapSackBlindness()
 	{
 		SetColorValue(m_BurlapBlindness, 0, 0, 0, 1, 1.0);
@@ -371,8 +394,8 @@ class PPEffects
 
 	static void UpdateSaturation()
 	{
-		Material matColors = GetGame().GetWorld().GetMaterial("graphics/materials/postprocess/glow");
-		matColors.SetParam("Saturation", m_BloodSaturation/*+add_additional_modifiers_here*/);
+		//Material matColors = GetGame().GetWorld().GetMaterial("graphics/materials/postprocess/glow");
+		m_MatColors.SetParam("Saturation", m_BloodSaturation/*+add_additional_modifiers_here*/);
 	}
 	
 	static void UpdateVignette()
@@ -418,7 +441,8 @@ class PPEffects
 	
 	static void UpdateColorize()
 	{
-		bool foundActiveEffect = false, lowestKey = 1000000;
+		bool foundActiveEffect = false;
+		int lowestKey = 1000000;
 		ref array<float> chosenArray;
 		// search for active effect with highest priority (lower value of key better)
 		for (int i = 0; i < m_ColorizeEffects.Count(); i++)
@@ -443,13 +467,13 @@ class PPEffects
 		if (foundActiveEffect)
 		{
 			// active effect found
-			Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
+			//Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
 			float color[4];
 			color[0] = chosenArray[0];
 			color[1] = chosenArray[1];
 			color[2] = chosenArray[2];
 			color[3] = 0;
-	        matHDR.SetParam("ColorizationColor", color);
+	        m_MatColors.SetParam("ColorizationColor", color);
 		}
 		else
 		{
@@ -459,71 +483,44 @@ class PPEffects
 	}
 	static void ResetColorize()
 	{
-		Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
+		//Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
 		float color[4];
 		color[0] = 1.0;
 		color[1] = 1.0;
 		color[2] = 1.0;
 		color[3] = 0;
-        matHDR.SetParam("ColorizationColor", color);
+        m_MatColors.SetParam("ColorizationColor", color);
 	}
 
-	// appropriate parts of the code will call these functions
-	static void SetFilmgrainNV(float grainsize, float intensityx0)
-	{
-		ref array<float> filmgrainArray = {grainsize, intensityx0};
-		m_FilmgrainEffects.Set(PPEffects.FILMGRAIN_NV, filmgrainArray);
-		UpdateFilmgrain();
-	}
-	
-	static void UpdateFilmgrain()
-	{
-		bool foundActiveEffect = false, lowestKey = 1000000;
-		ref array<float> chosenArray;
-		// search for active effect with highest priority (lower value of key better)
-		for (int i = 0; i < m_FilmgrainEffects.Count(); i++)
-		{
-			int currentKey = m_FilmgrainEffects.GetKey(i);
-			ref array<float> filmgrainValues = m_FilmgrainEffects.Get(currentKey);
-			// check for non-zero active effect
-			for (int j = 0; j < filmgrainValues.Count(); j++)
-			{
-				if ((filmgrainValues[j]) != 0)
-				{
-					if (currentKey < lowestKey)
-					{
-						chosenArray = filmgrainValues;
-						lowestKey = currentKey;
-						foundActiveEffect = true;
-						break;
-					}
-				}
-			}
-		}
-		if (foundActiveEffect)
-		{
-			// active effect found
-			Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/filmgrain");
-			matHDR.SetParam("GrainSize",   chosenArray[0]);
-			matHDR.SetParam("IntensityX0", chosenArray[1]);
-		} else {
-			// no active event found, reset filmgrain effect to default (for night-time)
-			ResetFilmgrain();
-		}
-	}
-	static void ResetFilmgrain()
-	{
-		Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/filmgrain");
-		matHDR.SetParam("GrainSize",   1.75);
-		matHDR.SetParam("IntensityX0", 0.0013);
-	}
-	
 	// EV check for NV optics
-	static void SetNVValueEV(float value)
+	static void SetEVValuePP(float value)
 	{
 		g_Game.SetEVValue(value);
 	}
 	
+	// light multiplier and noise intensity (using filmgrainNV.emat!) for nvg
+	// added other parameters for filmgrainNV.emat, sharpness and grain size
+	static void SetNVParams(float light_mult, float noise_intensity, float sharpness, float grain_size)
+	{
+		Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/filmgrainNV");
+/*#ifdef PLATFORM_CONSOLE
+//worst-case scenario console fix!
+		noise_intensity = 0.0;
+#endif*/
+		g_Game.NightVissionLightParams(light_mult, noise_intensity);
+		matHDR.SetParam("Sharpness", sharpness);
+		matHDR.SetParam("GrainSize", grain_size);
+	}
+	
+	// bloom PP, experimental stuff
+	static void SetBloom(float thres, float steep, float inten)
+    {
+		//Material matHDR = GetGame().GetWorld().GetMaterial("Graphics/Materials/postprocess/glow");
+		m_MatColors.SetParam("BloomThreshold", thres);
+		m_MatColors.SetParam("BloomSteepness", steep);
+		m_MatColors.SetParam("BloomIntensity", inten);
+    }
+
 	static void ResetAll()
 	{
 		ResetBlurEffects();
@@ -535,6 +532,5 @@ class PPEffects
 		SetBloodSaturation(1);
 		RemoveUnconsciousnessVignette();
 		ResetColorize();
-		ResetFilmgrain();
 	}	
 };

@@ -91,12 +91,12 @@ class HumanInventoryWithFSM : HumanInventory
 	 * @brief		hand's fsm handling of events
 	 * @NOTE:		warning: ProcessHandEvent can be called only within DayZPlayer::HandleInventory (or ::CommandHandler)
 	 **/
-	bool ProcessHandEvent (HandEventBase e)
+	override bool ProcessHandEvent (HandEventBase e)
 	{
 		//SyncRemote(e);
 		if (m_FSM.ProcessEvent(e) == ProcessEventResult.FSM_OK)
 		{
-			hndDebugSpam("[hndfsm] Processed event e=" + e.ToString());
+			hndDebugSpam("[hndfsm]  STS=" + GetManOwner().GetSimulationTimeStamp() + " Processed event e=" + e.ToString());
 			return true;
 		}
 		else
@@ -113,7 +113,7 @@ class HumanInventoryWithFSM : HumanInventory
 		m_FSM.ProcessAbortEvent(e, aa);
 		if (aa == ProcessEventResult.FSM_OK)
 		{
-			hndDebugSpam("[hndfsm] Processed event e=" + e.ToString());
+			hndDebugSpam("[hndfsm]  STS=" + GetManOwner().GetSimulationTimeStamp() + " Processed event e=" + e.ToString());
 			return true;
 		}
 		else

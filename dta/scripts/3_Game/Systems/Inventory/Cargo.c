@@ -10,6 +10,12 @@ class CargoBase : Managed
 	 * @return		cargo owner
 	 **/
 	proto native EntityAI GetCargoOwner ();
+
+	/**@fn			GetCargoOwnerIndex
+	 * @brief		get index of this cargo in the entity that owns the cargo
+	 * @return		owner's index of this cargo
+	 **/
+	proto native int GetOwnerCargoIndex ();
 	
 	/**@fn			GetItemCount
 	 * @return		number of items in cargo
@@ -58,6 +64,21 @@ class CargoBase : Managed
 	 * @return		true if cargo can be added, false otherwise
 	 **/
 	bool CanSwapItemInCargo (EntityAI child_entity, EntityAI new_entity) { return true; }
+	
+	proto native int GetUserReservedLocationCount ();
+	/**@fn			GetUserReservedLocation
+	 * @param[in]	idx			index of the user reserved location
+	 * @param[out]	eai			returned entity of the user reservation at internal index
+	 * @param[out]	row			returned row of the user reservation at internal index
+	 * @param[out]	col			returned col
+	 * @param[out]	w			returned width of the user reservation at internal index
+	 * @param[out]	h			returned height of the user reservation at internal index
+	 * @param[out]	flp			returned flip
+	 * @return		true if record found, false otherwise
+	 **/
+	proto bool GetUserReservedLocation (int index, out EntityAI eai, out int row, out int col, out int w, out int h, out int flp);
+	proto native void SetUserReservedLocation (notnull EntityAI eai);
+	proto native void ClearUserReservedLocation (notnull EntityAI eai);
 };
 
 
@@ -86,6 +107,16 @@ class CargoBase : Managed
 		override bool CanReceiveItemIntoCargo (EntityAI item)
 		{
 			return CanFitItemIntoCargo(item);
+		}
+	
+		/**@fn			CanFitSwappedItemInCargo
+		 * @return		true if swapping item does not exceed GetMaxWeight, false otherwise
+		 **/		
+		proto native bool CanFitSwappedItemInCargo (EntityAI child_entity, EntityAI new_entity);
+	
+		override bool CanSwapItemInCargo (EntityAI child_entity, EntityAI new_entity)
+		{
+			return CanFitSwappedItemInCargo(child_entity, new_entity);
 		}
 	};
 #else

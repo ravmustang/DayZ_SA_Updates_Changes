@@ -355,8 +355,8 @@ typedef Param1<string> ScriptLogEventParams;
 typedef Param4<int, string, string, string> ChatMessageEventParams;
 typedef Param1<int> ChatChannelEventParams;
 typedef Param1<int> SQFConsoleEventParams;
-//! PlayerIdentity, useDB, pos, yaw, queueTime
-typedef Param5<PlayerIdentity, bool, vector, float, int> PreloadEventParams;
+//! PlayerIdentity, useDB, pos, yaw
+typedef Param4<PlayerIdentity, bool, vector, float> ClientPrepareEventParams;
 //! PlayerIdentity, PlayerPos, Top, Bottom, Shoe, Skin
 typedef Param3<PlayerIdentity, vector, Serializer> ClientNewEventParams; 
 //! PlayerIdentity, Man
@@ -367,18 +367,23 @@ typedef Param2<PlayerIdentity, Man> ClientReadyEventParams;
 typedef Param2<PlayerIdentity, Man> ClientReconnectEventParams; 
 //! PlayerIdentity, Man, LogoutTime, AuthFailed
 typedef Param4<PlayerIdentity, Man, int, bool> ClientDisconnectedEventParams; 
-//! PlayerIdentity, QueueTime, NewChar
-typedef Param2<int, bool> ClientSpawningEventParams; 
+//! LoginTime
+typedef Param1<int> LoginTimeEventParams; 
+typedef Param1<vector> PreloadEventParams; 
 //! Player
 typedef Param1<Man> LogoutCancelEventParams; 
-//! Error 
-typedef Param1<string> DatabaseErrorEventParams; 
+//! text message for line 1, text message for line 2 
+typedef Param2<string, string> LoginStatusEventParams; 
 //! logoutTime
 typedef Param1<int> LogoutEventParams; 
 //! Width, Height, Windowed
 typedef Param3<int, int, bool> WindowsResizeEventParams;
 //! Enabled
 typedef Param1<bool> VONStateEventParams;
+//! player name, player id
+typedef Param2<string, string> VONStartSpeakingEventParams;
+//! player name, player id
+typedef Param2<string, string> VONStopSpeakingEventParams;
 //! Camera
 typedef Param1<FreeDebugCamera> SetFreeCameraEventParams;
 //! Duration
@@ -421,8 +426,8 @@ enum EventType
 	ChatMessageEventTypeID,
 	//! params: \ref ChatChannelEventParams
 	ChatChannelEventTypeID,
-	//! params: \ref PreloadEventParams
-	PreloadEventTypeID,
+	//! params: \ref ClientPrepareEventParams
+	ClientPrepareEventTypeID,
 	//! params: \ref ClientNewEventParams
 	ClientNewEventTypeID,	
 	//! params: \ref ClientRespawnEventParams
@@ -435,16 +440,22 @@ enum EventType
 	ClientDisconnectedEventTypeID,
 	//! params: \ref LogoutCancelEventParams
 	LogoutCancelEventTypeID,
-	//! params: \ref ClientSpawningEventParams
-	ClientSpawningEventTypeID,
+	//! params: \ref LoginTimeEventParams
+	LoginTimeEventTypeID,
+	//! params: \ref PreloadEventParams
+	PreloadEventTypeID,
 	//! params: \ref LogoutEventParams
 	LogoutEventTypeID,	
-	//! params: \ref DatabaseErrorEventParams
-	DatabaseErrorEventTypeID,	
+	//! params: \ref LoginStatusEventParams
+	LoginStatusEventTypeID,	
 	//! params: \ref ScriptLogEventParams
 	ScriptLogEventTypeID,
 	//! params: \ref VONStateEventParams
 	VONStateEventTypeID,
+	//! params: \ref VONStartSpeakingEventParams
+	VONStartSpeakingEventTypeID,
+	//! params: \ref VONStopSpeakingEventParams
+	VONStopSpeakingEventTypeID,
 	//! params: \ref SetFreeCameraEventParams
 	SetFreeCameraEventTypeID,
 	//! params: \ref MPConnectionLostEventParams
@@ -523,7 +534,7 @@ class Hud: Managed
 	ref Timer m_Timer;
 	void Init( Widget hud_panel_widget ) {}
 	void DisplayNotifier( int key, int tendency, int status ) {}
-	void DisplayBadge( int key, bool show ) {}
+	void DisplayBadge( int key, int value ) {}
 	void SetStamina( int value, int range ) {}
 	void DisplayStance( int stance ) {}
 	void DisplayPresence() {}
@@ -538,11 +549,9 @@ class Hud: Managed
 	void SetWalkieTalkieText( string text ) { }
 	void RefreshQuickbar( bool itemChanged = false ) {}
 	void Show(bool show) {}
-	void RefreshQuantity( EntityAI item_to_refresh ) {}
 	void UpdateBloodName() {}
-	void RefreshItemPosition( EntityAI item_to_refresh ) {}
+	void SetTemperature( string temp );
 	void Update( float timeslice ){}
-	void InitInventory();
 	bool IsXboxDebugCursorEnabled();
 	void ShowVehicleInfo();
 	void HideVehicleInfo();
@@ -649,6 +658,7 @@ class MenuData: Managed
 {
 	proto native int	GetCharactersCount();
 	proto native int 	GetLastPlayedCharacter();
+	//! Return Character person or null if character initialization failed (inventory load, or corrupted data)
 	proto native Man 	CreateCharacterPerson(int index);
 	
 	proto void 			GetLastServerAddress(int index, out string address);
@@ -716,6 +726,7 @@ const int AT_CONFIG_CONTROLLER_YAXIS = 59,
 const int AT_CONFIG_CONTROLLER_REVERSED_LOOK = 60,
 const int AT_OPTIONS_DISPLAY_MODE = 61,
 const int AT_OPTIONS_TERRAIN_SHADER = 62,
+const int AT_OPTIONS_AIM_HELPER = 63,
 
 // Option Access Control Type
 const int OA_CT_NUMERIC = 0;
@@ -863,7 +874,7 @@ class GameOptions: Managed
 // -------------------------------------------------------------------------
 class Hive
 {
-	proto native void InitOnline( string host = "" );
+	proto native void InitOnline( string ceSetup, string host = "" );
 	proto native void InitOffline();
 	proto native void InitSandbox();
 
@@ -892,6 +903,11 @@ proto native Hive GetHive();
 //	EUAINPUT_DEVICE_CONTROLLER
 //	EUAINPUT_DEVICE_IR
 
+// -------------------------------------------------------------------------
+class UAIDWrapper
+{
+	proto native UAInput InputP();			// get input pointer
+};
 
 // -------------------------------------------------------------------------
 class UAInput
@@ -924,6 +940,7 @@ class UAInput
 	proto native bool LocalPress();
 	proto native bool LocalRelease();
 	proto native bool LocalHold();
+	proto native bool LocalHoldBegin();
 	proto native bool LocalDoubleClick();
 	proto native bool LocalClick();
 
@@ -936,6 +953,8 @@ class UAInput
 	proto native bool IsPressLimit();		// if limited to PRESS
 	proto native bool IsReleaseLimit();		// if limited to RELEASE
 	proto native bool IsHoldLimit();		// if limited to HOLD
+	proto native bool IsHoldBeginLimit();	// if limited to HOLDBEGIN
+	proto native bool IsClickLimit();		// if limited to SINGLE CLICK
 	proto native bool IsDoubleClickLimit();	// if limited to DOUBLE CLICK
 
 	proto native bool HasSorting( int iIndex );		// has sorting group index?
@@ -954,6 +973,10 @@ class UAInput
 	proto native void Backlit_Override( int eType, int iColor ); // enable/ disable backlit of associated controls (EUABACKLIT_*)
 	proto native bool Backlit_Enabled(); // check whether associated controls are backlit
 
+	proto native UAIDWrapper GetPersistentWrapper(); // create persistent object for input access
+
+	private void UAInput();
+	private void ~UAInput();
 };
 
 // -------------------------------------------------------------------------
@@ -1070,6 +1093,7 @@ class UAInputAPI
 	proto native owned string SortingName( int index );	// sorting group name
 
 	proto native void Export();	// export XML (user) configuration
+	proto native void Revert();	// revert XML (user) configuration - all of it and use default PBO content!
 	
 	proto native void Backlit_None(); // turn off backlit
 	proto native void Backlit_Background( int eType, int iColor1, int iColor2 ); // start backlit
@@ -1096,10 +1120,13 @@ const int ECE_CENTER						= 8;	// use center from shape (model) for placement
 
 const int ECE_UPDATEPATHGRAPH				= 32;	// update navmesh when object placed upon it
 
-const int ECE_EQUIP							= 256;	// equip with configured attachments/ cargo
 const int ECE_ROTATIONFLAGS					= 512;	// enable rotation flags for object placement
 const int ECE_CREATEPHYSICS					= 1024;	// create collision envelope and related physics data (if object has them)
 const int ECE_AIRBORNE						= 4096;	// create flying unit in the air
+
+const int ECE_EQUIP_ATTACHMENTS				= 8192;		// equip with configured attachments
+const int ECE_EQUIP_CARGO					= 16384;	// equip with configured cargo
+const int ECE_EQUIP							= 24576;	// equip with configured attachments + cargo
 
 const int ECE_NOSURFACEALIGN				= 262144;	// do not align object on surface/ terrain
 const int ECE_KEEPHEIGHT					= 524288;	// keep height when creating object (do not use trace or placement on surface)
@@ -1137,7 +1164,7 @@ const int	RF_DECORRECTION			= 256;	// angle correction when spawning InventoryIt
 const int	RF_DEFAULT				= 512;	// use default placement setuped on object in config
 
 
-class CETesting
+class CEApi
 {
 	proto native void ExportSpawnData();
 	proto native void ExportProxyData( vector vCenter, float fRadius );
@@ -1151,8 +1178,6 @@ class CETesting
 
 	proto native void TimeShift( float fShift );
 	proto native void OverrideLifeTime( float fLifeTime );
-
-	proto native void NewRestock( bool bEnable );
 
 	proto native void SpawnGroup( string sEvName, vector vPos );
 	proto native void SpawnDE( string sEvName, vector vPos, float fAngle ); /* THIS WILL BE OBSOLETE OR PREFERABLY DEFAULT? */
@@ -1176,7 +1201,7 @@ class CETesting
 
 };
 
-proto native CETesting GetTesting();
+proto native CEApi GetCEApi();
 
 // -------------------------------------------------------------------------
 class CEItemProfile

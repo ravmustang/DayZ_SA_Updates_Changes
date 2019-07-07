@@ -44,21 +44,30 @@ class GameInventory
 	 * traversed recursively from root to leafs.
 	 *
 	 * @param[in]	item	\p		item to be found in inventory
-	 * @return	true if found, false otherwise
+	 * @return		true if found, false otherwise
 	 **/
 	proto native bool HasEntityInInventory (notnull EntityAI item);
 
 	/**
-	 * @brief		EnumerateInventory
+	 * @fn		EnumerateInventory
+	 * @brief		enumerate inventory using traversal type and filling items array
 	 * @param[in]	tt		used traversal type
 	 * @param[out]	items		items in inventory (in order determined by traversal)
 	 * @return	true if found any, false otherwise
 	 **/	
 	proto native bool EnumerateInventory (InventoryTraversalType tt, out array<EntityAI> items);
 
+	/**
+	 * @fn		CountInventory
+	 * @brief	almost identical to EnumerateInventory except it does not return items
+	 * @return	number of items
+	 **/		
+	proto native int CountInventory ();
+
 
 	///@{ cargo
 	proto native CargoBase GetCargo ();
+	proto native CargoBase GetCargoFromIndex (int index);
 	/**
 	 * @brief Create Entity of specified type in cargo of entity
 	 **/
@@ -69,12 +78,12 @@ class GameInventory
 	 * @param	row		the row of cargo to be created at
 	 * @param	col		the column of cargo to be created at
 	 **/
-	proto native EntityAI CreateEntityInCargoEx (string typeName, int idx, int row, int col);
+	proto native EntityAI CreateEntityInCargoEx (string typeName, int idx, int row, int col, bool flip);
 
 	proto native bool HasEntityInCargo (notnull EntityAI e);
 	proto native bool HasEntityInCargoEx (notnull EntityAI e, int idx, int row, int col);
-	proto native bool CanAddEntityInCargo (notnull EntityAI e);
-	proto native bool CanAddEntityInCargoEx (notnull EntityAI e, int idx, int row, int col);
+	proto native bool CanAddEntityInCargo (notnull EntityAI e, bool flip);
+	proto native bool CanAddEntityInCargoEx (notnull EntityAI e, int idx, int row, int col, bool flip);
 	//proto native bool AddEntityInCargo (notnull EntityAI owner, EntityAI cargo);
 	//proto native bool AddEntityInCargoEx (notnull EntityAI owner, notnull EntityAI e, int idx, int row, int col);
 	proto native bool CanRemoveEntityInCargo (notnull EntityAI e);
@@ -310,16 +319,16 @@ class GameInventory
 		if (!ctx.Read(type))
 			return;
 
-		InventoryLocation src = new InventoryLocation;
-		InventoryLocation dst = new InventoryLocation;
-
 		switch (type)
 		{
 			case InventoryCommandType.SYNC_MOVE:
 			{
+				InventoryLocation src = new InventoryLocation;
+				InventoryLocation dst = new InventoryLocation;
+
 				src.ReadFromContext(ctx);
 				dst.ReadFromContext(ctx);
-				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand cmd=" + typename.EnumToString(InventoryCommandType, type) + " src=" + InventoryLocation.DumpToStringNullSafe(src) + " dst=" + InventoryLocation.DumpToStringNullSafe(dst));
 
 				if (!src.GetItem() || !dst.GetItem())
 				{
@@ -334,78 +343,42 @@ class GameInventory
 			case InventoryCommandType.HAND_EVENT:
 			{
 				HandEventBase e = HandEventBase.CreateHandEventFromContext(ctx);
-				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e);
+				syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand cmd=" + typename.EnumToString(InventoryCommandType, type) + " event=" + e.DumpToString());
 				
-				if (!e.m_Entity)
+				if (!e.GetSrcEntity())
 				{
 					Error("[syncinv] ServerInventoryCommand (cmd=HAND_EVENT) dropped, item not in bubble");
 					break; // not in bubble
 				}
-
-				if (e.m_Entity.GetInventory().GetCurrentInventoryLocation(src))
-				{
-					dst = e.GetDst();
-					e.m_Player.GetHumanInventory().PostHandEvent(e);
-				}
-				else
-					Error("ServerInventoryCommand HandEvent - no inv loc");
-				break;
-			}
-
-			case InventoryCommandType.SWAP:
-			{
-				EntityAI item1, item2;
-				ctx.Read(item1);
-				ctx.Read(item2);
-				
-				if (!item1 || !item2)
-				{
-					Error("[syncinv] ServerInventoryCommand (cmd=SWAP) dropped, item not in bubble");
-					break; // not in bubble
-				}
-
-				InventoryLocation src1, src2, dst1, dst2;
-				if (GameInventory.MakeSrcAndDstForSwap(item1, item2, src1, src2, dst1, dst2))
-				{
-					syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand Swap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString() + "dst2=" + dst2.DumpToString());
-
-					LocationSwap(src1, src2, dst1, dst2);
-				}
-				else
-					Error("ServerInventoryCommand MakeSrcAndDstForSwap - no inv loc");
+				e.m_Player.GetHumanInventory().PostHandEvent(e);
 				break;
 			}
 
 			case InventoryCommandType.FORCESWAP:
+			case InventoryCommandType.SWAP:
 			{
-				Error("[syncinv] I.ForceSwap TODO");
-				/*EntityAI item1, item2;
-				ctx.Read(item1);
-				ctx.Read(item2);
-				InventoryLocation user_dst2 = new InventoryLocation;
-				user_dst2.ReadFromContext(ctx);
-				
-				if (!item1 || !item2 || !(user_dst2 && user_dst2.IsValid()))
+				InventoryLocation src1 = new InventoryLocation;
+				InventoryLocation src2 = new InventoryLocation;
+				InventoryLocation dst1 = new InventoryLocation;
+				InventoryLocation dst2 = new InventoryLocation;
+				src1.ReadFromContext(ctx);
+				src2.ReadFromContext(ctx);
+				dst1.ReadFromContext(ctx);
+				dst2.ReadFromContext(ctx);
+		
+				if (src1.IsValid() && src2.IsValid() && dst1.IsValid() && dst2.IsValid())
 				{
-					Error("[syncinv] ServerInventoryCommand (cmd=FORCESWAP) dropped, item not in bubble");
-					break; // not in bubble
-				}
+					syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand Swap src1=" + InventoryLocation.DumpToStringNullSafe(src1) + " src2=" + InventoryLocation.DumpToStringNullSafe(src2) +  " dst1=" + InventoryLocation.DumpToStringNullSafe(dst1) + " dst2=" + InventoryLocation.DumpToStringNullSafe(dst2));
 
-				InventoryLocation src1, src2, dst1;
-				if (GameInventory.MakeSrcAndDstForForceSwap(item1, item2, src1, src2, dst1, user_dst2))
-				{
-					syncDebugPrint("[syncinv] t=" + GetGame().GetTime() + "ms ServerInventoryCommand Swap src1=" + src1.DumpToString() + "dst1=" + dst1.DumpToString() +  "src2=" + src2.DumpToString() + "dst2=" + dst2.DumpToString());
-
-					LocationSwap(src1, src2, dst1, user_dst2);
+					LocationSwap(src1, src2, dst1, dst2);
 				}
 				else
-					Error("ServerInventoryCommand MakeSrcAndDstForSwap - no inv loc");
-*/
+					Error("ServerInventoryCommand - cannot swap, invalid location input: src1=" + InventoryLocation.DumpToStringNullSafe(src1) + " src2=" + InventoryLocation.DumpToStringNullSafe(src2) +  " dst1=" + InventoryLocation.DumpToStringNullSafe(dst1) + " dst2=" + InventoryLocation.DumpToStringNullSafe(dst2));
+
 				break;
 			}
 		}
 	}
-
 
 	/**
 	 * @fn		LocationAddEntity
@@ -463,7 +436,7 @@ class GameInventory
 	 * @brief	swaps two entities
 	 * @return true if success, false otherwise
 	 **/
-	static proto native bool ServerLocationSwap (notnull EntityAI item1, notnull EntityAI item2, ParamsWriteContext ctx);
+	static proto native bool ServerLocationSwap (notnull InventoryLocation src1, notnull InventoryLocation src2, notnull InventoryLocation dst1, notnull InventoryLocation dst2, ParamsWriteContext ctx);
 
 	/**
 	 * @fn		ServerHandEvent
@@ -491,10 +464,10 @@ class GameInventory
 	 *
 	 * @param [in]  item1     is the forced item (primary)
 	 * @param [in]  item2     second item that will be replaced by the item1. (secondary)
-	 * @param [out]  item2_dst     second item's potential destination
+	 * @param [out]  item2_dst     second item's potential destination (if null, search for item_dst2 is ommited)
 	 * @return    true if can be force swapped
 	 */
-	static proto native bool CanForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, out notnull InventoryLocation item2_dst);
+	static proto native bool CanForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, out InventoryLocation item2_dst);
 
 	///@{ reservations
 	const int c_InventoryReservationTimeoutMS = 15000;
@@ -524,10 +497,11 @@ class GameInventory
 
 	///@{ anti-cheats
 	const float c_MaxItemDistanceRadius = 2.0;
-	static proto native bool CheckDropRequest (notnull Man requestingPlayer, EntityAI item, float radius);
-	static proto native bool CheckTakeItemRequest (notnull Man requestingPlayer, EntityAI item, EntityAI target, float radius);
-	static proto native bool CheckMoveToDstRequest (notnull Man requestingPlayer, EntityAI item, notnull InventoryLocation dst, float radius);
-	static proto native bool CheckSwapItemsRequest (notnull Man requestingPlayer, EntityAI item1, EntityAI item2, float radius);
+	static proto native bool CheckRequestSrc (notnull Man requestingPlayer, notnull InventoryLocation src, float radius);
+	static proto native bool CheckDropRequest (notnull Man requestingPlayer, notnull InventoryLocation src, float radius);
+	static proto native bool CheckTakeItemRequest (notnull Man requestingPlayer, notnull InventoryLocation src, notnull InventoryLocation dst, float radius);
+	static proto native bool CheckMoveToDstRequest (notnull Man requestingPlayer, notnull InventoryLocation src, notnull InventoryLocation dst, float radius);
+	static proto native bool CheckSwapItemsRequest (notnull Man requestingPlayer, notnull InventoryLocation src1, notnull InventoryLocation src2, notnull InventoryLocation dst1, notnull InventoryLocation dst2, float radius);
 	static proto native bool CheckManipulatedObjectsDistances (notnull EntityAI e0, notnull EntityAI e1, float radius);
 	///@} anti-cheats
 
@@ -551,16 +525,16 @@ class GameInventory
 
 	void EEInit ()
 	{
-		InventoryLocation loc = new InventoryLocation;
-		if (GetCurrentInventoryLocation(loc))
+		InventoryLocation src = new InventoryLocation;
+		if (GetCurrentInventoryLocation(src))
 		{
-			if (loc.GetType() == InventoryLocationType.HANDS)
+			if (src.GetType() == InventoryLocationType.HANDS)
 			{
-				Man man = Man.Cast(loc.GetParent());
+				Man man = Man.Cast(src.GetParent());
 				if (man)
 				{
 					Print("Inventory::EEInit - Man=" + man + " item=" + this);
-					man.GetHumanInventory().OnEntityInHandsCreated(GetInventoryOwner());
+					man.GetHumanInventory().OnEntityInHandsCreated(src);
 				}
 			}
 		}
@@ -587,7 +561,7 @@ class GameInventory
 			switch (loc.GetType())
 			{
 				case InventoryLocationType.ATTACHMENT: return loc.GetParent().GetInventory().CreateAttachmentEx(type, loc.GetSlot()); break;
-				case InventoryLocationType.CARGO: return loc.GetParent().GetInventory().CreateEntityInCargoEx(type, loc.GetIdx(), loc.GetRow(), loc.GetCol()); break;
+				case InventoryLocationType.CARGO: return loc.GetParent().GetInventory().CreateEntityInCargoEx(type, loc.GetIdx(), loc.GetRow(), loc.GetCol(), loc.GetFlip()); break;
 				default: Error("CreateInInventory: unknown location for item"); break;
 			}
 		}
@@ -751,7 +725,7 @@ class GameInventory
 	 **/
 	bool TakeToDst (InventoryMode mode, notnull InventoryLocation src, notnull InventoryLocation dst)
 	{
-		Print("[inv] I::Take2Dst(" + typename.EnumToString(InventoryMode, mode) + ") src=" + src.DumpToString() + " dst=" + dst.DumpToString());
+		Print("[inv] I::Take2Dst(" + typename.EnumToString(InventoryMode, mode) + ") src=" + InventoryLocation.DumpToStringNullSafe(src) + " dst=" + InventoryLocation.DumpToStringNullSafe(dst));
 
 		switch (mode)
 		{
@@ -767,11 +741,9 @@ class GameInventory
 				return LocationSyncMoveEntity(src, dst);
 
 			case InventoryMode.SERVER:
-				Error("Server side inventory command without player is not implemented.. none shall pass! (src=" + src.DumpToString() + " dst=" + dst.DumpToString() + ")");
-				return false;
-				//bool ret = LocationSyncMoveEntity(src, dst);
-				//InventoryInputUserData.SendServerMove(nullptr, InventoryCommandType.SYNC_MOVE, src, dst);
-				//return ret;
+				bool ret = LocationSyncMoveEntity(src, dst);
+				InventoryInputUserData.SendServerMove(null, InventoryCommandType.SYNC_MOVE, src, dst);
+				return ret;
 			default:
 				Error("HandEvent - Invalid mode");
 		}
@@ -808,7 +780,7 @@ class GameInventory
 		if (item.GetInventory().GetCurrentInventoryLocation(src))
 		{
 			InventoryLocation dst = new InventoryLocation;
-			dst.SetCargo(GetInventoryOwner(), item, idx, row, col);
+			dst.SetCargo(GetInventoryOwner(), item, idx, row, col, item.GetInventory().GetFlipCargo());
 
 			return TakeToDst(mode, src, dst);
 		}
@@ -824,7 +796,7 @@ class GameInventory
 		if (item.GetInventory().GetCurrentInventoryLocation(src))
 		{
 			InventoryLocation dst = new InventoryLocation;
-			dst.SetCargo(target, item, idx, row, col);
+			dst.SetCargo(target, item, idx, row, col, item.GetInventory().GetFlipCargo());
 
 			return TakeToDst(mode, src, dst);
 		}
@@ -920,16 +892,16 @@ class GameInventory
 		InventoryLocation src1, src2, dst1, dst2;
 		if (GameInventory.MakeSrcAndDstForSwap(item1, item2, src1, src2, dst1, dst2))
 		{
-			Print("[inv] I::Swap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + src1.DumpToString() + " --> dst1=" + dst1.DumpToString() +  " src2=" + src2.DumpToString() + "--> dst2=" + dst2.DumpToString());
+			Print("[inv] I::Swap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + InventoryLocation.DumpToStringNullSafe(src1) + " src2=" + InventoryLocation.DumpToStringNullSafe(src2) +  " dst1=" + InventoryLocation.DumpToStringNullSafe(dst1) + " dst2=" + InventoryLocation.DumpToStringNullSafe(dst2));
 
 			switch (mode)
 			{
 				case InventoryMode.PREDICTIVE:
-					InventoryInputUserData.SendInputUserDataSwap(item1, item2);
+					InventoryInputUserData.SendInputUserDataSwap(src1, src2, dst1, dst2);
 					return LocationSwap(src1, src2, dst1, dst2);
 
 				case InventoryMode.JUNCTURE:
-					InventoryInputUserData.SendInputUserDataSwap(item1, item2);
+					InventoryInputUserData.SendInputUserDataSwap(src1, src2, dst1, dst2);
 					return true;
 
 				case InventoryMode.LOCAL:
@@ -948,30 +920,6 @@ class GameInventory
 	{
 		Error("I::ForceSwap TODO");
 		return false;
-		/*InventoryLocation src1, src2, dst1;
-		if (GameInventory.MakeSrcAndDstForForceSwap(item1, item2, src1, src2, dst1, item2_dst))
-		{
-			Print("[inv] I::ForceSwap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + src1.DumpToString() + " --> dst1=" + dst1.DumpToString() +  " src2=" + src2.DumpToString() + " --> item2_dst=" + item2_dst.DumpToString());
-
-			switch (mode)
-			{
-				case InventoryMode.PREDICTIVE:
-					InventoryInputUserData.SendInputUserDataForceSwap(item1, item2, item2_dst);
-					return LocationForceSwap(src1, src2, dst1, item2_dst);
-
-				case InventoryMode.JUNCTURE:
-					InventoryInputUserData.SendInputUserDataForceSwap(item1, item2, item2_dst);
-					return true;
-
-				case InventoryMode.LOCAL:
-					return LocationSwap(src1, src2, dst1, item2_dst2);
-
-				default:
-					Error("ForceSwapEntities - HandEvent - Invalid mode");
-			}
-		}
-		else
-			Error("ForceSwapEntities - MakeSrcAndDstForForceSwap - no inv loc");*/
 	}
 
 	static void SetGroundPosByOwner (EntityAI owner, notnull EntityAI item, out InventoryLocation ground)
@@ -1031,6 +979,14 @@ class GameInventory
 		Error("[inv] I::ReplaceItemWithNew - no inventory location");
 		return false;
 	}
+	
+	proto native bool GetFlipCargo ();
+	proto native void SetFlipCargo (bool flip);
+	proto native void FlipCargo ();
+	proto native void ResetFlipCargo ();
+	
+	proto native void SetUserReservedLocation ();
+	proto native void ClearUserReservedLocation (notnull EntityAI eai);
 
 ///@} script functions
 };

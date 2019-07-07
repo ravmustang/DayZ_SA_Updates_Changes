@@ -38,9 +38,26 @@ class Object extends IEntity
 		return NULL;
 	}
 	
+	//! Returns the hiddenSelectionsTextures array from the object's config
+	TStringArray GetHiddenSelectionsTextures()
+	{
+		string garden_type = this.GetType();
+		TStringArray textures = new TStringArray;
+		GetGame().ConfigGetTextArray( "CfgVehicles " + garden_type + " hiddenSelectionsTextures", textures );
+		return textures;
+	}
+	
+	//! Returns the hiddenSelectionsMaterials array from the object's config
+	TStringArray GetHiddenSelectionsMaterials()
+	{
+		string garden_type = this.GetType();
+		TStringArray materials = new TStringArray;
+		GetGame().ConfigGetTextArray( "CfgVehicles " + garden_type + " hiddenSelectionsMaterials", materials );
+		return materials;
+	}
 	
 	//! Creates an explosion on this object by its ammoType in config.
-	void Explode(string ammoType = "")
+	void Explode(int damageType, string ammoType = "")
 	{
 		if (ammoType == "")
 			ammoType = this.ConfigGetString("ammoType");
@@ -51,7 +68,7 @@ class Object extends IEntity
 		if ( GetGame().IsServer() )
 		{
 			SynchExplosion();
-			DamageSystem.ExplosionDamage(EntityAI.Cast(this), NULL, ammoType, GetPosition());
+			DamageSystem.ExplosionDamage(EntityAI.Cast(this), NULL, ammoType, GetPosition(), damageType);
 		}
 	}
 	
@@ -106,6 +123,8 @@ class Object extends IEntity
 			SEffectManager.PlayInWorld(eff, GetPosition() );
 		}
 	}
+	
+	void OnExplosionEffects (Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal, float energyFactor, float explosionFactor, bool isWater, string ammoType) { }
 	
 	//! returns action component name by given component index, 'geometry' can be "fire" or "view" (default "" for mixed/legacy mode)
 	proto native owned string GetActionComponentName(int componentIndex, string geometry = "");
@@ -278,6 +297,7 @@ class Object extends IEntity
 	proto native bool MemoryPointExists(string memoryPoint);
 	
 	proto native void CreateDynamicPhysics(PhxInteractionLayers layer);
+	proto native void EnableDynamicCCD(bool state);
 
 	//! Called when tree is chopped down.
 	void OnTreeCutDown( EntityAI cutting_tool )
@@ -446,6 +466,12 @@ class Object extends IEntity
 		return false;
 	}
 	
+	//! Returns if this entity is Fuel Station (extends Building)
+	bool IsFuelStation()
+	{
+		return false;
+	}
+	
 	//! Returns if this entity is transport
 	bool IsTransport()
 	{
@@ -457,11 +483,52 @@ class Object extends IEntity
 	{
 		return false;
 	}
+	
+	//! Returns if this entity if a food item
+	bool IsFood()
+	{
+		return ( IsFruit() || IsMeat() || IsMushroom() );
+	}
+	
+	bool IsFruit()
+	{
+		return false;
+	}
+	
+	bool IsMeat()
+	{
+		return false;
+	}
+	
+	bool IsMushroom()
+	{
+		return false;
+	}	
 
 	//! Returns if the health of this entity should be displayed (widgets, inventory)
 	bool IsHealthVisible()
 	{
 		return true;
+	}
+	
+	bool IsParticle()
+	{
+		return false;
+	}
+	
+	bool IsItemTent()
+	{
+		return false;
+	}
+	
+	bool IsScriptedLight()
+	{
+		return false;
+	}
+		
+	bool HasProxyParts()
+	{
+		return false;
 	}
 
 	//! Returns low and high bits of networkID.
@@ -475,9 +542,11 @@ class Object extends IEntity
 		return high.ToString() + low.ToString();
 	}
 	
-	string GetDebugName()
+	static string GetDebugName(Object o)
 	{
-		return GetType() + ":" + GetNetworkIDString();
+		if (o)
+			return o.GetType() + ":" + o.GetNetworkIDString();
+		return "null";
 	}
 	
 	//! Remote procedure call shortcut, see CGame.RPC / CGame.RPCSingleParam
@@ -727,6 +796,11 @@ class Object extends IEntity
 	proto native void GetDamageZones(out TStringArray dmgZones);
 	
 	/**
+  \brief Obtains middle position of damage zone based on it's name
+	@param name of the damage zone
+	*/
+	proto native vector GetDamageZonePos(string zoneName);
+	/**
   \brief Obtains name of damage zone based on index of specific component
 	@param index of the component
 	*/
@@ -780,19 +854,11 @@ class Object extends IEntity
 		
 		return false;
 	}
-	
-	void GetSingleUseActions(out TIntArray actions)
-	{	
-	}
-	
-	void GetContinuousActions(out TIntArray actions)
+
+	void GetActions(typename action_input_type, out array<ActionBase_Basic> actions)
 	{
 	}
-	
-	void GetInteractActions(out TIntArray actions)
-	{
-	}
-	
+
 	//! Plays the given sound once on this object's instance. Range is in meters. Created sound is only local, unless create_local is set to false. Returns the sound itself.
 	SoundOnVehicle PlaySound(string sound_name, float range, bool create_local = true)
 	{
@@ -856,6 +922,7 @@ class Object extends IEntity
 	
 	
 	void SpawnDamageDealtEffect() { }
+	void OnPlayerRecievedHit(){}
 	
 	bool HasNetworkID()
 	{

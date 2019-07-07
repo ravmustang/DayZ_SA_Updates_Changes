@@ -1,5 +1,7 @@
 class Entity extends ObjectTyped
 {
+	proto native void DisableSimulation(bool disable);
+
 	//! returns simulation timestamp
 	proto native int GetSimulationTimeStamp();
 
@@ -17,4 +19,20 @@ class Entity extends ObjectTyped
 	
 	//! Turns on/off invisibility
 	proto native void SetInvisible(bool invisible);
+
+	/**
+	\brief On server, entity's transformation is directly changed to targetTransform, on client entity's transformation is interpolated to targetTransform in time deltaT
+	@param targetTransform
+	@param deltaT, interpolation time between current transformation and target transformation 
+	\note it's not recommended to call this on client as it can break interpolation process if called on server previously
+	*/	
+	proto        void MoveInTime(vector targetTransform[4], float deltaT);
+	
+	/**
+	\brief Client event on transformation update from network
+	@param pos, world space position
+	@param ypr, world space orientation in radians in form of Yaw/Pitch/Roll
+	@return true if visual cut (won't do any interpolation) should be done after calling this callback
+	*/
+	bool OnNetworkTransformUpdate(out vector pos, out vector ypr);
 };

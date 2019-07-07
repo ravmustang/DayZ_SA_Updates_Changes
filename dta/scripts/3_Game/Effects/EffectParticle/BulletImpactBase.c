@@ -4,7 +4,7 @@ class EffBulletImpactBase : EffectParticle
 	static const int	INFECTED_HEAD = 3; // Head component
 	static float		DEFAULT_PROJECTILE_WEIGHT = 0.015;
 	
-	float				MIN_SCALING_PARAM = 1;
+	float				MIN_SCALING_PARAM = 0.1;
 	
 	Object 				m_DirectHit;
 	float 				m_StoppingForce;
@@ -26,10 +26,10 @@ class EffBulletImpactBase : EffectParticle
 	int m_ParticleRicochet = -1;
 	
 	// Calculations
-	float m_EnterSplashCoef = 0.002;
+	float m_EnterSplashCoef = 0.003;
 	float m_ExitSplashCoef = 0.002;
 	float m_RicochetSplashCoef = 0.002;
-	float m_EnterAngledSplashCoef = 0.002;
+	float m_EnterAngledSplashCoef = 0.01;
 	float m_AngledEnter = 0.40;
 	
 	void EffBulletImpactBase()
@@ -82,7 +82,7 @@ class EffBulletImpactBase : EffectParticle
 	{
 		if ( m_ImpactType == ImpactTypes.MELEE )
 		{
-			return 500;
+			return Math.RandomFloat(50, 150);
 		}
 		
 		float projectile_weight_coef = weight / DEFAULT_PROJECTILE_WEIGHT;
@@ -95,11 +95,13 @@ class EffBulletImpactBase : EffectParticle
 	void OnEnterCalculations( Particle p )
 	{
 		// All values represent scale
-		float randomize_scale = Math.RandomFloat(0.33, 1);
-		float velocity_min = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef)*randomize_scale;
-		float velocity_max = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef)*randomize_scale;
-		float size = MIN_SCALING_PARAM + ( m_StoppingForce * m_EnterSplashCoef)*randomize_scale;
-		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterSplashCoef)*randomize_scale;
+		float velocity_min 		= (m_StoppingForce * m_EnterSplashCoef);
+		float velocity_max 		= (m_StoppingForce * m_EnterSplashCoef);
+		float size 				= (m_StoppingForce * m_EnterSplashCoef);
+		float birth_rate 		= (m_StoppingForce * m_EnterSplashCoef);
+		float air_resistance 	= velocity_min;
+		float lifetime 			= (m_StoppingForce * m_EnterSplashCoef);
+		float lifetime_rnd		= (m_StoppingForce * m_EnterSplashCoef);
 		
 		if ( m_AmmoType == "Bullet_12GaugePellets" )
 		{
@@ -108,26 +110,47 @@ class EffBulletImpactBase : EffectParticle
 			velocity_max *= 2;
 		}
 		
-		if (velocity_min < MIN_SCALING_PARAM)
-			velocity_min = MIN_SCALING_PARAM;
 		
-		if (size < MIN_SCALING_PARAM)
-			size = MIN_SCALING_PARAM;
+		if (velocity_min < 0.75)
+			velocity_min = 0.75;
 		
+		if (size < 0.75)
+			size = 0.75;
+		
+		if (lifetime < 0.5)
+			lifetime = 0.5;
+		
+		if (lifetime_rnd < 0.5)
+			lifetime_rnd = 0.5;
+		
+		if (velocity_max < 1)
+			velocity_max = 1;
+		
+		/*Print("===============");
+		Print(velocity_min);
+		Print(velocity_max);
+		Print(size);
+		Print(birth_rate);
+		Print(air_resistance);
+		Print(lifetime);
+		Print(lifetime_rnd);*/
 		
 		p.ScaleParticleParam(EmitorParam.VELOCITY, velocity_min);
 		p.ScaleParticleParam(EmitorParam.VELOCITY_RND, velocity_max);
 		p.ScaleParticleParam(EmitorParam.SIZE, size);
 		p.ScaleParticleParam(EmitorParam.BIRTH_RATE, birth_rate);
+		p.ScaleParticleParam(EmitorParam.AIR_RESISTANCE, air_resistance);
+		p.ScaleParticleParam(EmitorParam.AIR_RESISTANCE_RND, air_resistance);
+		p.ScaleParticleParam(EmitorParam.LIFETIME, lifetime);
+		p.ScaleParticleParam(EmitorParam.LIFETIME_RND, lifetime_rnd);
 	}
 	
 	void OnExitCalculations(Particle p, float outSpeedf)
 	{
-		float randomize_scale = Math.RandomFloat(0.33, 1);
-		float velocity_min = 1 + (outSpeedf * m_ExitSplashCoef)*randomize_scale;
-		float velocity_max = 1 + (outSpeedf * m_ExitSplashCoef)*randomize_scale;
-		float size = 1 + ( outSpeedf * m_ExitSplashCoef)*randomize_scale;
-		float birth_rate = 1 + (outSpeedf * m_ExitSplashCoef)*randomize_scale;
+		float velocity_min = 1 + (outSpeedf * m_ExitSplashCoef);
+		float velocity_max = 1 + (outSpeedf * m_ExitSplashCoef);
+		float size = 1 + ( outSpeedf * m_ExitSplashCoef);
+		float birth_rate = 1 + (outSpeedf * m_ExitSplashCoef);
 		
 		if (velocity_min < MIN_SCALING_PARAM)
 			velocity_min = MIN_SCALING_PARAM;
@@ -146,11 +169,10 @@ class EffBulletImpactBase : EffectParticle
 	
 	void OnRicochetCalculations(Particle p, float outspeedf)
 	{
-		float randomize_scale = Math.RandomFloat(0.66, 1);
-		float velocity_min = MIN_SCALING_PARAM + (m_StoppingForce * m_RicochetSplashCoef)*randomize_scale;
-		float velocity_max = MIN_SCALING_PARAM + (m_StoppingForce * m_RicochetSplashCoef)*randomize_scale;
-		float size = MIN_SCALING_PARAM + ( m_StoppingForce * m_RicochetSplashCoef)*randomize_scale;
-		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_RicochetSplashCoef)*randomize_scale;
+		float velocity_min = MIN_SCALING_PARAM + (m_StoppingForce * m_RicochetSplashCoef);
+		float velocity_max = MIN_SCALING_PARAM + (m_StoppingForce * m_RicochetSplashCoef);
+		float size = MIN_SCALING_PARAM + ( m_StoppingForce * m_RicochetSplashCoef);
+		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_RicochetSplashCoef);
 		
 		if (velocity_min < MIN_SCALING_PARAM)
 			velocity_min = MIN_SCALING_PARAM;
@@ -169,11 +191,10 @@ class EffBulletImpactBase : EffectParticle
 	
 	void OnEnterAngledCalculations(Particle p)
 	{
-		float randomize_scale = Math.RandomFloat(0.33, 1);
-		float velocity_min = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef)*randomize_scale;
-		float velocity_max = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef)*randomize_scale;
-		float size = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef)*randomize_scale;
-		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef)*randomize_scale;
+		float velocity_min = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef);
+		float velocity_max = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef);
+		float size = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef);
+		float birth_rate = MIN_SCALING_PARAM + (m_StoppingForce * m_EnterAngledSplashCoef);
 		
 		if (velocity_min < MIN_SCALING_PARAM)
 			velocity_min = MIN_SCALING_PARAM;
@@ -211,7 +232,10 @@ class EffBulletImpactBase : EffectParticle
 		}
 		else
 		{
-			p = Particle.PlayInWorld(m_ParticleEnter, m_Pos );
+			if (m_AmmoType != "MeleeFist"  &&  m_AmmoType != "MeleeFist_Heavy")
+			{
+				p = Particle.PlayInWorld(m_ParticleEnter, m_Pos );
+			}
 			
 			if (p)
 			{

@@ -11,6 +11,8 @@ class HumanItemBehaviorCfg
 	static int IKSETTING_AIMING = 0x1;
 	static int IKSETTING_RHAND 	= 0x2;
 	static int IKSETTING_LHAND  = 0x4;	
+	
+	int		m_iType;
 
 	int		m_iStanceMask;					//!< combinations of STANCEMASK_
 	int		m_StanceMovements[6];			//! 6 stances -> all has movement mask, STANCEIDX_ ... is index
