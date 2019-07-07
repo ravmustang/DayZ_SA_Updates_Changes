@@ -93,22 +93,7 @@
     <input name="UAUISelectItem" />
   </context>
 
-  <!-- Inputs excluded when in inventory -->
-  <exclude name="inventory">
-    <!--
-    <input name="UAMoveForward" />
-    <input name="UAMoveBack" />
-    <input name="UAMoveLeft" />
-    <input name="UAMoveRight" />
-    <input name="UAWalkRunTemp" />
-    -->
-    <input name="UAAimLeft" />
-    <input name="UAAimRight" />
-    <input name="UAAimUp" />
-    <input name="UAAimDown" />
-    <input name="UATurbo" />
-    <input name="UAGetOver" />
-    <input name="UAStand" />
+  <exclude name="gestures">
     <input name="UAGestureSlot01" />
     <input name="UAGestureSlot02" />
     <input name="UAGestureSlot03" />
@@ -121,19 +106,9 @@
     <input name="UAGestureSlot10" />
     <input name="UAGestureSlot11" />
     <input name="UAGestureSlot12" />
-    <input name="UAPersonView" />
-    <input name="UALookAround" />
-    <input name="UAFire" />
-    <input name="UAHeavyMeleeAttack" />
-    <input name="UADefaultAction" />
-    <input name="UAAction" />
-    <input name="UADropitem" />
-    <input name="UATempRaiseWeapon" />
-    <input name="UAReloadMagazine" />
-    <input name="UAQuickReload" />
-    <input name="UAZeroingUp" />
-    <input name="UAZeroingDown" />
-    <input name="UAToggleWeapons" />
+  </exclude>
+
+  <exclude name="hotkey">
     <input name="UAItem0" />
     <input name="UAItem1" />
     <input name="UAItem2" />
@@ -144,13 +119,26 @@
     <input name="UAItem7" />
     <input name="UAItem8" />
     <input name="UAItem9" />
-    <input name="UAUIQuickbarToggle" />
-    <input name="UALeanLeft" />
-    <input name="UALeanRight" />
-    <input name="UAZoomIn" />
-    <input name="UAZoomInOptics" />
-    <input name="UAZoomOutOptics" />
-    <input name="UAZoomInToggle" />	
+  </exclude>
+
+  <exclude name="aiming">
+    <input name="UAAimLeft" />
+    <input name="UAAimRight" />
+    <input name="UAAimUp" />
+    <input name="UAAimDown" />
+  </exclude>
+
+  <exclude name="movement">
+    <input name="UAMoveForward" />
+    <input name="UAMoveBack" />
+    <input name="UAMoveLeft" />
+    <input name="UAMoveRight" />
+    <input name="UAWalkRunTemp" />
+    <!-- "walk" below are only used on consoles now? Remove if not needed -->
+    <input name="UAWalkForward" />
+    <input name="UAWalkBack" />
+    <input name="UAWalkLeft" />
+    <input name="UAWalkRight" />	
     <input name="UACarLeft" />
     <input name="UACarRight" />
     <input name="UACarForward" />
@@ -163,39 +151,76 @@
     <input name="UATrackRight" />
     <input name="UATrackUp" />
     <input name="UATrackDown" />
+    <input name="UALeanLeft" />
+    <input name="UALeanRight" />
+	<input name="UAEvasiveLeft" />
+    <input name="UAEvasiveRight" />
+  </exclude>
+
+  <exclude name="stances">
+    <input name="UAGetOver" />
+    <input name="UAStance" />
+    <input name="UAStand" />
+    <input name="UACrouch" />
+    <input name="UAProne" />
+  </exclude>
+
+  <exclude name="optics">
+    <input name="UAZeroingUp" />
+    <input name="UAZeroingDown" />
+    <input name="UAZoomIn" />
+    <input name="UAZoomInOptics" />
+    <input name="UAZoomOutOptics" />
+    <input name="UAZoomInToggle" />	
+  </exclude>
+
+  <exclude name="actions">
+    <input name="UATurbo" />
+    <input name="UAPersonView" />
+    <input name="UALookAround" />
+    <input name="UAFire" />
+    <input name="UAHeavyMeleeAttack" />
+    <input name="UADefaultAction" />
+    <input name="UAAction" />
+    <input name="UADropitem" />
+    <input name="UAThrowitem" />
+    <input name="UAToggleWeapons" />
+    <input name="UAQuickReload" />
+    <input name="UAUIQuickbarToggle" />
+    <input name="UATempRaiseWeapon" />
+    <input name="UAReloadMagazine" />
+  </exclude>
+
+  <!-- Inputs excluded when in inventory -->
+  <exclude name="inventory">
+    <include name="gestures" />  
+    <include name="aiming" />  
+    <include name="stances" />  
+    <include name="optics" />  
+    <include name="actions" />  
+	<input name="UAUIGesturesOpen" />
   </exclude>
 
   <!-- Inputs excluded when in main menu -->
   <exclude name="menu">
     <include name="inventory" />
+    <include name="hotkey" />  
+    <include name="movement" />
     <input name="UAGear" />
-    <input name="UAMoveForward" />
-    <input name="UAMoveBack" />
-    <input name="UAMoveLeft" />
-    <input name="UAMoveRight" />
-    <input name="UAWalkRunTemp" />
-    <!-- "walk" below are only used on consoles now? Remove if not needed -->
-    <input name="UAWalkForward" />
-    <input name="UAWalkBack" />
-    <input name="UAWalkLeft" />
-    <input name="UAWalkRight" />	
   </exclude>
 	
   <!-- Inputs excluded when in radial menu -->
   <exclude name="radialmenu">
-    <input name="UAAimLeft" />
-    <input name="UAAimRight" />
-    <input name="UAAimUp" />
-    <input name="UAAimDown" />
-    <input name="UAFire" />
-    <input name="UADefaultAction" />
-    <input name="UAAction" />
-    <input name="UADropitem" />
-    <input name="UATempRaiseWeapon" />
-    <input name="UAQuickReload" />
-    <input name="UAReloadMagazine" />
+    <include name="hotkey" />  
+    <include name="gestures" />  
+    <include name="aiming" />  
+    <include name="movement" />
+    <include name="stances" />  
+    <include name="optics" />  
+    <include name="actions" />  
     <input name="UAGear" />
     <input name="UAUIMenu" />
+	<input name="UAUIQuickbarRadialInventoryOpen" />
   </exclude>
 
 

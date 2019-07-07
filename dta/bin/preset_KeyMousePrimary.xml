@@ -18,12 +18,17 @@
     <input name="UAWalkRunTemp">
         <btn name="kLControl" />
     </input>
+    <input name="UAWalkRunToggle">
+        <btn name="kLControl">
+			<event name="doubleclick" />
+		</btn>
+    </input>
 	
 	<!-- Jump, Climb -->
 	<input name="UAGetOver">
         <btn name="kSpace" />
     </input>
-	<input name="UAStand">
+	<input name="UAStance">
 		<btn name="kC" />
 	</input>
 	
@@ -85,6 +90,18 @@
 	<input name="UAZoomIn">
 		<btn name="mBMiddle" />
 	</input>
+	
+	<!-- NVG attachment controlls -->
+	<input name="UAToggleNVG">
+		<btn name="kL">
+			<event name="hold" />
+		</btn>
+	</input>
+	
+	<!-- Head torch/light controlls -->
+	<input name="UAToggleHeadlight">
+		<btn name="kL"	/>
+	</input>
 
 	<!-- Switch to Iron Sights -->
 	<input name="UAADSToggle">
@@ -110,8 +127,15 @@
 	<input name="UAFire">
 		<btn name="mBLeft" />
 	</input>
+	<input name="UAWeaponMeleeAttack">
+		<btn name="kF" />
+	</input>
 	
-
+	<!-- Hold Breath -->
+	<input name="UAHoldBreath">
+        <btn name="kLControl" />
+    </input>
+	
 	<!-- User Action -->
 	<input name="UADefaultAction">
         <btn name="mBLeft" />
@@ -131,7 +155,15 @@
 	</input>
 	
 	<input name="UADropItem">
-		<btn name="kG" />
+		<btn name="kG">
+			<event name="click" />
+		</btn>
+	</input>
+
+	<input name="UAThrowitem">
+		<btn name="kG">
+			<event name="holdbegin" />
+		</btn>
 	</input>
 
 	<!-- Raise Hands -->
@@ -200,38 +232,6 @@
 		<btn name="k9" />
 	</input>
 	<input name="UAItem9">
-		<btn name="k0" />
-	</input>
-	
-		<!-- Quickslots in Inventory -->
-	<input name="UAItemInventory0">
-		<btn name="k1" />
-	</input>
-	<input name="UAItemInventory1">
-		<btn name="k2" />
-	</input>
-	<input name="UAItemInventory2">
-		<btn name="k3" />
-	</input>
-	<input name="UAItemInventory3">
-		<btn name="k4" />
-	</input>
-	<input name="UAItemInventory4">
-		<btn name="k5" />
-	</input>
-	<input name="UAItemInventory5">
-		<btn name="k6" />
-	</input>
-	<input name="UAItemInventory6">
-		<btn name="k7" />
-	</input>
-	<input name="UAItemInventory7">
-		<btn name="k8" />
-	</input>
-	<input name="UAItemInventory8">
-		<btn name="k9" />
-	</input>
-	<input name="UAItemInventory9">
 		<btn name="k0" />
 	</input>
 
@@ -339,14 +339,18 @@
 	</input>
 
 	<!-- RADIAL MENUS -->
-
 	<input name="UAUIGesturesOpen">
 		<btn name="kPeriod" />
 	</input>
-		
-	<!-------------------->
+
+	<!-- INVENTORY SPECIFIC -->
+	<input name="UAUIRotateInventory">
+		<btn name="kSpace"/>
+	</input>
+
+	<!-- ****** -->
 	<!-- DEBUG SPECIFIC -->
-	<!-------------------->
+	<!-- ****** -->
 	
 	<!-- Freefly Camera -->
 	<input name="UAMoveUp">
@@ -356,9 +360,9 @@
 		<btn name="kZ" />
 	</input>	
 	
-	<!-------------------->
+	<!-- ****** -->
 	<!-- BULDOZER SPECIFIC -->
-	<!-------------------->
+	<!-- ****** -->
 	<!-- BULDOZER BOTH -->
 	<input name="UABuldResetCamera">
 		<btn name="kNumpad0" />

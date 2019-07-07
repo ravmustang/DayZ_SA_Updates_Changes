@@ -1,4 +1,4 @@
-<inputs version="108">
+<inputs version="118">
 	
 	<actions>
 		<!-- UAMoveForward == 0 !!! -->
@@ -12,9 +12,10 @@
 		<input name="UAEvasiveLeft" loc="STR_USRACT_EVASIVE_LEFT" visible="false" />
 		<input name="UAEvasiveRight" loc="STR_USRACT_EVASIVE_RIGHT" visible="false" />
 		<!--input name="UAEvasiveBack" loc="STR_USRACT_EVASIVE_BACK" visible="false" /-->
+		<input name="UAStance" loc="STR_USRACT_STANCE" />
 		<input name="UAStand" loc="STR_USRACT_STAND" />
-		<input name="UACrouch" loc="STR_USRACT_CROUCH" visible="false" />
-		<input name="UAProne" loc="STR_USRACT_PRONE" visible="false" />
+		<input name="UACrouch" loc="STR_USRACT_CROUCH" />
+		<input name="UAProne" loc="STR_USRACT_PRONE" />
 		<input name="UALeanLeft" loc="STR_USRACT_LEAN_LEFT" />
 		<input name="UALeanRight" loc="STR_USRACT_LEAN_RIGHT" />
 		<input name="UALeanIronsightLeft" loc="STR_USRACT_LEAN_IRONSIGHT_LEFT" visible="false" />
@@ -22,7 +23,7 @@
 		<input name="UALeanLeftToggle" loc="STR_USRACT_LEAN_LEFT_TOGGLE" visible="false" />
 		<input name="UALeanRightToggle" loc="STR_USRACT_LEAN_RIGHT_TOGGLE" visible="false" />
 		<input name="UAPersonCamSwitchSide" loc="STR_USRACT_PERSON_CAM_SWITCH_SIDE" visible="false" />
-		<input name="UAWalkRunToggle" loc="STR_USRACT_WALK_RUN_TOGGLE" visible="false" />
+		<input name="UAWalkRunToggle" loc="STR_USRACT_WALK_RUN_TOGGLE" />
 		<input name="UAWalkRunTemp" loc="STR_USRACT_WALK_RUN_TEMP" />
 		<input name="UAWalkForward" loc="STR_USRACT_WALK_RUN_TEMP" rangefrom="0.00" rangeto="0.55" visible="false" />
 		<input name="UAWalkBack" loc="STR_USRACT_WALK_RUN_TEMP" rangefrom="0.00" rangeto="0.55" visible="false" />
@@ -38,6 +39,7 @@
 		<input name="UAFire" loc="STR_USRACT_FIRE" />
 		<input name="UADefaultAction" loc="STR_USRACT_ACTION" />
 		<input name="UAHeavyMeleeAttack" loc="STR_USRACT_UAHeavyMeleeAttack" visible="false" />
+		<input name="UAWeaponMeleeAttack" loc="STR_USRACT_UAHeavyMeleeAttack" />
 		<input name="UAReloadMagazine" loc="STR_USRACT_RELOAD_MAGAZINE" />
 		<input name="UAQuickReload" loc="STR_USRACT_UAQuickReload" />
 		<input name="UATempRaiseWeapon" loc="STR_USRACT_TEMP_RAISE_WEAPON" />
@@ -48,7 +50,7 @@
 		<input name="UAPrevAction" loc="STR_USRACT_UAPrevAction" />
 		<input name="UANextAction" loc="STR_USRACT_UANextAction" />
 
-		<input name="UAThrowitem" loc="" visible="false" />
+		<input name="UAThrowitem" loc="STR_USRACT_THROW_ITEM" />
 		<input name="UADropitem" loc="STR_USRACT_UADropItem" />
 		<input name="UAMoveItemFromHandsToInventory" loc="" visible="false" />
 		<input name="UAHeadlights" loc="" visible="false" />
@@ -76,6 +78,8 @@
 		<input name="UAZeroingUp" loc="STR_USRACT_ZEROING_UP" />
 		<input name="UAZeroingDown" loc="STR_USRACT_ZEROING_DOWN" />
 		<input name="UAToggleFlashlight" loc="" visible="false" />
+		<input name="UAToggleNVG" loc="TOGGLE_NVG" />
+		<input name="UAToggleHeadlight" loc="TOGGLE_LIGHT_HEAD" />
 		
 		<input name="UALookAround" loc="STR_USRACT_ACTION_FREELOOK" />
 
@@ -96,7 +100,7 @@
 		<input name="UAVehicleTurbo" loc="STR_USRACT_VEHICLE_TURBO" />
 		<input name="UAVehicleSlow" loc="STR_USRACT_CAR_SLOW_FORWARD" />
 		<input name="UAWalk" loc="" visible="false" />
-		<input name="UAHoldBreath" loc="STR_USRACT_UAHoldBreath" visible="false" />
+		<input name="UAHoldBreath" loc="STR_USRACT_UAHoldBreath" />
 		<input name="UAHoldBreathToggle" loc="STR_USRACT_UAHoldBreath" visible="false" />
 
 		<input name="UAGestureSlot01" loc="STR_USRACT_UAGestureSlot01" />
@@ -262,27 +266,15 @@
 		<input name="UAItem8" loc="STR_USRACT_ITEM_8" />
 		<input name="UAItem9" loc="STR_USRACT_ITEM_9" />
 		<input name="UAItemsShow" loc="" visible="false" />
-		
-		<!-- 	// Item shortcuts for Inventory -->
-		<input name="UAItemInventory0" loc="" visible="false" />
-		<input name="UAItemInventory1" loc="" visible="false" />
-		<input name="UAItemInventory2" loc="" visible="false" />
-		<input name="UAItemInventory3" loc="" visible="false" />
-		<input name="UAItemInventory4" loc="" visible="false" />
-		<input name="UAItemInventory5" loc="" visible="false" />
-		<input name="UAItemInventory6" loc="" visible="false" />
-		<input name="UAItemInventory7" loc="" visible="false" />
-		<input name="UAItemInventory8" loc="" visible="false" />
-		<input name="UAItemInventory9" loc="" visible="false" />
 
 		<!--input name="UAAltTab" loc="" visible="false" /-->
 
 		<input name="UAUISelect" loc="STR_USRACT_MENU_SELECT" visible="false" />
 		<input name="UAUIBack" loc="STR_USRACT_MENU_BACK" visible="false" core="true" />
-		<input name="UAUILeft" loc="STR_USRACT_MENU_LEFT" deadzone="0.55" visible="false" />
-		<input name="UAUIRight" loc="STR_USRACT_MENU_RIGHT" deadzone="0.55" visible="false" />
-		<input name="UAUIUp" loc="STR_USRACT_MENU_UP" deadzone="0.55" visible="false" />
-		<input name="UAUIDown" loc="STR_USRACT_MENU_DOWN" deadzone="0.55" visible="false" />
+		<input name="UAUILeft" loc="STR_USRACT_MENU_LEFT" deadzone="0.55" visible="false" noinvert="false" />
+		<input name="UAUIRight" loc="STR_USRACT_MENU_RIGHT" deadzone="0.55" visible="false" noinvert="false" />
+		<input name="UAUIUp" loc="STR_USRACT_MENU_UP" deadzone="0.55" visible="false" noinvert="false" />
+		<input name="UAUIDown" loc="STR_USRACT_MENU_DOWN" deadzone="0.55" visible="false" noinvert="false" />
 		<input name="UAUIMenu" loc="STR_USRACT_UAUIMenu" visible="false" core="true" />
 		<input name="UAUIDrag" loc="" visible="false" />
 		<input name="UAUITabLeft" loc="STR_USRACT_UAUITabLeft" visible="false" />
@@ -301,6 +293,7 @@
 		<input name="UAUIFastTransferToVicinity" loc="STR_USRACT_UAUIFastTransferToVicinity" visible="false" />
 		<input name="UAUIExpandCollapseContainer" loc="STR_USRACT_UAUIExpandCollapseContainer" visible="false" />
 		<input name="UAUISelectItem" loc="STR_USRACT_UAUISelectItem" visible="false" />
+		<input name="UAUIRotateInventory" loc="todo:" visible="false" />
 
 		<input name="UACameraFovLookCompensationToggle" loc="" visible="false" />
 		<input name="UAFreeCamLowerSensitivity" loc="" visible="false" />
