@@ -70,6 +70,7 @@ class HudDebugWinCharLevels extends HudDebugWinBase
 			if ( player )
 			{
 				player.RPCSingleParam( ERPCs.DEV_LEVELS_UPDATE, params, true );
+				SetRPCSent();
 			}
 		}
 		//else set directly

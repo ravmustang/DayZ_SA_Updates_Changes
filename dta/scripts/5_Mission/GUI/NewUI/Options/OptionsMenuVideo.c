@@ -64,7 +64,8 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	
 	void OptionsMenuVideo( Widget parent, Widget details_root, GameOptions options, OptionsMenu menu )
 	{
-		m_Root							= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/pc/video_tab.layout", parent );
+		m_Root							= GetGame().GetWorkspace().CreateWidgets( GetLayoutName(), parent );
+		
 		m_DetailsRoot					= details_root;
 		m_DetailsLabel					= TextWidget.Cast( m_DetailsRoot.FindAnyWidget( "details_label" ) );
 		m_DetailsText					= RichTextWidget.Cast( m_DetailsRoot.FindAnyWidget( "details_content" ) );
@@ -100,7 +101,7 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 		ref array<string> opt2			= { "#options_video_fullscreen", "#options_video_windowed" };
 		ref array<string> opt3			= { "#options_video_low", "#options_video_medium", "#options_video_high" };
 		ref array<string> opt4			= { "#options_video_poor", "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme" };
-		ref array<string> opt41			= { "#options_video_poor", "#options_video_low", "#options_video_medium", "#options_video_high" };
+		ref array<string> opt41			= { "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme" };
 		ref array<string> opt5			= { "#options_video_poor", "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme", "#options_video_custom" };
 		ref array<string> opt6			= { "#options_controls_disabled", "#options_video_low", "#options_video_medium", "#options_video_high", "#options_video_extreme" };
 		ref array<string> opt7			= { "#options_controls_disabled", "#options_video_low", "#options_video_medium", "#options_video_high" };
@@ -179,6 +180,11 @@ class OptionsMenuVideo extends ScriptedWidgetEventHandler
 	void ~OptionsMenuVideo()
 	{
 		GetGame().EndOptionsVideo();
+	}
+	
+	string GetLayoutName()
+	{
+		return "gui/layouts/new_ui/options/pc/video_tab.layout";
 	}
 	
 	void Focus()

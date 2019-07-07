@@ -93,14 +93,14 @@ class PlayerListScriptedWidget extends ScriptedWidgetEventHandler
 			foreach( string UID, ref PlayerListEntryScriptedWidget widget : m_Entries )
 			{
 				BiosFriendInfo player_found;
-				foreach( BiosFriendInfo player : player_list )
+				int j = 0;
+				while( !player_found && j < player_list.Count() )
 				{
-					if( player && player.m_Uid == UID )
-					{
-						player_found = player;
-						break;
-					}
+					if( player_list[j].m_Uid == UID )
+						player_found = player_list[j];
+					j++;
 				}
+				
 				if( !player_found )
 				{
 					RemovePlayer( UID );

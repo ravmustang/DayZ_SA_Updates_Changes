@@ -67,6 +67,7 @@ class HudDebugWinCharAgents extends HudDebugWinBase
 			if ( player )
 			{
 				player.RPCSingleParam( ERPCs.DEV_AGENTS_UPDATE, params, true );
+				SetRPCSent();
 			}
 		}
 		//else set directly

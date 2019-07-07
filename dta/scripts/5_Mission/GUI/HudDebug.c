@@ -31,6 +31,7 @@ class HudDebug extends Hud
 	static const int HUD_WIN_CHAR_AGENTS		= 3;
 	static const int HUD_WIN_CHAR_DEBUG			= 4;
 	static const int HUD_WIN_CHAR_LEVELS		= 5;
+	static const int HUD_WIN_CHAR_STOMACH		= 6;
 	
 	Widget							m_WgtRoot;
 	Widget							m_Crosshair;
@@ -88,6 +89,10 @@ class HudDebug extends Hud
 		// Register Window Chracter Debug
 		HudDebugWinCharDebug win_char_debug = new HudDebugWinCharDebug( m_WgtRoot.FindAnyWidget( "wdw_CharacterDebug" ) );
 		m_Panels.Insert( win_char_debug );
+				
+		// Register Window Chracter Debug
+		HudDebugWinCharStomach win_char_stomach = new HudDebugWinCharStomach( m_WgtRoot.FindAnyWidget( "wdw_CharacterStomach" ) );
+		m_Panels.Insert( win_char_stomach );
 		
 		
 		RefreshByLocalProfile();
@@ -217,6 +222,7 @@ class HudDebug extends Hud
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_MODIFIERS, 	module_cfg_profile.GetCharacterModifiersVisible() );
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_AGENTS,	 	module_cfg_profile.GetCharacterAgentsVisible() );
 			SetPanelVisible( HudDebug.HUD_WIN_CHAR_DEBUG, 		module_cfg_profile.GetCharacterDebugVisible() );
+			SetPanelVisible( HudDebug.HUD_WIN_CHAR_STOMACH, 	module_cfg_profile.GetCharacterStomachVisible() );
 		}
 	}
 	

@@ -51,6 +51,11 @@ class ChatInputMenu extends UIScriptedMenu
 		return true;
 	}
 	
+	override void OnShow()
+	{
+		SetFocus( m_edit_box );
+	}
+	
 	override void OnHide()
 	{
 		super.OnHide();

@@ -70,6 +70,7 @@ class HudDebugWinCharStats extends HudDebugWinBase
 			if ( player )
 			{
 				player.RPCSingleParam( ERPCs.DEV_STATS_UPDATE, params, true );
+				SetRPCSent();
 			}
 		}
 		//else set directly

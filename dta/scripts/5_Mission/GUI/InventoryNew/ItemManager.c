@@ -321,6 +321,11 @@ class ItemManager
 	void SetIsDragging( bool is_dragging )
 	{
 		m_IsDragging = is_dragging;
+		if( !is_dragging )
+		{
+			SetDraggedItem( null );
+			SetDraggedIcon( null );
+		}
 	}
 
 	bool IsDragging()
@@ -343,15 +348,15 @@ class ItemManager
 			{
 				case -1 :
 					break;
-				case STATE_PRISTINE:
+				case GameConstants.STATE_PRISTINE:
 					return Colors.COLOR_PRISTINE;
-				case STATE_WORN:
+				case GameConstants.STATE_WORN:
 					return Colors.COLOR_WORN;
-				case STATE_DAMAGED:
+				case GameConstants.STATE_DAMAGED:
 					return Colors.COLOR_DAMAGED;
-				case STATE_BADLY_DAMAGED:
+				case GameConstants.STATE_BADLY_DAMAGED:
 					return Colors.COLOR_BADLY_DAMAGED;
-				case STATE_RUINED:
+				case GameConstants.STATE_RUINED:
 					return Colors.COLOR_RUINED;	
 			}
 		}
@@ -533,7 +538,7 @@ class ItemManager
 				flags = flags | InventoryCombinationFlags.ADD_AS_ATTACHMENT;
 			}
 		}
-		if( entity1.GetInventory().CanAddEntityInCargo( entity2 ) ) flags = flags | InventoryCombinationFlags.ADD_AS_CARGO;
+		if( entity1.GetInventory().CanAddEntityInCargo( entity2, entity2.GetInventory().GetFlipCargo() ) ) flags = flags | InventoryCombinationFlags.ADD_AS_CARGO;
 
 		if( entity1 == m_player.GetHumanInventory().GetEntityInHands() || entity2 == m_player.GetHumanInventory().GetEntityInHands())
 		{

@@ -77,6 +77,15 @@ class SlotsIcon: LayoutHolder
 		SetActive( false );
 	}
 	
+	void ~SlotsIcon()
+	{
+		if( m_Obj )
+		{
+			m_Obj.GetOnItemFlipped().Remove( UpdateFlip );
+			m_Obj.GetOnViewIndexChanged().Remove( SetItemPreview );
+		}
+	}
+	
 	Widget GetPanelWidget()
 	{
 		return m_PanelWidget;
@@ -264,7 +273,7 @@ class SlotsIcon: LayoutHolder
 				float progress_max = m_QuantityProgress.GetMax();
 				int max = m_Item.ConfigGetInt( "varQuantityMax" );
 				int count = m_Item.ConfigGetInt( "count" );
-				float quantity = QuantityConversions.GetItemQuantity( InventoryItem.Cast( m_Item ) );
+				float quantity = QuantityConversions.GetItemQuantity( m_Item );
 
 				if( count > 0 )
 				{
@@ -301,6 +310,13 @@ class SlotsIcon: LayoutHolder
 			m_ItemSizeWidget.SetText( ( size_x * size_y ).ToString() );
 		}
 	}
+	
+	void UpdateFlip( bool flipped )
+	{
+		float x_content, y_content;
+		GetPanelWidget().GetScreenSize( x_content, y_content );
+		GetPanelWidget().SetSize( y_content, x_content );
+	}
 
 	void Init( EntityAI obj )
 	{
@@ -309,7 +325,9 @@ class SlotsIcon: LayoutHolder
 			Clear();
 			m_Obj	= obj;
 			m_Item	= ItemBase.Cast( m_Obj );
-			
+			m_Obj.GetOnItemFlipped().Insert( UpdateFlip );
+			m_Obj.GetOnViewIndexChanged().Insert( SetItemPreview );
+
 			SetItemPreview();
 			
 			CheckIsWeapon();
@@ -327,12 +345,19 @@ class SlotsIcon: LayoutHolder
 	
 	void Clear()
 	{
+		if( m_Obj )
+		{
+			m_Obj.GetOnItemFlipped().Remove( UpdateFlip );
+			m_Obj.GetOnViewIndexChanged().Remove( SetItemPreview );
+		}
+			
 		m_Obj = null;
 		m_Item = null;
 		
 		m_ItemPreview.Show( false );
 		m_ItemPreview.SetItem( null );
 		
+		m_CurrQuantity = -1;
 		m_IsWeapon = false;
 		m_IsMagazine = false;
 		m_HasTemperature = false;
@@ -390,7 +415,7 @@ class SlotsIcon: LayoutHolder
 	
 	void CheckHasItemSize()
 	{
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 		string config = "CfgVehicles " + m_Obj.GetType() + " GUIInventoryAttachmentsProps";
 		m_HasItemSize = ( InventoryItem.Cast( m_Obj ) && !GetGame().ConfigIsExisting( config ) );
 		#else

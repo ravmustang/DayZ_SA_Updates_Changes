@@ -58,6 +58,7 @@ class ScriptConsole extends UIScriptedMenu
 		m_LogsEnabled		= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_LogsEnabled") );
 		m_HudDCharStats		= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterStats") );
 		m_HudDCharLevels	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterLevels") );
+		m_HudDCharStomach	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterStomach") );
 		m_HudDCharModifiers	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterModifiers") );
 		m_HudDCharAgents	= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterAgents") );
 		m_HudDCharDebug		= CheckBoxWidget.Cast( layoutRoot.FindAnyWidget("cbx_CharacterDebug") );
@@ -115,6 +116,7 @@ class ScriptConsole extends UIScriptedMenu
 		// Update checkbox Character Values
 		m_HudDCharStats.SetChecked(m_ConfigDebugProfile.GetCharacterStatsVisible());
 		m_HudDCharLevels.SetChecked(m_ConfigDebugProfile.GetCharacterLevelsVisible());
+		m_HudDCharStomach.SetChecked(m_ConfigDebugProfile.GetCharacterStomachVisible());
 		m_HudDCharModifiers.SetChecked(m_ConfigDebugProfile.GetCharacterModifiersVisible());
 		m_HudDCharAgents.SetChecked(m_ConfigDebugProfile.GetCharacterAgentsVisible());
 		m_HudDCharDebug.SetChecked(m_ConfigDebugProfile.GetCharacterDebugVisible());
@@ -464,6 +466,18 @@ class ScriptConsole extends UIScriptedMenu
 			if ( m_ConfigDebugProfile )
 			{
 				m_ConfigDebugProfile.SetCharacterLevelsVisible(m_HudDCharLevels.IsChecked());
+			}
+
+			// Refresh UI by new settings
+			m_MissionGameplay.GetHudDebug().RefreshByLocalProfile();
+
+			return true;
+		}
+		else if ( w == m_HudDCharStomach )
+		{
+			if ( m_ConfigDebugProfile )
+			{
+				m_ConfigDebugProfile.SetCharacterStomachVisible(m_HudDCharStomach.IsChecked());
 			}
 
 			// Refresh UI by new settings
@@ -1515,6 +1529,7 @@ class ScriptConsole extends UIScriptedMenu
 	CheckBoxWidget		m_LogsEnabled;
 	CheckBoxWidget		m_HudDCharStats;
 	CheckBoxWidget		m_HudDCharLevels;
+	CheckBoxWidget		m_HudDCharStomach;
 	CheckBoxWidget		m_HudDCharModifiers;
 	CheckBoxWidget		m_HudDCharAgents;
 	CheckBoxWidget		m_HudDCharDebug;

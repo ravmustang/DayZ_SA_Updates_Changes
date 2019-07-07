@@ -102,14 +102,14 @@ class InspectMenuNew extends UIScriptedMenu
 		
 		if ( w == m_item_widget )
 		{
-			GetGame().GetDragQueue().Call(this, "UpdateScale");
-			m_characterScaleDelta = wheel ;
+			m_characterScaleDelta = wheel;
+			UpdateScale();
 		}
 		return false;
 	}
 	
 	//--------------------------------------------------------------------------
-	void UpdateScale(int mouse_x, int mouse_y, int wheel, bool is_dragging)
+	void UpdateScale()
 	{
 		float w, h, x, y;		
 		m_item_widget.GetPos(x, y);
@@ -173,30 +173,30 @@ class InspectMenuNew extends UIScriptedMenu
 		
 		switch(damageLevel)
 		{
-			case STATE_RUINED:
+			case GameConstants.STATE_RUINED:
 			{
 				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_ruined", Colors.COLOR_RUINED);
 				break;
 			}
-			case STATE_BADLY_DAMAGED:
+			case GameConstants.STATE_BADLY_DAMAGED:
 			{
 				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_badly", Colors.COLOR_BADLY_DAMAGED);
 				break;
 			}
 			
-			case STATE_DAMAGED:
+			case GameConstants.STATE_DAMAGED:
 			{
 				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_damaged", Colors.COLOR_DAMAGED);
 				break;
 			}
 			
-			case STATE_WORN:
+			case GameConstants.STATE_WORN:
 			{
 				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_worn", Colors.COLOR_WORN);
 				break;
 			}
 			
-			case STATE_PRISTINE:
+			case GameConstants.STATE_PRISTINE:
 			{
 				WidgetTrySetText(root_widget, "ItemDamageWidget", "#inv_inspect_pristine", Colors.COLOR_PRISTINE);
 				break;
@@ -353,19 +353,19 @@ class InspectMenuNew extends UIScriptedMenu
 			bagwet = parent.ConfigGetFloat("absorbency");
 		}
 		
-		if( wetness < STATE_DAMP )
+		if( wetness < GameConstants.STATE_DAMP )
 		{
 			WidgetTrySetText(root_widget, "ItemWetnessWidget", "");
 		}
-		else if( wetness >= STATE_DAMP && wetness < STATE_WET )
+		else if( wetness >= GameConstants.STATE_DAMP && wetness < GameConstants.STATE_WET )
 		{
 			WidgetTrySetText(root_widget, "ItemWetnessWidget", "#inv_inspcet_damp", Colors.COLOR_DAMP);
 		}
-		else if( wetness >= STATE_WET && wetness < STATE_SOAKING_WET )
+		else if( wetness >= GameConstants.STATE_WET && wetness < GameConstants.STATE_SOAKING_WET )
 		{
 			WidgetTrySetText( root_widget, "ItemWetnessWidget", "#inv_inspect_wet", Colors.COLOR_WET );
 		}
-		else if( wetness >= STATE_SOAKING_WET && wetness < STATE_DRENCHED )
+		else if( wetness >= GameConstants.STATE_SOAKING_WET && wetness < GameConstants.STATE_DRENCHED )
 		{
 			WidgetTrySetText( root_widget, "ItemWetnessWidget", "#inv_inspect_soaking_wet", Colors.COLOR_SOAKING_WET );
 		}

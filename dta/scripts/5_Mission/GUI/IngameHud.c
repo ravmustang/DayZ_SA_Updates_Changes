@@ -9,11 +9,15 @@ class IngameHud extends Hud
 
 	protected ref map<ImageWidget, int>			m_TendencyStatusCritical;	//array of icons that are blinking due to critical tendency status
 	protected const float						TENDENCY_BLINK_TIME = 0.25;
+	protected float								m_BlinkTime;
 	
 	protected ref map<int,string>				m_BadgesWidgetNames;
-	protected ref map<int,bool>					m_BadgesWidgetDisplay;
+	protected ref map<int,int>					m_BadgesWidgetDisplay;
 	protected ref map<int,ImageWidget>			m_BadgesWidgets;  // [key] ImageWidget
 	protected bool								m_AnyBadgeVisible;
+	protected bool								m_IsTemperatureVisible;
+	protected float								m_TemperatureTimer;
+	protected float								m_TemperatureShowTime = 30;
 	
 	protected ref map<int,string>				m_VehicleGearTable;
 
@@ -25,6 +29,8 @@ class IngameHud extends Hud
 	protected Widget							m_VehiclePanel;
 	
 	protected ImageWidget						m_VehicleRPMPointer;
+	protected ImageWidget						m_VehicleRPMDial;
+	protected ImageWidget						m_VehicleRPMRedline;
 	protected ImageWidget						m_VehicleSpeedPointer;
 	protected ImageWidget						m_VehicleTemperaturePointer;
 	protected ImageWidget						m_VehicleFuelPointer;
@@ -62,11 +68,10 @@ class IngameHud extends Hud
 	
 	protected ProgressBarWidget					m_Stamina;
 	protected Widget							m_StaminaBackground;
-	protected Widget							m_SpecializationPanel;
-	protected Widget							m_SpecializationIcon;
 	protected Widget							m_Presence;
 	protected Widget							m_StanceProne;
 	protected Widget							m_StanceStand;
+	protected Widget							m_StanceStandWalk;
 	protected Widget							m_StanceCrouch;
 	protected Widget							m_StanceCar;
 	protected Widget							m_StancePanel;
@@ -112,7 +117,12 @@ class IngameHud extends Hud
 	// CrossHairs
 	protected ImageWidget						m_PermanentCrossHair;
 	
+	protected bool								m_HudHideUI;
+	protected bool								m_HudHidePlayer;
+	protected bool								m_HudInventory;
 	protected bool								m_HudState;
+	protected bool								m_QuickbarHideUI;
+	protected bool								m_QuickbarHidePlayer;
 	protected bool								m_QuickbarState;
 	protected bool								m_Faded;
 	protected bool								m_ZeroingKeyPressed;
@@ -141,7 +151,7 @@ class IngameHud extends Hud
 		
 		m_BadgesWidgets					= new map<int, ImageWidget>; // [key] widgetName
 		m_BadgesWidgetNames				= new map<int, string>;
-		m_BadgesWidgetDisplay			= new map<int, bool>;
+		m_BadgesWidgetDisplay			= new map<int, int>;
 
 		m_VehicleGearTable				= new map<int, string>;
 		m_VehicleGearTable.Set( -1, "" );
@@ -184,8 +194,6 @@ class IngameHud extends Hud
 		
 		//Panels
 		Class.CastTo(m_Stamina, m_HudPanelWidget.FindAnyWidget("StaminaBar"));
-		m_SpecializationPanel			= m_HudPanelWidget.FindAnyWidget("SpecializationPanelPanel");
-		m_SpecializationIcon			= m_HudPanelWidget.FindAnyWidget("SpecializationIcon");
 		m_Presence						= m_HudPanelWidget.FindAnyWidget("PresencePanel");
 		m_Badges						= hud_panel_widget.FindAnyWidget("BadgesPanel");
 		m_Notifiers						= m_HudPanelWidget.FindAnyWidget("NotifiersPanel");
@@ -196,6 +204,8 @@ class IngameHud extends Hud
 		m_VehiclePanel					= m_HudPanelWidget.FindAnyWidget("VehiclePanel");
 		
 		m_VehicleRPMPointer				= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("RPMPointer") );
+		m_VehicleRPMDial				= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("RPMDial") );
+		m_VehicleRPMRedline				= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("RPMDialRedline") );
 		m_VehicleSpeedPointer			= ImageWidget.Cast( m_VehiclePanel.FindAnyWidget("SpeedPointer") );
 		m_VehicleSpeedValue				= TextWidget.Cast( m_VehiclePanel.FindAnyWidget("SpeedValue") );
 		
@@ -221,6 +231,7 @@ class IngameHud extends Hud
 		m_StanceProne					= m_HudPanelWidget.FindAnyWidget("StanceProne");
 		m_StanceCrouch					= m_HudPanelWidget.FindAnyWidget("StanceCrouch");
 		m_StanceStand					= m_HudPanelWidget.FindAnyWidget("StanceStand");
+		m_StanceStandWalk				= m_HudPanelWidget.FindAnyWidget("StanceStandWalk");
 		m_StanceCar						= m_HudPanelWidget.FindAnyWidget("StanceCar");
 		m_StancePanel					= m_HudPanelWidget.FindAnyWidget("StancePanel");
 
@@ -280,7 +291,7 @@ class IngameHud extends Hud
 			m_BadgesWidgetNames.Set( NTFKEY_STUFFED, "Stomach" );
 			m_BadgesWidgetNames.Set( NTFKEY_SICK, "Sick" );
 			m_BadgesWidgetNames.Set( NTFKEY_WETNESS, "Wetness" );
-			m_BadgesWidgetNames.Set( NTFKEY_FEVERISH, "Skull" );
+			m_BadgesWidgetNames.Set( NTFKEY_POISONED, "Poisoned" );
 			m_BadgesWidgetNames.Set( NTFKEY_BLEEDISH, "Bleeding" );
 			m_BadgesWidgetNames.Set( NTFKEY_LIVES, "Shock" );
 			m_BadgesWidgetNames.Set( NTFKEY_PILLS, "Pills" );
@@ -318,8 +329,10 @@ class IngameHud extends Hud
 //		#endif
 		
 		SetLeftStatsVisibility( true );
-		ToggleHud( g_Game.GetProfileOption( EDayZProfilesOptions.HUD ) );
-		ToggleQuickBar( g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR ) );
+		m_HudState = g_Game.GetProfileOption( EDayZProfilesOptions.HUD );
+#ifndef PLATFORM_CONSOLE
+		m_QuickbarState = g_Game.GetProfileOption(EDayZProfilesOptions.QUICKBAR);
+#endif // !PLATFORM_CONSOLE
 	}
 	
 	override void OnResizeScreen()
@@ -384,44 +397,6 @@ class IngameHud extends Hud
 	{
 		m_CursorWidget.Show( true );
 	}
-
-	override void RefreshQuantity( EntityAI item_to_refresh )
-	{
-		InventoryMenu inventory;
-		MissionGameplay mission;
-
-		UIManager manager = GetGame().GetUIManager();
-		Class.CastTo(inventory, manager.FindMenu( MENU_INVENTORY ));
-		Class.CastTo(mission, GetGame().GetMission());
-		if(	mission )
-		{
-			inventory = mission.GetInventory();
-		}
-		
-		if( inventory )
-		{
-			inventory.RefreshQuantity( item_to_refresh );
-		}
-	}
-	
-	override void RefreshItemPosition( EntityAI item_to_refresh )
-	{
-		InventoryMenu inventory;
-		MissionGameplay mission;
-
-		UIManager manager = GetGame().GetUIManager();
-		Class.CastTo(inventory, manager.FindMenu( MENU_INVENTORY ));
-		Class.CastTo(mission, GetGame().GetMission());
-		if(	mission )
-		{
-			inventory = mission.GetInventory();
-		}
-		
-		if( inventory )
-		{
-			inventory.RefreshItemPosition( item_to_refresh );
-		}
-	}
 	
 	override void HideCursor()
 	{
@@ -456,7 +431,6 @@ class IngameHud extends Hud
 	override void DisplayNotifier( int key, int tendency, int status )
 	{
 		ImageWidget w;
-		Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
 		if( key == NTFKEY_FEVERISH )
 		{
 			DisplayTendencyTemp( key, tendency, status );
@@ -465,6 +439,7 @@ class IngameHud extends Hud
 		{
 			DisplayTendencyNormal( key, tendency, status );
 		}
+		
 		// tendency arrows
 		string arrow_name = "ArrowUp";
 		if ( tendency < 0 )
@@ -528,15 +503,30 @@ class IngameHud extends Hud
 	
 	void DisplayTendencyTemp( int key, int tendency, int status )
 	{
-		ImageWidget w;
-		Class.CastTo(w,  m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
+		ImageWidget w = ImageWidget.Cast( m_Notifiers.FindAnyWidget( String( "Icon" + m_StatesWidgetNames.Get( key ) ) ) );
+		TextWidget temp_top = TextWidget.Cast( m_Notifiers.FindAnyWidget( "TemperatureValueTop" ) );
+		TextWidget temp_bot = TextWidget.Cast( m_Notifiers.FindAnyWidget( "TemperatureValueBottom" ) );
+		//string temp = player..ToString() + "°C";
 		float alpha = w.GetAlpha();
+		
+		if ( tendency < 0 )
+		{
+			temp_top.Show( true );
+			temp_bot.Show( false );
+		}
+		else
+		{
+			temp_top.Show( false );
+			temp_bot.Show( true );
+		}
+		
 		switch( status )
 		{
 			case 2:
 				w.SetColor( ARGB( alpha * 255, 220, 220, 0 ) );		//WARNING_PLUS
 				m_TendencyStatusCritical.Remove( w );
 				w.SetImage( 1 );
+				
 				break;
 			case 3:
 				w.SetColor( ARGB( alpha * 255, 220, 0, 0 ) );		//CRITICAL_PLUS
@@ -575,11 +565,12 @@ class IngameHud extends Hud
 		}
 	}
 	
-	override void DisplayBadge( int key, bool show )
+	override void DisplayBadge( int key, int value )
 	{
-		m_BadgesWidgetDisplay.Set( key, show );
+		TextWidget bleed_count = TextWidget.Cast( m_Badges.FindAnyWidget( "BleedingCount" ) );
+		
+		m_BadgesWidgetDisplay.Set( key, value );
 		m_AnyBadgeVisible = false;
-		int x = 0;
 		for ( int i = 0; i < m_BadgesWidgetDisplay.Count(); i++ )
 		{
 			int badge_key = m_BadgesWidgetDisplay.GetKey( i );
@@ -588,20 +579,47 @@ class IngameHud extends Hud
 			Class.CastTo(badge_widget,  m_Badges.FindAnyWidget( badge_name ) );
 			if ( badge_widget )
 			{
-				if ( m_BadgesWidgetDisplay.Get( badge_key ) )
+				if ( m_BadgesWidgetDisplay.Get( badge_key ) > 0 )
 				{
-					badge_widget.SetPos ( x * 0.2, 0.0, true);
 					badge_widget.Show( true );
-					x = x + 1;
 					m_AnyBadgeVisible = true;
+					if( badge_key == NTFKEY_BLEEDISH )
+					{
+						bleed_count.Show( true );
+						bleed_count.SetText( m_BadgesWidgetDisplay.Get( badge_key ).ToString() );
+					}
 				}
 				else
 				{
+					if( badge_key == NTFKEY_BLEEDISH )
+					{
+						bleed_count.Show( false );
+					}
 					badge_widget.Show( false );
 				}
 			}
 		}
 		m_BadgeNotifierDivider.Show( m_HudState && m_AnyBadgeVisible );
+	}
+	
+	override void SetTemperature( string temp )
+	{
+		m_IsTemperatureVisible = true;
+		TextWidget temp_top = TextWidget.Cast( m_Notifiers.FindAnyWidget( "TemperatureValueTop" ) );
+		TextWidget temp_bot = TextWidget.Cast( m_Notifiers.FindAnyWidget( "TemperatureValueBottom" ) );
+		temp_top.SetText( temp );
+		temp_bot.SetText( temp );
+		m_TemperatureTimer = 0;
+	}
+	
+	void HideTemperature()
+	{
+		m_IsTemperatureVisible = false;
+		TextWidget temp_top = TextWidget.Cast( m_Notifiers.FindAnyWidget( "TemperatureValueTop" ) );
+		TextWidget temp_bot = TextWidget.Cast( m_Notifiers.FindAnyWidget( "TemperatureValueBottom" ) );
+		temp_top.SetText( "" );
+		temp_bot.SetText( "" );
+		m_TemperatureTimer = 0;
 	}
 	
 	// state 0 = empty
@@ -621,7 +639,7 @@ class IngameHud extends Hud
 			return;
 		}*/
 		float sx, sy;
-		float max = STAMINA_MAX;
+		float max = GameConstants.STAMINA_MAX;
 		float percentage =  range / max;
 		m_Stamina.SetCurrent( ( value / range ) * 100 );
 		m_Stamina.GetSize( sx, sy );
@@ -767,18 +785,6 @@ class IngameHud extends Hud
 		m_ZeroingKeyPressed = true;
 	}
 	
-	override void InitInventory()
-	{
-		UIManager manager = GetGame().GetUIManager();
-		InventoryMenu inventory = InventoryMenu.Cast(manager.FindMenu( MENU_INVENTORY ));
-		MissionGameplay mission = MissionGameplay.Cast(GetGame().GetMission());
-
-		if(	mission )
-		{
-			mission.InitInventory();
-		}
-	}
-	
 	override void DisplayStance( int stance )
 	{
 		PlayerBase player;
@@ -788,7 +794,9 @@ class IngameHud extends Hud
 		{
 			if( stance == 1 )
 			{
-				m_StanceStand.Show(true);
+				bool is_walking;
+				m_StanceStand.Show(!is_walking);
+				m_StanceStandWalk.Show(is_walking);
 				m_StanceCrouch.Show(false);
 				m_StanceProne.Show(false);
 				m_StanceCar.Show( false );
@@ -796,6 +804,7 @@ class IngameHud extends Hud
 			if( stance == 2 )
 			{
 				m_StanceStand.Show(false);
+				m_StanceStandWalk.Show(false);
 				m_StanceCrouch.Show(true);
 				m_StanceProne.Show(false);
 				m_StanceCar.Show( false );
@@ -803,6 +812,7 @@ class IngameHud extends Hud
 			if( stance == 3 )
 			{
 				m_StanceStand.Show(false);
+				m_StanceStandWalk.Show(false);
 				m_StanceCrouch.Show(false);
 				m_StanceProne.Show(true);
 				m_StanceCar.Show( false );
@@ -892,10 +902,10 @@ class IngameHud extends Hud
 						m_VehicleOilLight.Show( false );
 					}
 					
-					//float optimal_rpm = car.
-					float redline_rpm = car.EngineGetRPMRedline();
+					float rpm_value_red = ( m_CurrentVehicle.EngineGetRPMRedline() / m_CurrentVehicle.EngineGetRPMMax() ) ;
+					m_VehicleRPMDial.SetMaskProgress( rpm_value_red );
+					m_VehicleRPMRedline.SetMaskProgress( 1 - rpm_value_red );
 					
-					m_HudPanelWidget.FindAnyWidget("RPMDialRedline").SetRotation( 0, 0, redline_rpm );
 					m_HudPanelWidget.FindAnyWidget("PlayerPanel").Show( false );
 					m_Presence.Show( false );
 					m_StancePanel.Show( false );
@@ -928,7 +938,7 @@ class IngameHud extends Hud
 			float rpm_value_red = ( m_CurrentVehicle.EngineGetRPMRedline() / m_CurrentVehicle.EngineGetRPMMax() ) ;
 			float speed_value = ( m_CurrentVehicle.GetSpeedometer() / 200 );
 			
-			m_VehicleRPMPointer.SetRotation( 0, 0, rpm_value * 290 - 130, true );
+			m_VehicleRPMPointer.SetRotation( 0, 0, rpm_value * 270 - 130, true );
 			m_VehicleSpeedPointer.SetRotation( 0, 0, speed_value * 260 - 130, true );
 			m_VehicleSpeedValue.SetText( Math.Floor( m_CurrentVehicle.GetSpeedometer() ).ToString() );
 
@@ -948,17 +958,12 @@ class IngameHud extends Hud
 				next_gear = CarGear.NEUTRAL;
 			}
 			
-			
-			rpm_value_red = rpm_value_red * 360 - 180;
-			m_HudPanelWidget.FindAnyWidget("RPMDialRedline").SetRotation( 0, 0, rpm_value_red );
-			
 			bool newHealth = false;
 			
 			int health = m_CurrentVehicle.GetHealthLevel( "Engine" );
 			int color;
 			if( m_CurrentVehicle.EngineGetRPM() > m_CurrentVehicle.EngineGetRPMRedline() )
 			{
-				Print( m_CurrentVehicle.EngineGetRPMRedline() );
 				if( m_TimeSinceLastEngineLightChange > 0.35 )
 				{
 					m_VehicleEngineLight.Show( !m_VehicleEngineLight.IsVisible() );
@@ -1001,7 +1006,7 @@ class IngameHud extends Hud
 			m_VehiclePrevGearValue.SetText( m_VehicleGearTable.Get( prev_gear ) );
 			
 			m_VehicleFuelPointer.SetRotation( 0, 0, m_CurrentVehicle.GetFluidFraction( CarFluid.FUEL ) * 260 - 130, true );
-			m_VehicleTemperaturePointer.SetRotation( 0, 0, m_CurrentVehicle.GetFluidFraction( CarFluid.COOLANT ) * 260 - 130, true );
+			m_VehicleTemperaturePointer.SetRotation( 0, 0, -1 * m_CurrentVehicle.GetFluidFraction( CarFluid.COOLANT ) * 260 + 130, true );
 			/*
 			if( !m_VehicleHasOil )
 			{
@@ -1037,7 +1042,6 @@ class IngameHud extends Hud
 		if (m_Quickbar == NULL)
 		{
 			m_Quickbar = new InventoryQuickbar( m_QuickbarWidget );
-			ShowQuickbar();
 		}
 	}
 	
@@ -1046,93 +1050,93 @@ class IngameHud extends Hud
 		return m_Quickbar;
 	}
 	
-	void ShowQuickbar( bool ignore_state = false )
+	void RefreshQuickbarVisibility()
 	{
-#ifdef PLATFORM_XBOX
-		return;
-#else
-#ifdef PLATFORM_PS4
-		return;
-#endif
-#endif
-		
-		PlayerBase player;
-		Class.CastTo(player,  GetGame().GetPlayer() );
-		if(!player)
-		{
-			return;
-		}
-
-		if ( m_QuickbarWidget && player.GetQuickBarSize() != 0 )
-		{
-				RefreshQuickbar();
-
-				m_FadeTimers.Clear();
-				
-				m_QuickbarWidget.Show( true );
-				if ( !ignore_state )
-				{
-					m_QuickbarState = true;
-				}
-		}
+		m_QuickbarWidget.Show( !m_QuickbarHideUI && !m_QuickbarHidePlayer && m_QuickbarState );
 	}
 	
-	void HideQuickbar( bool ignore_state = false , bool instant_hide = false )
+	void RefreshHudVisibility()
 	{
-		if ( m_QuickbarWidget )
-		{
-			InventoryGrid quickbarGrid;
-			m_QuickbarWidget.GetScript(quickbarGrid);
-			
-			if( !instant_hide )
-			{
-				Widget child = quickbarGrid.GetRoot().GetChildren();
-				while (child)
-				{
-					WidgetFadeTimer fade_timer_quickbar = new WidgetFadeTimer;
-					fade_timer_quickbar.FadeOut(child, 5, true);
-					m_FadeTimers.Insert(fade_timer_quickbar);
-					child = child.GetSibling();
-				}
-			}
-			else
-			{
-				m_QuickbarWidget.Show( false );
-			}
-			
-			if ( !ignore_state )
-			{
-				m_QuickbarState = false;
-			}
-		}
+		SetLeftStatsVisibility( !m_HudHidePlayer && !m_HudHideUI && m_HudState );
+		m_Badges.Show( ( !m_HudHidePlayer && !m_HudHideUI && m_HudState ) || m_HudInventory );
+		m_Notifiers.Show( ( !m_HudHidePlayer && !m_HudHideUI && m_HudState ) || m_HudInventory );
+		m_BadgeNotifierDivider.Show( ( ( !m_HudHidePlayer && !m_HudHideUI && m_HudState ) || m_HudInventory ) && m_AnyBadgeVisible );
 	}
 	
-	void ToggleQuickBar( bool show, bool ignore_state = false )
+	bool IsHideQuickbarPlayer()
 	{
-		if ( show )
+		return m_QuickbarHidePlayer;
+	}
+	
+	bool IsHideHudPlayer()
+	{
+		return m_HudHidePlayer;
+	}
+	
+	void ShowQuickbarUI( bool show )
+	{
+		m_QuickbarHideUI = !show;
+		RefreshQuickbarVisibility();
+	}
+	
+	void ShowQuickbarPlayer( bool show )
+	{
+		if( !m_QuickbarState )
 		{
-			ShowQuickbar( ignore_state );
+			m_QuickbarState = true;
+			m_QuickbarHidePlayer = false;
+			if( m_HideTimer.IsRunning() )
+				m_HideTimer.Stop();
+			m_HideTimer.Run( 3, this, "HideQuickbarTimer" );
 		}
 		else
 		{
-			HideQuickbar( false, ignore_state );
+			m_QuickbarHidePlayer = !show;
 		}
+		RefreshQuickbarVisibility();
 	}
 	
-	void ToggleHud( bool show, bool ignore_state = false )
+	void HideQuickbarTimer()
 	{
-		//You can add more widgets to toggle here
-		SetLeftStatsVisibility( show );
-		m_Badges.Show( show );
-		m_Notifiers.Show( show );
-		m_BadgeNotifierDivider.Show( show && m_AnyBadgeVisible );
-		
-		if( !ignore_state )
-		{
-			m_HudState = show;
-			//! save it to profiles
-			g_Game.SetProfileOption( EDayZProfilesOptions.HUD, show );
-		}
+		m_QuickbarState = false;
+		RefreshQuickbarVisibility();
+	}
+	
+	void ShowHudPlayer( bool show )
+	{
+		m_HudHidePlayer = !show;
+		RefreshHudVisibility();
+	}
+	
+	void ShowHudUI( bool show )
+	{
+		m_HudHideUI = !show;
+		RefreshHudVisibility();
+	}
+	
+	void ShowHudInventory( bool show )
+	{
+		m_HudInventory = show;
+		RefreshHudVisibility();
+	}
+
+	void ShowQuickBar( bool show )
+	{
+		#ifdef PLATFORM_CONSOLE
+			return;
+		#endif
+		if( m_HideTimer.IsRunning() )
+			m_HideTimer.Stop();
+		m_QuickbarState = show;
+		g_Game.SetProfileOption( EDayZProfilesOptions.QUICKBAR, show );
+		RefreshQuickbarVisibility();
+	}
+	
+	void ShowHud( bool show )
+	{
+		m_HudState = show;
+		g_Game.SetProfileOption( EDayZProfilesOptions.HUD, show );
+		RefreshHudVisibility();
 	}
 	
 	bool GetQuickBarState()
@@ -1148,31 +1152,6 @@ class IngameHud extends Hud
 	void SetLeftStatsVisibility(bool visible)
 	{
 		m_LeftHudPanelWidget.Show( visible );
-	}
-
-	void SetSpecialtyMeterVisibility( bool visible )
-	{
-		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-
-		if ( player && player.GetSoftSkillsManager() )
-		{
-			m_SpecializationPanel.Show( visible );
-			float x = player.GetSoftSkillsManager().GetSpecialtyLevel() / 2;
-			float y = -0.75;
-			m_SpecializationIcon.SetPos( x, y, true );	
-		}
-	}
-	
-	void CheckHudElementsVisibility()
-	{
-		if (m_HudState != g_Game.GetProfileOption( EDayZProfilesOptions.HUD))
-		{
-			ToggleHud( g_Game.GetProfileOption( EDayZProfilesOptions.HUD ) );
-		}
-		if (m_QuickbarState != (g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR)))
-		{
-			ToggleQuickBar( g_Game.GetProfileOption( EDayZProfilesOptions.QUICKBAR ) );
-		}
 	}
 	
 	override void RefreshQuickbar( bool itemChanged = false )
@@ -1234,9 +1213,95 @@ class IngameHud extends Hud
 			}
 		}
 	}
-
-	protected int m_LastTime;
-	protected float m_BlinkTime;
+	
+	void RefreshPlayerTags()
+	{
+		if( GetGame().GetPlayer() )
+		{
+			bool found = false;
+			vector head_pos = GetGame().GetCurrentCameraPosition();
+			float distance;
+			foreach( Man player : ClientData.m_PlayerBaseList )
+			{
+				vector target_player = player.GetPosition();
+				distance = vector.Distance( head_pos, target_player );
+				
+				target_player[1] = target_player[1] + 1.2;
+				
+				if( distance <= 15 && player != GetGame().GetPlayer() )
+				{
+					vector screen_pos = GetGame().GetScreenPosRelative( target_player );
+					vector end_pos = head_pos + GetGame().GetCurrentCameraDirection() * 25;
+					RaycastRVParams params = new RaycastRVParams( head_pos, end_pos, GetGame().GetPlayer(), 0 );
+					params.sorted = true;
+					
+					array<ref RaycastRVResult> results = new array<ref RaycastRVResult>;
+					DayZPhysics.RaycastRVProxy( params, results );
+					if( results.Count() > 0 )
+					{
+						if( results.Get( 0 ).obj == player )
+						{
+							m_CurrentTaggedPlayer = PlayerBase.Cast( player );
+							found = true;
+						}
+					}
+				}
+			}
+			if( !found )
+			{
+				m_CurrentTaggedPlayer = null;
+			}
+		}
+	}
+	
+	int			m_PlayerSpineIndex;
+	PlayerBase	m_CurrentTaggedPlayer;
+	Widget		m_PlayerTag;
+	TextWidget	m_PlayerTagText;
+	
+	void ShowPlayerTag( float timeslice )
+	{
+		if( m_CurrentTaggedPlayer && m_CurrentTaggedPlayer.GetIdentity() )
+		{
+			if( !m_PlayerTag )
+			{
+				m_PlayerTag = GetGame().GetWorkspace().CreateWidgets("gui/layouts/new_ui/hud/hud_player_tag.layout");
+				m_PlayerTagText = TextWidget.Cast( m_PlayerTag.FindAnyWidget( "TagText" ) );
+				//m_PlayerTagText.SetText( m_CurrentTaggedPlayer.GetIdentity().GetName() );
+			}
+			m_PlayerSpineIndex = m_CurrentTaggedPlayer.GetBoneIndex( "Spine2" );
+			vector player_pos = m_CurrentTaggedPlayer.GetBonePositionWS( m_PlayerSpineIndex );
+			vector screen_pos = GetGame().GetScreenPosRelative( player_pos );
+			
+			if( screen_pos[2] > 0 )
+			{
+				if( screen_pos[0] > 0 && screen_pos[0] < 1 )
+				{
+					if( screen_pos[1] > 0 && screen_pos[1] < 1 )
+					{
+						m_PlayerTagText.SetAlpha( Math.Clamp( m_PlayerTagText.GetAlpha() + timeslice * 10, 0, 1 ) );
+						m_PlayerTag.SetPos( 0.55, 0.55 );
+						m_PlayerTagText.SetText( m_CurrentTaggedPlayer.GetIdentity().GetName() );
+						
+						//m_PlayerTagText.SetSize( 1, 1 - screen_pos[2] / 25  );
+						return;
+					}
+				}
+			}
+		}
+		
+		if( m_PlayerTag )
+		{
+			float new_alpha = Math.Clamp( m_PlayerTagText.GetAlpha() - timeslice * 10, 0, 1 );
+			m_PlayerTagText.SetAlpha( Math.Clamp( m_PlayerTagText.GetAlpha() - timeslice * 10, 0, 1 ) );
+			if( new_alpha == 0 )
+			{
+				m_PlayerTagText.SetText( "" );
+				m_CurrentTaggedPlayer = null;
+			}
+		}
+	}
+	
 	override void Update( float timeslice )
 	{
 		super.Update( timeslice );
@@ -1277,15 +1342,23 @@ class IngameHud extends Hud
 		}
 		else
 		{
-			int current_time = GetGame().GetTime();
-			float delta_time = ( current_time - m_LastTime ) / 1000;		//in seconds
-			m_BlinkTime += delta_time;
+			m_BlinkTime += timeslice;
 		}
 		
-		//update time
-		m_LastTime = GetGame().GetTime();
-		//
+		if( m_IsTemperatureVisible )
+		{
+			m_TemperatureTimer += timeslice;
+			if( m_TemperatureTimer > m_TemperatureShowTime )
+			{
+				HideTemperature();
+			}
+		}
 		
 		RefreshVehicleHud( timeslice );
+		
+		#ifdef PLATFORM_PS4
+		RefreshPlayerTags();
+		ShowPlayerTag(timeslice);
+		#endif
 	}
 }

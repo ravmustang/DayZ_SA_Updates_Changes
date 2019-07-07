@@ -352,6 +352,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 	void Focus()
 	{
 		#ifdef PLATFORM_CONSOLE
+			
 			m_SortingFilter.Focus();
 		#else
 		#ifdef PLATFORM_WINDOWS
@@ -528,7 +529,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				input.SetNameFilter( name_text );
 			}
 		}
-		#ifdef PLATFORM_XBOX
+		#ifdef PLATFORM_CONSOLE
 		if( m_RegionFilter.IsSet() )
 		{
 			input.SetRegionIdFilter( m_RegionFilter.GetValue() );

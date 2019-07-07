@@ -11,6 +11,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	protected GameOptions					m_Options;
 	protected OptionsMenu					m_Menu;
 	
+	protected ref SwitchOptionsAccess		m_AimHelperOption;
 	protected ref NumericOptionsAccess		m_VSensitivityOption;
 	protected ref NumericOptionsAccess		m_HSensitivityOption;
 	protected ref SwitchOptionsAccess		m_InvertOption;
@@ -18,6 +19,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	protected ref NumericOptionsAccess		m_ControllerHSensitivityOption;
 	protected ref SwitchOptionsAccess		m_ControllerInvertOption;
 	
+	protected ref OptionSelectorMultistate	m_AimHelperSelector;
 	protected ref OptionSelectorSlider		m_VSensitivitySelector;
 	protected ref OptionSelectorSlider		m_HSensitivitySelector;
 	protected ref OptionSelectorMultistate	m_InvertSelector;
@@ -29,13 +31,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	void OptionsMenuControls( Widget parent, Widget details_root, GameOptions options, OptionsMenu menu )
 	{
-		#ifdef PLATFORM_CONSOLE
-			m_Root									= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/xbox/controls_tab.layout", parent );
-		#else
-		#ifdef PLATFORM_WINDOWS
-			m_Root									= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/pc/controls_tab.layout", parent );
-		#endif
-		#endif
+		m_Root										= GetGame().GetWorkspace().CreateWidgets( GetLayoutName(), parent );
 		
 		m_DetailsRoot								= details_root;
 		m_DetailsLabel								= TextWidget.Cast( m_DetailsRoot.FindAnyWidget( "details_label" ) );
@@ -52,6 +48,10 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		
 		SetOptions( options );
 		
+		#ifdef PLATFORM_CONSOLE
+		m_Root.FindAnyWidget( "aimhelper_setting_option" ).SetUserID( AT_OPTIONS_AIM_HELPER );
+		#endif
+		
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
 		m_Root.FindAnyWidget( "vsensitivity_setting_option" ).SetUserID( AT_CONFIG_YAXIS );
@@ -66,7 +66,12 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_Root.FindAnyWidget( "controller_invert_setting_option" ).SetUserID( AT_CONFIG_CONTROLLER_REVERSED_LOOK );
 
 		ref array<string> opt						= { "#options_controls_disabled", "#options_controls_enabled" };
-	
+		
+		#ifdef PLATFORM_CONSOLE
+		m_AimHelperSelector							= new OptionSelectorMultistate( m_Root.FindAnyWidget( "aimhelper_setting_option" ), m_AimHelperOption.GetIndex(), this, false, opt );
+		m_AimHelperSelector.m_OptionChanged.Insert( UpdateAimHelper );
+		#endif
+		
 		m_ControllerVSensitivitySelector			= new OptionSelectorSlider( m_Root.FindAnyWidget( "controller_vsensitivity_setting_option" ), m_ControllerVSensitivityOption.ReadValue(), this, false, m_ControllerVSensitivityOption.GetMin(), m_ControllerVSensitivityOption.GetMax() );
 		m_ControllerHSensitivitySelector			= new OptionSelectorSlider( m_Root.FindAnyWidget( "controller_hsensitivity_setting_option" ), m_ControllerHSensitivityOption.ReadValue(), this, false, m_ControllerHSensitivityOption.GetMin(), m_ControllerHSensitivityOption.GetMax() );
 		m_ControllerInvertSelector					= new OptionSelectorMultistate( m_Root.FindAnyWidget( "controller_invert_setting_option" ), m_ControllerInvertOption.GetIndex(), this, false, opt );
@@ -98,6 +103,17 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_Root.SetHandler( this );
 	}
 	
+	string GetLayoutName()
+	{
+		#ifdef PLATFORM_CONSOLE
+			return "gui/layouts/new_ui/options/xbox/controls_tab.layout";
+		#else
+		#ifdef PLATFORM_WINDOWS
+			return "gui/layouts/new_ui/options/pc/controls_tab.layout";
+		#endif
+		#endif
+	}
+	
 	void EnterKeybindingMenu()
 	{
 		m_Menu.EnterScriptedMenu( MENU_KEYBINDINGS );
@@ -106,7 +122,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	void Focus()
 	{
 		#ifdef PLATFORM_CONSOLE
-			SetFocus( m_ControllerInvertSelector.GetParent() );
+			SetFocus( m_AimHelperSelector.GetParent() );
 		#endif
 	}
 	
@@ -238,6 +254,11 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	void Revert()
 	{
+		#ifdef PLATFORM_CONSOLE
+		if( m_AimHelperSelector )
+			m_AimHelperSelector.SetValue( m_AimHelperOption.GetIndex(), false );
+		#endif
+		
 		if( m_ControllerVSensitivitySelector )
 			m_ControllerVSensitivitySelector.SetValue( m_ControllerVSensitivityOption.ReadValue(), false );
 		if( m_ControllerHSensitivitySelector )
@@ -256,6 +277,14 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		#endif
 		#endif
 	}
+	
+#ifdef PLATFORM_CONSOLE
+	void UpdateAimHelper( int index )
+	{
+		m_AimHelperOption.Switch();
+		m_Menu.OnChanged();
+	}
+#endif
 	
 #ifdef PLATFORM_WINDOWS
 #ifndef PLATFORM_CONSOLE
@@ -305,6 +334,9 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	void SetOptions( GameOptions options )
 	{
 		m_Options = options;
+		#ifdef PLATFORM_CONSOLE
+		m_AimHelperOption							= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_AIM_HELPER ) );
+		#endif
 		
 		#ifdef PLATFORM_WINDOWS
 		#ifndef PLATFORM_CONSOLE
@@ -328,9 +360,18 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_TextMap.Insert( AT_CONFIG_YAXIS, new Param2<string, string>( "#options_controls_vertical_sens", "#options_controls_vertical_sensitivity_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_XAXIS, new Param2<string, string>( "#options_controls_horizontal_sens", "#options_controls_horizontal_sensitivity_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_YREVERSED, new Param2<string, string>( "#options_controls_invert_vertical_view", "#options_controls_invert_vertical_view_desc" ) );
+		
+		#ifdef PLATFORM_PS4
+		m_TextMap.Insert( AT_OPTIONS_AIM_HELPER, new Param2<string, string>( "#ps4_options_controls_aim_helper_contr", "#ps4_options_controls_aim_helper_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "#ps4_options_controls_vertical_sens_contr", "#ps4_options_controls_vertical_sens_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "#ps4_options_controls_horizontal_sens_contr", "#ps4_options_controls_horizontal_sens_contr_desc" ) );
+		m_TextMap.Insert( AT_CONFIG_CONTROLLER_REVERSED_LOOK, new Param2<string, string>( "#ps4_options_controls_invert_vert_view_contr", "#ps4_options_controls_invert_vert_view_contr_desc" ) );
+		#else 
+		m_TextMap.Insert( AT_OPTIONS_AIM_HELPER, new Param2<string, string>( "#options_controls_aim_helper_contr", "#options_controls_aim_helper_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "#options_controls_vertical_sens_contr", "#options_controls_vertical_sens_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "#options_controls_horizontal_sens_contr", "#options_controls_horizontal_sens_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_REVERSED_LOOK, new Param2<string, string>( "#options_controls_invert_vert_view_contr", "#options_controls_invert_vert_view_contr_desc" ) );
+		#endif
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)

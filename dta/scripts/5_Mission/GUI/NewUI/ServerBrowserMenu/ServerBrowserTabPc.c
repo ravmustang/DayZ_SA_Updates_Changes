@@ -85,7 +85,12 @@ class ServerBrowserTabPc extends ServerBrowserTab
 		
 		if( type == TabType.LAN )
 		{
-			m_Root.FindAnyWidget( "filters_root" ).Show( false );
+			m_Root.FindAnyWidget( "filters_content" ).Show( false );
+			m_Root.FindAnyWidget( "spacer" ).Show( false );
+			m_Root.FindAnyWidget( "spacer2" ).Show( false );
+			m_Root.FindAnyWidget( "reset_filter_button" ).Show( false );
+			m_ApplyFilter.Show( false );
+			m_FiltersChanged.Show( false );
 		}
 		
 		m_Filters = new ServerBrowserFilterContainer( m_Root.FindAnyWidget( "filters_content" ), this );
@@ -195,7 +200,9 @@ class ServerBrowserTabPc extends ServerBrowserTab
 	}
 	
 	override void OnLoadServersAsyncPC( ref GetServersResult result_list, EBiosError error, string response )
-	{		
+	{
+		//Print("m_NumServers: "+ result_list.m_NumServers +" m_Pages: "+ result_list.m_Pages + " m_Page: "+ result_list.m_Page +" error: "+ error +" response: "+ response);
+		
 		if( result_list )
 		{
 		//Print("("+ GetGame().GetTime() +") ____OnLoadServersAsyncPC: " + result_list.m_Results.Count());
@@ -365,7 +372,7 @@ class ServerBrowserTabPc extends ServerBrowserTab
 	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
 	{
-		Print("SG OnMouseButtonUp: "+ w.GetName());
+		//Print("SG OnMouseButtonUp: "+ w.GetName());
 		
 		if( button == MouseState.LEFT )
 		{

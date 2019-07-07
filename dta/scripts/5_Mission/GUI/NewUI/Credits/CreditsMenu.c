@@ -2,7 +2,7 @@ class CreditsMenu extends UIScriptedMenu
 {
 	protected static float						MENU_FADEIN_TIME	= 2.0;		//fade starts as soon as menu opens
 	protected static float						LOGO_FADEIN_TIME	= 1.0;		//fade starts halfway through menu fade in
-	protected static float						CREDIT_SCROLL_SPEED	= 400.0;	//pixels per second (relative to 1080p res)
+	protected static float						CREDIT_SCROLL_SPEED	= 200.0;	//pixels per second (relative to 1080p res)
 	
 	protected float								m_MenuFadeInIncrement;
 	protected float								m_MenuFadeInLevel;
@@ -37,7 +37,7 @@ class CreditsMenu extends UIScriptedMenu
 		
 		m_MenuFadeInIncrement	= 1 / MENU_FADEIN_TIME;
 		m_LogoFadeInIncrement	= 1 / LOGO_FADEIN_TIME;
-		m_ScrollIncrement		= CREDIT_SCROLL_SPEED * ( 1080 / y );
+		m_ScrollIncrement		= CREDIT_SCROLL_SPEED * ( y / 1080 );
 		
 		m_Scroller.VScrollToPos01( 0 );
 		m_Scroller.GetScreenSize( x_f, m_ScrollSize );

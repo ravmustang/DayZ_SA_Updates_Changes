@@ -3,6 +3,7 @@ class MissionMainMenu extends MissionBase
 	private UIScriptedMenu m_mainmenu;
 	private ref DayZIntroScenePC m_IntroScenePC;
 	private ref DayZIntroSceneXbox m_IntroSceneXbox;
+	private ref AbstractWave m_MenuMusic;
 	bool m_NoCutscene;
 
 	override void OnInit()
@@ -15,7 +16,10 @@ class MissionMainMenu extends MissionBase
 		if (!m_mainmenu)
 		{
 			#ifdef PLATFORM_CONSOLE
+			if( g_Game.GetGameState() != DayZGameState.PARTY )
+			{
 				m_mainmenu = UIScriptedMenu.Cast( g_Game.GetUIManager().EnterScriptedMenu( MENU_TITLE_SCREEN, null ) );
+			}
 			#else
 				m_mainmenu = UIScriptedMenu.Cast( g_Game.GetUIManager().EnterScriptedMenu( MENU_MAIN, null ) );
 			#endif
@@ -71,6 +75,11 @@ class MissionMainMenu extends MissionBase
 		}
 		g_Game.GetUIManager().ShowUICursor(true);
 		g_Game.SetMissionState( DayZGame.MISSION_STATE_MAINMENU );
+		
+		//Print("*** MissionMainMenu.OnMissionStart()");
+		g_Game.LoadingHide(true);
+		ProgressAsync.DestroyAllPendingProgresses();
+		PlayMusic();
 	}
 	
 	override void OnMissionFinish()
@@ -83,6 +92,7 @@ class MissionMainMenu extends MissionBase
 		m_IntroScenePC = null;
 		m_IntroSceneXbox = null;
 		g_Game.GetUIManager().ShowUICursor(false);
+		StopMusic();
 	}
 
 	override void OnUpdate(float timeslice)
@@ -125,6 +135,26 @@ class MissionMainMenu extends MissionBase
 			Print("End--------");
 			list.Debug();
 			*/
+		}
+	}
+	
+	void PlayMusic()
+	{
+		ref SoundParams soundParams			= new SoundParams( "Music_Menu_SoundSet" );
+		ref SoundObjectBuilder soundBuilder	= new SoundObjectBuilder( soundParams );
+		ref SoundObject soundObject			= soundBuilder.BuildSoundObject();
+		soundObject.SetKind( WaveKind.WAVEMUSIC );
+		m_MenuMusic = GetGame().GetSoundScene().Play2D(soundObject, soundBuilder);
+		m_MenuMusic.Loop( true );
+		m_MenuMusic.Play();
+	}
+	
+	void StopMusic()
+	{
+		if( m_MenuMusic )
+		{
+			m_MenuMusic.Stop();
+			delete m_MenuMusic;
 		}
 	}
 	

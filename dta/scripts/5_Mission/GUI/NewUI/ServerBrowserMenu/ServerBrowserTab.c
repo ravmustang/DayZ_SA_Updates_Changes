@@ -81,7 +81,12 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		if(m_Root)
 			delete m_Root;
 	}
-		
+
+	ServerBrowserMenuNew GetRootMenu()
+	{
+		return m_Menu;
+	}
+	
 	override bool OnClick( Widget w, int x, int y, int button )
 	{
 		
@@ -409,48 +414,36 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		
 		if( m_Filters.FavoriteIsSet() )
 		{
+			#ifdef PLATFORM_CONSOLE
 			bool is_fav = m_Menu.IsFavorited( result.m_Id );
+			#else
+			bool is_fav = result.m_Favorite;
+			#endif
 			
-			Print ( m_Filters.m_Options["m_FavoritedFilter"] );
-			
-			if ( is_fav == false && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_show" )
+			if ( !is_fav && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_show" )
 			{
 				return false;
 			}
 			
-			if ( is_fav == true && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_hide" )
+			if ( is_fav && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_hide" )
 			{
 				return false;
 			}
-			
-			/*
-			if( is_fav != m_Filters.m_FavoritedFilter.IsEnabled() )
-			{
-				pass = false;
-			}
-			*/
 		}
 		
 		if( m_Filters.PreviouslyIsSet() )
 		{
 			bool is_visited = g_Game.IsVisited( result.m_HostIp, result.m_HostPort );
 			
-			if ( is_visited == false && m_Filters.m_Options["m_PreviouslyPlayedFilter"] == "#server_browser_show" )
+			if ( !is_visited && m_Filters.m_Options["m_PreviouslyPlayedFilter"] == "#server_browser_show" )
 			{
 				return false;
 			}
 			
-			if ( is_fav == true && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_hide" )
+			if ( is_fav && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_hide" )
 			{
 				return false;
 			}
-			
-			/*
-			if( is_vis != m_Filters.m_PreviouslyPlayedFilter.IsEnabled() )
-			{
-				pass = false;
-			}
-			*/
 		}
 		
 		return true;
@@ -501,9 +494,9 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		return -1;
 	}
 	
-	void SetFavorite( string uid, bool favorite )
+	void SetFavoriteConsoles( string uid, bool favorite )
 	{
-		m_Menu.SetFavorite( uid, favorite );
+		m_Menu.SetFavoriteConsoles( uid, favorite );
 	}
 	
 	void Unfavorite( string uid )

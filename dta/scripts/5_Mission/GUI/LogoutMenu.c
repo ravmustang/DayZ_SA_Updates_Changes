@@ -1,8 +1,8 @@
 
 class LogoutMenu extends UIScriptedMenu
 {	
-	private TextWidget m_LogoutTimetext;
-	private TextWidget m_Info;
+	private TextWidget m_LogoutTimeText;
+	private TextWidget m_DescriptionText;
 	private ButtonWidget m_bLogoutNow;
 	private ButtonWidget m_bCancel;
 	private ButtonWidget m_bCancelConsole;
@@ -23,8 +23,8 @@ class LogoutMenu extends UIScriptedMenu
 	{
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets("gui/layouts/day_z_logout_dialog.layout");
 		
-		m_LogoutTimetext = TextWidget.Cast( layoutRoot.FindAnyWidget("logoutTimeText") );
-		m_Info = TextWidget.Cast( layoutRoot.FindAnyWidget("txtInfo") );
+		m_LogoutTimeText = TextWidget.Cast( layoutRoot.FindAnyWidget("txtLogoutTime") );
+		m_DescriptionText = TextWidget.Cast( layoutRoot.FindAnyWidget("txtDescription") );
 		m_bLogoutNow = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bLogoutNow") );
 		m_bCancel = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bCancel") );
 		
@@ -32,12 +32,11 @@ class LogoutMenu extends UIScriptedMenu
 		m_bCancel.Show( false );
 		m_bLogoutNow.Show( false );
 		
-		m_bCancel = ButtonWidget.Cast( layoutRoot.FindAnyWidget("bCancelConsole") );
-		m_bCancel.Show( true );
+		layoutRoot.FindAnyWidget("toolbar_bg").Show( true );
 #else
 		m_bCancel.Show( true );
 		m_bLogoutNow.Show( true );
-		layoutRoot.FindAnyWidget("bCancelConsole").Show( false );
+		layoutRoot.FindAnyWidget("toolbar_bg").Show( false );
 #endif
 		
 		UpdateInfo();
@@ -82,7 +81,7 @@ class LogoutMenu extends UIScriptedMenu
 
 		return false;
 	}
-
+	
 	override bool OnKeyDown(Widget w, int x, int y, int key)
 	{
 		super.OnKeyDown( w, x, y, key);
@@ -104,25 +103,33 @@ class LogoutMenu extends UIScriptedMenu
 		
 		return true;
 	}
-	
+
+	override void Update( float timeslice )
+	{
+		if( GetGame().GetInput().LocalPress( "UAUIBack", false ) )
+		{
+			Cancel();
+			Hide();
+		}		
+	}
+		
 	void SetLogoutTime()
 	{
-		m_LogoutTimetext.SetText(" ");
+		m_LogoutTimeText.SetText(" ");
 	}
 	
 	void SetTime(int time)
 	{
 		m_iTime = time;
-		m_LogoutTimetext.SetText(m_iTime.ToString());
+		m_LogoutTimeText.SetText(m_iTime.ToString() + " #layout_logout_dialog_until_logout");
 	}
-	
+		
 	void UpdateTime()
 	{
 		
 		if (m_iTime > 0)
 		{
-			m_iTime -= 1;
-			m_LogoutTimetext.SetText(m_iTime.ToString());	
+			SetTime(--m_iTime);
 		}
 		else
 		{
@@ -136,12 +143,12 @@ class LogoutMenu extends UIScriptedMenu
 		if (player.IsRestrained() || player.IsUnconscious())
 		{
 			// display killInfo
-			m_Info.SetText("#layout_logout_dialog_note_killed");
+			m_DescriptionText.SetText("#layout_logout_dialog_note_killed");
 		}
 		else
 		{
 			// hide killInfo
-			m_Info.SetText("#layout_logout_dialog_note");
+			m_DescriptionText.SetText("#layout_logout_dialog_note");
 		}
 	}
 

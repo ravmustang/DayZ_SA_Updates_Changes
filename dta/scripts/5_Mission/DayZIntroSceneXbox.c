@@ -364,7 +364,7 @@ class DayZIntroSceneXbox: Managed
 				return;
 			}
 		}
-		g_Game.SetPlayerGameName(DEFAULT_CHARACTER_NAME);
+		g_Game.SetPlayerGameName(GameConstants.DEFAULT_CHARACTER_NAME);
 	}
 	
 	// ------------------------------------------------------------
@@ -399,6 +399,16 @@ class DayZIntroSceneXbox: Managed
 			m_SceneCharacter.SetDirection(m_CharacterDir);
 	
 			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
+		}
+		else
+		{
+			// random character
+			UpdateSelectedUserName();
+
+			CreateRandomCharacter();
+			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
+			g_Game.SetNewCharacter(true);
+			return;
 		}
 
 		UpdateSelectedUserName();
