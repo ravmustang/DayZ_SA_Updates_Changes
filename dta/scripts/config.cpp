@@ -1,12 +1,12 @@
 ////////////////////////////////////////////////////////////////////
 //DeRap: Produced from mikero's Dos Tools Dll version 5.69
-//'now' is Wed Apr 03 22:17:07 2019 : 'file' last modified on Wed Apr 03 12:18:09 2019
+//'now' is Sun Jul 07 16:26:43 2019 : 'file' last modified on Tue Jul 02 10:53:16 2019
 //http://dev-heaven.net/projects/list_files/mikero-pbodll
 ////////////////////////////////////////////////////////////////////
 
 #define _ARMA_
 
-//Class E:\Documents\GitHub\DayZ_SA_Scripts_Original\dta\scripts\config.bin{
+//Class C:\Program Files (x86)\Steam\steamapps\common\DayZServer\dta\scripts\config.bin{
 class CfgPatches
 {
 	class DZ_Scripts
@@ -30,13 +30,13 @@ class CfgSlots
 	{
 		name = "Shoulder";
 		displayName = "Shoulder";
-		ghostIcon = "shoulder";
+		ghostIcon = "shoulderleft";
 	};
 	class Slot_Melee
 	{
 		name = "Melee";
 		displayName = "Melee";
-		ghostIcon = "melee";
+		ghostIcon = "shoulderright";
 	};
 	class Slot_Bow
 	{
@@ -189,19 +189,19 @@ class CfgSlots
 		displayName = "Muzzle3";
 		ghostIcon = "muzzle";
 	};
-	class Slot_Vest_Holster
+	class Slot_VestHolster
 	{
 		name = "VestHolster";
 		displayName = "VestHolster";
-		ghostIcon = "muzzle";
+		ghostIcon = "vestholster";
 	};
-	class Slot_Vest_Pouch
+	class Slot_VestPouch
 	{
 		name = "VestPouch";
 		displayName = "VestPouch";
 		ghostIcon = "muzzle";
 	};
-	class Slot_Vest_Backpack
+	class Slot_VestBackpack
 	{
 		name = "VestBackpack";
 		displayName = "VestBackpack";
@@ -319,25 +319,25 @@ class CfgSlots
 	{
 		name = "weaponMuzzleAK";
 		displayName = "weaponMuzzleAK";
-		ghostIcon = "weaponmuzzleak";
+		ghostIcon = "weaponmuzzle";
 	};
 	class Slot_weaponMuzzleM4
 	{
 		name = "weaponMuzzleM4";
 		displayName = "weaponMuzzleM4";
-		ghostIcon = "weaponmuzzlem4";
+		ghostIcon = "weaponmuzzle";
 	};
 	class Slot_weaponMuzzleMP5
 	{
 		name = "weaponMuzzleMP5";
 		displayName = "weaponMuzzleMP5";
-		ghostIcon = "weaponmuzzlemp5";
+		ghostIcon = "weaponmuzzle";
 	};
 	class Slot_weaponMuzzleMosin
 	{
 		name = "weaponMuzzleMosin";
 		displayName = "weaponMuzzleMosin";
-		ghostIcon = "weaponmuzzlemosin";
+		ghostIcon = "weaponmuzzle";
 	};
 	class Slot_weaponUnderSlugM4
 	{
@@ -355,7 +355,7 @@ class CfgSlots
 	{
 		name = "weaponBarrelAug";
 		displayName = "weaponBarrelAug";
-		ghostIcon = "weaponmuzzleaug";
+		ghostIcon = "weaponmuzzle";
 	};
 	class Slot_weaponOptics
 	{
@@ -459,12 +459,13 @@ class CfgSlots
 		name = "Book";
 		displayName = "Book";
 		ghostIcon = "book";
+		stackMax = 1;
 	};
 	class Slot_ButaneTorchCanister
 	{
 		name = "ButaneTorchCanister";
 		displayName = "ButaneTorchCanister";
-		ghostIcon = "butanetorchcanister";
+		ghostIcon = "gascanister";
 	};
 	class Slot_CableReel
 	{
@@ -878,6 +879,46 @@ class CfgSlots
 		displayName = "V3SCoDriverDoors";
 		ghostIcon = "doorfront";
 	};
+	class Slot_UtilityVehicleWheel_1_1
+	{
+		name = "UtilityVehicleWheel_1_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleWheel_1_2
+	{
+		name = "UtilityVehicleWheel_1_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleWheel_2_1
+	{
+		name = "UtilityVehicleWheel_2_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleWheel_2_2
+	{
+		name = "UtilityVehicleWheel_2_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_UtilityVehicleDriverDoors
+	{
+		name = "UtilityVehicleDriverDoors";
+		displayName = "Utility Vehicle Driver Doors";
+		ghostIcon = "doorfront";
+	};
+	class Slot_UtilityVehicleCoDriverDoors
+	{
+		name = "UtilityVehicleCoDriverDoors";
+		displayName = "Utility Vehicle CoDriver Doors";
+		ghostIcon = "doorfront";
+	};
 	class Slot_NivaWheel_1_1
 	{
 		name = "NivaWheel_1_1";
@@ -1059,6 +1100,64 @@ class CfgSlots
 		displayName = "CivVanTrunkDown";
 		ghostIcon = "doorrear";
 	};
+	class Slot_Van_01_Wheel_1_1
+	{
+		name = "Van_01_Wheel_1_1";
+		displayName = "Front Left Van Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Van_01_Wheel_1_2
+	{
+		name = "Van_01_Wheel_1_2";
+		displayName = "Front Right Van Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Van_01_Wheel_2_1
+	{
+		name = "Van_01_Wheel_2_1";
+		displayName = "Front Left Van Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Van_01_Wheel_2_2
+	{
+		name = "Van_01_Wheel_2_2";
+		displayName = "Front Right Van Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Van_01_Door_1_1
+	{
+		name = "Van_01_Door_1_1";
+		displayName = "Van Driver Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Van_01_Door_2_1
+	{
+		name = "Van_01_Door_2_1";
+		displayName = "Van CoDriver Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Van_01_Door_2_2
+	{
+		name = "Van_01_Door_2_2";
+		displayName = "Van Cargo Door";
+		ghostIcon = "doorrear";
+	};
+	class Slot_Van_01_Trunk_1
+	{
+		name = "Van_01_Trunk_1";
+		displayName = "Van Trunk Up Part";
+		ghostIcon = "trunk";
+	};
+	class Slot_Van_01_Trunk_2
+	{
+		name = "Van_01_Trunk_2";
+		displayName = "Van Trunk Down Part";
+		ghostIcon = "doorrear";
+	};
 	class Slot_BusWheel_1_1
 	{
 		name = "BusWheel_1_1";
@@ -1199,46 +1298,6 @@ class CfgSlots
 		displayName = "CivHatchbackCargo2Doors";
 		ghostIcon = "doorrear";
 	};
-	class Slot_UtilityVehicleWheel_1_1
-	{
-		name = "UtilityVehicleWheel_1_1";
-		displayName = "Front Left Wheel";
-		selection = "wheel_1_1";
-		ghostIcon = "wheel";
-	};
-	class Slot_UtilityVehicleWheel_1_2
-	{
-		name = "UtilityVehicleWheel_1_2";
-		displayName = "Back Right Wheel";
-		selection = "wheel_1_2";
-		ghostIcon = "wheel";
-	};
-	class Slot_UtilityVehicleWheel_2_1
-	{
-		name = "UtilityVehicleWheel_2_1";
-		displayName = "Front Left Wheel";
-		selection = "wheel_2_1";
-		ghostIcon = "wheel";
-	};
-	class Slot_UtilityVehicleWheel_2_2
-	{
-		name = "UtilityVehicleWheel_2_2";
-		displayName = "Back Right Wheel";
-		selection = "wheel_2_2";
-		ghostIcon = "wheel";
-	};
-	class Slot_UtilityVehicleDriverDoors
-	{
-		name = "UtilityVehicleDriverDoors";
-		displayName = "Utility Vehicle Driver Doors";
-		ghostIcon = "doorfront";
-	};
-	class Slot_UtilityVehicleCoDriverDoors
-	{
-		name = "UtilityVehicleCoDriverDoors";
-		displayName = "Utility Vehicle CoDriver Doors";
-		ghostIcon = "doorfront";
-	};
 	class Slot_S120Wheel_1_1
 	{
 		name = "S120Wheel_1_1";
@@ -1301,6 +1360,248 @@ class CfgSlots
 	{
 		name = "S120Cargo2Doors";
 		displayName = "s120 Cargo Doors";
+		ghostIcon = "doorrear";
+	};
+	class Slot_Truck_01_Wheel_1_1
+	{
+		name = "Truck_01_Wheel_1_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_1_2
+	{
+		name = "Truck_01_Wheel_1_2";
+		displayName = "Back Left Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_1_3
+	{
+		name = "Truck_01_Wheel_1_3";
+		displayName = "Middle Right Wheel";
+		selection = "wheel_1_3";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_2_1
+	{
+		name = "Truck_01_Wheel_2_1";
+		displayName = "Front Right Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_2_2
+	{
+		name = "Truck_01_Wheel_2_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_2_3
+	{
+		name = "Truck_01_Wheel_2_3";
+		displayName = "Middle Right Wheel";
+		selection = "wheel_2_3";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_Spare_1
+	{
+		name = "Truck_01_Wheel_Spare_1";
+		displayName = "Spare Left Wheel";
+		selection = "wheel_spare_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Wheel_Spare_2
+	{
+		name = "Truck_01_Wheel_Spare_2";
+		displayName = "Spare Right Wheel";
+		selection = "wheel_spare_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_01_Hood
+	{
+		name = "Truck_01_Hood";
+		displayName = "Hood";
+		ghostIcon = "hood";
+	};
+	class Slot_Truck_01_Door_1_1
+	{
+		name = "Truck_01_Door_1_1";
+		displayName = "Left Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Truck_01_Doors_2_1
+	{
+		name = "Truck_01_Door_2_1";
+		displayName = "Right Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Truck_02_Wheel_1_1
+	{
+		name = "Truck_02_Wheel_1_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_02_Wheel_1_2
+	{
+		name = "Truck_02_Wheel_1_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_02_Wheel_2_1
+	{
+		name = "Truck_02_Wheel_2_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_02_Wheel_2_2
+	{
+		name = "Truck_02_Wheel_2_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Truck_02_Door_1_1
+	{
+		name = "Truck_02_Door_1_1";
+		displayName = "Left Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Truck_02_Door_2_1
+	{
+		name = "Truck_02_Door_2_1";
+		displayName = "Right Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Hatchback_02_Wheel_1_1
+	{
+		name = "Hatchback_02_Wheel_1_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Hatchback_02_Wheel_1_2
+	{
+		name = "Hatchback_02_Wheel_1_2";
+		displayName = "Back Right Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Hatchback_02_Wheel_2_1
+	{
+		name = "Hatchback_02_Wheel_2_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Hatchback_02_Wheel_2_2
+	{
+		name = "Hatchback_02_Wheel_2_2";
+		displayName = "Back Right  Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Hatchback_02_Door_1_1
+	{
+		name = "Hatchback_02_Door_1_1";
+		displayName = "Left Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Hatchback_02_Door_1_2
+	{
+		name = "Hatchback_02_Door_1_2";
+		displayName = "Left Back Doors";
+		ghostIcon = "doorrear";
+	};
+	class Slot_Hatchback_02_Door_2_1
+	{
+		name = "Hatchback_02_Door_2_1";
+		displayName = "Right Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Hatchback_02_Door_2_2
+	{
+		name = "Hatchback_02_Door_2_2";
+		displayName = "Right Back Door";
+		ghostIcon = "doorrear";
+	};
+	class Slot_Hatchback_02_Hood
+	{
+		name = "Hatchback_02_Hood";
+		displayName = "Hood";
+		ghostIcon = "hood";
+	};
+	class Slot_Hatchback_02_Trunk
+	{
+		name = "Hatchback_02_Trunk";
+		displayName = "Trunk";
+		ghostIcon = "trunk";
+	};
+	class Slot_Sedan_02_Wheel_1_1
+	{
+		name = "Sedan_02_Wheel_1_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_1_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Sedan_02_Wheel_1_2
+	{
+		name = "Sedan_02_Wheel_1_2";
+		displayName = "Front Right Wheel";
+		selection = "wheel_1_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Sedan_02_Wheel_2_1
+	{
+		name = "Sedan_02_Wheel_2_1";
+		displayName = "Front Left Wheel";
+		selection = "wheel_2_1";
+		ghostIcon = "wheel";
+	};
+	class Slot_Sedan_02_Wheel_2_2
+	{
+		name = "Sedan_02_Wheel_2_2";
+		displayName = "Front Right Wheel";
+		selection = "wheel_2_2";
+		ghostIcon = "wheel";
+	};
+	class Slot_Sedan_02_Hood
+	{
+		name = "Sedan_02_Hood";
+		displayName = "Hood";
+		ghostIcon = "hood";
+	};
+	class Slot_Sedan_02_Trunk
+	{
+		name = "Sedan_02_Trunk";
+		displayName = "Trunk";
+		ghostIcon = "trunk";
+	};
+	class Slot_Sedan_02_Door_1_1
+	{
+		name = "Sedan_02_Door_1_1";
+		displayName = "Left Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Sedan_02_Door_2_1
+	{
+		name = "Sedan_02_Door_2_1";
+		displayName = "Right Door";
+		ghostIcon = "doorfront";
+	};
+	class Slot_Sedan_02_Door_1_2
+	{
+		name = "Sedan_02_Door_1_2";
+		displayName = "Left Back Door";
+		ghostIcon = "doorrear";
+	};
+	class Slot_Sedan_02_Door_2_2
+	{
+		name = "Sedan_02_Door_2_2";
+		displayName = "Right Back Door";
 		ghostIcon = "doorrear";
 	};
 	class Slot_Level_1_Wall_1_Barbedwire_1
@@ -1769,7 +2070,79 @@ class CfgSlots
 	{
 		name = "KnifeHolster";
 		displayName = "KnifeHolster";
+		ghostIcon = "knifeholster";
+	};
+	class Slot_Chemlight
+	{
+		name = "Chemlight";
+		displayName = "Chemlight";
+		ghostIcon = "chemlight";
+	};
+	class Slot_WalkieTalkie
+	{
+		name = "WalkieTalkie";
+		displayName = "WalkieTalkie";
+		ghostIcon = "walkietalkie";
+	};
+	class Slot_NVG
+	{
+		name = "NVG";
+		displayName = "NVG";
 		ghostIcon = "muzzle";
+	};
+	class Slot_helmetFlashlight
+	{
+		name = "helmetFlashlight";
+		displayName = "helmetFlashlight";
+		ghostIcon = "weaponflashlight";
+	};
+	class Slot_Belt_Left
+	{
+		name = "Belt_Left";
+		displayName = "Belt_Left";
+		ghostIcon = "canteen";
+	};
+	class Slot_Belt_Right
+	{
+		name = "Belt_Right";
+		displayName = "Belt_Right";
+		ghostIcon = "vestholster";
+	};
+	class Slot_Belt_Back
+	{
+		name = "Belt_Back";
+		displayName = "Belt_Back";
+		ghostIcon = "knifeholster";
+	};
+	class Slot_VestGrenadeA
+	{
+		name = "VestGrenadeA";
+		displayName = "VestGrenadeA";
+		ghostIcon = "grenade";
+	};
+	class Slot_VestGrenadeB
+	{
+		name = "VestGrenadeB";
+		displayName = "VestGrenadeB";
+		ghostIcon = "grenade";
+	};
+	class Slot_VestGrenadeC
+	{
+		name = "VestGrenadeC";
+		displayName = "VestGrenadeC";
+		ghostIcon = "grenade";
+	};
+	class Slot_VestGrenadeD
+	{
+		name = "VestGrenadeD";
+		displayName = "VestGrenadeD";
+		ghostIcon = "grenade";
+	};
+	class Slot_GasMaskFilter
+	{
+		name = "GasMaskFilter";
+		displayName = "GasMaskFilter";
+		ghostIcon = "";
 	};
 };
 //};
