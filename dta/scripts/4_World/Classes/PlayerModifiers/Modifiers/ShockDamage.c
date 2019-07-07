@@ -1,5 +1,6 @@
 class ShockDamageMdfr: ModifierBase
 {
+	const int UNCONSIOUSS_COOLDOWN_TIME = 60;//in s
 	override void Init()
 	{
 		m_TrackActivatedTime	= false;
@@ -20,7 +21,7 @@ class ShockDamageMdfr: ModifierBase
 
 	override bool ActivateCondition(PlayerBase player)
 	{
-		if( !player.IsUnconscious() && player.GetHealth("","Blood") <= PlayerConstants.SHOCK_DAMAGE_BLOOD_THRESHOLD_HIGH )
+		if( !player.IsUnconscious() && player.GetHealth("","Blood") <= PlayerConstants.SHOCK_DAMAGE_BLOOD_THRESHOLD_HIGH && GetGame().GetTime() > (player.m_UnconsciousEndTime + UNCONSIOUSS_COOLDOWN_TIME) )
 		{
 			return true;
 		}

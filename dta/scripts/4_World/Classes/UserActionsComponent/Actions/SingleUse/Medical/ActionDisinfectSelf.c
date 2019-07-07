@@ -14,9 +14,6 @@ class ActionDisinfectSelf: ActionSingleUseBase
 	void ActionDisinfectSelf()
 	{
 		m_CallbackClass = ActionDisinfectSelfCB;
-		m_MessageSuccess = "I disinfected myself";
-		m_MessageStartFail = "Its' empty";
-		//m_Animation = "lick";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -24,11 +21,6 @@ class ActionDisinfectSelf: ActionSingleUseBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_DISINFECT_S;
 	}
 
 	override bool HasTarget()

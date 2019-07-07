@@ -2,9 +2,6 @@ class ActionToggleFishing: ActionSingleUseBase
 {
 	void ActionToggleFishing()
 	{
-		m_MessageStart = " ";
-		m_MessageSuccess = " ";
-		m_MessageFail = "Fishing rod is ruined.";
 		m_Sound = "CastingRod";
 	}
 	
@@ -12,11 +9,6 @@ class ActionToggleFishing: ActionSingleUseBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_TOGGLE_FISHING;
 	}
 
 	override bool HasTarget()

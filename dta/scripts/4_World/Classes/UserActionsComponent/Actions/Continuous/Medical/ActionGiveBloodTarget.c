@@ -11,12 +11,6 @@ class ActionGiveBloodTarget: ActionContinuousBase
 	void ActionGiveBloodTarget()
 	{
 		m_CallbackClass = ActionGiveBloodTargetCB;
-		m_MessageStartFail = "It is empty.";
-		m_MessageStart = "Player started giving you blood.";
-		m_MessageSuccess = "Player finished giving you blood.";
-		m_MessageFail = "Player moved and giving you blood was canceled.";
-		m_MessageCancel = "You stopped giving blood.";
-		//m_Animation = "giveblood";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_HIGH;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SALINEBLOODBAGTARGET;
@@ -28,11 +22,6 @@ class ActionGiveBloodTarget: ActionContinuousBase
 	{	
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_GIVE_BLOOD_T;
 	}
 		
 	override string GetText()

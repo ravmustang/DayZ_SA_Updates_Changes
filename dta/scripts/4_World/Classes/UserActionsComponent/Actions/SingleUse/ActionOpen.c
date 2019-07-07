@@ -2,7 +2,6 @@ class ActionOpen: ActionSingleUseBase
 {
 	void ActionOpen()
 	{
-		m_MessageSuccess = "I have opened it.";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM_ONCE;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_OPENITEM_ONCE;
 		//m_Animation = "open";
@@ -12,11 +11,6 @@ class ActionOpen: ActionSingleUseBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_OPEN;
 	}
 
 	override bool HasTarget()

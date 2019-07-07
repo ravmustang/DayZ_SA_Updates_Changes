@@ -9,8 +9,8 @@ class FeverBlurSymptom extends SymptomBase
 	float m_Time;
 	
 	
-	const int BLUR_STRENGTH_MIN = 0.1;
-	const int BLUR_STRENGTH_MAX = 0.3;
+	const float BLUR_STRENGTH_MIN = 0.1;
+	const float BLUR_STRENGTH_MAX = 0.3;
 	
 	const int BLUR_DURATION_TIME_MIN = 3;
 	const int BLUR_DURATION_TIME_MAX = 5;
@@ -32,7 +32,7 @@ class FeverBlurSymptom extends SymptomBase
 	//!gets called every frame
 	override void OnUpdateServer(PlayerBase player, float deltatime)
 	{
-		int i = 1 + 1;
+		//int i = 1 + 1;
 	}
 
 	
@@ -51,7 +51,9 @@ class FeverBlurSymptom extends SymptomBase
 		{
 			m_EffectTime += deltatime / m_BlurDuration;
 			float cos_value = Math.Sin(m_EffectTime  * Math.PI);
-			PPEffects.SetBlurDrunk(cos_value * m_BlurStrength);
+			float val = cos_value * m_BlurStrength;
+			Print(val);
+			PPEffects.SetBlurDrunk(val);
 			//PrintString("cos=" +cos_value.ToString());
 			
 			if( m_EffectTime >= 1 )

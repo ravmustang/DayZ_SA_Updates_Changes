@@ -7,7 +7,7 @@ class WeaponEjectCasing extends WeaponStateBase
 	{
 		super.OnEntry(e);
 
-		wpnDebugPrint("[wpnfsm] ejected fired out casing");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " ejected fired out casing");
 		int mi = m_weapon.GetCurrentMuzzle();
 		if(m_weapon.IsChamberFiredOut(mi))
 		{

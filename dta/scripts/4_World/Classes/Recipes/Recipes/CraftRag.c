@@ -26,6 +26,7 @@ class CraftRag extends RecipeBase
 		//ingredient 1
 		InsertIngredient(0,"Sickle");//you can insert multiple ingredients this way
 		InsertIngredient(0,"Hacksaw");
+		InsertIngredient(0,"HandSaw");
 		InsertIngredient(0,"KitchenKnife");
 		InsertIngredient(0,"SteakKnife");
 		InsertIngredient(0,"HayHook");

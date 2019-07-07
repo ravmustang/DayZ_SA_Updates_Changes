@@ -90,8 +90,10 @@ class BarrelHoles_ColorBase extends FireplaceBase
 
 	override bool CanReleaseAttachment( EntityAI attachment )
 	{
-		ItemBase item = ItemBase.Cast( attachment );
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
 		
+		ItemBase item = ItemBase.Cast( attachment );
 		//kindling items
 		if ( IsKindling ( item ) && !IsBurning() && IsOpen() )
 		{
@@ -144,7 +146,7 @@ class BarrelHoles_ColorBase extends FireplaceBase
 
 	override void EEItemAttached ( EntityAI item, string slot_name ) 
 	{
-		super.EEItemAttached ( item, slot_name );
+		super.EEItemAttached( item, slot_name );
 		
 		ItemBase item_base = ItemBase.Cast( item );
 		
@@ -432,19 +434,19 @@ class BarrelHoles_ColorBase extends FireplaceBase
 		}
 		
 		//check roof
-		if ( !IsEnoughRoomForFireAbove() )
+		if ( !HasEnoughRoomForFireAbove() )
 		{
 			return false;
 		}
 		
 		//check surface
-		if ( IsWaterSurface() )
+		if ( IsOnWaterSurface() )
 		{
 			return false;
 		}
 
 		//check wetness/rain/wind
-		if ( IsWet() || IsRainingAbove() || IsWindy() )
+		if ( IsWet() || IsRainingAbove() || FireplaceBase.IsWindy() )
 		{
 			return false;
 		}
@@ -459,5 +461,17 @@ class BarrelHoles_ColorBase extends FireplaceBase
 	override string GetPlaceSoundset()
 	{
 		return "placeBarrel_SoundSet";
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionTogglePlaceObject);
+		AddAction(ActionOpenBarrelHoles);
+		AddAction(ActionCloseBarrelHoles);
+		AddAction(ActionTakeFireplaceFromBarrel);
+		//AddAction(ActionLightItemOnFire);
+		AddAction(ActionPlaceObject);
 	}
 }

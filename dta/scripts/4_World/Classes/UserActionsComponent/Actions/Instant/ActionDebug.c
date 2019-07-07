@@ -11,11 +11,6 @@ class ActionDebugData : ActionData
 
 class ActionDebug : ActionInstantBase
 {	
-	override int GetType()  
-	{
-		return AT_DEBUG;
-	}
-	
 	override bool HasTarget()
 	{
 		return false;

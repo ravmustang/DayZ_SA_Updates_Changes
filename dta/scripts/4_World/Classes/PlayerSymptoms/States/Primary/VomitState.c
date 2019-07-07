@@ -24,17 +24,15 @@ class VomitSymptom extends SymptomBase
 	
 	override void OnAnimationStart()
 	{
-		m_Player.GetStatStomachVolume().Set(0);
-		m_Player.GetStatStomachWater().Set(0);
-		m_Player.GetStatStomachEnergy().Set(0);
 		m_Player.GetStatToxicity().Set(0);
-		
+		m_Player.m_PlayerStomach.ClearContents();
 		Print("------------ vomit start -------------");
 	}
 	
 	override void OnAnimationFinish()
 	{
-		
+		//! deplete stamina
+		m_Player.GetStaminaHandler().DepleteStamina(EStaminaModifiers.OVERALL_DRAIN);
 	}
 	
 	override bool CanActivate()

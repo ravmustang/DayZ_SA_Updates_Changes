@@ -27,11 +27,6 @@ class ActionUnmountBarbedWire: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.BASEBUILDING );
 	}
-
-	override int GetType()
-	{
-		return AT_UNMOUNT_BARBED_WIRE;
-	}
 		
 	override string GetText()
 	{

@@ -4,11 +4,6 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 	
 	void ActionPlugTargetIntoThis()
 	{
-		m_MessageStartFail = "m_MessageStartFail";
-		m_MessageStart = "m_MessageStart";
-		m_MessageSuccess = "m_MessageSuccess";
-		m_MessageFail = "m_MessageFail";
-		m_MessageCancel = "m_MessageCancel";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		m_Retoggle = false;
 	}
@@ -17,11 +12,6 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_PLUG_TARGET_INTO_THIS;
 	}
 	
 	override string GetText()
@@ -60,21 +50,20 @@ class ActionPlugTargetIntoThis: ActionSingleUseBase
 	{		
 		EntityAI target_EAI = EntityAI.Cast( target.GetObject() );
 		
-		if ( target_EAI.HasEnergyManager()  &&  item.HasEnergyManager() )
+		if ( target_EAI  &&  item  &&  target_EAI.HasEnergyManager()  &&  item.HasEnergyManager() )
 		{
 			if ( !target_EAI.GetCompEM().IsPlugged()  &&  item.GetCompEM().CanReceivePlugFrom(target_EAI) )
 			{
+				ActionBase tested_action = player.GetActionManager().GetAction(ActionPlugIn);
+				array<ActionBase_Basic> actions;
+				target_EAI.GetActions(DefaultActionInput,actions);
 				// Check if the target_EAI is a device which is supposed to be plugged into something
-				ref TIntArray cfg_actions = new TIntArray;
-				g_Game.ConfigGetIntArray("cfgVehicles " +target_EAI.GetType() + " SingleUseActions", cfg_actions);	
 				
-				if ( cfg_actions )
+				if ( actions )
 				{
-					for ( int i = 0;  i < cfg_actions.Count();  i++ )
+					for ( int i = 0;  i < actions.Count();  i++ )
 					{
-						int action = cfg_actions.Get(i);
-						
-						if ( action == AT_PLUG_THIS_INTO_TARGET )
+						if ( actions.Get(i) == tested_action )
 						{
 							return true;
 						}

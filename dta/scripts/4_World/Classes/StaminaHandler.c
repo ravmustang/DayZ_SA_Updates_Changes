@@ -19,8 +19,7 @@ class StaminaConsumer
 	void SetState(bool state) { m_State = state; }
 	
 	float GetThreshold() { return m_Threshold; }
-	void SetThreshold(float threshold) { m_Threshold = threshold; }
-	
+	void SetThreshold(float threshold) { m_Threshold = threshold; }	
 }
 
 class StaminaConsumers
@@ -47,17 +46,19 @@ class StaminaConsumers
 		if ( m_StaminaConsumers && m_StaminaConsumers.Contains(consumer) )
 		{
 			StaminaConsumer sc = m_StaminaConsumers.Get(consumer);
-			if( isDepleted )
+			
+			if( isDepleted && curStamina < sc.GetThreshold() )
 			{
 				sc.SetState(false);
 				return false;
 			}
-			
-			if( curStamina <= sc.GetThreshold() && sc.GetState() )
+
+			if( (curStamina >= sc.GetThreshold() && sc.GetState()) || (!isDepleted && sc.GetState()) )
 			{
+				sc.SetState(true);
 				return true;
 			}
-	
+
 			if( curStamina > sc.GetThreshold() )
 			{
 				sc.SetState(true);
@@ -76,17 +77,19 @@ class StaminaConsumers
  * @param[in]	type	 	calculation method
  * @param[in]	minValue	min value substracted from stamina (if type > 0)
  * @param[in]	maxValue	max value substracted from stamina
+ * @param[in]	cooldown	how many seconds will not be the stamina replenishing after depleting
  */
 class StaminaModifier
 {
 	int m_Type;
-	float m_MinValue, m_MaxValue;
+	float m_MinValue, m_MaxValue, m_Cooldown;
 
-	void StaminaModifier(int type, float min, float max)
+	void StaminaModifier(int type, float min, float max, float cooldown)
 	{
 		m_Type = type;
 		m_MinValue = min;
 		m_MaxValue = max;
+		m_Cooldown = cooldown;
 	}
 	
 	int GetType() { return m_Type; }
@@ -96,6 +99,9 @@ class StaminaModifier
 	
 	float GetMaxValue() { return m_MaxValue; }
 	void SetMaxValue(float val) { m_MaxValue = val; }
+
+	float GetCooldown() { return m_Cooldown; }
+	void SetCooldown(float val) { m_Cooldown = val; }
 }
 
 class StaminaModifiers
@@ -111,23 +117,23 @@ class StaminaModifiers
 	}
 
 	//! register single value modifier - depletes stamina for that value
-	void RegisterFixed(EStaminaModifiers modifier, float value)
+	void RegisterFixed(EStaminaModifiers modifier, float value, float cooldown = GameConstants.STAMINA_REGEN_COOLDOWN_DEPLETION)
 	{	
 		if ( !m_StaminaModifiers.Contains(modifier) )
 		{
 			//! init of StaminaModifier - type and min, max values (min is not relevant for that type)
-			StaminaModifier sm = new StaminaModifier(FIXED, -1, value);
+			StaminaModifier sm = new StaminaModifier(FIXED, -1, value, cooldown);
 			m_StaminaModifiers.Set(modifier, sm);
 		}
 	}
 	
 	//! register randomized modifier - stamina will be depleted by value between min and max value;
-	void RegisterRandomized(EStaminaModifiers modifier, float minValue, float maxValue)
+	void RegisterRandomized(EStaminaModifiers modifier, float minValue, float maxValue, float cooldown = GameConstants.STAMINA_REGEN_COOLDOWN_DEPLETION)
 	{
 		if ( !m_StaminaModifiers.Contains(modifier) )
 		{
 			//! init of StaminaModifier - type, min, max values
-			StaminaModifier sm = new StaminaModifier(RANDOMIZED, minValue, maxValue);
+			StaminaModifier sm = new StaminaModifier(RANDOMIZED, minValue, maxValue, cooldown);
 			m_StaminaModifiers.Set(modifier, sm);
 		}
 	}
@@ -147,7 +153,7 @@ class StaminaHandler
 	protected float 						m_StaminaCap;
 	protected float							m_StaminaDepletion;
 	protected float 						m_Time;
-	protected ref Param2<float,float>		m_StaminaParams; 
+	protected ref Param3<float,float,bool>	m_StaminaParams; 
 	protected ref HumanMovementState		m_State;
 	protected PlayerBase					m_Player;
 
@@ -159,18 +165,17 @@ class StaminaHandler
 	
 	protected ref StaminaConsumers			m_StaminaConsumers;
 	protected ref StaminaModifiers			m_StaminaModifiers;
-	//protected ref StaminaSoundHandler		m_StaminaSoundHandler;
 	
 	void StaminaHandler(PlayerBase player)
 	{
 		if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
 		{
-			m_StaminaParams = new Param2<float,float>(0,0);		
+			m_StaminaParams = new Param3<float,float,bool>(0,0, false);		
 		}
 		m_State 			= new HumanMovementState();
 		m_Player 			= player;
-		m_Stamina 			= STAMINA_MAX; 
-		m_StaminaCap 		= STAMINA_MAX;
+		m_Stamina 			= GameConstants.STAMINA_MAX; 
+		m_StaminaCap 		= GameConstants.STAMINA_MAX;
 		m_StaminaDepletion 	= 0;
 		m_Time 				= 0;
 		m_StaminaDepleted	= false;
@@ -187,19 +192,20 @@ class StaminaHandler
 	{
 		//! stamina consumers registration
 		m_StaminaConsumers = new StaminaConsumers;
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.HOLD_BREATH, STAMINA_HOLD_BREATH_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.SPRINT, STAMINA_SPRINT_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.JUMP, STAMINA_JUMP_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_HEAVY, STAMINA_MELEE_HEAVY_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_EVADE, STAMINA_MELEE_EVADE_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.HOLD_BREATH, GameConstants.STAMINA_HOLD_BREATH_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.SPRINT, GameConstants.STAMINA_MIN_CAP - 1);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.JUMP, GameConstants.STAMINA_JUMP_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_HEAVY, GameConstants.STAMINA_MELEE_HEAVY_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_EVADE, GameConstants.STAMINA_MELEE_EVADE_THRESHOLD);
 		
 		//! stamina modifiers registration
 		m_StaminaModifiers = new StaminaModifiers;
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.HOLD_BREATH, STAMINA_DRAIN_HOLD_BREATH);
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.JUMP, STAMINA_DRAIN_JUMP);
-		m_StaminaModifiers.RegisterRandomized(EStaminaModifiers.MELEE_LIGHT, 1, STAMINA_DRAIN_MELEE_LIGHT);
-		m_StaminaModifiers.RegisterRandomized(EStaminaModifiers.MELEE_HEAVY, STAMINA_DRAIN_MELEE_LIGHT, STAMINA_DRAIN_MELEE_HEAVY);
-		m_StaminaModifiers.RegisterRandomized(EStaminaModifiers.MELEE_EVADE, 3, STAMINA_DRAIN_MELEE_EVADE);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.HOLD_BREATH, GameConstants.STAMINA_DRAIN_HOLD_BREATH);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.JUMP, GameConstants.STAMINA_DRAIN_JUMP);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.MELEE_LIGHT, GameConstants.STAMINA_DRAIN_MELEE_LIGHT);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.MELEE_HEAVY, GameConstants.STAMINA_DRAIN_MELEE_HEAVY);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.OVERALL_DRAIN, GameConstants.STAMINA_MAX, 5.0);
+		m_StaminaModifiers.RegisterRandomized(EStaminaModifiers.MELEE_EVADE, 3, GameConstants.STAMINA_DRAIN_MELEE_EVADE);
 	}
 	
 	void Update(float deltaT, int pCurrentCommandID)
@@ -217,13 +223,13 @@ class StaminaHandler
 			m_PlayerLoad = m_Player.GetPlayerLoad();
 
 			//! StaminaCap calculation starts when PlayerLoad exceeds STAMINA_WEIGHT_LIMIT_THRESHOLD
-			if (m_PlayerLoad >= STAMINA_WEIGHT_LIMIT_THRESHOLD)
+			if (m_PlayerLoad >= GameConstants.STAMINA_WEIGHT_LIMIT_THRESHOLD)
 			{
-				m_StaminaCap =  Math.Max((STAMINA_MAX - (((m_PlayerLoad - STAMINA_WEIGHT_LIMIT_THRESHOLD)/STAMINA_KG_TO_GRAMS) * STAMINA_KG_TO_STAMINAPERCENT_PENALTY)),STAMINA_MIN_CAP);
+				m_StaminaCap =  Math.Max((GameConstants.STAMINA_MAX - (((m_PlayerLoad - GameConstants.STAMINA_WEIGHT_LIMIT_THRESHOLD)/GameConstants.STAMINA_KG_TO_GRAMS) * GameConstants.STAMINA_KG_TO_STAMINAPERCENT_PENALTY)),GameConstants.STAMINA_MIN_CAP);
 			}
 			else
 			{
-				m_StaminaCap = STAMINA_MAX;
+				m_StaminaCap = GameConstants.STAMINA_MAX;
 			}
 			
 			// Calculates stamina gain/loss based on movement and load
@@ -244,7 +250,10 @@ class StaminaHandler
 			case DayZPlayerConstants.COMMANDID_MELEE2:  //! processed on event
 			break;
 			default:
-				m_StaminaDelta = STAMINA_GAIN_IDLE_PER_SEC;
+				if( !m_IsInCooldown )
+				{
+					m_StaminaDelta = GameConstants.STAMINA_GAIN_IDLE_PER_SEC;
+				}
 			break;
 			}
 			
@@ -258,17 +267,15 @@ class StaminaHandler
 				m_Stamina = Math.Max(0,Math.Min((m_Stamina + m_StaminaDelta*deltaT),m_StaminaCap));
 				m_Stamina = m_Stamina - m_StaminaDepletion;
 			}
-			
+
 			if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
 			{
 				m_Player.GetStatStamina().Set(m_Stamina);
 				m_Time += deltaT;
-				if ( m_StaminaParams && m_Time >= STAMINA_SYNC_RATE )
+				if ( m_Time >= GameConstants.STAMINA_SYNC_RATE )
 				{
 					m_Time = 0;
-					m_StaminaParams.param1 = m_Stamina;
-					m_StaminaParams.param2 = m_StaminaCap;
-					GetGame().RPCSingleParam(m_Player, ERPCs.RPC_STAMINA, m_StaminaParams, true, m_Player.GetIdentity());
+					SyncStamina(m_Stamina, m_StaminaCap, m_IsInCooldown);
 				}
 			}
 			else
@@ -297,12 +304,6 @@ class StaminaHandler
 
 			m_StaminaDelta = 0;
 			m_StaminaDepletion = 0; // resets depletion modifier
-			/*
-			if(m_StaminaSoundHandler)
-			{
-				m_StaminaSoundHandler.Update(m_Stamina, deltaT);
-			}
-			*/
 		}
 	}
 	
@@ -313,42 +314,45 @@ class StaminaHandler
 		case DayZPlayerConstants.MOVEMENTIDX_SPRINT: //sprint
 			if ( pHumanMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_ERECT )
 			{
-				m_StaminaDelta = -STAMINA_DRAIN_STANDING_SPRINT_PER_SEC;
-				SetCooldown(STAMINA_REGEN_COOLDOWN_DEPLETION);
+				m_StaminaDelta = -GameConstants.STAMINA_DRAIN_STANDING_SPRINT_PER_SEC;
+				SetCooldown(GameConstants.STAMINA_REGEN_COOLDOWN_DEPLETION);
 				break;
 			}
 			if ( pHumanMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_CROUCH)
 			{
-				m_StaminaDelta = -STAMINA_DRAIN_CROUCHED_SPRINT_PER_SEC;
-				SetCooldown(STAMINA_REGEN_COOLDOWN_DEPLETION);
+				m_StaminaDelta = -GameConstants.STAMINA_DRAIN_CROUCHED_SPRINT_PER_SEC;
+				SetCooldown(GameConstants.STAMINA_REGEN_COOLDOWN_DEPLETION);
 				break;
 			}
-			m_StaminaDelta = STAMINA_GAIN_JOG_PER_SEC;
+			m_StaminaDelta = GameConstants.STAMINA_GAIN_JOG_PER_SEC;
 		break;
 			
 		case DayZPlayerConstants.MOVEMENTIDX_RUN: //jog
 			if (!m_IsInCooldown)
 			{
-				m_StaminaDelta = (STAMINA_GAIN_JOG_PER_SEC + CalcStaminaGainBonus());
+				m_StaminaDelta = (GameConstants.STAMINA_GAIN_JOG_PER_SEC + CalcStaminaGainBonus());
 			}
 		break;
 			
 		case DayZPlayerConstants.MOVEMENTIDX_WALK: //walk
 			if (!m_IsInCooldown)
 			{
-				m_StaminaDelta = (STAMINA_GAIN_WALK_PER_SEC + CalcStaminaGainBonus());
+				m_StaminaDelta = (GameConstants.STAMINA_GAIN_WALK_PER_SEC + CalcStaminaGainBonus());
 			}
 		break;
 			
 		case DayZPlayerConstants.MOVEMENTIDX_IDLE: //idle
 			if (!m_IsInCooldown)
 			{
-				m_StaminaDelta = (STAMINA_GAIN_IDLE_PER_SEC + CalcStaminaGainBonus());
+				m_StaminaDelta = (GameConstants.STAMINA_GAIN_IDLE_PER_SEC + CalcStaminaGainBonus());
 			}
 		break;
 			
 		default:
-			m_StaminaDelta = STAMINA_GAIN_IDLE_PER_SEC;
+			if( !m_IsInCooldown )
+			{
+				m_StaminaDelta = GameConstants.STAMINA_GAIN_IDLE_PER_SEC;
+			}
 		break;
 		}
 	}
@@ -358,20 +362,23 @@ class StaminaHandler
 		switch ( pHumanMovementState.m_iMovement )
 		{
 		case 2: //climb up (fast)
-			m_StaminaDelta = -STAMINA_DRAIN_LADDER_FAST_PER_SEC;
-			SetCooldown(STAMINA_REGEN_COOLDOWN_DEPLETION);
+			m_StaminaDelta = -GameConstants.STAMINA_DRAIN_LADDER_FAST_PER_SEC;
+			SetCooldown(GameConstants.STAMINA_REGEN_COOLDOWN_DEPLETION);
 			break;
 		break;
 			
 		case 1: //climb up (slow)
 			if (!m_IsInCooldown)
 			{
-				m_StaminaDelta = (STAMINA_GAIN_LADDER_PER_SEC + CalcStaminaGainBonus());
+				m_StaminaDelta = (GameConstants.STAMINA_GAIN_LADDER_PER_SEC + CalcStaminaGainBonus());
 			}
 		break;
 			
 		default:
-			m_StaminaDelta = STAMINA_GAIN_IDLE_PER_SEC;
+			if( !m_IsInCooldown )
+			{
+				m_StaminaDelta = GameConstants.STAMINA_GAIN_IDLE_PER_SEC;
+			}
 		break;
 		}
 	}
@@ -381,26 +388,42 @@ class StaminaHandler
 		switch ( pHumanMovementState.m_iMovement )
 		{
 		case 3: //swim fast
-			m_StaminaDelta = -STAMINA_DRAIN_SWIM_FAST_PER_SEC;
-			SetCooldown(STAMINA_REGEN_COOLDOWN_DEPLETION);
+			m_StaminaDelta = -GameConstants.STAMINA_DRAIN_SWIM_FAST_PER_SEC;
+			SetCooldown(GameConstants.STAMINA_REGEN_COOLDOWN_DEPLETION);
 			break;
 		break;
 			
 		case 2: //swim slow
 			if (!m_IsInCooldown)
 			{
-				m_StaminaDelta = (STAMINA_GAIN_SWIM_PER_SEC + CalcStaminaGainBonus());
+				m_StaminaDelta = (GameConstants.STAMINA_GAIN_SWIM_PER_SEC + CalcStaminaGainBonus());
 			}
 		break;
 			
 		default:
-			m_StaminaDelta = STAMINA_GAIN_IDLE_PER_SEC;
+			if( !m_IsInCooldown )
+			{
+				m_StaminaDelta = GameConstants.STAMINA_GAIN_IDLE_PER_SEC;
+			}
 		break;
 		}
 	}
-
+	
+	//! stamina sync - server part
+	protected void SyncStamina(float stamina, float stamina_cap, bool cooldown)
+	{
+		if( m_StaminaParams )
+		{
+			m_Player.GetStatStamina().Set(m_Stamina);
+			m_StaminaParams.param1 = m_Stamina;
+			m_StaminaParams.param2 = m_StaminaCap;
+			m_StaminaParams.param3 = m_IsInCooldown;
+			GetGame().RPCSingleParam(m_Player, ERPCs.RPC_STAMINA, m_StaminaParams, true, m_Player.GetIdentity());
+		}
+	}
+	
 	//! called from RPC on playerbase - syncs stamina values on server with client
-	void SyncStamina(float stamina, float stamina_cap)
+	void OnRPC(float stamina, float stamina_cap, bool cooldown)
 	{
 		if ( Math.AbsFloat(stamina - m_Stamina) > 5 )
 		{
@@ -410,6 +433,8 @@ class StaminaHandler
 		{
 			m_StaminaCap = stamina_cap;
 		}
+
+		m_IsInCooldown = cooldown;
 	}
 	
 	protected float CalcStaminaGainBonus()// Calulates stamina regain bonus based on current stamina level (So it's better to wait for stamina to refill completely and avoid overloading)
@@ -418,20 +443,20 @@ class StaminaHandler
 			return 0;
 
 		if (m_Stamina > 25)
-			return Math.Min((m_Stamina/10),STAMINA_GAIN_BONUS_CAP); // exp version
+			return Math.Min((m_Stamina/10),GameConstants.STAMINA_GAIN_BONUS_CAP); // exp version
 		else
-			return STAMINA_GAIN_BONUS_CAP; // linear version
+			return GameConstants.STAMINA_GAIN_BONUS_CAP; // linear version
 	}
 
 	
 	//! check if the stamina is completely depleted
 	protected void CheckStaminaState()
 	{
-		if ( m_Stamina <= 1 )
+		if ( m_Stamina <= 0 )
 		{
 			m_StaminaDepleted = true;
 			//! in case of complete depletion - start a cooldown timer before the regeneration cycle start
-			if(!m_IsInCooldown) SetCooldown(STAMINA_REGEN_COOLDOWN_EXHAUSTION); // set this only once
+			if(!m_IsInCooldown) SetCooldown(GameConstants.STAMINA_REGEN_COOLDOWN_EXHAUSTION); // set this only once
 		}
 		else
 			m_StaminaDepleted = false;
@@ -458,6 +483,12 @@ class StaminaHandler
 	{
 		return m_StaminaConsumers.HasEnoughStaminaFor(consumer, m_Stamina, m_StaminaDepleted);
 	}
+
+	void SetStamina(float stamina_value)
+	{
+		m_Stamina = Math.Clamp(stamina_value, 0, GameConstants.STAMINA_MAX);
+		SyncStamina(m_Stamina, m_StaminaCap, m_IsInCooldown);
+	}
 	
 	float GetStamina()
 	{
@@ -471,12 +502,12 @@ class StaminaHandler
 	
 	float GetStaminaMax()
 	{
-		return STAMINA_MAX;
+		return GameConstants.STAMINA_MAX;
 	}
 
 	float GetStaminaNormalized()
 	{	
-		return m_Stamina / STAMINA_MAX;
+		return m_Stamina / GameConstants.STAMINA_MAX;
 	}
 	
 	void DepleteStamina(EStaminaModifiers modifier)
@@ -498,7 +529,7 @@ class StaminaHandler
 		}
 
 		//! run cooldown right after depletion
-		SetCooldown(STAMINA_REGEN_COOLDOWN_DEPLETION);
-		m_StaminaDepletion = Math.Clamp(m_StaminaDepletion, 0, STAMINA_MAX);
+		SetCooldown(sm.GetCooldown());
+		m_StaminaDepletion = Math.Clamp(m_StaminaDepletion, 0, GameConstants.STAMINA_MAX);
 	}
 };

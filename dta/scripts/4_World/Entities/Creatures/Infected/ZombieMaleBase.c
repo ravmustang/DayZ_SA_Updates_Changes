@@ -93,6 +93,10 @@ class ZmbM_PatientSkinny_Base extends ZombieMaleBase
 
 class ZmbM_PatrolNormal_Base extends ZombieMaleBase
 {
+	override bool IsZombieMilitary()
+	{
+		return true;
+	}
 };
 
 class ZmbM_PolicemanFat_Base extends ZombieMaleBase
@@ -117,10 +121,18 @@ class ZmbM_SkaterYoung_Base extends ZombieMaleBase
 
 class ZmbM_Soldier_Base extends ZombieMaleBase
 {
+	override bool IsZombieMilitary()
+	{
+		return true;
+	}
 };
 
 class ZmbM_SoldierNormal_Base extends ZombieMaleBase
 {
+	override bool IsZombieMilitary()
+	{
+		return true;
+	}
 };
 
 class ZmbM_SurvivorDean_Base extends ZombieMaleBase
@@ -129,6 +141,10 @@ class ZmbM_SurvivorDean_Base extends ZombieMaleBase
 
 class ZmbM_usSoldier_normal_Base extends ZombieMaleBase
 {
+	override bool IsZombieMilitary()
+	{
+		return true;
+	}
 };
 
 class ZmbM_VillagerOld_Base extends ZombieMaleBase

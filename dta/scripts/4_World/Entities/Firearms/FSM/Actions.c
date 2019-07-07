@@ -18,7 +18,7 @@ class WeaponActionDryFire extends WeaponActionBase
 
 	override void Action (WeaponEventBase e)
 	{
-		Print("[wpnfsm] action=dry fire");
+		Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " action=dry fire");
 		int mi = m_weapon.GetCurrentMuzzle();
 		m_weapon.DryFire(mi);
 	}
@@ -30,7 +30,7 @@ class WeaponActionDryDryFire extends WeaponActionBase
 
 	override void Action (WeaponEventBase e)
 	{
-		Print("[wpnfsm] action=dry dry fire");
+		Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " action=dry dry fire");
 		int mi = m_weapon.GetCurrentMuzzle();
 		m_weapon.DryDryFire(mi);
 	}

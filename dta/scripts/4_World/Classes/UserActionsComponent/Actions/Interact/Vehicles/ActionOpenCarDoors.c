@@ -4,7 +4,6 @@ class ActionOpenCarDoors: ActionInteractBase
 	
 	void ActionOpenCarDoors()
 	{
-		m_MessageSuccess = "";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ALL;
 		//m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -15,11 +14,6 @@ class ActionOpenCarDoors: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTParent(10);
-	}
-
-	override int GetType()
-	{
-		return AT_OPEN_CAR_DOORS;
 	}
 
 	override string GetText()
@@ -50,8 +44,19 @@ class ActionOpenCarDoors: ActionInteractBase
 					if ( m_AnimSource != "" )
 					{
 						//! if player is in car and cannot reach doors
-						if (player.IsInVehicle() && !car.CanReachDoorsFromSeat(m_AnimSource, car.CrewMemberIndex( player )) )
-							return false;
+						m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
+						if ( player.IsInVehicle() )
+						{
+							int crewIdx = car.CrewMemberIndex( player );
+							if ( crewIdx < 0 || !car.CanReachDoorsFromSeat( m_AnimSource, crewIdx ) )
+								return false;
+
+							if ( crewIdx == 0 || crewIdx == 2 )
+								m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_DRIVER_DOOR_OPEN;
+
+							if ( crewIdx == 1 || crewIdx == 3 )
+								m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_CODRIVER_DOOROPEN;
+						}
 
 						//! is in reach, should open the door
 						if ( car.GetAnimationPhase( m_AnimSource ) <= 0.5 )
@@ -69,8 +74,6 @@ class ActionOpenCarDoors: ActionInteractBase
 		if( car )
 		{
 			car.SetAnimationPhase( m_AnimSource, 1.0);
-			if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
-				SEffectManager.PlaySound("offroad_door_open_SoundSet", car.GetPosition() );
 		}
 	}
 
@@ -80,6 +83,9 @@ class ActionOpenCarDoors: ActionInteractBase
 		if( car )
 		{
 			car.SetAnimationPhase( m_AnimSource, 1.0);
+			
+			if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
+				SEffectManager.PlaySound("offroad_door_open_SoundSet", car.GetPosition() );
 		}
 	}
 	

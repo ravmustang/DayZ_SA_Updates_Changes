@@ -13,16 +13,15 @@ class ActionCPR: ActionContinuousBase
 	void ActionCPR()
 	{
 		m_CallbackClass = ActionCPRCB;
-		m_MessageStartFail = "Target moved and canceled action.";
-		m_MessageStart = "Player started reusiscitating you.";
-		m_MessageSuccess = "Player revived you.";
-		m_MessageFail = "Player moved and CPR was canceled.";
-		m_MessageCancel = "You stopped CPR";
-		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CPR;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
+	}
+		
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
 	}
 	
 	override void OnStartClient(ActionData action_data)
@@ -39,11 +38,6 @@ class ActionCPR: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_CPR_T;
 	}
 		
 	override string GetText()

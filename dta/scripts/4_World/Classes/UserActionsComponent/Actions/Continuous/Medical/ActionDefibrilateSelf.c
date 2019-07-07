@@ -6,18 +6,15 @@ class ActionDefibrilateSelfCB : ActionContinuousBaseCB
 	}
 };
 
-class ActionDefibrilateSelf: ActionContinuousBase
+class ActionDefibrilateSelf: ActionDefibrilateBase
 {	
 	void ActionDefibrilateSelf()
 	{
 		m_CallbackClass = ActionDefibrilateSelfCB;
-		m_MessageStartFail = "It's out of juice.";
-		m_MessageStart = "I have started defibrilating myself";
-		m_MessageSuccess = "I have defibrilated myself.";
-		m_MessageFail = "I have moved and defibrilating was canceled.";
-		m_MessageCancel = "I stopped defibrilating.";
-		//m_Animation = "defibrilate";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_HIGH;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CRAFTING;
+		m_FullBody = true;
+		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
 	
 	override void CreateConditionComponents()  
@@ -25,11 +22,6 @@ class ActionDefibrilateSelf: ActionContinuousBase
 		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_DEFIBRILATE_S;
 	}
 
 	override bool HasTarget()
@@ -41,50 +33,22 @@ class ActionDefibrilateSelf: ActionContinuousBase
 	{
 		return "#defibrilate_myself";
 	}
-
-	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	
+	override void OnFinishProgressClient( ActionData action_data )
 	{	
 		Defibrillator defib;
-		Class.CastTo(defib, item);
-		
-		if ( defib.IsCharged() ) 
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	override void OnExecuteServer( ActionData action_data )
-	{	
-		Defibrillator defib;
+		PlayerBase player = action_data.m_Player;
 		Class.CastTo(defib, action_data.m_MainItem);
 		
-		if ( defib.IsCharged() ) 
-		{
-			defib.Discharge(action_data.m_Player);
-			
-			float regain_energy = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( defib.GetEnergyNeededToCharge(), this.GetSpecialtyWeight() );
-			regain_energy = defib.GetEnergyNeededToCharge() - regain_energy;
-			
-			ItemBase battery;
-			
-			if (Class.CastTo(battery, action_data.m_MainItem.GetCompEM().GetEnergySource()))
-			{
-				battery.GetCompEM().AddEnergy( regain_energy );
-			}
-			else
-			{
-				DPrint("ERROR! Defibrillator has no battery! Defibrillator softskill bonus can't be applied!");
-			}
-		}
-		else
-		{
-			action_data.m_Player.MessageImportant ( m_MessageStartFail );		
-		}
+		DefibrillateClient(action_data.m_Player, defib);
+	}
+
+	override void OnFinishProgressServer( ActionData action_data )
+	{	
+		Defibrillator defib;
+		PlayerBase player = action_data.m_Player;
+		Class.CastTo(defib, action_data.m_MainItem);
 		
-		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+		DefibrillateServer(action_data.m_Player, defib);
 	}
 };

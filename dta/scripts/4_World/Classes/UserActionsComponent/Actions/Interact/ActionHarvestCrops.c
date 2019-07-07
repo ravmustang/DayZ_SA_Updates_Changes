@@ -2,12 +2,6 @@ class ActionHarvestCrops: ActionInteractBase
 {
 	void ActionHarvestCrops()
 	{
-		m_MessageSuccess = "";
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "";
-		m_MessageFail = "";
-		m_MessageCancel = "";
 
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
 		
@@ -16,14 +10,14 @@ class ActionHarvestCrops: ActionInteractBase
 		m_FullBody = true;*/
 	}
 
-	override int GetType()
-	{
-		return AT_HARVEST_CROPS;
-	}
-
 	override string GetText()
 	{
 		return "#harvest";
+	}
+
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
 	}
 
 	override void CreateConditionComponents()  

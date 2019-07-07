@@ -20,6 +20,6 @@ class ExplosionTest : Building
 	
 	void ExplodeNow()
 	{
-		Explode("Explosion_NonLethal");
+		Explode(DT_EXPLOSION, "Explosion_NonLethal");
 	}
 }

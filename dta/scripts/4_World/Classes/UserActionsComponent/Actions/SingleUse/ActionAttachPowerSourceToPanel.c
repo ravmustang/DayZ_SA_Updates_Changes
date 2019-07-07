@@ -2,22 +2,12 @@ class ActionAttachPowerSourceToPanel: ActionSingleUseBase
 {
 	void ActionAttachPowerSourceToPanel()
 	{
-		//m_MessageStartFail = "m_MessageStartFail";
-		//m_MessageStart = "m_MessageStart";
-		m_MessageSuccess = "I've attached the power source to the panel.";
-		//m_MessageFail = "m_MessageFail";
-		//m_MessageCancel = "m_MessageCancel";
 	}
 
 	override void CreateConditionComponents() 
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
-	}
-	
-	override int GetType()
-	{
-		return AT_ATTACH_POWER_SOURCE_TO_PANEL;
 	}
 		
 	override string GetText()
@@ -42,7 +32,7 @@ class ActionAttachPowerSourceToPanel: ActionSingleUseBase
 	protected void OnExecuteImpl ( ActionData action_data )
 	{
 		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
-		EntityAI item_entity = EntityAI.Cast( action_data.m_MainItem );
+		EntityAI item_entity = action_data.m_MainItem;
 		
 		//find inventory location for attachment
 		InventoryLocation target_location = new InventoryLocation;

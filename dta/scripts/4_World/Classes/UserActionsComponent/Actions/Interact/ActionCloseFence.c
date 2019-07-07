@@ -2,7 +2,6 @@ class ActionCloseFence: ActionInteractBase
 {
 	void ActionCloseDoors()
 	{
-		m_MessageSuccess = "";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_HUDCursorIcon = CursorIcons.CloseDoors;
@@ -12,11 +11,6 @@ class ActionCloseFence: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-	
-	override int GetType()
-	{
-		return AT_FENCE_CLOSE;
 	}
 
 	override string GetText()

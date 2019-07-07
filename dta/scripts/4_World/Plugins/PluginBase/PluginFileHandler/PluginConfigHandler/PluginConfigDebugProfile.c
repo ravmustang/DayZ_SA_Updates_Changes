@@ -13,6 +13,7 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 	protected const string CHAR_MODIFIERS_VIS				= "console_character_modifiers_visible";
 	protected const string CHAR_AGENTS_VIS					= "console_character_agents_visible";
 	protected const string CHAR_DEBUG_VIS					= "console_character_debug_visible";
+	protected const string CHAR_STOMACH_VIS					= "console_character_stomach_visible";
 	protected const string FREE_CAMERA_CROSSHAIR			= "console_free_camera_crosshair_visible";
 	protected const string SUB_PARAM_ITEM					= "item";
 	protected const string SUB_PARAM_ITEM_NAME				= "name";
@@ -484,6 +485,19 @@ class PluginConfigDebugProfile extends PluginConfigHandler
 	void SetCharacterDebugVisible( bool is_visible )
 	{
 		SetBool( CHAR_DEBUG_VIS, is_visible );
+	}	
+		
+	//========================================
+	// CharacterStomachVisible
+	//========================================	
+	bool GetCharacterStomachVisible()
+	{
+		return GetBool( CHAR_STOMACH_VIS );
+	}
+
+	void SetCharacterStomachVisible( bool is_visible )
+	{
+		SetBool( CHAR_STOMACH_VIS, is_visible );
 	}	
 	
 	//========================================

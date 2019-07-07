@@ -6,20 +6,23 @@ class ActionTuneFrequencyOnGround : ActionInteractBase
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageSuccess 	= "I have tuned the frequency.";
-		m_MessageFail 		= "Cannot tune the frequency on the device without power.";
 		m_RadioFreq 		= string.Empty;
-	}
-
-	override int GetType()
-	{
-		return AT_TUNE_FREQUENCY_ON_GROUND;
 	}
 
 	override string GetText()
 	{
 		string text = "#tune_frequency | " + m_RadioFreq + " MHz";
 		return text;
+	}
+
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
+	}
+
+	override bool HasProgress()
+	{
+		return false;
 	}
 		
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )

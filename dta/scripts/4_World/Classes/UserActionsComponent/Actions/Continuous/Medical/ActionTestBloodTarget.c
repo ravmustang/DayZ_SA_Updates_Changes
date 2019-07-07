@@ -11,12 +11,6 @@ class ActionTestBloodTarget: ActionContinuousBase
 	void ActionTestBloodTarget()
 	{
 		m_CallbackClass = ActionTestBloodTargetCB;
-		m_MessageStartFail = "It's used up.";
-		m_MessageStart = "Player started testing your blood.";
-		m_MessageSuccess = "Player finished testing your blood.";
-		m_MessageFail = "Player moved and testing was canceled.";
-		m_MessageCancel = "You stopped testing.";
-	//	m_Animation = "testblood";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BANDAGETARGET;
 		m_FullBody = true;
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
@@ -27,25 +21,41 @@ class ActionTestBloodTarget: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
 	}
-
-	override int GetType()
-	{
-		return AT_TEST_BLOOD_T;
-	}
 		
 	override string GetText()
 	{
 		return "#test_targets_blood";
 	}
 
+	override void OnFinishProgressClient( ActionData action_data )
+	{
+		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
+
+		if( ntarget )
+		{
+			string blood_type_name, blood_name;
+			bool positive;
+			blood_type_name = BloodTypes.GetBloodTypeName( ntarget.GetBloodType(), blood_name, positive );
+	
+			ntarget.SetLastUAMessage(blood_type_name);
+		}
+	}
+
+	override void OnStartServer( ActionData action_data )
+	{
+		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
+		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
+		int blood_type = ntarget.GetStatBloodType().Get();
+		
+		module_lifespan.UpdateBloodType( ntarget, blood_type );			
+	}
+	
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		PlayerBase ntraget = PlayerBase.Cast( action_data.m_Target.GetObject() );
+		PlayerBase ntarget = PlayerBase.Cast( action_data.m_Target.GetObject() );
 		PluginLifespan module_lifespan = PluginLifespan.Cast( GetPlugin( PluginLifespan ) );
-		int blood_type = ntraget.GetStatBloodType().Get();
 		
-		module_lifespan.UpdateBloodTypeVisibility( ntraget, true );
-		module_lifespan.UpdateBloodType( ntraget, blood_type );
+		module_lifespan.UpdateBloodTypeVisibility( ntarget, true );
 		
 		action_data.m_MainItem.Delete();
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );

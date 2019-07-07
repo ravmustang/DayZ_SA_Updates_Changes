@@ -6,7 +6,7 @@ class ActionBandageSelfCB : ActionContinuousBaseCB
 	}
 };
 
-class ActionBandageSelf: ActionContinuousBase
+class ActionBandageSelf: ActionBandageBase
 {	
 	void ActionBandageSelf()
 	{
@@ -14,11 +14,6 @@ class ActionBandageSelf: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BANDAGE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-		m_MessageStartFail = "There's nothing to bandage.";
-		m_MessageStart = "I have started bandaging myself";
-		m_MessageSuccess = "I have bandaged myself.";
-		m_MessageFail = "I have moved and bandaging was canceled.";
-		m_MessageCancel = "I stopped bandaging.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 
@@ -26,11 +21,6 @@ class ActionBandageSelf: ActionContinuousBase
 	{		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-		
-	override int GetType()
-	{
-		return AT_BANDAGE_S;
 	}
 
 	override bool HasTarget()
@@ -42,24 +32,19 @@ class ActionBandageSelf: ActionContinuousBase
 	{
 		return "#treat_wound";
 	}
-
+/*
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		return player.IsBleeding();
-	}
+	}*/
 	
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
-		if (action_data.m_Player.GetBleedingManagerServer() )
+		PlayerBase target = PlayerBase.Cast(action_data.m_Player);
+		if(action_data.m_MainItem && target)
 		{
-			action_data.m_Player.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();	
+			ApplyBandage( action_data.m_MainItem, target );
+			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		}
-		
-		if (action_data.m_MainItem.GetQuantity() > 0)
-		{
-			action_data.m_MainItem.AddQuantity(-1,true);
-		}
-
-		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

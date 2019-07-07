@@ -2,7 +2,6 @@ class ActionOpenFence: ActionInteractBase
 {
 	void ActionOpenFence()
 	{
-		m_MessageSuccess = "";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_HUDCursorIcon = CursorIcons.OpenDoors;
@@ -12,11 +11,6 @@ class ActionOpenFence: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_FENCE_OPEN;
 	}
 
 	override string GetText()

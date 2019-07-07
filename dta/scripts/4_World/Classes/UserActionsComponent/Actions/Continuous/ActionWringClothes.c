@@ -16,12 +16,6 @@ class ActionWringClothes: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_WRING;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-		
-		m_MessageStartFail = "It's ruined.";
-		m_MessageStart = "I have started wringing clothes.";
-		m_MessageSuccess = "I have finished wringing clothes.";
-		m_MessageFail = "Player moved and stopped wringing clothes.";
-		m_MessageCancel = "I stopped wringing clothes.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -29,11 +23,6 @@ class ActionWringClothes: ActionContinuousBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_WRING_CLOTHES;
 	}
 
 	override bool HasTarget()

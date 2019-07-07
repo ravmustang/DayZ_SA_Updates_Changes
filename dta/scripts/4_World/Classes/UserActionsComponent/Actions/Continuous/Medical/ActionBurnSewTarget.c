@@ -11,12 +11,6 @@ class ActionBurnSewTarget: ActionContinuousBase
 	void ActionBurnSewTarget()
 	{
 		m_CallbackClass = ActionBurnSewTargetCB;
-		m_MessageStartFail = "It's not possible.";
-		m_MessageStart = "Player started closing your wounds.";
-		m_MessageSuccess = "Player finished closing your wounds.";
-		m_MessageFail = "Player moved and closing wounds was canceled.";
-		m_MessageCancel = "You stopped closing target's wounds.";
-	//	m_Animation = "sew";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
 	}
 	
@@ -24,11 +18,6 @@ class ActionBurnSewTarget: ActionContinuousBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_BURN_SEW_T;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

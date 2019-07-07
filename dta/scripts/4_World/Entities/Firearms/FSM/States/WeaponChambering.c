@@ -1,6 +1,13 @@
 // load 1 bullet
 class WeaponChambering_Start extends WeaponStartAction
-{ };
+{ 
+	override void OnEntry (WeaponEventBase e)
+	{
+		super.OnEntry(e);
+
+		m_weapon.SelectionBulletHide();
+	}
+};
 
 class WeaponChambering_Base extends WeaponStateBase
 {
@@ -15,17 +22,17 @@ class WeaponChambering_Base extends WeaponStateBase
 
 		if (!ctx.Write(m_damage))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot write m_damage for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot write m_damage for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Write(m_type))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot write m_type for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot write m_type for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Write(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot write m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot write m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -38,17 +45,17 @@ class WeaponChambering_Base extends WeaponStateBase
 
 		if (!ctx.Read(m_damage))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_damage for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_damage for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Read(m_type))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_type for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_type for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Read(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -66,15 +73,15 @@ class WeaponChambering_Cartridge extends WeaponChambering_Base
 		{
 			if (m_srcMagazine.LocalAcquireCartridge(m_damage, m_type))
 			{
-				wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);
 				m_weapon.SelectionBulletShow();
 			}
 			else
-				Error("[wpnfsm] WeaponChambering_Cartridge, error - cannot take cartridge from magazine");
+				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, error - cannot take cartridge from magazine");
 		}
 		else
 		{
-			Error("[wpnfsm] WeaponChambering_Cartridge, error - no magazine to load from (m_srcMagazine=NULL)");
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, error - no magazine to load from (m_srcMagazine=NULL)");
 		}
 	}
 
@@ -88,9 +95,9 @@ class WeaponChambering_Cartridge extends WeaponChambering_Base
 			if( !GetGame().IsMultiplayer() || GetGame().IsServer() )
 			{
 				if (DayZPlayerUtils.HandleDropCartridge(e.m_player, m_damage, m_type, magazineTypeName))
-					wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, ok - aborting, chambering cartridge dropped to ground");
+					wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, ok - aborting, chambering cartridge dropped to ground");
 				else
-					Error("[wpnfsm] WeaponChambering_Cartridge, error - cannot abort removal from wpn (of old mag)");
+					Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, error - cannot abort removal from wpn (of old mag)");
 			}
 
 			m_weapon.SelectionBulletHide(); // force hide on abort
@@ -106,10 +113,10 @@ class WeaponChambering_Cartridge extends WeaponChambering_Base
 		//	m_weapon.EjectCasing(mi);
 		if (m_weapon.PushCartridgeToChamber(mi, m_damage, m_type))
 		{
-			wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, ok - loaded chamber");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, ok - loaded chamber");
 		}
 		else
-			wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, error - cannot load chamber chamber!");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, error - cannot load chamber chamber!");
 
 		m_type = string.Empty;
 		super.OnExit(e);
@@ -129,10 +136,10 @@ class WeaponChambering_Cartridge_ChambToMag extends WeaponChambering_Cartridge
 			m_weapon.PopCartridgeFromChamber(mi, ammoDamage, ammoTypeName);
 			if (m_weapon.PushCartridgeToInternalMagazine(mi, ammoDamage, ammoTypeName))
 			{
-				wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, ok - loaded chamber");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, ok - loaded chamber");
 			}
 			else
-				wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge, error - cannot load chamber chamber!");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, error - cannot load chamber chamber!");
 		}
 		super.OnExit(e);
 	}
@@ -149,15 +156,15 @@ class WeaponChambering_Cartridge_InnerMag extends WeaponChambering_Base
 		{
 			if (m_srcMagazine.LocalAcquireCartridge(m_damage, m_type))
 			{
-				wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge_InnerMag, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);
 				m_weapon.SelectionBulletShow();
 			}
 			else
-				Error("[wpnfsm] WeaponChambering_Cartridge_InnerMag, error - cannot take cartridge from magazine");
+				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, error - cannot take cartridge from magazine");
 		}
 		else
 		{
-			Error("[wpnfsm] WeaponChambering_Cartridge_InnerMag, error - no magazine to load from (m_srcMagazine=NULL)");
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, error - no magazine to load from (m_srcMagazine=NULL)");
 		}
 	}
 
@@ -171,9 +178,9 @@ class WeaponChambering_Cartridge_InnerMag extends WeaponChambering_Base
 			if( !GetGame().IsMultiplayer() || GetGame().IsServer() )
 			{
 				if (DayZPlayerUtils.HandleDropCartridge(e.m_player, m_damage, m_type, magazineTypeName))
-					wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge_InnerMag, ok - aborting, chambering cartridge dropped to ground");
+					wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, ok - aborting, chambering cartridge dropped to ground");
 				else
-					Error("[wpnfsm] WeaponChambering_Cartridge_InnerMag, error - cannot abort removal from wpn (of old mag)");
+					Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, error - cannot abort removal from wpn (of old mag)");
 			}
 
 			m_weapon.SelectionBulletHide(); // force hide on abort
@@ -191,10 +198,10 @@ class WeaponChambering_Cartridge_InnerMag extends WeaponChambering_Base
 		{
 			if (m_weapon.PushCartridgeToInternalMagazine(mi, m_damage, m_type))
 			{
-				wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge_InnerMag, ok - loaded chamber");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, ok - loaded chamber");
 			}
 			else
-				wpnDebugPrint("[wpnfsm] WeaponChambering_Cartridge_InnerMag, error - cannot load chamber chamber!");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, error - cannot load chamber chamber!");
 		}
 		super.OnExit(e);
 	}
@@ -248,15 +255,15 @@ class WeaponChambering extends WeaponStateBase
 		{
 			if (e.m_magazine != NULL)
 			{
-				wpnDebugPrint("[wpnfsm] WeaponChambering, taking mag from event e.mag=" + e.m_magazine.ToString());
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering, taking mag from event e.mag=" + e.m_magazine.ToString());
 				m_srcMagazine = e.m_magazine;
 			}
 		}
 		else
 		{
-			wpnDebugPrint("[wpnfsm] WeaponChambering (e=NULL), m_srcMagazine=" + m_srcMagazine.ToString());
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering (e=NULL), m_srcMagazine=" + m_srcMagazine.ToString());
 		}
-		wpnDebugPrint("[wpnfsm] m_srcMagazine=" + m_srcMagazine.ToString());
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " m_srcMagazine=" + m_srcMagazine.ToString());
 
 		m_chamber.m_srcMagazine = m_srcMagazine;
 
@@ -284,7 +291,7 @@ class WeaponChambering extends WeaponStateBase
 
 		if (!ctx.Write(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -297,7 +304,7 @@ class WeaponChambering extends WeaponStateBase
 
 		if (!ctx.Read(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;

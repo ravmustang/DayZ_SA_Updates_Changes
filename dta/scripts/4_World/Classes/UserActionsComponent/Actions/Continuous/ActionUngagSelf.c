@@ -3,22 +3,12 @@ class ActionUngagSelf: ActionContinuousBase
 	void ActionUngagSelf()
 	{
 		m_CallbackClass = ActionUncoverHeadSelfCB;
-		m_MessageStartFail = "";
-		m_MessageStart = "I have started removing the sack";
-		m_MessageSuccess = "I have removed the sack.";
-		m_MessageFail = "I have moved and removing sack was canceled.";
-		m_MessageCancel = "I stopped removing the sack.";
 	}
 
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_UNGAG_SELF;
 	}
 
 	override bool HasTarget()

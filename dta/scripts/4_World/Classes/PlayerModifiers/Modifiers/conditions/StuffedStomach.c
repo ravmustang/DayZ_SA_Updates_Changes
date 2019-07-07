@@ -16,7 +16,7 @@ class StuffedStomachMdfr: ModifierBase
 	
 	override bool ActivateCondition(PlayerBase player)
 	{
-		float stomach = player.GetStatStomachVolume().Get();
+		float stomach = player.m_PlayerStomach.GetStomachVolume();
 		if ( stomach >= STUFFED_TRESHOLD )
 		{
 			return true;
@@ -31,7 +31,7 @@ class StuffedStomachMdfr: ModifierBase
 	{
 		if( player.GetNotifiersManager() )
 		{
-			player.GetNotifiersManager().AttachByType(eNotifiers.NTF_STUFFED);
+			player.GetNotifiersManager().ActivateByType(eNotifiers.NTF_STUFFED);
 		}
 	}
 
@@ -39,7 +39,7 @@ class StuffedStomachMdfr: ModifierBase
 	{
 		if( player.GetNotifiersManager() )
 		{
-			player.GetNotifiersManager().DetachByType(eNotifiers.NTF_STUFFED);
+			player.GetNotifiersManager().DeactivateByType(eNotifiers.NTF_STUFFED);
 		}
 	}
 

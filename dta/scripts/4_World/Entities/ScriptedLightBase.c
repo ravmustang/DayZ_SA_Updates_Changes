@@ -9,21 +9,30 @@ Script author: Boris Vacula
 
 class ScriptedLightBase extends EntityLightSource
 {
-	private float m_LifetimeStart;
-	private float m_LifetimeEnd = -1; // -1 makes this light permanent
-	private float m_FadeOutTime = -1;
-	private float m_FadeInTime = -1;
-	private float m_Radius;
-	private float m_RadiusTarget;
-	private float m_Brightness;
-	private float m_BrightnessTarget;
-	private float m_BrightnessSpeedOfChange = 1;
-	private float m_RadiusSpeedOfChange = 1;
-	private float m_OptimizeShadowsRadius = 0; // Within this range between the light source and camera the shadows will be automatically disabled for performance reasons.
+	float 		m_LifetimeStart;
+	float 		m_LifetimeEnd = -1; // -1 makes this light permanent
+	float 		m_FadeOutTime = -1;
+	float 		m_FadeInTime = -1;
+	float 		m_Radius;
+	float 		m_RadiusTarget;
+	float 		m_Brightness;
+	float 		m_BrightnessPulse; // flicker effect
+	float 		m_BrightnessPulseSpeed;
+	float 		m_BrightnessPulseAmplitude;
+	float 		m_BrightnessTarget;
+	float 		m_BrightnessSpeedOfChange = 1;
+	float 		m_RadiusSpeedOfChange = 1;
+	float 		m_OptimizeShadowsRadius = 0; // Within this range between the light source and camera the shadows will be automatically disabled to save on performance
+	float 		m_DancingShadowsAmplitude;
+	float 		m_DancingShadowsSpeed;
+	bool 		m_IsDebugEnabled = false;
 	
-	private Object m_Parent; // Attachment parent
-	private vector m_LocalPos; // Local position to my attachment parent
-	private vector m_LocalOri; // Local orientation to my attachment parent
+	Object 		m_Parent; // Attachment parent
+	vector 		m_LocalPos; // Local position to my attachment parent
+	vector 		m_LocalOri; // Local orientation to my attachment parent
+	vector 		m_DancingShadowsLocalPos;
+	
+	ref Timer 	m_DeleteTimer;
 	
 	//! Constructor. Everything here is executed before the constructor of all children.
 	void ScriptedLightBase()
@@ -31,6 +40,28 @@ class ScriptedLightBase extends EntityLightSource
 		m_LifetimeStart = GetGame().GetTime();
 		SetEnabled(true);
 		SetEventMask(EntityEvent.FRAME);
+	}
+	
+	override bool IsScriptedLight()
+	{
+		return true;
+	}
+	
+	//! Correct way of deleting light from memory. It is necesarry to have this delay due to hierarchy.
+	private void DeleteLightWithDelay()
+	{
+		DetachFromParent(); // This is the reason for the delay
+		
+		if (!m_DeleteTimer)
+			m_DeleteTimer = new Timer( CALL_CATEGORY_SYSTEM );
+			
+		m_DeleteTimer.Run( 0.03 , this, "DeleteLightNow", NULL, true);
+	}
+	
+	// Deletes light now. Do not call this directly. Call Destroy() instead. Otherwise you might get errors related to hierarchy.
+	private void DeleteLightNow()
+	{
+		GetGame().ObjectDelete(this);
 	}
 	
 	//! Attaches this light on the parent entity, with optional position and orientation offset.
@@ -71,7 +102,7 @@ class ScriptedLightBase extends EntityLightSource
 	//! Attaches this light on the parent entity's memory point, with optional direction target memory point.
 	void AttachOnMemoryPoint(Object parent, string memory_point_start, string memory_point_target = "")
 	{
-		vector local_pos = parent.GetMemoryPointPos(memory_point_start);
+		m_LocalPos = parent.GetMemoryPointPos(memory_point_start);
 		vector local_ori;
 		if (memory_point_target != "")
 		{
@@ -80,7 +111,7 @@ class ScriptedLightBase extends EntityLightSource
 			local_ori = target_pos.VectorToAngles();
 		}
 		
-		AttachOnObject(parent, local_pos, local_ori);
+		AttachOnObject(parent, m_LocalPos, local_ori);
 	}
 	
 	//! Detaches this light from its parent entity.
@@ -93,7 +124,10 @@ class ScriptedLightBase extends EntityLightSource
 		
 		if (m_Parent)
 		{
-			m_Parent.RemoveChild(this);
+			if ( !m_Parent.ToDelete()  &&  !ToDelete() )
+			{
+				m_Parent.RemoveChild(this);
+			}
 		}
 		
 		m_Parent = null;
@@ -102,7 +136,7 @@ class ScriptedLightBase extends EntityLightSource
 	}
 	
 	//! Creates an instance of light on the given position. Optionally, use fade_in_time_in_s parameter to make the light fade into existence.
-	static ScriptedLightBase CreateLight(typename name, vector global_pos, float fade_in_time_in_s = 0)
+	static ScriptedLightBase CreateLight(typename name, vector global_pos = "0 0 0", float fade_in_time_in_s = 0)
 	{
 		ScriptedLightBase light_instance;
 		
@@ -123,7 +157,10 @@ class ScriptedLightBase extends EntityLightSource
 		}
 		else // Server side
 		{
-			Error("An instance of ScriptedLightBase was attempted to spawn on server side! Lights are CLIENT SIDE ONLY!");
+			if ( GetGame().IsDebug() )
+			{
+				Error("An instance of ScriptedLightBase was attempted to spawn on server side! Lights are CLIENT SIDE ONLY!");
+			}
 		}
 		
 		return light_instance;
@@ -134,7 +171,7 @@ class ScriptedLightBase extends EntityLightSource
 	{
 		m_Brightness = value;
 		m_BrightnessTarget = value;
-		SetBrightness(m_Brightness);
+		SetBrightness(m_Brightness * m_BrightnessPulse);
 		CorrectLightPulseDuringDaylight();
 	}
 	
@@ -148,7 +185,7 @@ class ScriptedLightBase extends EntityLightSource
 			if (v > 0)
 			{
 				float brightness_compesation = 1 / v;
-				float compenset_brightness = m_Brightness * brightness_compesation;
+				float compenset_brightness = (m_Brightness * m_BrightnessPulse) * brightness_compesation;
 				SetBrightness(compenset_brightness);
 				SetPulseCoef(v);
 			}
@@ -195,8 +232,6 @@ class ScriptedLightBase extends EntityLightSource
 		{
 			m_RadiusSpeedOfChange = Math.AbsFloat(m_Radius - m_RadiusTarget) / time_in_s;
 		}
-		
-		
 	}
 	
 	//! Switches off the light and deletes it from memory
@@ -204,7 +239,7 @@ class ScriptedLightBase extends EntityLightSource
 	{
 		ClearEventMask(EntityEvent.FRAME);
 		SetEnabled(false);
-		GetGame().ObjectDelete(this);
+		DeleteLightWithDelay();
 	}
 	
 	//! Makes the light destroy itself after the given time in seconds. The light will fade out if it's set to do so with SetFadeOutTime(...)
@@ -213,7 +248,7 @@ class ScriptedLightBase extends EntityLightSource
 		m_LifetimeEnd = GetGame().GetTime() + life_in_s * 1000;
 	}
 	
-	//! Sets the fade out time in seconds. Fade out begins automatically as the light nears the end of its life time.
+	//! Sets the fade out time in seconds. Fade out begins automatically as the light nears the end of its life time, or when method FadeOut() is called.
 	void SetFadeOutTime(float time_in_s)
 	{
 		m_FadeOutTime = time_in_s * 1000;
@@ -240,7 +275,7 @@ class ScriptedLightBase extends EntityLightSource
 		}
 	}
 	
-	//! Makes the light fade into existence. Works only at the moment the light is created. Consider using FadeBrightnessTo(...) at anytime later during lifetime.
+	//! Makes the light fade into existence. Works only at the moment the light is created. Consider using FadeBrightnessTo(...) and FadeRadiusTo(...) at anytime later during lifetime.
 	void FadeIn(float time_in_s)
 	{
 		float brightness = m_Brightness;
@@ -248,16 +283,16 @@ class ScriptedLightBase extends EntityLightSource
 		FadeBrightnessTo(brightness, time_in_s);
 	}
 	
-	//! Prolongs the lifetime of the light in ms. Use negative number to shorten its lifetime.
+	//! Prolongs the lifetime of the light in seconds. Use negative number to shorten its lifetime.
 	void AddLifetime(float life_in_s)
 	{
 		m_LifetimeEnd += life_in_s * 1000;
 	}
 	
-	//! override this for custom functionality
+	//! Override this for custom functionality
 	void OnFrameLightSource(IEntity other, float timeSlice)
 	{
-		// ... insert your code here. No need to call super.
+		// ... 
 	}
 	
 	//! On frame event. If you want to control your light within your own rules then override the event OnFrameLightSource and put your code there.
@@ -275,13 +310,128 @@ class ScriptedLightBase extends EntityLightSource
 			return;
 		}
 		
+		HandleFlickering(current_time - m_LifetimeStart, timeSlice);
+		HandleDancingShadows(current_time - m_LifetimeStart, timeSlice);
 		CheckFadeOut(current_time);
 		HandleBrightnessFadeing(timeSlice);
 		HandleRadiusFadeing(timeSlice);
 		
-		OnFrameLightSource(other, timeSlice);
-		CheckIfparentIsInCargo();
+		CheckIfParentIsInCargo();
 		TryShadowOptimization();
+		OnFrameLightSource(other, timeSlice);
+	}
+	
+	//! Sets the maximum range of the point light within the dancing shadows effect
+	void SetDancingShadowsAmplitude(float max_deviation_in_meters)
+	{
+		m_DancingShadowsAmplitude = Math.AbsFloat(max_deviation_in_meters);
+	}
+	
+	//! Sets the maximum speed of the point light within the dancing shadows effect
+	void SetDancingShadowsMovementSpeed(float speed_in_meters_per_frame)
+	{
+		m_DancingShadowsSpeed = Math.AbsFloat(speed_in_meters_per_frame);
+	}
+	
+	//! Returns max movement range of pointlight within the dancing shadow effect
+	float GetDancingShadowsAmplitude()
+	{
+		return m_DancingShadowsAmplitude;
+	}
+	
+	//! Returns max movement speed of pointlight within the dancing shadow effect
+	float GetDancingShadowsMovementSpeed()
+	{
+		return m_DancingShadowsSpeed;
+	}
+	
+	//! Enables some debug functionality of this light
+	void EnableDebug(bool state)
+	{
+		m_IsDebugEnabled = state;
+	}
+	
+	// Handles subtle movement of the light point to create the effect of dancing shadows
+	void HandleDancingShadows(float time, float timeSlice)
+	{
+		if (m_DancingShadowsAmplitude > 0)
+		{
+			for (int i = 0; i < 3; i++ )
+			{
+				m_DancingShadowsLocalPos[i] = m_DancingShadowsLocalPos[i] +  ( Math.RandomFloat(-m_DancingShadowsSpeed,m_DancingShadowsSpeed) * timeSlice) ;
+				
+				if (m_DancingShadowsLocalPos[i] > m_DancingShadowsAmplitude)
+					m_DancingShadowsLocalPos[i] = m_DancingShadowsAmplitude;
+				
+				if (m_DancingShadowsLocalPos[i] < -m_DancingShadowsAmplitude)
+					m_DancingShadowsLocalPos[i] = -m_DancingShadowsAmplitude;
+				
+			}
+			
+			if (m_Parent)
+			{
+				// In order to move with the light, it must be detached from its parent first
+				
+				m_Parent.RemoveChild(this);
+				SetPosition(m_LocalPos + m_DancingShadowsLocalPos);
+				m_Parent.AddChild(this, -1);
+				m_Parent.Update();
+			}
+			
+			if (m_IsDebugEnabled)
+			{
+				Particle p = Particle.PlayInWorld( ParticleList.DEBUG_DOT, GetPosition() );
+				p.SetParticleParam( EmitorParam.SIZE, 0.01);
+			}
+		}
+		else
+		{
+			m_DancingShadowsLocalPos = Vector(0,0,0);
+		}
+	}
+	
+	// Updates flickering light
+	void HandleFlickering(float time, float timeSlice)
+	{
+		if (m_BrightnessPulseAmplitude > 0)
+		{
+			m_BrightnessPulse += ( Math.RandomFloat(-m_BrightnessPulseSpeed, m_BrightnessPulseSpeed) ) * timeSlice;
+			
+			if (m_BrightnessPulse < -m_BrightnessPulseAmplitude+1)
+				m_BrightnessPulse = -m_BrightnessPulseAmplitude+1;
+			
+			if (m_BrightnessPulse > m_BrightnessPulseAmplitude+1)
+				m_BrightnessPulse = m_BrightnessPulseAmplitude+1;
+			
+		}
+		else
+		{
+			m_BrightnessPulse = 1;
+		}
+	}
+	
+	//! Sets speed of light flickering (random brightness coefficient change per second)
+	void SetFlickerSpeed(float speed)
+	{
+		m_BrightnessPulseSpeed = speed;
+	}
+	
+	//! Sets the change coefficient of flickering light.
+	void SetFlickerAmplitude(float coef)
+	{
+		m_BrightnessPulseAmplitude = Math.AbsFloat(coef);
+	}
+	
+	//! Returns flicker speed
+	float GetFlickerSpeed()
+	{
+		return m_BrightnessPulseSpeed;
+	}
+	
+	//! Returns flicker amplitude
+	float GetFlickerAmplitudeCoef()
+	{
+		return m_BrightnessPulseAmplitude;
 	}
 	
 	//! Optimizes shadows by disabling them on this light source while it's within the given radius around the camera.
@@ -314,7 +464,7 @@ class ScriptedLightBase extends EntityLightSource
 		return m_OptimizeShadowsRadius;
 	}
 	
-	void CheckIfparentIsInCargo()
+	void CheckIfParentIsInCargo()
 	{
 		// TO DO: OPTIMIZE AND REFACTOR! THIS MUST BE HANDLED IN AN EVENT, NOT PER FRAME!
 		
@@ -396,7 +546,7 @@ class ScriptedLightBase extends EntityLightSource
 			
 			if ( m_Brightness > 0  ||  m_BrightnessTarget > 0)
 			{
-				SetBrightness(m_Brightness);
+				SetBrightness(m_Brightness * m_BrightnessPulse);
 				CorrectLightPulseDuringDaylight();
 			}
 			else
@@ -407,7 +557,7 @@ class ScriptedLightBase extends EntityLightSource
 		}
 		else
 		{
-			SetBrightness(m_Brightness);
+			SetBrightness(m_Brightness * m_BrightnessPulse);
 			CorrectLightPulseDuringDaylight();
 		}
 	}

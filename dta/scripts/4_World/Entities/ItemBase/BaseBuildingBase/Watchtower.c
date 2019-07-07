@@ -6,6 +6,7 @@ class Watchtower extends BaseBuildingBase
 	const float MAX_FLOOR_VERTICAL_DISTANCE 		= 0.5;
 	
 	const float MIN_ACTION_DETECTION_ANGLE_RAD 		= 0.35;		//0.35 RAD = 20 DEG
+	const float MAX_ACTION_DETECTION_DISTANCE 		= 2.0;		//meters
 	
 	void Watchtower()
 	{
@@ -321,5 +322,29 @@ class Watchtower extends BaseBuildingBase
 		}
 
 		return false;
-	}		
+	}
+	
+	override bool HasProperDistance( string selection, PlayerBase player )
+	{
+		if ( MemoryPointExists( selection ) )
+		{
+			vector selection_pos = ModelToWorld( GetMemoryPointPos( selection ) );
+			float distance = vector.Distance( selection_pos, player.GetPosition() );
+			if ( distance >= MAX_ACTION_DETECTION_DISTANCE )
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionTogglePlaceObject);
+		AddAction(ActionPlaceObject);
+		AddAction(ActionFoldBaseBuildingObject);
+	}	
 }

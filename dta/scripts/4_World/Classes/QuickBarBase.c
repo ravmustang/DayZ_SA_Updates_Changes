@@ -252,7 +252,7 @@ class QuickBarBase
 			m_aQuickbarEnts[index].m_entity = entity;
 			
 			bool can =  CanAddAsShortcut(entity);
-			if( force || can )
+			if( can )
 				m_aQuickbarEnts[index].m_enabled = true;
 			else
 				m_aQuickbarEnts[index].m_enabled = false;

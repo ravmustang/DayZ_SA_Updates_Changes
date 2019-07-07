@@ -11,12 +11,6 @@ class ActionUncoverHeadTarget: ActionContinuousBase
 	void ActionUncoverHeadTarget()
 	{
 		m_CallbackClass = ActionUncoverHeadTargetCB;
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "Player started removing sack from your head.";
-		m_MessageSuccess = "Player finished removing sack from your head.";
-		m_MessageFail = "Player moved and removing sack from was canceled.";
-		m_MessageCancel = "You stopped removing sack.";
-		//m_Animation = "INJECTEPIPENS";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -28,15 +22,15 @@ class ActionUncoverHeadTarget: ActionContinuousBase
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
 	}
-
-	override int GetType()
-	{
-		return AT_UNCOVER_HEAD_T;
-	}
 		
 	override string GetText()
 	{
 		return "#uncover_players_head";
+	}
+	
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

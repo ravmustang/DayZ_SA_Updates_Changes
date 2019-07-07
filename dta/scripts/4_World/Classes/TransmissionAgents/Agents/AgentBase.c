@@ -1,20 +1,10 @@
-enum eAgents
-{
-	//agent list
-	CHOLERA 		= 1;
-	INFLUENZA 		= 2;
-	SALMONELLA		= 4;
-	BRAIN 			= 8;
-}
-
-
 class AgentBase extends MessageReceiverBase
 {
 	float			m_Type = 0;
 	float			m_Invasibility;//how fast the agent grows when potent enough to grow
 	float 			m_TransferabilityIn;//to the player
 	float			m_TransferabilityOut;//from the player
-	float			m_ImmunityResistance;//from the player
+	float			m_Digestibility = 0.1;//multiplier for agents digested in the player stomach from an infected item(agents_transfered = digested_amount(in grams or mls) * m_Digestibility)
 	int				m_MaxCount = 1;
 	float 			m_AutoinfectProbability = -1;//probability of autoinfect as percentage per hour (50 means 50% chance autoinfect with this agent will happen 1x times within an hour of gameplay)(also dependent on CanAutoinfectPlayer check)
 	//int				m_ChanceOfInfection = 1;//chance of transmission from enviro sources like ponds etc. [0..1]
@@ -54,6 +44,11 @@ class AgentBase extends MessageReceiverBase
 	float GetInvasibility()
 	{
 		return m_Invasibility;
+	}
+	
+	float GetDigestibility()
+	{
+		return m_Digestibility;
 	}
 
 	bool AutoinfectCheck(float deltaT, PlayerBase player)
@@ -102,12 +97,7 @@ class AgentBase extends MessageReceiverBase
 	{
 		return m_MaxCount;
 	}
-	/*
-	float GetImmunityResistance()
-	{
-		return m_ImmunityResistance;
-	}
-*/
+
 	string GetName()
 	{
 		return ClassName();

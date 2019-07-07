@@ -2,18 +2,12 @@ class ActionTurnOffWhileInHands: ActionSingleUseBase
 {
 	void ActionTurnOffWhileInHands()
 	{
-		m_MessageSuccess = "I've flipped the switch off.";
 	}
 	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_TURN_OFF_WHILE_IN_HANDS;
 	}
 
 	override bool HasTarget()

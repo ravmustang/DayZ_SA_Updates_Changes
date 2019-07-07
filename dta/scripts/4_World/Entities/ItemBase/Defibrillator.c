@@ -1,26 +1,23 @@
 class Defibrillator extends ItemBase
 {
-	static const string	CHARGING_SOUND = 			"defibCharge";
-	static const string	CHARGED_AND_READY_SOUND = 	"defibReady";
-	static const string	SHOCK_SOUND = 				"defibShock";
+	static const string	CHARGING_SOUND = 			"defibrillator_charge_SoundSet";
+	static const string	CHARGED_AND_READY_SOUND = 	"defibrillator_ready_SoundSet";
+	static const string	SHOCK_SOUND = 				"defibrillator_shock_SoundSet";
 	
 	bool m_IsCharged = false;
 	
-	static float m_ChargeTime = 8;
+	static float m_ChargeTime = 5;
 	static float m_EnergyNeededToCharge = 20; 
 	
 	ref Timer m_ChargingTimer;
-	SoundOnVehicle m_ChargedAlarm;
+	EffectSound m_ChargedAlarm;
+	EffectSound m_ChargingSound;
 	
 	void Defibrillator()
 	{
 		// Read all config parameters
-		m_ChargeTime = GetTimeNeededToCharge();
+		//m_ChargeTime = GetTimeNeededToCharge();
 		m_EnergyNeededToCharge = GetEnergyNeededToCharge();
-		
-		if (m_ChargeTime == 0)
-			m_ChargeTime = 0.1;
-		
 	}
 	
 	float GetTimeNeededToCharge()
@@ -38,7 +35,8 @@ class Defibrillator extends ItemBase
 	override void OnWorkStart()
 	{
 		if (!GetGame().IsMultiplayer()  ||  GetGame().IsClient())
-			PlaySound(CHARGING_SOUND, 20);
+			//PlaySound(CHARGING_SOUND, 20);
+			m_ChargingSound = SEffectManager.PlaySoundOnObject(CHARGING_SOUND, this, 0, 0.15);
 		
 		float energy_needed = m_EnergyNeededToCharge / m_ChargeTime;
 		GetCompEM().SetEnergyUsage(energy_needed);
@@ -58,6 +56,7 @@ class Defibrillator extends ItemBase
 		GetCompEM().ResetEnergyUsage();
 		StopChargingTimer();
 		StopChargedAlarm();
+		StopChargingSound();
 		
 		m_IsCharged = false;
 	}
@@ -67,8 +66,11 @@ class Defibrillator extends ItemBase
 		if ( GetCompEM().IsWorking() )
 		{
 			if (!GetGame().IsMultiplayer()  ||  GetGame().IsClient())
-				m_ChargedAlarm = PlaySoundLoop(CHARGED_AND_READY_SOUND, 40);
-			
+			{
+				//m_ChargedAlarm = PlaySoundLoop(CHARGED_AND_READY_SOUND, 40);
+				m_ChargedAlarm = SEffectManager.PlaySoundOnObject(CHARGED_AND_READY_SOUND, this);
+				m_ChargingSound.SoundStop();
+			}
 			GetCompEM().ResetEnergyUsage();
 			m_IsCharged = true;
 		}
@@ -78,8 +80,17 @@ class Defibrillator extends ItemBase
 	{
 		if (m_ChargedAlarm)
 		{
-			GetGame().ObjectDelete(m_ChargedAlarm);
+			//GetGame().ObjectDelete(m_ChargedAlarm);
+			m_ChargedAlarm.SoundStop();
 			m_ChargedAlarm = NULL;
+		}
+	}	
+	
+	void StopChargingSound()
+	{
+		if(m_ChargingSound)
+		{
+			m_ChargingSound.SoundStop();
 		}
 	}
 	
@@ -97,13 +108,9 @@ class Defibrillator extends ItemBase
 		return m_IsCharged;
 	}
 	
-	void Discharge(PlayerBase victim)
+	void DischargeServer(PlayerBase victim)
 	{
-		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
-		{
-			PlaySound(SHOCK_SOUND, 40);
-		}
-		
+		/*
 		bool has_heart_attack = victim.m_ModifiersManager.IsModifierActive(eModifiers.MDF_HEART_ATTACK);
 		
 		if ( has_heart_attack )
@@ -114,7 +121,31 @@ class Defibrillator extends ItemBase
 		{
 			victim.m_ModifiersManager.ActivateModifier ( eModifiers.MDF_HEART_ATTACK );
 		}
+		*/
+		/*
+		if (!GetGame().IsMultiplayer()  ||  GetGame().IsClient())
+		{
+			SEffectManager.PlaySoundOnObject(SHOCK_SOUND, this);
+		}*/
 		
+		victim.SetPulseType(!victim.GetPulseType());
+		victim.SetHealth("","Shock",0);
+
 		GetCompEM().SwitchOff();
+	}
+	
+	void DischargeClient(PlayerBase victim)
+	{
+		SEffectManager.PlaySoundOnObject(SHOCK_SOUND, this);
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionTurnOnWhileInHands);
+		AddAction(ActionTurnOffWhileInHands);
+		AddAction(ActionDefibrilateTarget);
+		AddAction(ActionDefibrilateSelf);
 	}
 }

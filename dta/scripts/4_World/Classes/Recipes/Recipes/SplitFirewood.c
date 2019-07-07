@@ -34,6 +34,7 @@ class SplitFirewood extends RecipeBase
 		
 		//ingredient 2
 		InsertIngredient(1,"Hacksaw");
+		InsertIngredient(1,"HandSaw");
 		InsertIngredient(1,"Pickaxe");
 		InsertIngredient(1,"WoodAxe");
 		InsertIngredient(1,"Hatchet");

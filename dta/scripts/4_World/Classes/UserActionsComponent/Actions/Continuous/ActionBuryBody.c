@@ -14,12 +14,6 @@ class ActionBuryBody: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "There's nothing to ignite.";
-		m_MessageStart = "I have started igniting with hand drill.";
-		m_MessageSuccess = "I have ignited the fireplace with a hand drill.";
-		m_MessageFail = "I have canceled the igniting action.";
-		m_MessageCancel = "I have stopped igniting the fireplace.";
-		//m_Animation = "DIGGINGSHOVEL";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -28,11 +22,6 @@ class ActionBuryBody: ActionContinuousBase
 		
 		m_ConditionTarget = new CCTDummy;
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_BURY_BODY;
 	}
 		
 	override string GetText()

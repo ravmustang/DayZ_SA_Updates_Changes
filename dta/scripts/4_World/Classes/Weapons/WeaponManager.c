@@ -1,38 +1,49 @@
 class WeaponManager
 {
-	protected PlayerBase 				m_player;
+	protected PlayerBase 					m_player;
 	
-	protected int						m_LastAcknowledgmentID;
+	protected int							m_LastAcknowledgmentID;
 	
-	protected int 						m_PendingWeaponActionAcknowledgmentID;
-	protected Magazine 					m_PendingTargetMagazine;
-	protected ref InventoryLocation		m_TargetInventoryLocation;
-	protected int 						m_PendingWeaponAction; 
-	protected ref InventoryLocation		m_PendingInventoryLocation;
+	protected int 							m_PendingWeaponActionAcknowledgmentID;
+	protected Magazine 						m_PendingTargetMagazine;
+	protected ref InventoryLocation			m_TargetInventoryLocation;
+	protected int 							m_PendingWeaponAction; 
+	protected ref InventoryLocation			m_PendingInventoryLocation;
 	
-	protected bool						m_canEnd;
-	protected bool						m_justStart;
-	protected bool						m_InProgress;
-	protected bool						m_IsEventSended;
-	protected bool						m_WantContinue;
-	protected bool						m_InIronSight;
-	protected bool						m_InOptic;
-	protected bool 						m_readyToStart;
-	protected Weapon_Base				m_WeaponInHand;
-	protected FirearmActionBase			m_ControlAction;
+	protected bool							m_canEnd;
+	protected bool							m_justStart;
+	protected bool							m_InProgress;
+	protected bool							m_IsEventSended;
+	protected bool							m_WantContinue;
+	protected bool							m_InIronSight;
+	protected bool							m_InOptic;
+	protected bool 							m_readyToStart;
+	protected Weapon_Base					m_WeaponInHand;
+	protected MagazineStorage				m_MagazineInHand;
+	protected ActionBase					m_ControlAction;
+	protected int 							m_ForceEjectBulletTimestamp;
+	
+	protected const int 					FORCE_EJECT_BULLET_TIMEOUT = 2000;
+	
+	//Reload
+	protected ref array<Magazine>			m_MagazinePilesInInventory;
+	protected ref array<MagazineStorage>	m_MagazineStorageInInventory;
+	protected ref array<Magazine>			m_SuitableMagazines;
+	protected Magazine						m_PreparedMagazine;
 	
 	//Jamming
 	protected float m_NewJamChance;
 	protected bool m_WaitToSyncJamChance;
 	
-	
 	void WeaponManager(PlayerBase player)
 	{
+		m_ForceEjectBulletTimestamp = -1;
 		m_player = player;
 		m_PendingWeaponActionAcknowledgmentID = -1;
 		m_PendingTargetMagazine = NULL;
 		m_PendingInventoryLocation = NULL;
 		m_WeaponInHand = NULL;
+		m_MagazineInHand = NULL;
 		m_ControlAction = NULL;
 		m_PendingWeaponAction = -1;
 		m_LastAcknowledgmentID = 1;
@@ -44,6 +55,11 @@ class WeaponManager
 		
 		m_NewJamChance = -1;
 		m_WaitToSyncJamChance = false;
+		
+		m_MagazinePilesInInventory = new array<Magazine>;
+		m_MagazineStorageInInventory = new array<MagazineStorage>;
+		m_SuitableMagazines = new array<Magazine>;
+		m_PreparedMagazine = null;
 	}
 //----------------------------------------------------------------------------	
 // Weapon Action conditions
@@ -53,9 +69,8 @@ class WeaponManager
 		if( m_player.GetHumanInventory().GetEntityInHands() != wpn )
 			return false;
 		
-		if( m_player.IsLiftWeapon() || !m_player.IsRaised() || wpn.IsDamageDestroyed() || m_player.GetDayZPlayerInventory().IsProcessing()) 
-			return false;		
-		//IsFullRaised
+		if( m_player.IsLiftWeapon() || !m_player.IsRaised() || wpn.IsDamageDestroyed() || m_player.GetDayZPlayerInventory().IsProcessing() || !m_player.IsWeaponRaiseCompleted() || m_player.IsFighting() ) 
+			return false;
 		
 		return true;
 		
@@ -280,27 +295,27 @@ class WeaponManager
 //----------------------------------------------------------------------------	
 // Weapon Actions	
 //----------------------------------------------------------------------------
-	bool AttachMagazine( Magazine mag , FirearmActionBase control_action = NULL )
+	bool AttachMagazine( Magazine mag , ActionBase control_action = NULL )
 	{
 		return StartAction(AT_WPN_ATTACH_MAGAZINE, mag, NULL, control_action);
 	}
 	
-	bool DetachMagazine( InventoryLocation invLoc)
+	bool DetachMagazine( InventoryLocation invLoc, ActionBase control_action = NULL)
 	{
-		return StartAction(AT_WPN_DETACH_MAGAZINE, NULL, invLoc, NULL);
+		return StartAction(AT_WPN_DETACH_MAGAZINE, NULL, invLoc, control_action);
 	}
 	
-	bool SwapMagazine( Magazine mag, FirearmActionBase control_action = NULL )
+	bool SwapMagazine( Magazine mag, ActionBase control_action = NULL )
 	{
 		return StartAction(AT_WPN_SWAP_MAGAZINE, mag, NULL, control_action);
 	}
 	
-	bool LoadBullet( Magazine mag, FirearmActionBase control_action = NULL )
+	bool LoadBullet( Magazine mag, ActionBase control_action = NULL )
 	{
 		return StartAction(AT_WPN_LOAD_BULLET, mag, NULL, control_action);
 	}
 	
-	bool LoadMultiBullet( Magazine mag, FirearmActionBase control_action = NULL )
+	bool LoadMultiBullet( Magazine mag, ActionBase control_action = NULL )
 	{
 		return StartAction(AT_WPN_LOAD_MULTI_BULLETS_START, mag, NULL, control_action);
 	}
@@ -310,19 +325,63 @@ class WeaponManager
 		if(m_InProgress) m_WantContinue = false;
 	}
 	
-	bool Unjam( FirearmActionBase control_action = NULL)
+	bool Unjam( ActionBase control_action = NULL )
 	{
 		return StartAction(AT_WPN_UNJAM, NULL, NULL, control_action);
 	}
 
-	bool EjectBullet()
+	bool EjectBullet( ActionBase control_action = NULL )
 	{
-		return StartAction(AT_WPN_EJECT_BULLET, NULL, NULL, NULL);
+		return StartAction(AT_WPN_EJECT_BULLET, NULL, NULL, control_action);
+	}
+	
+	bool EjectBulletVerified( ActionBase control_action = NULL )
+	{
+		
+		if ( m_WeaponInHand )
+		{	
+			int mi = m_WeaponInHand.GetCurrentMuzzle();
+			if ( !m_WeaponInHand.IsChamberFiredOut(mi) && !m_WeaponInHand.IsChamberEmpty(mi) )
+			{
+				int actual_time = GetGame().GetTime();
+				if ( actual_time - m_ForceEjectBulletTimestamp < FORCE_EJECT_BULLET_TIMEOUT )
+				{
+					m_ForceEjectBulletTimestamp = actual_time;
+					return StartAction(AT_WPN_EJECT_BULLET, NULL, NULL, control_action);
+				}
+				m_ForceEjectBulletTimestamp = actual_time;
+			}
+			else
+			{
+				m_ForceEjectBulletTimestamp = -1;
+				return StartAction(AT_WPN_EJECT_BULLET, NULL, NULL, control_action);
+			}
+		}	
+		return false;
 	}
 	
 	bool SetNextMuzzleMode ()
 	{
 		return StartAction(AT_WPN_SET_NEXT_MUZZLE_MODE, NULL, NULL, NULL);
+	}
+	
+	void Fire(Weapon_Base wpn)
+	{
+		int mi = wpn.GetCurrentMuzzle();
+		if( wpn.IsChamberFiredOut(mi) || wpn.IsJammed() || wpn.IsChamberEmpty(mi) )
+		{
+			wpn.ProcessWeaponEvent(new WeaponEventTrigger(m_player));
+			return;
+		}
+		
+		if(wpn.JamCheck(0))
+		{
+			wpn.ProcessWeaponEvent(new WeaponEventTriggerToJam(m_player));
+		}
+		else
+		{
+			wpn.ProcessWeaponEvent(new WeaponEventTrigger(m_player));
+		}
 	}
 //-------------------------------------------------------------------------------------	
 // Synchronize - initialize from client side
@@ -551,7 +610,7 @@ class WeaponManager
 		//if it is controled by action inventory reservation and synchronization provide action itself
 		if(control_action)
 		{
-			m_ControlAction = FirearmActionBase.Cast(control_action);
+			m_ControlAction = ActionBase.Cast(control_action);
 			m_PendingWeaponAction = action;
 			m_InProgress = true;
 			m_IsEventSended = false;
@@ -665,82 +724,103 @@ class WeaponManager
 	
 	void Update( float deltaT )
 	{
+
 		if (m_WeaponInHand != m_player.GetItemInHands())
 		{
-			OnWeaponActionEnd();
+			if( m_WeaponInHand )
+			{
+				m_SuitableMagazines.Clear();
+				OnWeaponActionEnd();
+			}
 			m_WeaponInHand = Weapon_Base.Cast(m_player.GetItemInHands());
 			if ( m_WeaponInHand )
 			{
+				m_MagazineInHand = null;
+				//SET new magazine
+				SetSutableMagazines();
 				m_WeaponInHand.SetSyncJammingChance(0);
 			}
 		}
 		
-		if (!m_WeaponInHand)
-			return;
+		if (m_WeaponInHand)
+		{
 		
-		if (!GetGame().IsMultiplayer())
-		{
-			m_WeaponInHand.SetSyncJammingChance(m_WeaponInHand.GetChanceToJam());
-		}
-		else
-		{
-			if ( m_NewJamChance >= 0)
+			if (!GetGame().IsMultiplayer())
 			{
-				m_WeaponInHand.SetSyncJammingChance(m_NewJamChance);
-				m_NewJamChance = -1;
-				m_WaitToSyncJamChance = false;
+				m_WeaponInHand.SetSyncJammingChance(m_WeaponInHand.GetChanceToJam());
 			}
-			if (GetGame().IsServer() && !m_WaitToSyncJamChance )
+			else
 			{
-				float actual_chance_to_jam;
-				actual_chance_to_jam = m_WeaponInHand.GetChanceToJam();
-				if ( Math.AbsFloat(m_WeaponInHand.GetSyncChanceToJam() - m_WeaponInHand.GetChanceToJam()) > 0.001 )
+				if ( m_NewJamChance >= 0)
 				{
-					DayZPlayerSyncJunctures.SendWeaponJamChance(m_player, m_WeaponInHand.GetChanceToJam());
-					m_WaitToSyncJamChance = true;
+					m_WeaponInHand.SetSyncJammingChance(m_NewJamChance);
+					m_NewJamChance = -1;
+					m_WaitToSyncJamChance = false;
+				}
+				if (GetGame().IsServer() && !m_WaitToSyncJamChance )
+				{
+					float actual_chance_to_jam;
+					actual_chance_to_jam = m_WeaponInHand.GetChanceToJam();
+					if ( Math.AbsFloat(m_WeaponInHand.GetSyncChanceToJam() - m_WeaponInHand.GetChanceToJam()) > 0.001 )
+					{
+						DayZPlayerSyncJunctures.SendWeaponJamChance(m_player, m_WeaponInHand.GetChanceToJam());
+						m_WaitToSyncJamChance = true;
+					}
 				}
 			}
-		}
 			
-		if(m_readyToStart)
-		{
-			StartPendingAction();
-			m_readyToStart = false;
-			return;
-		}
-		
-		if( !m_InProgress || !m_IsEventSended )
-			return;
-		
-		if(m_canEnd)
-		{
-			
-			if(m_WeaponInHand.IsIdle())
+			if(m_readyToStart)
 			{
-				OnWeaponActionEnd();
+				StartPendingAction();
+				m_readyToStart = false;
+				return;
 			}
-			else if(m_justStart)
-			{
-				m_InIronSight = m_player.IsInIronsights();
-				m_InOptic = m_player.IsInOptics();
 		
-				if(m_InIronSight || m_InOptic)
+			if( !m_InProgress || !m_IsEventSended )
+				return;
+		
+			if(m_canEnd)
+			{
+			
+				if(m_WeaponInHand.IsIdle())
 				{
-					m_player.GetInputController().ResetADS();
-					m_player.ExitSights();
-					//Print("exitsights");
+					OnWeaponActionEnd();
 				}
+				else if(m_justStart)
+				{
+					m_InIronSight = m_player.IsInIronsights();
+					m_InOptic = m_player.IsInOptics();
+		
+					if(m_InIronSight || m_InOptic)
+					{
+						m_player.GetInputController().ResetADS();
+						m_player.ExitSights();
+						//Print("exitsights");
+					}
 				
-				m_justStart = false;
-			}
+					m_justStart = false;
+				}
 			
+			}
+			else
+			{
+				m_canEnd = true;
+				m_justStart = true;
+			}
 		}
 		else
 		{
-			m_canEnd = true;
-			m_justStart = true;
-		}
+			if ( m_MagazineInHand != m_player.GetItemInHands() )
+			{
+				m_MagazineInHand = MagazineStorage.Cast(m_player.GetItemInHands());
+				if ( m_MagazineInHand )
+				{
+					SetSutableMagazines();
+				}
+			}
 		
+		
+		}
 	}
 
 	void OnWeaponActionEnd()
@@ -803,5 +883,156 @@ class WeaponManager
 	{
 		return m_WantContinue;
 	}
+	
+	Magazine GetPreparedMagazine ()
+	{
+		for(int i = 0; i < m_SuitableMagazines.Count(); i++)
+			if(m_SuitableMagazines.Get(i).GetAmmoCount() > 0)
+				return m_SuitableMagazines.Get(i);
+		
+		return null;
+	}
+	
+	void OnMagazineInventoryEnter(Magazine mag)
+	{
+		int i;
+		MagazineStorage sMag = MagazineStorage.Cast(mag);
+		if(sMag)
+		{
+			for(i = 0; i < m_MagazineStorageInInventory.Count(); i++ ) 
+			{
+				MagazineStorage s_mag_i = m_MagazineStorageInInventory[i];
+				if(!s_mag_i)
+				{
+					m_MagazineStorageInInventory.RemoveOrdered(i);
+					i--;
+					continue;
+				}
+				
+				if(CompareMagazinesSuitability(s_mag_i,sMag)<0)
+					break;
+			}
+			m_MagazineStorageInInventory.InsertAt(sMag,i);
+			
+			SetSutableMagazines(); //TODO optimalize
+			return;
+		}
+		
+		if(mag)
+		{
 
+			for(i = 0; i < m_MagazinePilesInInventory.Count(); i++ ) 
+			{
+				Magazine mag_i = m_MagazinePilesInInventory[i];
+				if(!mag_i)
+				{
+					m_MagazinePilesInInventory.RemoveOrdered(i);
+					i--;
+					continue;
+				}
+				
+				
+				if(CompareMagazinesSuitability(mag_i,mag)<0)
+				{
+					break;
+				}
+			}
+			m_MagazinePilesInInventory.InsertAt(mag,i);
+			SetSutableMagazines(); //TODO optimalize
+		}
+		
+	}
+	
+	void OnMagazineInventoryExit(Magazine mag)
+	{
+		m_SuitableMagazines.RemoveItem(mag);
+
+		MagazineStorage sMag = MagazineStorage.Cast(mag);
+		if(sMag)
+		{
+			m_MagazineStorageInInventory.RemoveItem(sMag);
+			return;
+		}
+		
+		if(mag)
+		{
+			m_MagazinePilesInInventory.RemoveItem(mag);
+		}
+	}
+	
+	void OnMagazineAttach(Magazine mag)
+	{
+		OnMagazineInventoryExit(mag);
+	}
+	
+	void OnMagazineDetach(Magazine mag)
+	{
+		OnMagazineInventoryEnter(mag);
+	}
+	
+	int CompareMagazinesSuitability( Magazine mag1, Magazine mag2 )
+	{
+		return mag1.GetAmmoCount() - mag2.GetAmmoCount();
+	}
+	
+	void SetSutableMagazines()
+	{
+		m_SuitableMagazines.Clear();
+		int i;
+		
+		if(m_WeaponInHand)
+		{
+			int mi = m_WeaponInHand.GetCurrentMuzzle();
+			
+			for(i = 0; i < m_MagazineStorageInInventory.Count(); i++ )
+			{
+				MagazineStorage s_mag = m_MagazineStorageInInventory[i];
+				
+				if(!s_mag)	
+				{
+					m_MagazineStorageInInventory.RemoveOrdered(i);
+					i--;
+					continue;
+				}
+				
+				if( m_WeaponInHand.TestAttachMagazine(mi, s_mag, false, true))
+					m_SuitableMagazines.Insert(s_mag);
+			}
+			
+			for(i = 0; i < m_MagazinePilesInInventory.Count(); i++ )
+			{
+				Magazine mag = m_MagazinePilesInInventory[i];
+				if(!mag)	
+				{
+					m_MagazinePilesInInventory.RemoveOrdered(i);
+					i--;
+					continue;
+				}
+				
+				if(m_WeaponInHand.CanChamberFromMag(mi, mag))
+					m_SuitableMagazines.Insert(mag);	
+			}
+//TODO m_MagazineStorageInInventory and m_MagazinePilesInInventory always sort
+		}
+		else if(m_MagazineInHand)
+		{
+			for(i = 0; i < m_MagazinePilesInInventory.Count(); i++ )
+			{
+				Magazine m_mag = m_MagazinePilesInInventory[i];
+				if(!m_mag)	
+				{
+					m_MagazinePilesInInventory.RemoveOrdered(i);
+					i--;
+					continue;
+				}
+				if(m_MagazineInHand.IsCompatiableAmmo( m_mag ))
+					m_SuitableMagazines.Insert(m_mag);
+			}
+		}
+		else
+		{
+			m_PreparedMagazine = null;
+		}
+	
+	}
 }

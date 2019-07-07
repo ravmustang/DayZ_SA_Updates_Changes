@@ -67,4 +67,12 @@ class Raycaster extends ItemBase
 			StopPeriodicMeasurement();
 		}
 	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionTurnOnWhileInHands);
+		AddAction(ActionTurnOffWhileInHands);
+	}
 }

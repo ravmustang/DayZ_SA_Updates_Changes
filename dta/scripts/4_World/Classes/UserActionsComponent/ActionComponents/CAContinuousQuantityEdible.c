@@ -8,6 +8,7 @@ class CAContinuousQuantityEdible : CAContinuousQuantityRepeat
 		m_QuantityUsedPerSecond = quantity_used_per_second;
 		m_DefaultTimeToRepeat = time_to_repeat;
 		m_InitItemQuantity = -1;
+		m_SpentQuantityTotal = 0;
 	}
 	
 	override void Setup( ActionData action_data )

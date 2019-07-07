@@ -16,22 +16,15 @@ class ActionCookOnStick: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_GESTUREFB_CAMPFIRE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "I have failed to start the action.";
-		m_MessageStart = "I have started the action.";
-		m_MessageFail = "I have failed the action.";
-		m_MessageCancel = "I have stopped the action.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
+		
+		m_LockTargetOnUse = false;
 	}
 	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_COOK_ON_STICK;
 	}
 		
 	override string GetText()

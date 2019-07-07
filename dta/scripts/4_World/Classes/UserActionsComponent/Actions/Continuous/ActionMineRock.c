@@ -16,10 +16,6 @@ class ActionMineRock: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_MINEROCK;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "My tool is too damaged to mine.";
-		m_MessageStart = "I started mining the rock.";
-		m_MessageSuccess = "I have mined the rock.";
-		m_MessageFail = "My tool is ruined.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
 	
@@ -37,11 +33,6 @@ class ActionMineRock: ActionContinuousBase
 			return true;
 		}
 		return false;
-	}
-
-	override int GetType()
-	{
-		return AT_MINE_ROCK;
 	}
 		
 	override string GetText()

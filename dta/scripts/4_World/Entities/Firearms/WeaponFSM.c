@@ -12,7 +12,7 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 		{
 			state.SetInternalStateID(m_NextStateId);
 
-			//wpnDebugSpam("[wpnfsm] unique state=" + state + " has id=" + m_NextStateId);
+			//wpnDebugSpam("[wpnfsm] " + Object.GetDebugName(m_weapon) + " unique state=" + state + " has id=" + m_NextStateId);
 			m_UniqueStates.Insert(state);
 			++m_NextStateId;
 		}
@@ -94,7 +94,11 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 	bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
 	{
 		if (LoadAndSetCurrentFSMState(ctx, version))
-			return m_State.LoadCurrentFSMState(ctx, version);
+		{
+			bool res = m_State.LoadCurrentFSMState(ctx, version);
+			wpnDebugSpam("[wpnfsm] LoadCurrentFSMState - loaded current state=" + GetCurrentState());
+			return res;
+		}
 		return false;
 	}
 	
@@ -233,7 +237,7 @@ class WeaponFSM extends HFSMBase<WeaponStateBase, WeaponEventBase, WeaponActionB
 	void OnStoreSave (ParamsWriteContext ctx)
 	{
 		int id = GetCurrentStableStateID();
-		wpnDebugPrint("[wpnfsm] OnStoreSave - saving current state=" + GetCurrentState() + " id=" + id);
+		wpnDebugSpamALot("[wpnfsm] OnStoreSave - saving current state=" + GetCurrentState() + " id=" + id);
 		ctx.Write(id);
 	}
 

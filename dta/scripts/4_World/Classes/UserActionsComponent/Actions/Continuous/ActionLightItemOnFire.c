@@ -23,11 +23,6 @@ class ActionLightItemOnFire: ActionContinuousBase
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.DEFAULT );
 		m_ConditionItem = new CCINonRuined;
 	}
-
-	override int GetType()
-	{
-		return AT_LIGHT_ITEM_ON_FIRE;
-	}
 		
 	override string GetText()
 	{

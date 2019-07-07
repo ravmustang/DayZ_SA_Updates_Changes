@@ -23,15 +23,15 @@ class ActionFoldBaseBuildingObject: ActionContinuousBase
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.DEFAULT );
 		m_ConditionItem = new CCINotPresent;
 	}
-
-	override int GetType()
-	{
-		return AT_FOLD_BASEBUILDING_OBJECT;
-	}
 		
 	override string GetText()
 	{
 		return "#fold";
+	}
+	
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -55,5 +55,10 @@ class ActionFoldBaseBuildingObject: ActionContinuousBase
 	{	
 		BaseBuildingBase base_building = BaseBuildingBase.Cast( action_data.m_Target.GetObject() );
 		base_building.FoldBaseBuildingObject();
+	}
+	
+	override string GetAdminLogMessage(ActionData action_data)
+	{
+		return " folded " + action_data.m_Target.GetObject().GetDisplayName();
 	}
 }

@@ -10,7 +10,7 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 
 	override void OnEntry (WeaponEventBase e)
 	{
-		wpnDebugPrint("[wpnfsm]  WeaponDetachingMag_Store, Detaching mag=" + m_magazine.ToString() +  "to loc=" + m_dst.DumpToString());
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + "  WeaponDetachingMag_Store, Detaching mag=" + m_magazine.ToString() +  "to loc=" + InventoryLocation.DumpToStringNullSafe(m_dst));
 		super.OnEntry(e);
 
 		if (m_magazine && m_dst)
@@ -22,16 +22,16 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 				lhand.SetAttachment(e.m_player, m_magazine, InventorySlots.LEFTHAND);
 				if (GameInventory.LocationSyncMoveEntity(il, lhand))
 				{
-					wpnDebugPrint("[wpnfsm] WeaponDetachingMag_Store, ok - magazine removed from inv (inv->LHand)");
+					wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - magazine removed from inv (inv->LHand)");
 				}
 				else
-					Error("[wpnfsm] WeaponDetachingMag_Store, error - cannot remove mag from inv");
+					Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot remove mag from inv");
 			}
 			else
-				Error("[wpnfsm] WeaponDetachingMag_Store, error - cannot get curr location");
+				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot get curr location");
 		}
 		else
-			Error("[wpnfsm] WeaponDetachingMag_Store, error - no magazine to load from (m_magazine=NULL)");
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - no magazine to load from (m_magazine=NULL)");
 	}
 
 	override void OnAbort (WeaponEventBase e)
@@ -39,11 +39,11 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 		if (m_magazine && m_dst)
 		{
 			if (DayZPlayerUtils.HandleDropMagazine(e.m_player, m_magazine))
-				wpnDebugPrint("[wpnfsm] WeaponDetachingMag_Store, ok - aborting, detached magazine dropped to ground");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - aborting, detached magazine dropped to ground");
 			else
-				Error("[wpnfsm] WeaponDetachingMag_Store, error - cannot abort detaching of magazine");
+				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot abort detaching of magazine");
 
-			m_weapon.SelectionMagazineHide(); // force hide on abort
+			m_weapon.HideMagazine(); // force hide on abort
 		}
 
 		m_magazine = NULL;
@@ -58,12 +58,12 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 		lhand.SetAttachment(e.m_player, m_magazine, InventorySlots.LEFTHAND);
 		if (GameInventory.LocationSyncMoveEntity(lhand, m_dst))
 		{
-			wpnDebugPrint("[wpnfsm] WeaponDetachingMag_Store, ok - stored detached magazine (LHand->dst)");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - stored detached magazine (LHand->dst)");
 		}
 		else
 		{
 			// @TODO: drop on gnd
-			Error("[wpnfsm] WeaponDetachingMag_Store, error - cannot store detached magazine!");
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot store detached magazine!");
 		}
 
 		m_magazine = NULL;
@@ -78,13 +78,13 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 
 		if (!ctx.Write(m_magazine))
 		{
-			Error("[wpnfsm] WeaponDetachingMag_Store.SaveCurrentFSMState: cannot write m_magazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store.SaveCurrentFSMState: cannot write m_magazine for weapon=" + m_weapon);
 			return false;
 		}
 
 		if (!OptionalLocationWriteToContext(m_dst, ctx))
 		{
-			Error("[wpnfsm] WeaponDetachingMag_Store.SaveCurrentFSMState: cannot write m_st for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store.SaveCurrentFSMState: cannot write m_st for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -97,12 +97,12 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 
 		if (!ctx.Read(m_magazine))
 		{
-			Error("[wpnfsm] WeaponDetachingMag_Store.LoadCurrentFSMState: cannot read m_magazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store.LoadCurrentFSMState: cannot read m_magazine for weapon=" + m_weapon);
 			return false;
 		}
 		if (!OptionalLocationReadFromContext(m_dst, ctx))
 		{
-			Error("[wpnfsm] WeaponDetachingMag_Store.LoadCurrentFSMState: cannot read m_dst for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store.LoadCurrentFSMState: cannot read m_dst for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -180,13 +180,13 @@ class WeaponDetachingMag extends WeaponStateBase
 
 		if (!ctx.Write(m_magazine))
 		{
-			Error("[wpnfsm] WeaponDetachingMag.SaveCurrentFSMState: cannot write m_magazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag.SaveCurrentFSMState: cannot write m_magazine for weapon=" + m_weapon);
 			return false;
 		}
 
 		if (!OptionalLocationWriteToContext(m_dst, ctx))
 		{
-			Error("[wpnfsm] WeaponDetachingMag.SaveCurrentFSMState: cannot write m_st for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag.SaveCurrentFSMState: cannot write m_st for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -199,12 +199,12 @@ class WeaponDetachingMag extends WeaponStateBase
 
 		if (!ctx.Read(m_magazine))
 		{
-			Error("[wpnfsm] WeaponDetachingMag.LoadCurrentFSMState: cannot read m_magazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag.LoadCurrentFSMState: cannot read m_magazine for weapon=" + m_weapon);
 			return false;
 		}
 		if (!OptionalLocationReadFromContext(m_dst, ctx))
 		{
-			Error("[wpnfsm] WeaponDetachingMag.LoadCurrentFSMState: cannot read m_dst for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag.LoadCurrentFSMState: cannot read m_dst for weapon=" + m_weapon);
 			return false;
 		}
 		return true;

@@ -8,11 +8,6 @@ class ActionZoomOut: ActionSingleUseBase
 		m_ConditionTarget = new CCTNone;
 	}
 
-	override int GetType()
-	{
-		return AT_ZOOM_OUT;
-	}
-
 	override string GetText()
 	{
 		return "#zoom_out";

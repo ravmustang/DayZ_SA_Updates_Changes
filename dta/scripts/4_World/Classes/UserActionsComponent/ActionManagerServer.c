@@ -19,27 +19,6 @@ class ActionManagerServer: ActionManagerBase
 	//EVENTS 
 	//------------------------------------------
 	// Continuous---------------------------------------------
-	override void OnContinuousStart()
-	{
-//			StartDeliveredAction();
-	}
-	
-	override void OnContinuousCancel()
-	{
-		if( !m_CurrentActionData || m_CurrentActionData.m_Action.GetActionCategory() != AC_CONTINUOUS )
-			return;
-			
-		if( m_CurrentActionData.m_State == UA_AM_PENDING || m_CurrentActionData.m_State == UA_AM_ACCEPTED || m_CurrentActionData.m_State == UA_AM_REJECTED )
-		{
-			OnActionEnd();
-			m_PendingActionAcknowledgmentID = -1;
-		}
-		else
-		{
-			m_CurrentActionData.m_Action.OnContinuousCancel(m_CurrentActionData);
-		}
-	}
-	
 	override void OnJumpStart()
 	{
 		if(m_CurrentActionData)
@@ -80,7 +59,7 @@ class ActionManagerServer: ActionManagerBase
 	{		
 		switch ( userDataType )
 		{
-			case INPUT_UDT_STANDARD_ACTION:
+			case INPUT_UDT_STANDARD_ACTION_START:
 			{
 				bool success = true;
 				
@@ -110,6 +89,19 @@ class ActionManagerServer: ActionManagerBase
 				}
 					
 				break;
+
+			}
+
+			case INPUT_UDT_STANDARD_ACTION_END_REQUEST:
+			{
+				//Debug.Log("Action want end request, STS=" + m_Player.GetSimulationTimeStamp());
+				m_ActionWantEndRequest = true;
+			}
+			
+			case INPUT_UDT_STANDARD_ACTION_INPUT_END:
+			{
+				//Debug.Log("Action input ended, STS=" + m_Player.GetSimulationTimeStamp());
+				m_ActionInputWantEnd = true;
 			}
 			default:
 				return false;
@@ -117,6 +109,7 @@ class ActionManagerServer: ActionManagerBase
 		
 		if (!success)
 		{
+			//Debug.Log("[AM] OnInputUserDataProcess INPUT_UDT_STANDARD_ACTION_START Error");
 			if (recvAction.UseAcknowledgment())
 			{
 				DayZPlayerSyncJunctures.SendActionAcknowledgment(m_Player, m_PendingActionAcknowledgmentID, false);
@@ -153,9 +146,6 @@ class ActionManagerServer: ActionManagerBase
 		picked_action = m_CurrentActionData.m_Action;
 		target = m_CurrentActionData.m_Target;
 		item = m_CurrentActionData.m_MainItem;
-		
-		if ( picked_action.CanBePerformedFromQuickbar() )
-			m_CurrentActionData.m_Player.SetActionEndInput();
 
 		if( is_target_free && !m_Player.GetCommandModifier_Action() && !m_Player.GetCommand_Action() && !m_Player.IsSprinting() && picked_action && picked_action.Can(m_Player,target,item)) 
 		{
@@ -171,7 +161,7 @@ class ActionManagerServer: ActionManagerBase
 					//{
 					//	accepted = false;
 					//}
-					if( !AdvancedCommunication.Cast(targetEntity) && !Building.Cast(targetEntity) )
+					if( !AdvancedCommunication.Cast(targetEntity) && !Building.Cast(targetEntity) && !Fireplace.Cast(targetEntity) )
 					{
 						//Lock target
 						if( !GetGame().AddActionJuncture(m_Player,targetEntity,10000) )
@@ -185,6 +175,7 @@ class ActionManagerServer: ActionManagerBase
 		
 		if( accepted )
 		{
+			//Debug.Log("[AM] Action acccepted");
 			if(picked_action.UseAcknowledgment())
 			{
 						//Unlock target
@@ -212,6 +203,7 @@ class ActionManagerServer: ActionManagerBase
 	
 	override void OnActionEnd()
 	{
+		//Debug.Log("Action ended - hard, STS=" + m_Player.GetSimulationTimeStamp());
 		if(m_CurrentActionData)
 		{
 			if( m_CurrentActionData.m_Target )
@@ -234,6 +226,8 @@ class ActionManagerServer: ActionManagerBase
 	{
 		super.Update(pCurrentCommandID);
 		
+		//Debug.Log("m_ActionWantEnd " + m_ActionInputWantEnd);
+		
 		if (m_PendingAction)
 		{
 			if ( m_CurrentActionData )
@@ -244,18 +238,21 @@ class ActionManagerServer: ActionManagerBase
 			{
 				ref ActionTarget target = new ActionTarget(NULL, NULL, -1, vector.Zero, 0); 
 				bool success = true;
+
+				m_ActionWantEndRequest = false;
+				m_ActionInputWantEnd = false;
 						
 				Debug.Log("[Action DEBUG] Start time stamp ++: " + m_Player.GetSimulationTimeStamp());
 				if (!m_PendingAction.SetupAction(m_Player,target,m_Player.GetItemInHands(),m_CurrentActionData))
 				{
 					success = false;
 				}
-				Debug.Log("[AM] Action data synced (" + m_Player + ")");
+				//Debug.Log("[AM] Action data synced (" + m_Player + ") success: " + success);
 			
 				if (success)
 				{
 					StartDeliveredAction();
-				}	
+				}
 				else
 				{
 					if (m_PendingAction.UseAcknowledgment())
@@ -274,6 +271,7 @@ class ActionManagerServer: ActionManagerBase
 	
 		if (m_CurrentActionData)
 		{
+			//Debug.Log("m_CurrentActionData.m_State: " + m_CurrentActionData.m_State +" m_ActionWantEnd: " + m_ActionWantEndRequest );
 			switch (m_CurrentActionData.m_State)
 			{
 				case UA_AM_PENDING:
@@ -283,17 +281,10 @@ class ActionManagerServer: ActionManagerBase
 					// check pCurrentCommandID before start or reject 
 					if( ActionPossibilityCheck(pCurrentCommandID) )
 					{
-						if(!m_Player.IsRestrained() || m_CurrentActionData.m_Action.CanBeUsedInRestrain() )
-						{
-							m_CurrentActionData.m_State = UA_START;
-							m_CurrentActionData.m_Action.Start(m_CurrentActionData);
-							if( m_CurrentActionData.m_Action && m_CurrentActionData.m_Action.IsInstant() )
-								OnActionEnd();
-						}
-						else
-						{
+						m_CurrentActionData.m_State = UA_START;
+						m_CurrentActionData.m_Action.Start(m_CurrentActionData);
+						if( m_CurrentActionData.m_Action && m_CurrentActionData.m_Action.IsInstant() )
 							OnActionEnd();
-						}
 					}
 					else
 					{
@@ -305,11 +296,20 @@ class ActionManagerServer: ActionManagerBase
 				case UA_AM_REJECTED:
 					OnActionEnd();
 					m_PendingActionAcknowledgmentID = -1;
-			
-					//m_Player.GetDayZPlayerInventory().UnlockHands();
 					break;
 			
 				default:
+					if(m_ActionInputWantEnd)
+					{
+						m_ActionInputWantEnd = false;
+						m_CurrentActionData.m_Action.EndInput(m_CurrentActionData);
+					}
+				
+					if(m_ActionWantEndRequest)
+					{
+						m_ActionWantEndRequest = false;
+						m_CurrentActionData.m_Action.EndRequest(m_CurrentActionData);
+					}
 					break;
 			}
 		}

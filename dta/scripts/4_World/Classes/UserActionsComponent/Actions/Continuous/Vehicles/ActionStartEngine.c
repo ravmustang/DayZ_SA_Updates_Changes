@@ -29,11 +29,6 @@ class ActionStartEngine: ActionContinuousBase
 		m_ConditionTarget = new CCTNone;
 		m_ConditionItem = new CCINone;
 	}
-
-	override int GetType()
-	{
-		return AT_VEH_ENGINE_START;
-	}
 		
 	override string GetText()
 	{
@@ -52,7 +47,7 @@ class ActionStartEngine: ActionContinuousBase
 				Car car;
 				if ( Class.CastTo(car, trans) && !car.EngineIsOn() )
 				{
-					if ( car.GetHealthLevel("Engine") >= STATE_RUINED )
+					if ( car.GetHealthLevel("Engine") >= GameConstants.STATE_RUINED )
 						return false;
 					
 					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )

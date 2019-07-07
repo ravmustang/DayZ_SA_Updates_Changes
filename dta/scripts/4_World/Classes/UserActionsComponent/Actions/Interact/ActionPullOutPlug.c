@@ -2,14 +2,7 @@ class ActionPullOutPlug: ActionInteractBase
 {
 	void ActionPullOutPlug()
 	{
-		m_MessageSuccess = "I've unplugged the device.";
-		m_MessageStart = "";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
-	}
-
-	override int GetType()
-	{
-		return AT_PULL_OUT_PLUG;
 	}
 		
 	override string GetText()

@@ -5,7 +5,7 @@ class OffroadHatchback extends CarScript
 	{
 		m_dmgContactCoef = 0.075;
 	}
-
+	
 	override int GetAnimInstance()
 	{
 		return VehicleAnimInstances.HATCHBACK;
@@ -27,6 +27,17 @@ class OffroadHatchback extends CarScript
 
 		return 0;
 
+	}
+	
+	
+	override CarRearLightBase CreateRearLight()
+	{
+		return CarRearLightBase.Cast( ScriptedLightBase.CreateLight(OffroadHatchbackRearLight) );
+	}
+	
+	override CarLightBase CreateFrontLight()
+	{
+		return CarLightBase.Cast( ScriptedLightBase.CreateLight(OffroadHatchbackFrontLight) );
 	}
 
 /*
@@ -57,7 +68,7 @@ class OffroadHatchback extends CarScript
 			
 			if ( slot_name == "CarBattery")
 			{
-				if ( IsLightsOn() )
+				if ( IsScriptedLightsOn() )
 					SwitchLights();
 			}
 		}
@@ -66,7 +77,8 @@ class OffroadHatchback extends CarScript
 
 	override bool CanReleaseAttachment( EntityAI attachment )
 	{
-		super.CanReleaseAttachment( attachment );
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
 		
 		string attType = attachment.GetType();
 		
@@ -216,13 +228,13 @@ class OffroadHatchback extends CarScript
 				if ( GetCarDoorsState( "NivaTrunk" ) == CarDoorState.DOORS_CLOSED )
 					newValue += 0.3;
 			
-				if ( GetHealthLevel( "WindowFront") == STATE_RUINED )
+				if ( GetHealthLevel( "WindowFront") == GameConstants.STATE_RUINED )
 					newValue -= 0.6;
 
-				if ( GetHealthLevel( "WindowLR") == STATE_RUINED )
+				if ( GetHealthLevel( "WindowLR") == GameConstants.STATE_RUINED )
 					newValue -= 0.2;
 			
-				if ( GetHealthLevel( "WindowRR") == STATE_RUINED )
+				if ( GetHealthLevel( "WindowRR") == GameConstants.STATE_RUINED )
 					newValue -= 0.2;
 
 				if ( newValue > 1 )
@@ -231,12 +243,10 @@ class OffroadHatchback extends CarScript
 				if ( newValue < 0 )
 					newValue = 0;
 			
-				m_enviroCoef = newValue;
 				return newValue;
 			break;
 		}
 
-		m_enviroCoef = oldValue;
 		return oldValue;
 	}
 
@@ -268,12 +278,12 @@ class OffroadHatchback extends CarScript
 		case "seat_driver":
 		case "seatback_driver":
 		case "seat_cargo1":
-			return "lf_door_con";
+			return "seat_con_1_1";
 		break;
 		case "seat_codriver":
 		case "seatback_codriver":
 		case "seat_cargo2":
-			return "rf_door_con";
+			return "seat_con_2_1";
 		break;
 		}
 		
@@ -402,6 +412,12 @@ class OffroadHatchback extends CarScript
 		Fill( CarFluid.FUEL, 50 );
 		Fill( CarFluid.COOLANT, 6.0 );
 		Fill( CarFluid.OIL, 4.0 );
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
 
-	};
+		AddAction(ActionAnimateSeats);
+	}
 }

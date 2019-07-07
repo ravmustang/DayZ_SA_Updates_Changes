@@ -12,7 +12,7 @@ class UnconsciousnessMdfr: ModifierBase
 
 	override bool ActivateCondition(PlayerBase player)
 	{
-		if( player.GetHealth("","Shock") <=  PlayerConstants.UNCONSCIOUS_THRESHOLD && GetGame().GetTime() > player.m_UnconsciousEndTime + (UNCONSIOUSS_COOLDOWN_TIME * 1000))
+		if( player.GetHealth("","Shock") <=  PlayerConstants.UNCONSCIOUS_THRESHOLD )
 		{
 			return true;
 		}
@@ -32,7 +32,10 @@ class UnconsciousnessMdfr: ModifierBase
 	
 	override string GetDebugText()
 	{
-		return (PlayerConstants.CONSCIOUS_THRESHOLD - m_Player.GetHealth("","Shock")).ToString();
+		string text_pulse = "pulse type:"+m_Player.GetPulseType()+"|";
+		string text_shock = (PlayerConstants.CONSCIOUS_THRESHOLD - m_Player.GetHealth("","Shock")).ToString();
+		string debug_text = text_pulse + text_shock;
+		return debug_text;
 	}
 	
 	override void OnReconnect(PlayerBase player)
@@ -41,7 +44,7 @@ class UnconsciousnessMdfr: ModifierBase
 
 	override bool DeactivateCondition(PlayerBase player)
 	{
-		if( player.GetHealth("","Shock") >=  PlayerConstants.CONSCIOUS_THRESHOLD )
+		if( player.GetHealth("","Shock") >= PlayerConstants.CONSCIOUS_THRESHOLD && player.GetPulseType() == EPulseType.REGULAR )
 		{
 			return true;
 		}
@@ -50,6 +53,6 @@ class UnconsciousnessMdfr: ModifierBase
 
 	override void OnTick(PlayerBase player, float deltaT)
 	{
-		player.AddHealth("","Shock", PlayerConstants.SHOCK_REFILl_UNCONSCIOUS_SPEED * deltaT);
+		
 	}
 };

@@ -6,6 +6,10 @@ class DummyItem extends ItemBase {};
 
 class ItemBase extends InventoryItem
 {
+	static ref map<typename, ref TInputActionMap> m_ItemTypeActionsMap = new map<typename, ref TInputActionMap>;
+	TInputActionMap m_InputActionMap;
+	bool	m_ActionsInitialize;
+	
 	static int		m_DebugActionsMask;
 	bool	m_RecipesInitialized;
 	// ============================================
@@ -65,8 +69,7 @@ class ItemBase extends InventoryItem
 	float 								m_OverheatingDecayInterval = 1; // Timer's interval for decrementing overheat effect's lifespan
 	ref array <ref OverheatingParticle> m_OverheatingParticles;
 	
-	// inventory location management
-	//ref InventoryLocation m_OldLocation;
+	ref TStringArray m_HeadHidingSelections;
 	
 	// Admin Log
 	PluginAdminLog			m_AdminLog;
@@ -95,16 +98,19 @@ class ItemBase extends InventoryItem
 		if (GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
 			PreLoadSoundAttachmentType();
-			/*
-			if( !m_RecipesInitializedItem.Contains(Type()))
-				InitializeRecipes();
-			*/
+			m_ActionsInitialize = false;
 		}
 		m_OldLocation = null;
 		
 		if ( GetGame().IsServer() )
 		{
 			m_AdminLog = PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
+		}
+		
+		if ( ConfigIsExisting("headSelectionsToHide") )
+		{
+			m_HeadHidingSelections = new TStringArray;
+			ConfigGetTextArray("headSelectionsToHide",m_HeadHidingSelections);
 		}
 	}
 	
@@ -141,6 +147,82 @@ class ItemBase extends InventoryItem
 		
 		RegisterNetSyncVariableBool("m_IsBeingPlaced");
 		RegisterNetSyncVariableBool("m_IsTakeable");
+	}
+
+	void InitializeActions()
+	{
+		m_InputActionMap = m_ItemTypeActionsMap.Get( this.Type() );
+		if(!m_InputActionMap)
+		{
+			TInputActionMap iam = new TInputActionMap;
+			m_InputActionMap = iam;
+			SetActions();
+			m_ItemTypeActionsMap.Insert( this.Type(), m_InputActionMap);
+		}
+	}
+	
+	override void GetActions(typename action_input_type, out array<ActionBase_Basic> actions)
+	{
+		if(!m_ActionsInitialize)
+		{
+			m_ActionsInitialize = true;
+			InitializeActions();
+		}
+		
+		actions = m_InputActionMap.Get(action_input_type);
+	}
+	
+	void SetActions()
+	{
+		AddAction(ActionTakeItem);
+		AddAction(ActionTakeItemToHands);
+		AddAction(ActionWorldCraft);
+		AddAction(ActionWorldCraftSwitch);
+		AddAction(ActionDropItem);
+		//AddAction();
+		//AddAction();
+	}
+	
+	void AddAction(typename actionName)
+	{
+		ActionBase action = ActionManagerBase.GetAction(actionName);
+
+		if(!action)
+		{
+			Debug.LogError("Action " + actionName + " dosn't exist!");
+			return;
+		}		
+		
+		typename ai = action.GetInputType();
+		if(!ai)
+		{
+			m_ActionsInitialize = false;
+			return;
+		}
+		ref array<ActionBase_Basic> action_array = m_InputActionMap.Get( ai );
+		
+		if(!action_array)
+		{
+			action_array = new array<ActionBase_Basic>;
+			m_InputActionMap.Insert(ai, action_array);
+		}
+		
+		Debug.Log("+ " + this + " add action: " + action + " input " + ai);
+
+		action_array.Insert(action);
+	}
+	
+	void RemoveAction(typename actionName)
+	{
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		ActionBase action = player.GetActionManager().GetAction(actionName);
+		typename ai = action.GetInputType();
+		ref array<ActionBase_Basic> action_array = m_InputActionMap.Get( ai );
+		
+		if(action_array)
+		{
+			action_array.RemoveItem(action);
+		}
 	}
 	
 	// Loads muzzle flash particle configuration from config and saves it to a map for faster access
@@ -483,40 +565,6 @@ class ItemBase extends InventoryItem
 		g_Game.ConfigGetIntArray(path + " SingleUseActions", m_SingleUseActions);
 		g_Game.ConfigGetIntArray(path + " InteractActions", m_InteractActions);
 	}
-	
-	override void GetSingleUseActions(out TIntArray actions)
-	{	
-		if ( m_SingleUseActions )
-		{			
-			for ( int i = 0; i < m_SingleUseActions.Count(); i++ )
-			{
-				actions.Insert(m_SingleUseActions.Get(i));
-			}
-		}
-	}
-	
-	override void GetContinuousActions(out TIntArray actions)
-	{
-		if ( m_ContinuousActions )
-		{
-			for ( int i = 0; i < m_ContinuousActions.Count(); i++ )
-			{
-				actions.Insert(m_ContinuousActions.Get(i));
-			}
-		}
-	}
-	
-	override void GetInteractActions(out TIntArray actions)
-	{
-		if ( m_InteractActions )
-		{			
-			for ( int i = 0; i < m_InteractActions.Count(); i++ )
-			{
-				actions.Insert(m_InteractActions.Get(i));
-			}
-		}
-	}
-	
 	// -------------------------------------------------------------------------
 	static int GetDebugActionsMask()
 	{
@@ -688,23 +736,23 @@ class ItemBase extends InventoryItem
 		super.EECargoIn(item);
 	}
 	
-	override void EEItemLocationChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
+	override void EEItemLocationChanged(notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
 	{
 		super.EEItemLocationChanged(oldLoc,newLoc);
 		if(newLoc.GetType() == InventoryLocationType.HANDS)
 		{
-			m_OldLocation = new InventoryLocation;
+			if (!m_OldLocation)
+				m_OldLocation = new InventoryLocation;
 			//Print("is valid? "+m_OldLocation.IsValid());
 			m_OldLocation.Copy(oldLoc);
 		}
-		//out of hands, maybe save hand inventory location here?
-		/*else
+		else if (m_OldLocation)
 		{
-			m_OldLocation = null;
-		}*/
+			m_OldLocation.Reset();
+		}
 	}
 	
-	override void OnItemAttachmentSlotChanged (notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
+	override void OnItemAttachmentSlotChanged(notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
 	{
 		
 	}
@@ -741,11 +789,34 @@ class ItemBase extends InventoryItem
 		if ( owner_player_old != owner_player_new )
 		{
 			if ( owner_player_old )
-				OnInventoryExit(owner_player_old);
+			{
+				array<EntityAI> subItemsExit = new array<EntityAI>;
+				GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER,subItemsExit);
+				for (int i = 0; i < subItemsExit.Count(); i++)
+				{
+					ItemBase item_exit = ItemBase.Cast(subItemsExit.Get(i));
+					item_exit.OnInventoryExit(owner_player_old);
+				}
+				
+				PlayerBase player_exit = PlayerBase.Cast(owner_player_old);
+				player_exit.OnItemInventoryExit(this);
 				// Debug.Log("Item dropped from inventory");
+			}
 
 			if ( owner_player_new )
-				OnInventoryEnter(owner_player_new);
+			{
+				array<EntityAI> subItemsEnter = new array<EntityAI>;
+				GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER,subItemsEnter);
+				for (int j = 0; j < subItemsEnter.Count(); j++)
+				{
+					ItemBase item_enter = ItemBase.Cast(subItemsEnter.Get(j));
+					item_enter.OnInventoryEnter(owner_player_new);
+				}
+				
+				PlayerBase player_enter = PlayerBase.Cast(owner_player_new);
+				player_enter.OnItemInventoryEnter(this);
+				
+			}
 				// Debug.Log("Item taken to inventory");
 		}
 	//will not work, item location not yet specified
@@ -802,7 +873,7 @@ class ItemBase extends InventoryItem
 				else
 				{
 					//explode item
-					Explode();
+					Explode(DT_EXPLOSION);
 				}
 			}
 		}
@@ -1125,7 +1196,7 @@ class ItemBase extends InventoryItem
 			else
 				split_quantity_new = quantity;
 			
-			new_item = ItemBase.Cast( destination_entity.GetInventory().CreateEntityInCargoEx( this.GetType(), idx, row, col ) );
+			new_item = ItemBase.Cast( destination_entity.GetInventory().CreateEntityInCargoEx( this.GetType(), idx, row, col, false ) );
 			if( new_item )
 			{			
 				MiscGameplayFunctions.TransferItemProperties(this,new_item);
@@ -1211,6 +1282,23 @@ class ItemBase extends InventoryItem
 				new_item.SetQuantity( split_quantity_new );
 			}
 		}	
+	}
+	
+	//! Called on server side when this item's quantity is changed. Call super.OnQuantityChanged(); first when overriding this event.
+	void OnQuantityChanged()
+	{
+		ItemBase parent = ItemBase.Cast( GetHierarchyParent() );
+		
+		if (parent)
+		{
+			parent.OnAttachmentQuantityChanged(this);
+		}
+	}
+	
+	//! Called on server side when some attachment's quantity is changed. Call super.OnAttachmentQuantityChanged(item); first when overriding this event.
+	void OnAttachmentQuantityChanged( ItemBase item )
+	{
+		// insert code here
 	}
 	
 	override void OnRightClick()
@@ -1790,23 +1878,12 @@ class ItemBase extends InventoryItem
 		{
 			ReadVarsFromCTX(ctx);
 		}
-/*
+		/*
 		if( varFlags & ItemVariableFlags.STRING )
 		{
 			OnSyncStrings(ctx);
 		}
 		*/
-		// ------- quantity refresh --------
-		Mission mission;
-		Hud hud;
-		mission = GetGame().GetMission();
-		if ( mission )
-		{
-			hud = mission.GetHud();
-			if(hud) hud.RefreshQuantity( this );
-		}
-		//----------------------------------
-		
 	}	
 		
 	void SerializeNumericalVars(array<float> floats_out)
@@ -1990,13 +2067,18 @@ class ItemBase extends InventoryItem
 			return false;
 
 		PlayerBase player;
-		if( Class.CastTo(player, GetHierarchyRootPlayer()) )
+		int itemQBIndex;
+		if(version == int.MAX)
 		{
-			//Load quickbar item bind
-			int itemQBIndex;
 			if(!ctx.Read(itemQBIndex))
 				return false;
-			if( itemQBIndex != -1 )
+		}
+		else if( Class.CastTo(player, GetHierarchyRootPlayer()) )
+		{
+			//Load quickbar item bind
+			if(!ctx.Read(itemQBIndex))
+				return false;
+			if( itemQBIndex != -1 && player )
 			{
 				player.SetLoadedQuickBarItemBind(this,itemQBIndex);
 			}
@@ -2044,23 +2126,7 @@ class ItemBase extends InventoryItem
 		}
 		*/
 		super.OnVariablesSynchronized();
-		RefreshHud();
 	}
-	
-	void RefreshHud()
-	{
-		// ------- quantity refresh --------
-		Mission mission;
-		Hud hud;
-		mission = GetGame().GetMission();
-		if ( mission )
-		{
-			hud = mission.GetHud();
-			if(hud) hud.RefreshQuantity( this );
-		}
-		//----------------------------------
-	}
-
 	
 	//bool Consume(float amount, PlayerBase consumer);
 
@@ -2114,6 +2180,7 @@ class ItemBase extends InventoryItem
 		
 		m_VarQuantity = Math.Clamp(value, min, max);
 		SetVariableMask(VARIABLE_QUANTITY);
+		OnQuantityChanged();
 		return false;
 	}
 
@@ -2265,20 +2332,18 @@ class ItemBase extends InventoryItem
 			{
 				totalWeight += GetInventory().GetAttachmentFromIndex(i).GetItemWeight();
 			}
-			totalWeight += (item_wetness + 1) * ConfWeight;
 		}
+		
 		//cargo?
-		else if (cargo != NULL )
+		if (cargo != NULL )
 		{
 			for (i = 0; i < cargo.GetItemCount(); i++)
 			{
 				totalWeight += cargo.GetItem(i).GetItemWeight();
 			}
-			totalWeight += (item_wetness + 1) * ConfWeight;
-			//return Math.Round(GetContainerWeight() + ((item_wetness + 1) * ConfWeight));
 		}
+
 		//other
-		else
 		{
 			if (this.ConfigGetBool("canBeSplit")) //quantity determines size of the stack
 			{
@@ -2342,6 +2407,34 @@ class ItemBase extends InventoryItem
 			energy = this.GetCompEM().GetEnergy();
 		}
 		return energy;
+	}
+	
+	
+	override void OnEnergyConsumed()
+	{
+		super.OnEnergyConsumed();
+		
+		ConvertEnergyToQuantity();
+	}
+
+	override void OnEnergyAdded() 
+	{
+		super.OnEnergyAdded();
+		
+		ConvertEnergyToQuantity();
+	}
+	
+	// Converts energy (from Energy Manager) to quantity, if enabled.
+	void ConvertEnergyToQuantity()
+	{
+		if ( GetGame().IsServer()  &&  HasEnergyManager()  &&  GetCompEM().HasConversionOfEnergyToQuantity() )
+		{
+			if ( HasQuantity() )
+			{
+				float energy_0to1 = GetCompEM().GetEnergy0To1();
+				SetQuantityNormalized( energy_0to1 );
+			}
+		}
 	}
 
 	void SetTemperature(float value, bool allow_client = false)
@@ -2529,17 +2622,8 @@ class ItemBase extends InventoryItem
 		PlayerBase nplayer;
 		if ( PlayerBase.CastTo(nplayer, player) )
 		{
-			nplayer.OnItemInventoryEnter(this);
-			array<EntityAI> subItems = new array<EntityAI>;
-			GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER,subItems);
-			
-			for(int i = 0; i < subItems.Count(); i++)
-			{
-				nplayer.SetEnableQuickBarEntityShortcut(subItems.Get(i),true);				
-			}
-			//nplayer.CalculatePlayerLoad();
-			//nplayer.SetEnableQuickBarEntityShortcut(this,true);
-			//nplayer.CalculatePlayerLoad();
+			//nplayer.OnItemInventoryEnter(this);
+			nplayer.SetEnableQuickBarEntityShortcut(this,true);	
 		}
 	}
 	
@@ -2550,17 +2634,9 @@ class ItemBase extends InventoryItem
 		PlayerBase nplayer;
 		if ( PlayerBase.CastTo(nplayer,player) )
 		{		
-			nplayer.OnItemInventoryExit(this);
-			// Test item and attached items for quickbar shortcut to remove 
-			array<EntityAI> subItems = new array<EntityAI>;
-			GetInventory().EnumerateInventory(InventoryTraversalType.PREORDER,subItems);
-			
-			for(int i = 0; i < subItems.Count(); i++)
-			{
-				nplayer.SetEnableQuickBarEntityShortcut(subItems.Get(i),false);				
-			}
-			//nplayer.CalculatePlayerLoad();
-			//nplayer.SetEnableQuickBarEntityShortcut(this,false);
+			//nplayer.OnItemInventoryExit(this);
+			nplayer.SetEnableQuickBarEntityShortcut(this,false);
+
 		}
 		
 		if ( HasEnergyManager() )
@@ -2623,10 +2699,11 @@ class ItemBase extends InventoryItem
 		m_AttachedAgents = m_AttachedAgents & agent_to_keep;
 	}
 	// -------------------------------------------------------------------------
-	override void InsertAgent(int agent, float count)
+	override void InsertAgent(int agent, float count = 1)
 	{
-		if( count < 0.01 ) return;
-		Debug.Log("Inserting Agent on item: " + agent.ToString() +" count: " + count.ToString());
+		if( count < 1 )
+			return;
+		//Debug.Log("Inserting Agent on item: " + agent.ToString() +" count: " + count.ToString());
 		m_AttachedAgents = (agent | m_AttachedAgents);
 	}
 	
@@ -2635,12 +2712,54 @@ class ItemBase extends InventoryItem
 	{
 		m_AttachedAgents = (m_AttachedAgents | agents);
 	}
+	
 	// -------------------------------------------------------------------------
 	override int GetAgents()
 	{
 		return m_AttachedAgents;
 	}
-
+	//----------------------------------------------------------------------
+	
+	int GetContaminationType()
+	{
+		int contamination_type;
+		
+		const int CONTAMINATED_MASK = eAgents.CHOLERA | eAgents.INFLUENZA | eAgents.SALMONELLA | eAgents.BRAIN;
+		const int POISONED_MASK = eAgents.FOOD_POISON | eAgents.CHEMICAL_POISON;
+		const int NERVE_GAS_MASK = eAgents.NERVE_AGENT;
+		const int DIRTY_MASK = eAgents.WOUND_AGENT;
+		
+		Edible_Base edible = Edible_Base.Cast(this);
+		int agents = GetAgents();
+		if(edible)
+		{
+			NutritionalProfile profile = Edible_Base.GetNutritionalProfile(edible);
+			if(profile)
+			{
+				//Print("profile agents:" +profile.GetAgents());
+				agents = agents | profile.GetAgents();//merge item's agents with nutritional agents
+			}
+		}
+		if( agents & CONTAMINATED_MASK )
+		{
+			contamination_type = contamination_type | EContaminationTypes.ITEM_BADGE_CONTAMINATED;
+		}
+		if( agents & POISONED_MASK )
+		{
+			contamination_type = contamination_type | EContaminationTypes.ITEM_BADGE_POISONED;
+		}
+		if( agents & NERVE_GAS_MASK )
+		{
+			contamination_type = contamination_type | EContaminationTypes.ITEM_BADGE_NERVE_GAS;
+		}
+		if( agents & DIRTY_MASK )
+		{
+			contamination_type = contamination_type | EContaminationTypes.ITEM_BADGE_DIRTY;
+		}
+		
+		return agents;
+	}
+	
 	// -------------------------------------------------------------------------
 	bool LoadAgents(ParamsReadContext ctx, int version)
 	{
@@ -3003,27 +3122,8 @@ class ItemBase extends InventoryItem
 		return IsBeingPlaced() && IsSoundSynchRemote();
 	}
 	
-	//! adds this item to a recipe specified by the 'recipe_classname' parameter, as ingredient number specified by the 'mask' parameter(Ingredient.FIRST,Ingredient.SECOND, Ingredient.BOTH as options)
-	//! returns if adding succeeded(repetetive addition of the same item to the same recipe will fail)
-	bool AddToRecipe(string recipe_classname, int mask)
-	{
-		int recipe_id = PluginRecipesManager.RecipeIDFromClassname(recipe_classname);
-		string name = this.GetType();
-		if( !PluginRecipesManager.m_RecipeCache.Contains( name ) )
-		{
-			PluginRecipesManager.m_RecipeCache.Insert(name, new CacheObject );
-		}
+	void OnApply(PlayerBase player);
 
-		return PluginRecipesManager.m_RecipeCache.Get(name).AddRecipe(recipe_id,mask);
-	}
-
-	void InitializeRecipes()
-	{
-		OnInitializeRecipes();
-		PluginRecipesManager.m_RecipesInitializedItem.Insert( this.Type(), false);
-	}
-	
-	void OnInitializeRecipes();
 }
 
 EntityAI SpawnItemOnLocation (string object_name, notnull InventoryLocation loc, bool full_quantity)

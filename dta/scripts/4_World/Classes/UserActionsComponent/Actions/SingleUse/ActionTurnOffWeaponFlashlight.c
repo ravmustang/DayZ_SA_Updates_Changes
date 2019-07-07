@@ -5,20 +5,12 @@ class ActionTurnOffWeaponFlashlight: ActionSingleUseBase
 	void ActionTurnOffWeaponFlashlight()
 	{
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_OFF;//CMD_ACTIONMOD_INTERACTONCE
-		
-		m_MessageSuccess = "It's turned on.";
-		m_MessageFail = "It's out of energy";
 	}
 	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_TURN_OFF_WEAPON_FLASHLIGHT;
 	}
 
 	override bool HasTarget()

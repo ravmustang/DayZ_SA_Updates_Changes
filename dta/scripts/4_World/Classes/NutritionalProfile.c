@@ -5,25 +5,46 @@ class NutritionalProfile
 	float m_NutritionalIndex;
 	float m_FullnessIndex;
 	float m_Toxicity;
-	bool m_IsLiquid;
+	int m_LiquidType;
+	int m_Agents;
+	string m_LiquidClassname;
+	float m_Digestibility;
 	
-	void NutritionalProfile(float energy, float water_content, float nutritional_index, float fullness_index, float toxicity)
+	void NutritionalProfile(float energy, float water_content, float nutritional_index, float fullness_index, float toxicity, int agents, float digestibility)
 	{
 		m_Energy = energy;
 		m_WaterContent = water_content;
 		m_NutritionalIndex = nutritional_index;
 		m_FullnessIndex = fullness_index;
 		m_Toxicity = toxicity;
+		m_Agents = agents;
+		m_Digestibility = digestibility;
 	}
 	
-	void MarkAsLiquid()
+	void MarkAsLiquid(int liquid_type, string classname)
 	{
-		m_IsLiquid = true;
+		m_LiquidType = liquid_type;
+		m_LiquidClassname = classname;
+	}
+	
+	int GetAgents()
+	{
+		return m_Agents;
+	}
+	
+	int GetLiquidType()
+	{
+		return m_LiquidType;
+	}
+	
+	string GetLiquidClassname()
+	{
+		return m_LiquidClassname;
 	}
 	
 	bool IsLiquid()
 	{
-		return m_IsLiquid;
+		return (m_LiquidType > 0);
 	}
 	
 	float GetEnergy()
@@ -49,5 +70,10 @@ class NutritionalProfile
 	float GetToxicity()
 	{
 		return m_Toxicity;
+	}	
+	
+	float GetDigestibility()
+	{
+		return m_Digestibility;
 	}
 }

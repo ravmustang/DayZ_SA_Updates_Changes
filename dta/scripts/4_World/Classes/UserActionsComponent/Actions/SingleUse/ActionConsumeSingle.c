@@ -14,9 +14,6 @@ class ActionConsumeSingle: ActionSingleUseBase
 	{
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LICKBATTERY;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_LICKBATTERY;
-		m_MessageSuccess = "I have taken one.";
-		m_MessageStart = "I started taking one.";
-		m_MessageStartFail = "Its' empty";
 	}
 	
 	int GetConsumedQuantity()
@@ -33,11 +30,6 @@ class ActionConsumeSingle: ActionSingleUseBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-	
-	override int GetType()
-	{
-		return AT_CONSUME_SINGLE;
 	}
 
 	override bool HasTarget()

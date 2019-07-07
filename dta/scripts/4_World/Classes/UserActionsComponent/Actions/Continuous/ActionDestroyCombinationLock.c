@@ -23,11 +23,6 @@ class ActionDestroyCombinationLock: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 	}
 
-	override int GetType()
-	{
-		return AT_DESTROY_COMBINATION_LOCK;
-	}
-
 	override string GetText()
 	{
 		return "#destroy_combination_lock";
@@ -55,8 +50,8 @@ class ActionDestroyCombinationLock: ActionContinuousBase
 			CombinationLock combination_lock = fence.GetCombinationLock();
 			if ( combination_lock )
 			{
-				combination_lock.Unlock( fence );
-				combination_lock.DecreaseHealth( combination_lock.GetMaxHealth() );
+				combination_lock.UnlockServer( action_data.m_Player, fence );
+				GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( combination_lock.DestroyLock, 200, false );
 			}
 		}
 		
@@ -64,5 +59,10 @@ class ActionDestroyCombinationLock: ActionContinuousBase
 		
 		//soft skills
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+	}
+	
+	override string GetAdminLogMessage(ActionData action_data)
+	{
+		return " destroyed combination lock with " + action_data.m_MainItem.GetDisplayName();
 	}
 };

@@ -5,9 +5,6 @@ class ActionMeasureBattery: ActionSingleUseBase
 	{
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_LICKBATTERY;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_LICKBATTERY;
-		m_MessageSuccess = "There's still some juice in it.";
-		m_MessageFail = "It's dead.";
-		m_MessageStartFail = "It's dead.";
 	}
 	
 	override void CreateConditionComponents()  
@@ -19,11 +16,6 @@ class ActionMeasureBattery: ActionSingleUseBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-
-	override int GetType()
-	{
-		return AT_MEASURE_BATTERY;
 	}
 
 	override bool HasTarget()

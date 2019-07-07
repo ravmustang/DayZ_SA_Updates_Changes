@@ -7,19 +7,12 @@ class ActionWashHandsItem: ActionSingleUseBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_CLEANHANDSBOTTLE;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_CLEANHANDSBOTTLE;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageSuccess = "I have washed my hands.";
-		//m_Animation = "open";
 	}
 	
 	override void CreateConditionComponents()  
 	{		
 		m_ConditionItem = new CCINotRuinedAndEmpty;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_WASH_HANDS_ITEM;
 	}
 
 	override string GetText()

@@ -3,25 +3,12 @@ class ActionTogglePlaceObject: ActionSingleUseBase
 
 	void ActionTogglePlaceObject()
 	{
-		/*
-		m_CommandUID        	= DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
-		m_StanceMask       		= DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail 		= "";
-		m_MessageStart 			= "";
-		m_MessageSuccess 		= "";
-		m_MessageFail 			= "";
-		*/
 	}
 	
 	override void CreateConditionComponents()  
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-		
-	override int GetType()
-	{
-		return AT_TOGGLE_PLACE_OBJECT;
 	}
 
 	override bool HasTarget()

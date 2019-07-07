@@ -5,13 +5,6 @@ class ActionRepositionPluggedItem: ActionInteractBase
 // Through this action players can reposition already placed electric devices without unplugging them from the power source.
 	void ActionRepositionPluggedItem()
 	{
-		m_MessageStart = "";
-		m_MessageSuccess = "I've picked up the device.";
-	}
-
-	override int GetType()
-	{
-		return AT_REPOSITION_PLUGGED_ITEM;
 	}
 
 	override string GetText()

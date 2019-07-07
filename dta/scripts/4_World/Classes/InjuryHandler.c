@@ -24,6 +24,15 @@ enum eInjuryHandlerLevels
 	RUINED,
 }
 
+enum eInjuryOverrides
+{
+	//! MUST BE POW2
+	NONE = 0,
+	MORPHINE = 1,
+	PAIN_KILLERS_LVL0 = 2,
+	PAIN_KILLERS_LVL1 = 4,
+}
+
 class InjuryAnimationHandler
 {
 
@@ -42,7 +51,7 @@ class InjuryAnimationHandler
 	private bool m_AnimationChange = false;
 	private bool m_InjuryAnimEnabled = false;
 	private float m_InjuryAnimDamageValue = 0;
-	
+	int m_ForceInjuryAnimMask;
 	
 	void InjuryAnimationHandler(PlayerBase player)
 	{
@@ -84,10 +93,38 @@ class InjuryAnimationHandler
 		
 	}
 
+	eInjuryHandlerLevels GetOverrideLevel(eInjuryHandlerLevels unchanged_level)
+	{
+		eInjuryHandlerLevels override_level = unchanged_level;
+		
+		if(m_ForceInjuryAnimMask & eInjuryOverrides.MORPHINE && override_level > eInjuryHandlerLevels.PRISTINE)
+		{
+			override_level = eInjuryHandlerLevels.PRISTINE;
+		}
+		
+		if(m_ForceInjuryAnimMask & eInjuryOverrides.PAIN_KILLERS_LVL1 && override_level > eInjuryHandlerLevels.WORN)
+		{
+			override_level = eInjuryHandlerLevels.WORN;
+		}
+		
+		if(m_ForceInjuryAnimMask & eInjuryOverrides.PAIN_KILLERS_LVL0 && override_level > eInjuryHandlerLevels.DAMAGED)
+		{
+			override_level = eInjuryHandlerLevels.DAMAGED;
+		}
+
+		return override_level;
+	
+	}
+	
 	void CheckValue(bool forceUpdate = false)
 	{
 		float health_current_normalized = m_Player.GetHealth("","Health") / m_HealthMaxValue;
 		eInjuryHandlerLevels injury_level = GetInjuryLevel(health_current_normalized);
+		
+		if( m_ForceInjuryAnimMask )
+		{
+			injury_level = GetOverrideLevel(injury_level);
+		}
 		
 		if( m_LastHealthUpdate != injury_level || forceUpdate )
 		{

@@ -7,18 +7,12 @@ class ActionInsertSparkplug: ActionSingleUseBase
 {
 	void ActionInsertSparkplug()
 	{
-		m_MessageSuccess = "I've inserted the sparkplug.";
 	}
 	
 	override void CreateConditionComponents()  
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_INSERT_SPARKPLUG;
 	}
 		
 	override string GetText()

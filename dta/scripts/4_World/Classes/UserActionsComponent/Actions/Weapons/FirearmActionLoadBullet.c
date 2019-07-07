@@ -11,11 +11,6 @@ class FirearmActionLoadBullet : FirearmActionBase
 	{
 		return AC_SINGLE_USE;
 	}
-	
-	override int GetType()  //returns action uid
-	{
-		return AT_LOAD_BULLET_TO_WEAPON;
-	}
 
 	override string GetText() //text game displays in HUD hint 
 	{
@@ -78,4 +73,49 @@ class FirearmActionLoadBullet : FirearmActionBase
 	{
 		return -1;
 	}*/
+};
+
+class FirearmActionLoadBulletQuick : FirearmActionBase
+{	
+	//-----------------------------------------------------
+	// 	Action events and methods
+	//-----------------------------------------------------
+	void FirearmActionLoadBulletQuick() 
+	{
+	}	
+	
+	override bool HasTarget()
+	{
+		return false;
+	}
+	
+	override typename GetInputType()
+	{
+		return ContinuousWeaponManipulationActionInput;
+	} 
+	
+	override void CreateConditionComponents()  
+	{
+		m_ConditionItem = new CCINonRuined();
+		m_ConditionTarget = new CCTSelf;
+	}
+	
+	override bool HasProgress()
+	{
+		return false;
+	}
+	
+	
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item ) //condition for action
+	{
+		return player.GetWeaponManager().GetPreparedMagazine()!=null;
+	}
+	
+	override void Start( ActionData action_data )
+	{
+		super.Start( action_data );
+		Magazine mag = Magazine.Cast(action_data.m_Player.GetWeaponManager().GetPreparedMagazine());	
+
+		action_data.m_Player.GetWeaponManager().LoadBullet(mag, this);
+	}
 };

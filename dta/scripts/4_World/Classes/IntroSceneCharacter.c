@@ -21,17 +21,17 @@ class IntroSceneCharacter extends Managed
 	
 	void IntroSceneCharacter()
 	{
-		m_CharacterId = DEFAULT_CHARACTER_MENU_ID;
+		m_CharacterId = GameConstants.DEFAULT_CHARACTER_MENU_ID;
 	}
 	
 	bool IsDefaultCharacter()
 	{
-		return m_CharacterId == DEFAULT_CHARACTER_MENU_ID;
+		return m_CharacterId == GameConstants.DEFAULT_CHARACTER_MENU_ID;
 	}
 	
 	void SetToDefaultCharacter()
 	{
-		m_CharacterId = DEFAULT_CHARACTER_MENU_ID;
+		m_CharacterId = GameConstants.DEFAULT_CHARACTER_MENU_ID;
 	}
 	//==============================================
 	// SetcharacterID
@@ -196,7 +196,7 @@ class IntroSceneCharacter extends Managed
 	//==============================================
 	void CreateNewCharacterById( int character_id )
 	{
-		if ( character_id == DEFAULT_CHARACTER_MENU_ID )
+		if ( character_id == GameConstants.DEFAULT_CHARACTER_MENU_ID )
 		{
 			CreateDefaultCharacter();
 		}
@@ -230,7 +230,7 @@ class IntroSceneCharacter extends Managed
 		{
 			CreateNewCharacterRandom();
 			m_CharacterDta.SaveDefaultCharacter( m_CharacterObj );
-			m_CharacterDta.SetCharacterName(DEFAULT_CHARACTER_MENU_ID, DEFAULT_CHARACTER_NAME);
+			m_CharacterDta.SetCharacterName(GameConstants.DEFAULT_CHARACTER_MENU_ID, GameConstants.DEFAULT_CHARACTER_NAME);
 		}
 	}
 	
@@ -361,7 +361,7 @@ class IntroSceneCharacter extends Managed
 	//-------------------------
 	protected void SetupPlayerName( bool new_name )
 	{
-		string name = DEFAULT_CHARACTER_NAME;		
+		string name = GameConstants.DEFAULT_CHARACTER_NAME;		
 		
 #ifdef PLATFORM_CONSOLE
 		BiosUserManager user_manager = GetGame().GetUserManager();

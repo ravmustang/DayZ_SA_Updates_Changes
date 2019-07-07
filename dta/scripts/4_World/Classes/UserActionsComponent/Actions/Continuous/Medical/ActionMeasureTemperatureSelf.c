@@ -13,15 +13,6 @@ class ActionMeasureTemperatureSelf: ActionContinuousBase
 		m_CallbackClass = ActionMeasureTemperatureSelfCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_TAKETEMPSELF;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_TAKETEMPSELF;
-		//m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
-
-		m_MessageStartFail = "There's nothing to measure.";
-		m_MessageStart = "I have started measuring myself";
-		m_MessageSuccess = "I have measured myself.";
-		m_MessageFail = "I have moved and measuring was canceled.";
-		m_MessageCancel = "I stopped measuring.";
-		//m_Animation = "measure";
-		
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -34,11 +25,6 @@ class ActionMeasureTemperatureSelf: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-	
-	override int GetType()
-	{
-		return AT_MEASURE_TEMPERATURE_S;
 	}
 
 	override bool HasTarget()
@@ -57,7 +43,9 @@ class ActionMeasureTemperatureSelf: ActionContinuousBase
 		
 		if(thermometer)
 		{
-			SendMessageToClient(action_data.m_Player, thermometer.GetTemperatureMessage(action_data.m_Player));
+			ScriptRPC rpc = new ScriptRPC();
+			rpc.Write(thermometer.GetTemperatureMessage(action_data.m_Player));
+			rpc.Send(action_data.m_Player, ERPCs.RPC_SYNC_THERMOMETER, true, action_data.m_Player.GetIdentity() );
 		}
 		
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );

@@ -11,7 +11,7 @@ class MouthRag extends Clothing
 	{
 		PlayerBase player;
 		Class.CastTo(player, GetHierarchyRootPlayer());
-		if( GetGame() && GetGame().IsServer() && player )
+		if( player )
 		{
 			MutePlayerByGag(player,false);
 		}
@@ -30,7 +30,7 @@ class MouthRag extends Clothing
 		PlayerBase player;
 		Class.CastTo(player, parent.GetHierarchyRootPlayer());
 
-		if ( (GetGame().IsServer() || !GetGame().IsMultiplayer()) && player && slot_id == InventorySlots.MASK )
+		if ( player && slot_id == InventorySlots.MASK )
 		{
 			//GetGame().GetSoundScene().SetSpeechExVolume(0,1);
 			//GetGame().GetSoundScene().SetVOIPVolume(0,1);
@@ -46,7 +46,7 @@ class MouthRag extends Clothing
 		
 		PlayerBase player = PlayerBase.Cast(parent);
 		
-		if ( GetGame().IsServer() && player )
+		if ( player )
 		{
 			MutePlayerByGag(player,false);
 		}
@@ -58,8 +58,10 @@ class MouthRag extends Clothing
 		//GetGame().GetSoundScene().SetSpeechExVolume(g_Game.m_volume_speechEX,1);
 		//GetGame().GetSoundScene().SetVOIPVolume(g_Game.m_volume_VOIP,1);
 		//GetGame().GetSoundScene().SetRadioVolume(g_Game.m_volume_radio,1);
-		
-		GetGame().SetVoiceEffect(player, VoiceEffectMumbling, state);
+		if (( GetGame().IsServer() && GetGame().IsMultiplayer() ) || ( GetGame().GetPlayer() == player ))
+		{
+			GetGame().SetVoiceEffect(player, VoiceEffectMumbling, state);
+		}
 	}
 	
 	void SetIncomingLambaBool(bool state)

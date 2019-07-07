@@ -11,12 +11,6 @@ class ActionGiveSalineSelf: ActionContinuousBase
 	void ActionGiveSalineSelf()
 	{
 		m_CallbackClass = ActionGiveSalineSelfCB;
-		m_MessageStartFail = "There's nothing in it.";
-		m_MessageStart = "I have started giving me saline";
-		m_MessageSuccess = "I have salined myself.";
-		m_MessageFail = "I have moved and giving saline was canceled.";
-		m_MessageCancel = "I stopped giving saline myself.";
-		//m_Animation = "givesaline";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SALINEBLOODBAG;
@@ -28,11 +22,6 @@ class ActionGiveSalineSelf: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_GIVE_SALINE_S;
 	}
 
 	override bool HasTarget()

@@ -1,3 +1,14 @@
+enum ActionConditionMask
+{
+	ACM_NO_EXEPTION		= 0,
+	ACM_IN_VEHICLE		= 1,
+	ACM_ON_LADDER		= 2,
+	ACM_SWIMMING		= 4,
+	ACM_RESTRAIN		= 8,
+	ACM_RAISED			= 16,
+	ACM_ON_BACK			= 32,
+	ACM_THROWING		= 64,
+}
 class ActionReciveData
 {
 	ref ActionTarget					m_Target;
@@ -10,7 +21,7 @@ class ActionData
 		m_State = UA_NONE;
 	}
 	
-	ActionBase							m_Action;
+	ref ActionBase						m_Action;
 	ItemBase							m_MainItem;
 	ActionBaseCB 						m_Callback;
 	ref CABase							m_ActionComponent;
@@ -22,20 +33,13 @@ class ActionData
 	int									m_RefreshReservationTimer;
 	bool								m_WasExecuted;
 	bool								m_WasActionStarted;
+	bool								m_ReciveEndInput;
 }
 
-class ActionBase
+class ActionBase : ActionBase_Basic
 {	
 	//STATIC DATA
 	// Configurable action parameters
-	protected string				m_MessageStartFail; //called from ontick method of quantity and time baseclasses, usually informing player that item is empty
-	protected string				m_MessageStart; //called from onstart method, usually informing player that he started the action
-	protected string				m_MessageSuccess; //called from ontick method, ussualy informing player that he succesfully finished the action
-	protected string 				m_MessageFail; //called from cancel or ontick methods,  ussualy informing player that he or target moved and thus was action canceled
-	protected string				m_MessageCancel; //called from cancel method, ussualy informing player that he stoped holding RMB and canceled action
-	protected string				m_MessageSuccessTarget; //called from ontick method, ussualy informing other player that he succesfully finished the action
-	protected string 				m_MessageStartTarget; //called from cancel or ontick methods,  ussualy informing other player that he or target moved and thus was action canceled
-	protected string				m_MessageCancelTarget; //called from cancel method, ussualy informing other player that he stoped holding RMB and canceled action
 	protected string				m_Sound; //sound played at the beggining of action
 
 	protected bool					m_LockTargetOnUse;	//this parameter sets wheter player can perform actions on target while other player is already performing action on it. defaulted as true
@@ -44,10 +48,13 @@ class ActionBase
 	protected ref TStringArray		m_Sounds;			//User action sound is picked from this array randomly
 	ref CCIBase 					m_ConditionItem;	//Condition Component
 	ref CCTBase						m_ConditionTarget; 	//Condition Component
+	protected ActionInput			m_Input;
+	protected int 					m_ActionID;
+	int 							m_ConditionMask;
 
 	//RUNTIME DATA
 	protected ref Param1<string> 	m_MessageParam; //used for passing messages from server to client
-	protected ref Param2<int,int>	m_MessagesParam;
+	//protected ref Param2<int,int>	m_MessagesParam;
 	
 	//SOFT SKILLS
 	protected float					m_SpecialtyWeight;
@@ -62,19 +69,51 @@ class ActionBase
 		m_FullBody = false;
 		m_Sound = "";
 		m_LockTargetOnUse = HasTarget();
-		m_MessageStartFail = "The action failed";
-		m_MessageStart = "I have started an action.";
-		m_MessageSuccess = "The action succesfully finished.";
-		m_MessageFail = "The action failed.";
-		m_MessageCancel = "I have canceled the action.";
-		m_MessageStartTarget = "Other player started performing action on you.";
-		m_MessageSuccessTarget = "Other player succesfuly performed action on you.";
-		m_MessageCancelTarget = "Other player canceled the action.";
-		
 		// dont override
 		m_MessageParam = new Param1<string>("");
-		m_MessagesParam = new Param2<int,int>(0,0);
+		//m_MessagesParam = new Param2<int,int>(0,0);
 		m_Sounds = new TStringArray;
+		m_Input = null;
+		m_ActionID = 0;
+		InitConditionMask();
+	}
+	void InitConditionMask()
+	{
+		m_ConditionMask = ActionConditionMask.ACM_NO_EXEPTION;
+		if (CanBeUsedInVehicle())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_IN_VEHICLE;
+		}
+		
+		if (CanBeUsedOnLadder())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_ON_LADDER;
+		}
+		
+		if (CanBeUsedSwimming())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_SWIMMING;
+		}
+		
+		if (CanBeUsedInRestrain())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_RESTRAIN;
+		}
+		
+		if (CanBeUsedRaised())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_RAISED;
+		}
+		
+		if (CanBeUsedOnBack())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_ON_BACK;
+		}
+		
+		if (CanBeUsedThrowing())
+		{
+			m_ConditionMask |= ActionConditionMask.ACM_THROWING;
+		}
 	}
 	
 	bool SetupAction(PlayerBase player, ActionTarget target, ItemBase item, out ActionData action_data, Param extra_data = NULL )
@@ -89,6 +128,7 @@ class ActionBase
 		action_data.m_RefreshReservationTimer = 150;
 		action_data.m_WasExecuted = false;
 		action_data.m_WasActionStarted = false;
+		action_data.m_ReciveEndInput = false;
 		
 		ActionReciveData action_recive_data = player.GetActionManager().GetReciveData();
 		if ( action_recive_data )
@@ -103,6 +143,16 @@ class ActionBase
 		}
 		
 		return true;
+	}
+	
+	typename GetInputType()
+	{
+		return DefaultActionInput;
+	}
+	
+	void SetInput( ActionInput  ai)
+	{
+		m_Input = ai;
 	}
 	
 	ActionData CreateActionData()
@@ -157,11 +207,6 @@ class ActionBase
 	int GetActionCategory()
 	{
 		return AC_UNCATEGORIZED;
-	}
-	
-	int GetType()  //returns action uid
-	{
-		return 0;
 	}
 	
 	int IsEat()
@@ -219,7 +264,27 @@ class ActionBase
 	{
 		return false;
 	}
+
+	bool CanBeUsedSwimming()
+	{
+		return false;
+	}
 	
+	bool CanBeUsedOnLadder()
+	{
+		return false;
+	}
+	
+	bool CanBeUsedRaised()
+	{
+		return false;
+	}
+	
+	bool CanBeUsedThrowing()
+	{
+		return false;
+	}
+
 	protected bool ActionConditionContinue( ActionData action_data ) //condition for action
 	{
 		return ActionCondition(action_data.m_Player,action_data.m_Target,action_data.m_MainItem);
@@ -414,29 +479,76 @@ class ActionBase
 			action_data.m_Player.GetActionManager().OnActionEnd();
 	}
 	
-	void OnContinuousCancel(ActionData action_data)
-	{}
-	
 	void Interrupt(ActionData action_data)
 	{}
-
-	bool Can( PlayerBase player, ActionTarget target, ItemBase item )
+	
+	void OnEndInput(ActionData action_data)
+	{}
+	
+	void EndInput(ActionData action_data)
 	{
-		if(  !CanBeUsedOnBack() && player.GetCommand_Move() && player.GetCommand_Move().IsOnBack())
+		action_data.m_ReciveEndInput = true;
+		OnEndInput(action_data);
+	}
+
+	void OnEndRequest(ActionData action_data)
+	{}
+	
+	void EndRequest(ActionData action_data)
+	{
+		OnEndRequest(action_data);
+	}
+	
+	static int ComputeConditionMask( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		int mask = 0;
+		if ( player.GetCommand_Vehicle() )
 		{
-			return false;
+			mask |= ActionConditionMask.ACM_IN_VEHICLE;
 		}
+		
+		if ( player.GetCommand_Ladder() )
+		{
+			mask |= ActionConditionMask.ACM_ON_LADDER;
+		}
+		
+		if ( player.IsRestrained() )
+		{
+			mask |= ActionConditionMask.ACM_RESTRAIN;
+		}
+		
+		if ( player.GetCommand_Swim() )
+		{
+			mask |= ActionConditionMask.ACM_SWIMMING;
+		}
+		
+		if ( player.IsRaised() )
+		{
+			mask |= ActionConditionMask.ACM_RAISED;
+		}
+		
+		if ( player.GetCommand_Move() && player.GetCommand_Move().IsOnBack() )
+		{
+			mask |= ActionConditionMask.ACM_ON_BACK;
+		}
+		
+		if ( player.GetThrowing().IsThrowingModeEnabled())
+		{
+			mask |= ActionConditionMask.ACM_THROWING;
+		}
+		
+		return mask;
+	}
+
+	bool Can( PlayerBase player, ActionTarget target, ItemBase item, int condition_mask )
+	{
+		if ( (condition_mask & m_ConditionMask) != condition_mask )
+			return false;
 		
 		if ( !IsFullBody(player) && !player.IsPlayerInStance(GetStanceMask(player)) )
 		{
 			return false;
 		}
-		
-		if ( player.IsRestrained() && !CanBeUsedInRestrain() )
-			return false;
-		
-		if ( !CanBeUsedInVehicle() && player.GetCommand_Vehicle() )
-			return false;
 		
 		if ( HasTarget() )
 		{
@@ -451,16 +563,54 @@ class ActionBase
 			}
 		}
 		
-		if ( m_ConditionItem && m_ConditionItem.Can(player, item) && m_ConditionTarget && m_ConditionTarget.Can(player, target) && ActionCondition(player, target, item) )
+		if ( m_ConditionItem && !m_ConditionItem.Can(player, item))
+		{
+			return false;
+		}
+		
+		if ( m_ConditionTarget && !m_ConditionTarget.Can(player, target))
+		{
+			return false;
+		}
+		
+		if ( ActionCondition(player, target, item) )
 		{
 			return true;
 		}
 		return false;
 	}
 	
+	bool Can( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		int condition_mask = ComputeConditionMask( player, target, item );
+		
+		return Can( player, target, item, condition_mask);
+	}
+	
 	protected bool CanContinue( ActionData action_data )
 	{
-		if ( action_data.m_Player.IsPlayerInStance(action_data.m_PossibleStanceMask) && m_ConditionItem && m_ConditionItem.CanContinue(action_data.m_Player,action_data.m_MainItem) && m_ConditionTarget && m_ConditionTarget.CanContinue(action_data.m_Player,action_data.m_Target) && ActionConditionContinue(action_data) )
+		if ( !action_data.m_Player.IsPlayerInStance(action_data.m_PossibleStanceMask) )
+		{
+			return false;
+		}
+		if ( !m_ConditionItem )
+		{
+			return false;
+		}
+
+		if ( !m_ConditionItem.CanContinue(action_data.m_Player,action_data.m_MainItem) )
+		{
+			return false;
+		}
+		if ( !m_ConditionTarget )
+		{
+			return false;
+		}
+		if ( !m_ConditionTarget.CanContinue(action_data.m_Player,action_data.m_Target) )
+		{
+			return false;
+		}
+		if ( ActionConditionContinue(action_data) )
 		{
 			return true;
 		}
@@ -556,7 +706,7 @@ class ActionBase
 	}
 
 	// MESSAGES --------------------------------------------------------------------
-	string GetMessageText( int state ) //returns text of action based on given id
+/*	string GetMessageText( int state ) //returns text of action based on given id
 	{
 		string message = "";
 		switch ( state )
@@ -616,7 +766,7 @@ class ActionBase
 		}
 
 		return message;
-	}
+	}*/
 	
 	// action need first have permission from server before can start
 	bool UseAcknowledgment()
@@ -670,89 +820,27 @@ class ActionBase
 		}
 	}
 	
-	protected string GetMessageStartFail()
-	{
-		return m_MessageStartFail;
-	}
-	
-	protected string GetMessageStart()
-	{
-		return m_MessageStart;
-	}
-	
-	protected string GetMessageSuccess() 
-	{
-		return m_MessageSuccess;
-	}
-	
-	protected string GetMessageFail()
-	{
-		return m_MessageFail;
-	}
-	
-	protected string GetMessageCancel() 
-	{
-		return m_MessageCancel;
-	}
-	
-	protected string GetMessageInterrupt() 
-	{
-		return "";
-		//return m_MessageInterrupt;
-	}
-	
-	protected string GetMessageSuccessTarget() 
-	{
-		return m_MessageSuccessTarget;
-	}
-	
-	protected string GetMessageStartTarget()
-	{
-		return m_MessageStartTarget;
-	}
-	
-	protected string GetMessageCancelTarget()
-	{
-		return m_MessageCancelTarget;
-	}
-
 	// ActionCondition Rules
 	// ------------------------------------------------------
 	protected bool IsDamageDestroyed(ActionTarget target)
 	{
-		Object obj;
-		if(Class.CastTo(obj, target.GetObject()) )
-		{
-			if( obj.IsDamageDestroyed() )
-				return true;
-		}
-
-		return false;
+		return target.GetObject() && target.GetObject().IsDamageDestroyed();
 	}
 
 	protected bool IsBuilding(ActionTarget target)
 	{
-		Object obj;
-		
-		if( Class.CastTo(obj, target.GetObject()) )
-			return obj.IsBuilding();
-
-		return false;
+		return target.GetObject() && target.GetObject().IsBuilding();
 	}
 	
 	protected bool IsTransport(ActionTarget target)
 	{
-		Object obj;
-		if( Class.CastTo(obj, target.GetObject()) )
-			return obj.IsTransport();
-
-		return false;		
+		return target.GetObject() && target.GetObject().IsTransport();
 	}
 
 	protected bool IsInReach(PlayerBase player, ActionTarget target, float maxDistance = 1.0 )
 	{
-		Object obj;
-		if( Class.CastTo(obj, target.GetObject()) )
+		Object obj = target.GetObject();
+		if( obj )
 		{
 			string compName;
 			float distanceRoot, distanceHead;
@@ -765,9 +853,9 @@ class ActionBase
 			// get position of Head bone
 			MiscGameplayFunctions.GetHeadBonePos(player, playerHeadPos);
 
-			compName = target.GetObject().GetActionComponentName(target.GetComponentIndex());
-			modelPos = target.GetObject().GetSelectionPositionMS(compName);
-			worldPos = target.GetObject().ModelToWorld(modelPos);
+			compName = obj.GetActionComponentName(target.GetComponentIndex());
+			modelPos = obj.GetSelectionPositionMS(compName);
+			worldPos = obj.ModelToWorld(modelPos);
 
 			distanceRoot = Math.AbsFloat(vector.DistanceSq(worldPos, playerRootPos));
 			distanceHead = Math.AbsFloat(vector.DistanceSq(worldPos, playerHeadPos));
@@ -854,5 +942,25 @@ class ActionBase
 	float GetProgress( ActionData action_data )
 	{
 		return -1;
+	}
+	
+	ActionInput GetInput()
+	{
+		return m_Input;
+	}
+	
+	void SetID(int actionId)
+	{
+		m_ActionID = actionId;
+	}
+	
+	int GetID()
+	{
+		return m_ActionID;
+	}
+	
+	string GetAdminLogMessage(ActionData action_data)
+	{
+		return "";
 	}
 };

@@ -4,7 +4,6 @@ class ActionAnimateCarSelection: ActionInteractBase
 
 	void ActionAnimateCarSelection()
 	{
-		m_MessageSuccess = "";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ALL;
 		//m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -15,11 +14,6 @@ class ActionAnimateCarSelection: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_ANIMATE_CAR_SELECTION;
 	}
 
 	override string GetText()

@@ -3,7 +3,6 @@ class ActionUnfoldEntity : ActionSingleUseBase
 {
 	void ActionUnfoldEntity ()
 	{
-		m_MessageSuccess = "It's unfolded.";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
 	}
 

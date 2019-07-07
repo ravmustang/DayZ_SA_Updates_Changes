@@ -13,7 +13,6 @@ class ActionTakeABite: ActionConsumeSingle
 	void ActionTakeABite()
 	{
 		m_CallbackClass = ActionTakeABiteCB;
-		m_MessageSuccess = "I took a bite.";
 		m_Sound = "EatingSoft_0";
 		//m_Animation = "eat";
 	}
@@ -27,11 +26,6 @@ class ActionTakeABite: ActionConsumeSingle
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}	
-	
-	override int GetType()
-	{
-		return AT_TAKE_A_BITE;
 	}
 
 	override string GetText()

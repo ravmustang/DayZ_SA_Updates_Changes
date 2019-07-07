@@ -135,13 +135,13 @@ class ActionContinuousBase : AnimatedActionBase
 		m_CallbackClass = ActionContinuousBaseCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
 		
-		if( GetGame().IsServer() )
+		if( GetGame() && GetGame().IsServer() )
 		{
 			m_AdminLog = PluginAdminLog.Cast( GetPlugin(PluginAdminLog) );
 		}
 	}
 	
-	override void OnContinuousCancel(ActionData action_data)
+	override void OnEndInput( ActionData action_data )
 	{
 		ActionContinuousBaseCB callback;
 		if( Class.CastTo(callback, action_data.m_Callback) )
@@ -150,12 +150,17 @@ class ActionContinuousBase : AnimatedActionBase
 			{
 				callback.UserEndsAction();
 			}
-		}		
+		}
 	}
 	
 	bool HasAlternativeInterrupt()
 	{
 		return false;
+	}
+
+	override typename GetInputType()
+	{
+		return ContinuousDefaultActionInput;
 	}
 
 	override int GetActionCategory()

@@ -5,18 +5,7 @@ class ActionAttachWheels: ActionAttach
 	
 	void ActionAttachWheels()
 	{
-		//m_MessageStartFail = "m_MessageStartFail";
-		//m_MessageStart = "m_MessageStart";
-		m_MessageSuccess = "I've attached the object.";
-		//m_MessageFail = "m_MessageFail";
-		//m_MessageCancel = "m_MessageCancel";
-		
 		m_wheel_hub = -1;
-	}
-
-	override int GetType()
-	{
-		return AT_ATTACH_WHEELS;
 	}
 		
 	override string GetText()

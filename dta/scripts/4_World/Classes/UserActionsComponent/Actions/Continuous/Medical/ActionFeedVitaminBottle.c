@@ -14,9 +14,4 @@ class ActionFeedVitaminBottle: ActionForceConsume
 	{
 		m_CallbackClass = ActionFeedVitaminBottleCB;
 	}
-
-	override int GetType()
-	{
-		return AT_FEED_VITAMIN_BOTTLE;
-	}
 };

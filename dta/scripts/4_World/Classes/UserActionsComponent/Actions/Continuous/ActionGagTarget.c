@@ -3,11 +3,6 @@ class ActionGagTarget: ActionContinuousBase
 	void ActionGagTarget()
 	{
 		m_CallbackClass = ActionCoverHeadTargetCB;
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "Player started putting sack on your head.";
-		m_MessageSuccess = "Player finished putting sack on your head.";
-		m_MessageFail = "Player moved and putting sack on was canceled.";
-		m_MessageCancel = "You stopped putting sack on.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -16,11 +11,6 @@ class ActionGagTarget: ActionContinuousBase
 		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);		
-	}
-
-	override int GetType()
-	{
-		return AT_GAG_TARGET;
 	}
 		
 	override string GetText()

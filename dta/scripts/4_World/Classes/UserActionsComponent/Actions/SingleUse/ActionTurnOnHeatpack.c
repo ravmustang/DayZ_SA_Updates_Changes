@@ -2,14 +2,6 @@ class ActionTurnOnHeatpack : ActionTurnOnWhileInHands
 {
 	void ActionTurnOnHeatpack()
 	{
-		m_MessageSuccess = "I've activated the heatpack.";
-		m_MessageFail = "It's ran out.";
-		//m_Animation = "break";
-	}
-
-	override int GetType()
-	{
-	 	return AT_TURN_ON_HEATPACK;
 	}
 
 	override string GetText()

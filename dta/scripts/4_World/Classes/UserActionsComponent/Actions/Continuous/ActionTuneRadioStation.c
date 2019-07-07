@@ -15,10 +15,6 @@ class ActionTuneRadioStation: ActionContinuousBase
 		m_CallbackClass = ActionTuneRadioStationCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_TUNE;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_TUNE;	
-		m_MessageStartFail = "I've failed to change the radio station.";
-		m_MessageStart = "I've changed the radio station.";
-		m_MessageFail = "I've failed to change the radio station.";
-		m_MessageCancel = "I have stopped the radio tunning.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -31,11 +27,6 @@ class ActionTuneRadioStation: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-
-	override int GetType()
-	{
-		return AT_TUNE_RADIO_STATION;
 	}
 		
 	override string GetText()

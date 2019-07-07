@@ -45,7 +45,12 @@ class ActionSingleUseBase : AnimatedActionBase
 		m_CallbackClass = ActionSingleUseBaseCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
 	}
-	
+
+	override typename GetInputType()
+	{
+		return DefaultActionInput;
+	} 
+
 	override int GetActionCategory()
 	{
 		return AC_SINGLE_USE;

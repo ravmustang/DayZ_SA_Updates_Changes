@@ -10,11 +10,6 @@ class ActionNextCombinationLockDialOnTarget: ActionInteractBase
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.DEFAULT );
 	}
 
-	override int GetType()
-	{
-		return AT_NEXT_COMBINATION_LOCK_DIAL_ON_TARGET;
-	}
-
 	override string GetText()
 	{
 		return "#next_combination_lock_dial";
@@ -55,26 +50,10 @@ class ActionNextCombinationLockDialOnTarget: ActionInteractBase
 		
 		//set next dial
 		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
-		construction_action_data.SetNextCombinationLockDial();
+		CombinationLock combination_lock = construction_action_data.GetCombinationLock();
+		if ( combination_lock )
+		{
+			combination_lock.SetNextDial();
+		}
 	}
-	
-	override void OnStartServer( ActionData action_data )
-	{
-		Fence fence = Fence.Cast( action_data.m_Target.GetObject() );
-		if ( fence )
-		{
-			CombinationLock combination_lock = fence.GetCombinationLock();
-			combination_lock.SoundLockChangeDial();			
-		}
-	}	
-	
-	override void OnStartClient( ActionData action_data )
-	{
-		Fence fence = Fence.Cast( action_data.m_Target.GetObject() );
-		if ( fence )
-		{
-			CombinationLock combination_lock = fence.GetCombinationLock();
-			combination_lock.SoundLockChangeDial();			
-		}
-	}	
 }

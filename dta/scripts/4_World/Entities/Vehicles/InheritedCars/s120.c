@@ -139,12 +139,10 @@ class S120 extends CarScript
 				if ( newValue > 1 )
 					newValue = 1;
 			
-				m_enviroCoef = newValue;
 				return newValue;
 			break;
 		}
 
-		m_enviroCoef = oldValue;
 		return oldValue;
 	}
 	

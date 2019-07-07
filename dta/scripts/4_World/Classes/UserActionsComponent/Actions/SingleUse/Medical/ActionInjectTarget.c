@@ -2,11 +2,6 @@ class ActionInjectTarget: ActionSingleUseBase
 {
 	void ActionInjectTarget()
 	{
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "Player started injecting you.";
-		m_MessageSuccess = "Player finished injecting you.";
-		m_MessageFail = "Player moved and injecting was canceled.";
-		m_MessageCancel = "You stopped injecting.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INJECTIONTARGET;
@@ -18,11 +13,6 @@ class ActionInjectTarget: ActionSingleUseBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_INJECT_T;
 	}
 		
 	override string GetText()

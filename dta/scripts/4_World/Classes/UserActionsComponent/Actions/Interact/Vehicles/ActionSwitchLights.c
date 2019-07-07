@@ -2,7 +2,6 @@ class ActionSwitchLights: ActionInteractBase
 {
 	void ActionSwitchLights()
 	{
-		m_MessageSuccess    = "";
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_HEADLIGHT;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_HUDCursorIcon     = CursorIcons.LootCorpse;
@@ -12,16 +11,21 @@ class ActionSwitchLights: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}	
-	
-	override int GetType()
-	{
-		return AT_VEH_SWITCH_LIGHTS;
 	}
 
 	override string GetText()
 	{
 		return "#switch_lights";
+	}
+
+	override typename GetInputType()
+	{
+		return ToggleLightsActionInput;
+	}
+	
+	override bool HasTarget()
+	{
+		return false;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
@@ -38,7 +42,7 @@ class ActionSwitchLights: ActionInteractBase
 				{
 					if ( car.CrewMemberIndex( player ) == DayZPlayerConstants.VEHICLESEAT_DRIVER )
 					{
-						if ( !car.IsLightsOn() )
+						if ( !car.IsScriptedLightsOn() )
 						{
 							EntityAI neededItem = null;
 
@@ -48,14 +52,6 @@ class ActionSwitchLights: ActionInteractBase
 							if ( !neededItem || (neededItem && neededItem.IsRuined()) )
 								return false;
 							
-							EntityAI item1 = car.FindAttachmentBySlotName("Reflector_1_1");
-							EntityAI item2 = car.FindAttachmentBySlotName("Reflector_2_1");
-			
-							if ( !item1 && !item2 )
-								return false;
-							else if ( item1 && item1.IsRuined() && item2 && item2.IsRuined() )
-								return false;
-
 							return true;
 						}
 						else
@@ -80,12 +76,12 @@ class ActionSwitchLights: ActionInteractBase
 				CarScript car;
 				if ( Class.CastTo(car, trans) )
 				{
-					car.SwitchLights();
+					car.ToggleHeadlights();
 				}
 			}
 		}
 	}
-
+	
 	override bool CanBeUsedInVehicle()
 	{
 		return true;

@@ -10,7 +10,6 @@ class ConstructionActionData
 	
 	//combination lock
 	CombinationLock 			m_CombinationLock;
-	int 						m_DialIndex;
 	
 	//attaching
 	int 						m_SlotId;
@@ -22,7 +21,7 @@ class ConstructionActionData
 	void ConstructionActionData()
 	{
 		m_BuildParts = new ref array<ConstructionPart>;
-		m_DialIndex = 0;
+		m_PartIndex = 0;
 		
 		m_Attachments = new ref array<EntityAI>;
 		m_AttachmentsIndex = 0;
@@ -136,11 +135,6 @@ class ConstructionActionData
 	//************************************************/
 	//  Combination lock
 	//************************************************/	
-	int GetDialIndex()
-	{
-		return m_DialIndex;
-	}
-	
 	CombinationLock GetCombinationLock()
 	{
 		return m_CombinationLock;
@@ -150,40 +144,38 @@ class ConstructionActionData
 	{
 		m_CombinationLock = CombinationLock.Cast( combination_lock );
 	}
-		
-	void SetNextCombinationLockDial()
-	{
-		m_CombinationLock.SetNextDial( m_DialIndex );
-	}
 
 	string GetDialNumberText()
 	{
 		string dial_text;
-		string combination_text = m_CombinationLock.m_Combination.ToString();
 		
-		//insert zeros to dials with 0 value
-		int length_diff = m_CombinationLock.COMBINATION_LENGTH - combination_text.Length();
-		for ( int i = 0; i < length_diff; ++i )
+		if ( m_CombinationLock )
 		{
-			combination_text = "0" + combination_text;
-		}
-		
-		//assemble the whole combination with selected part
-		for ( int j = 0; j < m_CombinationLock.COMBINATION_LENGTH; ++j )
-		{
-			if ( j == m_DialIndex )
+			string combination_text = m_CombinationLock.GetCombination().ToString();
+			
+			//insert zeros to dials with 0 value
+			int length_diff = m_CombinationLock.GetLockDigits() - combination_text.Length();
+			for ( int i = 0; i < length_diff; ++i )
 			{
-				dial_text += string.Format( "[%1]", combination_text.Get( j ) );
+				combination_text = "0" + combination_text;
 			}
-			else
+			
+			//assemble the whole combination with selected part
+			for ( int j = 0; j < m_CombinationLock.GetLockDigits(); ++j )
 			{
-				dial_text += string.Format( " %1 ", combination_text.Get( j ) );
+				if ( j == m_CombinationLock.GetDialIndex() )
+				{
+					dial_text += string.Format( "[%1]", combination_text.Get( j ) );
+				}
+				else
+				{
+					dial_text += string.Format( " %1 ", combination_text.Get( j ) );
+				}
 			}
 		}
-		
+
 		return dial_text;
 	}
-	
 	
 	//************************************************/
 	//  Attach/Detach actions
@@ -328,5 +320,14 @@ class ConstructionActionData
 		}
 
 		return NULL;
+	}
+	
+	//************************************************/
+	//  Common
+	//************************************************/
+	void ResetActionIndexes()
+	{
+		m_PartIndex = 0;
+		m_AttachmentsIndex = 0;
 	}
 }

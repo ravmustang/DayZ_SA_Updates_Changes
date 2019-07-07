@@ -22,11 +22,6 @@ class ActionForceConsume: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 	}
 
-	override int GetType()
-	{
-		return AT_FORCE_CONSUME;
-	}
-
 	override string GetText()
 	{
 		return "#feed";

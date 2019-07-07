@@ -12,11 +12,6 @@ class ActionEatMeat: ActionEat
 	{
 		m_CallbackClass = ActionEatMeatCB;
 	}
-
-	override int GetType()
-	{
-		return AT_EAT_MEAT;
-	}
 			
 	override void ApplyModifiers( ActionData action_data )
 	{

@@ -42,7 +42,7 @@ class BurlapSackCover extends ClothingBase
 		{
 			PlayerBase player;
 			Class.CastTo(player, parent.GetHierarchyRootPlayer());
-			MiscGameplayFunctions.TurnItemIntoItem(ItemBase.Cast( this ), "BurlapSack", player);
+			MiscGameplayFunctions.TurnItemIntoItem(this, "BurlapSack", player);
 		}
 	}
 	

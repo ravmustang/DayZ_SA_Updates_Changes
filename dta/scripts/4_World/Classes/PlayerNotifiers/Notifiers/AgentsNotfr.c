@@ -1,3 +1,4 @@
+/*
 class AgentsNotfr: NotifierBase
 {
 
@@ -38,4 +39,4 @@ class AgentsNotfr: NotifierBase
 		//Debug.Log( "GetObservedValue:" + count.ToString(),"Tendency");
 		return count;
 	}
-};
+};*/

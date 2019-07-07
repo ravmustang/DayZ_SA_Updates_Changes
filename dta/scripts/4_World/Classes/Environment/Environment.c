@@ -12,7 +12,7 @@ class Environment
 	
 	protected float					m_WetDryTick; //ticks passed since last clothing wetting or drying
 	protected float					m_ItemsWetnessMax; //! keeps wetness of most wet item in player's possesion
-	protected float					m_BuildingRCCheckTimer; // keeps info about tick time
+	protected float					m_RoofCheckTimer; // keeps info about tick time
 
 	//player
 	protected PlayerBase 			m_Player;
@@ -33,7 +33,6 @@ class Environment
 	
 	//
 	protected float					m_WaterLevel;
-	protected bool 					m_IsInside;
 	protected bool 					m_IsUnderRoof;
 	protected bool 					m_IsInWater;
 	protected bool					m_IsTempSet;
@@ -60,11 +59,10 @@ class Environment
 		m_Player 				= pPlayer;
 		m_PlayerSpeed			= 0.0;
 		m_WetDryTick			= 0.0;
-		m_BuildingRCCheckTimer	= 0.0;
+		m_RoofCheckTimer		= 0.0;
 		m_WaterLevel			= 0.0;
 		m_HeatComfort			= 0.0;
 		
-		m_IsInside				= false;
 		m_IsUnderRoof			= false;
 		m_IsInWater				= false;
 
@@ -142,23 +140,24 @@ class Environment
 	{
 		if (m_Player)
 		{
-			m_BuildingRCCheckTimer += pDelta;
+			m_RoofCheckTimer += pDelta;
 			//! check if player is under roof (only if the Building check is false)
-			if (m_BuildingRCCheckTimer >= ENVIRO_TICK_ROOF_RC_CHECK && !IsInsideBuilding())
+			if (m_RoofCheckTimer >= GameConstants.ENVIRO_TICK_ROOF_RC_CHECK && !IsInsideBuilding())
 			{
 				CheckUnderRoof();
-				m_BuildingRCCheckTimer = 0;
+				m_RoofCheckTimer = 0;
 			}
 
 			m_Time += pDelta;
-			if ( m_Time >= ENVIRO_TICK_RATE )
+			if ( m_Time >= GameConstants.ENVIRO_TICK_RATE )
 			{
 				m_Time = 0;
 				m_WetDryTick++; // Sets whether it is time to add wetness to items and clothing
+				
+				//Print(IsInsideBuilding().ToString());
 
 				//! Updates data
 				CheckWaterContact(m_WaterLevel);
-				CheckInsideBuilding();
 				CollectAndSetPlayerData();
 				CollectAndSetEnvironmentData();
 				
@@ -166,13 +165,13 @@ class Environment
 				ProcessItemsHeat();
 
 				//! Process item wetness/dryness
-				if ( m_WetDryTick >= ENVIRO_TICKS_TO_WETNESS_CALCULATION )
+				if ( m_WetDryTick >= GameConstants.ENVIRO_TICKS_TO_WETNESS_CALCULATION )
 				{
-					if (IsWaterContact())
+					if( IsWaterContact() )
 					{
 						ProcessWetnessByWaterLevel(m_WaterLevel);
 					}
-					else if (IsRaining() && !IsInsideBuilding() && !IsUnderRoof())
+					else if( IsRaining() && !IsInsideBuilding() && !IsUnderRoof() && !IsInsideVehicle() )
 					{
 						ProcessWetnessByRain();
 					}
@@ -182,11 +181,11 @@ class Environment
 					}
 
 					//! setting of wetness/dryiness of player
-					if (m_ItemsWetnessMax <= STATE_DAMP && m_Player.GetStatWet().Get() == 1)
+					if( m_ItemsWetnessMax <= GameConstants.STATE_DAMP && m_Player.GetStatWet().Get() == 1 )
 					{
 						m_Player.GetStatWet().Set(0);
 					}
-					else if (m_ItemsWetnessMax > STATE_DAMP && m_Player.GetStatWet().Get() == 0)
+					else if( m_ItemsWetnessMax > GameConstants.STATE_DAMP && m_Player.GetStatWet().Get() == 0 )
 					{
 						m_Player.GetStatWet().Set(1);
 					}
@@ -213,7 +212,7 @@ class Environment
 	//! Returns heat player generated based on player's movement speed (for now)
 	protected float GetPlayerHeat()
 	{
-		float heat = Math.Max(m_PlayerSpeed * ENVIRO_DEFAULT_ENTITY_HEAT, ENVIRO_DEFAULT_ENTITY_HEAT);
+		float heat = Math.Max(m_PlayerSpeed * GameConstants.ENVIRO_DEFAULT_ENTITY_HEAT, GameConstants.ENVIRO_DEFAULT_ENTITY_HEAT);
 		return heat;
 	}
 	
@@ -229,7 +228,12 @@ class Environment
 	
 	protected bool IsInsideBuilding()
 	{
-		return m_IsInside;
+		return m_Player && m_Player.IsSoundInsideBuilding();
+	}
+
+	protected bool IsInsideVehicle()
+	{
+		return m_Player && m_Player.IsInVehicle();
 	}
 	
 	protected bool IsRaining()
@@ -276,17 +280,6 @@ class Environment
 		m_Player.SetInWater(m_IsInWater);
 	}
 	
-	protected void CheckInsideBuilding()
-	{
-		if (m_Player.IsSoundInsideBuilding() > 0)
-		{
-			m_IsInside = true;
-			return;
-		}
-
-		m_IsInside = false;
-	}
-
 	// Calculates item heat isolation based on its wetness
 	float GetCurrentItemHeatIsolation(ItemBase pItem)
 	{
@@ -298,44 +291,44 @@ class Environment
 		float itemWetness = pItem.GetWet();					//! item wetness
 		
 		//! wet factor selection
-		if ( itemWetness >= STATE_DRY && itemWetness < STATE_DAMP )
+		if ( itemWetness >= GameConstants.STATE_DRY && itemWetness < GameConstants.STATE_DAMP )
 		{
-			wetFactor = ENVIRO_ISOLATION_WETFACTOR_DRY;
+			wetFactor = GameConstants.ENVIRO_ISOLATION_WETFACTOR_DRY;
 		}
-		else if ( itemWetness >= STATE_DAMP && itemWetness < STATE_WET )
+		else if ( itemWetness >= GameConstants.STATE_DAMP && itemWetness < GameConstants.STATE_WET )
 		{
-			wetFactor = ENVIRO_ISOLATION_WETFACTOR_DAMP;
+			wetFactor = GameConstants.ENVIRO_ISOLATION_WETFACTOR_DAMP;
 		}
-		else if ( itemWetness >= STATE_WET && itemWetness < STATE_SOAKING_WET )
+		else if ( itemWetness >= GameConstants.STATE_WET && itemWetness < GameConstants.STATE_SOAKING_WET )
 		{
-			wetFactor = ENVIRO_ISOLATION_WETFACTOR_WET;
+			wetFactor = GameConstants.ENVIRO_ISOLATION_WETFACTOR_WET;
 		}
-		else if ( itemWetness >= STATE_SOAKING_WET && itemWetness < STATE_DRENCHED )
+		else if ( itemWetness >= GameConstants.STATE_SOAKING_WET && itemWetness < GameConstants.STATE_DRENCHED )
 		{
-			wetFactor = ENVIRO_ISOLATION_WETFACTOR_SOAKED;
+			wetFactor = GameConstants.ENVIRO_ISOLATION_WETFACTOR_SOAKED;
 		}
-		else if ( itemWetness >= STATE_DRENCHED )
+		else if ( itemWetness >= GameConstants.STATE_DRENCHED )
 		{
-			wetFactor = ENVIRO_ISOLATION_WETFACTOR_DRENCHED;
+			wetFactor = GameConstants.ENVIRO_ISOLATION_WETFACTOR_DRENCHED;
 		}
 		
 		//! health factor selection
 		switch (itemHealthLabel)
 		{
-		case STATE_PRISTINE:
-			healthFactor = ENVIRO_ISOLATION_HEALTHFACTOR_PRISTINE;
+		case GameConstants.STATE_PRISTINE:
+			healthFactor = GameConstants.ENVIRO_ISOLATION_HEALTHFACTOR_PRISTINE;
 		break;
-		case STATE_WORN:
-			healthFactor = ENVIRO_ISOLATION_HEALTHFACTOR_WORN;
+		case GameConstants.STATE_WORN:
+			healthFactor = GameConstants.ENVIRO_ISOLATION_HEALTHFACTOR_WORN;
 		break;
-		case STATE_DAMAGED:
-			healthFactor = ENVIRO_ISOLATION_HEALTHFACTOR_DAMAGED;
+		case GameConstants.STATE_DAMAGED:
+			healthFactor = GameConstants.ENVIRO_ISOLATION_HEALTHFACTOR_DAMAGED;
 		break;
-		case STATE_BADLY_DAMAGED:
-			healthFactor = ENVIRO_ISOLATION_HEALTHFACTOR_B_DAMAGED;
+		case GameConstants.STATE_BADLY_DAMAGED:
+			healthFactor = GameConstants.ENVIRO_ISOLATION_HEALTHFACTOR_B_DAMAGED;
 		break;
-		case STATE_RUINED:
-			healthFactor = ENVIRO_ISOLATION_HEALTHFACTOR_RUINED;
+		case GameConstants.STATE_RUINED:
+			healthFactor = GameConstants.ENVIRO_ISOLATION_HEALTHFACTOR_RUINED;
 		break;
 		}
 		
@@ -355,20 +348,20 @@ class Environment
 		//! health factor selection
 		switch (itemHealthLabel)
 		{
-		case STATE_PRISTINE:
-			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_PRISTINE;
+		case GameConstants.STATE_PRISTINE:
+			healthFactor = GameConstants.ENVIRO_ABSORBENCY_HEALTHFACTOR_PRISTINE;
 		break;
-		case STATE_WORN:
-			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_WORN;
+		case GameConstants.STATE_WORN:
+			healthFactor = GameConstants.ENVIRO_ABSORBENCY_HEALTHFACTOR_WORN;
 		break;
-		case STATE_DAMAGED:
-			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_DAMAGED;
+		case GameConstants.STATE_DAMAGED:
+			healthFactor = GameConstants.ENVIRO_ABSORBENCY_HEALTHFACTOR_DAMAGED;
 		break;
-		case STATE_BADLY_DAMAGED:
-			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_B_DAMAGED;
+		case GameConstants.STATE_BADLY_DAMAGED:
+			healthFactor = GameConstants.ENVIRO_ABSORBENCY_HEALTHFACTOR_B_DAMAGED;
 		break;
-		case STATE_RUINED:
-			healthFactor = ENVIRO_ABSORBENCY_HEALTHFACTOR_RUINED;
+		case GameConstants.STATE_RUINED:
+			healthFactor = GameConstants.ENVIRO_ABSORBENCY_HEALTHFACTOR_RUINED;
 		break;
 		}
 
@@ -382,7 +375,7 @@ class Environment
 	// Returns amount of ?C air temperature should be lowered by, based on player's height above water level
 	protected float GetTemperatureHeightCorrection()
 	{
-		float temperature_reduction = Math.Max(0, (m_PlayerHeightPos * ENVIRO_TEMPERATURE_HEIGHT_REDUCTION));
+		float temperature_reduction = Math.Max(0, (m_PlayerHeightPos * GameConstants.ENVIRO_TEMPERATURE_HEIGHT_REDUCTION));
 		return temperature_reduction;
 	}
 	
@@ -396,7 +389,8 @@ class Environment
 	{
 		float temperature;
 
-		if ( m_NightTemp < m_DayTemp )
+		//! day or night
+		if( m_NightTemp < m_DayTemp )
 		{
 			temperature = m_NightTemp + ((m_DayTemp - m_NightTemp) * m_DayOrNight);
 		}
@@ -405,23 +399,23 @@ class Environment
 			temperature = m_DayTemp + ((m_NightTemp - m_DayTemp) * m_DayOrNight);
 		}
 		
-		if ( IsWaterContact() ) 
+		if( IsWaterContact() ) 
 		{
-			temperature = temperature * ENVIRO_WATER_TEMPERATURE_COEF;
+			temperature = temperature * GameConstants.ENVIRO_WATER_TEMPERATURE_COEF;
 		}
 		
-		if ( IsInsideBuilding() )
+		if( IsInsideBuilding() )
 		{
-			temperature = temperature * ENVIRO_TEMPERATURE_INSIDE_COEF;
+			temperature = temperature * GameConstants.ENVIRO_TEMPERATURE_INSIDE_COEF;
 		}
 		
-		if ( IsUnderRoof() )
+		if( IsUnderRoof() )
 		{
-			temperature = temperature * ENVIRO_TEMPERATURE_UNDERROOF_COEF;
+			temperature = temperature * GameConstants.ENVIRO_TEMPERATURE_UNDERROOF_COEF;
 		}
 
-		float fog_effect  = m_Fog * ENVIRO_FOG_TEMP_EFFECT;
-		float clouds_effect = m_Clouds * ENVIRO_CLOUDS_TEMP_EFFECT;
+		float fog_effect  = m_Fog * GameConstants.ENVIRO_FOG_TEMP_EFFECT;
+		float clouds_effect = m_Clouds * GameConstants.ENVIRO_CLOUDS_TEMP_EFFECT;
 		//float wind_effect = m_Wind * 0.01;
 		//float combined_effect = clouds_effect + fog_effect + wind_effect;
 		float combined_effect = clouds_effect + fog_effect;
@@ -465,16 +459,16 @@ class Environment
 		else if ( IsRaining() && !IsInsideBuilding() && !IsUnderRoof() )
 		{
 			//! player is getting wet from rain
-			wet_delta = ENVIRO_WET_INCREMENT * ENVIRO_TICKS_TO_WETNESS_CALCULATION * (1+(ENVIRO_WIND_EFFECT*m_Wind)) * ( m_Rain );
+			wet_delta = GameConstants.ENVIRO_WET_INCREMENT * GameConstants.ENVIRO_TICKS_TO_WETNESS_CALCULATION * (1+(GameConstants.ENVIRO_WIND_EFFECT*m_Wind)) * ( m_Rain );
 		}
 		else
 		{
 			//! player is drying
-			float sun_effect = (ENVIRO_SUN_INCREMENT * m_DayOrNight * (1-m_Fog))*(1-(m_Clouds*ENVIRO_CLOUD_DRY_EFFECT));
+			float sun_effect = (GameConstants.ENVIRO_SUN_INCREMENT * m_DayOrNight * (1-m_Fog))*(1-(m_Clouds*GameConstants.ENVIRO_CLOUD_DRY_EFFECT));
 			float temp_effect = Math.Sqrt(m_PlayerHeat + GetEnvironmentTemperature());
 			//! Coef should be higher than 0 (Sqrt is none for x < 0)
 			if (temp_effect <= 0) { temp_effect = 1; }
-			wet_delta = -( ENVIRO_DRY_INCREMENT * ( temp_effect + sun_effect ) * ( 1 + ( ENVIRO_WIND_EFFECT * m_Wind ) ) );
+			wet_delta = -( GameConstants.ENVIRO_DRY_INCREMENT * ( temp_effect + sun_effect ) * ( 1 + ( GameConstants.ENVIRO_WIND_EFFECT * m_Wind ) ) );
 		}
 
 		return wet_delta;
@@ -501,7 +495,7 @@ class Environment
 		Weather weather = g_Game.GetWeather();
 
 		m_Rain = weather.GetRain().GetActual();
-		m_DayOrNight = (-1 * Math.AbsFloat( ( 1 - ( g_Game.GetDayTime() / ENVIRO_HIGH_NOON ) ) ) ) + 1;
+		m_DayOrNight = (-1 * Math.AbsFloat( ( 1 - ( g_Game.GetDayTime() / GameConstants.ENVIRO_HIGH_NOON ) ) ) ) + 1;
 		m_Fog = weather.GetFog().GetActual();
 		m_Clouds =	weather.GetOvercast().GetActual();
 		m_Wind = weather.GetWindSpeed();
@@ -626,7 +620,7 @@ class Environment
 					ItemBase inItem;
 					if ( Class.CastTo(inItem, pItem.GetInventory().GetCargo().GetItem(i)) )
 					{
-						inItem.AddWet(GetWetDelta() * GetCurrentItemWetAbsorbency(inItem) * ENVIRO_WET_PASSTHROUGH_COEF);
+						inItem.AddWet(GetWetDelta() * GetCurrentItemWetAbsorbency(inItem) * GameConstants.ENVIRO_WET_PASSTHROUGH_COEF);
 						//Print("processing wetness for (inside)" + inItem.GetDisplayName());
 					}
 				}
@@ -657,7 +651,7 @@ class Environment
 					{
 						if (inItem.GetWet() > inItem.GetWetMin())
 						{
-							inItem.AddWet(GetWetDelta() * ENVIRO_WET_PASSTHROUGH_COEF);
+							inItem.AddWet(GetWetDelta() * GameConstants.ENVIRO_WET_PASSTHROUGH_COEF);
 							//Print("drying for (inside)" + inItem.GetDisplayName());
 						}
 					}
@@ -676,16 +670,25 @@ class Environment
 		float heatComfortAvg;
 		float heatAvg;
 
-		BodyPartHeatProperties(m_HeadParts, ENVIRO_HEATCOMFORT_HEADPARTS_WEIGHT, hcHead, hHead);
-		BodyPartHeatProperties(m_BodyParts, ENVIRO_HEATCOMFORT_BODYPARTS_WEIGHT, hcBody, hBody);
-		BodyPartHeatProperties(m_FeetParts, ENVIRO_HEATCOMFORT_FEETPARTS_WEIGHT, hcFeet, hFeet);
+		BodyPartHeatProperties(m_HeadParts, GameConstants.ENVIRO_HEATCOMFORT_HEADPARTS_WEIGHT, hcHead, hHead);
+		BodyPartHeatProperties(m_BodyParts, GameConstants.ENVIRO_HEATCOMFORT_BODYPARTS_WEIGHT, hcBody, hBody);
+		BodyPartHeatProperties(m_FeetParts, GameConstants.ENVIRO_HEATCOMFORT_FEETPARTS_WEIGHT, hcFeet, hFeet);
 
 		heatComfortAvg = (hcHead + hcBody + hcFeet) / 3;
 		heatAvg = (hHead + hBody + hFeet) / 3;
 		
-		heatAvg = heatAvg * ENVIRO_ITEM_HEAT_TRANSFER_COEF;
-		m_HeatComfort = (heatComfortAvg + heatAvg + (GetPlayerHeat()/100)) + EnvTempToCoef(m_EnvironmentTemperature);
-		m_HeatComfort = Math.Clamp(m_HeatComfort, m_Player.GetStatHeatComfort().GetMin(), m_Player.GetStatHeatComfort().GetMax());
+		heatAvg = heatAvg * GameConstants.ENVIRO_ITEM_HEAT_TRANSFER_COEF;
+		float overridenHeatComfort = 0.0;
+		if( OverridenHeatComfort(overridenHeatComfort) )
+		{
+			m_HeatComfort = overridenHeatComfort;
+		}
+		else
+		{
+			m_HeatComfort = (heatComfortAvg + heatAvg + (GetPlayerHeat()/100)) + EnvTempToCoef(m_EnvironmentTemperature);
+			m_HeatComfort = Math.Clamp(m_HeatComfort, m_Player.GetStatHeatComfort().GetMin(), m_Player.GetStatHeatComfort().GetMax());
+		}
+		
 		m_Player.GetStatHeatComfort().Set(m_HeatComfort);
 
 		/*		
@@ -693,7 +696,7 @@ class Environment
 		{
 			DbgUI.BeginCleanupScope();
 			DbgUI.Begin("New HeatComfort debug", 300, 100);
-			DbgUI.Text("Heat comfort: " + m_HeatComfort.ToString());
+			DbgUI.Text("Heat comfort: " + m_Heat.ToString());
 			DbgUI.Text("HeatComfort raw (avg): " + heatComfortAvg.ToString());
 			DbgUI.Text("Heat raw (avg): " + heatAvg.ToString());
 			DbgUI.Text("TempToCoef: " + EnvTempToCoef(m_EnvironmentTemperature).ToString());
@@ -703,15 +706,34 @@ class Environment
 		*/
 	}
 	
+	protected bool OverridenHeatComfort(out float value)
+	{
+		if( IsInsideVehicle() )
+		{
+			if( m_Player.GetCommand_Vehicle() )
+			{
+				CarScript cs = CarScript.Cast(m_Player.GetCommand_Vehicle().GetTransport());
+				if( cs )
+				{
+					value = cs.GetEnviroHeatComfortOverride();
+				}
+			
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	protected float EnvTempToCoef(float pTemp)
 	{
-		if (pTemp >= ENVIRO_HIGH_TEMP_LIMIT)
+		if (pTemp >= GameConstants.ENVIRO_HIGH_TEMP_LIMIT)
 			return 1;
 		
-		if (pTemp <= ENVIRO_LOW_TEMP_LIMIT)
+		if (pTemp <= GameConstants.ENVIRO_LOW_TEMP_LIMIT)
 			return -1;
 		
-		float result = (pTemp - ENVIRO_PLAYER_COMFORT_TEMP) / 100;
+		float result = (pTemp - GameConstants.ENVIRO_PLAYER_COMFORT_TEMP) / 100;
 		
 		return result;
 	}
@@ -782,9 +804,12 @@ class Environment
 		{
 			//DbgUI.Text("Temperature: " + m_PlayerTemperature.ToString());
 			DbgUI.Text("Heat comfort: " + m_HeatComfort.ToString());
-			DbgUI.Text("Inside: " + m_IsInside.ToString() + " ("+m_Player.GetSurfaceType()+")");
+			DbgUI.Text("Inside: " + IsInsideBuilding().ToString() + " ("+m_Player.GetSurfaceType()+")");
 			DbgUI.Text("Under roof: " + m_IsUnderRoof.ToString());
-			DbgUI.Text("Water Level: " + m_WaterLevel);
+			if( IsWaterContact() && m_WaterLevel > WATER_LEVEL_NONE )
+			{
+				DbgUI.Text("Water Level: " + m_WaterLevel);
+			}
 			
 		}
 		DbgUI.End();

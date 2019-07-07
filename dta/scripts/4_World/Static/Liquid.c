@@ -1,5 +1,34 @@
 class Liquid
 {
+	static ref map<int, ref NutritionalProfile> m_AllLiquidsByType = new map<int, ref NutritionalProfile>;
+	static ref map<string, ref NutritionalProfile> m_AllLiquidsByName = new map<string, ref NutritionalProfile>;
+	
+	static bool m_Init = InitAllLiquids();
+	
+	static string GetLiquidClassname(int liquid_type)
+	{
+			return m_AllLiquidsByType.Get(liquid_type).GetLiquidClassname();
+	}
+	
+	static bool InitAllLiquids()
+	{
+		string cfg_classname = "cfgLiquidDefinitions";
+		string property_value = "NULL_PROPERTY";
+		int cfg_item_count = g_Game.ConfigGetChildrenCount(cfg_classname);
+
+		for ( int i = 0; i < cfg_item_count; i++ )
+		{
+			string liquid_class_name;
+			GetGame().ConfigGetChildName(cfg_classname, i, liquid_class_name);
+			string liquid_full_path = cfg_classname + " " + liquid_class_name;
+			int config_liquid_type = GetGame().ConfigGetInt(liquid_full_path + " " + "type");
+			m_AllLiquidsByType.Insert(config_liquid_type, SetUpNutritionalProfile(config_liquid_type, liquid_class_name));
+			m_AllLiquidsByName.Insert(liquid_class_name, SetUpNutritionalProfile(config_liquid_type, liquid_class_name));
+			
+		}
+		return true;
+	}
+	
 	//---------------------------------------------------------------------------------------------------------
 	static void Transfer(ItemBase source_ent, ItemBase target_ent, float quantity = -1)
 	{
@@ -169,17 +198,34 @@ class Liquid
 		}
 		return property_value;
 	}
-
-	static NutritionalProfile GetNutritionalProfile(int liquid_type)
+	
+	static NutritionalProfile GetNutritionalProfileByType(int liquid_type)
+	{
+		return m_AllLiquidsByType.Get(liquid_type);
+	}
+	
+	static NutritionalProfile GetNutritionalProfileByName(string class_name)
+	{
+		return m_AllLiquidsByName.Get(class_name);
+	}
+	
+	static NutritionalProfile SetUpNutritionalProfile(int liquid_type, string liquid_class_name)
 	{
 		float energy = GetEnergy(liquid_type);
 		float nutritional_index = GetNutritionalIndex(liquid_type);
 		float volume = GetFullness(liquid_type);
 		float water_content = GetWaterContent(liquid_type);
 		float toxicity = GetToxicity(liquid_type);
-		NutritionalProfile profile = new NutritionalProfile(energy, water_content, nutritional_index, volume, toxicity );
-		profile.MarkAsLiquid();
+		int agents = GetAgents(liquid_type);
+		float digest = GetDigestibility(liquid_type);
+		NutritionalProfile profile = new NutritionalProfile(energy, water_content, nutritional_index, volume, toxicity, agents, digest );
+		profile.MarkAsLiquid(liquid_type, liquid_class_name);
 		return profile;
+	}
+	
+	static int GetAgents(int liquid_type)
+	{
+		return Liquid.GetLiquidConfigProperty(liquid_type, "agents", true).ToInt();
 	}
 	
 	static float GetToxicity(int liquid_type)
@@ -215,6 +261,11 @@ class Liquid
 	static float GetFullness(int liquid_type)
 	{
 		return Liquid.GetLiquidConfigProperty(liquid_type, "fullnessIndex", true).ToFloat();
+	}
+	
+	static float GetDigestibility(int liquid_type)
+	{
+		return Liquid.GetLiquidConfigProperty(liquid_type, "digestibility", true).ToFloat();
 	}
 	
 };

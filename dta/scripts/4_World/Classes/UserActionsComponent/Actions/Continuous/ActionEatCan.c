@@ -13,11 +13,6 @@ class ActionEatCan: ActionEat
 	{
 		m_CallbackClass = ActionEatCanCB;
 	}
-
-	override int GetType()
-	{
-		return AT_EAT_CAN;
-	}
 		
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	

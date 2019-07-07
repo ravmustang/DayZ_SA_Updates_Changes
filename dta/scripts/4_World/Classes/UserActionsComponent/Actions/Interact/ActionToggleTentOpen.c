@@ -2,8 +2,6 @@ class ActionToggleTentOpen: ActionInteractBase
 {
 	void ActionToggleTentOpen()
 	{
-		m_MessageSuccess = "I've performed action.";
-		m_MessageFail = "I cannot perform action.";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 	}
 
@@ -11,11 +9,6 @@ class ActionToggleTentOpen: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTParent(10);
-	}
-
-	override int GetType()
-	{
-		return AT_TOGGLE_TENT_OPEN;
 	}
 
 	override string GetText()
@@ -91,7 +84,8 @@ class ActionToggleTentOpen: ActionInteractBase
 			if ( tent.CanAffectPathgraph() )
 			{
 				//Start update
-				GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(GetGame().UpdatePathgraphRegionByObject, 100, false, tent);
+				tent.RegenerateNavmesh();
+
 			}
 		}
 	}

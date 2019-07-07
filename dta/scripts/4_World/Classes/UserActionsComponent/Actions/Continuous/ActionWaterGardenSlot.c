@@ -15,11 +15,6 @@ class ActionWaterGardenSlot: ActionContinuousBase
 		m_CallbackClass = ActionWaterGardenSlotCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		m_FullBody = true;
-		m_MessageSuccess = "I've watered slot.";
-		m_MessageStartFail = "There's not enough fertilizer.";
-		m_MessageStart = "I've started fertilizing.";
-		m_MessageFail = "There's not enough fertilizer.";
-		m_MessageCancel = "I stoped fertilizing.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -27,11 +22,6 @@ class ActionWaterGardenSlot: ActionContinuousBase
 	{
 		m_ConditionTarget = new CCTDummy;
 		m_ConditionItem = new CCINonRuined;
-	}
-	
-	override int GetType()
-	{
-		return AT_WATER_GARDEN_SLOT;
 	}
 	
 	override string GetText()

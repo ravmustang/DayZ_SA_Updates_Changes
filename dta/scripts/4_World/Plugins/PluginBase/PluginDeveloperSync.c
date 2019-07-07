@@ -5,6 +5,7 @@ class PluginDeveloperSync extends PluginBase
 	ref array<PlayerBase> m_RegisteredPlayers;
 	
 	ref array<ref SyncedValue> m_PlayerStatsSynced;
+	ref array<ref Param> m_PlayerStomachSynced;
 	ref array<ref SyncedValueLevel> m_PlayerLevelsSynced;
 	ref array<ref SyncedValueModifier> m_PlayerModsSynced;
 	string 	m_PlayerModsDetailedSynced;
@@ -14,6 +15,7 @@ class PluginDeveloperSync extends PluginBase
 	bool m_LevelsUpdateStatus;
 	bool m_ModsUpdateStatus;
 	bool m_AgentsUpdateStatus;
+	bool m_StomachUpdateStatus;
 	
 	void PluginDeveloperSync()
 	{
@@ -22,11 +24,13 @@ class PluginDeveloperSync extends PluginBase
 		m_PlayerLevelsSynced 	= new array<ref SyncedValueLevel>;
 		m_PlayerModsSynced 		= new array<ref SyncedValueModifier>;
 		m_PlayerAgentsSynced 	= new array<ref SyncedValueAgent>;
+		m_PlayerStomachSynced 	= new array<ref Param>;
 		
 		m_StatsUpdateStatus 	= false;
 		m_LevelsUpdateStatus 	= false;
 		m_ModsUpdateStatus 		= false;
 		m_AgentsUpdateStatus 	= false;
+		m_StomachUpdateStatus 	= false;
 	}
 	
 	//================================================================
@@ -71,6 +75,12 @@ class PluginDeveloperSync extends PluginBase
 			{
 				m_AgentsUpdateStatus = state; 
 				break;	
+			}	
+			
+			case ERPCs.DEV_STOMACH_UPDATE: 
+			{
+				m_StomachUpdateStatus = state; 
+				break;	
 			}
 		}	
 		if ( m_UpdateTimer )
@@ -79,7 +89,7 @@ class PluginDeveloperSync extends PluginBase
 			{
 				//Print("ToggleUpdate() - RUN");
 				
-				if ( m_StatsUpdateStatus || m_ModsUpdateStatus || m_AgentsUpdateStatus || m_LevelsUpdateStatus )
+				if ( m_StatsUpdateStatus || m_ModsUpdateStatus || m_AgentsUpdateStatus || m_LevelsUpdateStatus || m_StomachUpdateStatus )
 				{
 					m_UpdateTimer.Run( 1, this, "Update", NULL, true );
 					
@@ -89,7 +99,7 @@ class PluginDeveloperSync extends PluginBase
 			{
 				//Print("ToggleUpdate() - STOP");
 				
-				if ( !m_StatsUpdateStatus && !m_ModsUpdateStatus && !m_AgentsUpdateStatus && !m_LevelsUpdateStatus)
+				if ( !m_StatsUpdateStatus && !m_ModsUpdateStatus && !m_AgentsUpdateStatus && !m_LevelsUpdateStatus && !m_StomachUpdateStatus)
 				{
 					m_UpdateTimer.Stop();
 				
@@ -186,6 +196,22 @@ class PluginDeveloperSync extends PluginBase
 					}
 				}
 			}
+		}		
+		
+		//Agents
+		if ( m_StomachUpdateStatus )
+		{
+			//Multiplayer server
+			if ( !GetDayZGame().IsMultiplayer() || GetDayZGame().IsServer() )
+			{
+				for ( int l = 0; l < m_RegisteredPlayers.Count(); l++ )
+				{
+					if ( m_RegisteredPlayers.Get( l ) )
+					{
+						SendRPCStomach( m_RegisteredPlayers.Get( l ) );		
+					}
+				}
+			}
 		}
 	}
 	
@@ -248,6 +274,11 @@ class PluginDeveloperSync extends PluginBase
 				EnableUpdate( GetRPCUpdateState( ctx ), ERPCs.DEV_AGENTS_UPDATE, player ); break;
 			}
 			
+			case ERPCs.DEV_STOMACH_UPDATE:
+			{
+				EnableUpdate( GetRPCUpdateState( ctx ), ERPCs.DEV_STOMACH_UPDATE, player ); break;
+			}
+			
 			case ERPCs.DEV_RPC_STATS_DATA:
 			{
 				OnRPCStats( ctx ); break;
@@ -271,6 +302,10 @@ class PluginDeveloperSync extends PluginBase
 			case ERPCs.DEV_RPC_AGENTS_DATA:
 			{
 				OnRPCAgents( ctx ); break;
+			}		
+			case ERPCs.DEV_RPC_STOMACH_DATA:
+			{
+				OnRPCStomach( ctx ); break;
 			}
 			
 			case ERPCs.DEV_RPC_MODS_ACTIVATE:
@@ -694,6 +729,53 @@ class PluginDeveloperSync extends PluginBase
 		{
 			ctx.Read(p3);
 			m_PlayerAgentsSynced.Insert( new SyncedValueAgent( p3.param1, p3.param2, p3.param3 ) );
+		}
+	}
+	
+	//============================================
+	// STOMACH
+	//============================================	
+
+	void SendRPCStomach( PlayerBase player )
+	{
+		//write and send values
+		if ( player )
+		{
+			
+			array<ref Param> stomach = new array<ref Param>;
+			int count = player.m_PlayerStomach.GetDebugObject( stomach );
+			stomach.InsertAt(new Param1<int>(count), 0);
+		
+			GetDayZGame().RPC( player, ERPCs.DEV_RPC_STOMACH_DATA, stomach, true, player.GetIdentity() );
+		}
+	}
+
+
+	void OnRPCStomach( ParamsReadContext ctx )
+	{
+		//clear values
+		m_PlayerStomachSynced.Clear();
+		
+		Param1<int> p1 = new Param1<int>(0);
+		int param_count = 0;
+		if ( ctx.Read(p1) )
+		{
+			param_count = p1.param1;
+		}
+		
+		if(param_count)
+		{
+			//invidividual stomach items
+			for ( int i = 0; i < param_count; i++ )
+			{
+				Param4<int,int,int,float> p4 = new Param4<int,int,int,float>(0,0,0,0);
+				ctx.Read(p4);
+				m_PlayerStomachSynced.Insert(p4);
+			}
+			//volume
+			Param1<float> p1b = new Param1<float>(0);
+			ctx.Read(p1b);
+			m_PlayerStomachSynced.Insert(p1b);
 		}
 	}
 

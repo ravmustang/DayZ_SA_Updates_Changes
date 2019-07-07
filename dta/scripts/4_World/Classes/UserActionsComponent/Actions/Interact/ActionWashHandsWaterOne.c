@@ -15,11 +15,6 @@ class ActionWashHandsWaterOne extends ActionInteractLoopBase
 		m_FullBody			= true;
 		m_StanceMask		= DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
-	
-	override int GetType()
-	{
-		return AT_WASH_HANDS_WATER_ONE;
-	}
 
 	override string GetText()
 	{

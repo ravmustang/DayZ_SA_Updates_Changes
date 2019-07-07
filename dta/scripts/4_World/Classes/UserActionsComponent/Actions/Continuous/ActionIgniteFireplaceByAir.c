@@ -6,10 +6,6 @@ class ActionIgniteFireplaceByAir: ActionIgniteFireplace
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_BLOWFIREPLACE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-		m_MessageStart = "I have started fire by blowing air into fireplace.";
-		m_MessageSuccess = "I have started fire by blowing air into fireplace.";
-		m_MessageFail = "I have failed to start fire by blowing air into fireplace.";
-		m_MessageCancel = "I have stopped blowing air into fireplace.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;	
 	}
 
@@ -17,16 +13,16 @@ class ActionIgniteFireplaceByAir: ActionIgniteFireplace
 	{	
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.DEFAULT );
 		m_ConditionItem = new CCINotPresent;
-	}	
-	
-	override int GetType()
-	{
-		return AT_IGNITE_FIREPLACE_BY_AIR;
 	}
 
 	override string GetText()
 	{
 		return "#blow_air_into_fireplace";
+	}
+
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
 	}
 		
 	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )

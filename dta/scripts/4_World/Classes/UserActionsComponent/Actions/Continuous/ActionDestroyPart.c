@@ -23,11 +23,6 @@ class ActionDestroyPart: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.BASEBUILDING );
 	}
-
-	override int GetType()
-	{
-		return AT_DESTROY_PART;
-	}
 		
 	override string GetText()
 	{
@@ -48,14 +43,43 @@ class ActionDestroyPart: ActionContinuousBase
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
+		return DestroyCondition( player, target, item, true );
+	}
+	
+	override bool ActionConditionContinue( ActionData action_data )
+	{	
+		return DestroyCondition( action_data.m_Player, action_data.m_Target, action_data.m_MainItem , false );
+	}	
+	
+	override void OnFinishProgressServer( ActionData action_data )
+	{	
+		BaseBuildingBase base_building = BaseBuildingBase.Cast( action_data.m_Target.GetObject() );
+		Construction construction = base_building.GetConstruction();
+		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
+		ConstructionPart construction_part = construction_action_data.GetTargetPart();
+		
+		if ( construction.CanDestroyPart( construction_part.GetPartName() ) )
+		{
+			//build
+			construction.DestroyPartServer( action_data.m_Player, construction_part.GetPartName(), AT_DESTROY_PART );
+			
+			//add damage to tool
+			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DESTROY, false );
+		}
+
+		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+	}
+	
+	protected bool DestroyCondition( PlayerBase player, ActionTarget target, ItemBase item, bool camera_check )
+	{	
 		if ( player && !player.IsLeaning() )
 		{
-			Object targetObject = target.GetObject();
-			if ( targetObject && targetObject.CanUseConstruction() )
+			Object target_object = target.GetObject();
+			if ( target_object && target_object.CanUseConstruction() )
 			{
-				string part_name = targetObject.GetActionComponentName( target.GetComponentIndex() );
+				string part_name = target_object.GetActionComponentName( target.GetComponentIndex() );
 				
-				BaseBuildingBase base_building = BaseBuildingBase.Cast( targetObject );
+				BaseBuildingBase base_building = BaseBuildingBase.Cast( target_object );
 				Construction construction = base_building.GetConstruction();		
 				ConstructionPart construction_part = construction.GetConstructionPartToDestroy( part_name );
 				
@@ -65,11 +89,14 @@ class ActionDestroyPart: ActionContinuousBase
 					if ( base_building.IsFacingPlayer( player, part_name ) && !player.GetInputController().CameraIsFreeLook() )
 					{
 						//Camera check (client-only)
-						if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+						if ( camera_check )
 						{
-							if ( !base_building.IsFacingCamera( part_name ) )
+							if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
 							{
-								return false;
+								if ( !base_building.IsFacingCamera( part_name ) )
+								{
+									return false;
+								}
 							}
 						}
 
@@ -85,22 +112,8 @@ class ActionDestroyPart: ActionContinuousBase
 		return false;
 	}
 	
-	override void OnFinishProgressServer( ActionData action_data )
-	{	
-		BaseBuildingBase base_building = BaseBuildingBase.Cast( action_data.m_Target.GetObject() );
-		Construction construction = base_building.GetConstruction();
-		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
-		ConstructionPart construction_part = construction_action_data.GetTargetPart();
-		
-		if ( construction.CanDestroyPart( construction_part.GetPartName() ) )
-		{
-			//build
-			construction.DestroyPartServer( construction_part.GetPartName(), GetType() );
-			
-			//add damage to tool
-			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DESTROY, false );
-		}
-
-		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
+	override string GetAdminLogMessage(ActionData action_data)
+	{
+		return " destroyed " + action_data.m_Target.GetObject().GetDisplayName() + " with " + action_data.m_MainItem.GetDisplayName();
 	}
 }

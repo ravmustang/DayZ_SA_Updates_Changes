@@ -7,24 +7,24 @@ class BarbedWire extends ItemBase
 	const static int		SOUNDS_SHOCK_COUNT							= 4;
 	const static float		RANDOM_SPARK_INTERVAL						= 5.0; // TO DO! Currently not used.
 	
-	const static string 	m_SoundsSpark[SOUNDS_SPARK_COUNT] 			= {"electricFenceSpark1", "electricFenceSpark2", "electricFenceSpark3", "electricFenceSpark4"};
-	const static string 	m_SoundsCut[SOUNDS_CUT_COUNT] 				= {"barbedFenceCut1", "barbedFenceCut2", "barbedFenceCut3"};
-	const static string 	m_SoundsCollision[SOUNDS_COLLISION_COUNT]	= {"barbedFenceCollision1", "barbedFenceCollision2", "barbedFenceCollision3", "barbedFenceCollision4"};
-	const static string 	m_SoundsShock[SOUNDS_SHOCK_COUNT] 			= {"electricFenceShock1", "electricFenceShock2", "electricFenceShock3", "electricFenceShock4"};
-	const static string 	m_SoundBuzzLoop 							= "electricFenceBuzzLoop1";
+	const static string 		m_SoundsSpark[SOUNDS_SPARK_COUNT] 			= {"electricFenceSpark1", "electricFenceSpark2", "electricFenceSpark3", "electricFenceSpark4"};
+	const static string 		m_SoundsCut[SOUNDS_CUT_COUNT] 				= {"barbedFenceCut1", "barbedFenceCut2", "barbedFenceCut3"};
+	const static string 		m_SoundsCollision[SOUNDS_COLLISION_COUNT]	= {"barbedFenceCollision1", "barbedFenceCollision2", "barbedFenceCollision3", "barbedFenceCollision4"};
+	const static string 		m_SoundsShock[SOUNDS_SHOCK_COUNT] 			= {"electricFenceShock1", "electricFenceShock2", "electricFenceShock3", "electricFenceShock4"};
+	const static string 		m_SoundBuzzLoop 							= "electricFenceBuzzLoop1";
 	ref protected EffectSound 	m_DeployLoopSound;
 	
 	SoundOnVehicle m_BuzzSoundLoop;
 	
 	ref Timer m_SparkEvent;
-	private ref AreaDamageBase m_AreaDamage;
+	protected ref AreaDamageBase m_AreaDamage;
 	
-	private bool m_TriggerActive;
-	private bool m_IsPlaced;
-	private bool m_IsMounted;
-	private bool m_IsMountedClient = -1;
+	protected bool m_TriggerActive;
+	protected bool m_IsPlaced;
 	
 	//mounting
+	protected bool m_IsMounted;
+	protected bool m_LastMountedState;
 	const string 				SOUND_MOUNT	= "putDown_BarbedWire_SoundSet";
 	protected EffectSound 		m_MountSound;
 	
@@ -37,9 +37,9 @@ class BarbedWire extends ItemBase
 		m_DeployLoopSound = new EffectSound;
 		
 		//synchronized variables
-		RegisterNetSyncVariableBool( "m_IsMounted" );	
 		RegisterNetSyncVariableBool( "m_IsSoundSynchRemote" );	
-		RegisterNetSyncVariableBool("m_IsDeploySound");
+		RegisterNetSyncVariableBool( "m_IsDeploySound" );
+		RegisterNetSyncVariableBool( "m_IsMounted" );
 	}
 	
 	void ~BarbedWire()
@@ -50,56 +50,91 @@ class BarbedWire extends ItemBase
 		}
 	}
 	
-	bool IsMounted()
+	override void EEInit()
 	{
-		return m_IsMounted;
+		super.EEInit();
+	
+		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( UpdateAttachmentSlot, 100, false );
 	}
 	
-	void SetMountedState( bool is_mounted )
+	bool IsMounted()
 	{
-		m_IsMounted = is_mounted;
-		
-		//lock slot
+		return GetSlotLockedState();
+	}
+	
+	protected bool GetSlotLockedState()
+	{
 		BaseBuildingBase base_building = BaseBuildingBase.Cast( GetHierarchyParent() );
 		if ( base_building )
 		{
 			InventoryLocation inventory_location = new InventoryLocation;
 			GetInventory().GetCurrentInventoryLocation( inventory_location );			
-			base_building.GetInventory().SetSlotLock( inventory_location.GetSlot(), m_IsMounted );
+			return base_building.GetInventory().GetSlotLock( inventory_location.GetSlot() );
 		}
 		
+		return false;	
+	}
+	
+	void SetMountedState( bool is_mounted )
+	{
+		bsbDebugPrint("[bsb] " + GetDebugName(this) + " SetMountedState mounted=" + is_mounted);
+		
+		//lock slot
+		m_IsMounted = is_mounted;
+		LockAttachmentSlot( is_mounted );
+		
+		//synchronize
 		Synchronize();
 	}
+	
+	protected void UpdateAttachmentSlot()
+	{
+		BaseBuildingBase base_building = BaseBuildingBase.Cast( GetHierarchyParent() );
+		if ( base_building )
+		{
+			InventoryLocation inventory_location = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( inventory_location );			
+			bool is_mounted = base_building.GetInventory().GetSlotLock( inventory_location.GetSlot() );
+			string slot_name = InventorySlots.GetSlotName( inventory_location.GetSlot() );
+			
+			base_building.UpdateAttachmentVisuals( slot_name, is_mounted );
+			base_building.UpdateAttachmentPhysics( slot_name, is_mounted );
+		}
+	}
 
+	protected void LockAttachmentSlot( bool lock_state )
+	{
+		BaseBuildingBase base_building = BaseBuildingBase.Cast( GetHierarchyParent() );
+		if ( base_building )
+		{
+			InventoryLocation inventory_location = new InventoryLocation;
+			GetInventory().GetCurrentInventoryLocation( inventory_location );			
+			base_building.GetInventory().SetSlotLock( inventory_location.GetSlot(), lock_state );
+			string slot_name = InventorySlots.GetSlotName( inventory_location.GetSlot() );
+			base_building.UpdateAttachmentVisuals( slot_name, lock_state );
+			base_building.UpdateAttachmentPhysics( slot_name, lock_state );
+		}
+	}
+		
 	// --- SYNCHRONIZATION
 	void Synchronize()
 	{
 		if ( GetGame().IsServer() )
 		{
 			SetSynchDirty();
-			
-			if ( GetGame().IsMultiplayer() )
-			{
-				RefreshParent();
-			}
 		}
 	}
 	
 	override void OnVariablesSynchronized()
 	{
 		super.OnVariablesSynchronized();
-
-		//update parent (client)
-		RefreshParent();
-
-		//mounting sounds
-		if ( IsMounted() != m_IsMountedClient )
+		
+		if ( ( m_IsMounted && !m_LastMountedState ) || ( !m_IsMounted && m_LastMountedState ) )
 		{
-			m_IsMountedClient = IsMounted();
-			
 			//Play sound
 			PlaySoundSet( m_MountSound, SOUND_MOUNT, 0.1, 0.1 );
 		}
+		m_LastMountedState = m_IsMounted;
 		
 		if ( IsDeploySound() )
 		{
@@ -137,25 +172,10 @@ class BarbedWire extends ItemBase
 		}
 	}
 	
-	void RefreshParent()
-	{
-		EntityAI parent = GetHierarchyParent();
-		
-		//Base building objects
-		BaseBuildingBase base_building = BaseBuildingBase.Cast( parent );
-		if ( base_building )
-		{
-			base_building.Refresh();
-		}
-	}
-	
 	// --- EVENTS
 	override void OnStoreSave( ParamsWriteContext ctx )
 	{   
 		super.OnStoreSave( ctx );
-		
-		//is mounted
-		ctx.Write( m_IsMounted );
 	}
 	
 	override bool OnStoreLoad( ParamsReadContext ctx, int version )
@@ -164,11 +184,14 @@ class BarbedWire extends ItemBase
 			return false;
 		
 		//--- Barbed wire data ---
-		//is mounted
-		if ( !ctx.Read( m_IsMounted ) )
+		//is mounted (removed in ver. 105)
+		if ( version < 105 )
 		{
-			m_IsMounted = false;
-			return false;
+			float is_mounted;
+			if ( !ctx.Read( is_mounted ) )
+			{
+				return false;
+			}			
 		}
 		//---
 		
@@ -179,8 +202,8 @@ class BarbedWire extends ItemBase
 	{	
 		super.AfterStoreLoad();
 				
-		// m_IsMounted is already set during Load - but not Active! this is done here because hierarchy
-		SetMountedState( m_IsMounted );
+		//set mounted state based on locked slot after everything is loaded
+		SetMountedState( GetSlotLockedState() );
 	}
 
 	// ---
@@ -251,7 +274,6 @@ class BarbedWire extends ItemBase
 	{
 		m_AreaDamage = new AreaDamageOneTime(this);
 		m_AreaDamage.SetExtents("-1 0 -0.4", "1 0.7 0.4");
-		m_AreaDamage.SetLoopInterval(0.1);
 		m_AreaDamage.SetHitZones({"RightLeg", "LeftLeg", "RightFoot", "LeftFoot"});
 		m_AreaDamage.SetAmmoName("MeleeDamage");
 		m_AreaDamage.Spawn();
@@ -260,7 +282,7 @@ class BarbedWire extends ItemBase
 	
 	protected void DestroyDamageTrigger()
 	{
-		m_AreaDamage.DestroyDamageTrigger();
+		m_AreaDamage.Destroy();
 		m_TriggerActive = false;
 	}
 	// ---------------------------------------------------------
@@ -401,5 +423,13 @@ class BarbedWire extends ItemBase
 	override string GetLoopDeploySoundset()
 	{
 		return "barbedwire_deploy_SoundSet";
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+
+		AddAction(ActionRestrainTarget);
+		AddAction(ActionRestrainSelf);
 	}	
 }

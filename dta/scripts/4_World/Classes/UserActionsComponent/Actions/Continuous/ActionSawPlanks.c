@@ -8,19 +8,13 @@ class ActionSawPlanksCB : ActionContinuousBaseCB
 
 class ActionSawPlanks: ActionContinuousBase
 {	
-	static const int DECREASE_HEALTH_OF_TOOL_DEFAULT = 1; // any other item, including hacksaw
-	static const int DECREASE_HEALTH_OF_TOOL_AXE = 2; // axes
-	static const int DECREASE_FUEL_OF_CHAINSAW = 3; // chainsaw fuel in ml
+	static const int DECREASE_HEALTH_OF_TOOL_DEFAULT = 3; // any other item, including hacksaw
+	static const int DECREASE_HEALTH_OF_TOOL_AXE = 6; // axes
+	static const int DECREASE_FUEL_OF_CHAINSAW = 9; // chainsaw fuel in ml
 	
 	void ActionSawPlanks()
 	{
 		m_CallbackClass = ActionSawPlanksCB;
-		m_MessageStartFail = "The tool is ruined.";
-		m_MessageStart = "I have started sawing the planks.";
-		m_MessageSuccess = "I have sawn 3 planks.";
-		m_MessageFail = "I've stopped sawing the planks.";
-		m_MessageCancel = "I've stopped sawing the planks.";
-		//m_Animation = "startFire";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DISASSEMBLE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
@@ -31,11 +25,6 @@ class ActionSawPlanks: ActionContinuousBase
 	{	
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_SAW_PLANKS;
 	}
 
 	override string GetText()
@@ -78,13 +67,12 @@ class ActionSawPlanks: ActionContinuousBase
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PileOfWoodenPlanks item_POWP = PileOfWoodenPlanks.Cast( action_data.m_Target.GetObject() );
-		item_POWP.RemovePlanks(1);
+		item_POWP.RemovePlanks(3);
 		
 		vector pos = action_data.m_Player.GetPosition();
 		ItemBase planks = ItemBase.Cast( GetGame().CreateObject("WoodenPlank", pos) );
-		const float NEW_PLANKS = 3;
 
-		planks.SetQuantity( Math.Round( action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( NEW_PLANKS, this.GetSpecialtyWeight() ) ), true );
+		planks.SetQuantity( Math.Round( action_data.m_Player.GetSoftSkillsManager().AddSpecialtyBonus( 9, this.GetSpecialtyWeight() ) ), true );
 		
 		ItemBase item = action_data.m_MainItem;
 		

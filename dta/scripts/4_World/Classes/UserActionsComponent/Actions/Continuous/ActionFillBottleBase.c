@@ -6,7 +6,15 @@ class ActionFillBottleBaseCB : ActionContinuousBaseCB
 	{
 		m_liquid_type = ActionFillBottleBase.Cast( m_ActionData.m_Action ).GetLiquidType( m_ActionData.m_Player, m_ActionData.m_Target, m_ActionData.m_MainItem );
 		
+		
 		m_ActionData.m_ActionComponent = new CAContinuousFill(UAQuantityConsumed.FILL_LIQUID, m_liquid_type);
+		
+		//first implementation for obtaining the fuel from the feed faster
+		//TODO:: make some proper get method, maybe param in config?
+		if( m_ActionData.m_Target.GetObject() && m_ActionData.m_Target.GetObject().GetType() == "Land_FuelStation_Feed")
+		{
+			m_ActionData.m_ActionComponent = new CAContinuousFill(UAQuantityConsumed.FUEL, m_liquid_type);
+		}
 	}
 };
 
@@ -20,12 +28,6 @@ class ActionFillBottleBase: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_FILLBOTTLEPOND;
 		m_FullBody = true;
 		m_StanceMask = 0;
-		
-		m_MessageStartFail = "It's ruined.";
-		m_MessageStart = "I have started filling the bottle.";
-		m_MessageSuccess = "I have finished filling the bottle..";
-		m_MessageFail = "Player moved and filling the bottle was canceled.";
-		m_MessageCancel = "I stopped filling the bottle.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -33,11 +35,6 @@ class ActionFillBottleBase: ActionContinuousBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_FILL_BOTTLE;
 	}
 
 	override string GetText()
@@ -153,7 +150,7 @@ class ActionFillBottleBase: ActionContinuousBase
 				return LIQUID_WATER;
 			}
 		}
-		else if(target.GetObject() && target.GetObject().GetType() == "Land_FuelStation_Feed")
+		else if(target.GetObject() && target.GetObject().IsFuelStation())
 		{
 			if ( vector.Distance(player.GetPosition(), pos_cursor) < UAMaxDistances.DEFAULT && Liquid.CanFillContainer(item, LIQUID_GASOLINE ) )
 			{

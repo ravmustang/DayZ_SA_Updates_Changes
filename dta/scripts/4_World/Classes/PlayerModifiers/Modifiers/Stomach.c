@@ -25,7 +25,8 @@ class StomachMdfr: ModifierBase
 	
 	override void OnTick(PlayerBase player, float deltaT)
 	{
-		
+		player.m_PlayerStomach.Update(deltaT);
+		/*
 		float stomachs_combined_before = player.GetStatStomachWater().Get() + player.GetStatStomachEnergy().Get();
 		if(stomachs_combined_before <=0) // takes care of division by 0 also there is no point in doing anything if there is nothing to transfer
 		{
@@ -62,6 +63,6 @@ class StomachMdfr: ModifierBase
 		float percentage = stomachs_combined_after / stomachs_combined_before;
 		
 		player.GetStatStomachVolume().Set( player.GetStatStomachVolume().Get() * percentage );
-		
+		*/
 	}
 };

@@ -23,11 +23,6 @@ class ActionBuryAshes: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "I can't bury it here.";
-		m_MessageStart = "I've started burying the ashes.";
-		m_MessageSuccess = "I have buried the ashes.";
-		m_MessageFail = "I couldn't bury the ashes.";
-		m_MessageCancel = "I've stopped burying the ashes.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -41,11 +36,6 @@ class ActionBuryAshes: ActionContinuousBase
 	{	
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_BURY_ASHES;
 	}
 
 	override string GetText()

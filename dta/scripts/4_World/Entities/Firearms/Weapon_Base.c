@@ -21,7 +21,11 @@ class Weapon_Base extends Weapon
 	protected ref WeaponFSM m_fsm;	/// weapon state machine
 	protected bool m_isJammed = false;
 	protected bool m_LiftWeapon = false;
+	protected bool m_BayonetAttached;
+	protected bool m_ButtstockAttached;
 	protected int m_weaponAnimState = -1; /// animation state the weapon is in, -1 == uninitialized
+	protected int m_magazineSimpleSelectionIndex = -1;
+	protected int m_weaponHideBarrelIdx = -1; //index in simpleHiddenSelections cfg array
 	protected float m_DmgPerShot;
 	protected float m_WeaponLength;
 	ref array<float> m_DOFProperties = new array<float>;
@@ -32,7 +36,17 @@ class Weapon_Base extends Weapon
 
 	void Weapon_Base ()
 	{
-		m_DmgPerShot = ConfigGetFloat("damagePerShot");
+		m_DmgPerShot 		= ConfigGetFloat("damagePerShot");
+		m_BayonetAttached 	= false;
+		m_ButtstockAttached = false;
+		
+		if ( ConfigIsExisting("simpleHiddenSelections") )
+		{
+			TStringArray selectionNames = new TStringArray;
+			ConfigGetTextArray("simpleHiddenSelections",selectionNames);
+			m_weaponHideBarrelIdx = selectionNames.Find("hide_barrel");
+			m_magazineSimpleSelectionIndex = selectionNames.Find("magazine");
+		}
 		
 		InitWeaponLength();
 		InitDOFProperties(m_DOFProperties);
@@ -144,7 +158,7 @@ class Weapon_Base extends Weapon
 	}
 	void ResetWeaponAnimState ()
 	{
-		fsmDebugSpam("[wpnfsm] resetting anim state: " + typename.EnumToString(PistolAnimState, m_weaponAnimState) + " --> " + typename.EnumToString(PistolAnimState, -1));
+		fsmDebugSpam("[wpnfsm] " + Object.GetDebugName(this) + " resetting anim state: " + typename.EnumToString(PistolAnimState, m_weaponAnimState) + " --> " + typename.EnumToString(PistolAnimState, -1));
 		m_weaponAnimState = -1;
 	}
 	int GetWeaponAnimState () { return m_weaponAnimState; }
@@ -171,14 +185,14 @@ class Weapon_Base extends Weapon
 			if (suppressor)
 				suppressor.AddHealth("","Health",-m_DmgPerShot); //damages suppressor; TODO add suppressor damage coeficient/parameter (?) to suppressors/weapons (?)
 		}
-		JamCheck(muzzleType);
+		//JamCheck(muzzleType);
 		
 		#ifdef DEVELOPER
 		MiscGameplayFunctions.UnlimitedAmmoDebugCheck(this);
 		#endif
 	}
 	
-	void JamCheck (int muzzleIndex )
+	bool JamCheck (int muzzleIndex )
 	{
 		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
 		if ( player )
@@ -186,8 +200,9 @@ class Weapon_Base extends Weapon
 			float rnd = player.GetRandomGeneratorSyncManager().GetRandom01(RandomGeneratorSyncUsage.RGSJam);
 			//Print("Random Jam - " + rnd);
 			if (rnd < GetSyncChanceToJam())
-				m_isJammed = true;
+				return true;
 		}
+		return false;
 	}
 	
 	bool IsJammed () { return m_isJammed; }
@@ -211,24 +226,58 @@ class Weapon_Base extends Weapon
 			SelectionBulletHide();
 
 		if (has_mag)
-			SelectionMagazineShow();
+			ShowMagazine();
 		else
-			SelectionMagazineHide();
+			HideMagazine();
 	}
 
 	override bool OnStoreLoad (ParamsReadContext ctx, int version)
 	{
 		if ( !super.OnStoreLoad(ctx, version) )
 			return false;
+		
+		if (version >= 105)
+		{
+			int mode_count = 0;
+			if (!ctx.Read(mode_count))
+			{
+				Error("Weapon.OnStoreLoad " + this + " cannot read mode count!");
+				return false;
+			}
+				
+			for (int m = 0; m < mode_count; ++m)
+			{
+				int mode = 0;
+				if (!ctx.Read(mode))
+				{
+					Error("Weapon.OnStoreLoad " + this + " cannot read mode[" + m + "]");
+					return false;
+				}
+				
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(this) + " OnStoreLoad - loaded muzzle[" + m + "].mode = " + mode);
+				SetCurrentMode(m, mode);
+			}
+		}
+		
+		if ( version >= 106 )
+		{
+			if ( !ctx.Read(m_isJammed) )
+			{
+				Error("Weapon.OnStoreLoad cannot load jamming state");
+				return false;
+			}
+		}
 
 		if (m_fsm)
 		{
-			m_fsm.OnStoreLoad(ctx, version);
+			if(!m_fsm.OnStoreLoad(ctx, version))
+				return false;
 		}
 		else
 		{
 			int dummy = 0;
-			ctx.Read(dummy);
+			if(!ctx.Read(dummy))
+				return false;
 		}
 
 		return true;
@@ -239,12 +288,12 @@ class Weapon_Base extends Weapon
 		if (m_fsm && m_fsm.IsRunning())
 		{
 			if (m_fsm.SaveCurrentFSMState(ctx))
-				wpnDebugPrint("[wpnfsm] Weapon=" + this + " state saved.");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(this) + " Weapon=" + this + " state saved.");
 			else
-				Error("[wpnfsm] Weapon=" + this + " state NOT saved.");
+				Error("[wpnfsm] " + Object.GetDebugName(this) + " Weapon=" + this + " state NOT saved.");
 		}
 		else
-			Error("[wpnfsm] Weapon.SaveCurrentFSMState: trying to save weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
+			Error("[wpnfsm] " + Object.GetDebugName(this) + " Weapon.SaveCurrentFSMState: trying to save weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
 	}
 
 	bool LoadCurrentFSMState (ParamsReadContext ctx, int version)
@@ -258,24 +307,24 @@ class Weapon_Base extends Weapon
 				{
 					SyncSelectionState(state.HasBullet(), state.HasMagazine());
 					state.SyncAnimState();
-					wpnDebugPrint("[wpnfsm] Weapon=" + this + " stable state loaded and synced.");
+					wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(this) + " Weapon=" + this + " stable state loaded and synced.");
 					return true;
 				}
 				else
 				{
-					wpnDebugPrint("[wpnfsm] Weapon=" + this + " unstable/error state loaded.");
+					wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(this) + " Weapon=" + this + " unstable/error state loaded.");
 					return false;
 				}
 			}
 			else
 			{
-				Error("[wpnfsm] Weapon=" + this + " did not load.");
+				Error("[wpnfsm] " + Object.GetDebugName(this) + " Weapon=" + this + " did not load.");
 				return false;
 			}
 		}
 		else
 		{
-			Error("[wpnfsm] Weapon.LoadCurrentFSMState: trying to load weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
+			Error("[wpnfsm] " + Object.GetDebugName(this) + " Weapon.LoadCurrentFSMState: trying to load weapon without FSM (or uninitialized weapon) this=" + this + " type=" + GetType());
 			return false;
 		}
 	}
@@ -295,6 +344,15 @@ class Weapon_Base extends Weapon
 	override void OnStoreSave (ParamsWriteContext ctx)
 	{
 		super.OnStoreSave(ctx);
+		
+		// fire mode added in version 105
+		int mode_count = GetMuzzleCount();
+		ctx.Write(mode_count);
+		for (int m = 0; m < mode_count; ++m)
+			ctx.Write(GetCurrentMode(m));
+		
+		ctx.Write(m_isJammed);
+
 		if (m_fsm)
 			m_fsm.OnStoreSave(ctx);
 		else
@@ -361,54 +419,63 @@ class Weapon_Base extends Weapon
 		return sc;
 	};
 
-	PropertyModifiers GetPropertyModifierObject () { return m_PropertyModifierObject; }
-
-	bool CreatePropertyModifierObject ()
+	PropertyModifiers GetPropertyModifierObject() 
 	{
-		if (!m_PropertyModifierObject)
+		if(!m_PropertyModifierObject)
 		{
 			m_PropertyModifierObject = new PropertyModifiers(this);
-			return true;
 		}
-		return false;
-	}
-
-	bool RemovePropertyModifierObject ()
-	{
-		if (m_PropertyModifierObject)
-		{
-			delete m_PropertyModifierObject;
-			return true;
-		}
-		return false;
+		return m_PropertyModifierObject;
 	}
 	
 	override void OnInventoryEnter (Man player)
 	{
+		m_PropertyModifierObject = null;
 		super.OnInventoryEnter(player);
-
-		CreatePropertyModifierObject();
 	}
 	
 	override void OnInventoryExit (Man player)
 	{
+		m_PropertyModifierObject = null;
 		super.OnInventoryExit(player);
-
-		RemovePropertyModifierObject();
 	}
 
 	override void EEItemAttached (EntityAI item, string slot_name)
 	{
 		super.EEItemAttached(item, slot_name);
 
-		if ( GetPropertyModifierObject() ) 	GetPropertyModifierObject().UpdateModifiers();
+		GetPropertyModifierObject().UpdateModifiers();
+		
+		if (ItemOptics.Cast(item))
+		{
+			PlayerBase player = PlayerBase.Cast( GetHierarchyRootPlayer() );
+			if( player )
+			{
+				if( player.GetItemInHands() == this )
+				{
+					player.SetOpticsPreload(true,item);
+				}
+			}
+		}
 	}
 
 	override void EEItemDetached (EntityAI item, string slot_name)
 	{
 		super.EEItemDetached(item, slot_name);
 
-		if ( GetPropertyModifierObject() ) 	GetPropertyModifierObject().UpdateModifiers();
+		GetPropertyModifierObject().UpdateModifiers();
+		
+		if (ItemOptics.Cast(item))
+		{
+			PlayerBase player = PlayerBase.Cast( GetHierarchyRootPlayer() );
+			if( player )
+			{
+				if( player.GetItemInHands() == this )
+				{
+					player.SetOpticsPreload(false,item);
+				}
+			}
+		}
 	}
 	
 	override void OnItemLocationChanged(EntityAI old_owner, EntityAI new_owner)
@@ -421,10 +488,13 @@ class Weapon_Base extends Weapon
 		{ 
 			player.SetReturnToOptics(false);
 		}
+		HideWeaponBarrel(false);
 	}
 	
 	override bool CanReleaseAttachment(EntityAI attachment)
 	{
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
 		PlayerBase player = PlayerBase.Cast( GetHierarchyRootPlayer() );
 		if( player )
 		{
@@ -432,6 +502,15 @@ class Weapon_Base extends Weapon
 				return true;
 		}
 		return false;
+	}
+	
+	override bool CanRemoveFromHands (EntityAI parent)
+	{
+		if (IsIdle())
+		{
+			return true;
+		}
+		return false; // do not allow removal of weapon while weapon is busy
 	}
 
 	bool IsRemoteWeapon ()
@@ -460,11 +539,12 @@ class Weapon_Base extends Weapon
 			ctx.Write(INPUT_UDT_WEAPON_REMOTE_EVENT);
 			e.WriteToContext(ctx);
 
-			wpnDebugPrint("[wpnfsm] send 2 remote: sending e=" + e + " id=" + e.GetEventID() + " p=" + e.m_player + "  m=" + e.m_magazine);
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(this) + " send 2 remote: sending e=" + e + " id=" + e.GetEventID() + " p=" + e.m_player + "  m=" + e.m_magazine);
 			p.StoreInputForRemotes(ctx);
 		}
 	}
 
+	
 	RecoilBase SpawnRecoilObject ()
 	{
 		return new DefaultRecoil(this);
@@ -532,7 +612,7 @@ class Weapon_Base extends Weapon
 			m_WeaponLength = ConfigGetFloat("WeaponLength");
 			return true;
 		}
-		m_WeaponLength = 0;
+		m_WeaponLength = 0.8; //default value if not set in config; should not be zero
 		return false;
 	}
 	
@@ -571,9 +651,7 @@ class Weapon_Base extends Weapon
 			return false;
 		
 		usti_hlavne_position = GetSelectionPositionLS( "Usti hlavne" ); 	// Usti hlavne
-		//vector weapon_back_position = GetSelectionPosition( "Weapon back" ); 	// back of weapon; barrel length
 		trigger_axis_position = GetSelectionPositionLS("trigger_axis");
-		//usti_hlavne_position = ModelToWorld(usti_hlavne_position);
 		
 		// freelook raycast
 		if (player.GetInputController().CameraIsFreeLook())
@@ -599,7 +677,6 @@ class Weapon_Base extends Weapon
 		else
 			{ start = player.GetBonePositionWS(idx); }
 		
-		//distance = vector.Distance(usti_hlavne_position,trigger_axis_position) + 0.1;
 		//! snippet below measures distance from "RightHandIndex1" bone for lifting calibration
 		/*usti_hlavne_position = ModelToWorld(usti_hlavne_position);
 		distance = vector.Distance(start,usti_hlavne_position);*/
@@ -609,16 +686,6 @@ class Weapon_Base extends Weapon
 		if (ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonet")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetAK")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetMosin")) || ItemBase.CastTo(attachment,FindAttachmentBySlotName("weaponBayonetSKS")) || ItemBase.CastTo(attachment,GetAttachedSuppressor()))
 		{
 			distance += attachment.m_ItemModelLength;
-			/*
-			vector mins, maxs;
-			//attachment.GetWorldBounds(mins, maxs);
-			mins = attachment.GetMemoryPointPos(BoundingBox_min)
-			maxs = attachment.GetMemoryPointPos(BoundingBox_max)
-			Print(vector.Distance(mins, maxs));
-			Print("mins " + mins);
-			Print("maxs " + maxs);
-			distance += 0.2; 
-			*/
 		}
 		end = start + (direction * distance);
 		DayZPhysics.RayCastBullet(start, end, hit_mask, player, obj, hit_pos, hit_normal, hit_fraction);
@@ -626,6 +693,7 @@ class Weapon_Base extends Weapon
 		// something is hit
 		if (hit_pos != vector.Zero)
 		{
+			//Print(distance);
 			m_LiftWeapon = true;
 			return true;
 		}
@@ -691,6 +759,68 @@ class Weapon_Base extends Weapon
 		src.OnStoreSave(ctx.GetWriteContext());
 		OnStoreLoad(ctx.GetReadContext(), dummy_version);
 		return true;
+	}
+	
+	//! attachment helpers (firearm melee)
+	override void SetBayonetAttached(bool pState)
+	{
+		m_BayonetAttached = pState;
+	}
+	
+	override bool HasBayonetAttached()
+	{
+		return m_BayonetAttached;
+	}
+	
+	override void SetButtstockAttached(bool pState)
+	{
+		m_ButtstockAttached = pState;
+	}
+
+	override bool HasButtstockAttached()
+	{
+		return m_ButtstockAttached;
+	}
+	
+	void HideWeaponBarrel(bool state)
+	{
+		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )//hidden for client only
+		{
+			ItemOptics optics = GetAttachedOptics();
+			if ( optics && !optics.AllowsDOF() && m_weaponHideBarrelIdx != -1 )
+			{
+				SetSimpleHiddenSelectionState(m_weaponHideBarrelIdx,!state);
+			}
+		}
+	}
+	
+	void ShowMagazine()
+	{
+		if (m_magazineSimpleSelectionIndex > -1)
+			SetSimpleHiddenSelectionState(m_magazineSimpleSelectionIndex,1);
+		else
+			SelectionMagazineShow();
+	}
+	
+	void HideMagazine()
+	{
+		if (m_magazineSimpleSelectionIndex > -1)
+			SetSimpleHiddenSelectionState(m_magazineSimpleSelectionIndex,0);
+		else
+			SelectionMagazineHide();
+	}
+
+	override void SetActions()
+	{
+		super.SetActions();
+		AddAction(FirearmActionUnjam);
+		AddAction(FirearmActionAttachMagazine);
+		//AddAction(FirearmActionAttachMagazineQuick); // Easy reload
+		AddAction(FirearmActionLoadBullet);
+		//AddAction(FirearmActionLoadBulletQuick); // Easy reload
+		AddAction(FirearmActionMechanicManipulate);
+		AddAction(ActionTurnOnWeaponFlashlight);
+		AddAction(ActionTurnOffWeaponFlashlight);
 	}
 };
 

@@ -2,9 +2,6 @@ class ActionPackTent: ActionInteractBase
 {
 	void ActionPackTent()
 	{
-		m_MessageSuccess = "I've packed tent.";
-		m_MessageFail = "I cannot pack tent.";
-		//m_Animation = "open";
 	}
 
 	override void CreateConditionComponents()  
@@ -12,20 +9,25 @@ class ActionPackTent: ActionInteractBase
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTParent(10);
 	}
-	
-	override int GetType()
-	{
-		return AT_PACK_TENT;
-	}
 
 	override string GetText()
 	{
 		return "#pack_tent";
 	}
 
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
+	}
+
 	override bool IsUsingProxies()
 	{
 		return true;
+	}
+
+	override bool HasProgress()
+	{
+		return false;
 	}
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

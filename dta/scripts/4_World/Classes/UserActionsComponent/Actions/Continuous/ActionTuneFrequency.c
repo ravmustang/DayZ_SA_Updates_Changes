@@ -15,10 +15,6 @@ class ActionTuneFrequency: ActionContinuousBase
 		m_CallbackClass = ActionTuneFrequencyCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_TUNE;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_TUNE;		
-		m_MessageStartFail = "I have failed the tunning.";
-		m_MessageStart = "I have started the tunning.";
-		m_MessageFail = "I have failed the tunning.";
-		m_MessageCancel = "I have stopped the tunning.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -31,11 +27,6 @@ class ActionTuneFrequency: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-	
-	override int GetType()
-	{
-		return AT_TUNE_FREQUENCY;
 	}
 
 	override bool HasTarget()

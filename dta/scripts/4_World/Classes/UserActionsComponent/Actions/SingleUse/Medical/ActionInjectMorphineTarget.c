@@ -2,18 +2,11 @@ class ActionInjectMorphineTarget: ActionInjectTarget
 {
 	void ActionInjectMorphineTarget()
 	{
-		m_MessageStart = "Player started injecting you morphine.";
-		m_MessageSuccess = "Player finished injecting you morphine.";
-	//	m_Animation = "INJECTEPIPENT";
-	}
-
-	override int GetType()
-	{
-		return AT_INJECT_MORPHINE_T;
 	}
 		
 	override void ApplyModifiers( ActionData action_data )
 	{
+		action_data.m_MainItem.OnApply(PlayerBase.Cast(action_data.m_Target.GetObject()));
 		//PlayerBase ntarget = PlayerBase.Cast( target.GetObject() );
 		//target.m_ModifiersManager.ActivateModifier(eModifiers.MDF_CHEMICALPOISON);
 	}

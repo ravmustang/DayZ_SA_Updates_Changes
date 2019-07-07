@@ -13,14 +13,6 @@ class ActionTurnOnTransmitter: ActionTurnOnWhileInHands
 		m_CallbackClass = ActionTurnOnTransmitterCB;
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_ON;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_ITEM_ON;
-		m_MessageSuccess = "I have turned it on.";
-		m_MessageStartFail = "Cannot turn on the device without a power source.";
-		m_MessageFail = "It's broken.";
-	}
-	
-	override int GetType()
-	{
-		return AT_TURN_ON_TRANSMITTER;
 	}
 
 	override string GetText()

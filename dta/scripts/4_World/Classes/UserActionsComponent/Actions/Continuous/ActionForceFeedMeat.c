@@ -21,11 +21,6 @@ class ActionForceFeedMeat: ActionForceConsume
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
 	}
-
-	override int GetType()
-	{
-		return AT_FEED_MEAT;
-	}
 		
 	override string GetText()
 	{

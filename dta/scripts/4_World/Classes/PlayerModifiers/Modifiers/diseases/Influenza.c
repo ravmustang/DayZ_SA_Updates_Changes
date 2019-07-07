@@ -1,7 +1,7 @@
 class InfluenzaMdfr: ModifierBase
 {
-	const int INFLUENZA_AGENT_THRESHOLD_ACTIVATE = 300;
-	const int INFLUENZA_AGENT_THRESHOLD_DEACTIVATE = 200;
+	const int AGENT_THRESHOLD_ACTIVATE = 300;
+	const int AGENT_THRESHOLD_DEACTIVATE = 200;
 	
 	override void Init()
 	{
@@ -10,9 +10,15 @@ class InfluenzaMdfr: ModifierBase
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
+	
+	override string GetDebugText()
+	{
+		return ("Activate threshold: "+AGENT_THRESHOLD_ACTIVATE + "| " +"Deativate threshold: "+AGENT_THRESHOLD_DEACTIVATE);
+	}
+	
 	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.INFLUENZA) > INFLUENZA_AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.INFLUENZA) > AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -31,7 +37,7 @@ class InfluenzaMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		return (player.GetSingleAgentCount(eAgents.INFLUENZA) < INFLUENZA_AGENT_THRESHOLD_DEACTIVATE);
+		return (player.GetSingleAgentCount(eAgents.INFLUENZA) < AGENT_THRESHOLD_DEACTIVATE);
 	}
 
 	override protected void OnTick(PlayerBase player, float deltaT)

@@ -11,12 +11,6 @@ class ActionShaveTarget: ActionContinuousBase
 	void ActionShaveTarget()
 	{
 		m_CallbackClass = ActionShaveTargetCB;
-		m_MessageStartFail = "There's no beard to be shaved.";
-		m_MessageStart = "I have started shaving target.";
-		m_MessageSuccess = "I have shaved target.";
-		m_MessageFail = "I have failed to shave target.";
-		m_MessageCancel = "I stopped shaving target.";
-		//m_Animation = "ignite";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -40,11 +34,6 @@ class ActionShaveTarget: ActionContinuousBase
 		}
 
 		return false;
-	}
-
-	override int GetType()
-	{
-		return AT_SHAVE_T;
 	}
 		
 	override string GetText()

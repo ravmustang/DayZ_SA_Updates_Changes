@@ -13,10 +13,7 @@ class ActionWritePaper: ActionContinuousBase
 	void ActionWritePaper()
 	{
 		m_CallbackClass = ActionWritePaperCB;
-		m_MessageSuccess = "I broke chemlight.";
-		m_MessageFail = "It's out of energy";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
-		//m_Animation = "break";
 	}
 	
 	override void CreateConditionComponents()
@@ -32,11 +29,6 @@ class ActionWritePaper: ActionContinuousBase
 			return true;
 		}
 		return false;
-	}
-
-	override int GetType()
-	{
-	 return AT_WRITE_PAPER;
 	}
 
 	/*override bool HasTarget()

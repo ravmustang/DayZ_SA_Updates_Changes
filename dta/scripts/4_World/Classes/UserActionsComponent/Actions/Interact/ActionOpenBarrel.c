@@ -2,16 +2,9 @@ class ActionOpenBarrel: ActionInteractBase
 {
 	void ActionOpenBarrel()
 	{
-		m_MessageSuccess = "I have opened it.";
-		//m_Animation = "open";	
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_HUDCursorIcon = CursorIcons.OpenHood;
-	}
-
-	override int GetType()
-	{
-		return AT_OPEN_BARREL;
 	}
 
 	override string GetText()

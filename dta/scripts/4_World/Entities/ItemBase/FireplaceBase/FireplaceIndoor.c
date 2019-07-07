@@ -189,6 +189,9 @@ class FireplaceIndoor extends FireplaceBase
 
 	override bool CanReleaseAttachment( EntityAI attachment )
 	{
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
+		
 		ItemBase item = ItemBase.Cast( attachment );
 		
 		//has last attachment and there are still items in cargo
@@ -437,5 +440,13 @@ class FireplaceIndoor extends FireplaceBase
 		}
 		
 		return true;	
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionTakeFireplaceIndoor);
+		//AddAction(ActionLightItemOnFire);
 	}
 }

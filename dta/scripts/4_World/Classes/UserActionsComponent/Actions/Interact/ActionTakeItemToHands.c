@@ -2,7 +2,6 @@ class ActionTakeItemToHands: ActionInteractBase
 {
 	void ActionTakeItemToHands()
 	{
-		m_MessageSuccess    = "";
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
 		m_CommandUIDProne	= DayZPlayerConstants.CMD_ACTIONFB_PICKUP_HANDS;
 		m_HUDCursorIcon     = CursorIcons.LootCorpse;
@@ -19,9 +18,14 @@ class ActionTakeItemToHands: ActionInteractBase
 		return true;
 	}
 	
-	override int GetType()
+	override typename GetInputType()
 	{
-		return AT_TAKE_ITEM_TO_HANDS;
+		return ContinuousInteractActionInput;
+	}
+	
+	override bool HasProgress()
+	{
+		return false;
 	}
 
 	override string GetText()
@@ -32,21 +36,13 @@ class ActionTakeItemToHands: ActionInteractBase
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		ItemBase tgt_item = ItemBase.Cast( target.GetObject() );
-		if ( tgt_item && !tgt_item.IsTakeable() ) return false;
-		if ( tgt_item && tgt_item.IsBeingPlaced() ) return false;
+		if ( !tgt_item || !tgt_item.IsTakeable() ) return false;
+		if ( tgt_item.IsBeingPlaced() ) return false;
+		if ( target.GetParent() ) return false;
 		
-		if ( player.GetCommand_Vehicle() )
-			return false;
-		
-		EntityAI tgt_parent = EntityAI.Cast( target.GetParent() );
-		EntityAI tgt_entity = EntityAI.Cast( target.GetObject() );
-
-		if ( tgt_entity && !tgt_parent )
+		if ( player.GetInventory().CanAddEntityIntoHands(tgt_item) )
 		{
-			if ( tgt_entity && tgt_entity.IsItemBase() && !player.GetInventory().CanAddEntityIntoInventory(tgt_entity) && player.GetInventory().CanAddEntityIntoHands(tgt_entity) && tgt_entity.GetHierarchyRootPlayer() != player )
-			{
-				return true;
-			}
+			return true;
 		}
 		return false;
 	}
@@ -80,20 +76,20 @@ class ActionTakeItemToHands: ActionInteractBase
 	
 	override void CreateAndSetupActionCallback( ActionData action_data )
 	{
-		Object target = action_data.m_Target.GetObject();
-		bool heavy_item = false;
+		//Print("starting - CreateAndSetupActionCallback");
+		EntityAI target = EntityAI.Cast(action_data.m_Target.GetObject());
 		ActionBaseCB callback;
-		if (target && target.ConfigIsExisting("heavyItem") && target.ConfigGetBool("heavyItem"))
+		if (!target)
+			return;
+		
+		if (target.IsHeavyBehaviour())
 		{
-			heavy_item = true;
-		}
-			
-		if(heavy_item)
-		{
+			//Print("heavybehaviour");
 			Class.CastTo(callback, action_data.m_Player.StartCommand_Action(DayZPlayerConstants.CMD_ACTIONFB_PICKUP_HEAVY,GetCallbackClassTypename(),DayZPlayerConstants.STANCEMASK_ERECT));
 		}
 		else
 		{
+			//Print("else - SHOULD NOT BE HERE");
 			if( action_data.m_Player.IsPlayerInStance(DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT) )
 			{
 				Class.CastTo(callback, action_data.m_Player.AddCommandModifier_Action(DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS,GetCallbackClassTypename()));
@@ -103,8 +99,55 @@ class ActionTakeItemToHands: ActionInteractBase
 				Class.CastTo(callback, action_data.m_Player.StartCommand_Action(DayZPlayerConstants.CMD_ACTIONFB_PICKUP_HANDS,GetCallbackClassTypename(),DayZPlayerConstants.STANCEMASK_PRONE));
 			}
 		}
+		//Print(callback);
 		callback.SetActionData(action_data); 
 		callback.InitActionComponent();
 		action_data.m_Callback = callback;
 	}
 };
+
+class ActionSwapItemToHands: ActionTakeItemToHands
+{
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
+	{
+		ItemBase tgt_item = ItemBase.Cast( target.GetObject() );
+		if ( !tgt_item || !tgt_item.IsTakeable() ) return false;
+		if ( tgt_item.IsBeingPlaced() ) return false;
+		
+		if ( player.GetInventory().CanSwapEntities(tgt_item,item) )
+		{
+			return true;
+		}
+		return false;
+	}
+	
+	/*override void OnStartServer( ActionData action_data )
+	{
+		Print("Server - ActionSwapItemToHands starting");
+	}
+	
+	override void OnStartClient( ActionData action_data )
+	{
+		Print("Client - ActionSwapItemToHands starting");
+	}*/
+	
+	override void OnExecuteServer( ActionData action_data )
+	{
+		//Print("Server - OnExecuteServer");
+		InventoryLocation inloc = new InventoryLocation;
+		EntityAI ntarget = EntityAI.Cast(action_data.m_Target.GetObject());
+		//action_data.m_Player.PredictiveSwapEntities(ntarget,action_data.m_MainItem);
+		//action_data.m_Player.PredictiveForceSwapEntities( ntarget, action_data.m_MainItem, inloc );
+		action_data.m_Player.LocalSwapEntities(ntarget,action_data.m_MainItem);
+	}
+	
+	override void OnExecuteClient( ActionData action_data )
+	{
+		//Print("Client - OnExecuteClient");
+		InventoryLocation inloc = new InventoryLocation;
+		EntityAI ntarget = EntityAI.Cast(action_data.m_Target.GetObject());
+		//action_data.m_Player.PredictiveSwapEntities(ntarget,action_data.m_MainItem);
+		//action_data.m_Player.PredictiveForceSwapEntities( ntarget, action_data.m_MainItem, inloc );
+		action_data.m_Player.LocalSwapEntities(ntarget,action_data.m_MainItem);
+	}
+}

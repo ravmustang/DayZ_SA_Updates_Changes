@@ -11,12 +11,6 @@ class ActionDisinfectPlant: ActionContinuousBase
 	void ActionDisinfectPlant()
 	{
 		m_CallbackClass = ActionDisinfectPlantCB;
-		m_MessageSuccess = "I've disinfected plant.";
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "";
-		m_MessageFail = "";
-		m_MessageCancel = "";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SPRAYPLANT;
@@ -28,11 +22,6 @@ class ActionDisinfectPlant: ActionContinuousBase
 	{	
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_DISINFECT_PLANT;
 	}
 		
 	override string GetText()

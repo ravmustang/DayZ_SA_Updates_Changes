@@ -64,7 +64,8 @@ class UpgradeTorchWithLard extends RecipeBase
 		
 		if (rag_on_torch) // Check if torch already has rag with 100% quantity
 		{
-			if (rag_on_torch.GetQuantity() >= 1 )
+			float quantity = rag_on_torch.GetQuantity();
+			if (quantity > 1  ||  (quantity >=1 && torch.IsIgnited()) )
 			{
 				return torch.CanReceiveUpgrade();
 			}

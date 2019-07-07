@@ -16,10 +16,6 @@ class ActionMineTree: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_HACKTREE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "My tool is too damaged to cut.";
-		m_MessageStart = "I started cutting down the tree.";
-		m_MessageSuccess = "I have cut down the tree.";
-		m_MessageFail = "My tool is ruined.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
 	
@@ -27,11 +23,6 @@ class ActionMineTree: ActionContinuousBase
 	{	
 		m_ConditionTarget = new CCTTree(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_MINE_TREE;
 	}
 		
 	override string GetText()

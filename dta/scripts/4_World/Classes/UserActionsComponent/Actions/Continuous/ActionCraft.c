@@ -17,11 +17,6 @@ class ActionCraft: ActionContinuousBase
 	
 	void ActionCraft()
 	{
-		m_MessageStartFail = "Ooops";
-		m_MessageStart = "I have started crafting.";
-		m_MessageSuccess = "I crafted something!";
-		m_MessageFail = "Oops again..";
-		
 		m_Sound = "craft_universal_0";
 		
 		m_CallbackClass = ActionCraftCB;
@@ -34,11 +29,6 @@ class ActionCraft: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_CRAFT;
 	}
 		
 	override string GetText()

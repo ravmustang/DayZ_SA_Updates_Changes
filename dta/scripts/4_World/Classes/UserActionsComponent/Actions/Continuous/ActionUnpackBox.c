@@ -13,14 +13,6 @@ class ActionUnpackBox: ActionContinuousBase
 		m_CallbackClass = ActionUnpackBoxCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_OPENITEM;
-		
-
-		
-		m_MessageStartFail = "I cannot unpack this.";
-		m_MessageStart = "I have started unpacking the box.";
-		m_MessageSuccess = "I have unpacked the box.";
-		m_MessageFail = "I have moved and unpacking was canceled.";
-		m_MessageCancel = "I stopped unpacking.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -33,11 +25,6 @@ class ActionUnpackBox: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-		
-	override int GetType()
-	{
-		return AT_UNPACK_BOX;
 	}
 
 	override bool HasTarget()

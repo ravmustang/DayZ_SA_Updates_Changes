@@ -52,10 +52,12 @@ class VirtualHud
 		RegisterElement(new TendencyHunger(m_Player));// size 6
 		RegisterElement(new TendencyThirst(m_Player));// size 6
 		RegisterElement(new TendencyBacteria(m_Player));// size 6
-		// sum 18/32
+		RegisterElement(new BadgeHeartbeat(m_Player));// size 2(client only)
+		// sum 20/32
 
 		RegisterElement(new ElementStance(m_Player));// size 0(client only)
 		RegisterElement(new BadgeBleeding(m_Player));// size 0(client only)
+		
 
 		mission = GetGame().GetMission();
 		if ( mission )
@@ -191,7 +193,8 @@ class VirtualHud
 	{
 		for(int i = 0; i < NUMBER_OF_ELEMENTS;i++)
 		{
-			if( GetElement(i) && GetElement(i).IsClientOnly() ) GetElement(i).UpdateHUD();
+			DisplayElementBase element = GetElement(i);
+			if( element && element.IsClientOnly() && element.IsValueChanged() ) element.UpdateHUD();
 		}
 	}
 	/*
@@ -206,11 +209,12 @@ class VirtualHud
 	void UpdateStatus()
 	{
 		//Log("UpdateStatus called for entity: "+ToString(m_Player));
-		for(int i = 0; i < NUMBER_OF_ELEMENTS;i++)
+		for(int i = 0; i < NUMBER_OF_ELEMENTS; i++)
 		{
-			if(  GetElement(i) && !GetElement(i).IsClientOnly() ) 
+			DisplayElementBase element = GetElement(i);
+			if(  element && !element.IsClientOnly() && element.IsValueChanged() ) 
 			{
-				GetElement(i).UpdateHUD();
+				element.UpdateHUD();
 			}
 		}
 	}

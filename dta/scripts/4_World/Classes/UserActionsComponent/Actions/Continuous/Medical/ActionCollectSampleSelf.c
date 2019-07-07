@@ -11,12 +11,6 @@ class ActionCollectSampleSelf: ActionContinuousBase
 	void ActionCollectSampleSelf()
 	{
 		m_CallbackClass = ActionCollectSampleSelfCB;
-		m_MessageStartFail = "It's full";
-		m_MessageStart = "I have started collecting sample";
-		m_MessageSuccess = "I have collected sample.";
-		m_MessageFail = "I have moved and fixing was canceled.";
-		m_MessageCancel = "I stopped fixing.";
-		//m_Animation = "bandage";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_COLLECTBLOODSELF;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -27,11 +21,6 @@ class ActionCollectSampleSelf: ActionContinuousBase
 	{		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_COLLECT_SAMPLE_S;
 	}
 
 	override bool HasTarget()

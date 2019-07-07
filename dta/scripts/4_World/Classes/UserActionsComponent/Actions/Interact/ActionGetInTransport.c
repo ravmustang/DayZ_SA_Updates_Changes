@@ -6,8 +6,6 @@ class ActionGetInTransport: ActionInteractBase
 
 	void ActionGetInTransport()
 	{
-		m_MessageSuccess = "";
-		//m_CommandUID = DayZPlayerConstants.;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		m_HUDCursorIcon = "GetInDriver";
 	}
@@ -19,14 +17,19 @@ class ActionGetInTransport: ActionInteractBase
 		m_ConditionTarget = new CCTNone;
 	}
 
-	override int GetType()
-	{
-		return AT_GETIN_TRANSPORT;
-	}
-
 	override string GetText()
 	{
 		return "#get_in_vehicle";
+	}
+
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
+	}
+	
+	override bool HasProgress()
+	{
+		return false;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

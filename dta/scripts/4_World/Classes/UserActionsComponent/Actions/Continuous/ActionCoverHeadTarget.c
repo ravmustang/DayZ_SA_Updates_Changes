@@ -11,11 +11,6 @@ class ActionCoverHeadTarget: ActionContinuousBase
 	void ActionCoverHeadTarget()
 	{
 		m_CallbackClass = ActionCoverHeadTargetCB;
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "Player started putting sack on your head.";
-		m_MessageSuccess = "Player finished putting sack on your head.";
-		m_MessageFail = "Player moved and putting sack on was canceled.";
-		m_MessageCancel = "You stopped putting sack on.";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_COVERHEAD_TARGET;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		//m_Animation = "INJECTEPIPENS";
@@ -27,11 +22,6 @@ class ActionCoverHeadTarget: ActionContinuousBase
 		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);		
-	}
-
-	override int GetType()
-	{
-		return AT_COVER_HEAD_T;
 	}
 	
 	override string GetText()

@@ -7,8 +7,6 @@ class ActionEmptySeedsPack: ActionSingleUseBase
 {
 	void ActionEmptySeedsPack()
 	{
-		m_MessageSuccess = "I've emptied the pack.";
-		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYSEEDSPACK;
 		m_FullBody = false;
 	}
@@ -17,11 +15,6 @@ class ActionEmptySeedsPack: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_EMPTY_SEEDS_PACK;
 	}
 
 	override bool HasTarget()

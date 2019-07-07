@@ -19,14 +19,6 @@ class ActionFillObject: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIG;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
-		/*
-		m_MessageStart = "Player started placing object.";
-		m_MessageSuccess = "Player placed the object."
-		m_MessageFail = "Player failed to place the object.";
-		m_MessageCancel = "You canceled action.";
-		m_MessageStartFail = "Failed to start action: Object collides with environment.";
-		*/
-		//m_Animation = "DIGGINGSHOVEL";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -35,11 +27,6 @@ class ActionFillObject: ActionContinuousBase
 		
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_FILL_OBJECT;
 	}
 		
 	override string GetText()

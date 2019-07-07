@@ -819,6 +819,18 @@ class EmoteManager
 					}
 				break;
 				
+				case ID_EMOTE_VOMIT :
+					if ( m_Player.GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER || !GetGame().IsMultiplayer() )
+					{
+						ref SymptomBase symptom = m_Player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_VOMIT);
+	        			
+			            if ( symptom )
+			            { 
+			                symptom.SetDuration(Math.RandomIntInclusive(4,8));
+			            }
+					}
+				break;
+				
 				default :
 					Print("EmoteManager.c | PlayEmote | WRONG ID");
 					m_bEmoteIsPlaying = false;
@@ -1126,7 +1138,7 @@ class EmoteManager
 			return false;
 		}
 		
-		if ( !m_Player || m_Player.GetCommand_Action() || m_Player.GetCommandModifier_Action() )
+		if ( !m_Player || m_Player.GetCommand_Action() || m_Player.GetCommandModifier_Action() || m_Player.GetThrowing().IsThrowingModeEnabled())
 		{	
 			return false;
 		}
@@ -1227,7 +1239,7 @@ class EmoteManager
 			}
 			
 			if ( m_Player.GetActionManager() )
-				m_Player.GetActionManager().EnableActions();
+				m_Player.GetActionManager().EnableActions(true);
 			
 			m_Player.SetInventorySoftLock(false);
 						
@@ -1248,7 +1260,7 @@ class EmoteManager
 			}
 				
 			if ( m_Player.GetActionManager() )
-				m_Player.GetActionManager().DisableActions();
+				m_Player.GetActionManager().EnableActions(false);
 			
 			//m_Player.SetInventorySoftLock(true);
 			

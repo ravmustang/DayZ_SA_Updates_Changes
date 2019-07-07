@@ -4,16 +4,7 @@ class ActionPlaceFireplaceIntoBarrel: ActionSingleUseBase
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "I placed the fireplace inside.";
-		m_MessageFail = "I was unable to place the fireplace inside.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
-	}
-	
-	override int GetType()
-	{
-		return AT_PLACE_FIREPLACE_BARREL;
 	}
 		
 	override string GetText()

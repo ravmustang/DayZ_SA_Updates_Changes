@@ -9,7 +9,6 @@ class ActionTakeItem: ActionInteractBase
 
 	void ActionTakeItem()
 	{
-		m_MessageSuccess    = "";
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_INVENTORY;
 		m_CommandUIDProne	= DayZPlayerConstants.CMD_ACTIONFB_PICKUP_INVENTORY;
 		m_HUDCursorIcon     = CursorIcons.LootCorpse;
@@ -19,11 +18,6 @@ class ActionTakeItem: ActionInteractBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTObject(UAMaxDistances.DEFAULT);
-	}	
-	
-	override int GetType()
-	{
-		return AT_TAKE_ITEM;
 	}
 
 	override string GetText()

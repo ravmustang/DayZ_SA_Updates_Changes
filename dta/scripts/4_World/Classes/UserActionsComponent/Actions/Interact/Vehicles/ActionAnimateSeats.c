@@ -1,10 +1,5 @@
 class ActionAnimateSeats: ActionAnimateCarSelection
 {
-	override int GetType()
-	{
-		return AT_ANIMATE_SEATS;
-	}
-
 	override string GetText()
 	{
 		return "#move_seat";
@@ -38,20 +33,27 @@ class ActionAnimateSeats: ActionAnimateCarSelection
 				{
 					//return true; //TODO:: NEED A LINK BETWEEN SeatBack and seat with crew after that we can REMOVE the return
 					
+					HumanCommandVehicle vehCmd = player.GetCommand_Vehicle();
+
 					if ( m_AnimSource == "SeatDriver" )
 					{
-						if ( car.GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED || transport.CrewMember( DayZPlayerConstants.VEHICLESEAT_DRIVER ) )
+						if ( transport.CrewMember( DayZPlayerConstants.VEHICLESEAT_DRIVER ) )
 							return false;
 
+						if ( !vehCmd && car.GetCarDoorsState( "NivaDriverDoors" ) == CarDoorState.DOORS_CLOSED )
+							return false;
 					}
 					
 					if ( m_AnimSource == "SeatCoDriver" )
 					{
-						if ( car.GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED || transport.CrewMember( DayZPlayerConstants.VEHICLESEAT_CODRIVER )  )
+						if ( transport.CrewMember( DayZPlayerConstants.VEHICLESEAT_CODRIVER ) )
+							return false;
+
+						if ( !vehCmd && car.GetCarDoorsState( "NivaCoDriverDoors" ) == CarDoorState.DOORS_CLOSED )
 							return false;
 					}
 					
-					if ( !transport.CanReachSeatFromDoors(selections[i], player.GetPosition(), 1.0) )
+					if ( !vehCmd && !transport.CanReachSeatFromDoors(selections[i], player.GetPosition(), 1.0) )
 						return false;
 
 					return true;

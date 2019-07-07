@@ -5,6 +5,9 @@ class PoisoningMdfr: ModifierBase
 	private const float 	POISONING_LASTS_SEC	 = 15;
 	private float			m_Time;
 	
+	const int FOOD_POISON_AGENT_THRESHOLD_ACTIVATE = 150;
+	const int FOOD_POISON_AGENT_THRESHOLD_DEACTIVATE = 50;
+	
 	override void Init()
 	{
 		m_TrackActivatedTime	= true;
@@ -17,12 +20,26 @@ class PoisoningMdfr: ModifierBase
 	
 	override bool ActivateCondition(PlayerBase player)
 	{
-		return false;
+		if(player.GetSingleAgentCount(eAgents.FOOD_POISON) > FOOD_POISON_AGENT_THRESHOLD_ACTIVATE) 
+		{
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
 	}
 	
 	override bool DeactivateCondition(PlayerBase player)
 	{
-		return false;
+		if(player.GetSingleAgentCount(eAgents.FOOD_POISON) < FOOD_POISON_AGENT_THRESHOLD_DEACTIVATE) 
+		{
+			return true;
+		}
+		else 
+		{
+			return false;
+		}
 	}
 
 	override void OnActivate(PlayerBase player)
@@ -37,6 +54,7 @@ class PoisoningMdfr: ModifierBase
 
 	override void OnTick(PlayerBase player, float deltaT)
 	{	
+		/*
 		player.GetStatWater().Add((WATER_DECREMENT_PER_SEC*deltaT));
 		
 		float currentblood = player.GetHealth("GlobalHealth", "Blood");
@@ -46,5 +64,6 @@ class PoisoningMdfr: ModifierBase
 		{
 			player.GetModifiersManager().DeactivateModifier(eModifiers.MDF_POISONING);
 		}
+		*/
 	}
 };

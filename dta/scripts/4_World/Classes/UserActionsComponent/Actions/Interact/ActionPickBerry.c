@@ -20,10 +20,6 @@ class ActionPickBerry: ActionInteractLoopBase
 {
 	void ActionPickBerry()
 	{
-		m_MessageSuccess = "I have harvested it.";
-		m_MessageStartFail = "Fail..";
-		//m_MaximalActionDistance = 1;
-		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
@@ -36,11 +32,6 @@ class ActionPickBerry: ActionInteractLoopBase
 	{
 		m_ConditionTarget = new CCTCursor(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINone;
-	}
-
-	override int GetType()
-	{
-		return AT_PICK_BERRY;
 	}
 
 	override string GetText()

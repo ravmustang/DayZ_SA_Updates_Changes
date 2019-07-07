@@ -137,7 +137,11 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 			else if ( source.IsWeapon() || source.IsMeleeWeapon() )  // player
 			{				
 				m_Source = PlayerBase.Cast( EntityAI.Cast( source ).GetHierarchyParent() );
-				m_PlayerPrefix2 = this.GetPlayerPrefix( m_Source ,  m_Source.GetIdentity() );
+				m_PlayerPrefix2 = "";
+				if(m_Source)
+				{
+					m_PlayerPrefix2 = this.GetPlayerPrefix( m_Source ,  m_Source.GetIdentity() );
+				}
 				
 				if ( source.IsMeleeWeapon() )
 				{	
@@ -173,7 +177,7 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 				
 					if ( m_HitFilter != 1 && ( source.IsZombie() || source.IsAnimal() ) )  // Infected & Animals
 					{
-						m_DisplayName = Object.Cast( source ).GetDisplayName();
+						m_DisplayName = source.GetDisplayName();
 												
 						LogPrint( m_PlayerPrefix + " hit by " + m_DisplayName + m_HitMessage );	
 					}			
@@ -194,7 +198,7 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 					}
 					else
 					{
-						m_DisplayName = Object.Cast(source).GetType();
+						m_DisplayName = source.GetType();
 					
 						LogPrint( m_PlayerPrefix + " hit by " + m_DisplayName + m_HitMessage );					
 					} 
@@ -213,7 +217,7 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 					}
 					else 
 					{
-						m_DisplayName = Object.Cast(source).GetType();
+						m_DisplayName = source.GetType();
 					
 						LogPrint( m_PlayerPrefix + " hit by " + m_DisplayName + m_HitMessage );			
 					}
@@ -230,17 +234,17 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 					{
 						LogPrint( m_PlayerPrefix + " hit by " + ammo );	
 					}
-					else if ( Object.Cast(source).GetType() == "AreaDamageTrigger" )  
+					else if ( source.GetType() == "AreaDamageBase" )  
 					{
-						EntityAI parent = AreaDamageTrigger.Cast( source ).GetParentObject();
+						EntityAI parent = EntityAI.Cast( source );
 						if ( parent )
 						{
-							LogPrint( m_PlayerPrefix + " hit by " + Object.Cast( parent ).GetType() + " with " + ammo );	
+							LogPrint( m_PlayerPrefix + " hit by " + parent.GetType() + " with " + ammo );	
 						}
 					}
 					else
 					{
-						m_DisplayName = Object.Cast(source).GetType();
+						m_DisplayName = source.GetType();
 										
 						LogPrint( m_PlayerPrefix + " hit by " + m_DisplayName + " with " + ammo );
 					}
@@ -298,37 +302,10 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 	{
 		if ( m_ActionsFilter == 1 )
 		{						
-			switch ( action_data.m_Action.GetType() )
-			{
-			case AT_DESTROY_COMBINATION_LOCK :
-				
-				m_Message = " destroyed combination lock with " + action_data.m_MainItem.GetDisplayName();
-				break;	
-							
-			case AT_BUILD_PART :
-				
-				m_Message = " built " + action_data.m_Target.GetObject().GetDisplayName() + " with " + action_data.m_MainItem.GetDisplayName();
-				break;		
-				
-			case AT_DISMANTLE_PART :
-				
-				m_Message = " dismantled " + action_data.m_Target.GetObject().GetDisplayName() + " with " + action_data.m_MainItem.GetDisplayName();
-				break;	
-				
-			case AT_DESTROY_PART :
-				
-				m_Message = " destroyed " + action_data.m_Target.GetObject().GetDisplayName() + " with " + action_data.m_MainItem.GetDisplayName();
-				break;		
-				
-			case AT_FOLD_BASEBUILDING_OBJECT :
-				
-				m_Message = " folded " + action_data.m_Target.GetObject().GetDisplayName();
-				break;	
-												
-			default:
-				
-				return;		
-			}
+			m_Message = action_data.m_Action.GetAdminLogMessage(action_data);
+			
+			if(m_Message == "")
+				return;
 			
 			m_PlayerPrefix = this.GetPlayerPrefix( action_data.m_Player , action_data.m_Player.GetIdentity() );
 			

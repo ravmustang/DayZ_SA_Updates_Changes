@@ -8,7 +8,6 @@ class ActionAttach: ActionSingleUseBase
 {
 	void ActionAttach()
 	{
-		m_MessageSuccess = "I've attached the object.";
 	}
 
 	override void CreateConditionComponents() 
@@ -17,11 +16,6 @@ class ActionAttach: ActionSingleUseBase
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.DEFAULT );
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ATTACHITEM;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
-	}
-	
-	override int GetType()
-	{
-		return AT_ATTACH;
 	}
 		
 	override string GetText()
@@ -71,11 +65,10 @@ class ActionAttach: ActionSingleUseBase
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		EntityAI target_entity = EntityAI.Cast( target.GetObject() );
-		EntityAI item_entity = EntityAI.Cast( item );
 		
-		if ( target_entity && item_entity )
+		if ( target_entity && item )
 		{
-			if ( target_entity.GetInventory() && target_entity.GetInventory().CanAddAttachment( item_entity ) )
+			if ( target_entity.GetInventory() && target_entity.GetInventory().CanAddAttachment( item ) )
 			{
 				return true;
 			}

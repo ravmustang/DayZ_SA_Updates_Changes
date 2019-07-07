@@ -21,7 +21,7 @@ class WeaponStableState extends WeaponStateBase
 		int curr = m_weapon.GetWeaponAnimState();
 		if (curr != m_animState)
 		{			
-			//fsmDebugSpam("[wpnfsm] synchronizing anim state: " + curr + " --> " + m_animState);
+			//fsmDebugSpam("[wpnfsm] " + Object.GetDebugName(m_weapon) + " synchronizing anim state: " + curr + " --> " + m_animState);
 			DayZPlayer p;
 			if (Class.CastTo(p, m_weapon.GetHierarchyParent()))
 			{
@@ -30,14 +30,14 @@ class WeaponStableState extends WeaponStateBase
 				{
 					hcw.SetInitState(m_animState);
 					m_weapon.SetWeaponAnimState(m_animState);
-					fsmDebugSpam("[wpnfsm] state=" + m_weapon.GetCurrentState().Type() + " synchronized anim state: " + typename.EnumToString(PistolAnimState, curr) + " --> " + typename.EnumToString(PistolAnimState, m_animState));
+					fsmDebugSpam("[wpnfsm] " + Object.GetDebugName(m_weapon) + " state=" + m_weapon.GetCurrentState().Type() + " synchronized anim state: " + typename.EnumToString(PistolAnimState, curr) + " --> " + typename.EnumToString(PistolAnimState, m_animState));
 				}
 				else
 				{
 					Human wpnOwner = Human.Cast(m_weapon.GetHierarchyRootPlayer());
 					HumanCommandWeapons.StaticSetInitState(wpnOwner, m_animState);
 					m_weapon.SetWeaponAnimState(m_animState);
-					fsmDebugSpam("[wpnfsm] state=" + m_weapon.GetCurrentState().Type() + " synchronized remote anim state: " + typename.EnumToString(PistolAnimState, curr) + " --> " + typename.EnumToString(PistolAnimState, m_animState));
+					fsmDebugSpam("[wpnfsm] " + Object.GetDebugName(m_weapon) + " state=" + m_weapon.GetCurrentState().Type() + " synchronized remote anim state: " + typename.EnumToString(PistolAnimState, curr) + " --> " + typename.EnumToString(PistolAnimState, m_animState));
 				}
 			}		
 		}

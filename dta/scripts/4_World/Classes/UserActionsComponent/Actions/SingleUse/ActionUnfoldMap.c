@@ -3,11 +3,13 @@ class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 	protected ref ActionData			m_ActionData; //needs to be reffed for the destructor use
 	bool 								m_MapFolding;
 	bool 								m_HasReceivedEvent;
+	bool 								m_CancelCondition;
 	
 	void ActionUnfoldMapCB()
 	{
 		RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);
 		EnableStateChangeCallback();
+		EnableCancelCondition( true );
 	}
 	
 	void ~ActionUnfoldMapCB()
@@ -31,22 +33,25 @@ class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 	{
 		m_ActionData = action_data;
 	}
+			
+	bool CancelCondition( bool pEnable )
+	{		
+		return m_CancelCondition;
+	}
 	
 	override void OnStateChange(int pOldState, int pCurrentState)
 	{
 		if (!m_ActionData || !m_ActionData.m_Player)
 			return;
 		
-		if ( m_HasReceivedEvent )
-			return;
-		
-		if ( pCurrentState == STATE_NONE ) //callback ended
+		if ( ( pOldState == STATE_LOOP_IN && pCurrentState == STATE_LOOP_LOOP ) && !m_HasReceivedEvent )
 		{
-			m_ActionData.m_Player.CloseMap();
+			m_CancelCondition = true;
 		}
-		if ( pOldState == STATE_LOOP_IN && pCurrentState == STATE_LOOP_LOOP )
+		
+		if ( ( pOldState == STATE_LOOP_IN && pCurrentState == STATE_LOOP_LOOP ) && m_HasReceivedEvent )
 		{
-			PerformMapChange();
+			m_CancelCondition = false; 
 		}
 	}
 	
@@ -90,6 +95,8 @@ class ActionUnfoldMapCB : HumanCommandActionCallback //ActionSingleUseBaseCB
 		if (m_ActionData.m_Player.IsSwimming() || m_ActionData.m_Player.IsFalling() || m_ActionData.m_Player.IsClimbingLadder() || m_ActionData.m_Player.IsUnconscious() || m_ActionData.m_Player.IsRestrained())
 			return;
 		
+		if ( m_CancelCondition ) { return; };
+		
 		ItemMap chernomap = ItemMap.Cast(m_ActionData.m_Player.GetItemInHands());
 		if (chernomap && !m_ActionData.m_Player.IsMapOpen() && !m_MapFolding)
 		{
@@ -130,11 +137,6 @@ class ActionUnfoldMap: ActionBase
 		m_ConditionTarget = new CCTNone;
 	}
 
-	override int GetType()
-	{
-		return AT_UNFOLD_MAP;
-	}
-
 	override string GetText()
 	{
 		return "#unfold_map";
@@ -167,6 +169,14 @@ class ActionUnfoldMap: ActionBase
 	override void OnStartServer( ActionData action_data )
 	{
 		OpenMap( action_data );
+	}
+	
+	override void OnEndRequest(ActionData action_data)
+	{
+		if ( action_data.m_Player.m_hac )
+			action_data.m_Player.m_hac.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END);
+		
+		action_data.m_State = UA_FINISHED;
 	}
 	
 	void OpenMap( ActionData action_data )

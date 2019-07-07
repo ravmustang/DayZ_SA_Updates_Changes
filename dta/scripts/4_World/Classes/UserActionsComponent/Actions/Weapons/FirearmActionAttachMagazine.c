@@ -11,11 +11,6 @@ class FirearmActionAttachMagazine : FirearmActionBase
 	{
 		return AC_SINGLE_USE;
 	}
-	
-	override int GetType()  //returns action uid
-	{
-		return AT_LOAD_MAGAZINE_TO_WEAPON;
-	}
 
 	override string GetText() //text game displays in HUD hint 
 	{
@@ -86,4 +81,50 @@ class FirearmActionAttachMagazine : FirearmActionBase
 	{
 		return -1;
 	}*/
+};
+
+
+class FirearmActionAttachMagazineQuick : FirearmActionBase
+{	
+	void FirearmActionAttachMagazineQuick() 
+	{
+	}	
+	
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item ) //condition for action
+	{
+		MagazineStorage mag = MagazineStorage.Cast(player.GetWeaponManager().GetPreparedMagazine());
+		return mag != null;
+	}
+	
+	override void Start( ActionData action_data )
+	{
+		super.Start( action_data );
+		Weapon_Base wpn = Weapon_Base.Cast(action_data.m_MainItem);
+		Magazine mag = Magazine.Cast(action_data.m_Player.GetWeaponManager().GetPreparedMagazine());	
+		if ( action_data.m_Player.GetWeaponManager().CanAttachMagazine(wpn,mag,false) )
+			action_data.m_Player.GetWeaponManager().AttachMagazine(mag, this);
+		else
+			action_data.m_Player.GetWeaponManager().SwapMagazine(mag, this);
+	}
+	
+	override bool HasTarget()
+	{
+		return false;
+	}
+	
+	override bool HasProgress()
+	{
+		return false;
+	}
+	
+	override typename GetInputType()
+	{
+		return ContinuousWeaponManipulationActionInput;
+	} 
+	
+	override void CreateConditionComponents()  
+	{
+		m_ConditionItem = new CCINonRuined();
+		m_ConditionTarget = new CCTSelf;
+	}
 };

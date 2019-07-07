@@ -68,7 +68,7 @@ class WeaponGuardJammed extends WeaponGuardBase
 		if (m_weapon.IsChamberJammed(mi))*/
 		if(m_weapon.IsJammed())
 		{
-			wpnDebugPrint("[wpnfsm] guard - jammed");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - jammed");
 			return true;
 		}
 		wpnDebugPrint("[wpnfsm] guard - not jammed");
@@ -85,10 +85,10 @@ class WeaponGuardIsDestroyed extends WeaponGuardBase
 	{
 		if (m_weapon.IsDamageDestroyed())
 		{
-			wpnDebugPrint("[wpnfsm] guard - weapon destroyed");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - weapon destroyed");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - weapon not destroyed");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - weapon not destroyed");
 		return false;
 	}
 }
@@ -104,10 +104,10 @@ class WeaponGuardHasAmmo extends WeaponGuardBase
 		Magazine mag = m_weapon.GetMagazine(mi);
 		if (mag != NULL && mag.GetAmmoCount() > 0)
 		{
-			wpnDebugPrint("[wpnfsm] guard - has ammo");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - has ammo");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - no ammo");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - no ammo");
 		return false;
 	}
 };
@@ -122,10 +122,10 @@ class WeaponGuardHasAmmoInnerMagazine extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.GetInternalMagazineCartridgeCount(mi) >= 1)
 		{
-			wpnDebugPrint("[wpnfsm] guard - has ammo in inner magazine");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - has ammo in inner magazine");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - no ammo in inner magazine");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - no ammo in inner magazine");
 		return false;
 	}
 };
@@ -140,10 +140,10 @@ class WeaponGuardHasAmmoInEvent extends WeaponGuardBase
 		Magazine mag = e.m_magazine;
 		if (mag != NULL && mag.GetAmmoCount() > 0)
 		{
-			wpnDebugPrint("[wpnfsm] guard - has ammo in event");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - has ammo in event");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - no ammo in event");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - no ammo in event");
 		return false;
 	}
 };
@@ -160,10 +160,10 @@ class WeaponGuardHasMag extends WeaponGuardBase
 		Magazine mag = m_weapon.GetMagazine(mi);
 		if (mag != NULL)
 		{
-			wpnDebugPrint("[wpnfsm] guard - has magazine");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - has magazine");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - no magazine");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - no magazine");
 		return false;
 	}
 };
@@ -178,10 +178,10 @@ class WeaponGuardChamberEmpty extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.IsChamberEmpty(mi))
 		{
-			wpnDebugPrint("[wpnfsm] guard - chamber empty");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber empty");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - chamber not empty");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber not empty");
 		return false;
 	}
 };
@@ -196,10 +196,10 @@ class WeaponGuardChamberFull extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.IsChamberFull(mi))
 		{
-			wpnDebugPrint("[wpnfsm] guard - chamber full");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber full");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - chamber not full");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber not full");
 		return false;
 	}
 };
@@ -215,10 +215,10 @@ class WeaponGuardInnerMagazineFull extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.IsInternalMagazineFull(mi))
 		{
-			wpnDebugPrint("[wpnfsm] guard - internal magazine full");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - internal magazine full");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - internal magazine not full");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - internal magazine not full");
 		return false;
 	}
 };
@@ -234,10 +234,10 @@ class WeaponGuardInnerMagazineFullShareChamber extends WeaponGuardBase
 		
 		if ( m_weapon.IsChamberFull(mi) && m_weapon.IsInternalMagazineFull(mi))
 		{
-			wpnDebugPrint("[wpnfsm] guard - internal magazine with share chamber is full");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - internal magazine with share chamber is full");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - internal magazine with share chamber is not full");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - internal magazine with share chamber is not full");
 		return false;
 	}
 }; 
@@ -253,10 +253,10 @@ class WeaponGuardChamberFiredOut extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.IsChamberFiredOut(mi))
 		{
-			wpnDebugPrint("[wpnfsm] guard - chamber fired out");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber fired out");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - chamber not fired out");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber not fired out");
 		return false;
 	}
 };
@@ -271,10 +271,10 @@ class WeaponGuardCanAttachMag extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon && e.m_magazine && m_weapon.CanAttachMagazine(mi, e.m_magazine))
 		{
-			wpnDebugPrint("[wpnfsm] guard - can attach magazine");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - can attach magazine");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - cannot attach magazine");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - cannot attach magazine");
 		return false;
 	}
 };
@@ -289,10 +289,10 @@ class WeaponGuardCanDetachMag extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon && e.m_magazine && m_weapon.GetMagazine(mi)/* && m_weapon.CanDetachMagazine(mi, e.m_magazine)*/)
 		{
-			wpnDebugPrint("[wpnfsm] guard - can detach magazine");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - can detach magazine");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - cannot detach magazine");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - cannot detach magazine");
 		return false;
 	}
 };
@@ -307,10 +307,10 @@ class WeaponGuardChamberHasRoomForMoreThanOne extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.GetInternalMagazineMaxCartridgeCount(mi) - m_weapon.GetInternalMagazineCartridgeCount(mi) > 1)
 		{
-			wpnDebugPrint("[wpnfsm] guard - chamber has room for more than 1b");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber has room for more than 1b");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - chamber has no room for more than 1b");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber has no room for more than 1b");
 		return false;
 	}
 };
@@ -325,10 +325,10 @@ class WeaponGuardChamberHasRoomForOne extends WeaponGuardBase
 		int mi = m_weapon.GetCurrentMuzzle();
 		if (m_weapon.GetTotalMaxCartridgeCount(mi) - m_weapon.GetTotalCartridgeCount(mi) == 1)
 		{
-			wpnDebugPrint("[wpnfsm] guard - chamber has room for 1b");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber has room for 1b");
 			return true;
 		}
-		wpnDebugPrint("[wpnfsm] guard - chamber has no room for 1b");
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - chamber has no room for 1b");
 		return false;
 	}
 };
@@ -366,14 +366,14 @@ class WeaponGuardMagazinesHaveEqualSizes extends WeaponGuardBase
 			bool eq = magazinesHaveEqualSizes(mag, mag2);
 			if (eq)
 			{
-				wpnDebugPrint("[wpnfsm] guard - same inventory sizes");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - same inventory sizes");
 				return true;
 			}
 
-			wpnDebugPrint("[wpnfsm] guard - different inventory sizes");
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - different inventory sizes");
 			return false;
 		}
-		Error("[wpnfsm] guard - mag == NULL or mag2 == NULL, cannot perform comparison");
+		Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - mag == NULL or mag2 == NULL, cannot perform comparison");
 		return false;
 	}
 };

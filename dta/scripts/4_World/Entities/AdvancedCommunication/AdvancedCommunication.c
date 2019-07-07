@@ -1,57 +1,18 @@
 class AdvancedCommunication extends EntityAI
 {
-	ref TIntArray m_SingleUseActions;
-	ref TIntArray m_ContinuousActions;
-	ref TIntArray m_InteractActions;
+	static ref map<typename, ref TInputActionMap> m_AdvComTypeActionsMap = new map<typename, ref TInputActionMap>;
+	TInputActionMap m_InputActionMap;
+	bool	m_ActionsInitialize;
 	
 	void AdvancedCommunication()
 	{
-		//user actions
-		m_SingleUseActions = new TIntArray;
-		m_ContinuousActions = new TIntArray;
-		m_InteractActions = new TIntArray;
-		SetUserActions();		
-	}
-			
-	//User actions
-	void SetUserActions()
-	{
-		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " ContinuousActions", m_ContinuousActions);	
-		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " SingleUseActions", m_SingleUseActions);	
-		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " InteractActions", m_InteractActions);	
-	}
-
-	override void GetSingleUseActions(out TIntArray actions)
-	{	
-		if ( m_SingleUseActions )
-		{			
-			for ( int i = 0; i < m_SingleUseActions.Count(); i++ )
-			{
-				actions.Insert(m_SingleUseActions.Get(i));
-			}
-		}
-	}
-	
-	override void GetContinuousActions(out TIntArray actions)
-	{
-		if ( m_ContinuousActions )
+		if (GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
-			for ( int i = 0; i < m_ContinuousActions.Count(); i++ )
+			if(GetGame().GetPlayer())
 			{
-				actions.Insert(m_ContinuousActions.Get(i));
+				m_ActionsInitialize = false;
 			}
-		}
-	}
-	
-	override void GetInteractActions(out TIntArray actions)
-	{
-		if ( m_InteractActions )
-		{			
-			for ( int i = 0; i < m_InteractActions.Count(); i++ )
-			{
-				actions.Insert(m_InteractActions.Get(i));
-			}
-		}
+		}	
 	}
 
 	//HUD
@@ -91,6 +52,78 @@ class AdvancedCommunication extends EntityAI
 	void TurnOffTransmitter()
 	{
 		GetCompEM().SwitchOff();
+	}
+	
+	void InitializeActions()
+	{
+		m_InputActionMap = m_AdvComTypeActionsMap.Get( this.Type() );
+		if(!m_InputActionMap)
+		{
+			TInputActionMap iam = new TInputActionMap;
+			m_InputActionMap = iam;
+			SetActions();
+			m_AdvComTypeActionsMap.Insert(this.Type(), m_InputActionMap);
+		}
+	}
+	
+	override void GetActions(typename action_input_type, out array<ActionBase_Basic> actions)
+	{
+		if(!m_ActionsInitialize)
+		{
+			m_ActionsInitialize = true;
+			InitializeActions();
+		}
+		
+		actions = m_InputActionMap.Get(action_input_type);
+	}
+	
+	void SetActions()
+	{
+		AddAction(ActionTurnOnTransmitterOnGround);
+		AddAction(ActionTurnOffTransmitterOnGround);
+		AddAction(ActionDetachPowerSourceFromPanel);
+	}
+	
+	void AddAction(typename actionName)
+	{
+		ActionBase action = ActionManagerBase.GetAction(actionName);
+
+		if(!action)
+		{
+			Debug.LogError("Action " + actionName + " dosn't exist!");
+			return;
+		}		
+		
+		typename ai = action.GetInputType();
+		if(!ai)
+		{
+			m_ActionsInitialize = false;
+			return;
+		}
+		ref array<ActionBase_Basic> action_array = m_InputActionMap.Get( ai );
+		
+		if(!action_array)
+		{
+			action_array = new array<ActionBase_Basic>;
+			m_InputActionMap.Insert(ai, action_array);
+		}
+		
+		Print("+ " + this + " add action: " + action + " input " + ai);
+
+		action_array.Insert(action);
+	}
+	
+	void RemoveAction(typename actionName)
+	{
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		ActionBase action = player.GetActionManager().GetAction(actionName);
+		typename ai = action.GetInputType();
+		ref array<ActionBase_Basic> action_array = m_InputActionMap.Get( ai );
+		
+		if(action_array)
+		{
+			action_array.RemoveItem(action);
+		}
 	}
 }
 

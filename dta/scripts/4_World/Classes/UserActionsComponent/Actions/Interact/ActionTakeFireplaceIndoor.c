@@ -6,12 +6,6 @@ class ActionTakeFireplaceIndoor: ActionInteractBase
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_PICKUP_HANDS;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageSuccess 	= "I took the fireplace.";
-	}
-
-	override int GetType()
-	{
-		return AT_TAKE_FIREPLACE_INDOOR;
 	}
 
 	override string GetText()

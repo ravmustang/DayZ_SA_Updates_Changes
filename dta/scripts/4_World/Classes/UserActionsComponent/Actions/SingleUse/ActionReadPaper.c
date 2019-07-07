@@ -5,20 +5,12 @@ class ActionReadPaper: ActionSingleUseBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_VIEWNOTE;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_PRONE;
-		m_MessageSuccess = "I broke chemlight.";
-		m_MessageFail = "It's out of energy";
-		//m_Animation = "break";
 	}
 	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-	 return AT_READ_PAPER;
 	}
 
 	override bool HasTarget()

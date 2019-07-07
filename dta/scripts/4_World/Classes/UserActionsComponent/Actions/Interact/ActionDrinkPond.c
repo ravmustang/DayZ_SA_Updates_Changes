@@ -6,11 +6,6 @@ class ActionDrinkPond: ActionInteractBase
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
-
-	override int GetType()
-	{
-		return AT_DRINK_POND_ONE;
-	}
 	
 	override bool IsDrink()
 	{

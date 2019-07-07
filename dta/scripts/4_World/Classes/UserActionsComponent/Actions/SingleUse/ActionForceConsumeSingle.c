@@ -23,11 +23,6 @@ class ActionForceConsumeSingle: ActionSingleUseBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
 	}
-
-	override int GetType()
-	{
-		return AT_FORCE_CONSUME_SINGLE;
-	}
 		
 	override string GetText()
 	{

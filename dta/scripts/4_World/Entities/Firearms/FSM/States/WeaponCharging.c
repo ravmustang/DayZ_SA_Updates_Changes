@@ -113,7 +113,7 @@ class WeaponEjectBullet_Cartridge extends WeaponStateBase
 
 		if (!ctx.Write(m_dstMagazine))
 		{
-			Error("[wpnfsm] WeaponEjectBullet_Cartridge.SaveCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponEjectBullet_Cartridge.SaveCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -126,7 +126,7 @@ class WeaponEjectBullet_Cartridge extends WeaponStateBase
 
 		if (!ctx.Read(m_dstMagazine))
 		{
-			Error("[wpnfsm] WeaponEjectBullet_Cartridge.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponEjectBullet_Cartridge.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;

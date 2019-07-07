@@ -13,11 +13,6 @@ class ActionFertilizeSlot: ActionContinuousBase
 	void ActionFertilizeSlot()
 	{
 		m_CallbackClass = ActionFertilizeSlotCB;
-		m_MessageSuccess = "I've fertilized slot.";
-		m_MessageStartFail = "There's not enough fertilizer.";
-		m_MessageStart = "I've started fertilizing.";
-		m_MessageFail = "There's not enough fertilizer.";
-		m_MessageCancel = "I stoped fertilizing.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_MEDIUM;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
@@ -29,11 +24,6 @@ class ActionFertilizeSlot: ActionContinuousBase
 	{
 		m_ConditionTarget = new CCTDummy;
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_FERTILIZE_SLOT;
 	}
 		
 	override string GetText()

@@ -68,6 +68,9 @@ class Fireplace extends FireplaceBase
 
 	override bool CanReleaseAttachment( EntityAI attachment )
 	{
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
+		
 		ItemBase item = ItemBase.Cast( attachment );
 		
 		//has last attachment and there are still items in cargo
@@ -279,6 +282,16 @@ class Fireplace extends FireplaceBase
 		return !IsOven();
 	}
 	
+	
+	void DestroyClutterCutter( Object clutter_cutter )
+	{
+		GetGame().ObjectDelete( clutter_cutter );
+	}	
+	
+	//================================================================
+	// IGNITION ACTION
+	//================================================================	
+	
 	// Item-to-item fire distribution
 	override bool HasFlammableMaterial()
 	{
@@ -350,12 +363,7 @@ class Fireplace extends FireplaceBase
 			}
 		}
 	}
-	
-	void DestroyClutterCutter( Object clutter_cutter )
-	{
-		GetGame().ObjectDelete( clutter_cutter );
-	}
-	
+
 	override bool IsThisIgnitionSuccessful( EntityAI item_source = NULL )
 	{
 		//check kindling
@@ -365,13 +373,13 @@ class Fireplace extends FireplaceBase
 		}
 		
 		//check roof
-		if ( !IsEnoughRoomForFireAbove() )
+		if ( !HasEnoughRoomForFireAbove() )
 		{
 			return false;
 		}
 		
 		//check surface
-		if ( IsWaterSurface() )
+		if ( IsOnWaterSurface() )
 		{
 			return false;
 		}
@@ -383,8 +391,68 @@ class Fireplace extends FireplaceBase
 		}
 		
 		return true;	
-	}	
+	}
 	
+	//================================================================
+	// FIREPLACE ENTITY
+	//================================================================	
+	static Fireplace IgniteEntityAsFireplace( notnull EntityAI entity,notnull EntityAI fire_source )
+	{
+		//get player
+		PlayerBase player = PlayerBase.Cast( fire_source.GetHierarchyRootPlayer() );
+		
+		//create fireplace
+		Fireplace fireplace = Fireplace.Cast( GetGame().CreateObject ( "Fireplace" , player.GetPosition() ) );
+		
+		//attach
+		if ( !GetGame().IsMultiplayer() )		//clear inventory reservation (single player)
+		{
+			InventoryLocation loc = new InventoryLocation;
+			entity.GetInventory().GetCurrentInventoryLocation( loc );
+			player.GetInventory().ClearInventoryReservation( entity, loc );
+		}
+		
+		if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+		{
+			player.ServerTakeEntityToTargetAttachment( fireplace, entity ); // multiplayer server side
+		}
+		else
+		{
+			player.LocalTakeEntityToTargetAttachment( fireplace, entity ); // single player or multiplayer client side
+		}
+		
+		//start fire
+		fireplace.StartFire();
+		
+		//call event
+		fireplace.OnIgnitedThis( fire_source );
+		
+		return fireplace;
+	}
+	
+	static bool CanIgniteEntityAsFireplace( notnull EntityAI entity )
+	{
+		//check roof
+		if ( !FireplaceBase.HasEntityEnoughRoomForFireAbove( entity ) )
+		{
+			return false;
+		}
+		
+		//check surface
+		if ( FireplaceBase.IsEntityOnWaterSurface( entity ) )
+		{
+			return false;
+		}
+
+		//check wetness/rain/wind
+		if ( FireplaceBase.IsEntityWet( entity ) || FireplaceBase.IsRainingAboveEntity( entity ) || FireplaceBase.IsWindy() )
+		{
+			return false;
+		}
+
+		return true;	
+	}	
+
 	//================================================================
 	// ADVANCED PLACEMENT
 	//================================================================
@@ -392,5 +460,18 @@ class Fireplace extends FireplaceBase
 	override string GetPlaceSoundset()
 	{
 		return "placeFireplace_SoundSet";
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionPlaceFireplaceIntoBarrel);
+		AddAction(ActionPlaceFireplaceIndoor);
+		//AddAction(ActionLightItemOnFire);
+		AddAction(ActionTogglePlaceObject);
+		AddAction(ActionPlaceObject);
+		AddAction(ActionBuildOven);
+		AddAction(ActionDismantleOven);
 	}
 }

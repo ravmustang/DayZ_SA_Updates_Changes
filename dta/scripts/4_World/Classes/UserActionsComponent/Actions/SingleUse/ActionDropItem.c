@@ -31,7 +31,6 @@ class ActionDropItem: ActionSingleUseBase
 
 	void ActionDropItem()
 	{
-		m_MessageSuccess    = "";
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_DROPITEM_HANDS;
 		m_CommandUIDProne	= DayZPlayerConstants.CMD_ACTIONFB_DROPITEM_HANDS;
 		m_CallbackClass 	= ActionDropItemCB;
@@ -42,11 +41,6 @@ class ActionDropItem: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}	
-	
-	override int GetType()
-	{
-		return AT_DROP_ITEM;
 	}
 
 	override string GetText()
@@ -54,7 +48,17 @@ class ActionDropItem: ActionSingleUseBase
 		return "#drop_item";
 	}
 	
+	override typename GetInputType()
+	{
+		return DropActionInput;
+	}
+	
 	override bool HasProneException()
+	{
+		return true;
+	}
+	
+	override bool CanBeUsedThrowing()
 	{
 		return true;
 	}

@@ -35,11 +35,20 @@ class RestrainingToolLocked extends ItemBase
 			
 			if(player)
 			{
-				player.GetItemInHands() == this;
-				player.OnRestrainStart();
+				if(player.GetItemInHands() == this && player.IsControlledPlayer())
+				{
+					player.OnRestrainStart();
+				}
 				//Print("---------============ restraining item goes into inventory =============-----------");
 			}
 		}
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionUnrestrainSelf);
 	}
 }
 

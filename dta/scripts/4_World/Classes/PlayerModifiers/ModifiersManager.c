@@ -7,6 +7,7 @@ enum EActivationType {
 
 const int DEFAULT_TICK_TIME_ACTIVE = 3;
 const int DEFAULT_TICK_TIME_INACTIVE = 3;
+const int DEFAULT_TICK_TIME_INACTIVE_LONG = 10;
 
 class ModifierDebugObj
 {
@@ -99,6 +100,13 @@ class ModifiersManager
 		AddModifier(new ImmunityBoost);
 		AddModifier(new AntibioticsMdfr);
 		AddModifier(new ToxicityMdfr);
+		AddModifier(new BreathVapourMdfr);
+		AddModifier(new ShockMdfr);
+		AddModifier(new WoundInfectionMdfr);
+		AddModifier(new CharcoalMdfr);
+		AddModifier(new MorphineMdfr);
+		AddModifier(new PainKillersMdfr);
+		AddModifier(new EpinephrineMdfr);
 	}
 
 	void SetModifiers(bool enable)

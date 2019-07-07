@@ -22,6 +22,7 @@ class CivilianHatchback extends CarScript
 		return 0;
 	}
 	
+	
 	override int GetCarDoorsState( string slotType )
 	{
 		CarDoor carDoor;
@@ -139,12 +140,10 @@ class CivilianHatchback extends CarScript
 				if ( newValue > 1 )
 					newValue = 1;
 			
-				m_enviroCoef = newValue;
 				return newValue;
 			break;
 		}
 
-		m_enviroCoef = oldValue;
 		return oldValue;
 	}
 	

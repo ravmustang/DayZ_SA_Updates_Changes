@@ -41,7 +41,7 @@ class SmptAnimMetaBase
 		
 		if( type == eAnimFinishType.FAILURE)//   <--------------- FAILED
 		{
-			if( m_Player.GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER )
+			if( m_Player.GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_SERVER || !GetGame().IsMultiplayer())
 			{
 				if( Symptom ) 
 				{
@@ -85,7 +85,8 @@ class SmptAnimMetaFB extends SmptAnimMetaBase
 	
 	void ~SmptAnimMetaFB()
 	{
-		m_Player.m_isFBsymptomPlaying = false;
+		if(m_Player)
+			m_Player.m_isFBsymptomPlaying = false;
 	}
 	
 	override void Init(ParamsReadContext ctx, SymptomManager manager, PlayerBase player)

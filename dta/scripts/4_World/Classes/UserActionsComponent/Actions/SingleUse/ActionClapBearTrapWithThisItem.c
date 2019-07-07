@@ -2,7 +2,6 @@ class ActionClapBearTrapWithThisItem: ActionSingleUseBase
 {
 	void ActionClapBearTrapWithThisItem()
 	{
-		m_MessageSuccess = "I've poked the bear trap";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_POKE;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_FullBody = true;
@@ -12,11 +11,6 @@ class ActionClapBearTrapWithThisItem: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_CLAP_BEARTRAP_WITH_THIS_ITEM;
 	}
 
 	override string GetText()

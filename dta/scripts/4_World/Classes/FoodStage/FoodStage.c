@@ -97,24 +97,37 @@ class FoodStage
 	}
 		
 	//Food properties
-	protected float GetNutritionPropertyFromIndex( int index )
+	protected static float GetNutritionPropertyFromIndex( int index, FoodStageType stage_type, FoodStage stage, string classname )
 	{
-		string config_path;
-		string food_stage_name = GetFoodStageName( m_FoodStageType );
+		if(stage)
+		{
+			stage_type = stage.m_FoodStageType;
+			classname = stage.GetFoodItem().GetType();
+		}
 		
-		config_path = "CfgVehicles" + " " + GetFoodItem().GetType() + " " + "Food" + " " + "FoodStages" + " " + food_stage_name + " " + "nutrition_properties";
+		string config_path;
+		string food_stage_name = GetFoodStageName( stage_type );
+
+		config_path = "CfgVehicles" + " " + classname + " " + "Food" + " " + "FoodStages" + " " + food_stage_name + " " + "nutrition_properties";
 		array<float> nutrition_properties = new array<float>;
 		GetGame().ConfigGetFloatArray( config_path, nutrition_properties );
 		
 		if ( nutrition_properties.Count() > 0 )
 		{
-			return nutrition_properties.Get( index );
+			if( index > (nutrition_properties.Count() - 1))
+			{
+				return 0;
+			}
+			else
+			{
+				return nutrition_properties.Get( index );
+			}
 		}
 		//calculate nutrition properties from base stage and nutrition modifiers
 		else
 		{
 			//get modifiers class for nutrition values
-			config_path = "CfgVehicles" + " " + GetFoodItem().GetType() + " " + "Food" + " " + "nutrition_modifiers_class";
+			config_path = "CfgVehicles" + " " + classname + " " + "Food" + " " + "nutrition_modifiers_class";
 			
 			if ( GetGame().ConfigIsExisting( config_path ) )
 			{
@@ -126,7 +139,7 @@ class FoodStage
 				GetGame().ConfigGetText( config_path, nutr_base_stage );
 				
 				//get nutrition values for food stage and modifiers 
-				config_path = "CfgVehicles" + " " + GetFoodItem().GetType() + " " + "Food" + " " + "FoodStages" + " " + nutr_base_stage + " " + "nutrition_properties";
+				config_path = "CfgVehicles" + " " + classname + " " + "Food" + " " + "FoodStages" + " " + nutr_base_stage + " " + "nutrition_properties";
 				array<float> base_nutr_properties = new array<float>;
 				GetGame().ConfigGetFloatArray( config_path, base_nutr_properties );
 				
@@ -145,29 +158,40 @@ class FoodStage
 		return 0;
 	}
 	
-	float GetFullnessIndex()
+	static float GetFullnessIndex(FoodStage stage, int stage_type = -1, string classname = "")
 	{
-		return GetNutritionPropertyFromIndex( 0 );
+		return GetNutritionPropertyFromIndex( 0 , stage_type, stage, classname );
 	}
 	
-	float GetEnergy()
+	static float GetEnergy(FoodStage stage, int stage_type = -1, string classname = "")
 	{
-		return GetNutritionPropertyFromIndex( 1 );
+
+		return GetNutritionPropertyFromIndex( 1 , stage_type, stage, classname );
 	}
 	
-	float GetWater()
+	static float GetWater(FoodStage stage, int stage_type = -1, string classname = "")
 	{
-		return GetNutritionPropertyFromIndex( 2 );
+		return GetNutritionPropertyFromIndex( 2 , stage_type, stage, classname );
 	}
 	
-	float GetNutritionalIndex()
+	static float GetNutritionalIndex(FoodStage stage, int stage_type = -1, string classname = "")
 	{
-		return GetNutritionPropertyFromIndex( 3 );
+		return GetNutritionPropertyFromIndex( 3 , stage_type , stage, classname);
 	}
 	
-	float GetToxicity()
+	static float GetToxicity(FoodStage stage, int stage_type = -1, string classname = "")
 	{
-		return GetNutritionPropertyFromIndex( 4 );
+		return GetNutritionPropertyFromIndex( 4 , stage_type, stage, classname );
+	}
+	
+	static int GetAgents(FoodStage stage, int stage_type = -1, string classname = "")
+	{
+		return GetNutritionPropertyFromIndex( 5 , stage_type, stage, classname );
+	}
+	
+	static float GetDigestibility(FoodStage stage, int stage_type = -1, string classname = "")
+	{
+		return GetNutritionPropertyFromIndex( 6 , stage_type, stage, classname );
 	}
 	
 	//Food item
@@ -379,7 +403,7 @@ class FoodStage
 	}
 			
 	//get name of food stage type
-	string GetFoodStageName( FoodStageType food_stage_type )
+	static string GetFoodStageName( FoodStageType food_stage_type )
 	{
 		switch( food_stage_type )
 		{

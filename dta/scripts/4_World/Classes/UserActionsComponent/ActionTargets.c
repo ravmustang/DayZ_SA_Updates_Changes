@@ -138,6 +138,11 @@ class ActionTargets
 		return m_VicinityObjects.GetVicinityObjects();
 	}
 	
+	void Clear()
+	{
+		m_Targets.Clear();
+	}
+	
 	void Update()
 	{
 #ifdef DEVELOPER
@@ -145,7 +150,7 @@ class ActionTargets
 #endif
 		//! clear state
 		m_VicinityObjects.ClearVicinityObjects();
-		m_Targets.Clear();
+		Clear();
 
 		Object cursorTarget = null;
 		array<Object> vicinityObjects = new array<Object>;
@@ -357,7 +362,7 @@ class ActionTargets
 					return 0.01;
 
 				if( pTarget.IsBuilding() )
-					return 0.01;
+					return 0.25;
 
 				if( pTarget.IsTransport() )
 					return 0.01;

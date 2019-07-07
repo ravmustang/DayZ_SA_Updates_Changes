@@ -66,10 +66,11 @@ class PortableGasStove extends ItemBase
 		//cookware
 		if ( item.Type() == ATTACHMENT_COOKING_POT )
 		{
-			ClearCookingEquipment();
-			
 			//stop steam particle
-			RemoveCookingAudioVisuals();			
+			RemoveCookingAudioVisuals();
+			
+			//remove cooking equipment reference
+			ClearCookingEquipment();
 		}	
 	}
 	
@@ -228,5 +229,15 @@ class PortableGasStove extends ItemBase
 	override bool CanIgniteItem(EntityAI ignite_target = NULL)
 	{
 		return GetCompEM().IsWorking();
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+
+		AddAction(ActionLightItemOnFire);
+		AddAction(ActionTurnOnWhileOnGround);
+		AddAction(ActionTurnOffWhileOnGround);
 	}
 }

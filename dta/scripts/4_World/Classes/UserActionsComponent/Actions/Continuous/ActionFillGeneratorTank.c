@@ -16,11 +16,6 @@ class ActionFillGeneratorTank: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_FullBody = true;
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "I am filling the tank.";
-		m_MessageSuccess = "I've poured fuel into generator.";
-		m_MessageFail = "I've stopped filling the tank.";
-		m_MessageCancel = "I've stopped filling the tank.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -28,11 +23,6 @@ class ActionFillGeneratorTank: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_FILL_GENERATOR_TANK;
 	}
 		
 	override string GetText()

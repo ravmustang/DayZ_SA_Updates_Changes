@@ -66,6 +66,11 @@ class ActionInteractBase : AnimatedActionBase
 		return m_HUDCursorIcon;
 	}
 	
+	override typename GetInputType()
+	{
+		return InteractActionInput;
+	}
+
 	override int GetActionCategory()
 	{
 		return AC_INTERACT;

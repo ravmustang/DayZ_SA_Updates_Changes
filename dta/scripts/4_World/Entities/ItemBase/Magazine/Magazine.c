@@ -1,8 +1,45 @@
+typedef Magazine Magazine_Base;
+
+enum CartridgeType
+{
+	None = 0,
+	Pistol = 1,
+	Intermediate = 2,
+	FullPower = 3,
+	Shell = 4
+}
+
+enum ProjectileType
+{
+	None = 0,
+	Tracer = 1,
+	AP = 2
+}
+
+
+class AmmoData
+{
+	bool m_IsValid;
+	CartridgeType m_CartridgeType;
+	ProjectileType m_ProjectileType;
+	
+	void AmmoData( string init_type )
+	{
+		m_IsValid = GetGame().ConfigIsExisting( "CfgMagazines " + init_type );
+		if( m_IsValid )
+		{
+			m_CartridgeType = GetGame().ConfigGetInt( "CfgMagazines " + init_type + " iconCartridge" );
+			m_ProjectileType = GetGame().ConfigGetInt( "CfgMagazines " + init_type + " iconType" );
+		}
+	}
+}
+
 class Magazine : InventoryItemSuper
 {
-	ref array<string>	m_CompatiableAmmo;
-	ref array<float> 	m_ChanceToJam;
-	protected float 	m_ManipulationDamage;
+	protected static ref map<string, ref AmmoData>	m_AmmoData;
+	ref array<string>								m_CompatiableAmmo;
+	ref array<float> 								m_ChanceToJam;
+	protected float 								m_ManipulationDamage;
 	
 	void Magazine () 
 	{
@@ -11,6 +48,18 @@ class Magazine : InventoryItemSuper
 		m_ManipulationDamage = ConfigGetFloat("manipulationDamage");
 		m_CompatiableAmmo = new array<string>;
 		ConfigGetTextArray ("ammoItems", m_CompatiableAmmo);
+		if( GetGame().IsClient() || !GetGame().IsMultiplayer() )
+		{
+			if( !m_AmmoData )
+				m_AmmoData = new map<string, ref AmmoData>;
+			string classname = ClassName();
+			if( !m_AmmoData.Contains(classname) )
+			{
+				ref AmmoData new_data = new AmmoData( classname );
+				if( new_data.m_IsValid )
+					m_AmmoData.Insert( classname, new AmmoData( classname ) );
+			}
+		}
 	}
 
 	//! Gets magazine ammo count
@@ -59,6 +108,23 @@ class Magazine : InventoryItemSuper
 		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " ContinuousActions", m_ContinuousActions);
 		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " SingleUseActions", m_SingleUseActions);	
 		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " InteractActions", m_InteractActions);	
+	}
+	
+	static AmmoData GetAmmoData( string classname )
+	{
+		if( !m_AmmoData )
+			m_AmmoData = new map<string, ref AmmoData>;
+		if( !m_AmmoData.Contains(classname) )
+		{
+			ref AmmoData new_data = new AmmoData( classname );
+			if( new_data.m_IsValid )
+				m_AmmoData.Insert( classname, new AmmoData( classname ) );
+			return new_data;
+		}
+		else
+		{
+			return m_AmmoData.Get( classname );
+		}
 	}
 	
 	bool IsCompatiableAmmo( ItemBase ammo )
@@ -188,6 +254,8 @@ class Magazine : InventoryItemSuper
 			ServerAcquireCartridge(damage, cartrige_name);
 			new_pile.ServerStoreCartridge(damage, cartrige_name);
 		}
+		new_pile.SetSynchDirty();
+		SetSynchDirty();
 	}
 	
 	void ApplyManipulationDamage()
@@ -296,4 +364,59 @@ class Magazine : InventoryItemSuper
 		}
 		return false;
 	}
+	
+	override void OnInventoryEnter(Man player)
+	{
+		super.OnInventoryEnter(player);
+		
+		PlayerBase p = PlayerBase.Cast(player);
+		p.GetWeaponManager().OnMagazineInventoryEnter(this);
+	}
+	
+	override void OnInventoryExit(Man player)
+	{
+		super.OnInventoryExit(player);
+
+		PlayerBase p = PlayerBase.Cast(player);
+		p.GetWeaponManager().OnMagazineInventoryExit(this);
+	}
+	
+	override void OnWasAttached( EntityAI parent, int slot_id )
+	{
+		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
+		Weapon_Base wpn = Weapon_Base.Cast(parent);
+		if(wpn && player)
+		{
+			player.GetWeaponManager().OnMagazineAttach(this);
+		}
+		/*PlayerBase player = PlayerBase.Cast(parent);
+		if (player)
+			//player.SwitchItemTypeAttach(this, slot_id);
+		//{
+		//	player.UpdateQuickBarEntityVisibility(this);
+		//}*/
+		//Print("OnWasAttached: " + GetType());
+	}
+	
+	override void OnWasDetached( EntityAI parent, int slot_id )
+	{
+		PlayerBase player = PlayerBase.Cast(GetHierarchyRootPlayer());
+		Weapon_Base wpn = Weapon_Base.Cast(parent);
+		
+		if(wpn && player)
+		{
+			player.GetWeaponManager().OnMagazineDetach(this);
+		}
+	}
 };
+
+class MagazineStorage : Magazine
+{
+	override void SetActions()
+	{
+		super.SetActions();
+		AddAction(ActionLoadMagazine);
+		AddAction(ActionEmptyMagazine);
+		AddAction(ActionLoadMagazineQuick);
+	}
+}

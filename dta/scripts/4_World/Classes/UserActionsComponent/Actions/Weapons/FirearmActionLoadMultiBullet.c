@@ -11,11 +11,6 @@ class FirearmActionLoadMultiBullet : FirearmActionBase
 	{
 		return AC_CONTINUOUS;
 	}
-	
-	override int GetType()  //returns action uid
-	{
-		return AT_LOAD_MULTI_BULLET_TO_WEAPON;
-	}
 
 	override string GetText() //text game displays in HUD hint 
 	{
@@ -62,12 +57,12 @@ class FirearmActionLoadMultiBullet : FirearmActionBase
 	{
 		return false;
 	}
-	
-	override void OnContinuousCancel( ActionData action_data )
+
+	override void OnEndInput( ActionData action_data )
 	{
 		action_data.m_Player.GetWeaponManager().LoadMultiBulletStop();
 	}
-	
+
 	override bool CanBePerformedFromQuickbar()
 	{
 		return true;
@@ -94,4 +89,61 @@ class FirearmActionLoadMultiBullet : FirearmActionBase
 	{
 		return -1;
 	}*/
+	
+	override typename GetInputType()
+	{
+		return ContinuousDefaultActionInput;
+	}
 };
+
+
+class FirearmActionLoadMultiBulletQuick : FirearmActionBase
+{	
+	//-----------------------------------------------------
+	// 	Action events and methods
+	//-----------------------------------------------------
+	void FirearmActionLoadMultiBulletQuick() 
+	{
+	}	
+	
+	override bool HasTarget()
+	{
+		return false;
+	}
+	
+	override bool HasProgress()
+	{
+		return false;
+	}
+	
+	override typename GetInputType()
+	{
+		return ContinuousWeaponManipulationActionInput;
+	} 
+	
+	override void CreateConditionComponents()  
+	{
+		m_ConditionItem = new CCINonRuined();
+		m_ConditionTarget = new CCTSelf;
+	}
+	
+	
+	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item ) //condition for action
+	{
+		return player.GetWeaponManager().GetPreparedMagazine()!=null;
+	}
+	
+	override void Start( ActionData action_data )
+	{
+		super.Start( action_data );
+		Magazine mag = Magazine.Cast(action_data.m_Player.GetWeaponManager().GetPreparedMagazine());	
+
+		action_data.m_Player.GetWeaponManager().LoadMultiBullet(mag, this);
+	}
+	
+	override void OnEndInput( ActionData action_data )
+	{
+		action_data.m_Player.GetWeaponManager().LoadMultiBulletStop();
+	}
+};
+

@@ -81,9 +81,10 @@ class TurnItemIntoItemLambda extends ReplaceItemWithNewLambda
 	override void OnSuccess (EntityAI new_item)
 	{
 		super.OnSuccess(new_item);
-		Human player = Human.Cast(m_Player);
-		if (player)
-			player.GetItemAccessor().OnItemInHandsChanged();
+		if( m_Player )
+		{
+			m_Player.GetItemAccessor().OnItemInHandsChanged();
+		}
 	}
 };
 
@@ -92,8 +93,10 @@ class TurnItemIntoItemLambdaAnimSysNotifyLambda extends TurnItemIntoItemLambda
 	override void OnSuccess (EntityAI new_item)
 	{
 		super.OnSuccess(new_item);
-		Human player = Human.Cast(m_Player);
-		player.GetItemAccessor().OnItemInHandsChanged();
+		if( m_Player )
+		{
+			m_Player.GetItemAccessor().OnItemInHandsChanged();
+		}
 	}
 }
 
@@ -502,7 +505,7 @@ class MiscGameplayFunctions
 		return dir.Normalized();
 	}
 
-	static float GetHeadingAngle(notnull PlayerBase player)
+	static float GetHeadingAngle(notnull DayZPlayerImplement player)
 	{
 		HumanInputController hic = player.GetInputController();
 		float headingAngle = hic.GetHeadingAngle();
@@ -611,6 +614,38 @@ class MiscGameplayFunctions
 	{
 		return (value >= from) && (value <= to);
 	}
+
+	//! Check if player direction(based on cone of defined angle) is oriented to target position
+	static bool IsPlayerOrientedTowardPos(notnull DayZPlayerImplement player, vector target_pos, float cone_angle)
+	{
+		if(player)
+		{
+			vector player_dir = player.GetDirection();
+			vector to_target_dir = target_pos - player.GetPosition();
+	
+			player_dir[1] = 0;
+			to_target_dir[1] = 0;
+		
+			player_dir.Normalize();
+			to_target_dir.Normalize();
+		
+			float cos_fi = vector.Dot(player_dir, to_target_dir);
+			vector cross = player_dir * to_target_dir;
+		
+			int dir = Math.Acos(cos_fi) * Math.RAD2DEG;
+				
+			if( cross[1] < 0 )
+				dir = -dir;
+
+			//! dir in cone or in a tip of cone 
+			if( (dir <= cone_angle && dir >= -cone_angle) || Math.AbsFloat(dir) == 90 )
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 };
 
@@ -630,6 +665,6 @@ class DestroyItemInCorpsesHandsAndCreateNewOnGndLambda : ReplaceAndDestroyLambda
 	protected override void RemoveOldItemFromLocation ()
 	{
 		super.RemoveOldItemFromLocation();
-		m_Player.GetHumanInventory().OnEntityInHandsDestroyed(m_OldItem);
+		m_Player.GetHumanInventory().OnEntityInHandsDestroyed(m_OldLocation);
 	}
 }

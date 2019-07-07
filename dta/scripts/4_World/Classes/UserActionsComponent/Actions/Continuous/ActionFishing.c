@@ -26,11 +26,6 @@ class ActionFishing: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
 	}
-	
-	override int GetType()
-	{
-		return AT_FISHING;
-	}
 		
 	override string GetText()
 	{

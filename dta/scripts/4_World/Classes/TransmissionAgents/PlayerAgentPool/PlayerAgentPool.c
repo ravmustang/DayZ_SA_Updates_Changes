@@ -5,6 +5,7 @@ class PlayerAgentPool
 	float m_LastTicked = 0;
 	float m_TotalAgentCount;
 	PlayerBase m_Player;
+	int m_AgentMask;
 	
 	const int STORAGE_VERSION = 100;
 	
@@ -118,19 +119,24 @@ class PlayerAgentPool
 				return false;
 			}
 			
-			m_VirusPool.Insert( key,value );
+			SetAgentCount( key,value );
 		}
 	
 		return true;
 	}
-		
+	void DigestAgent(int agent_id, float count)
+	{
+		AddAgent(agent_id, m_PluginTransmissionAgents.GetAgentDigestibility(agent_id) * count);
+	}	
+	
 	void AddAgent(int agent_id, float count)
 	{
 		int max_count = m_PluginTransmissionAgents.GetAgentMaxCount(agent_id);
 		
 		if(	!m_VirusPool.Contains(agent_id) )//if it contains, maybe add count only ?
 		{
-			m_VirusPool.Insert( agent_id, Math.Clamp(count,0,max_count) );
+			//m_VirusPool.Insert( agent_id, Math.Clamp(count,0,max_count) );
+			SetAgentCount(agent_id,count);
 		}
 		else
 		{
@@ -140,7 +146,7 @@ class PlayerAgentPool
 		}
 	}
 
-
+/*
 	void RemoveAgent(int agent_id)
 	{
 		if(	m_VirusPool.Contains(agent_id) )
@@ -148,13 +154,20 @@ class PlayerAgentPool
 			m_VirusPool.Remove( agent_id );
 		}
 	}
+	*/
+	void RemoveAgent(int agent_id)
+	{
+		SetAgentCount(agent_id, 0);
+	}
 	
 	void RemoveAllAgents()
 	{
+		m_AgentMask = 0;
 		m_VirusPool.Clear();
 	}
 	
-	array<int> GetAgents()
+	/*
+	array<int GetAgents()
 	{
 		m_VirusPoolArray.Clear();
 		
@@ -165,10 +178,16 @@ class PlayerAgentPool
 		
 		return m_VirusPoolArray;
 	}
+	*/
+	
+	int GetAgents()
+	{
+		return m_AgentMask;
+	}
 
 	int GetSingleAgentCount(int agent_id)
 	{
-		if(	m_VirusPool.Contains(agent_id) )//if it contains, maybe add count only ?
+		if(	m_VirusPool.Contains(agent_id) )
 		{
 			return m_VirusPool.Get( agent_id );
 		}
@@ -205,17 +224,18 @@ class PlayerAgentPool
 	{
 		if(count > 0)
 		{
-			Debug.Log("+ growing agent"+ agent_id.ToString() +"to count: "+count.ToString(), "Agents");
+			//Debug.Log("+ growing agent"+ agent_id.ToString() +"to count: "+count.ToString(), "Agents");
 			m_VirusPool.Set( agent_id, count);
+			m_AgentMask = m_AgentMask | agent_id;
 		}
 		else
 		{
-			Debug.Log("- REMOVING agent"+ agent_id.ToString(), "Agents");
+			//Debug.Log("- REMOVING agent"+ agent_id.ToString(), "Agents");
 			m_VirusPool.Remove( agent_id );
+			m_AgentMask = m_AgentMask & ~agent_id;
 		}			
 		
 	}
-
 
 	void AntibioticsAttack(float attack_value)
 	{
@@ -232,27 +252,7 @@ class PlayerAgentPool
 			SetAgentCount(agent_id, new_count);
 		}
 	}
-/*
-	void GetDebugObject(array<ref Param> object_out)
-	{
-	
-		int total_items = 0;
-		for(int i = 0;i < m_VirusPool.Count(); i++)
-		{
-			int 	item_key 	= m_VirusPool.GetKey(i);
-			int 	item_value 	= m_VirusPool.Get(item_key);
-			int 	max_count 	= m_PluginTransmissionAgents.GetAgentMaxCount( item_key );
-			
-			string agent_name = m_PluginTransmissionAgents.GetNameByID(item_key);
-			string count = item_value.ToString()+"/"+max_count.ToString();
-			
-			object_out.Insert( new Param2<string,string>(agent_name, count) );
-			total_items++;
-		}
-		object_out.InsertAt(new Param1<int>(total_items) ,0);
-	}
-	
-	*/
+
 	
 	void RemoteGrowRequestDebug(ParamsReadContext ctx)
 	{

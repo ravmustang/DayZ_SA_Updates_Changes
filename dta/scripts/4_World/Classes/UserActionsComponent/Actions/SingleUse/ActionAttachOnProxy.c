@@ -2,7 +2,6 @@ class ActionAttachOnProxy: ActionAttach
 {
 	void ActionAttachOnProxy()
 	{
-		m_MessageSuccess = "I've attached the object.";
 	}
 
 	override void CreateConditionComponents() 
@@ -11,11 +10,6 @@ class ActionAttachOnProxy: ActionAttach
 		m_ConditionTarget = new CCTParent(10);
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_ATTACHITEM;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
-	}
-	
-	override int GetType()
-	{
-		return AT_ATTACH_ON_PROXY;
 	}
 		
 	override string GetText()
@@ -28,7 +22,7 @@ class ActionAttachOnProxy: ActionAttach
 		Object targetObject = target.GetObject();
 		Object targetParent = target.GetParent();
 		EntityAI target_entity = EntityAI.Cast( targetParent );
-		EntityAI item_entity = EntityAI.Cast( item );
+		EntityAI item_entity = item;
 		
 		if ( targetParent )
 		{

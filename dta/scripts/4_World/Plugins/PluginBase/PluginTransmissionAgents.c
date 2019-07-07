@@ -14,12 +14,19 @@ class PluginTransmissionAgents extends PluginBase
 	void PluginTransmissionAgents()
 	{
 		//add new agents here
-		m_AgentList.Insert(eAgents.INFLUENZA, new InfluenzaAgent);
-		m_AgentList.Insert(eAgents.CHOLERA, new CholeraAgent);
-		m_AgentList.Insert(eAgents.SALMONELLA, new SalmonellaAgent);
-		m_AgentList.Insert(eAgents.BRAIN, new BrainAgent);
+		RegisterAgent(new InfluenzaAgent);
+		RegisterAgent(new CholeraAgent);
+		RegisterAgent(new SalmonellaAgent);
+		RegisterAgent(new BrainAgent);
+		RegisterAgent(new FoodPoisonAgent);
+		RegisterAgent(new ChemicalAgent);
+		RegisterAgent(new WoundAgent);
 	}
 	
+	void RegisterAgent(AgentBase agent)
+	{
+		m_AgentList.Insert(agent.GetAgentType(), agent);
+	}
 
 	void ConstructSimpleAgentList()
 	{
@@ -50,7 +57,7 @@ class PluginTransmissionAgents extends PluginBase
 		return m_SimpleAgentList;
 	}
 	
-	string GetNameByID(int agent_id)
+	static string GetNameByID(int agent_id)
 	{
 		return m_AgentList.Get(agent_id).GetName();
 	}
@@ -102,6 +109,14 @@ class PluginTransmissionAgents extends PluginBase
 			return 0;
 		return m_AgentList.Get(agent_id).GetInvasibility();
 	}
+	
+	float GetAgentDigestibility( int agent_id )
+	{
+		if( !m_AgentList.Get(agent_id) ) 
+			return 0;
+		return m_AgentList.Get(agent_id).GetDigestibility();
+	}
+	
 	float GetDieOffSpeed( int agent_id )
 	{
 		if( !m_AgentList.Get(agent_id) ) 
@@ -162,8 +177,8 @@ class PluginTransmissionAgents extends PluginBase
 				InjectAgentsWithPlayer( target, eAgents.CHOLERA , 0, dose_size, InjectTypes.ITEM_TO_PLAYER );
 				break;
 				
-			case AGT_UACTION_CONSUME: //user action of a consumption, from item to player and player to item(should not be used in continuous actions)
-				InjectAgentsWithPlayer( target, sourceAgents , 0, dose_size, InjectTypes.ITEM_TO_PLAYER );
+			case AGT_UACTION_CONSUME:
+				//InjectAgentsWithPlayer( target, sourceAgents , 0, dose_size, InjectTypes.ITEM_TO_PLAYER );
 				InjectAgentsWithPlayer( source, targetAgents , 0, dose_size, InjectTypes.PLAYER_TO_ITEM );
 				break;
 			
@@ -177,9 +192,13 @@ class PluginTransmissionAgents extends PluginBase
 				
 			case AGT_TRANSFER_COPY: //transferring liquid
 				InjectAgentsWithoutPlayer( target, sourceAgents );
+				break;	
+			
+			case AGT_ITEM_TO_FLESH: //transferring liquid
+				InjectAgentsWithPlayer( target, sourceAgents , 0, dose_size, InjectTypes.ITEM_TO_PLAYER);
 				break;
 
-			case AGT_AIRBOURNE:
+			case AGT_AIRBOURNE_BIOLOGICAL:
 				float prot_level_mask_target = GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.MASK, Man.Cast( target ));
 				float prot_level_mask_source = GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.MASK, Man.Cast( source ));
 				float prot_level_headgear_target = GetProtectionLevel(DEF_BIOLOGICAL,InventorySlots.HEADGEAR, Man.Cast( target ));
@@ -188,6 +207,9 @@ class PluginTransmissionAgents extends PluginBase
 				float prot_level_source = Math.Max(prot_level_mask_source, prot_level_headgear_source);//find the bigger of the 2, TODO: should be improved
 				float prot_level_combined = 1 - (1 - prot_level_target) * (1 - prot_level_source);
 				InjectAgentsWithPlayer( target, sourceAgents , prot_level_combined, dose_size, InjectTypes.PLAYER_AIR_PLAYER );
+				break;
+			case AGT_AIRBOURNE_CHEMICAL:
+				break;
 		}
 	}
 	
@@ -200,23 +222,6 @@ class PluginTransmissionAgents extends PluginBase
 		}
 	}
 	
-	//! will add agents to a given target
-	/*
-	protected void InjectAgentsWithPlayer(EntityAI target, int agents,float protection, int dose_size, int inject_type)//target,array_of_agents,protection_lvl
-	{
-		if(target && (agents != 0) && target.IsEntityAI() )
-		{
-			ref array<int> agents_aray = new array<int>;
-			PluginTransmissionAgents.BuildAgentArray(agents, agents_aray);
-			
-			for(int i = 0; i < agents_aray.Count(); i++)
-			{
-				float count = CalculateAgentsToTransmit(agents_aray.Get(i), protection, dose_size, inject_type);
-				target.InsertAgent(agents_aray.Get(i),count);
-			}
-		}
-	}
-	*/
 	//! will add agents to a given target
 	protected void InjectAgentsWithPlayer(EntityAI target, int agents,float protection, int dose_size, int inject_type)//target,array_of_agents,protection_lvl
 	{
@@ -246,7 +251,7 @@ class PluginTransmissionAgents extends PluginBase
 			mask = mask * 2;
 		}
 	}
-
+/*
 	static int MakeMaskFromArray(array<int> agents)
 	{
 		int mask = 0;
@@ -257,7 +262,7 @@ class PluginTransmissionAgents extends PluginBase
 		}
 		return mask;
 	}
-	
+	*/
 	
 	protected float GetProtectionLevel(int type, int slot, Man player)
 	{
@@ -324,11 +329,11 @@ class PluginTransmissionAgents extends PluginBase
 		{
 			transf = GetAgentTransferabilityOut(agent_id);
 		}
-		if( inject_type == InjectTypes.ITEM_TO_PLAYER )
+		else if( inject_type == InjectTypes.ITEM_TO_PLAYER )
 		{
 			transf = GetAgentTransferabilityIn(agent_id);
 		}
-		if( inject_type == InjectTypes.PLAYER_AIR_PLAYER )
+		else if( inject_type == InjectTypes.PLAYER_AIR_PLAYER )
 		{
 			transf = GetAgentTransferabilityAirOut(agent_id);
 		}

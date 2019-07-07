@@ -15,10 +15,6 @@ class ActionDialCombinationLock: ActionContinuousBase
 		m_CallbackClass = ActionDialCombinationLockCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONMOD_OPENITEM;		
-		m_MessageStartFail = "I have failed the tunning.";
-		m_MessageStart = "I have started the tunning.";
-		m_MessageFail = "I have failed the tunning.";
-		m_MessageCancel = "I have stopped the tunning.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -31,11 +27,6 @@ class ActionDialCombinationLock: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-	
-	override int GetType()
-	{
-		return AT_DIAL_COMBINATION_LOCK;
 	}
 
 	override bool HasTarget()
@@ -75,6 +66,6 @@ class ActionDialCombinationLock: ActionContinuousBase
 		//set dialed number
 		ConstructionActionData construction_action_data = action_data.m_Player.GetConstructionActionData();
 		CombinationLock combination_lock =  construction_action_data.GetCombinationLock();
-		combination_lock.DialNextNumber( construction_action_data.GetDialIndex() );
+		combination_lock.DialNextNumber();
 	}
 }

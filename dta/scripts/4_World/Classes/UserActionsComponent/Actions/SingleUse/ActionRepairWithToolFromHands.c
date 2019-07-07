@@ -3,15 +3,6 @@ class ActionRepairWithToolFromHands: ActionSingleUseBase
 {
 	void ActionRepairWithToolFromHands()
 	{
-		Print("ActionRepairWithToolFromHands");
-		m_MessageSuccess = "";
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "";
-		m_MessageFail = "";
-		m_MessageCancel = "";
-		
-		//m_Animation = "open";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_HIGH;
 	}
 	
@@ -19,11 +10,6 @@ class ActionRepairWithToolFromHands: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return 0; //AT_REPAIR;
 	}
 
 	override string GetText()

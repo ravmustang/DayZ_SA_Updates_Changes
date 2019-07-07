@@ -6,11 +6,6 @@ class ActionEatPainkillerTablets: ActionConsume
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EAT;
 	}
 	
-	override int GetType()
-	{
-		return AT_EAT_PAINKILLER_TABLETS;
-	}
-	
 	override int IsEat()
 	{
 		return true;

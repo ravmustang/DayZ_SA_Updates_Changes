@@ -14,8 +14,8 @@ enum RSSStableStateID
 
 class RSSEmpty extends WeaponStableState
 {
-	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { Empty E"); super.OnEntry(e); }
-	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } Empty E"); }
+	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " { Empty E"); super.OnEntry(e); }
+	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " } Empty E"); }
 	override int GetCurrentStateID () { return RSSStableStateID.Empty; }
 	override bool HasBullet () { return false; }
 	override bool HasMagazine () { return false; }
@@ -23,8 +23,8 @@ class RSSEmpty extends WeaponStableState
 };
 class RSSFireout extends WeaponStableState
 {
-	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { Fireout F"); super.OnEntry(e); }
-	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } Fireout F"); }
+	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " { Fireout F"); super.OnEntry(e); }
+	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " } Fireout F"); }
 	override int GetCurrentStateID () { return RSSStableStateID.Fireout; }
 	override bool HasBullet () { return false; }
 	override bool HasMagazine () { return false; }
@@ -32,8 +32,8 @@ class RSSFireout extends WeaponStableState
 };
 class RSSLoaded extends WeaponStableState
 {
-	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { Loaded C"); super.OnEntry(e); }
-	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } Loaded C"); }
+	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " { Loaded C"); super.OnEntry(e); }
+	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " } Loaded C"); }
 	override int GetCurrentStateID () { return RSSStableStateID.Loaded; }
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return false; }
@@ -41,8 +41,8 @@ class RSSLoaded extends WeaponStableState
 };
 class RSSJammed extends WeaponStateJammed
 {
-	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] { Jammed J"); super.OnEntry(e); }
-	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] } Jammed J"); }
+	override void OnEntry (WeaponEventBase e) { wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " { Jammed J"); super.OnEntry(e); }
+	override void OnExit (WeaponEventBase e) { super.OnExit(e); wpnPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " } Jammed J"); }
 	override int GetCurrentStateID () { return RSSStableStateID.Jammed; }
 	override bool HasBullet () { return true; }
 	override bool HasMagazine () { return false; }
@@ -88,12 +88,14 @@ class RifleSingleShot_Base extends Rifle_Base
 		WeaponStateBase Trigger_L = new WeaponFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_NORMAL);
 		WeaponStateBase Trigger_F = new WeaponDryFire(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_COCKED);
 
+		WeaponStateBase Trigger_LJ = new WeaponFireToJam(this, NULL, WeaponActions.FIRE, WeaponActionFireTypes.FIRE_JAM);
 		
 		WeaponStateBase Unjam_J = new WeaponUnjamming(this, NULL, WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_START);
 
 		// events
 		WeaponEventBase __M__ = new WeaponEventMechanism;
 		WeaponEventBase __T__ = new WeaponEventTrigger;
+		WeaponEventBase __TJ_ = new WeaponEventTriggerToJam;
 		WeaponEventBase __L__ = new WeaponEventLoad1Bullet;
 		WeaponEventBase __U__ = new WeaponEventUnjam;
 		WeaponEventBase _fin_ = new WeaponEventHumanCommandActionFinished;
@@ -140,10 +142,12 @@ class RifleSingleShot_Base extends Rifle_Base
 		m_fsm.AddTransition(new WeaponTransition(Trigger_F	, _abt_,	F));
 		
 		m_fsm.AddTransition(new WeaponTransition(L			, __T__,	Trigger_L)); // a) fire if not jammed
-		m_fsm.AddTransition(new WeaponTransition(Trigger_L	, _fin_,	F, NULL, new GuardNot(new WeaponGuardJammed(this))));
-		m_fsm.AddTransition(new WeaponTransition(Trigger_L	, _abt_,	F, NULL, new GuardNot(new WeaponGuardJammed(this))));
-		m_fsm.AddTransition(new WeaponTransition(Trigger_L	, _fin_,	J));
-		m_fsm.AddTransition(new WeaponTransition(Trigger_L	, _abt_,	J));
+		m_fsm.AddTransition(new WeaponTransition(Trigger_L	, _fin_,	F));
+		m_fsm.AddTransition(new WeaponTransition(Trigger_L	, _abt_,	F));
+		
+		m_fsm.AddTransition(new WeaponTransition(L			, __TJ_,	Trigger_LJ)); // a) fire if not jammed
+		m_fsm.AddTransition(new WeaponTransition(Trigger_LJ	, _fin_,	J));
+		m_fsm.AddTransition(new WeaponTransition(Trigger_LJ	, _abt_,	J));
 		
 		
 		

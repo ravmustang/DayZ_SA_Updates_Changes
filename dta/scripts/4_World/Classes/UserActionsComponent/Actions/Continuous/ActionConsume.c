@@ -12,13 +12,7 @@ class ActionConsume: ActionContinuousBase
 	{
 		m_CallbackClass = ActionConsumeCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EAT;
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "I have started consuming.";
-		m_MessageSuccess = "I have finished consuming.";
-		m_MessageFail = "Player moved and consuming was canceled.";
-		m_MessageCancel = "I stopped consuming.";
-		//m_Animation = "EATTABLETS";		
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EAT;		
 	}
 	
 	override void CreateConditionComponents()  
@@ -30,11 +24,6 @@ class ActionConsume: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-
-	override int GetType()
-	{
-		return AT_CONSUME;
 	}
 
 	override bool HasTarget()

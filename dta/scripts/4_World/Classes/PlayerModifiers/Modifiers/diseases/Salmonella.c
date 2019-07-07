@@ -1,7 +1,7 @@
 class SalmonellaMdfr: ModifierBase
 {
-	static const int SALMONELLA_AGENT_THRESHOLD_ACTIVATE = 100;
-	static const int SALMONELLA_AGENT_THRESHOLD_DEACTIVATE = 20;
+	static const int AGENT_THRESHOLD_ACTIVATE = 100;
+	static const int AGENT_THRESHOLD_DEACTIVATE = 20;
 	override void Init()
 	{
 		m_TrackActivatedTime			= false;
@@ -10,9 +10,14 @@ class SalmonellaMdfr: ModifierBase
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
 	
+	override string GetDebugText()
+	{
+		return ("Activate threshold: "+AGENT_THRESHOLD_ACTIVATE + "| " +"Deativate threshold: "+AGENT_THRESHOLD_DEACTIVATE);
+	}
+	
 	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.CHOLERA) > SALMONELLA_AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.SALMONELLA) > AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -24,7 +29,7 @@ class SalmonellaMdfr: ModifierBase
 
 	override protected void OnActivate(PlayerBase player)
 	{
-		//if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(eNotifiers.NTF_SICK);
+		//if( player.m_NotifiersManager ) player.m_NotifiersManager.ActivateByType(eNotifiers.NTF_SICK);
 		player.IncreaseDiseaseCount();
 		
 	}
@@ -36,7 +41,7 @@ class SalmonellaMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.CHOLERA) < SALMONELLA_AGENT_THRESHOLD_DEACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.SALMONELLA) < AGENT_THRESHOLD_DEACTIVATE) 
 		{
 			return true;
 		}
@@ -48,15 +53,18 @@ class SalmonellaMdfr: ModifierBase
 
 	override protected void OnTick(PlayerBase player, float deltaT)
 	{
-		//Log("Ticking OnTick influenza modifier "+ToString(player.GetSingleAgentCount(eAgents.INFLUENZA)));
-		float chance_of_vomit = player.GetStatStomachVolume().GetNormalized() / 10;
-		if( Math.RandomFloat01() < chance_of_vomit )
+		float stomach_volume = player.m_PlayerStomach.GetStomachVolume();
+		if( stomach_volume > 300 )
 		{
-			SymptomBase symptom = player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_VOMIT);
-			
-			if( symptom )
+			float chance_of_vomit = Math.RandomFloat01() / 10;
+			if( Math.RandomFloat01() < chance_of_vomit )
 			{
-				symptom.SetDuration(5);
+				SymptomBase symptom = player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_VOMIT);
+				
+				if( symptom )
+				{
+					symptom.SetDuration(5);
+				}
 			}
 		}
 	}

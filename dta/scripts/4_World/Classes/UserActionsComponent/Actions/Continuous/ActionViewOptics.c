@@ -13,11 +13,6 @@ class ActionViewOptics : ActionContinuousBase
 		m_ConditionTarget = new CCTNone;
 	}
 	
-	override int GetType()
-	{
-		return AT_VIEW_OPTICS;
-	}
-	
 	override bool IsFullBody(PlayerBase player)
 	{
 		return true;

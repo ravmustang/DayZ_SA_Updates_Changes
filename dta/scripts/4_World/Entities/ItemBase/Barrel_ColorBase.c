@@ -201,7 +201,7 @@ class Barrel_ColorBase : Container_Base
 	
 	void ProduceFertilizer( ItemBase guts, ItemBase plant, PlayerBase player )
 	{	
-		float lime_quantity = plant.GetQuantity()*BAREL_LIME_PER_PLANT;
+		float lime_quantity = plant.GetQuantity()*GameConstants.BAREL_LIME_PER_PLANT;
 		
 		guts.Delete();
 		plant.Delete();
@@ -217,7 +217,7 @@ class Barrel_ColorBase : Container_Base
 		EntityAI item;		
 		int item_count = GetInventory().GetCargo().GetItemCount();
 		int pelt_count = 0;
-		int lime_amount = Math.Floor(lime.GetQuantity()/BAREL_LIME_PER_PELT);
+		int lime_amount = Math.Floor(lime.GetQuantity()/GameConstants.BAREL_LIME_PER_PELT);
 		
 			
 		for (int i = 0; i < item_count; i++)
@@ -243,7 +243,7 @@ class Barrel_ColorBase : Container_Base
 		}	
 		if ( lime ) 
 		{
-			lime.SetQuantity(lime_amount*BAREL_LIME_PER_PELT);		
+			lime.SetQuantity(lime_amount*GameConstants.BAREL_LIME_PER_PELT);		
 		}
 		if ( pelt_count > 0 ) 
 		{
@@ -314,7 +314,7 @@ class Barrel_ColorBase : Container_Base
 			item = GetInventory().GetCargo().GetItem(i);
 			if ( item.IsClothing() )
 			{	
-				if ( bleach_amount >= BAREL_BLEACH_PER_CLOTH )
+				if ( bleach_amount >= GameConstants.BAREL_BLEACH_PER_CLOTH )
 				{
 					if ( ( GetGame().ObjectIsKindOf (item, "TShirt_ColorBase") && !GetGame().ObjectIsKindOf (item, "TShirt_White") ) || ( GetGame().ObjectIsKindOf (item, "Armband_ColorBase") && !GetGame().ObjectIsKindOf (item, "Armband_White") ) ) //cannot bleach white items...?
 					{	
@@ -323,7 +323,7 @@ class Barrel_ColorBase : Container_Base
 						ItemBase itemIB = ItemBase.Cast(item);
 						MiscGameplayFunctions.TurnItemIntoItem(itemIB,itemtype+"White",player);
 						
-						bleach_amount -= BAREL_BLEACH_PER_CLOTH;
+						bleach_amount -= GameConstants.BAREL_BLEACH_PER_CLOTH;
 					}
 					if ( GetGame().IsKindOf (item.GetDisplayName(), "LeatherSack_ColorBase") ) 
 					{
@@ -354,7 +354,7 @@ class Barrel_ColorBase : Container_Base
 						TurnItemIntoItemLambda lambda = new TurnItemIntoItemLambda(item, item_name, player);
 						lambda.SetTransferParams(true, true, true);
 						player.ServerReplaceItemWithNew(lambda);
-						bleach_amount -= BAREL_BLEACH_PER_CLOTH;
+						bleach_amount -= GameConstants.BAREL_BLEACH_PER_CLOTH;
 					}
 				}
 				else
@@ -486,7 +486,22 @@ class Barrel_ColorBase : Container_Base
 	{
 		return "placeBarrel_SoundSet";
 	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionTogglePlaceObject);
+		AddAction(ActionOpenBarrel);
+		AddAction(ActionCloseBarrel);
+		AddAction(ActionPlaceObject);
+	}
 };
+
+class Barrel_Green: Barrel_ColorBase {};
+class Barrel_Blue: Barrel_ColorBase {};
+class Barrel_Red: Barrel_ColorBase {};
+class Barrel_Yellow: Barrel_ColorBase {};
 
 class ColourClothesLambda : TurnItemIntoItemLambda
 {

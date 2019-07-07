@@ -5,11 +5,31 @@ enum CarDoorState
 	DOORS_CLOSED
 }
 
+enum CarHeadlightBulbsState
+{
+	NONE,
+	LEFT,
+	RIGHT,
+	BOTH
+}
+
+enum CarRearLightType
+{
+	NONE,
+	BRAKES_ONLY,
+	REVERSE_ONLY,
+	BRAKES_AND_REVERSE
+}
+
 /*!
 	Base script class for all motorized wheeled vehicles.
 */
 class CarScript extends Car
 {
+	static ref map<typename, ref TInputActionMap> m_CarTypeActionsMap = new map<typename, ref TInputActionMap>;
+	TInputActionMap m_InputActionMap;
+	bool	m_ActionsInitialize;
+
 	protected float m_Time;
 
 	//! keeps ammount of each fluid
@@ -20,7 +40,7 @@ class CarScript extends Car
 
 	//!
 	protected float m_dmgContactCoef;
-	protected float m_enviroCoef;
+	protected float m_EnviroHeatComfortOverride;
 
 	//!
 	protected float m_EngineHealth;
@@ -43,9 +63,37 @@ class CarScript extends Car
 	protected vector m_enginePtcPos;
 	protected vector m_coolantPtcPos;
 	
+	protected vector m_fuelPos;
+	
 	//!Sounds
 	protected bool m_PlayCrashSoundLight;
 	protected bool m_PlayCrashSoundHeavy;
+	
+	protected bool m_HeadlightsOn;
+	protected bool m_HeadlightsState;
+	protected bool m_BrakesArePressed; // synchronized variable
+	
+	CarLightBase 		m_Headlight;
+	CarRearLightBase 	m_RearLight;
+	
+	// Memory points for lights
+	static string m_ReverseLightPoint = "light_reverse";
+	static string m_LeftHeadlightPoint = "light_left";
+	static string m_RightHeadlightPoint = "light_right";
+	static string m_LeftHeadlightTargetPoint = "light_left_dir";
+	static string m_RightHeadlightTargetPoint = "light_right_dir";
+	
+	// Model selection IDs for texture/material changes
+	// If each car needs different IDs, then feel free to remove the 'static' flag and overwrite these numbers down the hierarchy
+	static const int SELECTION_ID_FRONT_LIGHT_L 	= 0;
+	static const int SELECTION_ID_FRONT_LIGHT_R 	= 1;
+	static const int SELECTION_ID_BRAKE_LIGHT_L 	= 2;
+	static const int SELECTION_ID_BRAKE_LIGHT_R 	= 3;
+	static const int SELECTION_ID_REVERSE_LIGHT_L 	= 4;
+	static const int SELECTION_ID_REVERSE_LIGHT_R 	= 5;
+	static const int SELECTION_ID_TAIL_LIGHT_L 		= 6;
+	static const int SELECTION_ID_TAIL_LIGHT_R 		= 7;
+	static const int SELECTION_ID_DASHBOARD_LIGHT 	= 8;
 	
 	void CarScript()
 	{
@@ -65,13 +113,15 @@ class CarScript extends Car
 		m_exhaustPtcFx = -1;
 
 		m_dmgContactCoef = 0;
-		m_enviroCoef = 0;
+		m_EnviroHeatComfortOverride = 0;
 
 		m_PlayCrashSoundLight = false;
 		m_PlayCrashSoundHeavy = false;
 		
 		RegisterNetSyncVariableBool("m_PlayCrashSoundLight");
 		RegisterNetSyncVariableBool("m_PlayCrashSoundHeavy");
+		RegisterNetSyncVariableBool("m_HeadlightsOn");
+		RegisterNetSyncVariableBool("m_BrakesArePressed");
 		
 		if 	( MemoryPointExists("ptcExhaust_end") )
 		{
@@ -107,9 +157,27 @@ class CarScript extends Car
 		if 	( MemoryPointExists("ptcCoolantPos") )
 			m_coolantPtcPos = GetMemoryPointPos("ptcCoolantPos");
 		else
-			m_coolantPtcPos = "0 0 0";	
+			m_coolantPtcPos = "0 0 0";
+
+		if 	( MemoryPointExists("refill") )
+			m_fuelPos = GetMemoryPointPos("refill");
+		else
+			m_fuelPos = "0 0 0";
+		
+		m_ActionsInitialize = false;
+
 	}
 
+	vector GetCoolantPtcPosWS()
+	{
+		return ModelToWorld( m_coolantPtcPos );
+	}
+
+	vector GetRefillPointPosWS()
+	{	
+		return ModelToWorld( m_fuelPos );
+	}
+	
 /*
 	//here we should handle the damage dealt in OnContact event, but maybe we will react even in that event 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
@@ -150,6 +218,13 @@ class CarScript extends Car
 
 			if ( SEffectManager.IsEffectExist( m_enginePtcFx ) )
 				SEffectManager.Stop( m_enginePtcFx );
+			
+			if ( m_Headlight )
+				m_Headlight.Destroy();
+			
+			if ( m_RearLight )
+				m_RearLight.Destroy();
+			
 		}
 	}
 
@@ -161,10 +236,13 @@ class CarScript extends Car
 			PlayCrashHeavySound();
 		else if ( GetCrashLightSound() )
 			PlayCrashLightSound();
+		
+		UpdateLights();
 	}
 	
 	override void EEItemAttached ( EntityAI item, string slot_name ) 
 	{
+		super.EEItemAttached( item, slot_name );
 		if ( GetGame().IsServer() )
 		{
 			if ( slot_name == "Reflector_1_1" )
@@ -187,6 +265,32 @@ class CarScript extends Car
 			
 			Synchronize();
 		}
+		UpdateHeadlightState();
+		UpdateLights();
+	}
+	
+	// Updates state of attached headlight bulbs for faster access
+	void UpdateHeadlightState()
+	{
+		EntityAI bulb_L = FindAttachmentBySlotName("Reflector_1_1");
+		EntityAI bulb_R = FindAttachmentBySlotName("Reflector_2_1");
+		
+		if (bulb_L  &&  !bulb_L.IsRuined()  &&  bulb_R  &&  !bulb_R.IsRuined())
+		{
+			m_HeadlightsState = CarHeadlightBulbsState.BOTH;
+		}
+		else if (bulb_L  &&  !bulb_L.IsRuined())
+		{
+			m_HeadlightsState = CarHeadlightBulbsState.LEFT;
+		}
+		else if (bulb_R  &&  !bulb_R.IsRuined())
+		{
+			m_HeadlightsState = CarHeadlightBulbsState.RIGHT;
+		}
+		else if ( ( !bulb_L  ||  bulb_L.IsRuined() )  &&  ( !bulb_R  ||  bulb_R.IsRuined() ) )
+		{
+			m_HeadlightsState = CarHeadlightBulbsState.NONE;
+		}
 	}
 
 	override void EEItemDetached(EntityAI item, string slot_name)
@@ -194,27 +298,11 @@ class CarScript extends Car
 		if ( GetGame().IsServer() )
 		{
 			//int slot_id = InventorySlots.GetSlotIdFromString(slot_name);
-			if ( IsLightsOn() )
+			if ( IsScriptedLightsOn() )
 			{
 				if ( slot_name == "CarBattery" || slot_name == "TruckBattery" )
-					SwitchLights();
-
-				if ( slot_name == "Reflector_1_1" )
 				{
-					SetHealth( "Reflector_1_1", "Health", 0 );
-				
-					item = FindAttachmentBySlotName( "Reflector_2_1" );
-					if ( !item || GetHealth01("Reflector_2_1", "") <= 0 )
-						SwitchLights();
-				}
-
-				if ( slot_name == "Reflector_2_1" )
-				{
-					SetHealth( "Reflector_2_1", "Health", 0 );
-
-					item = FindAttachmentBySlotName( "Reflector_1_1" );
-					if ( !item || GetHealth01("Reflector_1_1", "") <= 0 )
-						SwitchLights();
+					ToggleHeadlights();
 				}
 			}
 
@@ -245,12 +333,17 @@ class CarScript extends Car
 
 			Synchronize();
 		}
+		
+		UpdateHeadlightState();
+		UpdateLights();
 	}
 	
 	override bool CanReleaseAttachment( EntityAI attachment )
 	{
-
-		if ( GetSpeedometer() > 0.5 )
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
+		
+		if ( IsMoving() )
 			return false;
 
 		//GetInventoryOwner()
@@ -277,7 +370,7 @@ class CarScript extends Car
 		m_Time += timeSlice;
 
 		//! move it to constants.c const float CAR_UPDATE_INTERVAL = 1.0
-		if ( m_Time >= CARS_FLUIDS_TICK )
+		if ( m_Time >= GameConstants.CARS_FLUIDS_TICK )
 		{
 			m_Time = 0;
 
@@ -433,8 +526,42 @@ class CarScript extends Car
 				}
 			}
 		}
+		
+		
+		// Visualisation of brake lights for all players
+		float brake_coef = GetController().GetBrake();
+		
+		if (brake_coef > 0)
+		{
+			if (!m_BrakesArePressed)
+			{
+				m_BrakesArePressed = true;
+				SetSynchDirty();
+				OnBrakesPressed();
+			}
+		}
+		else
+		{
+			if (m_BrakesArePressed)
+			{
+				m_BrakesArePressed = false;
+				SetSynchDirty();
+				OnBrakesReleased();
+			}
+		}
 	}
-
+	
+	void OnBrakesPressed()
+	{
+		UpdateLights();
+	}
+	
+	void OnBrakesReleased()
+	{
+		UpdateLights();
+	}
+	
+	
 	override void OnContact( string zoneName, vector localPos, IEntity other, Contact data )
 	{
 
@@ -508,6 +635,10 @@ class CarScript extends Car
 				}
 			break;
 		}
+		
+		
+		UpdateHeadlightState();
+		UpdateLights();
 	}
 
 	/*!
@@ -536,10 +667,9 @@ class CarScript extends Car
 		return oldValue;
 	}
 	
-	float enviroCoef()
+	float GetEnviroHeatComfortOverride()
 	{
-		//range <-1;1> higher number, higher heatcomfort
-		return m_enviroCoef;
+		return Math.Clamp(m_EnviroHeatComfortOverride, -1, 1);
 	}
 
 	/*!
@@ -666,14 +796,21 @@ class CarScript extends Car
 		return true;
 	}
 
+	override void OnGearChanged( int newGear, int oldGear )
+	{
+		UpdateLights(newGear);
+	}
+	
 	//! Gets called everytime the engine starts.
 	override void OnEngineStart()
 	{
+		UpdateLights();
 	}
 
 	//! Gets called everytime the engine stops.
 	override void OnEngineStop()
 	{
+		UpdateLights();
 /*
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 		{		
@@ -687,7 +824,7 @@ class CarScript extends Car
 		Gets called everytime the game wants to switch the lights.
 		\return true when lights can be switched, false otherwise.
 	*/
-	override bool OnBeforeSwitchLights( bool toOn )
+	bool OnBeforeSwitchLights( bool toOn )
 	{
 		if ( toOn )
 		{
@@ -726,7 +863,363 @@ class CarScript extends Car
 		// this is the case on -> off
 		return true;
 	}
+	
+	//! Propper way to get if light is swiched on. Use instead of IsLightsOn().
+	bool IsScriptedLightsOn()
+	{
+		return m_HeadlightsOn;
+	}
+	
+	//! Switches headlights on/off, including the illumination of the control panel and synchronizes this change to all clients.
+	void ToggleHeadlights()
+	{
+		m_HeadlightsOn = !m_HeadlightsOn;
+		SetSynchDirty();
+		
+		UpdateLights();
+	}
+	
+	//! Updates representation of lights. Call on server and client after change in relevant mechanics.
+	void UpdateLights(int new_gear = -1) // -1 is invalid gear.
+	{
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
+		{
+			ItemBase battery;
+			
+			if ( IsVitalCarBattery() ) 
+				battery = ItemBase.Cast( FindAttachmentBySlotName("CarBattery") );
+			
+			if (battery)
+			{
+				// HEADLIGHTS
+				
+				if (m_HeadlightsOn)
+				{
+					DashboardShineOn();
+					
+					if (!m_Headlight  &&  m_HeadlightsState != CarHeadlightBulbsState.NONE)
+					{
+						m_Headlight = CreateFrontLight();
+						TailLightsShineOn();
+					}
+					
+					if (m_HeadlightsState == CarHeadlightBulbsState.LEFT)
+					{
+						m_Headlight.AttachOnMemoryPoint(this, m_LeftHeadlightPoint, m_LeftHeadlightTargetPoint);
+						m_Headlight.SegregateLight();
+						LeftFrontLightShineOn();
+						RightFrontLightShineOff();
+					}
+					else if (m_HeadlightsState == CarHeadlightBulbsState.RIGHT)
+					{
+						m_Headlight.AttachOnMemoryPoint(this, m_RightHeadlightPoint, m_RightHeadlightTargetPoint);
+						m_Headlight.SegregateLight();
+						RightFrontLightShineOn();
+						LeftFrontLightShineOff();
+					}
+					else if (m_HeadlightsState == CarHeadlightBulbsState.BOTH)
+					{
+						vector local_pos_left = GetMemoryPointPos(m_LeftHeadlightPoint);
+						vector local_pos_right = GetMemoryPointPos(m_RightHeadlightPoint);
+						
+						vector local_pos_middle = (local_pos_left + local_pos_right) *0.5;
+						m_Headlight.AttachOnObject(this, local_pos_middle);
+						m_Headlight.AggregateLight();
+						LeftFrontLightShineOn();
+						RightFrontLightShineOn();
+					}
+					
+					if (m_Headlight  &&  m_HeadlightsState == CarHeadlightBulbsState.NONE)
+					{
+						m_Headlight.FadeOut();
+						m_Headlight = null;
+						LeftFrontLightShineOff();
+						RightFrontLightShineOff();
+						TailLightsShineOff();
+					}
+				}
+				else
+				{
+					TailLightsShineOff();
+					DashboardShineOff();
+					LeftFrontLightShineOff();
+					RightFrontLightShineOff();
+					
+					if (m_Headlight)
+					{
+						m_Headlight.FadeOut();
+						m_Headlight = null;
+					}
+				}
+			
+				// REAR LIGHTS (brakes, reverse & tail lights)
+			
+				if ( EngineIsOn() )
+				{
+					int reverse_light_state = CarRearLightType.NONE;
+					
+					// reverse
+					
+					int gear;
+					
+					if (new_gear == -1)
+						gear = GetController().GetGear();
+					else
+						gear = new_gear;
+					
+					
+					if (gear == CarGear.REVERSE)
+					{
+						reverse_light_state = CarRearLightType.REVERSE_ONLY;
+					}
+					else
+					{
+						reverse_light_state = CarRearLightType.NONE;
+					}
+					
+					// brakes
+					
+					if (m_BrakesArePressed)
+					{
+						if (reverse_light_state == CarRearLightType.REVERSE_ONLY)
+						{
+							reverse_light_state = CarRearLightType.BRAKES_AND_REVERSE;
+						}
+						else
+						{
+							reverse_light_state = CarRearLightType.BRAKES_ONLY;
+						}
+					}
+					
+					if (reverse_light_state != CarRearLightType.NONE    &&  m_HeadlightsState != CarHeadlightBulbsState.NONE  &&  !m_RearLight)
+					{
+						m_RearLight = CreateRearLight();
+						vector local_pos = GetMemoryPointPos(m_ReverseLightPoint);
+						m_RearLight.AttachOnObject(this, local_pos, "180 0 0");
+					}
+					
+					if (m_RearLight)
+					{
+						if (reverse_light_state == CarRearLightType.REVERSE_ONLY)
+						{
+							m_RearLight.SetAsSegregatedReverseLight();
 
+							if (m_HeadlightsState != CarHeadlightBulbsState.NONE)
+							{
+								ReverseLightsShineOn();
+								BrakeLightsShineOff();
+							}
+						}
+						else if (reverse_light_state == CarRearLightType.BRAKES_ONLY)
+						{
+							m_RearLight.SetAsSegregatedBrakeLight();
+							
+							if (m_HeadlightsState != CarHeadlightBulbsState.NONE)
+							{
+								ReverseLightsShineOff();
+								BrakeLightsShineOn();
+							}
+						}
+						else if (reverse_light_state == CarRearLightType.BRAKES_AND_REVERSE)
+						{
+							m_RearLight.AggregateLight();
+							m_RearLight.SetFadeOutTime(1);
+							
+							if (m_HeadlightsState != CarHeadlightBulbsState.NONE)
+							{
+								BrakeLightsShineOn();
+								ReverseLightsShineOn();
+							}
+						}
+						else if (reverse_light_state == CarRearLightType.NONE)
+						{
+							m_RearLight.FadeOut();
+							m_RearLight = null;
+							ReverseLightsShineOff();
+						}
+					}
+					else
+					{
+						ReverseLightsShineOff();
+						BrakeLightsShineOff();
+					}
+				}
+			}
+			else
+			{
+				LeftFrontLightShineOff();
+				RightFrontLightShineOff();
+				DashboardShineOff();
+				BrakeLightsShineOff();
+				ReverseLightsShineOff();
+				
+				if (m_RearLight)
+				{
+					m_RearLight.FadeOut();
+					m_RearLight = null;
+				}
+				
+				if (m_Headlight)
+				{
+					m_Headlight.FadeOut();
+					m_Headlight = null;
+				}
+			}
+		}
+	}
+	
+	void LeftFrontLightShineOn()
+	{
+		string material = ConfigGetString("frontReflectorMatOn");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_FRONT_LIGHT_L, material);
+		}
+	}
+	
+	void RightFrontLightShineOn()
+	{
+		string material = ConfigGetString("frontReflectorMatOn");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_FRONT_LIGHT_R, material);
+		}
+	}
+	
+	void LeftFrontLightShineOff()
+	{
+		string material = ConfigGetString("frontReflectorMatOff");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_FRONT_LIGHT_L, material);
+		}
+	}
+	
+	void RightFrontLightShineOff()
+	{
+		string material = ConfigGetString("frontReflectorMatOff");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_FRONT_LIGHT_R, material);
+		}
+	}
+	
+	void ReverseLightsShineOn()
+	{
+		string material = ConfigGetString("ReverseReflectorMatOn");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_REVERSE_LIGHT_L, material);
+			SetObjectMaterial(SELECTION_ID_REVERSE_LIGHT_R, material);
+		}
+	}
+	
+	void ReverseLightsShineOff()
+	{
+		string material = ConfigGetString("ReverseReflectorMatOff");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_REVERSE_LIGHT_L, material);
+			SetObjectMaterial(SELECTION_ID_REVERSE_LIGHT_R, material);
+		}
+	}
+	
+	void BrakeLightsShineOn()
+	{
+		string material = ConfigGetString("brakeReflectorMatOn");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_BRAKE_LIGHT_L, material);
+			SetObjectMaterial(SELECTION_ID_BRAKE_LIGHT_R, material);
+		}
+	}
+	
+	void BrakeLightsShineOff()
+	{
+		string material = ConfigGetString("brakeReflectorMatOff");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_BRAKE_LIGHT_L, material);
+			SetObjectMaterial(SELECTION_ID_BRAKE_LIGHT_R, material);
+		}
+	}
+	
+	void TailLightsShineOn()
+	{
+		string material = ConfigGetString("TailReflectorMatOn");
+		string material_off = ConfigGetString("TailReflectorMatOff");
+		
+		if (material != ""  &&  material_off != "")
+		{
+			if (m_HeadlightsState == CarHeadlightBulbsState.LEFT)
+			{
+				SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_L, material);
+				SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_R, material_off);
+			}
+			else if (m_HeadlightsState == CarHeadlightBulbsState.RIGHT)
+			{
+				SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_R, material);
+				SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_L, material_off);
+			}
+			else if (m_HeadlightsState == CarHeadlightBulbsState.BOTH)
+			{
+				SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_R, material);
+				SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_L, material);
+			}
+		}
+	}
+	
+	void TailLightsShineOff()
+	{
+		string material = ConfigGetString("TailReflectorMatOff");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_L, material);
+			SetObjectMaterial(SELECTION_ID_TAIL_LIGHT_R, material);
+		}
+	}
+	
+	void DashboardShineOn()
+	{
+		string material = ConfigGetString("dashboardMatOn");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_DASHBOARD_LIGHT, material);
+		}
+	}
+	
+	void DashboardShineOff()
+	{
+		string material = ConfigGetString("dashboardMatOff");
+		
+		if (material != "")
+		{
+			SetObjectMaterial(SELECTION_ID_DASHBOARD_LIGHT, material);
+		}
+	}
+	
+	// Override this for a car-specific light type
+	CarRearLightBase CreateRearLight()
+	{
+		return CarRearLightBase.Cast( ScriptedLightBase.CreateLight(OffroadHatchbackFrontLight) ); // just a default value
+	}
+	
+	// Override this for a car-specific light type
+	CarLightBase CreateFrontLight()
+	{
+		return CarLightBase.Cast( ScriptedLightBase.CreateLight(OffroadHatchbackFrontLight) ); // just a default value
+	}
+	
 	protected void CheckVitalItem( bool isVital, string itemName )
 	{
 		if ( !isVital )
@@ -801,6 +1294,7 @@ class CarScript extends Car
 		{		
 			EffectSound sound =	SEffectManager.PlaySound("offroad_hit_light_SoundSet", GetPosition() );
 			sound.SetSoundAutodestroy( true );
+			m_PlayCrashSoundLight = false;
 		}
 	}
 
@@ -821,6 +1315,7 @@ class CarScript extends Car
 		{		
 			EffectSound sound =	SEffectManager.PlaySound("offroad_hit_heavy_SoundSet", GetPosition() );
 			sound.SetSoundAutodestroy( true );
+			m_PlayCrashSoundHeavy = false;
 		}
 	}
 	
@@ -831,6 +1326,22 @@ class CarScript extends Car
 
 	string GetDoorConditionPointFromSelection( string selection )
 	{
+		switch( selection )
+		{
+			case "seat_driver":
+				return "seat_con_1_1";
+			break;
+			case "seat_codriver":
+				return "seat_con_2_1";
+			break;
+			case "seat_cargo1":
+				return "seat_con_1_2";
+			break;
+			case "seat_cargo2":
+				return "seat_con_2_2";
+			break;
+		}
+		
 		return "";
 	}
 	
@@ -892,6 +1403,15 @@ class CarScript extends Car
 	{
 		return true;
 	}
+	
+	//!
+	bool IsMoving()
+	{
+		if ( GetSpeedometer() > 3.5 )
+			return true;
+		
+		return false;
+	}
 
 	//! camera type
 	override int Get3rdPersonCameraType()
@@ -912,7 +1432,7 @@ class CarScript extends Car
 
 	float GetActionDistanceCoolant()
 	{
-		return 3.0;
+		return 2.0;
 	}
 
 	string GetActionCompNameFuel()
@@ -922,6 +1442,103 @@ class CarScript extends Car
 
 	float GetActionDistanceFuel()
 	{
-		return 3.2;
+		return 1.5;
+	}
+	
+	string GetActionCompNameOil()
+	{
+		return "carradiator";
+	}
+
+	float GetActionDistanceOil()
+	{
+		return 2.0;
+	}
+	
+	string GetActionCompNameBrakes()
+	{
+		return "carradiator";
+	}
+
+	float GetActionDistanceBrakes()
+	{
+		return 2.0;
+	}
+	
+	void InitializeActions()
+	{
+		m_InputActionMap = m_CarTypeActionsMap.Get( this.Type() );
+		if(!m_InputActionMap)
+		{
+			TInputActionMap iam = new TInputActionMap;
+			m_InputActionMap = iam;
+			SetActions();
+			m_CarTypeActionsMap.Insert(this.Type(), m_InputActionMap);
+		}
+	}
+	
+	override void GetActions(typename action_input_type, out array<ActionBase_Basic> actions)
+	{
+		if(!m_ActionsInitialize)
+		{
+			m_ActionsInitialize = true;
+			InitializeActions();
+		}
+		
+		actions = m_InputActionMap.Get(action_input_type);
+	}
+	
+	void SetActions()
+	{
+		//AddAction(ActionAnimateCarSelection); not needed now
+		AddAction(ActionGetInTransport);
+		AddAction(ActionSwitchLights);
+	}
+	
+	void AddAction(typename actionName)
+	{
+		ActionBase action = ActionManagerBase.GetAction(actionName);
+
+		if(!action)
+		{
+			Debug.LogError("Action " + actionName + " dosn't exist!");
+			return;
+		}		
+		
+		typename ai = action.GetInputType();
+		if(!ai)
+		{
+			m_ActionsInitialize = false;
+			return;
+		}
+		ref array<ActionBase_Basic> action_array = m_InputActionMap.Get( ai );
+		
+		if(!action_array)
+		{
+			action_array = new array<ActionBase_Basic>;
+			m_InputActionMap.Insert(ai, action_array);
+		}
+		
+		Print("+ " + this + " add action: " + action + " input " + ai);
+
+		action_array.Insert(action);
+	}
+	
+	void RemoveAction(typename actionName)
+	{
+		PlayerBase player = PlayerBase.Cast(GetGame().GetPlayer());
+		ActionBase action = player.GetActionManager().GetAction(actionName);
+		typename ai = action.GetInputType();
+		ref array<ActionBase_Basic> action_array = m_InputActionMap.Get( ai );
+		
+		if(action_array)
+		{
+			action_array.RemoveItem(action);
+		}
+	}
+	
+	override bool IsInventoryVisible()
+	{
+		return ( GetGame().GetPlayer() && ( !GetGame().GetPlayer().GetCommand_Vehicle() || GetGame().GetPlayer().GetCommand_Vehicle().GetTransport() == this ) );
 	}
 };

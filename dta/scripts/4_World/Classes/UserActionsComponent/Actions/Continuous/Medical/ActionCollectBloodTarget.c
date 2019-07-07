@@ -11,12 +11,6 @@ class ActionCollectBloodTarget: ActionContinuousBase
 	void ActionCollectBloodTarget()
 	{
 		m_CallbackClass = ActionCollectBloodTargetCB;
-		m_MessageStartFail = "There's no bandage left.";
-		m_MessageStart = "Player started bandaging you.";
-		m_MessageSuccess = "Player finished bandaging you.";
-		m_MessageFail = "Player moved and bandaging was canceled.";
-		m_MessageCancel = "You stopped bandaging.";
-		//m_Animation = "collectblood";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SALINEBLOODBAGTARGET;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -27,11 +21,6 @@ class ActionCollectBloodTarget: ActionContinuousBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_COLLECT_BLOOD_T;
 	}
 
 	override string GetText()

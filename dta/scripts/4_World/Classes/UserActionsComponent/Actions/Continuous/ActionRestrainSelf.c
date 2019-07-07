@@ -25,11 +25,6 @@ class ActionRestrainSelf: ActionContinuousBase
 	void ActionRestrainSelf()
 	{
 		m_CallbackClass = ActionRestrainSelfCB;
-		m_MessageStartFail = "It's too torn.";
-		m_MessageStart = "I have started putting sack on";
-		m_MessageSuccess = "I have put sack on.";
-		m_MessageFail = "I have moved and putting sack on was canceled.";
-		m_MessageCancel = "I stopped putting sack on.";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_RESTRAINSELF;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -41,11 +36,6 @@ class ActionRestrainSelf: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_RESTRAIN_S;
 	}
 
 	override bool HasTarget()

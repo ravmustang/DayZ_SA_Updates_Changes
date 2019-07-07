@@ -25,12 +25,6 @@ class ActionRestrainTarget: ActionContinuousBase
 	void ActionRestrainTarget()
 	{
 		m_CallbackClass = ActionRestrainTargetCB;
-		m_MessageStartFail = "Item is damaged.";
-		m_MessageStart = "Player started restraining you.";
-		m_MessageSuccess = "Player finished restraining you.";
-		m_MessageFail = "Player moved and restraining was canceled.";
-		m_MessageCancel = "You stopped restraining.";
-		//m_Animation = "restrain";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_RESTRAINTARGET;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -73,12 +67,6 @@ class ActionRestrainTarget: ActionContinuousBase
 		return true;
 	}
 		
-	
-	override int GetType()
-	{
-		return AT_RESTRAIN_T;
-	}
-		
 	override string GetText()
 	{
 		return "#restrain";
@@ -117,13 +105,17 @@ class ActionRestrainTarget: ActionContinuousBase
 		string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands_source);
 		if (item_in_hands_target)
 		{
-			Print("Restraining player with item in hands, drop first");
-			target_player.ServerDropEntity(item_in_hands_target);				
-		}
+			Print("Restraining player with item in hands, first drop & then restrain");
 
-		Print("Restraining player with empty hands");
-		RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player);
-		source_player.LocalReplaceItemInHandsWithNewElsewhere(lambda);
+			ChainedDropAndRestrainLambda lambda2 = new ChainedDropAndRestrainLambda(item_in_hands_target, item_in_hands_target.GetType(), target_player, false, source_player);
+			MiscGameplayFunctions.TurnItemInHandsIntoItemEx(target_player, lambda2);
+		}
+		else
+		{
+			Print("Restraining player with empty hands");
+			RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, target_player);
+			source_player.LocalReplaceItemInHandsWithNewElsewhere(lambda);
+		}
 		
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
@@ -132,9 +124,41 @@ class ActionRestrainTarget: ActionContinuousBase
 	{
 		super.OnFinishProgressClient( action_data );
 		
-		AnalyticsManager.OnActionRestrain();
+		GetGame().GetAnalyticsClient().OnActionRestrain();
 	}
 };
+
+class ChainedDropAndRestrainLambda : DestroyItemInCorpsesHandsAndCreateNewOnGndLambda
+{
+	PlayerBase m_SourcePlayer;
+
+	void ChainedDropAndRestrainLambda (EntityAI old_item, string new_item_type, PlayerBase player, bool destroy = false, PlayerBase src_player = null)
+	{
+		m_SourcePlayer = src_player;
+	}
+	
+	override void OnSuccess(EntityAI entity)
+	{
+		super.OnSuccess(new_item);
+		
+		// as soon as previous op is finish, start another one
+		EntityAI item_in_hands_source = m_SourcePlayer.GetHumanInventory().GetEntityInHands();
+		if (item_in_hands_source)
+		{
+			string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands_source);
+			RestrainTargetPlayerLambda lambda = new RestrainTargetPlayerLambda(item_in_hands_source, new_item_name, m_Player);
+			if (m_SourcePlayer)
+				m_SourcePlayer.LocalReplaceItemInHandsWithNewElsewhere(lambda);
+			else
+				Error("ChainedDropAndRestrainLambda: missing source player!");
+		}
+		else
+		{
+			Error("ChainedDropAndRestrainLambda: missing source item in hands!");
+		}
+	}
+}
+
 
 class RestrainTargetPlayerLambda : ReplaceItemWithNewLambdaBase
 {
@@ -154,6 +178,7 @@ class RestrainTargetPlayerLambda : ReplaceItemWithNewLambdaBase
 		super.OnSuccess(new_item);
 
 		m_TargetPlayer.SetRestrained(true);
+		m_TargetPlayer.OnItemInHandsChanged();
 	}
 };
 

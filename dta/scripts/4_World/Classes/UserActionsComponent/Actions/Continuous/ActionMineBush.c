@@ -16,12 +16,6 @@ class ActionMineBush: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_HACKBUSH;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "My tool is too damaged to cut.";
-		m_MessageStart = "I started cutting the bush down.";
-		m_MessageSuccess = "I have cut the bush down.";
-		m_MessageFail = "My tool is ruined.";
-		//m_AnimationOneHanded = "DRINK";
-		//m_AnimationTwoHanded = "DIGGINGSHOVEL";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_HIGH;
 	}
 	
@@ -29,11 +23,6 @@ class ActionMineBush: ActionContinuousBase
 	{
 		m_ConditionTarget = new CCTCursor(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
-	}
-
-	override int GetType()
-	{
-		return AT_MINE_BUSH;
 	}
 		
 	override string GetText()

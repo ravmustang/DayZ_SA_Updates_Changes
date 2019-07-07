@@ -9,9 +9,4 @@ class ActionEmptyCookingPot: ActionEmptyBottleBase
 		m_FullBody = false;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 	}
-	
-	override int GetType()
-	{
-		return AT_EMPTY_COOKING_POT;
-	}
 };

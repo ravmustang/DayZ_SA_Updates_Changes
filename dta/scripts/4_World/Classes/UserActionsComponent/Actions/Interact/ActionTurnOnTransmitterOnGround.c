@@ -4,13 +4,6 @@ class ActionTurnOnTransmitterOnGround: ActionInteractBase
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageSuccess 	= "I have turned it on.";
-		m_MessageFail 		= "Cannot turn on the device without power source.";
-	}
-
-	override int GetType()
-	{
-		return AT_TURN_ON_TRANSMITTER_ON_GROUND;
 	}
 
 	override string GetText()

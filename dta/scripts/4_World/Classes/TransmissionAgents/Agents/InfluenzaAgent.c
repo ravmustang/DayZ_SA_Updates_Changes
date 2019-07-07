@@ -10,6 +10,7 @@ class InfluenzaAgent extends AgentBase
 		m_TransferabilityIn		= 1;//to the player
 		m_TransferabilityOut	= 1;//from the player
 		m_MaxCount 				= 1000;
+		m_Digestibility = 0.1;//multiplier for agents digested in the player stomach from an infected item(agents_transfered = consumed_amount * m_Digestibility)
 		m_AntibioticsResistance = 0;//[0..1], 0 means antibiotics have full effect, 1 means no effect
 		m_AutoinfectProbability = 50;//
 		m_TransferabilityAirOut = 1;

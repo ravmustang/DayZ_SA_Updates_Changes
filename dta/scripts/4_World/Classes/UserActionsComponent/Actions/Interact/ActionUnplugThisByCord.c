@@ -2,18 +2,21 @@ class ActionUnplugThisByCord: ActionInteractBase
 {
 	void ActionUnplugThisByCord()
 	{
-		m_MessageSuccess = "I've unplugged and folded the cord.";
-		m_MessageStart = "";
-	}
-
-	override int GetType()
-	{
-		return AT_UNPLUG_THIS_BY_CORD;
 	}
 		
 	override string GetText()
 	{
 		return "#unplug_by_cord";
+	}
+	
+	override typename GetInputType()
+	{
+		return ContinuousInteractActionInput;
+	}
+	
+	override bool HasProgress()
+	{
+		return false;
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

@@ -14,12 +14,6 @@ class ActionStripCarrierVest: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CRAFTING;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-		
-		m_MessageStartFail = "I cannot unpack this.";
-		m_MessageStart = "I have started unpacking the box.";
-		m_MessageSuccess = "I have unpacked the box.";
-		m_MessageFail = "I have moved and unpacking was canceled.";
-		m_MessageCancel = "I stopped unpacking.";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -36,11 +30,6 @@ class ActionStripCarrierVest: ActionContinuousBase
 			return false;
 		}
 		return true;
-	}
-		
-	override int GetType()
-	{
-		return AT_STRIP_CARRIER_VEST;
 	}
 
 	override bool HasTarget()

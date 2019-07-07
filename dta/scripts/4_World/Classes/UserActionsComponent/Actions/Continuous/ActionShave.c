@@ -11,12 +11,6 @@ class ActionShave: ActionContinuousBase
 	void ActionShave()
 	{
 		m_CallbackClass = ActionShaveCB;
-		m_MessageStartFail = "I have no beard to be shaved.";
-		m_MessageStart = "I have started shaving myself.";
-		m_MessageSuccess = "I have shaved myself.";
-		m_MessageFail = "I have failed to shave myself.";
-		m_MessageCancel = "I stopped shaving myself.";
-		//m_Animation = "ignite";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_SHAVE;
@@ -44,11 +38,6 @@ class ActionShave: ActionContinuousBase
 	{
 		return false;
 	}
-
-	override int GetType()
-	{
-		return AT_SHAVE;
-	}
 		
 	override string GetText()
 	{
@@ -70,6 +59,6 @@ class ActionShave: ActionContinuousBase
 	{
 		super.OnFinishProgressClient( action_data );
 		
-		AnalyticsManager.OnActionFinishedShaveSelf();
+		GetGame().GetAnalyticsClient().OnActionFinishedShaveSelf();
 	}
 };

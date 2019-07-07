@@ -2,19 +2,12 @@ class ActionClose: ActionSingleUseBase
 {
 	void ActionClose()
 	{
-		m_MessageSuccess = "I have closed it.";
-		//m_Animation = "close";
 	}
 	
 	override void CreateConditionComponents()  
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_CLOSE;
 	}
 
 	override bool HasTarget()

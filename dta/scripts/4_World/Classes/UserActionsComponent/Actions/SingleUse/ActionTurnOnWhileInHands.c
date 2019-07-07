@@ -2,19 +2,12 @@ class ActionTurnOnWhileInHands: ActionSingleUseBase
 {
 	void ActionTurnOnWhileInHands()
 	{
-		m_MessageSuccess = "It's turned on.";
-		m_MessageFail = "It's out of energy";
 	}
 	
 	override void CreateConditionComponents()  
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_TURN_ON_WHILE_IN_HANDS;
 	}
 
 	override bool HasTarget()

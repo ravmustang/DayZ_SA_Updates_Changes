@@ -3,7 +3,7 @@ class Spotlight extends ItemBase
 	private bool	m_IsFolded;
 	SpotlightLight 	m_Light;
 	
-	static vector 	m_LightLocalPosition 	= "0 1.50668 0.134863";
+	static vector 	m_LightLocalPosition 	= "0 1.50668 0.134863"; // We can't use GetMemoryPointPos() on this object, so we need to remember light position like this instead.
 	static vector 	m_LightLocalOrientation = "0 0 0";
 	
 	// Spotlight can be extended and compressed
@@ -46,6 +46,7 @@ class Spotlight extends ItemBase
 		m_DeployLoopSound = new EffectSound;
 		RegisterNetSyncVariableBool("m_IsSoundSynchRemote");
 		RegisterNetSyncVariableBool("m_IsDeploySound");
+		RegisterNetSyncVariableBool("m_IsFolded");
 	}
 	
 	void ~Spotlight()
@@ -106,8 +107,6 @@ class Spotlight extends ItemBase
 		{
 			m_Light = SpotlightLight.Cast( ScriptedLightBase.CreateLight( SpotlightLight, "0 0 0") );
 			m_Light.AttachOnObject(this, m_LightLocalPosition, m_LightLocalOrientation);
-			
-			
 		}
 		
 		SetObjectMaterial(ID_GLASS, LIGHT_ON_GLASS);
@@ -171,6 +170,17 @@ class Spotlight extends ItemBase
 			{
 				ShowSelection( SEL_CORD_FOLDED_F );
 			}
+			
+			if (GetCompEM().IsWorking())
+			{
+				SetObjectMaterial(ID_GLASS, LIGHT_ON_GLASS);
+				SetObjectMaterial(ID_REFLECTOR, LIGHT_ON_REFLECTOR);
+			}
+			else
+			{
+				SetObjectMaterial(ID_GLASS, LIGHT_OFF_GLASS);
+				SetObjectMaterial(ID_REFLECTOR, LIGHT_OFF_REFLECTOR);
+			}
 		}
 		else
 		{
@@ -187,6 +197,17 @@ class Spotlight extends ItemBase
 			{
 				ShowSelection( SEL_CORD_FOLDED_U );
 			}
+		}
+		
+		if (GetCompEM().IsWorking())
+		{
+			SetObjectMaterial(ID_GLASS, LIGHT_ON_GLASS);
+			SetObjectMaterial(ID_REFLECTOR, LIGHT_ON_REFLECTOR);
+		}
+		else
+		{
+			SetObjectMaterial(ID_GLASS, LIGHT_OFF_GLASS);
+			SetObjectMaterial(ID_REFLECTOR, LIGHT_OFF_REFLECTOR);
 		}
 	}
 	
@@ -220,6 +241,7 @@ class Spotlight extends ItemBase
 		m_IsFolded = true;
 		GetCompEM().SwitchOff();
 		GetCompEM().UnplugThis();
+		SetSynchDirty();
 		
 		UpdateAllSelections();
 	}
@@ -227,7 +249,7 @@ class Spotlight extends ItemBase
 	void Unfold()
 	{
 		m_IsFolded = false;
-		
+		SetSynchDirty();
 		UpdateAllSelections();
 	}
 
@@ -359,5 +381,19 @@ class Spotlight extends ItemBase
 			m_DeployLoopSound.SetSoundFadeOut(0.5);
 			m_DeployLoopSound.SoundStop();
 		}
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionClapBearTrapWithThisItem);
+		AddAction(ActionPlugIn);
+		AddAction(ActionTogglePlaceObject);
+		AddAction(ActionUnplugThisByCord);
+		AddAction(ActionTurnOnSpotlight);
+		AddAction(ActionTurnOffSpotlight);
+		AddAction(ActionRepositionPluggedItem);
+		AddAction(ActionDeployObject);
 	}
 }

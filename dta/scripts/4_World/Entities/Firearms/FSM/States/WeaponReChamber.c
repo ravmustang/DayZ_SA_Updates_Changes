@@ -34,7 +34,7 @@ class WeaponRechamber extends WeaponStateBase
 
 	override void OnEntry (WeaponEventBase e)
 	{
-		wpnDebugPrint("[wpnfsm] WeaponRechamber, mag=" + e.m_magazine.ToString());
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponRechamber, mag=" + e.m_magazine.ToString());
 		m_srcMagazine = e.m_magazine;
 		m_loa.m_srcMagazine = m_srcMagazine;
 
@@ -48,7 +48,7 @@ class WeaponRechamber extends WeaponStateBase
 			m_dstMagazine = DayZPlayerUtils.SelectStoreCartridge(e.m_player, m_weapon, mi, m_srcMagazine, damage, magazineTypeName);
 			if (!m_dstMagazine)
 			{
-				Error("[wpnfsm]   WeaponRechamber - error, cannot prepare mag for catridge, magType=" + magazineTypeName);
+				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + "   WeaponRechamber - error, cannot prepare mag for catridge, magType=" + magazineTypeName);
 			}
 		}
 
@@ -71,12 +71,12 @@ class WeaponRechamber extends WeaponStateBase
 
 		if (!ctx.Write(m_dstMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_dstMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot save m_dstMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Write(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -89,12 +89,12 @@ class WeaponRechamber extends WeaponStateBase
 
 		if (!ctx.Read(m_dstMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Read(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;

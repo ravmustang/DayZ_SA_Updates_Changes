@@ -2,13 +2,6 @@ class ActionTurnOffSpotlight: ActionInteractBase
 {	
 	void ActionTurnOffSpotlight()
 	{
-		m_MessageStart = "";
-		m_MessageSuccess = "I've flipped the switch off";
-	}
-	
-	override int GetType()
-	{
-		return AT_TURN_OFF_SPOTLIGHT;
 	}
 
 	override string GetText()

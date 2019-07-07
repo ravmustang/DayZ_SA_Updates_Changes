@@ -15,12 +15,6 @@ class ActionWaterPlant: ActionContinuousBase
 		m_CallbackClass = ActionWaterPlantCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_EMPTY_VESSEL;
 		m_FullBody = true;
-		m_MessageSuccess = "I've watered plant.";
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "";
-		m_MessageFail = "";
-		m_MessageCancel = "";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
 	}
 	
@@ -28,11 +22,6 @@ class ActionWaterPlant: ActionContinuousBase
 	{	
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINotRuinedAndEmpty;
-	}
-
-	override int GetType()
-	{
-		return AT_WATER_PLANT;
 	}
 		
 	override string GetText()

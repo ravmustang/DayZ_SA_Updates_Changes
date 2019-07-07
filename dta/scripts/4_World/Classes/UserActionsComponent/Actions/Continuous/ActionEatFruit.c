@@ -14,11 +14,6 @@ class ActionEatFruit: ActionEat
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EAT;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EAT;
 	}
-
-	override int GetType()
-	{
-		return AT_EAT_FRUIT;
-	}
 		
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	

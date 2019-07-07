@@ -6,17 +6,11 @@ class ActionSewSelfCB : ActionContinuousBaseCB
 	}
 };
 
-class ActionSewSelf: ActionContinuousBase
+class ActionSewSelf: ActionBandageBase
 {
 	void ActionSewSelf()
 	{
 		m_CallbackClass = ActionSewSelfCB;
-		m_MessageStartFail = "There's no sewing left.";
-		m_MessageStart = "I have started sewing myself";
-		m_MessageSuccess = "I have sewed myself.";
-		m_MessageFail = "I have moved and sewing was canceled.";
-		m_MessageCancel = "I stopped sewing.";
-		//m_Animation = "bandage";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_STITCHUPSELF;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -29,11 +23,6 @@ class ActionSewSelf: ActionContinuousBase
 		m_ConditionTarget = new CCTSelf;
 	}
 
-	override int GetType()
-	{
-		return AT_SEW_S;
-	}
-
 	override bool HasTarget()
 	{
 		return false;
@@ -43,22 +32,19 @@ class ActionSewSelf: ActionContinuousBase
 	{
 		return "#sew_cuts";
 	}
-	
+	/*
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		return player.IsBleeding();
 	}
-
+*/
 	override void OnFinishProgressServer( ActionData action_data )
 	{
-		const float ITEM_DAMAGE = 10;
-		float delta = action_data.m_Player.GetSoftSkillsManager().SubtractSpecialtyBonus( ITEM_DAMAGE, this.GetSpecialtyWeight() );
-
-		if (action_data.m_Player.GetBleedingManagerServer() )
+		PlayerBase target = PlayerBase.Cast(action_data.m_Player);
+		if(action_data.m_MainItem && target)
 		{
-			action_data.m_Player.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();	
+			ApplyBandage( action_data.m_MainItem, target );
+			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		}
-		action_data.m_MainItem.AddHealth("GlobalHealth","Health",-delta);
-		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };

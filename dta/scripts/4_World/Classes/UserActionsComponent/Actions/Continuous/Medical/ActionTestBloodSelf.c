@@ -11,12 +11,6 @@ class ActionTestBloodSelf: ActionContinuousBase
 	void ActionTestBloodSelf()
 	{
 		m_CallbackClass = ActionTestBloodSelfCB;
-		m_MessageStartFail = "It's used up.";
-		m_MessageStart = "I have started testing my blood.";
-		m_MessageSuccess = "I have tested my blood.";
-		m_MessageFail = "I have moved and testing was canceled.";
-		m_MessageCancel = "I stopped testing my blood.";
-		//m_Animation = "INJECTS";
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CRAFTING;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -27,11 +21,6 @@ class ActionTestBloodSelf: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_TEST_BLOOD_S;
 	}
 
 	override bool HasTarget()

@@ -2,18 +2,12 @@ class ActionAttachToConstruction: ActionSingleUseBase
 {
 	void ActionAttachToConstruction()
 	{
-		m_MessageSuccess = "I've attached the object.";
 	}
 
 	override void CreateConditionComponents() 
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-	
-	override int GetType()
-	{
-		return AT_ATTACH_TO_CONSTRUCTION;
 	}
 		
 	override string GetText()

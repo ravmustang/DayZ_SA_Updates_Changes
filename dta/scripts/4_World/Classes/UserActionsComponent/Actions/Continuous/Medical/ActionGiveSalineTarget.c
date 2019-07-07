@@ -11,12 +11,6 @@ class ActionGiveSalineTarget: ActionContinuousBase
 	void ActionGiveSalineTarget()
 	{
 		m_CallbackClass = ActionGiveSalineTargetCB;
-		m_MessageStartFail = "Bag is empty.";
-		m_MessageStart = "Player started giving you saline.";
-		m_MessageSuccess = "Player finished giving you saline.";
-		m_MessageFail = "Player moved and giving you saline was canceled.";
-		m_MessageCancel = "You stopped giving saline.";
-		//m_Animation = "givesaline";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SALINEBLOODBAGTARGET;
@@ -29,11 +23,6 @@ class ActionGiveSalineTarget: ActionContinuousBase
 		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);	
-	}
-
-	override int GetType()
-	{
-		return AT_GIVE_SALINE_T;
 	}
 		
 	override string GetText()

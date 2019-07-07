@@ -86,7 +86,7 @@ class WeaponEjectBullet extends WeaponStateBase
 		m_eject.m_dstMagazine = m_dstMagazine;
 
 		super.OnEntry(e); // @NOTE: super after submachine init (prevent override from submachine start)
-		wpnDebugPrint("[wpnfsm] WeaponEjectBullet m_mag=" + m_dstMagazine.ToString() + ", e.mag=" + e.m_magazine.ToString());
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponEjectBullet m_mag=" + m_dstMagazine.ToString() + ", e.mag=" + e.m_magazine.ToString());
 	}
 
 	override void OnAbort (WeaponEventBase e)
@@ -108,7 +108,7 @@ class WeaponEjectBullet extends WeaponStateBase
 
 		if (!ctx.Write(m_dstMagazine))
 		{
-			Error("[wpnfsm] WeaponEjectBullet.LoadCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponEjectBullet.LoadCurrentFSMState: cannot write m_dstMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -121,7 +121,7 @@ class WeaponEjectBullet extends WeaponStateBase
 
 		if (!ctx.Read(m_dstMagazine))
 		{
-			Error("[wpnfsm] WeaponEjectBullet.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponEjectBullet.LoadCurrentFSMState: cannot read m_dstMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;

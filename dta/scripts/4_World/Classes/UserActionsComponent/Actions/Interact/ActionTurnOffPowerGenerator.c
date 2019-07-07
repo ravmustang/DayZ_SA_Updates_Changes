@@ -3,13 +3,6 @@ class ActionTurnOffPowerGenerator: ActionInteractBase
 	void ActionTurnOffPowerGenerator()
 	{
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
-		m_MessageSuccess = "I've turned off the generator.";
-		m_MessageStart = "";
-	}
-	
-	override int GetType()
-	{
-		return AT_TURN_OFF_POWER_GENERATOR;
 	}
 
 	override string GetText()

@@ -7,7 +7,7 @@ class ActionPlaceObjectCB : ActiondeployObjectCB
 	
 	override void DropDuringPlacing()
 	{
-		EntityAI entity_for_placing = EntityAI.Cast( m_ActionData.m_MainItem );	
+		EntityAI entity_for_placing = m_ActionData.m_MainItem;	
 		vector orientation = m_ActionData.m_Player.GetLocalProjectionOrientation();
 		vector 	position = m_ActionData.m_Player.GetPosition() + m_ActionData.m_Player.GetDirection();
 		vector rotation_matrix[3];
@@ -31,11 +31,6 @@ class ActionPlaceObject: ActionDeployObject
 	void ActionPlaceObject()
 	{
 		m_CallbackClass	= ActionPlaceObjectCB;
-	}
-
-	override int GetType()
-	{
-		return AT_PLACE_OBJECT;
 	}
 
 	override bool HasProgress()

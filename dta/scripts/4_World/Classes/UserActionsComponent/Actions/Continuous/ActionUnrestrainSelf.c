@@ -49,13 +49,7 @@ class ActionUnrestrainSelf: ActionContinuousBase
 	{
 		m_CallbackClass = ActionUnrestrainSelfCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_RESTRAINEDSTRUGGLE;
-		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_RESTRAINEDSTRUGGLE;
-		m_MessageStartFail = "There's nothing left.";
-		m_MessageStart = "I have started consuming.";
-		m_MessageSuccess = "I have finished consuming.";
-		m_MessageFail = "Player moved and consuming was canceled.";
-		m_MessageCancel = "I stopped consuming.";
-		//m_Animation = "EATTABLETS";		
+		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_RESTRAINEDSTRUGGLE;	
 	}
 	
 	override void CreateConditionComponents()  
@@ -72,11 +66,6 @@ class ActionUnrestrainSelf: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-
-	override int GetType()
-	{
-		return AT_STRUGGLE;
 	}
 
 	override bool HasTarget()

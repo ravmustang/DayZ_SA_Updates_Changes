@@ -1,7 +1,7 @@
 class CommonColdMdfr: ModifierBase
 {
-	const int INFLUENZA_AGENT_THRESHOLD_ACTIVATE = 200;
-	const int INFLUENZA_AGENT_THRESHOLD_DEACTIVATE = 100;
+	const int AGENT_THRESHOLD_ACTIVATE = 200;
+	const int AGENT_THRESHOLD_DEACTIVATE = 100;
 	override void Init()
 	{
 		m_TrackActivatedTime	= false;
@@ -10,9 +10,14 @@ class CommonColdMdfr: ModifierBase
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
 	
+	override string GetDebugText()
+	{
+		return ("Activate threshold: "+AGENT_THRESHOLD_ACTIVATE + "| " +"Deativate threshold: "+AGENT_THRESHOLD_DEACTIVATE);
+	}
+	
 	override bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.INFLUENZA) > INFLUENZA_AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.INFLUENZA) > AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -24,7 +29,7 @@ class CommonColdMdfr: ModifierBase
 
 	override protected void OnActivate(PlayerBase player)
 	{
-		//if( player.m_NotifiersManager ) player.m_NotifiersManager.AttachByType(eNotifiers.NTF_SICK);
+		//if( player.m_NotifiersManager ) player.m_NotifiersManager.ActivateByType(eNotifiers.NTF_SICK);
 		player.IncreaseDiseaseCount();
 	}
 	
@@ -37,7 +42,7 @@ class CommonColdMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		return (player.GetSingleAgentCount(eAgents.INFLUENZA) < INFLUENZA_AGENT_THRESHOLD_DEACTIVATE);
+		return (player.GetSingleAgentCount(eAgents.INFLUENZA) < AGENT_THRESHOLD_DEACTIVATE);
 	}
 
 	override protected void OnTick(PlayerBase player, float deltaT)

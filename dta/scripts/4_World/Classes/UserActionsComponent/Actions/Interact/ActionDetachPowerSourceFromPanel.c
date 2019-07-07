@@ -3,16 +3,6 @@ class ActionDetachPowerSourceFromPanel: ActionInteractBase
 {
 	void ActionDetachPowerSourceFromPanel()
 	{
-		//m_MessageStartFail = "m_MessageStartFail";
-		//m_MessageStart = "m_MessageStart";
-		m_MessageSuccess = "I've detached the power source from the panel.";
-		//m_MessageFail = "m_MessageFail";
-		//m_MessageCancel = "m_MessageCancel";
-	}
-	
-	override int GetType()
-	{
-		return AT_DETACH_POWER_SOURCE_FROM_PANEL;
 	}
 		
 	override string GetText()

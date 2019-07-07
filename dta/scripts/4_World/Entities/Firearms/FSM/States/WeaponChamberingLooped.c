@@ -67,15 +67,15 @@ class LoopedChambering extends WeaponStateBase
 		{
 			if (e.m_magazine != NULL)
 			{
-				Print("[wpnfsm] LoopedChamberingEjectFirst, taking mag from event e.mag=" + e.m_magazine.ToString());
+				Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " LoopedChamberingEjectFirst, taking mag from event e.mag=" + e.m_magazine.ToString());
 				m_srcMagazine = e.m_magazine;
 			}
 		}
 		else
 		{
-			Print("[wpnfsm] LoopedChamberingEjectFirst (e=NULL), m_srcMagazine=" + m_srcMagazine.ToString());
+			Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " LoopedChamberingEjectFirst (e=NULL), m_srcMagazine=" + m_srcMagazine.ToString());
 		}
-		Print("[wpnfsm] m_srcMagazine=" + m_srcMagazine.ToString());
+		Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " m_srcMagazine=" + m_srcMagazine.ToString());
 
 		m_chamber.m_srcMagazine = m_srcMagazine;
 		
@@ -104,7 +104,7 @@ class LoopedChambering extends WeaponStateBase
 
 		if (!ctx.Write(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -117,7 +117,7 @@ class LoopedChambering extends WeaponStateBase
 
 		if (!ctx.Read(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -189,15 +189,15 @@ class LoopedChamberingEjectLast extends WeaponStateBase
 		{
 			if (e.m_magazine != NULL)
 			{
-				Print("[wpnfsm] LoopedChamberingEjectLast, taking mag from event e.mag=" + e.m_magazine.ToString());
+				Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " LoopedChamberingEjectLast, taking mag from event e.mag=" + e.m_magazine.ToString());
 				m_srcMagazine = e.m_magazine;
 			}
 		}
 		else
 		{
-			Print("[wpnfsm] LoopedChamberingEjectLast (e=NULL), m_srcMagazine=" + m_srcMagazine.ToString());
+			Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " LoopedChamberingEjectLast (e=NULL), m_srcMagazine=" + m_srcMagazine.ToString());
 		}
-		Print("[wpnfsm] m_srcMagazine=" + m_srcMagazine.ToString());
+		Print("[wpnfsm] " + Object.GetDebugName(m_weapon) + " m_srcMagazine=" + m_srcMagazine.ToString());
 
 		m_chamber.m_srcMagazine = m_srcMagazine;
 		
@@ -227,7 +227,7 @@ class LoopedChamberingEjectLast extends WeaponStateBase
 
 		if (!ctx.Write(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.SaveCurrentFSMState: cannot save m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -240,7 +240,7 @@ class LoopedChamberingEjectLast extends WeaponStateBase
 
 		if (!ctx.Read(m_srcMagazine))
 		{
-			Error("[wpnfsm] WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering.LoadCurrentFSMState: cannot read m_srcMagazine for weapon=" + m_weapon);
 			return false;
 		}
 		return true;

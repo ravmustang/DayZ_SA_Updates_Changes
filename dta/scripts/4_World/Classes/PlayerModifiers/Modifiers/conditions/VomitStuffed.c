@@ -16,7 +16,7 @@ class VomitStuffedMdfr: ModifierBase
 	
 	override bool ActivateCondition(PlayerBase player)
 	{
-		float stomach = player.GetStatStomachVolume().Get();
+		float stomach = m_Player.m_PlayerStomach.GetStomachVolume();
 		if ( stomach >= VOMIT_THRESHOLD )
 		{
 			return true;

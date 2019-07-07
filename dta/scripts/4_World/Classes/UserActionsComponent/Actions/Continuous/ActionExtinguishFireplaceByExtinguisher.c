@@ -17,11 +17,6 @@ class ActionExtinguishFireplaceByExtinguisher: ActionContinuousBase
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_FIREESTINGUISHER;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageStartFail = "There's nothing to extinguish.";
-		m_MessageStart = "I have started extinguishing the fireplace.";
-		m_MessageSuccess = "I have extinguished the fireplace.";
-		m_MessageFail = "I have canceled the extinguish action.";
-		m_MessageCancel = "I have stopped extinguishing the fireplace.";
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_MEDIUM;
 	}
 	
@@ -30,11 +25,6 @@ class ActionExtinguishFireplaceByExtinguisher: ActionContinuousBase
 		
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTDummy;
-	}
-
-	override int GetType()
-	{
-		return AT_EXTINGUISH_FIREPLACE_BY_EXTINGUISHER;
 	}
 		
 	override string GetText()

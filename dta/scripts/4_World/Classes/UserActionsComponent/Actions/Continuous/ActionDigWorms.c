@@ -15,11 +15,6 @@ class ActionDigWorms: ActionContinuousBase
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_MEDIUM;
-		m_MessageStartFail = "I have no beard to be shaved.";
-		m_MessageStart = "I have started shaving myself.";
-		m_MessageSuccess = "I have shaved myself.";
-		m_MessageFail = "I have failed to shave myself.";
-		m_MessageCancel = "I stopped shaving myself.";
 	}
 	
 	override void CreateConditionComponents()  
@@ -46,11 +41,6 @@ class ActionDigWorms: ActionContinuousBase
 		}
 	
 		return false;
-	}
-
-	override int GetType()
-	{
-		return AT_DIG_WORMS;
 	}
 
 	override bool HasTarget()

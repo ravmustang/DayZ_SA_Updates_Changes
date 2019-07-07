@@ -7,11 +7,6 @@ class ActionDrinkWell extends ActionInteractBase
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
 	}
 
-	override int GetType()
-	{
-		return AT_DRINK_WELL_ONE;
-	}
-
 	override bool IsDrink()
 	{
 		return true;

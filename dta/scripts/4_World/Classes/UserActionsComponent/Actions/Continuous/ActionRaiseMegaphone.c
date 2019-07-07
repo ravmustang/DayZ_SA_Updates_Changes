@@ -15,10 +15,6 @@ class ActionRaiseMegaphone: ActionContinuousBase
 		m_CallbackClass = ActionRaiseMegaphoneCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_RAISEITEM;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_RAISEITEM;		
-		m_MessageStartFail = "I have failed to raise the megaphone.";
-		m_MessageStart = "I have raised the megaphone.";
-		m_MessageFail = "I have failed to raise the megaphone.";
-		m_MessageCancel = "I have stopped raising the megaphone.";
 	}
 	
 	override void CreateConditionComponents()  
@@ -30,11 +26,6 @@ class ActionRaiseMegaphone: ActionContinuousBase
 	override bool HasProneException()
 	{
 		return true;
-	}
-	
-	override int GetType()
-	{
-		return AT_RAISE_MEGAPHONE;
 	}
 
 	override bool HasProgress()
@@ -78,4 +69,17 @@ class ActionRaiseMegaphone: ActionContinuousBase
 		ItemMegaphone megaphone = ItemMegaphone.Cast( action_data.m_MainItem );
 		megaphone.SetCanSpeak( false );
 	}
+	
+	override void OnStartClient( ActionData action_data )
+	{
+		ItemMegaphone megaphone = ItemMegaphone.Cast( action_data.m_MainItem );
+		megaphone.SetCanSpeak( true );
+	}
+		
+	override void OnEndClient( ActionData action_data )
+	{
+		ItemMegaphone megaphone = ItemMegaphone.Cast( action_data.m_MainItem );
+		megaphone.SetCanSpeak( false );
+	}
+	
 }

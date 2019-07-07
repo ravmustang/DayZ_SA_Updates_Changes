@@ -14,11 +14,11 @@ class ActionDisinfectTargetCB : ActionSingleUseBaseCB
 		}
 		return DefaultCancelCondition(); 
 	}*/
-	override void InitActionComponent()
+	/*override void InitActionComponent()
 	{
 		super.InitActionComponent();
 		EnableCancelCondition(true);
-	}
+	}*/
 };
 
 
@@ -37,11 +37,6 @@ class ActionDisinfectTarget: ActionSingleUseBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_DISINFECT_T;
 	}
 		
 	override string GetText()

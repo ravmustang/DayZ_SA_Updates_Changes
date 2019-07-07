@@ -24,11 +24,7 @@ class ActionDigGardenPlot: ActionDeployObject
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 		m_SpecialtyWeight = UASoftSkillsWeight.ROUGH_LOW;
-	}
-
-	override int GetType()
-	{
-		return AT_DIG_GARDEN_PLOT;
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 	}
 		
 	override string GetText()
@@ -36,7 +32,7 @@ class ActionDigGardenPlot: ActionDeployObject
 		return "#make_garden_plot";
 	}
 	
-	override bool Can ( PlayerBase player, ActionTarget target, ItemBase item )
+	override bool ActionCondition ( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		//Client
 		if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
@@ -50,7 +46,6 @@ class ActionDigGardenPlot: ActionDeployObject
 	
 				if ( !hologram.IsColliding() )
 				{
-					m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DIGMANIPULATE;
 					return true;
 				}
 			}
@@ -104,7 +99,7 @@ class ActionDigGardenPlot: ActionDeployObject
 	{	
 		PlaceObjectActionData poActionData;
 		poActionData = PlaceObjectActionData.Cast(action_data);
-		EntityAI entity_for_placing = EntityAI.Cast( action_data.m_MainItem );
+		EntityAI entity_for_placing = action_data.m_MainItem;
 		vector position = action_data.m_Player.GetLocalProjectionPosition();
 		vector orientation = action_data.m_Player.GetLocalProjectionOrientation();
 				

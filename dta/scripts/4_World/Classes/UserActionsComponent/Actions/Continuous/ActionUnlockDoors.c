@@ -11,8 +11,6 @@ class ActionUnlockDoors: ActionContinuousBase
 	void ActionUnlockDoors()
 	{
 		m_CallbackClass = ActionLockDoorsCB;
-		m_MessageSuccess = "";
-		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_INTERACT;
 		m_FullBody = true;
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
@@ -22,11 +20,6 @@ class ActionUnlockDoors: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_UNLOCK_DOORS;
 	}
 		
 	override string GetText()

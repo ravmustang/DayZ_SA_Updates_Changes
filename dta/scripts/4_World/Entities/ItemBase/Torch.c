@@ -47,6 +47,8 @@ class Torch : ItemBase
 	
 	override bool CanReleaseAttachment (EntityAI attachment)
 	{
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
 		return !GetCompEM().IsWorking();
 	}
 	
@@ -537,6 +539,19 @@ class Torch : ItemBase
 			return 5; // ???
 		else
 			return 2; // ???
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		AddAction(ActionLightItemOnFire);
+	}
+	
+	override void OnAttachmentQuantityChanged(ItemBase item)
+	{
+		super.OnAttachmentQuantityChanged(item);
+		CalculateQuantity();
 	}
 };
 

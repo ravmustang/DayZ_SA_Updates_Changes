@@ -330,8 +330,8 @@ class PluginItemDiagnostic extends PluginBase
 	
 		for(int i = 0; i < agents_count; i++)
 		{
-			PluginTransmissionAgents mta = PluginTransmissionAgents.Cast(GetPlugin(PluginTransmissionAgents));
-			string agent_name = mta.GetNameByID(agents_aray.Get(i));
+			//PluginTransmissionAgents mta = PluginTransmissionAgents.Cast(GetPlugin(PluginTransmissionAgents));
+			string agent_name = PluginTransmissionAgents.GetNameByID(agents_aray.Get(i));
 			Param1<string> param1 = new Param1<string>(agent_name);
 			properties.Insert(param1);
 			num_of_agents++;

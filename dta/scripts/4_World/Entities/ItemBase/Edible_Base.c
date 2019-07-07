@@ -119,17 +119,17 @@ class Edible_Base extends ItemBase
 	}
 	
 	//food types
-	bool IsMeat()
+	override bool IsMeat()
 	{
 		return false;
 	}
 	
-	bool IsFruit()
+	override bool IsFruit()
 	{
 		return false;
 	}
 	
-	bool IsMushroom()
+	override bool IsMushroom()
 	{
 		return false;
 	}	
@@ -138,75 +138,116 @@ class Edible_Base extends ItemBase
 	// NUTRITIONAL VALUES
 	//================================================================	
 	//food properties
-	float GetFoodTotalVolume()
+	static float GetFoodTotalVolume(ItemBase item, string classname = "", int food_stage = 0)
 	{
-		if ( !GetFoodStage() )
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
 		{
-			string class_path = "cfgVehicles " + GetType() + " Nutrition";
-			return GetGame().ConfigGetFloat( class_path + " fullnessIndex" );			
+			 return FoodStage.GetFullnessIndex(food_item.GetFoodStage());
 		}
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetFullnessIndex(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetFloat( class_path + " fullnessIndex" );
+
+	}
+	
+	static float GetFoodEnergy(ItemBase item, string classname = "", int food_stage = 0)
+	{
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
+		{
+			 return FoodStage.GetEnergy(food_item.GetFoodStage());
+		}
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetEnergy(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetFloat( class_path + " energy" );			
+	}
+	
+	static float GetFoodWater(ItemBase item, string classname = "", int food_stage = 0)
+	{
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
+		{
+			return FoodStage.GetWater(food_item.GetFoodStage());
+		}
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetWater(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetFloat( class_path + " water" );			
+	}
+	
+	static float GetFoodNutritionalIndex(ItemBase item, string classname = "", int food_stage = 0)
+	{
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
+		{
+			return FoodStage.GetNutritionalIndex(food_item.GetFoodStage());	
+		}
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetNutritionalIndex(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetFloat( class_path + " nutritionalIndex" );		
 		
-		return GetFoodStage().GetFullnessIndex();
 	}
 	
-	float GetFoodEnergy()
+	static float GetFoodToxicity(ItemBase item, string classname = "", int food_stage = 0)
 	{
-		if ( !GetFoodStage() )
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
 		{
-			string class_path = "cfgVehicles " + GetType() + " Nutrition";
-			return GetGame().ConfigGetFloat( class_path + " energy" );			
+			return FoodStage.GetToxicity(food_item.GetFoodStage());
 		}
-
-		return GetFoodStage().GetEnergy();
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetToxicity(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetFloat( class_path + " toxicity" );			
 	}
 	
-	float GetFoodWater()
+	static int GetFoodAgents(ItemBase item, string classname = "", int food_stage = 0)
 	{
-		if ( !GetFoodStage() )
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
 		{
-			string class_path = "cfgVehicles " + GetType() + " Nutrition";
-			return GetGame().ConfigGetFloat( class_path + " water" );			
+			return FoodStage.GetAgents(food_item.GetFoodStage());
 		}
-
-		return GetFoodStage().GetWater();
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetAgents(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetInt( class_path + " agents" );
 	}
 	
-	float GetFoodNutritionalIndex()
+	static float GetFoodDigestibility(ItemBase item, string classname = "", int food_stage = 0)
 	{
-		if ( !GetFoodStage() )
+		Edible_Base food_item = Edible_Base.Cast(item);
+		if(food_item && food_item.GetFoodStage())
 		{
-			string class_path = "cfgVehicles " + GetType() + " Nutrition";
-			return GetGame().ConfigGetFloat( class_path + " nutritionalIndex" );			
+			return FoodStage.GetDigestibility(food_item.GetFoodStage());
 		}
-
-		return GetFoodStage().GetNutritionalIndex();
+		else if(classname != "" && food_stage)
+		{
+			return FoodStage.GetDigestibility(null, food_stage, classname);
+		}
+		string class_path = "cfgVehicles " + classname + " Nutrition";
+		return GetGame().ConfigGetInt( class_path + " digestibility" );
 	}
 	
-	float GetFoodToxicity()
+	static NutritionalProfile GetNutritionalProfile(ItemBase item, string classname = "", int food_stage = 0)
 	{
-		if ( !GetFoodStage() )
-		{
-			string class_path = "cfgVehicles " + GetType() + " Nutrition";
-			return GetGame().ConfigGetFloat( class_path + " toxicity" );			
-		}
-
-		return GetFoodStage().GetToxicity();
-	}
-	
-	NutritionalProfile GetNutritionalProfile()
-	{
-		NutritionalProfile profile; 
-		if( !IsLiquidPresent() )
-		{
-			profile = NutritionalProfile(GetFoodEnergy(),GetFoodWater(),GetFoodNutritionalIndex(),GetFoodTotalVolume(), GetFoodToxicity());
-		}
-		else
-		{
-			int liquid_type = GetLiquidType();
-			profile = Liquid.GetNutritionalProfile(liquid_type);
-		}
-		return profile;
-		
+		return new NutritionalProfile(GetFoodEnergy(item, classname, food_stage),GetFoodWater(item, classname, food_stage),GetFoodNutritionalIndex(item, classname, food_stage),GetFoodTotalVolume(item, classname, food_stage), GetFoodToxicity(item, classname, food_stage),  GetFoodAgents(item, classname,food_stage), GetFoodDigestibility(item, classname,food_stage));
 	}
 	
 	//================================================================

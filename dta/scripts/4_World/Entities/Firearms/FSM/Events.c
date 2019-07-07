@@ -7,6 +7,7 @@ enum WeaponEventID
 	UNKNOWN,
 	MECHANISM,
 	TRIGGER,
+	TRIGGER_JAM,
 	TRIGGER_AUTO_START,
 	TRIGGER_AUTO_END,
 	LOAD1_BULLET,
@@ -57,6 +58,15 @@ class WeaponEventBase
 		ctx.Write(m_player);
 		ctx.Write(m_magazine);
 	}
+	
+	string DumpToString ()
+	{
+		string res = "{ WpnEv id=" + typename.EnumToString(WeaponEventID, GetEventID());
+		res = res + " pl=" + Object.GetDebugName(m_player);
+		res = res + " mag=" + Object.GetDebugName(m_magazine);
+		res = res + " }";
+		return res;
+	}
 };
 
 /**@brief		signalize mechanism manipulation
@@ -70,6 +80,12 @@ class WeaponEventMechanism extends WeaponEventBase
 class WeaponEventTrigger extends WeaponEventBase
 {
 	void WeaponEventTrigger (DayZPlayer p = NULL, Magazine m = NULL) { m_eventID = WeaponEventID.TRIGGER; }
+};
+/**@brief		event when trigger pressed
+ **/
+class WeaponEventTriggerToJam extends WeaponEventBase
+{
+	void WeaponEventTriggerToJam (DayZPlayer p = NULL, Magazine m = NULL) { m_eventID = WeaponEventID.TRIGGER_JAM; }
 };
 /**@brief		event when trigger pressed
  **/
@@ -198,6 +214,7 @@ WeaponEventBase WeaponEventFactory (WeaponEventID id, int aetype, DayZPlayer p =
 		case WeaponEventID.UNKNOWN: return null;
 		case WeaponEventID.MECHANISM: return new WeaponEventMechanism(p, m);
 		case WeaponEventID.TRIGGER: return new WeaponEventTrigger(p, m);
+		case WeaponEventID.TRIGGER_JAM: return new WeaponEventTriggerToJam(p, m);
 		case WeaponEventID.LOAD1_BULLET: return new WeaponEventLoad1Bullet(p, m);
 		case WeaponEventID.CONTINUOUS_LOADBULLET_START: return new WeaponEventContinuousLoadBulletStart(p, m);
 		case WeaponEventID.CONTINUOUS_LOADBULLET_END: return new WeaponEventContinuousLoadBulletEnd(p, m);

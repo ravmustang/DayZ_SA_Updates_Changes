@@ -14,13 +14,6 @@ class ActionWashHandsWell: ActionContinuousBase
 		m_CommandUID		= DayZPlayerConstants.CMD_ACTIONFB_WASHHANDSWELL;
 		m_FullBody			= true;
 		m_StanceMask		= DayZPlayerConstants.STANCEMASK_CROUCH;
-		m_MessageSuccess = "I have washed my hands.";
-		//m_Animation = "open";
-	}
-
-	override int GetType()
-	{
-		return AT_WASH_HANDS_WELL;
 	}
 
 	override string GetText()

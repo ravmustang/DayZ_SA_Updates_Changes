@@ -13,11 +13,6 @@ class ActionWorldLiquidActionSwitch: ActionSingleUseBase
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
 	}
 	
-	override int GetType()
-	{
-		return AT_WORLD_LIQUID_ACTION_SWITCH;
-	}
-	
 	override string GetText()
 	{
 		//return "#switch_to" + " " + m_switch_to;

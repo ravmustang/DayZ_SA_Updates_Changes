@@ -20,24 +20,12 @@ class ActionFillFuel: ActionContinuousBase
 		m_FullBody = true;
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 		m_LockTargetOnUse = false;
-
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "";
-		m_MessageFail = "";
-		m_MessageCancel = "";
-
 	}
 
 	override void CreateConditionComponents()  
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-
-	override int GetType()
-	{
-		return AT_FILL_FUEL;
 	}
 
 	override string GetText()
@@ -63,22 +51,25 @@ class ActionFillFuel: ActionContinuousBase
 		if( car.GetFluidFraction( CarFluid.FUEL ) >= 0.98 )
 			return false;
 
-		float distance = Math.AbsFloat(vector.Distance(car.GetPosition(), player.GetPosition()));
+		array<string> selections = new array<string>;
+		target.GetObject().GetActionComponentNameList(target.GetComponentIndex(), selections);
 
 		CarScript carS = CarScript.Cast(car);
-		if( distance <= carS.GetActionDistanceFuel() )
+		
+		if( carS )
 		{
-			array<string> selections = new array<string>;
-			target.GetObject().GetActionComponentNameList(target.GetComponentIndex(), selections);
-
 			for (int s = 0; s < selections.Count(); s++)
 			{
 				if ( selections[s] == carS.GetActionCompNameFuel() )
 				{
-					return true;
+					float dist = vector.Distance( carS.GetRefillPointPosWS(), player.GetPosition() );
+
+					if ( dist < carS.GetActionDistanceFuel() )
+						return true;
 				}
 			}
 		}
+
 		return false;
 	}
 };

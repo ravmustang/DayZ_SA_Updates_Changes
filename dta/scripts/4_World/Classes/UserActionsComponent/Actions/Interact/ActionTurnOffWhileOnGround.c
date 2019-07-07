@@ -4,13 +4,6 @@ class ActionTurnOffWhileOnGround: ActionInteractBase
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_INTERACTONCE;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageSuccess 	= "I've switched it off.";
-		m_MessageFail 		= "It's already turned off.";
-	}
-	
-	override int GetType()
-	{
-		return AT_TURN_OFF_WHILE_ON_GROUND;
 	}
 
 	override string GetText()

@@ -13,13 +13,6 @@ class ActionTurnOffTransmitter: ActionTurnOffWhileInHands
 		m_CallbackClass = ActionTurnOffTransmitterCB;
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_ITEM_OFF;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;		
-		m_MessageSuccess = "I have turned it off.";
-		m_MessageFail = "I have failed to turn it off.";
-	}
-	
-	override int GetType()
-	{
-		return AT_TURN_OFF_TRANSMITTER;
 	}
 
 	override string GetText()

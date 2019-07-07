@@ -1,4 +1,4 @@
-class ActionSwapItemToHands: ActionInteractBase
+/*class ActionSwapItemToHands: ActionInteractBase
 {
 	string m_ItemName = "";
 
@@ -50,14 +50,12 @@ class ActionSwapItemToHands: ActionInteractBase
 
 	override void OnExecuteServer( ActionData action_data )
 	{
-		EntityAI eih = EntityAI.Cast(action_data.m_Player.GetItemInHands());
 		EntityAI ntarget = EntityAI.Cast(action_data.m_Target.GetObject());
-		action_data.m_Player.LocalSwapEntities(ntarget, eih);
+		action_data.m_Player.LocalSwapEntities(ntarget, action_data.m_Player.GetItemInHands());
 	}
 	override void OnExecuteClient( ActionData action_data )
 	{
-		EntityAI eih = EntityAI.Cast(action_data.m_Player.GetItemInHands());
 		EntityAI ntarget = EntityAI.Cast(action_data.m_Target.GetObject());
-		action_data.m_Player.LocalSwapEntities(ntarget, eih);
+		action_data.m_Player.LocalSwapEntities(ntarget, action_data.m_Player.GetItemInHands());
 	}
-};
+};*/

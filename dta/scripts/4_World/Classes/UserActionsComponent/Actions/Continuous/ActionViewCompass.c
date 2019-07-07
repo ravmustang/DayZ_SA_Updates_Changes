@@ -35,11 +35,6 @@ class ActionViewCompass : ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
 	}
-	
-	override int GetType()
-	{
-		return AT_VIEW_COMPASS;
-	}
 		
 	override string GetText()
 	{

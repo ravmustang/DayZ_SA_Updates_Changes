@@ -13,11 +13,6 @@ class ActionSwitchSeats: ActionBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}	
-	
-	override int GetType()
-	{
-		return AT_VEH_SWITCH_SEATS;
 	}
 
 	override string GetText()

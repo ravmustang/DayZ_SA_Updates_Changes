@@ -14,14 +14,6 @@ class ActionDisinfectPlantBit: ActionSingleUseBase
 	void ActionDisinfectPlantBit()
 	{
 		m_CallbackClass = ActionDisinfectPlantBitCB;
-		m_MessageSuccess = "";
-		m_MessageStartFail = "";
-		m_MessageStart = "";
-		m_MessageSuccess = "";
-		m_MessageFail = "";
-		m_MessageCancel = "";
-		
-		//m_Animation = "open";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	
@@ -29,11 +21,6 @@ class ActionDisinfectPlantBit: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined(UAMaxDistances.DEFAULT);
-	}
-
-	override int GetType()
-	{
-		return AT_DISINFECT_PLANT_BIT;
 	}
 
 	override string GetText()

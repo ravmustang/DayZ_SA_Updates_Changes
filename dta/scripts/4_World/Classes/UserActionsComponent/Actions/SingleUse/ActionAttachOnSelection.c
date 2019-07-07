@@ -2,18 +2,12 @@ class ActionAttachOnSelection: ActionSingleUseBase
 {
 	void ActionAttachOnSelection()
 	{
-		m_MessageSuccess = "I've attached the object.";
 	}
 
 	override void CreateConditionComponents() 
 	{
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-	
-	override int GetType()
-	{
-		return AT_ATTACH_SELECTION;
 	}
 		
 	override string GetText()
@@ -37,7 +31,7 @@ class ActionAttachOnSelection: ActionSingleUseBase
 				AttachActionData action_data_a = AttachActionData.Cast(action_data);
 			
 				EntityAI target_entity = EntityAI.Cast( target.GetObject() );
-				EntityAI item_entity = EntityAI.Cast( item );
+				EntityAI item_entity = item;
 			
 				array<string> selections = new array<string>;
 				target_entity.GetActionComponentNameList(target.GetComponentIndex(), selections);
@@ -105,7 +99,7 @@ class ActionAttachOnSelection: ActionSingleUseBase
 	{
 		
 		EntityAI target_entity = EntityAI.Cast( target.GetObject() );
-		EntityAI item_entity = EntityAI.Cast( item );
+		EntityAI item_entity = item;
 		
 		if ( target_entity && item_entity )
 		{
@@ -146,7 +140,7 @@ class ActionAttachOnSelection: ActionSingleUseBase
 			return;
 		
 		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
-		EntityAI item_entity = EntityAI.Cast( action_data.m_MainItem );
+		EntityAI item_entity = action_data.m_MainItem;
 		
 		AttachActionData action_data_a = AttachActionData.Cast(action_data);
 		
@@ -158,7 +152,7 @@ class ActionAttachOnSelection: ActionSingleUseBase
 	override void OnExecuteClient( ActionData action_data )
 	{
 		EntityAI target_entity = EntityAI.Cast( action_data.m_Target.GetObject() );
-		EntityAI item_entity = EntityAI.Cast( action_data.m_MainItem );
+		EntityAI item_entity = action_data.m_MainItem;
 		
 		AttachActionData action_data_a = AttachActionData.Cast(action_data);
 		

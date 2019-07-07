@@ -39,6 +39,7 @@ class DayZPlayerImplement extends DayZPlayer
 	protected ref DayZPlayerImplementMeleeCombat		m_MeleeCombat;
 	protected ref DayZPlayerMeleeFightLogic_LightHeavy	m_MeleeFightLogic;
 	protected ref DayZPlayerImplementSwimming			m_Swimming;
+	protected ref DayZPlayerImplementThrowing			m_Throwing;
 	protected ref DayZPlayerImplementFallDamage			m_FallDamage;
 	protected ref PlayerSoundEventHandler 				m_PlayerSoundEventHandler;
 	protected SHumanCommandMoveSettings 				m_MoveSettings;
@@ -50,7 +51,7 @@ class DayZPlayerImplement extends DayZPlayer
 	protected bool										m_Camera3rdPerson;
 	protected bool										m_CameraZoomToggle;
 	protected bool										m_bADS;
-	protected bool 										m_ADSTimedCondition;
+	protected bool 										m_WeaponRaiseCompleted;
 	protected bool										m_CameraEyeZoom;
 	protected bool										m_WasIronsight; // tag of ironsight - if false - then optics
 ///**/	protected bool										m_REMOVE; // stupid backup ironsight :-/
@@ -64,24 +65,31 @@ class DayZPlayerImplement extends DayZPlayer
 	protected bool 										m_Suicide;
 	protected bool										m_IsUnconscious;
 	protected bool										m_ShouldBeUnconscious;
+	bool												m_UnconsciousDebug;
 	protected int			 							m_LastCommandBeforeUnconscious;
 	ref WeaponDebug										m_WeaponDebug;
 	ref Timer 											m_DeathEffectTimer;
 	ref Timer 											m_ADSAutomationTimer;
+	ref Timer 											m_FightEndBlendTimer;
 //	protected bool 										m_ShouldReturnToOptics;
 //	protected bool 										m_ShouldReturnToRegularIronsights;
 //	protected bool 										m_ShouldReturnToBackupIronsights;
-	//protected bool 										m_ForceHandleOptics;
+	//protected bool 									m_ForceHandleOptics;
 	protected bool										m_ProcessFirearmMeleeHit;
+	protected bool										m_ContinueFirearmMelee;
 	protected bool 										m_LiftWeapon_player;
 	protected bool 										m_ProcessLiftWeapon;
-	protected bool 										m_KilledByHeadshot;
 	protected int										m_LastSurfaceUnderHash;
 	protected Transport									m_TransportCache;
 	protected string 									m_ClimbingLadderType;
 	bool												m_isFBsymptomPlaying;
 	protected bool 										m_HandheldOpticsInUse;
+	protected bool										m_RaiseStarted;
 	protected bool 										m_ResetADS;
+	protected int										m_StepCounter;
+	//protected bool 									m_DeathSyncSent;
+	//protected bool 									m_KilledByHeadshot;
+	//protected ref KillerData 							m_KillerData;
 	
 	//! constructor 
 	void 	DayZPlayerImplement()
@@ -94,13 +102,15 @@ class DayZPlayerImplement extends DayZPlayer
 		m_MeleeCombat = new DayZPlayerImplementMeleeCombat(this);
 		m_MeleeFightLogic = new DayZPlayerMeleeFightLogic_LightHeavy(this);
 		m_Swimming = new DayZPlayerImplementSwimming(this);
+		m_Throwing = new DayZPlayerImplementThrowing(this);
 		m_FallDamage = new DayZPlayerImplementFallDamage(this);
 		m_bADS = false;
-		m_ADSTimedCondition = false;
+		m_WeaponRaiseCompleted = false;
 		m_CameraEyeZoom = false;
 		m_CameraOptics = false;
 		m_IsShootingFromCamera = true;
 		m_ProcessFirearmMeleeHit = false;
+		m_ContinueFirearmMelee = false;
 		m_WasIronsight = true;
 		#ifdef PLATFORM_CONSOLE
 		m_Camera3rdPerson = !GetGame().GetWorld().Is3rdPersonDisabled();
@@ -121,6 +131,11 @@ class DayZPlayerImplement extends DayZPlayer
 	DayZPlayerMeleeFightLogic_LightHeavy GetMeleeFightLogic()
 	{
 		return m_MeleeFightLogic;
+	}
+	
+	DayZPlayerImplementThrowing GetThrowing()
+	{
+		return m_Throwing;
 	}
 
 	//! destructor 
@@ -331,7 +346,7 @@ class DayZPlayerImplement extends DayZPlayer
 	{
 	#ifdef PLATFORM_PS4
 		//PSN Set multiplay state - NOT ACTIVE	
-		GetGame().SetMultiplayState( false );
+		OnlineServices.SetMultiplayState( false );
 		//Print("=== PLATFORM_PS4 - SetMultiplayState NOT ACTIVE [ShowDeadScreen]");
 		//
 	#endif		
@@ -366,8 +381,8 @@ class DayZPlayerImplement extends DayZPlayer
 			Print("m_DeathEffectTimer = " + m_DeathEffectTimer);
 			Print("~StopDeathDarkeningEffect");*/
 			m_DeathEffectTimer.Stop();
-			PPEffects.SetDeathDarkening(0);
 		}
+		PPEffects.SetDeathDarkening(0);
 	}
 	
 	void SimulateDeath(bool state)
@@ -385,7 +400,7 @@ class DayZPlayerImplement extends DayZPlayer
 		{
 			duration = 0;
 		}
-		if (state && duration > DYING_PROGRESSION_TIME)
+		if (state && duration > DYING_PROGRESSION_TIME && !m_IsUnconscious)
 		{
 			//Print("--SimulateDeath--");
 			if (!m_DeathEffectTimer)
@@ -393,8 +408,14 @@ class DayZPlayerImplement extends DayZPlayer
 			//TODO: move below audio to execute the delayed stuff all at once. Plus, rename the fn called.
 			m_DeathEffectTimer.Run(DYING_PROGRESSION_TIME, this, "SetDeathDarknessLevel", new Param2<float,float>( duration, DYING_PROGRESSION_TIME ), true);
 		}
-		ShowDeadScreen(state,duration);
-		
+		/*else if (!state && IsAlive() && m_DeathEffectTimer && m_DeathEffectTimer.IsRunning())
+		{
+			m_DeathEffectTimer.Stop();
+		}*/
+		if (state)
+			ShowDeadScreen(state,duration);
+		else
+			ShowDeadScreen(state,0);
 		//audio
 		if (state == true)
 		{
@@ -449,9 +470,25 @@ class DayZPlayerImplement extends DayZPlayer
 	{
 	}
 	
-	void EnterADSDelay()
+	void RunADSTimer()
 	{
-		m_ADSTimedCondition = true;
+		if (!m_ADSAutomationTimer)
+			m_ADSAutomationTimer = new Timer();
+		if (!m_ADSAutomationTimer.IsRunning())
+		{
+			m_ADSAutomationTimer.Run(PlayerConstants.WEAPON_RAISE_BLEND_DELAY,this,"CompleteWeaponRaise");
+		}
+	}
+	
+	void CompleteWeaponRaise()
+	{
+		m_WeaponRaiseCompleted = true;
+		//Print("");
+	}
+	
+	bool IsWeaponRaiseCompleted()
+	{
+		return m_WeaponRaiseCompleted;
 	}
 	
 	DayZPlayerInventory GetDayZPlayerInventory ()
@@ -539,7 +576,7 @@ class DayZPlayerImplement extends DayZPlayer
 		ProcessLiftWeapon();
 
 		// @TODO: refactor to action (rm from input, mk action)
-		if (pInputs.IsReloadOrMechanismSingleUse() && GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_CLIENT )
+		/*if (pInputs.IsReloadOrMechanismSingleUse() && GetInstanceType() == DayZPlayerInstanceType.INSTANCETYPE_CLIENT )
 		{
 			if (weapon && weapon.CanProcessWeaponEvents())
 			{
@@ -549,7 +586,7 @@ class DayZPlayerImplement extends DayZPlayer
 					pExitIronSights = true;
 				}
 			}
-		}
+		}*/
 		
 		GetMovementState(m_MovementState);
 		
@@ -592,7 +629,7 @@ class DayZPlayerImplement extends DayZPlayer
 				HandleOptic(optic, false, pInputs, pExitIronSights);
 		}
 
-		if (!m_LiftWeapon_player && weapon && weapon.CanProcessWeaponEvents())
+		/*if (!m_LiftWeapon_player && weapon && weapon.CanProcessWeaponEvents())
 		{
 			if (pInputs.IsReloadOrMechanismContinuousUseStart())
 			{
@@ -603,19 +640,29 @@ class DayZPlayerImplement extends DayZPlayer
 					//pExitIronSights = true;
 				}
 			}
-		}
+		}*/
 
 		if (!m_MovementState.IsRaised())
 		{
 			m_IsFireWeaponRaised = false;
 			if (weapon && weapon.IsInOptics())
 				weapon.ExitOptics();
+			
+			if (m_ADSAutomationTimer)
+				m_ADSAutomationTimer.Stop();
+			
+			m_WeaponRaiseCompleted = false;
 
 			return; // if not raised => return
 		}
 		else
+		{
 			m_IsFireWeaponRaised = true;
-		
+			if (!m_WeaponRaiseCompleted && (!m_ADSAutomationTimer || (m_ADSAutomationTimer && !m_ADSAutomationTimer.IsRunning())) )
+			{
+				RunADSTimer();
+			}
+		}
 		
 		#ifdef PLATFORM_CONSOLE
 			if ( !pInputs.IsMeleeFastAttackModifier() )
@@ -636,14 +683,14 @@ class DayZPlayerImplement extends DayZPlayer
 			{
 				if (pInputs.IsUseButtonDown())
 				{
-					weapon.ProcessWeaponEvent(new WeaponEventTrigger(this));
+					GetWeaponManager().Fire(weapon);
 				}
 			}
 			else
 			{
 				if (pInputs.IsUseButton())
 				{
-					weapon.ProcessWeaponEvent(new WeaponEventTrigger(this));
+					GetWeaponManager().Fire(weapon);
 				}
 			}
 		}
@@ -885,28 +932,27 @@ class DayZPlayerImplement extends DayZPlayer
 	void RegisterTransportHit(Transport transport)
 	{
 		if( !m_TransportHitRegistered )
-		{
+		{	
 			m_TransportHitRegistered = true; 
 			m_TransportHitVelocity = GetVelocity(transport);
-			
-			// compute impulse
-			if (m_TransportHitVelocity.Length() > 0.3)
-			{
-				vector impulse = 40 * m_TransportHitVelocity;
-				impulse[1] = 40 * 1.5;
-				//Print("Impulse: " + impulse.ToString());
-				dBodyApplyImpulse(this, impulse);
-			}
-			
+		
 			// avoid damage because of small movements
-			if (m_TransportHitVelocity.Length() > 1.5)
+			if (m_TransportHitVelocity.Length() > 0.1)
 			{
-				float damage = 10 * m_TransportHitVelocity.Length();
+				float damage = m_TransportHitVelocity.Length();
 				//Print("Transport damage: " + damage.ToString() + " velocity: " +  m_TransportHitVelocity.Length().ToString());
 				ProcessDirectDamage( 3, transport, "", "TransportHit", "0 0 0", damage );
 			}
 			else
-				m_TransportHitRegistered = false; // EEHitBy is not called if no damage
+				m_TransportHitRegistered = false; // EEHitBy is not called if no damage	
+			
+			// compute impulse and apply only if the body dies
+			if (IsDamageDestroyed() && m_TransportHitVelocity.Length() > 0.3)
+			{
+				vector impulse = 40 * m_TransportHitVelocity;
+				impulse[1] = 40 * 1.5;
+				dBodyApplyImpulse(this, impulse);
+			}
 		}
 	}
 
@@ -926,6 +972,29 @@ class DayZPlayerImplement extends DayZPlayer
 				SendDeathJuncture(animTypeDeath, animHitDirDeath);
 			}
 			dBodySetInteractionLayer(this, PhxInteractionLayers.AI_NO_COLLISION);
+			
+			if ( !m_DeathSyncSent ) //checked until the death is evaluated by 'OnCommandHandlerTick' higher up the road
+			{
+				Man killer = source.GetHierarchyRootPlayer();
+				
+				if ( !m_KillerData ) //only one player is considered killer in the event of crossfire
+				{
+					m_KillerData = new KillerData;
+					m_KillerData.m_Killer = killer;
+					m_KillerData.m_MurderWeapon = source;
+				}
+				
+				if ( killer && killer.IsPlayer() )
+				{
+					// was player killed by headshot?
+					if ( dmgZone == "Brain" )
+					{
+						m_KilledByHeadshot = true;
+						if (m_KillerData.m_Killer == killer)
+							m_KillerData.m_KillerHiTheBrain = true;
+					}
+				}
+			}
 		}
 		else
 		{
@@ -949,10 +1018,6 @@ class DayZPlayerImplement extends DayZPlayer
 			HumanCommandMelee2 hcm = GetCommand_Melee2();
 			if(hcm) hcm.Cancel();
 		}
-		
-		// was player killed by headshot?
-		if (dmgZone == "Brain")
-			m_KilledByHeadshot = true;
 	}
 
 	override void EEHitByRemote(int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
@@ -1049,7 +1114,16 @@ class DayZPlayerImplement extends DayZPlayer
 		
 		if(isFireWeaponRaised)
 		{
+			if(!m_RaiseStarted)
+			{
+				m_AimingModel.OnRaiseBegin(this);
+				m_RaiseStarted = true;
+			}
 			m_AimingModel.ProcessAimFilters( pDt, pModel, m_MovementState.m_iStanceIdx );
+		}
+		else
+		{
+			m_RaiseStarted = false;
 		}
 		
 		if (isInIronsights)
@@ -1078,7 +1152,7 @@ class DayZPlayerImplement extends DayZPlayer
 	//!
 	bool CanJump()
 	{
-		if( IsFBSymptomPlaying() || IsRestrained() || IsUnconscious() || IsInFBEmoteState() || !CanConsumeStamina(EStaminaConsumers.JUMP) )
+		if( IsFBSymptomPlaying() || IsRestrained() || IsUnconscious() || IsInFBEmoteState() )
 			return false;
 		
 		if( m_MovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_PRONE || m_MovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDPRONE)
@@ -1122,27 +1196,25 @@ class DayZPlayerImplement extends DayZPlayer
 	//! This is main command logic
 	//! 
 
-
 	void HandleADS()
 	{
+		if ( !IsAlive() )
+		{
+			if (m_CameraIronsight || m_CameraOptics)
+			{
+				ExitSights();
+			}
+			return;
+		}
+		
+		bool bADSToggle = false;
+		bool exitSights = false;
 		HumanInputController hic = GetInputController();
 		HumanItemAccessor 	hia = GetItemAccessor();
 		HumanCommandWeapons	hcw = GetCommandModifier_Weapons();
 		PlayerBase playerPB = PlayerBase.Cast(this);
 		
-		//Print("hic.WeaponADS() = " + hic.WeaponADS());
-//		float val = GetInputInterface().SyncedValue("UAWalkRunTemp");
-//		Print(val);
-		
-		//UAInterface input_interface = GetInputInterface();
-		//if (input_interface.SyncedClick("UAADSToggle"))
-			//Print("Click!");
 		//Print("UAWalkRunTemp = " + GetUApi().GetInputByName("UAWalkRunTemp").LocalValue());
-		
-		bool bADSToggle = false;
-		//bool ADSPressedNow = false;
-		bool exitSights = false;
-		bool raiseInput = hic.IsWeaponRaised();
 		
 		if( !hia.IsItemInHandsWeapon() )
 			hic.ResetADS();
@@ -1153,19 +1225,18 @@ class DayZPlayerImplement extends DayZPlayer
 			m_ResetADS = false;
 		}
 		
-		if( !m_IsFireWeaponRaised && !raiseInput )
+		if( (!m_IsFireWeaponRaised) || m_LiftWeapon_player )
 		{
 			if (m_ADSAutomationTimer && m_ADSAutomationTimer.IsRunning())
 				m_ADSAutomationTimer.Stop();
 			exitSights = true;
 		}
 		else
-		{		
+		{
 			if( m_bADS != hic.WeaponADS() )
 			{
 				m_bADS = hic.WeaponADS();
 				bADSToggle = true;
-				
 /*				if( m_bADS && hic.WeaponWasRaiseClick() )
 					m_WasIronsights = true;
 				else
@@ -1173,43 +1244,19 @@ class DayZPlayerImplement extends DayZPlayer
 			}
 			
 			if( m_bADS && !m_CameraIronsight && !m_CameraOptics )
-			{
-				if( m_bADS && hic.WeaponWasRaiseClick() )
-				{
-					m_ADSTimedCondition = true;
-				}
-				
+			{				
 				//!artificial Auto-ADS delay
-/*				if ( !m_ADSTimedCondition)
+				if ( !m_WeaponRaiseCompleted )
 				{
-					if (!m_ADSAutomationTimer)
-						m_ADSAutomationTimer = new Timer();
-					if (!m_ADSAutomationTimer.IsRunning())
-					{
-						m_ADSAutomationTimer.Run(PlayerConstants.WEAPON_RAISE_BLEND_DELAY,this,"EnterADSDelay");
-					}
 					bADSToggle = false;
 					exitSights = true;
 				}
 				else
-				{*/
+				{
 					bADSToggle = true;
-//				}
+				}
 			}
 		}
-		
-		/*	
-		if( hic.IsZoom() )
-		{
-			bADSToggle = true;
-		}
-		*/
-		
-///**/if( m_REMOVE != m_WasIronsight )
-///**/{
-///**/		Print(m_WasIronsight);
-///**/		m_REMOVE = m_WasIronsight;
-///**/}
 	
 		if( bADSToggle )
 		{
@@ -1219,7 +1266,7 @@ class DayZPlayerImplement extends DayZPlayer
 				ItemOptics optic = weapon.GetAttachedOptics();
 				bool switchToOptics = false;
 				
-				if( weapon.CanEnterIronsights()/* && !m_ShouldReturnToOptics*/ )
+				if( weapon.CanEnterIronsights() )
 					switchToOptics = m_bADS;
 				
 				if( optic && !m_CameraOptics )
@@ -1238,18 +1285,12 @@ class DayZPlayerImplement extends DayZPlayer
 				}
 				
 				// fixes camera switching during item transitions
-				if( !GetWeaponManager().CanFire(weapon) )
-					exitSights = true;		
+				if( IsLiftWeapon() || !IsRaised() || GetDayZPlayerInventory().IsProcessing() || !IsWeaponRaiseCompleted() || IsFighting() )
+					exitSights = true;
 				
 				// enter ironsight or optics
 				if( switchToOptics )
-				{
-//					if (m_ShouldReturnToRegularIronsights)
-//						m_ShouldReturnToRegularIronsights = weapon.CanEnterIronsights();
-
-//					Print(m_WasIronsight);
-//					Print(weapon.CanEnterIronsights());
-					
+				{					
 					// for weapons which cannot enter ironsights anymore
 					if( m_WasIronsight )
 					{
@@ -1257,7 +1298,7 @@ class DayZPlayerImplement extends DayZPlayer
 							m_WasIronsight = false;
 					}
 
-					if( m_WasIronsight || !optic /*|| m_ShouldReturnToRegularIronsights*/ /*|| (optic && optic.HasWeaponIronsightsOverride()*//* && m_ShouldReturnToBackupIronsights)*/ )
+					if( m_WasIronsight || !optic )
 					{
 //						Print("GO: IRONSIGHT");
 						m_CameraIronsight = true;
@@ -1270,7 +1311,6 @@ class DayZPlayerImplement extends DayZPlayer
 						SwitchOptics(optic,true);
 						m_CameraOptics = true;
 						m_CameraIronsight = false;
-//						m_WasIronsight = false;
 					}
 					
 					if( hcw )
@@ -1284,10 +1324,8 @@ class DayZPlayerImplement extends DayZPlayer
 		}
 		
 		// leave ironsight and/ or optics
-		if( exitSights && !m_HandheldOpticsInUse && (m_CameraIronsight || m_CameraOptics))
+		if( exitSights && !m_HandheldOpticsInUse && (m_CameraIronsight || m_CameraOptics) || GetCommand_Melee2() )
 		{
-			//m_CameraIronsight = false;
-			//m_CameraOptics = false;
 			ExitSights();
 			
 			if( hcw )
@@ -1298,7 +1336,6 @@ class DayZPlayerImplement extends DayZPlayer
 		Print("m_CameraOptics " + m_CameraOptics);
 		Print("---------------");*/
 	}
-	
 	
 	void HandleView()
 	{
@@ -1328,9 +1365,8 @@ class DayZPlayerImplement extends DayZPlayer
 
 		//Print("m_LiftWeapon_player " + !m_LiftWeapon_player);
 		//Print("IsFireWeaponRaised " + IsFireWeaponRaised());
-			
-		
-		if( !m_MovementState.IsRaised() && hic.IsZoomToggle() )		
+
+		if( !m_MovementState.IsRaised() && hic.IsZoomToggle() )        
 		{
 			m_CameraZoomToggle = true;
 			m_CameraEyeZoom = true;
@@ -1340,14 +1376,183 @@ class DayZPlayerImplement extends DayZPlayer
 			m_CameraZoomToggle = false;
 			m_CameraEyeZoom = false;
 		}
-		
-	}
-	
 
+		if (m_MovementState.IsRaisedInProne())
+		{
+			float headingAngle = MiscGameplayFunctions.GetHeadingAngle(this);
+			float headingAngleDiffBlock = Math.AbsFloat(m_LastHeadingAngleBlock - headingAngle);
+			float headingAngleDiffBlock2 = Math.AbsFloat(m_LastHeadingAngleBlock2 - headingAngle);
+			float headingAngleDiff = 0.0;
+
+			if (m_LastHeadingAngle * headingAngle < 0.0)
+			{
+				headingAngleDiff = Math.AbsFloat(m_LastHeadingAngle + headingAngle);
+			}
+			else
+			{
+				headingAngleDiff = Math.AbsFloat(m_LastHeadingAngle - headingAngle);
+			}
+
+			if (headingAngleDiff > 0.2)
+			{
+				int time = GetGame().GetTime();
+
+				float timefilterconstant = 400 - (headingAngleDiff * 100);
+
+				if (headingAngleDiffBlock > 0.8 && time - m_LastBackSoundTime > timefilterconstant)
+				{
+
+					float volume = headingAngleDiff / 0.5;
+					if (volume > 1)
+					{
+						volume = 1;
+					}
+					if (volume < 0.25)
+					{
+						volume = 0.25;
+					}
+
+					m_SoundOffset = headingAngleDiff / 2;
+					if (m_SoundOffset > 0.25)
+					{
+						m_SoundOffset = 0.25;
+					}
+
+					string soundSetName = "Cloth_Body_longmove_TShirt_Soundset";
+					
+					string bodyClothName = "";
+					EntityAI attachment = GetInventory().FindAttachment(InventorySlots.BODY);
+					if (attachment)
+					{
+						bodyClothName = attachment.GetAttachmentSoundType();
+					}
+
+					if (bodyClothName != "")
+					{
+						string path = "CfgSoundTables CfgAttachmentSoundTables Cloth_Body_Longmove_LookupTable";
+						int soundCount = GetGame().ConfigGetChildrenCount(path);
+
+						for (int i = 0; i < soundCount; i++)
+						{
+							string name = "";
+							GetGame().ConfigGetChildName(path, i, name);
+							
+							if (name == bodyClothName)
+							{
+								TStringArray stringArray = new TStringArray();
+								GetGame().ConfigGetTextArray(path + " " + name + " soundSets", stringArray);
+								soundSetName = stringArray.Get(0);
+
+								delete stringArray;
+							}
+						}
+					}
+
+					SoundParams soundParams = new SoundParams(soundSetName);
+					SoundObjectBuilder soundObjectBuilder = new SoundObjectBuilder(soundParams);
+					
+					if (soundObjectBuilder != NULL)
+					{
+						SoundObject soundObject = soundObjectBuilder.BuildSoundObject();
+						
+						if (soundObject != NULL)
+						{
+							soundObject.SetPosition(GetPosition());
+
+							AbstractWave wave = GetGame().GetSoundScene().Play3D(soundObject, soundObjectBuilder);
+							wave.SetStartOffset(m_SoundOffset);
+							wave.SetVolumeRelative(volume);
+
+							m_LastBackSoundTime = GetGame().GetTime();
+							m_LastHeadingAngleBlock = headingAngle;
+						}
+					}
+				}
+
+				if (headingAngleDiffBlock2 > 1.5 && time - m_LastBackSoundTime2 > (timefilterconstant * 2))
+				{
+					float volume2 = headingAngleDiff * 2;
+					if (volume2 > 1)
+					{
+						volume2 = 1;
+					}
+
+					m_SoundOffset = headingAngleDiff / 1.8;
+					if (m_SoundOffset < 0.1)
+					{
+						m_SoundOffset = 0.1;
+					}
+					if (m_SoundOffset > 0.3)
+					{
+						m_SoundOffset = 0.3;
+					}
+
+					string soundSetName2 = "walkProne_noHS_asphalt_ext_Char_SoundSet";
+					string surfaceType = GetSurfaceType();
+
+					if (surfaceType != "")
+					{
+						string movementSurfaceType = "walkProne_" + surfaceType;
+						
+						string path2 = "CfgSoundTables CfgStepSoundTables walkProne_noHS_Char_LookupTable";
+						int soundCount2 = GetGame().ConfigGetChildrenCount(path2);
+
+						for (int i2 = 0; i2 < soundCount2; i2++)
+						{
+							string name2 = "";
+							GetGame().ConfigGetChildName(path2, i2, name2);
+							
+							if (name2 == movementSurfaceType)
+							{
+								TStringArray stringArray2 = new TStringArray();
+								GetGame().ConfigGetTextArray(path2 + " " + name2 + " soundSets", stringArray2);
+								soundSetName2 = stringArray2.Get(0);
+
+								delete stringArray2;
+							}
+						}
+					}
+
+					SoundParams soundParams2 = new SoundParams(soundSetName2);
+					SoundObjectBuilder soundObjectBuilder2 = new SoundObjectBuilder(soundParams2);
+					
+					if (soundObjectBuilder2 != NULL)
+					{
+						SoundObject soundObject2 = soundObjectBuilder2.BuildSoundObject();
+						
+						if (soundObject2 != NULL)
+						{
+							soundObject2.SetPosition(GetPosition());
+
+							AbstractWave wave2 = GetGame().GetSoundScene().Play3D(soundObject2, soundObjectBuilder2);
+							wave2.SetStartOffset(m_SoundOffset);
+							wave2.SetVolumeRelative(volume2);            
+
+							m_LastBackSoundTime2 = GetGame().GetTime();
+							m_LastHeadingAngleBlock2 = headingAngle;
+						}
+					}
+				}
+
+				m_LastHeadingAngle = headingAngle;
+			}
+		}
+	}
+
+	float m_LastHeadingAngleBlock;
+	float m_LastHeadingAngleBlock2;
+	float m_LastHeadingAngle;
+	int m_LastBackSoundTime;
+	int m_LastBackSoundTime2;
+	float m_SoundOffset;
+	
 	//! 
 	override void  CommandHandler(float pDt, int pCurrentCommandID, bool pCurrentCommandFinished)
 	{
-		//! top priority - handle death first
+		//! handle weapon mode switch
+		HandleADS();
+		
+		//! handle death with high priority
 		if (HandleDeath(pCurrentCommandID))
 		{
 			return;
@@ -1372,11 +1577,7 @@ class DayZPlayerImplement extends DayZPlayer
 		*/
 		
 		//! handle Camera switch + zoom
-		HandleView();
-
-		//! handle weapon mode switch
-		HandleADS();
-		
+		HandleView();		
 	
 		//! handle finished commands
 		if (pCurrentCommandFinished)
@@ -1454,6 +1655,7 @@ class DayZPlayerImplement extends DayZPlayer
 		// ladder handling
 		if (pCurrentCommandID == DayZPlayerConstants.COMMANDID_LADDER)
 		{
+			OnLadder(pDt, m_MovementState);
 			return;
 		}
 
@@ -1594,49 +1796,48 @@ class DayZPlayerImplement extends DayZPlayer
 
 		if (hic)
 		{
-			//! get weapon 
+			//! get item in hands
 			EntityAI entityInHands = GetHumanInventory().GetEntityInHands();
 			bool isWeapon		= entityInHands	&& entityInHands.IsInherited(Weapon);
 			bool isOptics		= entityInHands	&& entityInHands.IsInherited(ItemOptics);
 
+			//! throwing handling
+			HumanCommandWeapons hcw = GetCommandModifier_Weapons();
+			m_Throwing.HandleThrowing(hic, hcw, entityInHands, pDt);
+					
+			
 			GetMovementState(m_MovementState);
-			if (isWeapon)
+			if( isWeapon && (!hic.IsImmediateAction() || !m_ProcessFirearmMeleeHit || !m_ContinueFirearmMelee) )
 			{
-				//! Melee with firearms
-				/*
-				if ((hic.IsWeaponRaised() && hic.IsImmediateAction()) || m_ProcessFirearmMeleeHit )
-				{
-					if (m_MeleeFightLogic.Process(pCurrentCommandID, hic, entityInHands, m_MovementState))
-					{
-						//! process melee with firearm in next step
-						m_ProcessFirearmMeleeHit = true;
-						return;
-					}
-					else
-					{
-						//! reset; ready for next firearm attack
-						m_ProcessFirearmMeleeHit = false;
-					}
-				}
-				*/
-				
+				m_ProcessFirearmMeleeHit = false;
 				bool exitIronSights = false;
 				HandleWeapons(pDt, entityInHands, hic, exitIronSights);
 				if (exitIronSights)
 					return;
 			}
-			else if (isOptics)
+			else if( isOptics )
 			{
 				ItemOptics opticInHands = ItemOptics.Cast(entityInHands);
 				bool exitOptic = false;
 				HandleOptic(opticInHands, true, hic, exitOptic);
 				if (exitOptic)
-					return;				
+					return;		
+			}
+
+			//! melee
+			if( isWeapon && (hic.IsMeleeWeaponAttack() || m_ProcessFirearmMeleeHit) || m_ContinueFirearmMelee )
+			{
+				if(m_MeleeFightLogic.HandleFightLogic(pCurrentCommandID, hic, entityInHands, m_MovementState, m_ContinueFirearmMelee))
+				{
+					m_ProcessFirearmMeleeHit = true;
+					return;
+				}
 			}
 			else
 			{
-				if(m_MeleeFightLogic.HandleFightLogic(pCurrentCommandID, hic, entityInHands, m_MovementState))
+				if(m_MeleeFightLogic.HandleFightLogic(pCurrentCommandID, hic, entityInHands, m_MovementState, m_ContinueFirearmMelee))
 				{
+					m_ProcessFirearmMeleeHit = false;
 					return;
 				}
 			}
@@ -1659,7 +1860,7 @@ class DayZPlayerImplement extends DayZPlayer
 			optics = ItemOptics.Cast(entityInHands);
 		}
 		
-		m_ADSTimedCondition = false;
+		//m_WeaponRaiseCompleted = false;
 		//Print("m_CameraOptics " + m_CameraOptics);
 		if ( m_CameraOptics )
 		{
@@ -2059,6 +2260,12 @@ class DayZPlayerImplement extends DayZPlayer
 				m_MeleeCombat.SetTargetObject(target);
 			}
 
+			vector hitPos = vector.Zero;
+			if (ctx.Read(hitPos))
+			{
+				m_MeleeCombat.SetHitPos(hitPos);
+			}
+
 			int hitZoneIdx = -1;
 			if (ctx.Read(hitZoneIdx))
 			{
@@ -2162,16 +2369,49 @@ class DayZPlayerImplement extends DayZPlayer
 	AnimRangedWeaponType GetShoulderAttachmentType()
 	{
 		EntityAI shoulderAttachment = GetInventory().FindAttachment(InventorySlots.SHOULDER);
+		EntityAI meleeAttachment = GetInventory().FindAttachment(InventorySlots.MELEE);
+		
+		AnimRangedWeaponType shoulderAttType = AnimRangedWeaponType.None;
+		AnimRangedWeaponType meleeAttType = AnimRangedWeaponType.None;
+		
 		if(shoulderAttachment)
 		{
 			switch( shoulderAttachment.GetAttachmentSoundType())
 			{
 				case "Shotgun":
-					return AnimRangedWeaponType.Shotgun;
+				{
+					shoulderAttType = AnimRangedWeaponType.Shotgun;
+					break;
+				}	
 				case "Rifle":
-					return AnimRangedWeaponType.Rifle;
+				{
+					shoulderAttType = AnimRangedWeaponType.Rifle;
+					break;
+				}
 			}
 		}
+		if(meleeAttachment)
+		{
+			switch( meleeAttachment.GetAttachmentSoundType())
+			{
+				case "Shotgun":
+				{
+					meleeAttType = AnimRangedWeaponType.Shotgun;
+					break;
+				}
+				case "Rifle":
+				{
+					meleeAttType = AnimRangedWeaponType.Rifle;
+					break;
+				}
+			}
+		}
+		
+		if(shoulderAttType == AnimRangedWeaponType.Shotgun || meleeAttType == AnimRangedWeaponType.Shotgun)
+			return AnimRangedWeaponType.Shotgun;
+		
+		if(shoulderAttType == AnimRangedWeaponType.Rifle || meleeAttType == AnimRangedWeaponType.Rifle)
+			return AnimRangedWeaponType.Rifle;
 
 		return AnimRangedWeaponType.None;
 	}
@@ -2323,6 +2563,7 @@ class DayZPlayerImplement extends DayZPlayer
 		
 		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
 		{
+			m_StepCounter++;//move outside of server condition if needed on client as well
 			float noiseMultiplier = 0;
 			float speedNoiseMultiplier = 0;
 			float bootsNoiseMultiplier = 0;
@@ -2378,7 +2619,10 @@ class DayZPlayerImplement extends DayZPlayer
 			{
 				noiseMultiplier = (speedNoiseMultiplier + bootsNoiseMultiplier + surfaceNoiseMultiplier) / 3;
 			}
-			ProcessFeetDamageServer(pUserInt);
+			if( (m_StepCounter % PlayerConstants.CHECK_EVERY_N_STEP) == 0 )
+			{
+				ProcessFeetDamageServer(pUserInt);
+			}
 			AddNoise(noiseParams, noiseMultiplier);
 		}
 	}
@@ -2600,48 +2844,92 @@ class DayZPlayerImplement extends DayZPlayer
 		}
 	}
 	
+	
+
 	AbstractWave ProcessVoiceEvent(string pEventType, string pUserString, int pUserInt)
 	{
 		DayZPlayerType type = GetDayZPlayerType();
-		DayZPlayerTypeAnimTable table = type.GetSoundVoiceTable();
-		AnimSoundEvent soundEvent;
-		if( table )
+		DayZPlayerTypeVoiceSoundLookupTable table = type.GetVoiceSoundLookupTable();
+		if(!table)
+			return null;
+		AbstractWave wave;
+		EntityAI mask = GetInventory().FindAttachment(InventorySlots.MASK);
+		EntityAI head_gear = GetInventory().FindAttachment(InventorySlots.HEADGEAR);
+		
+		string category;
+		if( mask || head_gear )
 		{
-			soundEvent = table.GetSoundEvent(pUserInt);
+			string category_mask;
+			string category_headgear;
+			
+			int priority_mask;
+			int priority_headgear;
+			
+			if(mask)
+			{
+				category_mask = mask.ConfigGetString("soundVoiceType");
+				priority_mask = mask.ConfigGetInt("soundVoicePriority");
+			}
+			if(head_gear)
+			{
+				category_headgear = head_gear.ConfigGetString("soundVoiceType");
+				priority_headgear = head_gear.ConfigGetInt("soundVoicePriority");
+			}
+			
+			if(priority_headgear >= priority_mask && category_headgear != "")
+			{
+				category = category_headgear;
+			}
+			else
+			{
+				category = category_mask;
+			}
+		}
+
+		if(category == "")
+		{
+			category = "none";
 		}
 		
-		if(soundEvent != NULL)
+		if(GetGame().IsClient() || !GetGame().IsMultiplayer())
 		{
-			if(GetGame().IsClient() || !GetGame().IsMultiplayer())
+			SoundObjectBuilder soundBuilder = table.GetSoundBuilder(pUserInt, category.Hash());
+			
+			if (soundBuilder)
 			{
-				SoundObjectBuilder objectBuilder = soundEvent.GetSoundBuilder();
-				
 				PlayerBase player = PlayerBase.Cast(this);
-				int isMale = 0;
-				int isFemale = 0;
+				int maleVoiceType = 0;
+				int femaleVoiceType = 0;
 				if(player.IsMale())
-					isMale = 1;
+				{
+					maleVoiceType = player.GetVoiceType();
+				}
 				else
-					isFemale = 1;
+				{
+					femaleVoiceType = player.GetVoiceType();
+				}
+
+				soundBuilder.SetVariable("male", maleVoiceType);
+				soundBuilder.SetVariable("female", femaleVoiceType);
 				
-				objectBuilder.SetVariable("male", isMale);
-				objectBuilder.SetVariable("female", isFemale);
-				
-				SoundObject soundObject = objectBuilder.BuildSoundObject();
+				SoundObject soundObject = soundBuilder.BuildSoundObject();
 				if (soundObject != NULL)
 				{
 					AttenuateSoundIfNecessary(soundObject);
-					return PlaySound(soundObject, objectBuilder);
+					wave = PlaySound(soundObject, soundBuilder);
 				}
 			}
-			
-			if(GetGame().IsServer() || !GetGame().IsMultiplayer())
-			{
-				if(soundEvent.m_NoiseParams != NULL)
-					GetGame().GetNoiseSystem().AddNoise(this, soundEvent.m_NoiseParams);
-			}
 		}
-		return null;
+		
+		/*
+		if(GetGame().IsServer() || !GetGame().IsMultiplayer())
+		{
+			NoiseParams noise_params = table.GetNoiseParams(pUserInt);
+			if(noise_params != NULL)
+					GetGame().GetNoiseSystem().AddNoise(this, noise_params);
+		}
+		*/
+		return wave;
 	}
 	
 	void ProcessFeetDamageServer(int pUserInt);
@@ -2757,6 +3045,10 @@ class DayZPlayerImplement extends DayZPlayer
 //		m_WasIronsight = !state;
 	}	
 	
+	
+	//!called every command handler tick when player is on ladder
+	void OnLadder(float delta_time, HumanMovementState pState);
+	
 	//-------------------------------------------------------------
 	//!
 	//! Phx contact event
@@ -2767,7 +3059,7 @@ class DayZPlayerImplement extends DayZPlayer
 		if( !IsAlive() )
 			return;
 		
-		if( GetCommand_Vehicle() )
+		if( GetParent() == other )
 			return;
 
 		Transport transport = Transport.Cast(other);
@@ -2804,6 +3096,10 @@ class DayZPlayerImplement extends DayZPlayer
 	{
 		return m_HandheldOpticsInUse;
 	}
+	
+	bool IsLiftWeapon();
+	bool IsRaised();
+	bool IsFighting();
 	/*bool ProcessInputDown(string input_name)
 	{
 		if (input_name == m_input_name)

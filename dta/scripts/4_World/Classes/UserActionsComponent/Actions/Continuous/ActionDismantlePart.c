@@ -23,11 +23,6 @@ class ActionDismantlePart: ActionContinuousBase
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNonRuined( UAMaxDistances.BASEBUILDING );
 	}
-
-	override int GetType()
-	{
-		return AT_DISMANTLE_PART;
-	}
 		
 	override string GetText()
 	{
@@ -48,42 +43,13 @@ class ActionDismantlePart: ActionContinuousBase
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{	
-		if ( player && !player.IsLeaning() )
-		{
-			Object targetObject = target.GetObject();
-			if ( targetObject && targetObject.CanUseConstruction() )
-			{
-				string part_name = targetObject.GetActionComponentName( target.GetComponentIndex() );
-				
-				BaseBuildingBase base_building = BaseBuildingBase.Cast( targetObject );
-				Construction construction = base_building.GetConstruction();		
-				ConstructionPart construction_part = construction.GetConstructionPartToDismantle( part_name, item );
-				
-				if ( construction_part )
-				{
-					//camera and position checks
-					if ( !base_building.IsFacingPlayer( player, part_name ) && !player.GetInputController().CameraIsFreeLook() )
-					{
-						//Camera check (client-only)
-						if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
-						{
-							if ( base_building.IsFacingCamera( part_name ) )
-							{
-								return false;
-							}
-						}
-
-						ConstructionActionData construction_action_data = player.GetConstructionActionData();
-						construction_action_data.SetTargetPart( construction_part );
-					
-						return true;
-					}
-				}
-			}
-		}
-		
-		return false;
+		return DismantleCondition( player, target, item, true );
 	}
+	
+	override bool ActionConditionContinue( ActionData action_data )
+	{	
+		return DismantleCondition( action_data.m_Player, action_data.m_Target, action_data.m_MainItem , false );
+	}	
 	
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
@@ -95,7 +61,7 @@ class ActionDismantlePart: ActionContinuousBase
 		if ( construction.CanDismantlePart( construction_part.GetPartName(), action_data.m_MainItem ) )
 		{
 			//build
-			construction.DismantlePartServer( construction_part.GetPartName(), GetType() );
+			construction.DismantlePartServer( action_data.m_Player, construction_part.GetPartName(), AT_DISMANTLE_PART );
 			
 			//add damage to tool
 			action_data.m_MainItem.DecreaseHealth( UADamageApplied.DISMANTLE, false );
@@ -117,7 +83,7 @@ class ActionDismantlePart: ActionContinuousBase
 		return false;
 	}
 	
-	void SetBuildingAnimation( ItemBase item )
+	protected void SetBuildingAnimation( ItemBase item )
 	{
 		switch( item.Type() )
 		{
@@ -132,5 +98,52 @@ class ActionDismantlePart: ActionContinuousBase
 				m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_DISASSEMBLE;
 				break;
 		}
-	}		
+	}	
+	
+	protected bool DismantleCondition( PlayerBase player, ActionTarget target, ItemBase item, bool camera_check )
+	{	
+		if ( player && !player.IsLeaning() )
+		{
+			Object target_object = target.GetObject();
+			if ( target_object && target_object.CanUseConstruction() )
+			{
+				string part_name = target_object.GetActionComponentName( target.GetComponentIndex() );
+				
+				BaseBuildingBase base_building = BaseBuildingBase.Cast( target_object );
+				Construction construction = base_building.GetConstruction();		
+				ConstructionPart construction_part = construction.GetConstructionPartToDismantle( part_name, item );
+				
+				if ( construction_part )
+				{
+					//camera and position checks
+					if ( !base_building.IsFacingPlayer( player, part_name ) && !player.GetInputController().CameraIsFreeLook() && base_building.HasProperDistance( construction_part.GetMainPartName(), player ) )
+					{
+						//Camera check (client-only)
+						if ( camera_check )
+						{
+							if ( GetGame() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
+							{
+								if ( base_building.IsFacingCamera( part_name ) )
+								{
+									return false;
+								}
+							}
+						}
+
+						ConstructionActionData construction_action_data = player.GetConstructionActionData();
+						construction_action_data.SetTargetPart( construction_part );
+					
+						return true;
+					}
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	override string GetAdminLogMessage(ActionData action_data)
+	{
+		return " dismantled " + action_data.m_Target.GetObject().GetDisplayName() + " with " + action_data.m_MainItem.GetDisplayName();
+	}
 }

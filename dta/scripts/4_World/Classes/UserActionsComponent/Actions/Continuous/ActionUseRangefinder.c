@@ -12,13 +12,6 @@ class ActionUseRangefinder : ActionContinuousBase
 	{
 		m_CallbackClass = ActionUseRangefinderCB;
 		m_CommandUID = DayZPlayerConstants.CMD_GESTUREFB_LOOKOPTICS;
-		m_MessageStartFail = "ActionUseRangefinder - m_MessageStartFail";
-		m_MessageStart = "ActionUseRangefinder - m_MessageStart";
-		m_MessageSuccess = "ActionUseRangefinder - m_MessageSuccess";
-		m_MessageFail = "ActionUseRangefinder - m_MessageFail";
-		m_MessageCancel = "ActionUseRangefinder - m_MessageCancel";
-		////m_TimeToCompleteAction = 999; // TO DO: Must be infinite!
-		//m_Animation = "close";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;	
 	}
 	
@@ -26,11 +19,6 @@ class ActionUseRangefinder : ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTNone;
-	}
-	
-	override int GetType()
-	{
-		return AT_USE_RANGE_FINDER;
 	}
 	
 	override bool IsFullBody(PlayerBase player)

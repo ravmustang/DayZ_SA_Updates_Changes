@@ -4,13 +4,6 @@ class ActionTurnOnWhileOnGround: ActionInteractBase
 	{
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_OPENDOORFW;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
-		m_MessageSuccess 	= "I've flipped the switch on.";
-		m_MessageFail 		= "I've flipped the switch off.";
-	}
-	
-	override int GetType()
-	{
-		return AT_TURN_ON_WHILE_ON_GROUND;
 	}
 
 	override string GetText()

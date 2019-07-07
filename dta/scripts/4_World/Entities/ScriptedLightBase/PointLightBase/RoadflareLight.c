@@ -14,7 +14,11 @@ class RoadflareLight extends PointLightBase
 		SetFadeOutTime(1);
 		SetDiffuseColor(1.0, 0.3, 0.3);
 		SetAmbientColor(1.0, 0.3, 0.3);
-		SetFlareVisible(false);
+		SetFlareVisible(true);
+		SetFlickerAmplitude(0.2);
+		SetFlickerSpeed(1.5);
+		SetDancingShadowsMovementSpeed(0.1);
+		SetDancingShadowsAmplitude(0.015);
 	}
 	
 	/*override void OnFrameLightSource(IEntity other, float timeSlice)

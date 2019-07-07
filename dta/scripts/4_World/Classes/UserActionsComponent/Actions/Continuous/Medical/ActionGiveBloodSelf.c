@@ -16,12 +16,6 @@ class ActionGiveBloodSelf: ActionContinuousBase
 	void ActionGiveBloodSelf()
 	{
 		m_CallbackClass = ActionGiveBloodSelfCB;
-		m_MessageStartFail = "There's no blood left.";
-		m_MessageStart = "I have started giving blood myself";
-		m_MessageSuccess = "I gave myself blood.";
-		m_MessageFail = "I have moved and giving blood was canceled.";
-		m_MessageCancel = "I stopped giving self a blood.";
-		//m_Animation = "GIVEBLOODS";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_HIGH;
 		
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_SALINEBLOODBAG;
@@ -33,11 +27,6 @@ class ActionGiveBloodSelf: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINotRuinedAndEmpty;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_GIVE_BLOOD_S;
 	}
 
 	override bool HasTarget()

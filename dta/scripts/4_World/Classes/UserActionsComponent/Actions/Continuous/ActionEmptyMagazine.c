@@ -16,12 +16,6 @@ class ActionEmptyMagazine: ActionContinuousBase
 	
 	void ActionEmptyMagazine()
 	{
-		m_MessageStartFail = "It's empty.";
-		m_MessageStart = "I have started emptying magazine.";
-		m_MessageSuccess = "I have finished emptying the magazine.";
-		m_MessageFail = "It broke.";
-		m_MessageCancel = "I stopped emptying the magazine.";
-		
 		m_CallbackClass = ActionEmptyMagazineCB;
 		m_CommandUID = DayZPlayerConstants.CMD_ACTIONMOD_EMPTYMAG;
 		m_CommandUIDProne = DayZPlayerConstants.CMD_ACTIONFB_EMPTYMAG;
@@ -67,11 +61,6 @@ class ActionEmptyMagazine: ActionContinuousBase
 		{
 			return false;
 		}
-	}
-	
-	override int GetType()
-	{
-		return AT_EMPTY_MAGAZINE;
 	}
 
 	override bool HasTarget()
@@ -164,7 +153,7 @@ class ActionEmptyMagazine: ActionContinuousBase
 						emActionData.m_magazinePile = piles.Get(0);
 				}	
 			}
-			//callback.m_magazinePile.SetSynchDirty();
+			//emActionData.m_magazinePile.SetSynchDirty();
 		}
 		//mag.SetSynchDirty();
 	}

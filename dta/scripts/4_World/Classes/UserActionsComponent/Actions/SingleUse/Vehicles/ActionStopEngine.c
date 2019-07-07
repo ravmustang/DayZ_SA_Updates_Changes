@@ -2,7 +2,6 @@ class ActionStopEngine: ActionSingleUseBase
 {
 	void ActionStopEngine()
 	{
-		m_MessageSuccess    = "";
 		m_CommandUID        = DayZPlayerConstants.CMD_ACTIONMOD_STOPENGINE;
 		m_StanceMask        = DayZPlayerConstants.STANCEMASK_CROUCH | DayZPlayerConstants.STANCEMASK_ERECT;
 		//m_HUDCursorIcon     = CursorIcons.LootCorpse;
@@ -12,11 +11,6 @@ class ActionStopEngine: ActionSingleUseBase
 	{
 		m_ConditionItem = new CCINone;
 		m_ConditionTarget = new CCTNone;
-	}	
-	
-	override int GetType()
-	{
-		return AT_VEH_ENGINE_STOP;
 	}
 
 	override string GetText()

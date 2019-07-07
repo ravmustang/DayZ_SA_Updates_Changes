@@ -1,7 +1,7 @@
 class BrainDiseaseMdfr: ModifierBase
 {
-	static const int BRAIN_AGENT_THRESHOLD_ACTIVATE = 2000;
-	static const int BRAIN_AGENT_THRESHOLD_DEACTIVATE = 0;
+	static const int AGENT_THRESHOLD_ACTIVATE = 2000;
+	static const int AGENT_THRESHOLD_DEACTIVATE = 0;
 	const int SHAKE_INTERVAL_MIN = 1;
 	const int SHAKE_INTERVAL_MAX = 4;
 	//const float SHAKE_INTERVAL_DEVIATION = 1;
@@ -17,9 +17,14 @@ class BrainDiseaseMdfr: ModifierBase
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
 	
+	override string GetDebugText()
+	{
+		return ("Activate threshold: "+AGENT_THRESHOLD_ACTIVATE + "| " +"Deativate threshold: "+AGENT_THRESHOLD_DEACTIVATE);
+	}
+	
 	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.BRAIN) > BRAIN_AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.BRAIN) > AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -41,7 +46,7 @@ class BrainDiseaseMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.BRAIN) < BRAIN_AGENT_THRESHOLD_DEACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.BRAIN) < AGENT_THRESHOLD_DEACTIVATE) 
 		{
 			return true;
 		}

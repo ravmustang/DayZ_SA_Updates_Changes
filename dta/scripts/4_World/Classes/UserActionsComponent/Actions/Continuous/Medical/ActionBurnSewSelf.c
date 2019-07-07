@@ -11,12 +11,6 @@ class ActionBurnSewSelf: ActionContinuousBase
 	void ActionBurnSewSelf()
 	{
 		m_CallbackClass = ActionBurnSewSelfCB;
-		m_MessageStartFail = "It's not possible.";
-		m_MessageStart = "I have started closing my wounds";
-		m_MessageSuccess = "I have closed my wounds.";
-		m_MessageFail = "I have moved and healing was canceled.";
-		m_MessageCancel = "I stopped closing my wounds.";
-		//m_Animation = "bandage";
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_MEDIUM;
 	}
 	
@@ -24,11 +18,6 @@ class ActionBurnSewSelf: ActionContinuousBase
 	{	
 		m_ConditionItem = new CCINonRuined;
 		m_ConditionTarget = new CCTSelf;
-	}
-
-	override int GetType()
-	{
-		return AT_BURN_SEW_S;
 	}
 
 	override bool HasTarget()

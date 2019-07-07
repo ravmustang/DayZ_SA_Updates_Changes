@@ -37,7 +37,7 @@ class WeaponUnjamming_Start extends WeaponStartAction
 
 			if (m_dtAccumulator >= m_jamTime)
 			{
-				wpnDebugPrint("[wpnfsm] Unjammed!");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " Unjammed!");
 				hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_END);
 				m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingTimeout(p));
 				return; // unjammed successfuly
@@ -46,13 +46,13 @@ class WeaponUnjamming_Start extends WeaponStartAction
 			
 			if (hic.IsReloadOrMechanismContinuousUse())
 			{
-				wpnDebugPrint("[wpnfsm] Unjamming...");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " Unjamming...");
 			}
 			#ifndef PLATFORM_CONSOLE
 			#ifndef SERVER_FOR_CONSOLE
 			else
 			{
-				wpnDebugPrint("[wpnfsm] Unjamming failed, weapon still jammed");
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " Unjamming failed, weapon still jammed");
 				hcw.StartAction(WeaponActions.UNJAMMING, WeaponActionUnjammingTypes.UNJAMMING_INTERRUPT);
 				m_weapon.ProcessWeaponEvent(new WeaponEventUnjammingFailedTimeout(p));
 			}
@@ -104,12 +104,12 @@ class WeaponUnjamming_Cartridge extends WeaponStateBase
 
 		if (!ctx.Write(m_damage))
 		{
-			Error("[wpnfsm] WeaponUnjamming_Cartridge.SaveCurrentFSMState: cannot write m_damage for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponUnjamming_Cartridge.SaveCurrentFSMState: cannot write m_damage for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Write(m_type))
 		{
-			Error("[wpnfsm] WeaponUnjamming_Cartridge.SaveCurrentFSMState: cannot write m_type for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponUnjamming_Cartridge.SaveCurrentFSMState: cannot write m_type for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
@@ -122,12 +122,12 @@ class WeaponUnjamming_Cartridge extends WeaponStateBase
 
 		if (!ctx.Read(m_damage))
 		{
-			Error("[wpnfsm] WeaponUnjamming_Cartridge.LoadCurrentFSMState: cannot read m_damage for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponUnjamming_Cartridge.LoadCurrentFSMState: cannot read m_damage for weapon=" + m_weapon);
 			return false;
 		}
 		if (!ctx.Read(m_type))
 		{
-			Error("[wpnfsm] WeaponUnjamming_Cartridge.LoadCurrentFSMState: cannot read m_type for weapon=" + m_weapon);
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponUnjamming_Cartridge.LoadCurrentFSMState: cannot read m_type for weapon=" + m_weapon);
 			return false;
 		}
 		return true;
