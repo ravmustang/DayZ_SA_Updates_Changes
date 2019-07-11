@@ -57,6 +57,7 @@ class DayZPlayerImplementThrowing
 				aimOrientation[1] = aimOrientation[1] + ud;
 
 				m_Player.GetHumanInventory().ThrowEntity(pEntityInHands, aimOrientation.AnglesToVector(), c_fThrowingForceMin + m_fThrowingForce01 * (c_fThrowingForceMax - c_fThrowingForceMin));
+				m_bThrowingAnimationPlaying = false;
 				return;
 			}
 
@@ -95,8 +96,13 @@ class DayZPlayerImplementThrowing
 					}
 					
 					pHcw.ThrowItem(throwType);
+					m_bThrowingAnimationPlaying = true;
 				}
 			}
+		}
+		else if( m_bThrowingInProgress )
+		{
+			ResetState();
 		}
 	}
 	
@@ -104,11 +110,24 @@ class DayZPlayerImplementThrowing
 	{
 		m_fThrowingForce01 = 0;
 		m_bThrowingInProgress = false;
+		m_bThrowingAnimationPlaying = false;
 	}
 	
 	bool IsThrowingModeEnabled()
 	{
 		return m_bThrowingModeEnabled;
+	}
+	
+	//! Throwing wind-up only (button hold)
+	bool IsThrowingInProgress()
+	{
+		return m_bThrowingInProgress;
+	}
+	
+	//! Throwing animation after button release
+	bool IsThrowingAnimationPlaying()
+	{
+		return m_bThrowingAnimationPlaying;
 	}
 	
 	bool CanChangeThrowingStance(HumanInputController pHic)
@@ -140,6 +159,7 @@ class DayZPlayerImplementThrowing
 	private DayZPlayer m_Player;
 	private bool m_bThrowingModeEnabled;
 	private bool m_bThrowingInProgress;
+	private bool m_bThrowingAnimationPlaying;
 	private float m_fThrowingForce01;
 	
 	private const float c_fThrowingForceMin = 20.0;

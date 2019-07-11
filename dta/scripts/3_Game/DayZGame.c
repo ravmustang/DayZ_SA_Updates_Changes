@@ -147,7 +147,23 @@ class LoginTimeBase extends UIScriptedMenu
 		m_txtDescription = TextWidget.Cast( layoutRoot.FindAnyWidget("txtDescription") );
 		m_txtLabel = TextWidget.Cast( layoutRoot.FindAnyWidget("txtLabel") );
 		m_btnLeave = ButtonWidget.Cast( layoutRoot.FindAnyWidget("btnLeave") );
-
+		#ifdef PLATFORM_CONSOLE
+		m_btnLeave.Show(false);
+		layoutRoot.FindAnyWidget("toolbar_bg").Show(true);
+		#ifdef PLATFORM_PS4
+			string back = "circle";
+			if( GetGame().GetInput().GetEnterButton() == GamepadButton.A )
+			{
+				back = "circle";
+			}
+			else
+			{
+				back = "cross";
+			}
+			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
+			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:" + back );
+		#endif
+		#endif
 		return layoutRoot;
 	}
 	
@@ -681,6 +697,7 @@ class DayZGame extends CGame
 	private string 	m_PlayerName;
 	private bool 	m_IsNewCharacter;
 	private bool 	m_IsConnecting;
+	private bool	m_ConnectFromJoin;
 	
 	private float	m_UserFOV;
 	float 	m_volume_sound;
@@ -756,6 +773,7 @@ class DayZGame extends CGame
 		GetCallQueue(CALL_CATEGORY_GUI).Call(DeferredInit);
 		//m_isTileSet = true;
 		m_IsConnecting = false;
+		m_ConnectFromJoin = false;
 	}
 	
 	// ------------------------------------------------------------
@@ -1191,6 +1209,12 @@ class DayZGame extends CGame
 		case ConnectingAbortEventTypeID:
 		{
 			g_Game.SetGameState(DayZGameState.MAIN_MENU);
+			SetConnecting(false);
+			if (m_ConnectFromJoin)
+			{
+				m_ConnectFromJoin = false;
+				AbortMission();
+			}
 			break;
 		}
 		case VONStartSpeakingEventTypeID:
@@ -2046,6 +2070,7 @@ class DayZGame extends CGame
 		m_ConnectAddress	= ip;
 		m_ConnectPort		= port;
 		m_ConnectPassword	= password;
+		m_ConnectFromJoin	= false;
 		OnlineServices.LoadMPPrivilege();
 	}
 	
@@ -2053,6 +2078,7 @@ class DayZGame extends CGame
 	{
 		m_ConnectAddress	= ip;
 		m_ConnectPort		= port;
+		m_ConnectFromJoin	= true;
 		Connect();
 	}
 	
@@ -2066,6 +2092,7 @@ class DayZGame extends CGame
 			
 			GetCLIParam("password", m_ConnectPassword);
 			
+			m_ConnectFromJoin = false;
 			Connect();
 		}
 	}

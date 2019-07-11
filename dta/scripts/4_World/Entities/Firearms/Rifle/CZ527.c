@@ -421,6 +421,7 @@ class CZ527_Base : BoltActionRifle_Base
 	override void SetActions()
 	{
 		super.SetActions();
-		AddAction(ActionAdvencedDetachMagazine);
+		AddAction(FirearmActionDetachMagazine);
+		//AddAction(ActionAdvancedDetachMagazine);
 	}
 };

@@ -36,7 +36,6 @@ class BloodTest extends RecipeBase
 		InsertIngredient(1,"BloodSyringe");//you can insert multiple ingredients this way
 		InsertIngredient(1,"BloodBagFull");//you can insert multiple ingredients this way
 		InsertIngredient(1,"BloodBagIV");//you can insert multiple ingredients this way
-		InsertIngredient(1,"SalineBagIV");//you can insert multiple ingredients this way
 		
 		m_IngredientAddHealth[1] = 0;// 0 = do nothing
 		m_IngredientSetHealth[1] = -1; // -1 = do nothing

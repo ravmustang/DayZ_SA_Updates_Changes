@@ -21,7 +21,7 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 	
 	void KeybindingElement( int key_index, Widget parent, KeybindingsGroup group )
 	{
-		m_Root					= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_option.layout", parent );
+		m_Root					= GetGame().GetWorkspace().CreateWidgets( GetLayoutName(), parent );
 		m_ElementName			= TextWidget.Cast( m_Root.FindAnyWidget( "setting_label" ) );
 		m_ElementModifier		= TextWidget.Cast( m_Root.FindAnyWidget( "modifier_label" ) );
 		m_PrimaryBindButton		= ButtonWidget.Cast( m_Root.FindAnyWidget( "primary_bind" ) );
@@ -34,6 +34,11 @@ class KeybindingElement extends ScriptedWidgetEventHandler
 		
 		Reload();
 		m_Root.SetHandler( this );
+	}
+	
+	string GetLayoutName()
+	{
+		return "gui/layouts/new_ui/options/keybindings_selectors/keybinding_option.layout";
 	}
 	
 	bool IsChanged()

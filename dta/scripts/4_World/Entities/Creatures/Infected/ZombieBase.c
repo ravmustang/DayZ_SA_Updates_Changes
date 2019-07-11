@@ -888,4 +888,13 @@ class ZombieBase extends DayZInfected
 			}
 		}
 	}
+	
+	override bool CanReceiveAttachment (EntityAI attachment, int slotId)
+	{
+		if (!IsAlive())
+		{
+			return false;
+		}
+		return super.CanReceiveAttachment(attachment, slotId);
+	}
 }

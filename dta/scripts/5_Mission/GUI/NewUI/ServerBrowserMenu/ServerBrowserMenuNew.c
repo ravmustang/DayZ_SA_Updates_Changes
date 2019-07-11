@@ -325,7 +325,6 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		if( !GetGame().GetUIManager().IsDialogVisible() && !GetDayZGame().IsConnecting() )
 		{
-			#ifndef PLATFORM_PS4
 			if( GetGame().GetInput().LocalPress("UAUITabLeft",false) )
 			{
 				m_Tabber.PreviousTab();
@@ -335,7 +334,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 			{
 				m_Tabber.NextTab();
 			}
-			#endif
+			
 			if( GetGame().GetInput().LocalPress("UAUINextDown",false) )
 			{
 				GetSelectedTab().PressSholderLeft();

@@ -111,6 +111,11 @@ class Grenade_Base extends InventoryItemSuper
 	void SetParticlePosition(vector local_pos)
 	{
 		m_ParticlePosition = local_pos;
+
+		if( GetHierarchyParent() )
+		{
+			m_ParticlePosition = GetHierarchyParent().WorldToModel(GetPosition());
+		}
 	}
 	
 	EGrenadeType GetGrenadeType()
@@ -157,7 +162,7 @@ class Grenade_Base extends InventoryItemSuper
 		case EGrenadeType.CHEMICAL:
 		break;
 		case EGrenadeType.ILLUMINATING:
-			Explode(DT_STUN, m_AmmoType);
+			Explode(DT_EXPLOSION, m_AmmoType);
 		break;
 		case EGrenadeType.NON_LETHAL:
 		break;
@@ -192,6 +197,7 @@ class Grenade_Base extends InventoryItemSuper
 		if( GetGame().IsServer() )
 		{
 			SetHealth("", "", 0.0); // causes explosion when grenade is destroyed
+			SetTakeable(false);
 		}
 	}
 	
@@ -200,6 +206,7 @@ class Grenade_Base extends InventoryItemSuper
 		if( GetGame().IsServer() )
 		{
 			SetHealth("", "", 0.0); // causes explosion when grenade is destroyed
+			SetTakeable(false);
 		}
 	}
 	
@@ -229,13 +236,48 @@ class Grenade_Base extends InventoryItemSuper
 		}
 	}
 
+	override void OnStoreSave(ParamsWriteContext ctx)
+	{
+		super.OnStoreSave(ctx);
+		
+		if( GetGame().SaveVersion() >= 107 )
+		{
+			ctx.Write( m_Pinned );
+		}
+	}
+	
+	override bool OnStoreLoad(ParamsReadContext ctx, int version)
+	{
+		if ( !super.OnStoreLoad(ctx, version) )
+			return false;
+		
+		bool pinned;
+		if( version >= 107 )
+		{
+			if( !ctx.Read(pinned) )
+			{
+				return false;
+			}
+			
+			m_Pinned = pinned;
+		}
+
+		return true;
+	}
+
 	override void OnExplosionEffects(Object source, Object directHit, int componentIndex, string surface, vector pos, vector surfNormal, float energyFactor, float explosionFactor, bool isWater, string ammoType)
 	{
 		super.OnExplosionEffects(source, directHit, componentIndex, surface, pos, surfNormal, energyFactor, explosionFactor, isWater, ammoType);
 
 		if( m_ParticleExplosionId > ParticleList.INVALID )
 		{
-			m_ParticleExplosion = Particle.PlayOnObject(m_ParticleExplosionId, this, m_ParticlePosition, Vector(0, 0, 0), true);
+			EntityAI parent = this;
+			if( GetHierarchyParent() )
+			{
+				parent = GetHierarchyParent();
+			}
+
+			m_ParticleExplosion = Particle.PlayOnObject(m_ParticleExplosionId, parent, m_ParticlePosition, Vector(0, 0, 0), true);
 		}
 
 		CreateLight();
@@ -253,7 +295,7 @@ class Grenade_Base extends InventoryItemSuper
 		super.EEKilled(killer);
 
 		//! should be called only here to avoid multiple explosion calculations, call SetHealth("","",0.0) instead
-	 	ExplodeGrenade(m_GrenadeType); 
+	 	ExplodeGrenade(m_GrenadeType);
 	}
 
 	override bool CanExplodeInFire()

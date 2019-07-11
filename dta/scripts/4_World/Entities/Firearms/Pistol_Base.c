@@ -570,7 +570,8 @@ class Pistol_Base extends Weapon_Base
 	override void SetActions()
 	{
 		super.SetActions();
-		AddAction(ActionAdvencedDetachMagazine);
+		AddAction(FirearmActionDetachMagazine);
+		//AddAction(ActionAdvancedDetachMagazine);
 	}
 };
 

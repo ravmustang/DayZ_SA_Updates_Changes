@@ -293,7 +293,8 @@ class ActionConstructor
 		actions.Insert(FirearmActionMechanicManipulate);
 		actions.Insert(FirearmActionUnjam);
 		
-		actions.Insert(ActionAdvencedDetachMagazine);
+		actions.Insert(FirearmActionDetachMagazine);		
+		//actions.Insert(ActionAdvancedDetachMagazine);
 		
 	}
 };

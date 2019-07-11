@@ -14,22 +14,23 @@ class FlashGrenade extends Grenade_Base
 			// get grenade range
 			string grenadePath = "cfgAmmo " + ammoType + " indirectHitRange";
 			float maxRange = GetGame().ConfigGetFloat(grenadePath);
-				
+
 			if( vector.Distance(headPos, pos) <= maxRange ) 
 			{
 				// check visibility
 				vector contactPos;
 				vector contactDir;
 				int contactComponent;
-				
+
 				if (!DayZPhysics.RaycastRV(headPos, pos, contactPos, contactDir, contactComponent, NULL, player, source, false, false, ObjIntersectFire))
-				{	
+				{
 					if( MiscGameplayFunctions.IsPlayerOrientedTowardPos(player, pos, 60) )
 					{
 						visual = true;
-					}				
+					}
+
+					player.OnPlayerReceiveFlashbangHitStart(visual);
 				}
-				player.OnPlayerReceiveFlashbangHitStart(visual);
 			}
 		}
 	}
@@ -39,7 +40,7 @@ class FlashGrenade extends Grenade_Base
 	{
 		SetAmmoType("FlashGrenade_Ammo");
 		SetFuseDelay(2);
-		SetGrenadeType(EGrenadeType.ILLUMINATING);
+		SetGrenadeType(EGrenadeType.FRAGMENTATION);
 		SetParticleExplosion(ParticleList.GRENADE_M84);
 	}
 

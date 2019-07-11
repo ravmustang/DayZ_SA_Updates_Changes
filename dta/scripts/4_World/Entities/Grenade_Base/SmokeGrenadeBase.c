@@ -217,6 +217,12 @@ class SmokeGrenadeBase extends Grenade_Base
 		return m_SmokeGrenadeState;
 	}
 
+	override void EEDelete(EntityAI parent)
+	{
+		SoundSmokeStop();
+		DestroyParticle(m_ParticleSmoke);
+	}
+
 	void SetSmokeGrenadeState(ESmokeGrenadeState state)
 	{
 		//Print("Setting SGS to: " + typename.EnumToString(ESmokeGrenadeState, state));

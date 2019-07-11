@@ -1,3 +1,12 @@
+class DetachMagActionReciveData : ActionReciveData
+{
+	ref InventoryLocation  m_ilMagazine;
+}
+class DetachMagActionData : ActionData
+{
+	ref InventoryLocation  m_ilMagazine;
+}
+
 class FirearmActionDetachMagazine : FirearmActionBase
 {	
 	void FirearmActionDetachMagazine() 
@@ -6,14 +15,19 @@ class FirearmActionDetachMagazine : FirearmActionBase
 	
 	override bool HasTarget()
 	{
-		return false;
+		return true;
 	}
 	
-/*	override typename GetInputType()
+	override typename GetInputType()
 	{
-		return ContinuousWeaponManipulationActionInput;
-	} 
-*/	
+		return QuickaBarActionInput;
+	}
+	
+	override bool CanBePerformedFromQuickbar()
+	{
+		return true;
+	}
+	
 	override void CreateConditionComponents()  
 	{
 		m_ConditionItem = new CCINonRuined();
@@ -25,13 +39,80 @@ class FirearmActionDetachMagazine : FirearmActionBase
 		return false;
 	}
 	
+	override bool InventoryReservation( ActionData action_data)
+	{
+		Magazine mag = Magazine.Cast(action_data.m_Target.GetObject());
+		InventoryLocation il = new InventoryLocation();
+		if( !action_data.m_Player.GetInventory().FindFreeLocationFor(mag, FindInventoryLocationType.ANY_CARGO, il) )
+			return false;
+		
+		if( !super.InventoryReservation( action_data) )
+			return false;
+
+		DetachMagActionData action_data_dm = DetachMagActionData.Cast(action_data);
+		if( !action_data.m_Player.GetInventory().AddInventoryReservation(mag,il,10000) )
+			return false;
+			
+		action_data_dm.m_ReservedInventoryLocations.Insert(il);
+		action_data_dm.m_ilMagazine = il;
+
+		return true;
+	}
+	
+	override ActionData CreateActionData()
+	{
+		ActionData action_data = new DetachMagActionData;
+		return action_data;
+	}
+	
+	override void WriteToContext (ParamsWriteContext ctx, ActionData action_data)
+	{
+		super.WriteToContext(ctx, action_data);
+		
+		DetachMagActionData action_data_dm;
+		DetachMagActionData.CastTo(action_data_dm, action_data);
+
+		action_data_dm.m_ilMagazine.WriteToContext(ctx);
+	}
+	
+	override bool ReadFromContext(ParamsReadContext ctx, out ActionReciveData action_recive_data )
+	{
+		if(!action_recive_data)
+		{
+			action_recive_data = new DetachMagActionReciveData;
+		}
+		
+		if(!super.ReadFromContext( ctx, action_recive_data ))
+			return false;
+		
+		DetachMagActionReciveData recive_data_dm;
+		recive_data_dm = DetachMagActionReciveData.Cast( action_recive_data );
+		
+		recive_data_dm.m_ilMagazine = new InventoryLocation;
+
+		if(!recive_data_dm.m_ilMagazine.ReadFromContext(ctx))
+			return false;
+		
+		return true;
+	}
+	
+	override void HandleReciveData(ActionReciveData action_recive_data, ActionData action_data)
+	{
+		super.HandleReciveData(action_recive_data, action_data);
+		
+		DetachMagActionReciveData recive_data_dm = DetachMagActionReciveData.Cast(action_recive_data);
+		DetachMagActionData action_data_dm = DetachMagActionData.Cast(action_data);
+		
+		action_data_dm.m_ilMagazine = recive_data_dm.m_ilMagazine;
+	}
+	
 	
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item ) //condition for action
 	{
 		Weapon_Base wpn = Weapon_Base.Cast(item);
 		if (wpn && wpn.CanProcessWeaponEvents())
 		{
-			Magazine mag = wpn.GetMagazine(wpn.GetCurrentMuzzle());
+			Magazine mag = Magazine.Cast(target.GetObject());
 			if (player.GetWeaponManager().CanDetachMagazine(wpn,mag))
 				return true;
 		}
@@ -46,20 +127,18 @@ class FirearmActionDetachMagazine : FirearmActionBase
 	override void Start( ActionData action_data )
 	{
 		super.Start( action_data );
+		DetachMagActionData action_data_dm = DetachMagActionData.Cast(action_data);
 		
 		Weapon_Base wpn = Weapon_Base.Cast( action_data.m_MainItem );
-		Magazine mag = wpn.GetMagazine(wpn.GetCurrentMuzzle());
 		
-		InventoryLocation il = new InventoryLocation();
-		action_data.m_Player.GetInventory().FindFreeLocationFor(mag, FindInventoryLocationType.ANY_CARGO, il);
-		action_data.m_Player.GetWeaponManager().DetachMagazine(il);
+		action_data.m_Player.GetWeaponManager().DetachMagazine(action_data_dm.m_ilMagazine,this);
 	}
 };
 
 
-class ActionAdvencedDetachMagazine : ActionSequentialBase
+class ActionAdvancedDetachMagazine : ActionSequentialBase
 {
-	void ActionAdvencedDetachMagazine()
+	void ActionAdvancedDetachMagazine()
 	{
 	}
 	
@@ -78,11 +157,6 @@ class ActionAdvencedDetachMagazine : ActionSequentialBase
 	{
 		return true;
 	}
-	
-	/*override typename GetInputType()
-	{
-		return ExternalControlledActionInput;
-	}*/
 	
 	override bool ActionCondition(PlayerBase player, ActionTarget target, ItemBase item)
 	{
@@ -108,7 +182,7 @@ class ActionAdvencedDetachMagazine : ActionSequentialBase
 		super.OnStageStart(action_data);
 		Weapon_Base wpn;
 		Magazine mag;
-		InventoryLocation il;
+		InventoryLocation il = new InventoryLocation();
 		
 		switch (action_data.m_Stage)
 		{
@@ -116,34 +190,36 @@ class ActionAdvencedDetachMagazine : ActionSequentialBase
 				wpn = Weapon_Base.Cast( action_data.m_MainItem );
 				mag = Magazine.Cast(action_data.m_Target.GetObject());
 		
-				il = new InventoryLocation();
 				action_data.m_Player.GetInventory().FindFreeLocationFor(mag, FindInventoryLocationType.ANY_CARGO, il);
 				action_data.m_Player.GetWeaponManager().DetachMagazine(il,this);			
 				break;
 			
 			case 1:
-				//TODO MW Remove after fix
 				End( action_data );
-				break;
+				break;/*
 				ClearInventoryReservation(action_data);
 				
 				wpn = Weapon_Base.Cast(action_data.m_MainItem);
 				mag = Magazine.Cast(action_data.m_Target.GetObject());
 			
-				if (action_data.m_Player.GetInventory().CanSwapEntities(mag, wpn) )
+				int ur_index = action_data.m_Player.GetHumanInventory().FindUserReservedLocationIndex(wpn);
+			
+				if(ur_index > -1)
+					action_data.m_Player.GetHumanInventory().GetUserReservedLocation(ur_index,il);
+			
+				if ( action_data.m_Player.GetInventory().CanForceSwapEntities(mag, wpn, il) )
 				{
-					action_data.m_Player.GetInventory().SwapEntities(InventoryMode.PREDICTIVE, mag, wpn);
-				}
-				else
-				{
-					il = new InventoryLocation;
-					if(action_data.m_Player.GetInventory().CanForceSwapEntities(mag, wpn, il) )
+					if(GetGame().IsClient() || !GetGame().IsMultiplayer())
 					{
 						action_data.m_Player.GetInventory().ForceSwapEntities(InventoryMode.PREDICTIVE, mag, wpn, il);
 					}
 				}
+				else if (action_data.m_Player.GetInventory().CanSwapEntities(mag, wpn) )
+				{
+					action_data.m_Player.GetInventory().SwapEntities(InventoryMode.PREDICTIVE, mag, wpn);
+				}
 				End( action_data );
-				break;
+				break;*/
 			default:
 				End( action_data );
 				break;

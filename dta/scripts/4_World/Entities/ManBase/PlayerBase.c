@@ -552,8 +552,8 @@ class PlayerBase extends ManBase
 			m_LastShockHitTime = GetGame().GetTime();
 		}
 		
-		 //! DT_STUN & FlashGrenade
-		if( damageType == 3 && ammo == "FlashGrenade_Ammo" )
+		 //! DT_EXPLOSION & FlashGrenade
+		if( damageType == DT_EXPLOSION && ammo == "FlashGrenade_Ammo" )
 		{
 			GetStaminaHandler().DepleteStamina(EStaminaModifiers.OVERALL_DRAIN);
 		}

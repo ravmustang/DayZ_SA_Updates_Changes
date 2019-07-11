@@ -17,7 +17,7 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		string group_name;
 		input.GetActionGroupName( index, group_name );
 		
-		m_Root	= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/options/keybindings_selectors/keybinding_group.layout", parent );
+		m_Root	= GetGame().GetWorkspace().CreateWidgets( GetLayoutName(), parent );
 		Widget subgroup	= m_Root.FindAnyWidget( "group_content" );
 		
 //		for( int i = 0; i < 1; i++ )
@@ -30,6 +30,11 @@ class KeybindingsGroup extends ScriptedWidgetEventHandler
 		subgroup.Update();
 		
 		m_Root.SetHandler( this );
+	}
+	
+	string GetLayoutName()
+	{
+		return "gui/layouts/new_ui/options/keybindings_selectors/keybinding_group.layout";
 	}
 	
 	void InitPresets( int index, Widget parent, Input input )

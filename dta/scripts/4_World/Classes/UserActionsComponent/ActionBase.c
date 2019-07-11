@@ -139,7 +139,10 @@ class ActionBase : ActionBase_Basic
 		if ( (!GetGame().IsMultiplayer() || GetGame().IsClient()) && !IsInstant() )
 		{
 			if (!InventoryReservation(action_data))
+			{
+				ClearInventoryReservation(action_data);
 				return false;
+			}
 		}
 		
 		return true;

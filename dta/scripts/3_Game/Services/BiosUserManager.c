@@ -151,7 +151,7 @@ class BiosUserManager
 			if ( GetGame().GetMission() )
 				GetGame().GetMission().Reset();
 			OnGameNameChanged( user );
-			g_Game.SelectUser();
+			g_Game.SelectUser(GetGame().GetInput().GetUserGamepad(user));
 		}
 	}
 
@@ -159,7 +159,7 @@ class BiosUserManager
 	void OnLoggedOn(BiosUser user)
 	{
 		if ( user && GetSelectedUser() == user )
-			g_Game.SelectUser();
+			g_Game.SelectUser(GetGame().GetInput().GetUserGamepad(user));
 	}
 
 	//! Callback function.

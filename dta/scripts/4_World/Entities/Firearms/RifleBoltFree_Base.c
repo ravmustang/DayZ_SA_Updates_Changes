@@ -361,7 +361,8 @@ class RifleBoltFree_Base extends Rifle_Base
 	override void SetActions()
 	{
 		super.SetActions();
-		AddAction(ActionAdvencedDetachMagazine);
+		AddAction(FirearmActionDetachMagazine);
+		//AddAction(ActionAdvancedDetachMagazine);
 	}
 };
 

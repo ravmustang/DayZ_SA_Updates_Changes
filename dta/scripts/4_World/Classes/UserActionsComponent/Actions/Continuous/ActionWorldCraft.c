@@ -150,7 +150,7 @@ class ActionWorldCraft: ActionContinuousBase
 	override void WriteToContext (ParamsWriteContext ctx, ActionData action_data)
 	{
 		PlayerBase player;
-		Class.CastTo(player, GetGame().GetPlayer());
+		Class.CastTo(player, action_data.m_Player);
 		WorldCraftActionData action_data_wc;
 		Class.CastTo(action_data_wc, action_data);
 
