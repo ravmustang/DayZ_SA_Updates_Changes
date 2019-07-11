@@ -47,6 +47,8 @@ void Error(string err)
 //!Prints content of variable to console/log
 proto void Print(void var);
 
+//!Prints content of variable to RPT file (performance warning - each write means fflush! use with care)
+proto void PrintToRPT(void var);
 	
 /**
 \brief Prints formated text to console/log

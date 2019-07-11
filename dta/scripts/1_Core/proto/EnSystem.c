@@ -339,6 +339,7 @@ proto void GetScreenSize(out int x, out int y);
 
 enum GamepadButton
 {
+	BUTTON_NONE,
 	MENU,
 	VIEW,
 	A,
