@@ -119,6 +119,13 @@
         <btn name="x1ThumbLeft" />
     </input>
 	
+	<input name="UAThrowitem">
+		<btn name="x1X">
+			<event name="doubleclick" />
+		</btn>
+	</input>
+	
+	
 	<!-- User Action -->
 	<input name="UADefaultAction">
 		<btn name="x1TriggerRight" />

@@ -96,7 +96,7 @@ WindowWidgetClass server_browser_tab_root {
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:playstation_buttons image:L1"
+         image0 "set:playstation_buttons image:L2"
          mode blend
          "src alpha" 1
         }
@@ -130,7 +130,7 @@ WindowWidgetClass server_browser_tab_root {
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         image0 "set:playstation_buttons image:R1"
+         image0 "set:playstation_buttons image:R2"
          mode blend
          "src alpha" 1
         }
@@ -735,8 +735,8 @@ WindowWidgetClass server_browser_tab_root {
        vexactsize 1
        style Colorable
        "no focus" 0
-       "next left" "sort_button"
-       "next right" "sort_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -815,8 +815,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "region_button"
-       "next right" "region_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -896,8 +896,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "ping_button"
-       "next right" "ping_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -975,8 +975,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "favorites_button"
-       "next right" "favorites_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -1056,8 +1056,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "friends_button"
-       "next right" "friends_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -1136,8 +1136,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "prev_played_button"
-       "next right" "prev_played_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -1216,8 +1216,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "full_server_button"
-       "next right" "full_server_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {
@@ -1297,8 +1297,8 @@ WindowWidgetClass server_browser_tab_root {
        hexactsize 0
        vexactsize 1
        style Colorable
-       "next left" "accelerated_time_button"
-       "next right" "accelerated_time_button"
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        {

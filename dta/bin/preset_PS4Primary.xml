@@ -118,6 +118,12 @@
 	<input name="UAHoldBreath">
         <btn name="ps4ThumbLeft" />
     </input>
+
+	<input name="UAThrowitem">
+		<btn name="ps4X">
+			<event name="doubleclick" />
+		</btn>
+	</input>
 	
 	<!-- User Action -->
 	<input name="UADefaultAction">

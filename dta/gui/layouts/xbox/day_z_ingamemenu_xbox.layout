@@ -363,8 +363,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "tutorials"
-       "next down" "play_video"
+       "next up" ""
+       "next down" ""
        text_proportion 0.6
        font "gui/fonts/sdf_MetronLight72"
        switch normal
@@ -415,8 +415,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "tutorials"
-       "next down" "play_video"
+       "next up" ""
+       "next down" ""
        text_proportion 0.6
        font "gui/fonts/sdf_MetronLight72"
        switch normal
@@ -494,8 +494,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "continuebtn"
-       "next down" "restartbtn"
+       "next up" ""
+       "next down" ""
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
        switch normal
@@ -549,8 +549,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "exitbtn"
-       "next down" "optionsbtn"
+       "next up" ""
+       "next down" ""
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
        switch normal
@@ -602,8 +602,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "restartbtn"
-       "next down" "invitebtn"
+       "next up" ""
+       "next down" ""
        text "#layout_xbox_ingame_menu_options"
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
@@ -655,8 +655,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "optionsbtn"
-       "next down" "controlsbtn"
+       "next up" ""
+       "next down" ""
        text "#layout_xbox_ingame_menu_invite"
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
@@ -708,8 +708,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "invitebtn"
-       "next down" "onlinebtn"
+       "next up" ""
+       "next down" ""
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
        switch normal
@@ -760,8 +760,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "controlsbtn"
-       "next down" "tutorialsbtn"
+       "next up" ""
+       "next down" ""
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
        switch normal
@@ -812,8 +812,8 @@ FrameWidgetClass FrameWidget {
        "no focus" 0
        "next left" ""
        "next right" ""
-       "next up" "onlinebtn"
-       "next down" "continuebtn"
+       "next up" ""
+       "next down" ""
        text_proportion 0.55
        font "gui/fonts/sdf_MetronLight24"
        switch normal
