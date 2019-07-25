@@ -179,9 +179,6 @@
 	<input name="UAReloadMagazine">
 		<btn name="kR" />
 	</input>
-	<input name="UAQuickReload">
-		<btn name="kR" />
-	</input>
 	
 	<!-- Firearms Zeroing -->
 	<input name="UAZeroingUp">

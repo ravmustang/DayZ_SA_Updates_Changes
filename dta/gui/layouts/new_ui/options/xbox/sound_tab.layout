@@ -109,10 +109,10 @@ FrameWidgetClass sound_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "master_button"
-           "next right" "master_button"
-           "next up" "music_button"
-           "next down" "effects_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass master_button_panel {
              ignorepointer 1
@@ -189,10 +189,10 @@ FrameWidgetClass sound_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "effects_button"
-           "next right" "effects_button"
-           "next up" "master_button"
-           "next down" "voip_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass effects_button_panel {
              ignorepointer 1
@@ -269,10 +269,10 @@ FrameWidgetClass sound_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "voip_button"
-           "next right" "voip_button"
-           "next up" "effects_button"
-           "next down" "music_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass voip_button_panel {
              ignorepointer 1
@@ -350,10 +350,10 @@ FrameWidgetClass sound_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "music_button"
-           "next right" "music_button"
-           "next up" "voip_button"
-           "next down" "master_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass music_button_panel {
              ignorepointer 1

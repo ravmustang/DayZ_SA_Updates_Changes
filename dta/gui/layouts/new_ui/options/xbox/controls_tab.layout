@@ -102,6 +102,7 @@ FrameWidgetClass controls_tab_root {
          Rows 1
          {
           ButtonWidgetClass aimhelper_button {
+           visible 0
            ignorepointer 1
            position 0 0
            size 1 38
@@ -110,10 +111,10 @@ FrameWidgetClass controls_tab_root {
            hexactsize 0
            vexactsize 1
            style Colorable
-           "next left" "language_button"
-           "next right" "language_button"
-           "next up" "player_button"
-           "next down" "fov_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass aimhelper_button_panel {
              ignorepointer 0
@@ -193,10 +194,10 @@ FrameWidgetClass controls_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "controller_invert_button"
-           "next right" "controller_invert_button"
-           "next up" "aimhelper_button"
-           "next down" "controller_vsensitivity_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass controller_invert_button_panel {
              ignorepointer 1
@@ -274,10 +275,10 @@ FrameWidgetClass controls_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "controller_vsensitivity_button"
-           "next right" "controller_vsensitivity_button"
-           "next up" "controller_invert_button"
-           "next down" "controller_hsensitivity_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass controller_vsensitivity_button_panel {
              ignorepointer 1
@@ -356,10 +357,10 @@ FrameWidgetClass controls_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "controller_hsensitivity_button"
-           "next right" "controller_hsensitivity_button"
-           "next up" "controller_vsensitivity_button"
-           "next down" "aimhelper_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass controller_hsensitivity_button_panel {
              ignorepointer 0

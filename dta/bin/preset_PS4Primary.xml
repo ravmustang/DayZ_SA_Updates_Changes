@@ -114,11 +114,14 @@
 			<event name="hold" />
 		</btn>
 	</input>
+	<input name="UAWeaponMeleeAttack">
+		<btn name="ps4X" />
+	</input>
 	
 	<input name="UAHoldBreath">
         <btn name="ps4ThumbLeft" />
     </input>
-
+	
 	<input name="UAThrowitem">
 		<btn name="ps4X">
 			<event name="doubleclick" />
@@ -152,10 +155,8 @@
 	</input>
 	
 	<!-- Firearms Reload, Unjam -->
-	<input name="UAQuickReload">
-		<btn name="ps4Y" >
-			<event name="press" />
-		</btn>	
+	<input name="UAReloadMagazine">
+		<btn name="ps4Y" />
 	</input>
 	
 	<!-- Firearms Zeroing -->

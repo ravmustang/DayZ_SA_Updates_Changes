@@ -3,7 +3,7 @@ PanelWidgetClass BackPanelWidget {
  clipchildren 0
  ignorepointer 1
  position 0 0.1
- size 480 195
+ size 550 195
  halign center_ref
  hexactpos 1
  vexactpos 0
@@ -16,10 +16,11 @@ PanelWidgetClass BackPanelWidget {
    clipchildren 0
    ignorepointer 1
    color 0 0 0 0.9412
-   size 480 40
+   position 0 0
+   size 1 40
    hexactpos 0
    vexactpos 0
-   hexactsize 1
+   hexactsize 0
    vexactsize 1
    image0 "set:dayz_gui image:inv_header_3"
    mode blend
@@ -137,10 +138,10 @@ PanelWidgetClass BackPanelWidget {
    ignorepointer 1
    color 0 0 0 0.8627
    position 0 40
-   size 480 1
+   size 1 1
    hexactpos 1
    vexactpos 1
-   hexactsize 1
+   hexactsize 0
    vexactsize 0
    style Colorable
    Padding 0
@@ -165,10 +166,10 @@ PanelWidgetClass BackPanelWidget {
     GridSpacerWidgetClass GridSpacerWidget1 {
      ignorepointer 1
      position 0 0
-     size 324 0
+     size 1 0
      hexactpos 1
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      priority 202
      style Colorable
@@ -178,7 +179,7 @@ PanelWidgetClass BackPanelWidget {
      Columns 1
      Rows 2
      {
-      WrapSpacerWidgetClass GridSpacerWidget0 {
+      GridSpacerWidgetClass GridSpacerWidget0 {
        visible 1
        ignorepointer 1
        position 0 0
@@ -190,7 +191,12 @@ PanelWidgetClass BackPanelWidget {
        style Colorable
        Padding 4
        Margin 0
+       "Size To Content H" 1
        "Size To Content V" 1
+       content_halign center
+       content_valign center
+       Columns 2
+       Rows 2
        {
         ImageWidgetClass ItemWetnessWidgetBackground {
          visible 1
@@ -199,11 +205,11 @@ PanelWidgetClass BackPanelWidget {
          ignorepointer 1
          color 1 1 1 0
          position 0 0
-         size 160 20
+         size 0.5 20
          halign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
+         hexactsize 0
          vexactsize 1
          image0 "set:dayz_gui image:ColorableBar"
          mode blend
@@ -242,11 +248,11 @@ PanelWidgetClass BackPanelWidget {
          ignorepointer 1
          color 1 1 1 0
          position 0 0
-         size 160 20
+         size 0.5 20
          halign center_ref
          hexactpos 1
          vexactpos 1
-         hexactsize 1
+         hexactsize 0
          vexactsize 1
          image0 "set:dayz_gui image:ColorableBar"
          mode blend
@@ -285,10 +291,10 @@ PanelWidgetClass BackPanelWidget {
          ignorepointer 1
          color 1 1 1 0
          position 0 0
-         size 160 20
+         size 0.5 20
          hexactpos 1
          vexactpos 1
-         hexactsize 1
+         hexactsize 0
          vexactsize 1
          image0 "set:dayz_gui image:ColorableBar"
          mode blend
@@ -327,10 +333,10 @@ PanelWidgetClass BackPanelWidget {
          ignorepointer 1
          color 1 1 1 0
          position 0 0
-         size 160 20
+         size 0.5 20
          hexactpos 1
          vexactpos 1
-         hexactsize 1
+         hexactsize 0
          vexactsize 1
          image0 "set:dayz_gui image:ColorableBar"
          mode blend

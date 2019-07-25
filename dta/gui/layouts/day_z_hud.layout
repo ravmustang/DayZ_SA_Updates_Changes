@@ -3097,7 +3097,6 @@ FrameWidgetClass HudFrameWidget {
      vexactpos 1
      hexactsize 1
      vexactsize 1
-     text "#layout_xbox_hud_text_info"
      "text halign" center
      "text valign" center
     }
@@ -3560,7 +3559,6 @@ FrameWidgetClass HudFrameWidget {
                vexactpos 1
                hexactsize 1
                vexactsize 1
-               text "#layout_hud_description_up"
                font "gui/fonts/sdf_MetronBook24"
                "shadow size" 3
                "shadow color" 0 0 0 1
@@ -3572,7 +3570,6 @@ FrameWidgetClass HudFrameWidget {
                vexactpos 1
                hexactsize 1
                vexactsize 1
-               text "#layout_hud_target_down"
                font "gui/fonts/sdf_MetronBook24"
                "shadow size" 3
                "shadow color" 0 0 0 1
@@ -3800,7 +3797,7 @@ FrameWidgetClass HudFrameWidget {
              vexactsize 1
              scaled 1
              style None
-             text "layout_hud_action_single"
+             text "#layout_hud_action_target_interact"
              font "gui/fonts/sdf_MetronBook72"
              "shadow size" 3
              "shadow color" 0 0 0 1
@@ -4031,7 +4028,7 @@ FrameWidgetClass HudFrameWidget {
              vexactsize 1
              scaled 1
              style None
-             text "layout_hud_action_single"
+             text "#layout_hud_action_target_interact"
              font "gui/fonts/sdf_MetronBook72"
              "shadow size" 3
              "shadow color" 0 0 0 1
@@ -4146,7 +4143,7 @@ FrameWidgetClass HudFrameWidget {
              vexactsize 1
              scaled 1
              style None
-             text "layout_hud_action_single"
+             text "#layout_hud_action_single"
              font "gui/fonts/sdf_MetronBook72"
              "shadow size" 3
              "shadow color" 0 0 0 1

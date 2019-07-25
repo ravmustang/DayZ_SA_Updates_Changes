@@ -11,7 +11,7 @@ FrameWidgetClass rootFrame {
    visible 1
    clipchildren 0
    position 320 0
-   size 300 660
+   size 330 660
    valign center_ref
    hexactpos 1
    vexactpos 1
@@ -23,14 +23,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 0
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -39,7 +39,7 @@ FrameWidgetClass rootFrame {
      {
       RichTextWidgetClass TextWidget0 {
        visible 1
-       size 1 1
+       size 1 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -50,7 +50,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -62,14 +63,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 50
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -78,7 +79,7 @@ FrameWidgetClass rootFrame {
      {
       RichTextWidgetClass TextWidget1 {
        visible 1
-       size 1 1
+       size 1 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -89,7 +90,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -101,14 +103,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 100
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -117,7 +119,7 @@ FrameWidgetClass rootFrame {
      {
       RichTextWidgetClass TextWidget2 {
        visible 1
-       size 1 1
+       size 1 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -128,7 +130,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -140,14 +143,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 150
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -156,7 +159,7 @@ FrameWidgetClass rootFrame {
      {
       RichTextWidgetClass TextWidget3 {
        visible 1
-       size 1 1
+       size 1 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -167,7 +170,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -179,14 +183,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 200
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -196,7 +200,7 @@ FrameWidgetClass rootFrame {
       RichTextWidgetClass TextWidget4 {
        visible 1
        position 0 0
-       size 1 1
+       size 1 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -207,7 +211,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -219,14 +224,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 250
-     size 300 30
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -235,7 +240,7 @@ FrameWidgetClass rootFrame {
      {
       RichTextWidgetClass TextWidget5 {
        visible 1
-       size 1 1
+       size 1 60
        halign center_ref
        valign center_ref
        hexactpos 1
@@ -246,7 +251,7 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
        "size to text h" 0
        "size to text v" 1
        "text halign" center
@@ -259,14 +264,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 300
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -286,7 +291,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -298,14 +304,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 350
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -325,7 +331,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -337,14 +344,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 400
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -364,7 +371,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -376,14 +384,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 450
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -403,7 +411,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -415,14 +424,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 500
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -442,7 +451,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -454,14 +464,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 550
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -482,7 +492,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -494,14 +505,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 600
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -521,7 +532,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -533,14 +545,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 650
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -560,7 +572,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -572,14 +585,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 700
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -600,7 +613,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -613,7 +627,7 @@ FrameWidgetClass rootFrame {
   FrameWidgetClass InfoTextLeft {
    clipchildren 0
    position 320 0
-   size 300 700
+   size 330 700
    halign right_ref
    valign center_ref
    hexactpos 1
@@ -626,14 +640,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 0
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -653,7 +667,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -665,14 +680,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 50
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -692,7 +707,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -704,14 +720,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 100
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -731,7 +747,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -743,14 +760,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 150
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -770,7 +787,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -782,14 +800,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 200
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -809,7 +827,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -821,14 +840,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 250
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -848,7 +867,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -860,14 +880,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 300
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -887,7 +907,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -899,14 +920,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 350
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -926,7 +947,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -938,14 +960,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 400
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -965,7 +987,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -977,14 +1000,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 450
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -1004,7 +1027,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -1016,14 +1040,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 500
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -1043,7 +1067,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -1055,14 +1080,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 550
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -1082,7 +1107,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -1094,14 +1120,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 600
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -1121,7 +1147,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -1133,14 +1160,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 650
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -1160,7 +1187,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center
@@ -1172,14 +1200,14 @@ FrameWidgetClass rootFrame {
      visible 1
      color 0 0 0 1
      position 0 700
-     size 300 80
+     size 1 70
      hexactpos 0
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style DayZDefaultPanel
      Padding 0
-     Margin 5
+     Margin 0
      "Size To Content V" 1
      content_halign center
      content_valign center
@@ -1199,7 +1227,8 @@ FrameWidgetClass rootFrame {
        font "gui/fonts/sdf_MetronLight24"
        "text spacing" 0 5
        "exact text" 1
-       "exact text size" 20
+       "exact text size" 18
+       "size to text h" 0
        "size to text v" 1
        "text halign" center
        "text valign" center

@@ -185,7 +185,6 @@
     <input name="UADropitem" />
     <input name="UAThrowitem" />
     <input name="UAToggleWeapons" />
-    <input name="UAQuickReload" />
     <input name="UAUIQuickbarToggle" />
     <input name="UATempRaiseWeapon" />
     <input name="UAReloadMagazine" />

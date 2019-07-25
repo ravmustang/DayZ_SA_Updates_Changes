@@ -110,10 +110,10 @@ FrameWidgetClass game_tab_root {
            hexactsize 0
            vexactsize 1
            style Colorable
-           "next left" "language_button"
-           "next right" "language_button"
-           "next up" "player_button"
-           "next down" "fov_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass language_button_panel {
              ignorepointer 0
@@ -262,10 +262,10 @@ FrameWidgetClass game_tab_root {
            userID 42
            style Colorable
            "no focus" 0
-           "next left" "fov_button"
-           "next right" "fov_button"
-           "next up" "player_button"
-           "next down" "brightness_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass fov_button_panel {
              ignorepointer 1
@@ -346,10 +346,10 @@ FrameWidgetClass game_tab_root {
            userID 42
            style Colorable
            "no focus" 0
-           "next left" "brightness_button"
-           "next right" "brightness_button"
-           "next up" "fov_button"
-           "next down" "hud_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass brightness_setting {
              ignorepointer 0
@@ -494,10 +494,10 @@ FrameWidgetClass game_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "hud_button"
-           "next right" "hud_button"
-           "next up" "brightness_button"
-           "next down" "crosshair_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass hud_button_panel {
              ignorepointer 1
@@ -576,10 +576,10 @@ FrameWidgetClass game_tab_root {
            vexactsize 1
            style Colorable
            "no focus" 0
-           "next left" "crosshair_button"
-           "next right" "crosshair_button"
-           "next up" "hud_button"
-           "next down" "game_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass crosshair_button_panel {
              ignorepointer 1
@@ -725,10 +725,10 @@ FrameWidgetClass game_tab_root {
            hexactsize 0
            vexactsize 1
            style Colorable
-           "next left" "game_button"
-           "next right" "game_button"
-           "next up" "crosshair_button"
-           "next down" "admin_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass game_button_panel {
              ignorepointer 0
@@ -807,10 +807,10 @@ FrameWidgetClass game_tab_root {
            hexactsize 0
            vexactsize 1
            style Colorable
-           "next left" "admin_button"
-           "next right" "admin_button"
-           "next up" "game_button"
-           "next down" "player_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass admin_button_panel {
              ignorepointer 0
@@ -889,10 +889,10 @@ FrameWidgetClass game_tab_root {
            hexactsize 0
            vexactsize 1
            style Colorable
-           "next left" "player_button"
-           "next right" "player_button"
-           "next up" "admin_button"
-           "next down" "language_button"
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
            {
             GridSpacerWidgetClass player_button_panel {
              ignorepointer 0

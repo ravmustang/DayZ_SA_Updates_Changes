@@ -13,7 +13,7 @@ PanelWidgetClass rootFrame {
   ImageWidgetClass XboxControlsImage {
    visible 0
    inheritalpha 0
-   ignorepointer 0
+   ignorepointer 1
    position 0 0.03
    size 792 554
    halign center_ref
@@ -35,6 +35,7 @@ PanelWidgetClass rootFrame {
    {
     PanelWidgetClass xb_button_marker_X {
      visible 1
+     ignorepointer 1
      position 0.687 0.2676
      size 7 7
      hexactpos 0
@@ -46,6 +47,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_UP {
      visible 1
+     ignorepointer 1
      position 0.3626 0.4328
      size 7 7
      hexactpos 0
@@ -57,6 +59,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_R {
      visible 1
+     ignorepointer 1
      position 0.63 0.4855
      size 7 7
      hexactpos 0
@@ -68,6 +71,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_A {
      visible 1
+     ignorepointer 1
      position 0.757 0.3663
      size 7 7
      hexactpos 0
@@ -79,6 +83,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_LEFT {
      visible 1
+     ignorepointer 1
      position 0.308 0.505
      size 7 7
      hexactpos 0
@@ -90,6 +95,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_DOWN {
      visible 1
+     ignorepointer 1
      position 0.3626 0.5742
      size 7 7
      hexactpos 0
@@ -101,6 +107,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_RIGHT {
      visible 1
+     ignorepointer 1
      position 0.4156 0.505
      size 7 7
      hexactpos 0
@@ -112,6 +119,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_Y {
      visible 1
+     ignorepointer 1
      position 0.7572 0.175
      size 7 7
      hexactpos 0
@@ -123,6 +131,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_B {
      visible 1
+     ignorepointer 1
      position 0.82687 0.27343
      size 7 7
      hexactpos 0
@@ -134,6 +143,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_START {
      visible 1
+     ignorepointer 1
      position 0.569 0.2311
      size 7 7
      hexactpos 0
@@ -145,6 +155,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_BACK {
      visible 1
+     ignorepointer 1
      position 0.4218 0.2311
      size 7 7
      hexactpos 0
@@ -156,6 +167,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_L {
      visible 1
+     ignorepointer 1
      position 0.237 0.2685
      size 7 7
      hexactpos 0
@@ -167,6 +179,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_LTilt {
      visible 1
+     ignorepointer 1
      position 0.1902 0.2685
      size 7 7
      hexactpos 0
@@ -178,6 +191,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_RS {
      visible 1
+     ignorepointer 1
      position 0.6904 0.0149
      size 7 7
      hexactpos 0
@@ -189,6 +203,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_RT {
      visible 1
+     ignorepointer 1
      position 0.7841 0.0478
      size 7 7
      hexactpos 0
@@ -200,6 +215,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_LS {
      visible 1
+     ignorepointer 1
      position 0.3008 0.0149
      size 7 7
      hexactpos 0
@@ -211,6 +227,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass xb_button_marker_LT {
      visible 1
+     ignorepointer 1
      position 0.2054 0.0478
      size 7 7
      hexactpos 0
@@ -224,8 +241,9 @@ PanelWidgetClass rootFrame {
   }
   ImageWidgetClass PSControlsImage {
    visible 0
+   disabled 0
    inheritalpha 0
-   ignorepointer 0
+   ignorepointer 1
    position 0 0.03
    size 796 449
    halign center_ref
@@ -247,6 +265,7 @@ PanelWidgetClass rootFrame {
    {
     PanelWidgetClass ps_button_marker_X {
      visible 1
+     ignorepointer 1
      position 0.737 0.2898
      size 7 7
      hexactpos 0
@@ -258,6 +277,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_UP {
      visible 1
+     ignorepointer 1
      position 0.18 0.2
      size 7 7
      hexactpos 0
@@ -269,6 +289,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_R {
      visible 1
+     ignorepointer 1
      position 0.65778 0.51258
      size 7 7
      hexactpos 0
@@ -280,6 +301,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_A {
      visible 1
+     ignorepointer 1
      position 0.811 0.4077
      size 7 7
      hexactpos 0
@@ -291,6 +313,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_LEFT {
      visible 1
+     ignorepointer 1
      position 0.125 0.288
      size 7 7
      hexactpos 0
@@ -302,6 +325,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_DOWN {
      visible 1
+     ignorepointer 1
      position 0.18 0.38
      size 7 7
      hexactpos 0
@@ -313,6 +337,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_RIGHT {
      visible 1
+     ignorepointer 1
      position 0.24 0.288
      size 7 7
      hexactpos 0
@@ -324,6 +349,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_Y {
      visible 1
+     ignorepointer 1
      position 0.811 0.1701
      size 7 7
      hexactpos 0
@@ -335,6 +361,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_B {
      visible 1
+     ignorepointer 1
      position 0.885 0.2898
      size 7 7
      hexactpos 0
@@ -346,6 +373,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_START {
      visible 1
+     ignorepointer 1
      position 0.70232 0.13016
      size 7 7
      hexactpos 0
@@ -357,6 +385,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_BACK {
      visible 1
+     ignorepointer 1
      position 0.5 0.2311
      size 7 7
      hexactpos 0
@@ -368,6 +397,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_L {
      visible 1
+     ignorepointer 1
      position 0.33143 0.50731
      size 7 7
      hexactpos 0
@@ -379,6 +409,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_LTilt {
      visible 1
+     ignorepointer 1
      position 0.2763 0.51223
      size 7 7
      hexactpos 0
@@ -390,6 +421,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_RS {
      visible 1
+     ignorepointer 1
      position 0.8015 0.0149
      size 7 7
      hexactpos 0
@@ -401,6 +433,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_RT {
      visible 1
+     ignorepointer 1
      position 0.86603 0.03057
      size 7 7
      hexactpos 0
@@ -412,6 +445,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_LS {
      visible 1
+     ignorepointer 1
      position 0.18693 0.00998
      size 7 7
      hexactpos 0
@@ -423,6 +457,7 @@ PanelWidgetClass rootFrame {
     }
     PanelWidgetClass ps_button_marker_LT {
      visible 1
+     ignorepointer 1
      position 0.12208 0.0281
      size 7 7
      hexactpos 0
@@ -435,8 +470,9 @@ PanelWidgetClass rootFrame {
    }
   }
   FrameWidgetClass InfoTextRight {
+   ignorepointer 1
    position 80 150
-   size 380 900
+   size 500 900
    hexactpos 1
    vexactpos 1
    hexactsize 1
@@ -446,12 +482,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget0 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -465,6 +502,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget0 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -487,12 +525,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget1 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.1
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -506,6 +545,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget1 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -528,12 +568,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget2 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.2
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -547,6 +588,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget2 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -569,12 +611,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget3 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.3
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -588,6 +631,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget3 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -610,12 +654,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget4 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.4
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -629,6 +674,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget4 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -651,12 +697,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget5 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.5
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -670,6 +717,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget5 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -692,12 +740,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget6 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.6
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -711,6 +760,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget6 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -733,12 +783,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget7 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.7
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -752,6 +803,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget7 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -774,12 +826,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget8 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.8
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -793,6 +846,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget8 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -815,12 +869,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget9 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.9
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -834,6 +889,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget9 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -856,8 +912,9 @@ PanelWidgetClass rootFrame {
    }
   }
   FrameWidgetClass InfoTextLeft {
+   ignorepointer 1
    position 80 150
-   size 380 900
+   size 500 900
    halign right_ref
    hexactpos 1
    vexactpos 1
@@ -868,12 +925,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget10 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -887,6 +945,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget10 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -909,12 +968,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget11 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.1
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -928,6 +988,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget11 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -950,12 +1011,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget12 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.2
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -969,6 +1031,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget12 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -991,12 +1054,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget13 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.3
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1010,6 +1074,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget13 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -1032,12 +1097,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget14 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.4
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1051,6 +1117,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget14 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -1073,12 +1140,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget15 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.5
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1092,6 +1160,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget15 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -1114,12 +1183,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget16 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.6
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1133,6 +1203,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget16 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -1155,12 +1226,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget17 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.7
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1174,6 +1246,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget17 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -1196,12 +1269,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget18 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.8
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1215,6 +1289,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget18 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref
@@ -1237,12 +1312,13 @@ PanelWidgetClass rootFrame {
     GridSpacerWidgetClass PanelWidget19 {
      visible 0
      clipchildren 1
+     ignorepointer 1
      color 0 0 0 1
      position 0 0.9
-     size 380 80
+     size 1 80
      hexactpos 0
      vexactpos 0
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      scaled 1
      style DayZDefaultPanel
@@ -1256,6 +1332,7 @@ PanelWidgetClass rootFrame {
      {
       MultilineTextWidgetClass TextWidget19 {
        visible 1
+       ignorepointer 1
        size 360 60
        halign center_ref
        valign center_ref

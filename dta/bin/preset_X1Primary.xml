@@ -114,6 +114,9 @@
 			<event name="hold" />
 		</btn>
 	</input>
+	<input name="UAWeaponMeleeAttack">
+		<btn name="x1X" />
+	</input>
 	
 	<input name="UAHoldBreath">
         <btn name="x1ThumbLeft" />
@@ -153,10 +156,8 @@
 	</input>
 	
 	<!-- Firearms Reload, Unjam -->
-	<input name="UAQuickReload">
-		<btn name="x1Y" >
-			<event name="press" />
-		</btn>	
+	<input name="UAReloadMagazine">
+		<btn name="x1Y" />
 	</input>
 	
 	<!-- Firearms Zeroing -->

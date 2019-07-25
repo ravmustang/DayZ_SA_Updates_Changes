@@ -41,7 +41,6 @@
 		<input name="UAHeavyMeleeAttack" loc="STR_USRACT_UAHeavyMeleeAttack" visible="false" />
 		<input name="UAWeaponMeleeAttack" loc="STR_USRACT_UAHeavyMeleeAttack" />
 		<input name="UAReloadMagazine" loc="STR_USRACT_RELOAD_MAGAZINE" />
-		<input name="UAQuickReload" loc="STR_USRACT_UAQuickReload" />
 		<input name="UATempRaiseWeapon" loc="STR_USRACT_TEMP_RAISE_WEAPON" />
 		<input name="UAToggleRaiseWeapon" loc="" visible="false" />
 		<input name="UATempOptics" loc="" visible="false" />
