@@ -158,6 +158,11 @@ class MissionMainMenu extends MissionBase
 		}
 	}
 	
+	AbstractWave GetMenuMusic()
+	{
+		return m_MenuMusic;
+	}
+	
 	int SortedInsert( array<int> list, int number )
 	{
 		int find_number = number;

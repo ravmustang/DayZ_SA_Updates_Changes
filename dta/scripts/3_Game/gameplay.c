@@ -555,6 +555,15 @@ class Hud: Managed
 	bool IsXboxDebugCursorEnabled();
 	void ShowVehicleInfo();
 	void HideVehicleInfo();
+	
+	void ShowQuickbarUI( bool show );
+	void ShowQuickbarPlayer( bool show );
+	void ShowHudPlayer( bool show );
+	void ShowHudUI( bool show );
+	void ShowHudInventory( bool show );
+	void ShowQuickBar( bool show );
+	void ShowHud( bool show );
+	
 	void OnResizeScreen();
 
 	void SetPermanentCrossHair( bool show ) {}
@@ -649,7 +658,6 @@ class Mission
 	
 	void ShowChat() {}
 	void HideChat() {}
-
 };
 
 // -------------------------------------------------------------------------

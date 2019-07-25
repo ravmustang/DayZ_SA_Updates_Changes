@@ -1,7 +1,7 @@
 class ModsMenuSimpleEntry extends ScriptedWidgetEventHandler
 {
 	protected ImageWidget		m_Icon;
-	protected ImageWidget		m_Hover;
+	protected Widget			m_Hover;
 
 	protected bool				m_HasLogoOver;
 	protected ModInfo			m_Data;

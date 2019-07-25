@@ -508,7 +508,7 @@ class DayZAnimal extends DayZCreatureAI
 			{
 				float damage = m_TransportHitVelocity.Length();
 				//Print("Transport damage: " + damage.ToString() + " velocity: " +  m_TransportHitVelocity.Length().ToString());
-				ProcessDirectDamage( 3, transport, "", "TransportHit", "0 0 0", damage );
+				ProcessDirectDamage( DT_CUSTOM, transport, "", "TransportHit", "0 0 0", damage );
 			}
 			else
 				m_TransportHitRegistered = false; // EEHitBy is not called if no damage	

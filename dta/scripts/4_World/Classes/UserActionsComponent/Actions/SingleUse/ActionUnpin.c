@@ -17,7 +17,7 @@ class ActionUnpin extends ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "Unpin";
+		return "#unpin";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

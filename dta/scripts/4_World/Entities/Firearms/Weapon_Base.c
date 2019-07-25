@@ -815,12 +815,18 @@ class Weapon_Base extends Weapon
 		super.SetActions();
 		AddAction(FirearmActionUnjam);
 		AddAction(FirearmActionAttachMagazine);
-		//AddAction(FirearmActionAttachMagazineQuick); // Easy reload
 		AddAction(FirearmActionLoadBullet);
-		//AddAction(FirearmActionLoadBulletQuick); // Easy reload
 		AddAction(FirearmActionMechanicManipulate);
 		AddAction(ActionTurnOnWeaponFlashlight);
 		AddAction(ActionTurnOffWeaponFlashlight);
+		#ifdef SERVER_FOR_CONSOLE
+			AddAction(FirearmActionAttachMagazineQuick); // Easy reload
+			AddAction(FirearmActionLoadBulletQuick); // Easy reload
+		#endif
+		#ifdef PLATFORM_CONSOLE
+			AddAction(FirearmActionAttachMagazineQuick); // Easy reload
+			AddAction(FirearmActionLoadBulletQuick); // Easy reload
+		#endif
 	}
 };
 

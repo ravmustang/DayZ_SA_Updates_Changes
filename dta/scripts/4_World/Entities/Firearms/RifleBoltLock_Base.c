@@ -379,13 +379,13 @@ class RifleBoltLock_Base extends Rifle_Base
 
 
 		// replace magazine
-		m_fsm.AddTransition(new WeaponTransition(   C11, __S__, Reload_C11)); // swap in Chg/b1/m1
+		m_fsm.AddTransition(new WeaponTransition(   C11, __S__, Reload_C11, NULL, new WeaponGuardCanSwapMag(this))); // swap in Chg/b1/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_C11, _fin_,    C11));
 		m_fsm.AddTransition(new WeaponTransition(Reload_C11, _abt_,    C11, NULL, new WeaponGuardHasMag(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_C11, _abt_,    C10));
 
 	
-		m_fsm.AddTransition(new WeaponTransition(   C01, __S__, Reload_C01)); // swap in CLO/b0/m1
+		m_fsm.AddTransition(new WeaponTransition(   C01, __S__, Reload_C01, NULL, new WeaponGuardCanSwapMag(this))); // swap in CLO/b0/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_C01, _fin_,   C01, NULL, new WeaponGuardChamberEmpty(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_C01, _fin_,   C11));
 		m_fsm.AddTransition(new WeaponTransition(Reload_C01, _abt_,    C11, NULL, new WeaponGuardChamberFull(this)) );
@@ -393,7 +393,7 @@ class RifleBoltLock_Base extends Rifle_Base
 		m_fsm.AddTransition(new WeaponTransition(Reload_C01, _abt_,    C00));
 		
 	
-		m_fsm.AddTransition(new WeaponTransition(   L01, __S__, Reload_L01)); // swap in CLO/b0/m1
+		m_fsm.AddTransition(new WeaponTransition(   L01, __S__, Reload_L01, NULL, new WeaponGuardCanSwapMag(this))); // swap in CLO/b0/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_L01, _fin_,   C01, NULL, new WeaponGuardChamberEmpty(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_L01, _fin_,   C11));
 			Reload_L01.AddTransition(new WeaponTransition(Reload_L01.m_start ,    _abt_,   L01));
@@ -404,7 +404,7 @@ class RifleBoltLock_Base extends Rifle_Base
 			Reload_C01.AddTransition(new WeaponTransition(Reload_C01.m_onCK,      _abt_,   C01));
 			Reload_L01.AddTransition(new WeaponTransition(Reload_L01.m_chamber,   _abt_,   C11));
 
-		m_fsm.AddTransition(new WeaponTransition(   JF1, __S__, Reload_JF1)); // swap in JAM/b1/m1
+		m_fsm.AddTransition(new WeaponTransition(   JF1, __S__, Reload_JF1, NULL, new WeaponGuardCanSwapMag(this))); // swap in JAM/b1/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_JF1, _fin_,    JF1));
 		m_fsm.AddTransition(new WeaponTransition(Reload_JF1, _abt_,    JF1, NULL, new WeaponGuardHasMag(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_JF1, _abt_,    JF0));

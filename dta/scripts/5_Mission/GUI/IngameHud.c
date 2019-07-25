@@ -1073,13 +1073,13 @@ class IngameHud extends Hud
 		return m_HudHidePlayer;
 	}
 	
-	void ShowQuickbarUI( bool show )
+	override void ShowQuickbarUI( bool show )
 	{
 		m_QuickbarHideUI = !show;
 		RefreshQuickbarVisibility();
 	}
 	
-	void ShowQuickbarPlayer( bool show )
+	override void ShowQuickbarPlayer( bool show )
 	{
 		if( !m_QuickbarState )
 		{
@@ -1102,25 +1102,25 @@ class IngameHud extends Hud
 		RefreshQuickbarVisibility();
 	}
 	
-	void ShowHudPlayer( bool show )
+	override void ShowHudPlayer( bool show )
 	{
 		m_HudHidePlayer = !show;
 		RefreshHudVisibility();
 	}
 	
-	void ShowHudUI( bool show )
+	override void ShowHudUI( bool show )
 	{
 		m_HudHideUI = !show;
 		RefreshHudVisibility();
 	}
 	
-	void ShowHudInventory( bool show )
+	override void ShowHudInventory( bool show )
 	{
 		m_HudInventory = show;
 		RefreshHudVisibility();
 	}
 
-	void ShowQuickBar( bool show )
+	override void ShowQuickBar( bool show )
 	{
 		#ifdef PLATFORM_CONSOLE
 			return;
@@ -1132,7 +1132,7 @@ class IngameHud extends Hud
 		RefreshQuickbarVisibility();
 	}
 	
-	void ShowHud( bool show )
+	override void ShowHud( bool show )
 	{
 		m_HudState = show;
 		g_Game.SetProfileOption( EDayZProfilesOptions.HUD, show );

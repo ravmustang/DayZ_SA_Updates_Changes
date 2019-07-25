@@ -415,7 +415,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 		if( m_Filters.FavoriteIsSet() )
 		{
 			#ifdef PLATFORM_CONSOLE
-			bool is_fav = m_Menu.IsFavorited( result.m_Id );
+			string server_id = result.m_HostIp + ":" + result.m_HostPort;
+			bool is_fav = m_Menu.IsFavorited( server_id );
 			#else
 			bool is_fav = result.m_Favorite;
 			#endif
@@ -492,11 +493,6 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	int AddSorted( GetServersResultRow entry )
 	{	
 		return -1;
-	}
-	
-	void SetFavoriteConsoles( string uid, bool favorite )
-	{
-		m_Menu.SetFavoriteConsoles( uid, favorite );
 	}
 	
 	void Unfavorite( string uid )

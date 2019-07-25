@@ -442,7 +442,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		
 #ifdef PLATFORM_CONSOLE
 		//Save Data Console
-		m_Tab.GetRootMenu().SetFavoriteConsoles(m_ServerData.m_Id, m_IsFavorited);
+		GetServersResultRow data = m_ServerData;
+		m_Tab.GetRootMenu().SetFavoriteConsoles(data.m_HostIp, data.m_HostPort, m_IsFavorited);
 #else
 		//Save Data PC
 		GetServersResultRow data = m_ServerData;

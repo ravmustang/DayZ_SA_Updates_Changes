@@ -14,6 +14,7 @@ class EffectSound : Effect
 	protected Object					m_SoundParent;
 	protected WaveKind					m_SoundWaveKind;
 	protected bool						m_SoundLoop;
+	protected bool						m_SetEnvVariables;
 	protected bool						m_SoundAutodestroy;
 	protected bool						m_SoundWaveIsPlaying;
 	protected bool						m_SoundWaveStarting;
@@ -145,6 +146,14 @@ class EffectSound : Effect
 	}
 	
 	//=====================================
+	// SetEnviromentVariables
+	//=====================================
+	void SetEnviromentVariables(bool setEnvVariables)
+	{
+		m_SetEnvVariables = setEnvVariables;
+	}
+	
+	//=====================================
 	// IsSoundPlaying
 	//=====================================
 	bool IsSoundPlaying()
@@ -184,6 +193,8 @@ class EffectSound : Effect
 			}
 			
 			m_SoundObjectBuilder = new SoundObjectBuilder( m_SoundParams );
+			if(m_SetEnvVariables)
+				m_SoundObjectBuilder.UpdateEnvSoundControllers(GetPosition());
 			m_SoundObject = m_SoundObjectBuilder.BuildSoundObject();
 			m_SoundObject.SetKind( m_SoundWaveKind );
 		}
@@ -213,9 +224,16 @@ class EffectSound : Effect
 		
 		if (m_SoundSetName != "")
 		{
+			bool was_loaded = (m_SoundParams != NULL);
 			bool is_sound_valid = SoundLoad();
 			if ( is_sound_valid )
 			{
+				if(m_SetEnvVariables && was_loaded)
+				{
+					m_SoundObjectBuilder.UpdateEnvSoundControllers(GetPosition());
+					m_SoundObject = m_SoundObjectBuilder.BuildSoundObject();
+					m_SoundObject.SetKind( m_SoundWaveKind );
+				}
 				m_SoundObject.SetPosition( GetPosition() );
 				m_SoundWaveObject = GetGame().GetSoundScene().Play3D( m_SoundObject, m_SoundObjectBuilder );
 				m_SoundWaveLenght = m_SoundWaveObject.GetLength();

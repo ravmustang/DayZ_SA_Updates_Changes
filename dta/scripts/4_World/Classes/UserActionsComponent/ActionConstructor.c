@@ -288,13 +288,20 @@ class ActionConstructor
 		
 		actions.Insert(ActionLoadMagazineQuick);
 		actions.Insert(FirearmActionAttachMagazineQuick);
-		//actions.Insert(FirearmActionLoadBulletQuick);
-		//actions.Insert(FirearmActionLoadMultiBulletQuick);
 		actions.Insert(FirearmActionMechanicManipulate);
 		actions.Insert(FirearmActionUnjam);
 		
 		actions.Insert(FirearmActionDetachMagazine);		
 		//actions.Insert(ActionAdvancedDetachMagazine);
+		
+		#ifdef SERVER_FOR_CONSOLE
+			actions.Insert(FirearmActionLoadBulletQuick);
+			actions.Insert(FirearmActionLoadMultiBulletQuick);
+		#endif
+		#ifdef PLATFORM_CONSOLE
+			actions.Insert(FirearmActionLoadBulletQuick);
+			actions.Insert(FirearmActionLoadMultiBulletQuick);
+		#endif
 		
 	}
 };

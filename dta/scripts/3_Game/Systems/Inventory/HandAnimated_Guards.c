@@ -127,11 +127,11 @@ bool SelectAnimationOfForceSwapInHands (notnull Man player, notnull InventoryLoc
 {
 	if (player.IsInTransport())
 		return false;
+	
+	hndDebugPrint("[hndfsm] SlotToAnimType - old_src=" + InventoryLocation.DumpToStringNullSafe(old_src) + " new_src=" + InventoryLocation.DumpToStringNullSafe(new_src) + " old_dst=" + InventoryLocation.DumpToStringNullSafe(old_dst) + " new_dst=" + InventoryLocation.DumpToStringNullSafe(new_dst));
 
-	if (old_src.GetItem().GetHierarchyRootPlayer() == player && new_src.GetItem().GetHierarchyRootPlayer() == player)
+	if (old_src.GetItem().GetHierarchyRootPlayer() == player || new_src.GetItem().GetHierarchyRootPlayer() == player)
 	{
-		hndDebugPrint("[hndfsm] SlotToAnimType - old_src=" + InventoryLocation.DumpToStringNullSafe(old_src) + " new_src=" + InventoryLocation.DumpToStringNullSafe(new_src) + " old_dst=" + InventoryLocation.DumpToStringNullSafe(old_dst) + " new_dst=" + InventoryLocation.DumpToStringNullSafe(new_dst));
-		
 		animType1 = SlotToAnimType(player, new_dst, new_src);
 		animType2 = SlotToAnimType(player, old_src, old_dst);
 		//Print("animType1 = " + animType1);

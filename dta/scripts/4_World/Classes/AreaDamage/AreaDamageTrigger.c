@@ -106,7 +106,7 @@ class AreaDamageTrigger extends Trigger
 			if( m_AreaDamageType )
 			{
 			 	m_AreaDamageType.OnEnter(obj);
-				Print("On Enter called!");
+				//Print("On Enter called!");
 			}
 		}
 	}
@@ -122,7 +122,7 @@ class AreaDamageTrigger extends Trigger
 			if( m_AreaDamageType )
 			{
 		 		m_AreaDamageType.OnLeave(obj);
-				Print("On Leave called!");
+				//Print("On Leave called!");
 			}
 		}
 	}

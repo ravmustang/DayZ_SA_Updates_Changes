@@ -255,20 +255,6 @@ class MissionGameplay extends MissionBase
 		}
 
 #ifdef PLATFORM_CONSOLE
-		//Quick Reload Weapon
-		if ( !menu && input.LocalPress("UAQuickReload",false) )
-		{
-			if ( !GetGame().IsInventoryOpen() && playerPB )
-			{
-				EntityAI entity_hands = playerPB.GetHumanInventory().GetEntityInHands();
-				
-				if ( entity_hands && entity_hands.IsWeapon() )
-				{
-					playerPB.QuickReloadWeapon( entity_hands );
-				}
-			}
-		}
-
 		//Radial quickbar
 		if( input.LocalPress("UAUIQuickbarRadialOpen",false) )
 		{
@@ -540,7 +526,7 @@ class MissionGameplay extends MissionBase
 					PlayerControlDisable(INPUT_EXCLUDE_MOUSE_RADIAL);
 					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
 				}
-				else if( IsPaused() )
+				else if( IsPaused() && !g_Game.GetUIManager().ScreenFadeVisible() )
 				{
 					if( input.LocalPress("UAUIMenu",false) )
 					{
@@ -903,14 +889,14 @@ class MissionGameplay extends MissionBase
 		CloseAllMenus();
 		
 		// open ingame menu
-		GetUIManager().EnterScriptedMenu( MENU_INGAME, GetGame().GetUIManager().GetMenu() );
+		GetUIManager().EnterScriptedMenu( MENU_INGAME, null );
 		PlayerControlDisable(INPUT_EXCLUDE_ALL);
 	}
 	
 	override void Continue()
 	{
 		int menu_id = GetGame().GetUIManager().GetMenu().GetID();
-		if ( !IsPaused() || ( menu_id != MENU_INGAME && menu_id != MENU_LOGOUT ) )
+		if ( !IsPaused() || ( menu_id != MENU_INGAME && menu_id != MENU_LOGOUT ) || ( m_Logout && m_Logout.layoutRoot.IsVisible() ) )
 		{
 			return;
 		}

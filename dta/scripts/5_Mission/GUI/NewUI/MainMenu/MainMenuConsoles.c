@@ -66,7 +66,7 @@ class MainMenuConsole extends UIScriptedMenu
 	override bool OnClick( Widget w, int x, int y, int button )
 	{
 		if( m_IsShown )
-		{
+		{			
 			if( w == m_Play )
 			{
 				m_LastFocusedButton = m_Play;
@@ -81,6 +81,7 @@ class MainMenuConsole extends UIScriptedMenu
 			}
 			else if ( w == m_PlayVideo )
 			{
+				m_Mission.StopMusic();
 				m_LastFocusedButton = m_PlayVideo;
 				OpenMenuPlayVideo();
 				return true;
@@ -131,6 +132,11 @@ class MainMenuConsole extends UIScriptedMenu
 		string version;
 		GetGame().GetVersion( version );
 		m_Version.SetText( "#main_menu_version" + " " + version + " (" + g_Game.GetDatabaseID() + ")" );
+		
+		if ( m_Mission && !m_Mission.GetMenuMusic() )
+		{
+			m_Mission.PlayMusic();
+		}
 	}	
 	
 	override void OnShow()

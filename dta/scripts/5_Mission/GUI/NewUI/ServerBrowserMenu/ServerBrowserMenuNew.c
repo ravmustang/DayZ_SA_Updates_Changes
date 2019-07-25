@@ -188,8 +188,9 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		return ( index >= 0 );
 	}
 	
-	void SetFavoriteConsoles( string server_id, bool favorite )
+	void SetFavoriteConsoles( string ipAddress, int port, bool favorite )
 	{
+		string server_id = ipAddress + ":" + port;
 		if( m_Favorites )
 		{
 			if( favorite && m_Favorites.Find( server_id ) < 0 )

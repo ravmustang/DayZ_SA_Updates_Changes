@@ -5,6 +5,7 @@ class Icon: LayoutHolder
 	protected int					m_PosX;
 	protected int					m_PosY;
 	
+	protected EntityAI				m_Lock;
 	protected bool					m_IsWeapon			= false;
 	protected bool					m_IsMagazine		= false;
 	protected bool					m_HasTemperature	= false;
@@ -985,6 +986,12 @@ class Icon: LayoutHolder
 	{
 		m_SizeX = x;
 		m_SizeY = y;
+	}
+	
+	void SetPos( int x, int y )
+	{
+		m_PosX = x;
+		m_PosY = y;
 	}
 
 	int GetCargoPos()

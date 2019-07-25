@@ -150,10 +150,11 @@ class ServerBrowserTabConsole extends ServerBrowserTab
 				if( PassFilter( result ) )
 				{
 					ref ServerBrowserEntry entry = new ServerBrowserEntry( m_ServerList, index, this );
+					string server_id = result.m_HostIp + ":" + result.m_HostPort;
 					entry.FillInfo( result );
-					entry.SetFavorite( m_Menu.IsFavorited( result.m_Id ) );
+					entry.SetFavorite( m_Menu.IsFavorited( server_id ) );
 					
-					m_EntryWidgets.Insert( result.m_Id, entry );
+					m_EntryWidgets.Insert( server_id, entry );
 					index++;					
 					m_EntriesSorted[m_SortType].Insert( result );
 					
@@ -349,7 +350,8 @@ class ServerBrowserTabConsole extends ServerBrowserTab
 		array<ref GetServersResultRow> entries = m_EntriesSorted[m_SortType];
 		if( entries.Count() > 0 )
 		{
-			m_EntryWidgets.Get( entries.Get( 0 ).m_Id ).Focus();
+			string server_id = entries.Get( 0 ).m_HostIp + ":" + entries.Get( 0 ).m_HostPort;
+			m_EntryWidgets.Get( server_id ).Focus();
 			m_IsFilterFocused = false;
 		}
 		else

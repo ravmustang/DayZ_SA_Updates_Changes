@@ -869,7 +869,7 @@ class DayZPlayerImplement extends DayZPlayer
 
 		switch(pDamageType)
 		{
-			case 0: // DT_CLOSE_COMBAT
+			case DT_CLOSE_COMBAT:
 				//! ignore hit impacts in prone (for now)
 				if (m_MovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_PRONE || m_MovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDPRONE)
 					return false;
@@ -882,7 +882,7 @@ class DayZPlayerImplement extends DayZPlayer
 				if (pAnimType == 1 && !m_MeleeFightLogic.IsInBlock())
 					pAnimHitFullbody = true;
 			break;
-			case 1: // DT_FIREARM
+			case DT_FIRE_ARM:
 				int impactBehaviour = 0;
 				//! play full body when these coponents were hit
 				if ( pComponent == "Torso" || pComponent == "Head")
@@ -896,9 +896,9 @@ class DayZPlayerImplement extends DayZPlayer
 				}
 
 			break;
-			case 2: // DT_EXPLOSION
+			case DT_EXPLOSION:
 			break;
-			case 3: // DT_CUSTOM (used by Fall Damage)
+			case DT_CUSTOM:
 				pAnimType = GetGame().ConfigGetInt("cfgAmmo " + pAmmoType + " hitAnimation");
 				if( pAnimType == 1 )
 					pAnimHitFullbody = true;
@@ -941,7 +941,7 @@ class DayZPlayerImplement extends DayZPlayer
 			{
 				float damage = m_TransportHitVelocity.Length();
 				//Print("Transport damage: " + damage.ToString() + " velocity: " +  m_TransportHitVelocity.Length().ToString());
-				ProcessDirectDamage( 3, transport, "", "TransportHit", "0 0 0", damage );
+				ProcessDirectDamage( DT_CUSTOM, transport, "", "TransportHit", "0 0 0", damage );
 			}
 			else
 				m_TransportHitRegistered = false; // EEHitBy is not called if no damage	
@@ -3068,7 +3068,7 @@ class DayZPlayerImplement extends DayZPlayer
 			if ( GetGame().IsServer() || !GetGame().IsMultiplayer() )
 			{
 				RegisterTransportHit(transport);
-			}			
+			}
 		}
 	}
 	

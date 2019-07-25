@@ -38,7 +38,7 @@ class ActionTakeItemToHands: ActionInteractBase
 		ItemBase tgt_item = ItemBase.Cast( target.GetObject() );
 		if ( !tgt_item || !tgt_item.IsTakeable() ) return false;
 		if ( tgt_item.IsBeingPlaced() ) return false;
-		if ( target.GetParent() ) return false;
+		if ( tgt_item.GetHierarchyParent() ) return false;
 		
 		if ( player.GetInventory().CanAddEntityIntoHands(tgt_item) )
 		{

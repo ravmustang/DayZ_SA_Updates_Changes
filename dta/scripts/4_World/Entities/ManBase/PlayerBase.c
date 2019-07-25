@@ -1185,44 +1185,48 @@ class PlayerBase extends ManBase
 	
 	bool CanManipulateInventory()
 	{
-		return ( !IsControlledPlayer() || !IsRestrained() );
+		if( IsControlledPlayer() )
+		{
+			return !IsRestrained();
+		}
+		return true;
 	}
 	
 	override bool CanReleaseAttachment (EntityAI attachment)
 	{
-		return CanManipulateInventory() && super.CanReleaseAttachment(attachment);
+		return super.CanReleaseAttachment(attachment);
 	}
 	
 	override bool CanReleaseCargo (EntityAI cargo)
 	{
-		return CanManipulateInventory() && super.CanReleaseCargo(cargo);
+		return super.CanReleaseCargo(cargo);
 	}
 	
 	override bool CanReceiveItemIntoCargo (EntityAI cargo)
 	{
-		return CanManipulateInventory() && super.CanReceiveItemIntoCargo(cargo);
+		return super.CanReceiveItemIntoCargo(cargo);
 	}
 	
 	override bool CanSwapItemInCargo (EntityAI child_entity, EntityAI new_entity)
 	{
-		return CanManipulateInventory() && super.CanSwapItemInCargo(child_entity, new_entity);
+		return super.CanSwapItemInCargo(child_entity, new_entity);
 	}
 	
 	override bool CanReceiveAttachment (EntityAI attachment, int slotId)
 	{
-		return CanManipulateInventory() && super.CanReceiveAttachment(attachment, slotId);
+		return super.CanReceiveAttachment(attachment, slotId);
 	}
 	
 	override bool CanReceiveItemIntoHands (EntityAI item_to_hands)
 	{
 		if( IsInVehicle() )
 			return false;
-		return CanManipulateInventory() && super.CanReceiveItemIntoHands(item_to_hands);
+		return super.CanReceiveItemIntoHands(item_to_hands);
 	}
 	
 	override bool CanReleaseFromHands (EntityAI handheld)
 	{
-		return CanManipulateInventory() && super.CanReleaseFromHands(handheld);
+		return super.CanReleaseFromHands(handheld);
 	}
 	
 	int GetCraftingRecipeID()
@@ -4605,7 +4609,8 @@ class PlayerBase extends ManBase
 		if( IsPlayerSelected() && !IsAlive() )
 		{
 			SimulateDeath(true);
-			Event_OnPlayerDeath.Invoke( this );
+			if(GetIdentity() && !m_IsUnconscious)
+				Event_OnPlayerDeath.Invoke( this );
 			m_DeathCheckTimer.Stop();
 		}
 	}
@@ -5079,7 +5084,7 @@ class PlayerBase extends ManBase
 			
 			
 			//Print("----------bleeding_SoundSet----------");
-			SEffectManager.PlaySoundOnObject("bleeding_SoundSet", this);
+			//SEffectManager.PlaySoundOnObject("bleeding_SoundSet", this); Removed due as it caused a freeze on the Console Submission builds.
 		}
 	}
 	

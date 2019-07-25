@@ -40,7 +40,7 @@ class SEffectManager
 	//===============================
 	// CreateSound
 	//===============================
-	static EffectSound CreateSound(string sound_set, vector position, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false)
+	static EffectSound CreateSound(string sound_set, vector position, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false, bool enviroment = false)
 	{
 		ref EffectSound effect_sound = new EffectSound();
 		effect_sound.SetSoundSet(sound_set);
@@ -48,6 +48,7 @@ class SEffectManager
 		effect_sound.SetSoundFadeIn(play_fade_in);
 		effect_sound.SetSoundFadeOut(stop_fade_out);
 		effect_sound.SetSoundLoop(loop);
+		effect_sound.SetEnviromentVariables(enviroment);
 		
 		EffectRegister( effect_sound );
 		
@@ -59,7 +60,19 @@ class SEffectManager
 	//===============================
 	static EffectSound PlaySound(string sound_set, vector position, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false)
 	{
-		ref EffectSound effect_sound = CreateSound(sound_set, position, play_fade_in, stop_fade_out, loop);
+		ref EffectSound effect_sound = CreateSound(sound_set, position, play_fade_in, stop_fade_out, loop, false);
+				
+		effect_sound.SoundPlay();
+		
+		return effect_sound;
+	}
+	
+	//===============================
+	// PlaySoundEnviroment
+	//===============================
+	static EffectSound PlaySoundEnviroment(string sound_set, vector position, float play_fade_in = 0, float stop_fade_out = 0, bool loop = false)
+	{
+		ref EffectSound effect_sound = CreateSound(sound_set, position, play_fade_in, stop_fade_out, loop, true);
 				
 		effect_sound.SoundPlay();
 		

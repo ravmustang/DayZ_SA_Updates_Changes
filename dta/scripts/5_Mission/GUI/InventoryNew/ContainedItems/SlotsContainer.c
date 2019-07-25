@@ -21,6 +21,22 @@ class SlotsContainer: LayoutHolder
 			}
 		}
 	}
+	
+	void SetFocus( int index )
+	{
+		if( index >= 0 &&index < m_Icons.Count() )
+		{
+			m_Icons.Get( index ).GetCursorWidget().Show( true );
+		}
+	}
+	
+	void UnfocusAll()
+	{
+		for( int i = 0; i < m_Icons.Count(); i++ )
+		{
+			m_Icons.Get( i ).GetCursorWidget().Show( false );
+		}
+	}
 
 	void SetColumnCount( int column_count )
 	{

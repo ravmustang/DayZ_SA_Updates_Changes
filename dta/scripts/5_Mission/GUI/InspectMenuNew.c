@@ -17,6 +17,8 @@ class InspectMenuNew extends UIScriptedMenu
 	void ~InspectMenuNew()
 	{
 		GetGame().GetDragQueue().RemoveCalls(this);
+		GetGame().GetMission().GetHud().ShowHudUI( true );
+		GetGame().GetMission().GetHud().ShowQuickbarUI( true );
 	}
 	
 	//--------------------------------------------------------------------------

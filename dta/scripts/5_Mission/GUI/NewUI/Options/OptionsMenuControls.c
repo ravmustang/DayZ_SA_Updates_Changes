@@ -122,7 +122,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	void Focus()
 	{
 		#ifdef PLATFORM_CONSOLE
-			SetFocus( m_AimHelperSelector.GetParent() );
+			SetFocus( m_ControllerInvertSelector.GetParent() );
 		#endif
 	}
 	

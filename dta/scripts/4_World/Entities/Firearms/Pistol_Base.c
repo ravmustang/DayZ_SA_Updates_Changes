@@ -453,7 +453,7 @@ class Pistol_Base extends Weapon_Base
 			Attach_CC00.AddTransition(new WeaponTransition(Attach_CC00.m_chamber, _abt_,   CC11));
 
 		// replace magazine
-		m_fsm.AddTransition(new WeaponTransition(  CD01, __S__, Reload_CD01)); // swap in CLO/b0/m1
+		m_fsm.AddTransition(new WeaponTransition(  CD01, __S__, Reload_CD01, NULL, new WeaponGuardCanSwapMag(this))); // swap in CLO/b0/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_CD01, _fin_,   CC01, NULL, new WeaponGuardChamberEmpty(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_CD01, _fin_,   CC11));
 			Reload_CD01.AddTransition(new WeaponTransition(Reload_CD01.m_start ,    _abt_,   CD01));
@@ -465,7 +465,7 @@ class Pistol_Base extends Weapon_Base
 			Reload_CD01.AddTransition(new WeaponTransition(Reload_CD01.m_chamber,   _abt_,   CC11));
 
 
-		m_fsm.AddTransition(new WeaponTransition(  CC11, __S__, Reload_CC11)); // swap in CLO/b1/m1
+		m_fsm.AddTransition(new WeaponTransition(  CC11, __S__, Reload_CC11, NULL, new WeaponGuardCanSwapMag(this))); // swap in CLO/b1/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_CC11, _fin_,   CC11));
 			Reload_CC11.AddTransition(new WeaponTransition(Reload_CC11.m_start ,    _abt_,   CC11));
 			Reload_CC11.AddTransition(new WeaponTransition(Reload_CC11.m_detach,    _abt_,   CC10));
@@ -473,7 +473,7 @@ class Pistol_Base extends Weapon_Base
 			Reload_CC11.AddTransition(new WeaponTransition(Reload_CC11.m_swapMags,  _abt_,   CC10));
 			Reload_CC11.AddTransition(new WeaponTransition(Reload_CC11.m_attach,    _abt_,   CC11));
 
-		m_fsm.AddTransition(new WeaponTransition(  CC01, __S__, Reload_CC01)); // CLO/b0/m1 swap with empty mag (no chamber)
+		m_fsm.AddTransition(new WeaponTransition(  CC01, __S__, Reload_CC01, NULL, new WeaponGuardCanSwapMag(this))); // CLO/b0/m1 swap with empty mag (no chamber)
 		m_fsm.AddTransition(new WeaponTransition(Reload_CC01, _fin_,   CC01, NULL, new WeaponGuardChamberEmpty(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_CC01, _fin_,   CC11));
 			Reload_CC01.AddTransition(new WeaponTransition(Reload_CC01.m_start ,    _abt_,   CC01));
@@ -484,7 +484,7 @@ class Pistol_Base extends Weapon_Base
 			Reload_CC01.AddTransition(new WeaponTransition(Reload_CC01.m_onCK,      _abt_,   CC01));
 			Reload_CC01.AddTransition(new WeaponTransition(Reload_CC01.m_chamber,   _abt_,   CC11));
 
-		m_fsm.AddTransition(new WeaponTransition(  OD01, __S__, Reload_OD01)); // OPE/b0/m1 swap with empty mag (no chamber)
+		m_fsm.AddTransition(new WeaponTransition(  OD01, __S__, Reload_OD01, NULL, new WeaponGuardCanSwapMag(this))); // OPE/b0/m1 swap with empty mag (no chamber)
 		m_fsm.AddTransition(new WeaponTransition(Reload_OD01, _fin_,   CC01, NULL, new WeaponGuardChamberEmpty(this)));
 		m_fsm.AddTransition(new WeaponTransition(Reload_OD01, _fin_,   CC11));
 			Reload_OD01.AddTransition(new WeaponTransition(Reload_OD01.m_start ,    _abt_,   OD01));
@@ -495,7 +495,7 @@ class Pistol_Base extends Weapon_Base
 			Reload_OD01.AddTransition(new WeaponTransition(Reload_OD01.m_onCK,      _abt_,   CC01));
 			Reload_OD01.AddTransition(new WeaponTransition(Reload_OD01.m_chamber,   _abt_,   CC11));
 
-		m_fsm.AddTransition(new WeaponTransition(  CJF1, __S__, Reload_CJF1)); // swap in JAM/b1/m1
+		m_fsm.AddTransition(new WeaponTransition(  CJF1, __S__, Reload_CJF1, NULL, new WeaponGuardCanSwapMag(this))); // swap in JAM/b1/m1
 		m_fsm.AddTransition(new WeaponTransition(Reload_CJF1, _fin_,   CJF1));
 			Reload_CJF1.AddTransition(new WeaponTransition(Reload_CJF1.m_start ,    _abt_,   CJF1));
 			Reload_CJF1.AddTransition(new WeaponTransition(Reload_CJF1.m_detach,    _abt_,   CJF0));

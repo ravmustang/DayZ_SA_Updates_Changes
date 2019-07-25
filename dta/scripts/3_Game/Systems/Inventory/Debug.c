@@ -1,5 +1,5 @@
 void syncDebugPrint (string s)
 {
-	PrintToRPT("" + s); // comment/uncomment to hide/see debug logs
+	//PrintToRPT("" + s); // comment/uncomment to hide/see debug logs
 }
 

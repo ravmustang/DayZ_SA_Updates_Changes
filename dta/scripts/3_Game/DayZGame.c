@@ -96,7 +96,7 @@ class LoginQueueBase extends UIScriptedMenu
 		g_Game.SetGameState( DayZGameState.MAIN_MENU );
 		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
 		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
-		
+		g_Game.SetConnecting(false);
 		Close();
 	}
 };
@@ -218,7 +218,7 @@ class LoginTimeBase extends UIScriptedMenu
 		g_Game.SetGameState( DayZGameState.MAIN_MENU );
 		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
 		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
-		
+		g_Game.SetConnecting(false);
 		Close();
 	}
 };
@@ -1040,6 +1040,7 @@ class DayZGame extends CGame
 		case MPSessionFailEventTypeID:
 		{
 			LoadingHide(true);
+			SetConnecting( false );
 			ProgressAsync.DestroyAllPendingProgresses();
 			
 			if ( GetGameState() == DayZGameState.CONNECTING )
@@ -1552,20 +1553,21 @@ class DayZGame extends CGame
 		RichTextWidget text_widget = RichTextWidget.Cast( m_IntroMenu.FindAnyWidget("InputPromptText") );
 		if (text_widget)
 		{
+			string text = Widget.TranslateString( "#console_start_game" );
 			#ifdef PLATFORM_XBOX
-				BiosUserManager user_manager = GetUserManager();
+				BiosUserManager user_manager = GetGame().GetUserManager();
 				if( user_manager )
 				{
 					if( user_manager.GetSelectedUser() )
-						text_widget.SetText( string.Format( "#console_start_game", "<image set=\"xbox_buttons\" name=\"A\" />" ) );
+						text_widget.SetText( string.Format( text, "<image set=\"xbox_buttons\" name=\"A\" />" ) );
 					else
-						text_widget.SetText( string.Format( "#console_log_in", "<image set=\"xbox_buttons\" name=\"A\" />" ) );
+						text_widget.SetText( string.Format( text, "<image set=\"xbox_buttons\" name=\"A\" />" ) );
 				}
 			#endif
 					
 			#ifdef PLATFORM_PS4
 				string confirm = "cross";
-				if( GetInput().GetEnterButton() == GamepadButton.A )
+				if( GetGame().GetInput().GetEnterButton() == GamepadButton.A )
 				{
 					confirm = "cross";
 				}
@@ -1573,7 +1575,7 @@ class DayZGame extends CGame
 				{
 					confirm = "circle";
 				}
-				text_widget.SetText( string.Format( "#console_start_game", "<image set=\"playstation_buttons\" name=\"" + confirm + "\" />" ) );
+				text_widget.SetText( string.Format( text, "<image set=\"playstation_buttons\" name=\"" + confirm + "\" />" ) );
 			#endif
 		}
 	}
@@ -2306,7 +2308,7 @@ class DayZGame extends CGame
 		Mission mission = GetMission();
 		if (mission && !m_loading.IsLoading() && GetUIManager().IsDialogQueued())
 		{
-			mission.Pause();
+			//mission.Pause();
 			GetUIManager().ShowQueuedDialog();
 		}
 		#endif

@@ -1717,10 +1717,14 @@ class Inventory: LayoutHolder
 		string general_text_left;
 		string general_text_right;
 		
-		m_TopConsoleToolbarVicinity.Show( m_LeftArea.IsActive() );
-		m_TopConsoleToolbarHands.Show( m_HandsArea.IsActive() );
-		m_TopConsoleToolbarEquipment.Show( m_RightArea.IsActive() );
-		m_BottomConsoleToolbar.SetText( context_text + " " );
+		if(m_TopConsoleToolbarVicinity)
+			m_TopConsoleToolbarVicinity.Show( m_LeftArea.IsActive() );
+		if (m_TopConsoleToolbarHands)
+			m_TopConsoleToolbarHands.Show( m_HandsArea.IsActive() );
+		if (m_TopConsoleToolbarEquipment)
+			m_TopConsoleToolbarEquipment.Show( m_RightArea.IsActive() );
+		if (m_BottomConsoleToolbar)
+			m_BottomConsoleToolbar.SetText( context_text + " " );
 		
 		#endif
 	}

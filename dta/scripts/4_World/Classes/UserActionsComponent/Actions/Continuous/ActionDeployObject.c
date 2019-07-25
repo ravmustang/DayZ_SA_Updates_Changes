@@ -65,12 +65,24 @@ class ActiondeployObjectCB : ActionContinuousBaseCB
 		Math3D.YawPitchRollMatrix( orientation, rotation_matrix );
 		Math3D.MatrixToQuat( rotation_matrix, direction );
 			
-		position[1] = GetGame().SurfaceY(position[0],position[2]);
+		vector ground_position = position;
+		ground_position[1] = GetGame().SurfaceY(ground_position[0],ground_position[2]);
 		
-		if ( entity_for_placing.GetInventory().GetCurrentInventoryLocation( source ) )
+		if ( vector.DistanceSq( m_ActionData.m_Player.GetPosition(), ground_position ) > UAMaxDistances.DEFAULT * UAMaxDistances.DEFAULT)
 		{
-			destination.SetGroundEx( entity_for_placing, position, direction );
-			m_ActionData.m_Player.PredictiveTakeToDst(source, destination);
+			if ( entity_for_placing.GetInventory().GetCurrentInventoryLocation( source ) )
+			{
+				destination.SetGroundEx( entity_for_placing, position, direction );
+				m_ActionData.m_Player.PredictiveTakeToDst(source, destination);
+			}
+		}
+		else
+		{
+			if ( entity_for_placing.GetInventory().GetCurrentInventoryLocation( source ) )
+			{
+				destination.SetGroundEx( entity_for_placing, ground_position, direction );
+				m_ActionData.m_Player.PredictiveTakeToDst(source, destination);
+			}
 		}
 	}
 };

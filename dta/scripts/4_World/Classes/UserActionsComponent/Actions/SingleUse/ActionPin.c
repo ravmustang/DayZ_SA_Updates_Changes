@@ -17,7 +17,7 @@ class ActionPin extends ActionSingleUseBase
 
 	override string GetText()
 	{
-		return "Pin";
+		return "#pin";
 	}
 
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )

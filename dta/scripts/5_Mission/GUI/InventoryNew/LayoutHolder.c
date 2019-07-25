@@ -108,13 +108,15 @@ class LayoutHolder extends ScriptedWidgetEventHandler
 		m_RootWidget.Update();
 	}
 	
-	void InspectItem(InventoryItem item)
+	void InspectItem( EntityAI item )
 	{
 		InventoryMenu menu = InventoryMenu.Cast( GetGame().GetUIManager().FindMenu(MENU_INVENTORY) );
 		InspectMenuNew inspect_menu = InspectMenuNew.Cast( menu.EnterScriptedMenu(MENU_INSPECT) );
 		if ( inspect_menu )
 		{
-			inspect_menu.SetItem(item);
+			GetGame().GetMission().GetHud().ShowHudUI( false );
+			GetGame().GetMission().GetHud().ShowQuickbarUI( false );
+			inspect_menu.SetItem( item );
 		}
 	}
 }

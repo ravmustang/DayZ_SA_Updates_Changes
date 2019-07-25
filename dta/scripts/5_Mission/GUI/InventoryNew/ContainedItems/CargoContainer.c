@@ -61,15 +61,24 @@ class CargoContainer extends Container
 		int y = il.GetRow();
 		#endif
 		
-		ref Icon icon = new Icon( this );
-		m_Icons.Insert( icon );
-		InitIcon( icon, item, x, y );
-		m_ShowedItemPositions.Insert( item, new Param3<ref Icon, int, int>( icon, x, y ) );
+		if( m_ShowedItemPositions.Contains( item ) )
+		{
+			Param3<ref Icon, int, int> item_pos = m_ShowedItemPositions.Get( item );
+			InitIcon( item_pos.param1, item, x, y );
+			item_pos.param2 = x;
+			item_pos.param3 = y;
+		}
+		else
+		{
+			ref Icon icon = new Icon( this );
+			m_Icons.Insert( icon );
+			InitIcon( icon, item, x, y );
+			m_ShowedItemPositions.Insert( item, new Param3<ref Icon, int, int>( icon, x, y ) );
+		}
+		
 		UpdateHeaderText();
 		
 		#ifdef PLATFORM_CONSOLE
-		UpdateRowVisibility( m_ShowedItemPositions.Count() );
-		UpdateSelection();
 		for( int i = 0; i < m_Cargo.GetItemCount(); i++ )
 		{
 			EntityAI item2 = m_Cargo.GetItem( i );
@@ -80,6 +89,11 @@ class CargoContainer extends Container
 				data.param1.SetPos();
 			}
 		}
+		
+		m_FocusedItemPosition = Math.Min( m_ShowedItemPositions.Count() - 1, m_FocusedItemPosition );
+		
+		UpdateRowVisibility( m_ShowedItemPositions.Count() );
+		UpdateSelection();
 		#endif
 	}
 	
@@ -89,10 +103,8 @@ class CargoContainer extends Container
 		m_Icons.RemoveItem( ic );
 		m_ShowedItemPositions.Remove( item );
 		UpdateHeaderText();
-		#ifdef PLATFORM_CONSOLE
-		UpdateRowVisibility( m_ShowedItemPositions.Count() );
-		UpdateSelection();
 		
+		#ifdef PLATFORM_CONSOLE
 		for( int i = 0; i < m_Cargo.GetItemCount(); i++ )
 		{
 			EntityAI item2 = m_Cargo.GetItem( i );
@@ -103,6 +115,11 @@ class CargoContainer extends Container
 				data.param1.SetPos();
 			}
 		}
+		
+		m_FocusedItemPosition = Math.Min( m_ShowedItemPositions.Count() - 1, m_FocusedItemPosition );
+		
+		UpdateRowVisibility( m_ShowedItemPositions.Count() );
+		UpdateSelection();
 		#endif
 	}
 	
@@ -137,6 +154,7 @@ class CargoContainer extends Container
 				data.param1.UpdateInterval();
 			}
 		}
+		UpdateSelection();
 	}
 	
 	override void SetLayoutName()
@@ -373,6 +391,10 @@ class CargoContainer extends Container
 				Inventory.GetInstance().UpdateConsoleToolbar();
 			}
 		}
+		else
+		{
+			Print( "Inactive container item selected." );
+		}
 	}
 	
 	void UpdateRowVisibility( int count )
@@ -471,14 +493,8 @@ class CargoContainer extends Container
 		}
 		
 		Unfocus();
-		
-		if( !IsEmpty() )
-		{
-			m_FocusedItemPosition = 0;
-			UpdateSelection();
-		}
-		else
-			m_FocusedItemPosition = 0;
+		UpdateSelection();
+
 	}
 	
 	void Unfocus()
@@ -755,7 +771,7 @@ class CargoContainer extends Container
 			}
 			
 			int focused_row = m_FocusedItemPosition / ROWS_NUMBER_XBOX;
-			int max_rows = m_Rows.Count() / 2 + 1;
+			int max_rows = m_Rows.Count();
 			int row_min = focused_row * ROWS_NUMBER_XBOX;
 			int row_max = row_min + ROWS_NUMBER_XBOX - 1;
 			
@@ -768,7 +784,7 @@ class CargoContainer extends Container
 			{
 				m_FocusedItemPosition -= ROWS_NUMBER_XBOX;
 				focused_row = m_FocusedItemPosition / ROWS_NUMBER_XBOX;
-				if( m_FocusedItemPosition < 0 )
+				if( m_FocusedItemPosition < 0 || m_Icons.Count() == 1 )
 				{
 					m_FocusedItemPosition = 0;
 					cnt = Container.Cast( GetParent() );
@@ -783,7 +799,7 @@ class CargoContainer extends Container
 			{
 				m_FocusedItemPosition += ROWS_NUMBER_XBOX;
 				focused_row = m_FocusedItemPosition / ROWS_NUMBER_XBOX;
-				if( m_FocusedItemPosition > m_Icons.Count() - 1 && focused_row > max_rows - 1 )
+				if( ( m_FocusedItemPosition > m_Icons.Count() - 1 && focused_row >= m_Rows.Count() ) || m_Icons.Count() == 0 )
 				{
 					cnt = Container.Cast( GetParent() );
 					if( cnt )
@@ -798,7 +814,7 @@ class CargoContainer extends Container
 					m_FocusedItemPosition = m_Icons.Count() - 1;
 				}
 			}
-			else if( direction == Direction.RIGHT )
+			else if( direction == Direction.RIGHT && m_Icons.Count() > 1 )
 			{
 				m_FocusedItemPosition++;
 				if( m_FocusedItemPosition > row_max  )
@@ -806,19 +822,13 @@ class CargoContainer extends Container
 					m_FocusedItemPosition = row_min;
 				}
 			}
-			else if( direction == Direction.LEFT )
+			else if( direction == Direction.LEFT && m_Icons.Count() > 1 )
 			{
 				m_FocusedItemPosition--;
 				if( m_FocusedItemPosition < row_min  )
 				{
 					m_FocusedItemPosition = row_max;
 				}
-			}
-			
-			icon = GetIcon( m_FocusedItemPosition );
-			if( icon )
-			{
-				icon.SetActive( true );
 			}
 		}
 		else
@@ -844,5 +854,6 @@ class CargoContainer extends Container
 				return;
 			}
 		}
+		UpdateSelection();
 	}
 }

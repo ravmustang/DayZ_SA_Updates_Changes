@@ -62,12 +62,21 @@ class ActionCPR: ActionContinuousBase
 		PlayerBase other_player = PlayerBase.Cast(action_data.m_Target.GetObject());
 		other_player.GiveShock(5);
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
-		action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}
 	
 	override void OnExecuteServer(ActionData action_data)
 	{
 
+	}
+	
+	override void OnEndServer( ActionData action_data )
+	{
+		if ( action_data.m_Player ) action_data.m_Player.GetItemAccessor().HideItemInHands(false);
+	}
+	
+	override void OnEndClient( ActionData action_data )
+	{
+		if ( action_data.m_Player ) action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}
 
 };

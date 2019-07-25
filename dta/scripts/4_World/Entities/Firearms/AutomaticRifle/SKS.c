@@ -231,7 +231,13 @@ class SKS_Base extends Rifle_Base
 	{
 		super.SetActions();
 		AddAction(FirearmActionLoadMultiBullet);
-		//RemoveAction(FirearmActionLoadBulletQuick); // Easy reload
-		//AddAction(FirearmActionLoadMultiBulletQuick);
+		#ifdef SERVER_FOR_CONSOLE
+			RemoveAction(FirearmActionLoadBulletQuick); // Easy reload
+			AddAction(FirearmActionLoadMultiBulletQuick); // Easy reload
+		#endif
+		#ifdef PLATFORM_CONSOLE
+			RemoveAction(FirearmActionLoadBulletQuick); // Easy reload
+			AddAction(FirearmActionLoadMultiBulletQuick); // Easy reload
+		#endif
 	}
 };

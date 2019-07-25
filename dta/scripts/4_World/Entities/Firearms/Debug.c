@@ -1,10 +1,10 @@
 void wpnPrint (string s)
 {
-	PrintToRPT("" + s); // comment/uncomment to hide/see at least important info
+	//PrintToRPT("" + s); // comment/uncomment to hide/see at least important info
 }
 void wpnDebugPrint (string s)
 {
-	PrintToRPT("" + s); // comment/uncomment to hide/see debug logs
+	//PrintToRPT("" + s); // comment/uncomment to hide/see debug logs
 }
 void wpnDebugSpam (string s)
 {

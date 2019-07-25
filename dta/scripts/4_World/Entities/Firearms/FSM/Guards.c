@@ -279,6 +279,25 @@ class WeaponGuardCanAttachMag extends WeaponGuardBase
 	}
 };
 
+class WeaponGuardCanSwapMag extends WeaponGuardBase
+{
+	protected Weapon_Base m_weapon;
+	void WeaponGuardCanSwapMag (Weapon_Base w = NULL) { m_weapon = w; }
+
+	override bool GuardCondition (WeaponEventBase e)
+	{
+		int mi = m_weapon.GetCurrentMuzzle();
+		Magazine attached_mag = m_weapon.GetMagazine(mi);
+		if (m_weapon && e.m_magazine && e.m_magazine != attached_mag /*&& m_weapon.CanSwapMagazine(mi, e.m_magazine)*/)
+		{
+			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - can swap magazine");
+			return true;
+		}
+		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " guard - cannot swap magazine");
+		return false;
+	}
+};
+
 class WeaponGuardCanDetachMag extends WeaponGuardBase
 {
 	protected Weapon_Base m_weapon;

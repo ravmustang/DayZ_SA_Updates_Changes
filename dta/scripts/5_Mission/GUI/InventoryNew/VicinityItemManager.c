@@ -202,16 +202,22 @@ class VicinityItemManager
 			}
 			else if ( entity_ai.IsMan() )
 			{
-				//Print("NA HRACovi alebo INFECTEDovi getujem pelvis");
+				//Print("NA HRACovi getujem pelvis");
 				PlayerBase vicinity_player = PlayerBase.Cast( entity_ai );
-				int bone_index_player = vicinity_player.GetBoneIndexByName( "Pelvis" );
-				object_center_pos = vicinity_player.GetBonePositionWS( bone_index_player );
+				if ( vicinity_player )
+				{
+					int bone_index_player = vicinity_player.GetBoneIndexByName( "Pelvis" );
+					object_center_pos = vicinity_player.GetBonePositionWS( bone_index_player );
+				}
 			}
 			else if ( entity_ai.IsZombie() || entity_ai.IsZombieMilitary() )
 			{
 				//Print("NA INFECTEDovi getujem pelvis");
 				ZombieBase vicinity_zombie = ZombieBase.Cast( entity_ai );
-				object_center_pos = vicinity_zombie.ModelToWorld( vicinity_zombie.GetSelectionPositionOld("Pelvis") );
+				if ( vicinity_zombie )
+				{
+					object_center_pos = vicinity_zombie.ModelToWorld( vicinity_zombie.GetSelectionPositionOld("Pelvis") );
+				}
 			}
 			else
 			{

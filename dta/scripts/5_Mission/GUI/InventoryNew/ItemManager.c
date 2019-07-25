@@ -41,9 +41,9 @@ class ItemManager
 		m_DefautHeaderOpenStates	= new map<string, bool>;
 		
 		#ifdef PLATFORM_CONSOLE
-			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip_xbox.layout", NULL );
+			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip_xbox.layout", root );
 		#else
-			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip.layout", NULL );
+			m_TooltipWidget			= GetGame().GetWorkspace().CreateWidgets("gui/layouts/inventory_new/day_z_inventory_new_tooltip.layout", root );
 		#endif
 		m_TooltipWidget.Show( false );
 	}

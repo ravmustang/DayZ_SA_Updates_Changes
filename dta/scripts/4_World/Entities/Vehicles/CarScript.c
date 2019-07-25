@@ -407,7 +407,7 @@ class CarScript extends Car
 							
 						dmg = EngineGetRPM() * 0.001 * Math.RandomFloat( 0.02, 1.0 );  //CARS_TICK_DMG_MIN; //CARS_TICK_DMG_MAX
 						//AddHealth( "Engine", "Health", -dmg); //CAR_RPM_DMG
-						ProcessDirectDamage( 3, null, "Engine", "EnviroDmg", "0 0 0", dmg );
+						ProcessDirectDamage( DT_CUSTOM, null, "Engine", "EnviroDmg", "0 0 0", dmg );
 					}
 
 					//! leaking of coolant from radiator when damaged
@@ -630,7 +630,7 @@ class CarScript extends Car
 
 						//m_PlayCrashSoundHeavy = true;
 						SynchCrashHeavySound( true );
-						ProcessDirectDamage( 3, null, zoneName, "EnviroDmg", "0 0 0", dmg );
+						ProcessDirectDamage( DT_CUSTOM, null, zoneName, "EnviroDmg", "0 0 0", dmg );
 					}
 				}
 			break;

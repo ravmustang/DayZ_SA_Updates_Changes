@@ -46,7 +46,7 @@ class AreaDamageBase
 		m_DamageableTypes.Insert(DayZPlayer);
 
 		m_AmmoName			= "MeleeDamage";
-		m_DamageType 		= 3;
+		m_DamageType 		= DT_CUSTOM;
 		
 		m_LoopTimer 		= new Timer(CALL_CATEGORY_SYSTEM);
 		m_DeferTimer 		= new Timer(CALL_CATEGORY_SYSTEM);
@@ -71,7 +71,7 @@ class AreaDamageBase
 	//! events
 	void OnEnter(Object object)
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		if ( GetGame().IsServer() )
 		{
 			OnEnterServer(object);
 		}
@@ -80,12 +80,12 @@ class AreaDamageBase
 			OnEnterClient(object);
 		}
 	}
-	void OnEnterClient(Object object) {Print("AreaDamage::OnEnterClient");}
+	void OnEnterClient(Object object) {}
 	void OnEnterServer(Object object) {}
 	
 	void OnLeave(Object object)
 	{
-		if ( GetGame().IsMultiplayer() && GetGame().IsServer() )
+		if ( GetGame().IsServer() )
 		{
 			OnLeaveServer(object);
 		}
@@ -95,7 +95,7 @@ class AreaDamageBase
 		}
 	}
 
-	void OnLeaveClient(Object object) {Print("AreaDamage::OnLeaveClient");}
+	void OnLeaveClient(Object object) {}
 	void OnLeaveServer(Object object)
 	{
 		//! stop all running timers
@@ -335,8 +335,8 @@ class AreaDamageBase
 	
 	void EnableDebug(bool pState = false)
 	{
-		if(GetGame() && (!GetGame().IsClient() || GetGame().IsMultiplayer()))
-			return;
+		//if(GetGame() && (!GetGame().IsClient() || GetGame().IsMultiplayer()))
+			//return;
 
 		if( pState )
 		{

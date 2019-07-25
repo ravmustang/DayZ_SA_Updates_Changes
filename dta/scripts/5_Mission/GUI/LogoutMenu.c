@@ -33,6 +33,19 @@ class LogoutMenu extends UIScriptedMenu
 		m_bLogoutNow.Show( false );
 		
 		layoutRoot.FindAnyWidget("toolbar_bg").Show( true );
+		#ifdef PLATFORM_PS4
+			string back = "circle";
+			if( GetGame().GetInput().GetEnterButton() == GamepadButton.A )
+			{
+				back = "circle";
+			}
+			else
+			{
+				back = "cross";
+			}
+			ImageWidget toolbar_b = layoutRoot.FindAnyWidget( "BackIcon" );
+			toolbar_b.LoadImageFile( 0, "set:playstation_buttons image:" + back );
+		#endif
 #else
 		m_bCancel.Show( true );
 		m_bLogoutNow.Show( true );
@@ -108,8 +121,8 @@ class LogoutMenu extends UIScriptedMenu
 	{
 		if( GetGame().GetInput().LocalPress( "UAUIBack", false ) )
 		{
-			Cancel();
 			Hide();
+			Cancel();
 		}		
 	}
 		

@@ -16,7 +16,7 @@
     },
     "3": {
         "m_Icon": "",
-        "m_TitleText": "CONNECTING FAILED",
-        "m_DescriptionText": "An unknown error has occurred."
+        "m_TitleText": "#server_browser_connecting_failed",
+        "m_DescriptionText": "#server_browser_error_unknown"
     }
 }
