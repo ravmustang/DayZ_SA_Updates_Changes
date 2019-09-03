@@ -732,6 +732,36 @@ ImageSetClass {
    Size 60 60
    Flags 0
   }
+  ImageSetDefClass reserved {
+   Name "reserved"
+   Pos 691 323
+   Size 10 10
+   Flags 3
+  }
+  ImageSetDefClass tutorials {
+   Name "tutorials"
+   Pos 557 41
+   Size 37 37
+   Flags 0
+  }
+  ImageSetDefClass middle_mouse_up {
+   Name "middle_mouse_up"
+   Pos 638 427
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass middle_mouse_down {
+   Name "middle_mouse_down"
+   Pos 677 427
+   Size 38 38
+   Flags 0
+  }
+  ImageSetDefClass shift {
+   Name "shift"
+   Pos 712 310
+   Size 73 38
+   Flags 0
+  }
  }
  Groups {
   ImageSetGroupClass UI {

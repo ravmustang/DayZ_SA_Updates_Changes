@@ -161,6 +161,23 @@ FrameWidgetClass LoadingFrame {
       }
      }
     }
+    MultilineTextWidgetClass ModdedWarning {
+     visible 0
+     inheritalpha 1
+     position 100 286
+     size 444 30
+     hexactpos 1
+     vexactpos 1
+     hexactsize 1
+     vexactsize 1
+     fixaspect outside
+     text "#str_modded_version_warning0"
+     font "gui/fonts/sdf_MetronLight24"
+     "exact text" 1
+     "size to text h" 1
+     "size to text v" 1
+     wrap 1
+    }
    }
   }
  }

@@ -1,4 +1,5 @@
 FrameWidgetClass controls_tab_root {
+ ignorepointer 1
  position 0 0
  size 1 1
  hexactpos 1
@@ -101,9 +102,92 @@ FrameWidgetClass controls_tab_root {
          Columns 1
          Rows 1
          {
+          ButtonWidgetClass keyboard_button {
+           visible 1
+           ignorepointer 0
+           position 0 0
+           size 1 38
+           hexactpos 1
+           vexactpos 1
+           hexactsize 0
+           vexactsize 1
+           style Colorable
+           "next left" "none"
+           "next right" "none"
+           "next up" ""
+           "next down" ""
+           {
+            GridSpacerWidgetClass keyboard_button_panel {
+             ignorepointer 1
+             color 0 0 0 0
+             size 1 30
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 1
+             style Empty
+             "no focus" 1
+             Padding 0
+             Margin 0
+             "Size To Content H" 1
+             Columns 2
+             Rows 1
+             {
+              FrameWidgetClass keyboard_setting_panel {
+               ignorepointer 1
+               position 0 0
+               size 0.5 0.6
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+               {
+                TextWidgetClass keyboard_button_label {
+                 ignorepointer 1
+                 size 1 0.55
+                 valign center_ref
+                 hexactpos 1
+                 vexactpos 1
+                 hexactsize 0
+                 vexactsize 0
+                 text "MOUSE AND KEYBOARD"
+                 font "gui/fonts/sdf_MetronLight24"
+                 "text offset" 8 0
+                 "exact text" 0
+                 "exact text size" 18
+                 "text valign" center
+                }
+               }
+              }
+              FrameWidgetClass keyboard_setting_option {
+               ignorepointer 1
+               position 0 0
+               size 0.5 1
+               hexactpos 1
+               vexactpos 1
+               hexactsize 0
+               vexactsize 0
+              }
+             }
+            }
+            PanelWidgetClass keyboard_button_disable {
+             visible 0
+             ignorepointer 1
+             color 0.1569 0.1569 0.1569 0.902
+             size 1 1
+             valign center_ref
+             hexactpos 1
+             vexactpos 1
+             hexactsize 0
+             vexactsize 0
+             style rover_sim_colorable
+            }
+           }
+          }
           ButtonWidgetClass aimhelper_button {
-           visible 0
-           ignorepointer 1
+           visible 1
+           ignorepointer 0
            position 0 0
            size 1 38
            hexactpos 1
@@ -117,7 +201,7 @@ FrameWidgetClass controls_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass aimhelper_button_panel {
-             ignorepointer 0
+             ignorepointer 1
              color 0 0 0 0
              size 1 30
              valign center_ref
@@ -125,7 +209,7 @@ FrameWidgetClass controls_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
-             style DayZDefaultPanel
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -186,6 +270,7 @@ FrameWidgetClass controls_tab_root {
           }
           ButtonWidgetClass controller_invert_button {
            disabled 0
+           ignorepointer 0
            position 0 0
            size 1 38
            hexactpos 1
@@ -208,6 +293,7 @@ FrameWidgetClass controls_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -267,6 +353,7 @@ FrameWidgetClass controls_tab_root {
            }
           }
           ButtonWidgetClass controller_vsensitivity_button {
+           ignorepointer 0
            position 0 0
            size 1 38
            hexactpos 1
@@ -289,6 +376,7 @@ FrameWidgetClass controls_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -363,7 +451,7 @@ FrameWidgetClass controls_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass controller_hsensitivity_button_panel {
-             ignorepointer 0
+             ignorepointer 1
              size 1 30
              halign center_ref
              valign center_ref
@@ -371,6 +459,7 @@ FrameWidgetClass controls_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0

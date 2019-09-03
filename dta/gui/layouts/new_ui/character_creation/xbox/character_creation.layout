@@ -19,6 +19,7 @@ FrameWidgetClass character_creation_root {
    hexactsize 1
    vexactsize 1
    priority 3
+   "no focus" 1
    Padding 0
    Margin 0
    "Size To Content V" 1
@@ -36,6 +37,7 @@ FrameWidgetClass character_creation_root {
      hexactsize 1
      vexactsize 1
      style DayZDefaultPanelTop
+     "no focus" 1
      {
       TextWidgetClass character_text {
        visible 1
@@ -66,6 +68,7 @@ FrameWidgetClass character_creation_root {
      hexactsize 0
      vexactsize 0
      style DayZDefaultPanel
+     "no focus" 1
      Padding 0
      Margin 0
      "Size To Content H" 1
@@ -74,26 +77,29 @@ FrameWidgetClass character_creation_root {
      Rows 1
      {
       ButtonWidgetClass character_name_button {
+       visible 0
        position 0 0
-       size 1 30
+       size 1 38
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 1
-       style Empty
-       "next up" "character_shoes_button"
-       "next down" "character_gender_button"
+       style Colorable
+       "next left" "none"
+       "next right" "none"
+       "next up" ""
+       "next down" ""
        {
-        GridSpacerWidgetClass general_name_setting {
+        GridSpacerWidgetClass character_name_button_panel {
          ignorepointer 1
          color 0 0 0 0
-         position 0 0
-         size 1 1
+         size 1 30
+         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 0
-         vexactsize 0
-         style DayZDefaultPanel
+         vexactsize 1
+         style Empty
          "no focus" 1
          Padding 0
          Margin 0
@@ -101,16 +107,16 @@ FrameWidgetClass character_creation_root {
          Columns 2
          Rows 1
          {
-          FrameWidgetClass general_name_setting_panel {
+          FrameWidgetClass character_name_setting_panel {
            ignorepointer 1
-           position 0 0
            size 0.4 0.6
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 0
            {
-            TextWidgetClass general_name_setting_label {
+            TextWidgetClass character_name_button_label {
              ignorepointer 1
              size 1 0.55
              valign center_ref
@@ -127,54 +133,17 @@ FrameWidgetClass character_creation_root {
             }
            }
           }
-          FrameWidgetClass general_name_setting_option {
+          FrameWidgetClass character_name_setting_option {
            ignorepointer 1
            size 0.6 30
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 1
-           {
-            PanelWidgetClass general_name_setting_option_wrapper {
-             clipchildren 1
-             ignorepointer 1
-             color 1 1 1 0.3922
-             position 0 0
-             size 280 20
-             valign center_ref
-             hexactpos 1
-             vexactpos 1
-             hexactsize 1
-             vexactsize 1
-             style Outline
-             {
-              EditBoxWidgetClass general_name_setting_text {
-               clipchildren 0
-               ignorepointer 1
-               position 0 -1
-               size 0.96 0.8
-               halign center_ref
-               valign center_ref
-               hexactpos 1
-               vexactpos 1
-               hexactsize 0
-               vexactsize 0
-               style ServerBrowser
-               "no focus" 0
-               "next down" "search_ip_setting_option"
-               text "WWWWQQQ"
-               "limit visible" 0
-               "Use default text" 0
-               "exact text" 0
-               font "gui/fonts/sdf_MetronLight24"
-              }
-             }
-            }
-           }
           }
          }
         }
-        PanelWidgetClass general_name_setting_disable {
+        PanelWidgetClass character_name_setting_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902
@@ -190,25 +159,27 @@ FrameWidgetClass character_creation_root {
       }
       ButtonWidgetClass character_gender_button {
        position 0 0
-       size 1 30
+       size 1 38
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 1
-       style Empty
-       "next up" "character_name_button"
-       "next down" "character_head_button"
+       style Colorable
+       "next left" "none"
+       "next right" "none"
+       "next up" ""
+       "next down" ""
        {
-        GridSpacerWidgetClass character_gender_setting {
+        GridSpacerWidgetClass character_gender_button_panel {
          ignorepointer 1
          color 0 0 0 0
-         position 0 0
-         size 1 1
+         size 1 30
+         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 0
-         vexactsize 0
-         style DayZDefaultPanel
+         vexactsize 1
+         style Empty
          "no focus" 1
          Padding 0
          Margin 0
@@ -218,14 +189,14 @@ FrameWidgetClass character_creation_root {
          {
           FrameWidgetClass character_gender_setting_panel {
            ignorepointer 1
-           position 0 0
            size 0.4 0.6
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 0
            {
-            TextWidgetClass character_gender_setting_label {
+            TextWidgetClass character_gender_button_label {
              ignorepointer 1
              size 1 0.55
              valign center_ref
@@ -253,7 +224,7 @@ FrameWidgetClass character_creation_root {
           }
          }
         }
-        PanelWidgetClass character_gender_setting_disable {
+        PanelWidgetClass character_gender_button_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902
@@ -269,23 +240,26 @@ FrameWidgetClass character_creation_root {
       }
       ButtonWidgetClass character_head_button {
        position 0 0
-       size 1 30
+       size 1 38
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 1
-       style Empty
-       "next up" "character_gender_button"
-       "next down" "character_top_button"
+       style Colorable
+       "next left" "none"
+       "next right" "none"
+       "next up" ""
+       "next down" ""
        {
-        GridSpacerWidgetClass character_head_setting {
+        GridSpacerWidgetClass character_head_button_panel {
          ignorepointer 1
-         position 0 0
-         size 1 1
+         size 1 30
+         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 0
-         vexactsize 0
+         vexactsize 1
+         style Empty
          "no focus" 1
          Padding 0
          Margin 0
@@ -295,14 +269,14 @@ FrameWidgetClass character_creation_root {
          {
           FrameWidgetClass character_head_setting_panel {
            ignorepointer 1
-           position 0 0
            size 0.4 0.6
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 0
            {
-            TextWidgetClass character_head_setting_label {
+            TextWidgetClass character_head_button_label {
              ignorepointer 1
              size 1 0.55
              valign center_ref
@@ -330,7 +304,7 @@ FrameWidgetClass character_creation_root {
           }
          }
         }
-        PanelWidgetClass character_head_setting_disable {
+        PanelWidgetClass character_head_button_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902
@@ -346,23 +320,26 @@ FrameWidgetClass character_creation_root {
       }
       ButtonWidgetClass character_top_button {
        position 0 0
-       size 1 30
+       size 1 38
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 1
-       style Empty
-       "next up" "character_head_button"
-       "next down" "character_bottom_button"
+       style Colorable
+       "next left" "none"
+       "next right" "none"
+       "next up" ""
+       "next down" ""
        {
-        GridSpacerWidgetClass character_top_setting {
+        GridSpacerWidgetClass character_top_button_panel {
          ignorepointer 1
-         position 0 0
-         size 1 1
+         size 1 30
+         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 0
-         vexactsize 0
+         vexactsize 1
+         style Empty
          "no focus" 1
          Padding 0
          Margin 0
@@ -372,14 +349,14 @@ FrameWidgetClass character_creation_root {
          {
           FrameWidgetClass character_top_setting_panel {
            ignorepointer 1
-           position 0 0
            size 0.4 0.6
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 0
            {
-            TextWidgetClass character_top_setting_label {
+            TextWidgetClass character_top_button_label {
              ignorepointer 1
              size 1 0.55
              valign center_ref
@@ -407,7 +384,7 @@ FrameWidgetClass character_creation_root {
           }
          }
         }
-        PanelWidgetClass character_top_setting_disable {
+        PanelWidgetClass character_top_button_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902
@@ -423,23 +400,26 @@ FrameWidgetClass character_creation_root {
       }
       ButtonWidgetClass character_bottom_button {
        position 0 0
-       size 1 30
+       size 1 38
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 1
-       style Empty
-       "next up" "character_top_button"
-       "next down" "character_shoes_button"
+       style Colorable
+       "next left" "none"
+       "next right" "none"
+       "next up" ""
+       "next down" ""
        {
-        GridSpacerWidgetClass character_bottom_setting {
+        GridSpacerWidgetClass character_bottom_button_panel {
          ignorepointer 1
-         position 0 0
-         size 1 1
+         size 1 30
+         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 0
-         vexactsize 0
+         vexactsize 1
+         style Empty
          "no focus" 1
          Padding 0
          Margin 0
@@ -449,14 +429,14 @@ FrameWidgetClass character_creation_root {
          {
           FrameWidgetClass character_bottom_setting_panel {
            ignorepointer 1
-           position 0 0
            size 0.4 0.6
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 0
            {
-            TextWidgetClass character_bottom_setting_label {
+            TextWidgetClass character_bottom_button_label {
              ignorepointer 1
              size 1 0.55
              valign center_ref
@@ -484,7 +464,7 @@ FrameWidgetClass character_creation_root {
           }
          }
         }
-        PanelWidgetClass character_bottom_setting_disable {
+        PanelWidgetClass character_bottom_button_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902
@@ -500,23 +480,26 @@ FrameWidgetClass character_creation_root {
       }
       ButtonWidgetClass character_shoes_button {
        position 0 0
-       size 1 30
+       size 1 38
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 1
-       style Empty
-       "next up" "character_bottom_button"
-       "next down" "character_name_button"
+       style Colorable
+       "next left" "none"
+       "next right" "none"
+       "next up" ""
+       "next down" ""
        {
-        GridSpacerWidgetClass character_shoes_setting {
+        GridSpacerWidgetClass character_shoes_button_panel {
          ignorepointer 1
-         position 0 0
-         size 1 1
+         size 1 30
+         valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 0
-         vexactsize 0
+         vexactsize 1
+         style Empty
          "no focus" 1
          Padding 0
          Margin 0
@@ -526,14 +509,14 @@ FrameWidgetClass character_creation_root {
          {
           FrameWidgetClass character_shoes_setting_panel {
            ignorepointer 1
-           position 0 0
            size 0.4 0.6
+           valign center_ref
            hexactpos 1
            vexactpos 1
            hexactsize 0
            vexactsize 0
            {
-            TextWidgetClass character_shoes_setting_label {
+            TextWidgetClass character_shoes_button_label {
              ignorepointer 1
              size 1 0.55
              valign center_ref
@@ -561,7 +544,7 @@ FrameWidgetClass character_creation_root {
           }
          }
         }
-        PanelWidgetClass character_shoes_setting_disable {
+        PanelWidgetClass character_shoes_button_disable {
          visible 0
          ignorepointer 1
          color 0.1569 0.1569 0.1569 0.902
@@ -600,180 +583,6 @@ FrameWidgetClass character_creation_root {
    filter 0
    nocache 1
   }
-  WrapSpacerWidgetClass play_panel_root {
-   visible 1
-   ignorepointer 1
-   position 100 130
-   size 400 200
-   halign right_ref
-   valign bottom_ref
-   hexactpos 1
-   vexactpos 1
-   hexactsize 1
-   vexactsize 1
-   priority 3
-   "Ignore invisible" 0
-   Padding 0
-   Margin 0
-   "Size To Content H" 1
-   content_halign center
-   content_valign bottom
-   {
-    PanelWidgetClass bottom {
-     color 0 0 0 0.549
-     position 0 0
-     size 1 90
-     halign center_ref
-     valign bottom_ref
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 1
-     style DayZDefaultPanel
-     "no focus" 0
-     "next left" "news_main"
-     "next right" "news_main"
-     "next up" ""
-     "next down" "exit_button"
-     {
-      ButtonWidgetClass apply {
-       color 0.7843 0 0 1
-       position 0 0
-       size 1 1
-       halign center_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 0
-       vexactsize 0
-       style DayZDefaultButtonAll
-       "no focus" 0
-       "next left" ""
-       "next right" ""
-       "next up" "back"
-       "next down" "randomize_character"
-       text "#layout_character_creation_apply"
-       text_proportion 0.8
-       font "gui/fonts/sdf_MetronLight72"
-       switch normal
-      }
-     }
-    }
-    PanelWidgetClass separator_red {
-     ignorepointer 1
-     color 0.7843 0 0 1
-     position 10 10
-     size 1 2
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 1
-     style rover_sim_colorable
-    }
-    WrapSpacerWidgetClass top {
-     ignorepointer 1
-     color 0 0 0 0.549
-     position 0 0
-     size 1 48
-     hexactpos 1
-     vexactpos 1
-     hexactsize 0
-     vexactsize 1
-     style DayZDefaultPanel
-     "no focus" 1
-     Padding 0
-     Margin 0
-     "Size To Content V" 1
-     content_valign bottom
-     {
-      FrameWidgetClass separator_bottom {
-       ignorepointer 1
-       position 10 10
-       size 1 5
-       hexactpos 1
-       vexactpos 1
-       hexactsize 0
-       vexactsize 1
-      }
-      ButtonWidgetClass back {
-       color 0.0392 0.0392 0.0392 1
-       position 0 0
-       size 1 38
-       halign center_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 0
-       vexactsize 1
-       style DayZDefaultButtonBottom
-       "no focus" 0
-       "next left" ""
-       "next right" ""
-       "next up" "randomize_character"
-       "next down" "apply"
-       text "#layout_character_creation_back"
-       text_proportion 0.55
-       font "gui/fonts/sdf_MetronLight24"
-       switch normal
-      }
-      ButtonWidgetClass randomize_character {
-       color 0.0392 0.0392 0.0392 1
-       position 0 0
-       size 1 38
-       halign center_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 0
-       vexactsize 1
-       style DayZDefaultButtonSides
-       "no focus" 0
-       "next left" ""
-       "next right" ""
-       "next up" "apply"
-       "next down" "back"
-       text "#layout_character_creation_randomize"
-       text_proportion 0.55
-       font "gui/fonts/sdf_MetronLight24"
-       switch normal
-      }
-      PanelWidgetClass character {
-       visible 0
-       ignorepointer 0
-       color 0.0392 0.0392 0.0392 1
-       position 0 0
-       size 1 38
-       halign center_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 0
-       vexactsize 1
-       style blank
-      }
-      FrameWidgetClass separator_top {
-       ignorepointer 1
-       position 10 10
-       size 1 5
-       hexactpos 1
-       vexactpos 1
-       hexactsize 0
-       vexactsize 1
-      }
-     }
-    }
-   }
-  }
-  FrameWidgetClass character_rotation_frame {
-   size 0.3 1
-   halign center_ref
-   valign center_ref
-   hexactpos 1
-   vexactpos 1
-   hexactsize 0
-   vexactsize 0
-   priority 2
-  }
   TextWidgetClass CharacterCreationTextWidget {
    ignorepointer 1
    position 0.05 80
@@ -795,8 +604,9 @@ FrameWidgetClass character_creation_root {
    "text valign" center
   }
   PanelWidgetClass toolbar_bg {
-   visible 0
+   visible 1
    inheritalpha 0
+   ignorepointer 1
    color 1 1 1 0.4706
    position 0 0
    size 1 0.1
@@ -808,10 +618,12 @@ FrameWidgetClass character_creation_root {
    vexactsize 0
    priority 3
    style ToolbarWidget
+   "no focus" 1
    {
     WrapSpacerWidgetClass ConsoleToolbar {
      visible 1
      clipchildren 0
+     ignorepointer 1
      position 0.05 0.1
      size 0.45 0.45
      halign right_ref
@@ -827,69 +639,10 @@ FrameWidgetClass character_creation_root {
      content_halign right
      content_valign center
      {
-      GridSpacerWidgetClass Select {
-       visible 1
-       clipchildren 0
-       size 110 30
-       halign right_ref
-       valign bottom_ref
-       hexactpos 1
-       vexactpos 1
-       hexactsize 1
-       vexactsize 1
-       priority 3
-       Padding 4
-       Margin 0
-       "Size To Content H" 1
-       "Size To Content V" 1
-       content_halign center
-       content_valign center
-       Columns 2
-       Rows 1
-       {
-        ImageWidgetClass SelectIcon {
-         clipchildren 0
-         inheritalpha 0
-         size 36 36
-         valign center_ref
-         hexactpos 1
-         vexactpos 1
-         hexactsize 1
-         vexactsize 1
-         scaled 1
-         image0 "set:xbox_buttons image:A"
-         mode blend
-         "src alpha" 1
-         "no wrap" 1
-         stretch 0
-         "flip u" 0
-         "flip v" 0
-         filter 1
-         nocache 0
-        }
-        TextWidgetClass SelectText {
-         clipchildren 0
-         position 40 0
-         size 70 36
-         valign center_ref
-         hexactpos 1
-         vexactpos 1
-         hexactsize 1
-         vexactsize 1
-         text "#layout_character_creation_toolbar_select"
-         font "gui/fonts/sdf_MetronBook24"
-         "exact text" 1
-         "exact text size" 30
-         "size to text h" 1
-         "size to text v" 0
-         "text halign" center
-         "text valign" center
-        }
-       }
-      }
       GridSpacerWidgetClass Randomize {
        visible 1
        clipchildren 0
+       ignorepointer 1
        size 153 30
        halign right_ref
        valign bottom_ref
@@ -897,7 +650,8 @@ FrameWidgetClass character_creation_root {
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       priority 2
+       priority 3
+       "no focus" 1
        Padding 4
        Margin 0
        "Size To Content H" 1
@@ -910,8 +664,9 @@ FrameWidgetClass character_creation_root {
         ImageWidgetClass RandomizeIcon {
          clipchildren 0
          inheritalpha 0
+         ignorepointer 1
          position 0 0
-         size 36 36
+         size 38 38
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -930,6 +685,7 @@ FrameWidgetClass character_creation_root {
         }
         TextWidgetClass RandomizeText {
          clipchildren 0
+         ignorepointer 1
          position 40 0
          size 122 36
          valign center_ref
@@ -938,9 +694,9 @@ FrameWidgetClass character_creation_root {
          hexactsize 1
          vexactsize 1
          text "#layout_character_creation_toolbar_randomize"
-         font "gui/fonts/sdf_MetronBook24"
+         font "gui/fonts/sdf_MetronLight24"
          "exact text" 1
-         "exact text size" 30
+         "exact text size" 22
          "size to text h" 1
          "size to text v" 0
          "text halign" center
@@ -948,17 +704,19 @@ FrameWidgetClass character_creation_root {
         }
        }
       }
-      GridSpacerWidgetClass Reset {
+      GridSpacerWidgetClass Select {
        visible 1
        clipchildren 0
-       size 189 30
+       ignorepointer 1
+       size 110 30
        halign right_ref
        valign bottom_ref
        hexactpos 1
        vexactpos 1
        hexactsize 1
        vexactsize 1
-       priority 1
+       priority 2
+       "no focus" 1
        Padding 4
        Margin 0
        "Size To Content H" 1
@@ -968,17 +726,18 @@ FrameWidgetClass character_creation_root {
        Columns 2
        Rows 1
        {
-        ImageWidgetClass ResetIcon {
+        ImageWidgetClass SelectIcon {
          clipchildren 0
          inheritalpha 0
-         size 36 36
+         ignorepointer 1
+         size 38 38
          valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
          scaled 1
-         image0 "set:xbox_buttons image:Y"
+         image0 "set:xbox_buttons image:A"
          mode blend
          "src alpha" 1
          "no wrap" 1
@@ -988,19 +747,20 @@ FrameWidgetClass character_creation_root {
          filter 1
          nocache 0
         }
-        TextWidgetClass ResetText {
+        TextWidgetClass SelectText {
          clipchildren 0
+         ignorepointer 1
          position 40 0
-         size 160 36
+         size 70 36
          valign center_ref
          hexactpos 1
          vexactpos 1
          hexactsize 1
          vexactsize 1
-         text "#layout_character_creation_toolbar_new"
-         font "gui/fonts/sdf_MetronBook24"
+         text "#layout_character_creation_toolbar_select"
+         font "gui/fonts/sdf_MetronLight24"
          "exact text" 1
-         "exact text size" 30
+         "exact text size" 22
          "size to text h" 1
          "size to text v" 0
          "text halign" center
@@ -1010,6 +770,7 @@ FrameWidgetClass character_creation_root {
       }
       GridSpacerWidgetClass Back {
        clipchildren 0
+       ignorepointer 1
        size 88 30
        halign right_ref
        valign bottom_ref
@@ -1017,6 +778,8 @@ FrameWidgetClass character_creation_root {
        vexactpos 1
        hexactsize 1
        vexactsize 1
+       priority 1
+       "no focus" 1
        Padding 4
        Margin 0
        "Size To Content H" 1
@@ -1029,7 +792,8 @@ FrameWidgetClass character_creation_root {
         ImageWidgetClass BackIcon {
          clipchildren 0
          inheritalpha 0
-         size 36 36
+         ignorepointer 1
+         size 38 38
          valign center_ref
          hexactpos 1
          vexactpos 1
@@ -1048,6 +812,7 @@ FrameWidgetClass character_creation_root {
         }
         TextWidgetClass BackText {
          clipchildren 0
+         ignorepointer 1
          position 40 0
          size 52 36
          valign center_ref
@@ -1056,9 +821,9 @@ FrameWidgetClass character_creation_root {
          hexactsize 1
          vexactsize 1
          text "#layout_character_creation_toolbar_back"
-         font "gui/fonts/sdf_MetronBook24"
+         font "gui/fonts/sdf_MetronLight24"
          "exact text" 1
-         "exact text size" 30
+         "exact text size" 22
          "size to text h" 1
          "size to text v" 0
          "text halign" center
@@ -1081,6 +846,7 @@ FrameWidgetClass character_creation_root {
    hexactsize 0
    vexactsize 1
    priority 5
+   "no focus" 1
    Padding 8
    Margin 0
    "Size To Content H" 1

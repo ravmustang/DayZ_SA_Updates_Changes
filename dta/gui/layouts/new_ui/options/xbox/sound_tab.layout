@@ -1,4 +1,5 @@
 FrameWidgetClass sound_tab_root {
+ ignorepointer 1
  position 0 0
  size 1 1
  hexactpos 1
@@ -122,6 +123,7 @@ FrameWidgetClass sound_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -202,6 +204,7 @@ FrameWidgetClass sound_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -282,6 +285,7 @@ FrameWidgetClass sound_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -363,6 +367,7 @@ FrameWidgetClass sound_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0

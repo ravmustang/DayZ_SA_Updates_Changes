@@ -62,7 +62,7 @@ FrameWidgetClass FrameWidget {
    visible 1
    ignorepointer 1
    color 0 0 0 0.7843
-   position 0 0
+   position 2.8169 0
    size 1.6 0.9
    halign center_ref
    hexactpos 1
@@ -359,21 +359,6 @@ FrameWidgetClass FrameWidget {
     }
    }
   }
-  ImageWidgetClass dayz_logo {
-   visible 1
-   ignorepointer 1
-   position 80 80
-   size 400 187.5
-   hexactpos 1
-   vexactpos 1
-   hexactsize 1
-   vexactsize 1
-   priority 2
-   image0 "set:dayz_gui image:DayZLogo"
-   mode additive
-   "src alpha" 1
-   stretch 0
-  }
   FrameWidgetClass hint_frame {
    clipchildren 0
    ignorepointer 1
@@ -384,6 +369,38 @@ FrameWidgetClass FrameWidget {
    vexactpos 1
    hexactsize 1
    vexactsize 1
+  }
+  MultilineTextWidgetClass ModdedWarning {
+   visible 1
+   inheritalpha 1
+   position 100 286
+   size 444 30
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   fixaspect outside
+   text "#str_modded_version_warning0"
+   font "gui/fonts/sdf_MetronLight24"
+   "exact text" 1
+   "size to text h" 1
+   "size to text v" 1
+   wrap 1
+  }
+  ImageWidgetClass dayz_logo {
+   visible 1
+   ignorepointer 1
+   position 100 78
+   size 444 208
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   image0 "set:dayz_gui image:DayZLogo"
+   mode additive
+   "src alpha" 1
+   stretch 0
   }
  }
 }

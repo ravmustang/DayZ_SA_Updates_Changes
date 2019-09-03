@@ -1,5 +1,5 @@
 ImageWidgetClass height_wrapper {
- clipchildren 1
+ clipchildren 0
  ignorepointer 1
  color 0.502 0.502 0.502 0.8
  size 1 48

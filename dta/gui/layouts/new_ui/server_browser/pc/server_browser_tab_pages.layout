@@ -999,7 +999,6 @@ WindowWidgetClass server_browser_tab_root {
                style ServerBrowser
                "no focus" 0
                "next down" "search_ip_setting_option"
-               text "WWWWQQQ"
                "limit visible" 0
                "Use default text" 0
                "exact text" 0

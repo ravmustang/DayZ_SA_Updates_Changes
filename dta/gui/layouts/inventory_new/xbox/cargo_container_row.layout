@@ -76,7 +76,7 @@ PanelWidgetClass widget {
      draggable 0
      style blank
     }
-    PanelWidgetClass Icon3 {
+    PanelWidgetClass Icon2 {
      visible 1
      clipchildren 0
      inheritalpha 0
@@ -90,7 +90,7 @@ PanelWidgetClass widget {
      draggable 0
      style blank
     }
-    PanelWidgetClass Icon2 {
+    PanelWidgetClass Icon3 {
      visible 1
      clipchildren 0
      inheritalpha 0

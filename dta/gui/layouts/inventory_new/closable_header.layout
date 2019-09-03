@@ -11,13 +11,14 @@ WrapSpacerWidgetClass closable_header_root {
  userID -1
  draggable 1
  scriptclass ""
+ style Empty
  Padding 0
  Margin 0
  "Size To Content V" 1
  content_halign center
  {
   ImageWidgetClass PanelWidget {
-   clipchildren 0
+   clipchildren 1
    ignorepointer 1
    color 0 0 0 0.8
    position 0 0
@@ -192,15 +193,14 @@ WrapSpacerWidgetClass closable_header_root {
        ignorepointer 1
        color 0.6235 0.6235 0.6235 1
        position 0 0
-       size 1 1
+       size 29 29
        halign right_ref
        valign center_ref
        hexactpos 1
-       vexactpos 0
-       hexactsize 0
-       vexactsize 0
-       fixaspect inside
-       priority 500
+       vexactpos 1
+       hexactsize 1
+       vexactsize 1
+       draggable 0
        image0 "set:dayz_gui image:battery"
        mode additive
        "src alpha" 1

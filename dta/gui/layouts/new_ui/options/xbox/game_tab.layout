@@ -102,7 +102,7 @@ FrameWidgetClass game_tab_root {
          Rows 1
          {
           ButtonWidgetClass language_button {
-           ignorepointer 1
+           ignorepointer 0
            position 0 0
            size 1 38
            hexactpos 1
@@ -116,7 +116,7 @@ FrameWidgetClass game_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass language_button_panel {
-             ignorepointer 0
+             ignorepointer 1
              color 0 0 0 0
              size 1 30
              valign center_ref
@@ -124,7 +124,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
-             style DayZDefaultPanel
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -275,6 +275,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -352,13 +353,14 @@ FrameWidgetClass game_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass brightness_setting {
-             ignorepointer 0
+             ignorepointer 1
              size 1 30
              valign center_ref
              hexactpos 1
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -507,6 +509,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              "next down" "crosshair_button"
              Padding 0
@@ -589,6 +592,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -716,7 +720,7 @@ FrameWidgetClass game_tab_root {
          Columns 1
          {
           ButtonWidgetClass game_button {
-           ignorepointer 1
+           ignorepointer 0
            color 0 0 0 0
            position 0 0
            size 1 38
@@ -731,7 +735,7 @@ FrameWidgetClass game_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass game_button_panel {
-             ignorepointer 0
+             ignorepointer 1
              color 0 0 0 0
              size 1 30
              valign center_ref
@@ -739,6 +743,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -798,7 +803,7 @@ FrameWidgetClass game_tab_root {
            }
           }
           ButtonWidgetClass admin_button {
-           ignorepointer 1
+           ignorepointer 0
            color 0 0 0 0
            position 0 0
            size 1 38
@@ -813,7 +818,7 @@ FrameWidgetClass game_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass admin_button_panel {
-             ignorepointer 0
+             ignorepointer 1
              color 0 0 0 0
              size 1 30
              valign center_ref
@@ -821,6 +826,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0
@@ -880,7 +886,7 @@ FrameWidgetClass game_tab_root {
            }
           }
           ButtonWidgetClass player_button {
-           ignorepointer 1
+           ignorepointer 0
            color 0 0 0 0
            position 0 0
            size 1 38
@@ -895,7 +901,7 @@ FrameWidgetClass game_tab_root {
            "next down" ""
            {
             GridSpacerWidgetClass player_button_panel {
-             ignorepointer 0
+             ignorepointer 1
              color 0 0 0 0
              size 1 30
              valign center_ref
@@ -903,6 +909,7 @@ FrameWidgetClass game_tab_root {
              vexactpos 1
              hexactsize 0
              vexactsize 1
+             style Empty
              "no focus" 1
              Padding 0
              Margin 0

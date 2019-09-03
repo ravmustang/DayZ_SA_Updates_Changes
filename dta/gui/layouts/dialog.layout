@@ -128,11 +128,11 @@ WindowWidgetClass DialogBox {
      clipchildren 1
      color 1 1 1 1
      position 0 72.5
-     size 512 30
+     size 0.95 30
      halign center_ref
      hexactpos 1
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      text "text"
      font "gui/fonts/sdf_MetronLight24"
@@ -147,11 +147,11 @@ WindowWidgetClass DialogBox {
      visible 1
      clipchildren 0
      position 0 20
-     size 512 30
+     size 0.95 30
      halign center_ref
      hexactpos 1
      vexactpos 1
-     hexactsize 1
+     hexactsize 0
      vexactsize 1
      style Bold
      text "#layout_dialog_title"

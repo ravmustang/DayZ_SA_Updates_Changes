@@ -1,4 +1,4 @@
-<inputs version="118">
+<inputs version="119">
 	
 	<actions>
 		<!-- UAMoveForward == 0 !!! -->
@@ -85,6 +85,7 @@
 		<input name="UAPrevChannel" loc="" visible="false" />
 		<input name="UANextChannel" loc="" visible="false" />
 		<input name="UAChat" loc="STR_USRACT_CHAT" />
+		<input name="UAVoiceLevel" loc="STR_USRACT_UAChangeSpeechLevel" />
 		<input name="UAVoiceOverNet" loc="STR_USRACT_VOICE_OVER_NET" />
 
 		<input name="UANetworkStats" loc="" visible="false" />

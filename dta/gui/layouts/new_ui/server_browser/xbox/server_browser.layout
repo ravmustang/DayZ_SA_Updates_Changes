@@ -258,7 +258,7 @@ FrameWidgetClass ServerBrowserRoot {
      visible 1
      ignorepointer 0
      position 0 160
-     size 1 800
+     size 1 783
      hexactpos 1
      vexactpos 1
      hexactsize 0
@@ -268,7 +268,7 @@ FrameWidgetClass ServerBrowserRoot {
      visible 0
      ignorepointer 0
      position 0 160
-     size 1 800
+     size 1 783
      hexactpos 1
      vexactpos 1
      hexactsize 0

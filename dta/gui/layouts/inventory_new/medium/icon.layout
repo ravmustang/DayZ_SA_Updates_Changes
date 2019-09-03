@@ -267,5 +267,23 @@ FrameWidgetClass Icon {
    "no wrap" 1
    stretch 1
   }
+  ImageWidgetClass Reserved {
+   visible 0
+   ignorepointer 1
+   color 0.7059 0.7059 0.7059 0.6275
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 300
+   image0 ""
+   imageTexture "{31884CE8620E2EEE}Gui/textures/reserved@2x.edds"
+   mode blend
+   "src alpha" 1
+   "no wrap" 0
+   stretch 0
+  }
  }
 }

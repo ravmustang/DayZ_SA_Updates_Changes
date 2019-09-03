@@ -1263,17 +1263,17 @@ FrameWidgetClass main_menu_root {
    vexactsize 1
    priority 3
    {
-    ButtonWidgetClass stat_button {
-     visible 0
+    ButtonWidgetClass tutorial_button {
+     visible 1
      color 1 1 1 0
      position 0.75 0
-     size 0.25 0.25
+     size 37 37
      halign right_ref
+     valign center_ref
      hexactpos 0
      vexactpos 1
-     hexactsize 0
-     vexactsize 0
-     fixaspect inside
+     hexactsize 1
+     vexactsize 1
      style Empty
      "no focus" 1
      "next up" "play"
@@ -1281,16 +1281,16 @@ FrameWidgetClass main_menu_root {
      font "gui/fonts/sdf_MetronLight24"
      switch normal
      {
-      ImageWidgetClass stat_button_image {
+      ImageWidgetClass tutorial_button_image {
        ignorepointer 1
-       size 0.8 0.8
+       size 1 1
        halign center_ref
        valign center_ref
        hexactpos 1
        vexactpos 1
        hexactsize 0
        vexactsize 0
-       image0 "set:dayz_gui image:icon_forums"
+       image0 "set:dayz_gui image:tutorials"
        mode blend
        "src alpha" 1
       }
@@ -1416,6 +1416,24 @@ FrameWidgetClass main_menu_root {
    "src alpha" 1
    stretch 0
   }
+  MultilineTextWidgetClass ModdedWarning {
+   visible 0
+   inheritalpha 1
+   position 100 286
+   size 444 30
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   fixaspect outside
+   priority 5
+   text "#str_modded_version_warning0"
+   font "gui/fonts/sdf_MetronLight24"
+   "exact text" 1
+   "size to text h" 1
+   "size to text v" 1
+   wrap 1
+  }
   ButtonWidgetClass news_feed_open {
    visible 0
    color 0 0 0 0.8627
@@ -1478,7 +1496,7 @@ FrameWidgetClass main_menu_root {
   FrameWidgetClass ModsDetailed {
    clipchildren 0
    ignorepointer 1
-   position 100 300
+   position 100 320
    size 580 640
    hexactpos 1
    vexactpos 1

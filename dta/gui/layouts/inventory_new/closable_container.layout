@@ -25,7 +25,8 @@ WrapSpacerWidgetClass container_root {
    hexactsize 0
    vexactsize 1
    priority 1
-   style Colorable
+   style Empty
+   Padding 0
    Margin 0
    "Size To Content V" 1
   }

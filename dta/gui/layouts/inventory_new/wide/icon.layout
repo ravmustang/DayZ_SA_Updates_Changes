@@ -2,6 +2,7 @@ FrameWidgetClass Icon {
  visible 1
  clipchildren 1
  ignorepointer 0
+ position 0 0
  size 51 51
  hexactpos 1
  vexactpos 1
@@ -265,6 +266,23 @@ FrameWidgetClass Icon {
    "src alpha" 1
    "no wrap" 1
    stretch 1
+  }
+  ImageWidgetClass Reserved {
+   visible 0
+   ignorepointer 1
+   color 0.7059 0.7059 0.7059 0.0392
+   position 0 0
+   size 1 1
+   hexactpos 1
+   vexactpos 1
+   hexactsize 0
+   vexactsize 0
+   priority 300
+   image0 ""
+   mode blend
+   "src alpha" 1
+   "no wrap" 0
+   stretch 0
   }
  }
 }

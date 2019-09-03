@@ -77,7 +77,6 @@
 	<!-- Change Perspective -->
 	<input name="UAPersonView">
 		<btn name="kV" />
-		<btn name="kReturn" />
 		<btn name="kNumpadEnter" />
 	</input>
 	
@@ -155,14 +154,12 @@
 	</input>
 	
 	<input name="UADropItem">
-		<btn name="kG">
-			<event name="click" />
-		</btn>
+		<btn name="kG" />
 	</input>
 
 	<input name="UAThrowitem">
 		<btn name="kG">
-			<event name="holdbegin" />
+			<event name="click" />
 		</btn>
 	</input>
 
@@ -236,8 +233,10 @@
 	
 	<!-- Text Chat -->
 	<input name="UAChat">
-		<btn name="kT" />
-		<btn name="kSlash" />
+		<btn name="kReturn" />
+	</input>
+	<input name="UAVoiceLevel">
+		<btn name="kUp" />
 	</input>
 	
 	<!-- Voice Over Network -->

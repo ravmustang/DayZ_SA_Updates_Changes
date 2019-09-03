@@ -361,8 +361,8 @@ FrameWidgetClass FrameWidget {
        userID 114
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.6
@@ -413,8 +413,8 @@ FrameWidgetClass FrameWidget {
        userID 105
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.6
@@ -492,8 +492,8 @@ FrameWidgetClass FrameWidget {
        userID 106
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.55
@@ -547,8 +547,8 @@ FrameWidgetClass FrameWidget {
        userID 105
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.55
@@ -600,8 +600,8 @@ FrameWidgetClass FrameWidget {
        userID 102
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text "#layout_xbox_ingame_menu_options"
@@ -653,8 +653,8 @@ FrameWidgetClass FrameWidget {
        userID 126
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text "#layout_xbox_ingame_menu_invite"
@@ -706,8 +706,8 @@ FrameWidgetClass FrameWidget {
        userID 201
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.55
@@ -758,8 +758,8 @@ FrameWidgetClass FrameWidget {
        userID 124
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.55
@@ -810,8 +810,8 @@ FrameWidgetClass FrameWidget {
        userID 117
        style Empty
        "no focus" 0
-       "next left" ""
-       "next right" ""
+       "next left" "none"
+       "next right" "none"
        "next up" ""
        "next down" ""
        text_proportion 0.55
@@ -873,21 +873,6 @@ FrameWidgetClass FrameWidget {
     }
    }
   }
-  ImageWidgetClass dayz_logo {
-   visible 1
-   ignorepointer 1
-   position 80 80
-   size 400 187.5
-   hexactpos 1
-   vexactpos 1
-   hexactsize 1
-   vexactsize 1
-   priority 2
-   image0 "set:dayz_gui image:DayZLogo"
-   mode additive
-   "src alpha" 1
-   stretch 0
-  }
   WrapSpacerWidgetClass Licensing {
    clipchildren 0
    position 0.05 0.062
@@ -938,6 +923,21 @@ FrameWidgetClass FrameWidget {
      "text valign" center
     }
    }
+  }
+  ImageWidgetClass dayz_logo {
+   visible 1
+   ignorepointer 1
+   position 100 78
+   size 444 208
+   hexactpos 1
+   vexactpos 1
+   hexactsize 1
+   vexactsize 1
+   priority 2
+   image0 "set:dayz_gui image:DayZLogo"
+   mode additive
+   "src alpha" 1
+   stretch 0
   }
  }
 }

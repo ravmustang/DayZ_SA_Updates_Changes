@@ -24,7 +24,7 @@ GridSpacerWidgetClass option_slider_root {
    hexactsize 0
    vexactsize 0
    {
-    SliderWidgetClass option_value {
+    EditBoxWidgetClass option_value {
      clipchildren 0
      ignorepointer 0
      color 1 1 1 0.549
@@ -35,11 +35,10 @@ GridSpacerWidgetClass option_slider_root {
      vexactpos 1
      hexactsize 0
      vexactsize 0
-     style GUI_Black_simple
+     style ServerBrowser
      "no focus" 0
-     maximum 1
-     step 0.05
-     current 0.5
+     "exact text" 0
+     font "gui/fonts/sdf_MetronLight24"
     }
    }
   }

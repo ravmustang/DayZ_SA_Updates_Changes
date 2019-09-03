@@ -41,7 +41,7 @@ FrameWidgetClass grid_container_root {
      {
       ImageWidgetClass grid_container_header {
        visible 1
-       clipchildren 0
+       clipchildren 1
        ignorepointer 1
        color 0 0 0 0.7059
        size 1 48
