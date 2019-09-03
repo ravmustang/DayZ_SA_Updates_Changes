@@ -1,4 +1,3 @@
-
 void main()
 {
 	//INIT WEATHER BEFORE ECONOMY INIT------------------------
@@ -20,28 +19,28 @@ void main()
 	int reset_month = 9, reset_day = 20;
 	GetGame().GetWorld().GetDate(year, month, day, hour, minute);
 
-    if ((month == reset_month) && (day < reset_day))
-    {
-        GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
-    }
-    else
-    {
-        if ((month == reset_month + 1) && (day > reset_day))
-        {
-            GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
-        }
-        else
-        {
-            if ((month < reset_month) || (month > reset_month + 1))
-            {
-                GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
-            }
-        }
-    }
+	if ((month == reset_month) && (day < reset_day))
+	{
+		GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
+	}
+	else
+	{
+		if ((month == reset_month + 1) && (day > reset_day))
+		{
+			GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
+		}
+		else
+		{
+			if ((month < reset_month) || (month > reset_month + 1))
+			{
+				GetGame().GetWorld().SetDate(year, reset_month, reset_day, hour, minute);
+			}
+		}
+	}
 }
 
 class CustomMission: MissionServer
-{	
+{
 	void SetRandomHealth(EntityAI itemEnt)
 	{
 		if ( itemEnt )
@@ -56,21 +55,21 @@ class CustomMission: MissionServer
 		Entity playerEnt;
 		playerEnt = GetGame().CreatePlayer(identity, characterName, pos, 0, "NONE");//Creates random player
 		Class.CastTo(m_player, playerEnt);
-		
+
 		GetGame().SelectPlayer(identity, m_player);
-		
+
 		return m_player;
 	}
-	
+
 	override void StartingEquipSetup(PlayerBase player, bool clothesChosen)
 	{
 		EntityAI itemTop;
 		EntityAI itemEnt;
 		ItemBase itemBs;
 		float rand;
-		
+
 		itemTop = player.FindAttachmentBySlotName("Body");
-		
+
 		if ( itemTop )
 		{
 			itemEnt = itemTop.GetInventory().CreateInInventory("Rag");
@@ -78,10 +77,12 @@ class CustomMission: MissionServer
 				itemBs.SetQuantity(4);
 
 			SetRandomHealth(itemEnt);
-			
-			itemEnt = itemTop.GetInventory().CreateInInventory("RoadFlare");
+
+			string chemlightArray[] = { "Chemlight_White", "Chemlight_Yellow", "Chemlight_Green", "Chemlight_Red" };
+			int rndIndex = Math.RandomInt(0, 4);
+			itemEnt = itemTop.GetInventory().CreateInInventory(chemlightArray[rndIndex]);
 			SetRandomHealth(itemEnt);
-			
+
 			rand = Math.RandomFloatInclusive(0.0, 1.0);
 			if ( rand < 0.35 )
 				itemEnt = player.GetInventory().CreateInInventory("Apple");
@@ -89,12 +90,12 @@ class CustomMission: MissionServer
 				itemEnt = player.GetInventory().CreateInInventory("Pear");
 			else
 				itemEnt = player.GetInventory().CreateInInventory("Plum");
-		
+
 			SetRandomHealth(itemEnt);
 		}
 	}
 };
-  
+
 Mission CreateCustomMission(string path)
 {
 	return new CustomMission();
