@@ -56,6 +56,11 @@ class UndergroundStash extends ItemBase
 		return false;
 	}
 	
+	override bool CanSaveItemInHands (EntityAI item_in_hands)
+	{
+		return false;
+	}
+	
 	override bool CanPutIntoHands (EntityAI parent)
 	{
 		super.CanPutIntoHands( parent );

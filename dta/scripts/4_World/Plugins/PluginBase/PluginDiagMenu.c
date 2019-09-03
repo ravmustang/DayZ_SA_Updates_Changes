@@ -69,7 +69,8 @@ enum DiagMenuIDs
 	DM_HAIR_DISPLAY_DEBUG,
 	DM_HAIR_LEVEL,
 	DM_HAIR_LEVEL_HIDE,
-	DM_HAIR_HIDE_ALL
+	DM_HAIR_HIDE_ALL,
+	DM_CAM_SHAKE,
 	
 };
 
@@ -179,7 +180,7 @@ class PluginDiagMenu extends PluginBase
 				// LEVEL 2
 				//---------------------------------------------------------------
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_CRAFTING_GENERATE, "", "Generate Cache", "Crafting");
-				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_CRAFTING_DEBUG_ACTIONS_ENABLE, "lalt+3", "Debug Insta Crafting", "Crafting");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_CRAFTING_DEBUG_ACTIONS_ENABLE, "", "Debug Insta Crafting", "Crafting");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_CRAFTING_DUMP, "", "Dump recipes to file", "Crafting");
 			
 			
@@ -247,7 +248,7 @@ class PluginDiagMenu extends PluginBase
 				// LEVEL 2
 				//---------------------------------------------------------------
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_ITEM_DEBUG_ACTIONS_SHOW, "lalt+4", "Item Debug Actions", "Misc");
-				DiagMenu.RegisterBool(DiagMenuIDs.DM_BULLET_IMPACT, "", "BulletImpact", "Misc");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_BULLET_IMPACT, "lalt+7", "BulletImpact", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_PLAYER_STATS_LOG_ENABLE, "", "Log Player Stats", "Misc");
 				DiagMenu.RegisterMenu(DiagMenuIDs.DM_ACTION_TARGETS_MENU, "Action Targets", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_XBOX_CURSOR, "", "XboxCursor", "Misc");
@@ -262,6 +263,7 @@ class PluginDiagMenu extends PluginBase
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_QUICK_RESTRAIN, "ralt+0", "Quick Restrain", "Misc");
 				DiagMenu.RegisterMenu(DiagMenuIDs.DM_HAIR_MENU, "Hair Hiding", "Misc");
 				DiagMenu.RegisterBool(DiagMenuIDs.DM_DISABLE_PERSONAL_LIGHT, "", "Disable Personal Light", "Misc");
+				DiagMenu.RegisterBool(DiagMenuIDs.DM_CAM_SHAKE, "lalt+3", "Simulate Cam Shake", "Misc");
 					//---------------------------------------------------------------
 					// LEVEL 3
 					//---------------------------------------------------------------
@@ -353,6 +355,7 @@ class PluginDiagMenu extends PluginBase
 		CheckHairLevel();
 		CheckHairHide();
 		CheckPersonalLight();
+		CheckCamShake();
 
 	}
 	//---------------------------------------------
@@ -971,6 +974,7 @@ class PluginDiagMenu extends PluginBase
 	//---------------------------------------------	
 	void CheckQuickRestrain()
 	{
+		
 		if( DiagMenu.GetBool( DiagMenuIDs.DM_QUICK_RESTRAIN ) )
 		{
 			if(!m_EnableQuickRestrain)
@@ -987,6 +991,18 @@ class PluginDiagMenu extends PluginBase
 				m_EnableQuickRestrain = false;
 			}
 		}
+	}
+	//---------------------------------------------	
+	
+	void CheckCamShake()
+	{
+		if( DiagMenu.GetBool( DiagMenuIDs.DM_CAM_SHAKE ) )
+		{
+			GetGame().GetPlayer().GetCurrentCamera().SpawnCameraShake(1,1,15,4);
+			DiagMenu.SetValue(DiagMenuIDs.DM_CAM_SHAKE, false);
+		}
+		
+
 	}
 	//---------------------------------------------	
 	void CheckAimNoise()

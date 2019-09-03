@@ -19,16 +19,6 @@ class HandsArea: LayoutHolder
 	override void SetActive( bool active )
 	{
 		m_HandsContainer.SetActive( active );
-		
-		/*
-		#ifdef PLATFORM_CONSOLE
-		Widget bg = GetRootWidget().GetParent().GetParent().GetParent().FindAnyWidget( "CenterBackground" );
-		if( active )
-			bg.SetAlpha( 0.4 );
-		else
-			bg.SetAlpha( 0 );
-		#endif
-		*/
 	}
 
 	override bool IsActive()
@@ -114,6 +104,11 @@ class HandsArea: LayoutHolder
 	bool TransferItemToVicinity()
 	{
 		return m_HandsContainer.TransferItemToVicinity();
+	}
+	
+	bool InspectItem()
+	{
+		return m_HandsContainer.InspectItem();
 	}
 	
 	bool IsItemActive()

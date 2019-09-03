@@ -1,6 +1,7 @@
 class ContainerWithCargo: ClosableContainer
 {
 	protected ref CargoContainer	m_CargoGrid;
+	protected int m_CargoIndex = -1;
 
 	void ContainerWithCargo( Container parent, int sort = -1 )
 	{
@@ -124,10 +125,17 @@ class ContainerWithCargo: ClosableContainer
 	{
 		return m_CargoGrid.TransferItemToVicinity();
 	}
+	
+	override bool InspectItem()
+	{
+		return m_CargoGrid.InspectItem();
+	}
 
-	void SetEntity( EntityAI entity )
+	void SetEntity( EntityAI entity, int cargo_index = 0 )
 	{
 		m_Entity = entity;
+		m_CargoIndex = cargo_index;
+
 		SetOpenState( ItemManager.GetInstance().GetDefaultOpenState( m_Entity.GetType() ) );
 
 		m_CargoGrid.SetEntity( entity );
@@ -219,16 +227,24 @@ class ContainerWithCargo: ClosableContainer
 		int idx = 0;
 		#endif
 		
-		if( m_Entity.GetInventory().GetCargo() )
+		CargoBase cargo = m_Entity.GetInventory().GetCargoFromIndex(m_CargoIndex);
+		if( cargo )
 		{
-			c_x = m_Entity.GetInventory().GetCargo().GetHeight();
-			c_y = m_Entity.GetInventory().GetCargo().GetWidth();
+			c_x = cargo.GetHeight();
+			c_y = cargo.GetWidth();
 		}
 		
 		#ifdef PLATFORM_CONSOLE
-		if( m_Entity.GetInventory().CanAddEntityInCargo( item, item.GetInventory().GetFlipCargo() ) && item.GetInventory().CanRemoveEntity() )
+		y = cargo.GetItemCount();
+		#endif
+		
+		InventoryLocation dst = new InventoryLocation;		
+		dst.SetCargoAuto(cargo, item, x, y, item.GetInventory().GetFlipCargo());
+		
+		#ifdef PLATFORM_CONSOLE
+		if( m_Entity.GetInventory().LocationCanAddEntity(dst))
 		#else
-		if( m_Entity && c_x > x && c_y > y && m_Entity.GetInventory().CanAddEntityInCargoEx( item, 0, x, y, item.GetInventory().GetFlipCargo() ) && item.GetInventory().CanRemoveEntity() )
+		if( m_Entity && c_x > x && c_y > y && m_Entity.GetInventory().LocationCanAddEntity(dst))
 		#endif
 		{
 			ItemManager.GetInstance().HideDropzones();
@@ -288,21 +304,30 @@ class ContainerWithCargo: ClosableContainer
 		#endif
 		int c_x, c_y;
 		
-		if( m_Entity.GetInventory().GetCargo() )
+		CargoBase cargo = m_Entity.GetInventory().GetCargoFromIndex(m_CargoIndex);
+		
+		if( cargo )
 		{
-			c_x = m_Entity.GetInventory().GetCargo().GetHeight();
-			c_y = m_Entity.GetInventory().GetCargo().GetWidth();
+			c_x = cargo.GetHeight();
+			c_y = cargo.GetWidth();
 		}
 		
 		#ifdef PLATFORM_CONSOLE
-		if( m_Entity.GetInventory().CanAddEntityInCargo( item, item.GetInventory().GetFlipCargo() ) )
+		y = cargo.GetItemCount();
+		#endif
+		
+		InventoryLocation dst = new InventoryLocation;		
+		dst.SetCargoAuto(cargo, item, x, y, item.GetInventory().GetFlipCargo());
+		
+		#ifdef PLATFORM_CONSOLE
+		if(m_Entity.GetInventory().LocationCanAddEntity(dst))
 		#else
-		if( c_x > x && c_y > y && m_Entity.GetInventory().CanAddEntityInCargoEx( item, idx, x, y, item.GetInventory().GetFlipCargo() ) )
+		if( c_x > x && c_y > y && m_Entity.GetInventory().LocationCanAddEntity(dst))
 		#endif
 		{
 			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 			
-			TakeIntoCargo( player, m_Entity, item, idx, x, y );
+			SplitItemUtils.TakeOrSplitToInventoryLocation( player, dst );
 			
 			Icon icon = m_CargoGrid.GetIcon( item );
 			
@@ -334,28 +359,6 @@ class ContainerWithCargo: ClosableContainer
 		else if( stackable != 0 && stackable < item_base.GetQuantity() )
 		{
 			item_base.SplitIntoStackMaxHandsClient( player );
-		}
-	}
-	
-	void TakeIntoCargo( notnull PlayerBase player, notnull EntityAI entity, notnull EntityAI item, int idx = -1, int row = 0, int col = 0 )
-	{
-		ItemBase item_base = ItemBase.Cast( item );
-		
-		if( !item.GetInventory().CanRemoveEntity() || !player.CanManipulateInventory() )
-			return;
-		
-		float stackable = item_base.ConfigGetFloat("varStackMax");
-		
-		if( stackable == 0 || stackable >= item_base.GetQuantity() )
-		{
-			if( idx != -1 )
-				player.PredictiveTakeEntityToTargetCargoEx( m_Entity, item, idx, row, col );
-			else
-				player.PredictiveTakeEntityToTargetCargo(m_Entity, item);
-		}
-		else if( stackable != 0 && stackable < item_base.GetQuantity() )
-		{
-			item_base.SplitIntoStackMaxCargoClient( entity, idx, row, col );
 		}
 	}
 
@@ -402,13 +405,20 @@ class ContainerWithCargo: ClosableContainer
 		}
 
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
-		if( GetEntity() )
+		InventoryLocation src = new InventoryLocation();
+		if( GetEntity() && item.GetInventory().GetCurrentInventoryLocation(src))
 		{
+			InventoryLocation dst = new InventoryLocation();
+			if (m_Entity.GetInventory().FindFreeLocationFor(item, FindInventoryLocationType.ATTACHMENT, dst))
+			{
+				player.PredictiveTakeToDst(src, dst);
+			}
+
 			bool can_add = m_Entity.GetInventory().CanAddEntityInCargo( item, item.GetInventory().GetFlipCargo() );
 			bool in_cargo = !player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item );
 			if( can_add && in_cargo )
 			{
-				TakeIntoCargo( player, m_Entity, item );
+				SplitItemUtils.TakeOrSplitToInventory( player, m_Entity, item );
 			}
 		}
 	}

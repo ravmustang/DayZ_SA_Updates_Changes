@@ -54,6 +54,9 @@ class SHumanCommandSwimSettings
 
 class SHumanCommandClimbSettings 
 {
+	//! generic settings
+	float		m_fCharHeight;
+
 	//! forward pass
 	float 		m_fCharWidth;
 

@@ -6,15 +6,24 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 	protected ref map<EntityAI, ref CargoContainer>			m_AttachmentCargos;
 	protected ref map<EntityAI, ref AttachmentsWrapper>		m_AttachmentAttachmentsContainers;
 	protected ref map<EntityAI, ref Attachments>			m_AttachmentAttachments;
+	protected ref array<int>								m_AttachmentSlotsSorted;
 
 	void ~ContainerWithCargoAndAttachments()
 	{
+		if( m_Entity )
+		{
+			m_Entity.GetOnItemAttached().Remove( AttachmentAdded );
+			m_Entity.GetOnItemDetached().Remove( AttachmentRemoved );
+		}
+		
 		if( m_Atts )
 			delete m_Atts;
+		
 		foreach( EntityAI e, Attachments att : m_AttachmentAttachments )
 		{
 			delete att;
 		}
+		
 		if( m_AttachmentAttachments )
 			m_AttachmentAttachments.Clear();
 		if( m_AttachmentAttachmentsContainers )
@@ -23,97 +32,80 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			m_AttachmentCargos.Clear();
 	}
 	
+	void AttachmentAdded(EntityAI item, string slot, EntityAI parent)
+	{
+		int slot_id								= InventorySlots.GetSlotIdFromString( slot );
+		
+		if( item.GetInventory().GetCargo() )
+		{
+			ref CargoContainer cont = new CargoContainer( this, true );
+			cont.GetRootWidget().SetSort( m_AttachmentSlotsSorted.Find( slot_id ) + 50 );
+			cont.SetEntity( item );
+			Insert( cont, m_Atts.GetAttachmentHeight() + 1 + m_AttachmentCargos.Count() );
+			
+			m_AttachmentCargos.Insert( item, cont );
+			RecomputeOpenedContainers();
+			if( m_Parent )
+				m_Parent.Refresh();
+			Inventory.GetInstance().UpdateConsoleToolbar();
+			return;
+		}
+		
+		if( item.GetInventory().GetAttachmentSlotsCount() > 0  )
+		{
+			ref Attachments att_cont = new Attachments( this, item );
+			att_cont.InitAttachmentGrid( m_AttachmentSlotsSorted.Find( slot_id ) + m_Atts.GetAttachmentHeight() + 1 );
+			
+			m_AttachmentAttachments.Insert( item, att_cont );
+			m_AttachmentAttachmentsContainers.Insert( item, att_cont.GetWrapper() );
+			
+			att_cont.UpdateInterval();
+			RecomputeOpenedContainers();
+			if( m_Parent )
+				m_Parent.Refresh();
+			Inventory.GetInstance().UpdateConsoleToolbar();
+			return;
+		}
+	}
+	
+	void AttachmentRemoved(EntityAI item, string slot, EntityAI parent)
+	{
+		int slot_id = InventorySlots.GetSlotIdFromString( slot );
+		
+		CargoContainer old_cont = m_AttachmentCargos.Get( item );
+		if( old_cont )
+		{
+			m_Body.RemoveItem( old_cont );
+			m_AttachmentCargos.Remove( item );
+			RecomputeOpenedContainers();
+			if( m_Parent )
+				m_Parent.Refresh();
+			Inventory.GetInstance().UpdateConsoleToolbar();
+		}
+				
+		
+		AttachmentsWrapper old_att_cont = m_AttachmentAttachmentsContainers.Get( item );
+		if( old_att_cont )
+		{
+			m_Body.RemoveItem( old_att_cont );
+			m_AttachmentAttachmentsContainers.Remove( item );
+			m_AttachmentAttachments.Remove( item );
+			delete old_att_cont;
+			RecomputeOpenedContainers();
+			if( m_Parent )
+				m_Parent.Refresh();
+			Inventory.GetInstance().UpdateConsoleToolbar();
+		}
+	}
+	
 	override void UpdateInterval()
 	{
 		int i;
 		if( m_Entity )
 		{
-			EntityAI e;
-			array<EntityAI> cargo_attachments = m_Entity.GetAttachmentsWithCargo();
-			if( cargo_attachments && m_AttachmentCargos )
+			for( i = 0; i < m_AttachmentCargos.Count(); i++ )
 			{
-				for( i = 0; i < m_AttachmentCargos.Count(); i++ )
-				{
-					e			= m_AttachmentCargos.GetKey( i );
-					if( e )
-					{
-						if( cargo_attachments.Find( e ) == -1 )
-						{
-							CargoContainer old_cont = m_AttachmentCargos.GetElement( i );
-							m_Body.RemoveItem( old_cont );
-							m_AttachmentCargos.Remove( e );
-							RecomputeOpenedContainers();
-							if( m_Parent )
-								m_Parent.Refresh();
-						}
-						else
-						{
-							m_AttachmentCargos.Get( e ).UpdateInterval();
-						}
-					}
-				}
-				
-				for( i = 0; i < cargo_attachments.Count(); i++ )
-				{
-					if( !m_AttachmentCargos.Contains( cargo_attachments.Get( i ) ) )
-					{
-						ref CargoContainer cont = new CargoContainer( this, true );
-						cont.GetRootWidget().SetSort( i + 50 );
-						cont.SetEntity( cargo_attachments.Get( i ) );
-						Insert( cont, m_Atts.GetAttachmentHeight() + 1 + m_AttachmentCargos.Count() );
-						
-						m_AttachmentCargos.Insert( cargo_attachments.Get( i ), cont );
-						RecomputeOpenedContainers();
-						if( m_Parent )
-							m_Parent.Refresh();
-					}
-				}
-			}
-			
-			array<EntityAI> attachment_attachments = m_Entity.GetAttachmentsWithAttachments();
-			if( attachment_attachments && m_AttachmentAttachments )
-			{
-				for( i = 0; i < m_AttachmentAttachmentsContainers.Count(); i++ )
-				{
-					e			= m_AttachmentAttachmentsContainers.GetKey( i );
-					if( e )
-					{
-						if( attachment_attachments.Find( e ) == -1 )
-						{
-							AttachmentsWrapper old_att_cont = m_AttachmentAttachmentsContainers.GetElement( i );
-							m_Body.RemoveItem( old_att_cont );
-							m_AttachmentAttachmentsContainers.Remove( e );
-							m_AttachmentAttachments.Remove( e );
-							delete old_att_cont;
-							m_Body.RemoveItem( old_att_cont );
-							m_AttachmentAttachments.Remove( e );
-							RecomputeOpenedContainers();
-							if( m_Parent )
-								m_Parent.Refresh();
-						}
-						else
-						{
-							m_AttachmentAttachments.Get( e ).RefreshAtt();
-						}
-					}
-				}
-				
-				for( i = 0; i < attachment_attachments.Count(); i++ )
-				{
-					if( !m_AttachmentAttachments.Contains( attachment_attachments.Get( i ) ) )
-					{
-						ref Attachments att_cont = new Attachments( this, attachment_attachments.Get( i ) );
-						att_cont.InitAttachmentGrid( i + m_Atts.GetAttachmentHeight() + 1 );
-						
-						m_AttachmentAttachments.Insert( attachment_attachments.Get( i ), att_cont );
-						m_AttachmentAttachmentsContainers.Insert( attachment_attachments.Get( i ), att_cont.GetWrapper() );
-						
-						att_cont.RefreshAtt();
-						RecomputeOpenedContainers();
-						if( m_Parent )
-							m_Parent.Refresh();
-					}
-				}
+				m_AttachmentCargos.GetElement( i ).UpdateInterval();
 			}
 			
 			if( m_Entity.GetInventory().IsInventoryLockedForLockType( HIDE_INV_FROM_SCRIPT ) || m_Closed )
@@ -127,7 +119,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			
 			if( m_Atts )
 			{
-				m_Atts.RefreshAtt();
+				m_Atts.UpdateInterval();
 			}
 			
 			if( m_CargoGrid )
@@ -215,6 +207,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			GetFocusedContainer().SetActive( active );
 		if( active )
 			SetFocusToIndex( true );
+		Inventory.GetInstance().UpdateConsoleToolbar();
 	}
 	
 	override void SetLastActive()
@@ -230,6 +223,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 			old.SetActive( false );
 		
 		SetFocusToIndex( true, true );
+		Inventory.GetInstance().UpdateConsoleToolbar();
 	}
 	
 	void EquipmentMoveUp()
@@ -370,6 +364,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 				m_AttachmentCargos.GetElement( index - cargo_start_index ).MoveGridCursor( direction );
 			}
 		}
+		Inventory.GetInstance().UpdateConsoleToolbar();
 	}
 	
 	override void SetNextActive()
@@ -556,6 +551,7 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 				}
 			}
 		}
+		Inventory.GetInstance().UpdateConsoleToolbar();
 	}
 
 	void SetEntity( EntityAI entity )
@@ -564,6 +560,10 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		
 		m_Atts = new Attachments( this, entity );
 		m_Atts.InitAttachmentGrid( 1 );
+		m_AttachmentSlotsSorted = m_Atts.GetSlotsSorted();
+		
+		m_Entity.GetOnItemAttached().Insert( AttachmentAdded );
+		m_Entity.GetOnItemDetached().Insert( AttachmentRemoved );
 		
 		m_ClosableHeader.SetItemPreview( entity );
 		
@@ -587,6 +587,13 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		m_AttachmentAttachments				= new map<EntityAI, ref Attachments>;
 		
 		( Container.Cast( m_Parent ) ).Insert( this );
+		
+		foreach( int slot_id : m_AttachmentSlotsSorted )
+		{
+			EntityAI item = m_Entity.GetInventory().FindAttachment( slot_id );
+			if( item )
+				AttachmentAdded( item, InventorySlots.GetSlotName( slot_id ), m_Entity );
+		}
 		
 		if( m_Entity.GetInventory().IsInventoryLockedForLockType( HIDE_INV_FROM_SCRIPT ) || m_Closed )
 		{
@@ -789,12 +796,15 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		else
 			return;
 		
-		if( c_x > x && c_y > y && target_entity.GetInventory().CanAddEntityInCargoEx( item, idx, x, y, item.GetInventory().GetFlipCargo() ) )
+		InventoryLocation dst = new InventoryLocation;		
+		dst.SetCargoAuto(target_cargo, item, x, y, item.GetInventory().GetFlipCargo());
+			
+		if( c_x > x && c_y > y && target_entity.GetInventory().LocationCanAddEntity(dst))
 		{
 			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 
-			TakeIntoCargo( player, target_entity, item, idx, x, y );
-
+			SplitItemUtils.TakeOrSplitToInventoryLocation( player, dst);
+			
 			Icon icon = cargo.GetIcon( item );
 			
 			if( icon )
@@ -810,31 +820,6 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		ItemManager.GetInstance().SetIsDragging( false );
 	}
 	
-	void TakeIntoCargo( notnull PlayerBase player, notnull EntityAI entity, notnull EntityAI item, int idx = -1, int row = 0, int col = 0 )
-	{
-		ItemBase item_base = ItemBase.Cast( item );
-		if( item_base )
-		{
-			float stackable = item_base.ConfigGetFloat("varStackMax");
-			
-			if( !item.GetInventory().CanRemoveEntity() || !player.CanManipulateInventory() )
-				return;
-			
-			if( stackable == 0 || stackable >= item_base.GetQuantity() )
-			{
-				if( idx != -1 )
-					player.PredictiveTakeEntityToTargetCargoEx( entity, item, idx, row, col );
-				else
-					player.PredictiveTakeEntityToTargetAttachment(entity, item);
-			}
-			else if( stackable != 0 && stackable < item_base.GetQuantity() )
-			{
-				item_base.SplitIntoStackMaxCargoClient( entity, idx, row, col );
-			}
-		}
-		
-	}
-
 	void TakeAsAttachment( Widget w, Widget receiver )
 	{
 		ItemManager.GetInstance().HideDropzones();
@@ -904,11 +889,11 @@ class ContainerWithCargoAndAttachments extends ClosableContainer
 		}
 		else if( ( m_Entity.GetInventory().CanAddEntityInCargo( item, item.GetInventory().GetFlipCargo() ) && ( !player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item )) ) || player.GetHumanInventory().HasEntityInHands( item ) )
 		{
-			TakeIntoCargo( PlayerBase.Cast( GetGame().GetPlayer() ), m_Entity, item );
+			SplitItemUtils.TakeOrSplitToInventory( PlayerBase.Cast( GetGame().GetPlayer() ), m_Entity, item );
 		}
 		else if( !player.GetInventory().HasEntityInInventory( item ) || !m_Entity.GetInventory().HasEntityInCargo( item ) )
 		{
-			TakeIntoCargo( PlayerBase.Cast( GetGame().GetPlayer() ), m_Entity, item );
+			SplitItemUtils.TakeOrSplitToInventory( PlayerBase.Cast( GetGame().GetPlayer() ), m_Entity, item );
 		}
 	}
 

@@ -87,9 +87,9 @@ class TentBase extends ItemBase
 		return true;
 	}
 	
-	override void EEInit()
+	override void OnCreatePhysics()
 	{
-		super.EEInit();
+		super.OnCreatePhysics();
 		
 		if ( GetState() == PITCHED )
 		{
@@ -542,7 +542,7 @@ class TentBase extends ItemBase
 	void Refresh()
 	{
 		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).Call( UpdateVisuals );
-		GetGame().GetCallQueue( CALL_CATEGORY_GAMEPLAY ).CallLater( UpdatePhysics, 100, false );
+		UpdatePhysics();
 	}
 	
 	bool CanToggleAnimations( string selection )

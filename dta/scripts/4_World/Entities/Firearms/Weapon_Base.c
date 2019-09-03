@@ -400,15 +400,6 @@ class Weapon_Base extends Weapon
 	}
 
 	/**
-	 * @brief	Load posible actions for wepon from config
-	 **/
-	override void SetUserActions ()
-	{
-		g_Game.ConfigGetIntArray("cfgWeapons " + GetType() + " ContinuousActions", m_ContinuousActions);
-		g_Game.ConfigGetIntArray("cfgWeapons " + GetType() + " SingleUseActions", m_SingleUseActions);
-		g_Game.ConfigGetIntArray("cfgWeapons " + GetType() + " InteractActions", m_InteractActions);
-	}
-	/**
 	 * @brief Returns number of slots for attachments corrected for weapons
 	 **/
 	override int GetSlotsCountCorrect ()
@@ -557,21 +548,6 @@ class Weapon_Base extends Weapon
 		if (!IsChamberEmpty(GetCurrentMuzzle()) && !IsChamberFiredOut(GetCurrentMuzzle()) && !IsJammed() && !m_LiftWeapon)
 			return true;
 		return false;
-	}
-	
-	override int GetItemWeight ()
-	{
-		int AttachmentWeight = 0;
-		float item_wetness = GetWet();
-		int AttachmentsCount = GetInventory().AttachmentCount();
-		int ConfWeight = ConfigGetInt("weight");
-		
-		for (int i = 0; i < AttachmentsCount; i++)
-		{
-			AttachmentWeight += GetInventory().GetAttachmentFromIndex(i).GetItemWeight();
-		}
-		
-		return Math.Round((item_wetness + 1) * (ConfWeight + AttachmentWeight));
 	}
 			
 	bool CanEnterIronsights ()
@@ -819,14 +795,9 @@ class Weapon_Base extends Weapon
 		AddAction(FirearmActionMechanicManipulate);
 		AddAction(ActionTurnOnWeaponFlashlight);
 		AddAction(ActionTurnOffWeaponFlashlight);
-		#ifdef SERVER_FOR_CONSOLE
-			AddAction(FirearmActionAttachMagazineQuick); // Easy reload
-			AddAction(FirearmActionLoadBulletQuick); // Easy reload
-		#endif
-		#ifdef PLATFORM_CONSOLE
-			AddAction(FirearmActionAttachMagazineQuick); // Easy reload
-			AddAction(FirearmActionLoadBulletQuick); // Easy reload
-		#endif
+
+		AddAction(FirearmActionAttachMagazineQuick); // Easy reload
+		AddAction(FirearmActionLoadBulletQuick); // Easy reload
 	}
 };
 

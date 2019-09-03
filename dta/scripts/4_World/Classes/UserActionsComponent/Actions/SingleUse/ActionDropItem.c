@@ -5,24 +5,6 @@ class ActionDropItemCB : ActionSingleUseBaseCB
 		SetCommand(DayZPlayerConstants.CMD_ACTIONINT_END);
 		m_ActionData.m_State = UA_FINISHED;
 	}
-	
-	override void OnAnimationEvent(int pEventID)
-	{
-		switch (pEventID)
-		{
-			case UA_ANIM_EVENT: 
-				if (( ( !GetGame().IsServer() && GetGame().IsMultiplayer() ) || (!GetGame().IsMultiplayer()) ) && m_ActionData && m_ActionData.m_Player)
-				{
-					m_ActionData.m_Player.PredictiveDropEntity(m_ActionData.m_Player.GetItemInHands());
-				
-					if ( m_ActionData.m_Player.IsPlacingLocal() )
-					{
-						m_ActionData.m_Player.TogglePlacingLocal();
-					}
-				}
-			break;
-		}
-	}
 };
 
 class ActionDropItem: ActionSingleUseBase
@@ -85,13 +67,36 @@ class ActionDropItem: ActionSingleUseBase
 		return false;
 	}
 	
-	/*override void OnExecuteServer( ActionData action_data )
+	override void OnExecuteServer( ActionData action_data )
 	{
-	}*/
+		if ( !GetGame().IsMultiplayer() )
+		{
+			action_data.m_Player.PredictiveDropEntity(action_data.m_Player.GetItemInHands());
+		
+			if ( action_data.m_Player.IsPlacingLocal() )
+			{
+				action_data.m_Player.TogglePlacingLocal();
+			}
+		}
+	}
 	
-	//would not work? Action probably already gone by then
 	override void OnExecuteClient( ActionData action_data )
 	{
-		//action_data.m_Player.PredictiveDropEntity(action_data.m_Player.GetItemInHands());
+		/*if (action_data.m_Player.GetItemInHands().IsHeavyBehaviour())
+		{*/
+			action_data.m_Player.PredictiveDropEntity(action_data.m_Player.GetItemInHands());
+		
+			if ( action_data.m_Player.IsPlacingLocal() )
+			{
+				action_data.m_Player.TogglePlacingLocal();
+			}
+		/*}
+		else
+		{
+			vector dir = action_data.m_Player.GetOrientation();
+			HumanInventory hin = action_data.m_Player.GetHumanInventory();
+			ItemBase item = action_data.m_Player.GetItemInHands();
+			hin.ThrowEntity(item,dir,0);
+		}*/
 	}
 };

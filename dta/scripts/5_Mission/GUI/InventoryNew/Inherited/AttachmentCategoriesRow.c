@@ -22,10 +22,20 @@ class AttachmentCategoriesRow: ClosableContainer
 	
 	override EntityAI GetFocusedEntity()
 	{
+		SlotsIcon icon = GetFocusedIcon();
+		if( icon )
+		{
+			return icon.GetEntity();
+		}
+		return null;
+	}
+	
+	SlotsIcon GetFocusedIcon()
+	{
 		if( m_FocusedRow < m_Ics.Count() )
 		{
-			ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Ics.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Render" + m_FocusedColumn ) );
-			return ipw.GetItem();
+			SlotsContainer cont = SlotsContainer.Cast( m_Ics.Get( m_FocusedRow ) );
+			return cont.GetSlotIcon( m_FocusedColumn );
 		}
 		return null;
 	}
@@ -58,13 +68,14 @@ class AttachmentCategoriesRow: ClosableContainer
 	{
 		ItemBase prev_item = ItemBase.Cast( GetFocusedEntity() );
 		Man player = GetGame().GetPlayer();
+		SlotsIcon selected_icon = GetFocusedIcon();
 		
 		if( ItemManager.GetInstance().IsItemMoving() )
 		{
 			ItemBase selected_item = ItemBase.Cast( ItemManager.GetInstance().GetSelectedItem() );
 			int selected_slot = GetFocusedSlot();
 			int stack_max;
-			if( selected_item && selected_item.GetInventory().CanRemoveEntity() )
+			if( selected_item && selected_item.GetInventory().CanRemoveEntity() && !selected_icon.IsOutOfReach() )
 			{
 				if( m_Entity.GetInventory().CanAddAttachmentEx( selected_item, selected_slot ) )
 				{
@@ -103,7 +114,7 @@ class AttachmentCategoriesRow: ClosableContainer
 						{
 							if( prev_item.GetInventory().CanAddEntityInCargo( selected_item, selected_item.GetInventory().GetFlipCargo() ) )
 							{
-								TakeIntoCargo( PlayerBase.Cast( player ), prev_item, selected_item );
+								SplitItemUtils.TakeOrSplitToInventory( PlayerBase.Cast( player ), prev_item, selected_item );
 								return true;
 							}
 						}
@@ -136,7 +147,7 @@ class AttachmentCategoriesRow: ClosableContainer
 		}
 		else
 		{
-			if( prev_item && prev_item.GetInventory().CanRemoveEntity() )
+			if( prev_item && prev_item.GetInventory().CanRemoveEntity() && !selected_icon.IsOutOfReach() )
 			{
 				EntityAI item_in_hands = GetGame().GetPlayer().GetHumanInventory().GetEntityInHands();
 				if( item_in_hands && item_in_hands.GetInventory().CanRemoveEntity() )
@@ -163,7 +174,7 @@ class AttachmentCategoriesRow: ClosableContainer
 	override bool TransferItem()
 	{
 		EntityAI entity = GetFocusedEntity();
-		if( entity && !entity.IsLockedInSlot() )
+		if( entity && !entity.IsLockedInSlot() && !GetFocusedIcon().IsOutOfReach() )
 		{
 			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.CARGO, entity );
@@ -177,7 +188,7 @@ class AttachmentCategoriesRow: ClosableContainer
 		EntityAI item = GetFocusedEntity();
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		
-		if( item && !item.IsLockedInSlot() )
+		if( item && !item.IsLockedInSlot() && !GetFocusedIcon().IsOutOfReach() )
 		{
 			player.PredictiveDropEntity( item );
 			return true;
@@ -195,7 +206,7 @@ class AttachmentCategoriesRow: ClosableContainer
 		{
 			int selected_slot = GetFocusedSlot();
 			int stack_max;
-			if( selected_item && selected_item.GetInventory().CanRemoveEntity() )
+			if( selected_item && selected_item.GetInventory().CanRemoveEntity() && !GetFocusedIcon().IsOutOfReach() )
 			{
 				if( m_Entity.GetInventory().CanAddAttachmentEx( selected_item, selected_slot ) )
 				{
@@ -234,7 +245,7 @@ class AttachmentCategoriesRow: ClosableContainer
 						{
 							if( prev_item.GetInventory().CanAddEntityInCargo( selected_item, selected_item.GetInventory().GetFlipCargo() ) )
 							{
-								TakeIntoCargo( PlayerBase.Cast( player ), prev_item, selected_item );
+								SplitItemUtils.TakeOrSplitToInventory( PlayerBase.Cast( player ), prev_item, selected_item );
 								return true;
 							}
 						}
@@ -288,7 +299,7 @@ class AttachmentCategoriesRow: ClosableContainer
 		{
 			int selected_slot = GetFocusedSlot();
 			int stack_max;
-			if( selected_item && selected_item.GetInventory().CanRemoveEntity() )
+			if( selected_item && selected_item.GetInventory().CanRemoveEntity() && !GetFocusedIcon().IsOutOfReach() )
 			{
 				if( m_Entity.GetInventory().CanAddAttachmentEx( selected_item, selected_slot ) )
 				{
@@ -916,42 +927,24 @@ class AttachmentCategoriesRow: ClosableContainer
 		else
 			return;
 		
-		if( c_x > x && c_y > y && target_entity.GetInventory().CanAddEntityInCargoEx( item, idx, x, y, item.GetInventory().GetFlipCargo() ) )
+		InventoryLocation dst = new InventoryLocation;		
+		dst.SetCargoAuto(target_cargo, item, x, y, item.GetInventory().GetFlipCargo());
+			
+		if( c_x > x && c_y > y && target_entity.GetInventory().LocationCanAddEntity(dst))
 		{
 			PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 
-			TakeIntoCargo( player, target_entity, item, idx, x, y );
+			SplitItemUtils.TakeOrSplitToInventoryLocation( player, dst);
 
 			Icon icon = cargo.GetIcon( item );
 			
 			if( icon )
 			{
-				w.FindAnyWidget("Selected").SetColor( ColorManager.BASE_COLOR );
+				icon.GetRootWidget().FindAnyWidget("Selected").SetColor( ColorManager.BASE_COLOR );
 				icon.RefreshPos( x, y );
 				icon.Refresh();
 				Refresh();
 			}
-		}
-	}
-	
-	void TakeIntoCargo( notnull PlayerBase player, notnull EntityAI entity, notnull EntityAI item, int idx = -1, int row = 0, int col = 0 )
-	{
-		ItemBase item_base = ItemBase.Cast( item );
-		float stackable = item_base.ConfigGetFloat("varStackMax");
-		
-		if( !item.GetInventory().CanRemoveEntity() )
-			return;
-		
-		if( stackable == 0 || stackable >= item_base.GetQuantity() )
-		{
-			if( idx != -1 )
-				player.PredictiveTakeEntityToTargetCargoEx( entity, item, idx, row, col );
-			else
-				player.PredictiveTakeEntityToTargetCargo(entity, item);
-		}
-		else if( stackable != 0 && stackable < item_base.GetQuantity() )
-		{
-			item_base.SplitIntoStackMaxCargoClient( entity, idx, row, col );
 		}
 	}
 	

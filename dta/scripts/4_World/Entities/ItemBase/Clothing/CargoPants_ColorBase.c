@@ -1,4 +1,11 @@
-class CargoPants_ColorBase extends Clothing {};
+class CargoPants_ColorBase extends Clothing
+{
+	override void SetActions()
+	{
+		super.SetActions();
+		AddAction(ActionWringClothes);
+	}
+};
 class CargoPants_Beige extends CargoPants_ColorBase {};
 class CargoPants_Black extends CargoPants_ColorBase {};
 class CargoPants_Blue extends CargoPants_ColorBase {};

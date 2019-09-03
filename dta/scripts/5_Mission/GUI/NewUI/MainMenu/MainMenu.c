@@ -17,7 +17,7 @@ class MainMenu extends UIScriptedMenu
 	protected Widget				m_CustomizeCharacter;
 	protected Widget				m_PlayVideo;
 	protected Widget				m_Tutorials;
-	protected Widget				m_StatButton;
+	protected Widget				m_TutorialButton;
 	protected Widget				m_MessageButton;
 	protected Widget				m_SettingsButton;
 	protected Widget				m_Exit;
@@ -36,7 +36,8 @@ class MainMenu extends UIScriptedMenu
 	
 	protected ref WidgetFadeTimer	m_LastPlayedTooltipTimer;
 	protected ref Widget			m_LastFocusedButton;
-
+	
+	protected ref TextWidget		m_ModdedWarning;
 	protected ref ModsMenuSimple	m_ModsSimple;
 	protected ref ModsMenuDetailed	m_ModsDetailed;
 	protected ref ModsMenuTooltip	m_ModsTooltip;
@@ -50,7 +51,7 @@ class MainMenu extends UIScriptedMenu
 		m_CustomizeCharacter		= layoutRoot.FindAnyWidget( "customize_character" );
 		m_PlayVideo					= layoutRoot.FindAnyWidget( "play_video" );
 		m_Tutorials					= layoutRoot.FindAnyWidget( "tutorials" );
-		m_StatButton				= layoutRoot.FindAnyWidget( "stat_button" );
+		m_TutorialButton			= layoutRoot.FindAnyWidget( "tutorial_button" );
 		m_MessageButton				= layoutRoot.FindAnyWidget( "message_button" );
 		m_SettingsButton			= layoutRoot.FindAnyWidget( "settings_button" );
 		m_Exit						= layoutRoot.FindAnyWidget( "exit_button" );
@@ -60,6 +61,7 @@ class MainMenu extends UIScriptedMenu
 		m_NextCharacter				= layoutRoot.FindAnyWidget( "next_character" );
 
 		m_Version					= TextWidget.Cast( layoutRoot.FindAnyWidget( "version" ) );
+		m_ModdedWarning				= TextWidget.Cast( layoutRoot.FindAnyWidget( "ModdedWarning" ) );
 		m_CharacterRotationFrame	= layoutRoot.FindAnyWidget( "character_rotation_frame" );
 		
 		m_LastPlayedTooltip			= layoutRoot.FindAnyWidget( "last_server_info" );
@@ -126,10 +128,14 @@ class MainMenu extends UIScriptedMenu
 		if( m_ModsDetailed )
 			delete m_ModsDetailed;
 		
-		m_ModsTooltip = new ModsMenuTooltip(layoutRoot);
-		m_ModsDetailed = new ModsMenuDetailed(modArray, layoutRoot.FindAnyWidget("ModsDetailed"), m_ModsTooltip);
-		
-		m_ModsSimple = new ModsMenuSimple(modArray, layoutRoot.FindAnyWidget("ModsSimple"), m_ModsDetailed);
+		if( modArray.Count() > 0 )
+		{
+			m_ModdedWarning.Show( true );
+			m_ModsTooltip = new ModsMenuTooltip(layoutRoot);
+			m_ModsDetailed = new ModsMenuDetailed(modArray, layoutRoot.FindAnyWidget("ModsDetailed"), m_ModsTooltip);
+			
+			m_ModsSimple = new ModsMenuSimple(modArray, layoutRoot.FindAnyWidget("ModsSimple"), m_ModsDetailed);
+		}
 	}
 	
 	override bool OnMouseButtonDown( Widget w, int x, int y, int button )
@@ -184,9 +190,9 @@ class MainMenu extends UIScriptedMenu
 				OpenMenuCustomizeCharacter();
 				return true;
 			}
-			else if ( w == m_StatButton )
+			else if ( w == m_TutorialButton )
 			{
-				OpenStats();
+				OpenTutorials();
 				return true;
 			}
 			else if ( w == m_MessageButton )
@@ -306,7 +312,7 @@ class MainMenu extends UIScriptedMenu
 	{
 		if( w )
 		{
-			if( w == m_Play || w == m_ChooseServer || w == m_CustomizeCharacter || w == m_StatButton || w == m_MessageButton || w == m_SettingsButton );
+			if( w == m_Play || w == m_ChooseServer || w == m_CustomizeCharacter || w == m_TutorialButton || w == m_MessageButton || w == m_SettingsButton );
 			{
 				return true;
 			}

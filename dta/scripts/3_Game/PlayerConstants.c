@@ -11,9 +11,9 @@ class PlayerConstants
 	//----------------------------------------------------------
 	//					STAT LEVELS START
 	//----------------------------------------------------------
-	static const float SL_HEALTH_CRITICAL = 20;
-	static const float SL_HEALTH_LOW = 40;
-	static const float SL_HEALTH_NORMAL = 60;
+	static const float SL_HEALTH_CRITICAL = 15;
+	static const float SL_HEALTH_LOW = 30;
+	static const float SL_HEALTH_NORMAL = 50;
 	static const float SL_HEALTH_HIGH = 80;	
 	
 	static const float SL_TOXICITY_CRITICAL = 20;
@@ -52,6 +52,8 @@ class PlayerConstants
 	static const float LOW_WATER_THRESHOLD 						= PlayerConstants.SL_WATER_LOW;	//threshold from which water affects health
 
 	static const float LOW_ENERGY_THRESHOLD 					= 200;	//threshold from which energy affects health
+	static const float WATER_DRAIN_FROM_VOMIT					= -150;
+	static const float ENERGY_DRAIN_FROM_VOMIT					= -150;
 
 	//--------------------------------------------------------
 	static const float METABOLIC_SPEED_ENERGY_BASAL		= 0.01;		//energy loss per second while idle
@@ -89,11 +91,13 @@ class PlayerConstants
 	static const float BLOOD_REGEN_MODIFIER_WATER_MID		= 0.5;
 	static const float BLOOD_REGEN_MODIFIER_WATER_HIGH		= 1;
 	
-	static const float SALINE_BLOOD_REGEN_PER_SEC			= 2;	//boost for blood regen per second, independent on BLOOD_REGEN_SPEED
-	static const float SALINE_LIQUID_AMOUNT					= 250;
+	static const float SALINE_BLOOD_REGEN_PER_SEC			= 3;	//boost for blood regen per second, independent on BLOOD_REGEN_SPEED
+	static const float SALINE_LIQUID_AMOUNT					= 500;
 	
-	static const float HEMOLYTIC_BLOOD_DRAIN_PER_SEC		= 2;	//hemolytic reaction blood drain per second
-	static const float HEMOLYTIC_BLOODLOSS_AMOUNT			= 250;
+	static const float HEMOLYTIC_BLOOD_DRAIN_PER_SEC		= 7;	//hemolytic reaction blood drain per second
+	static const float HEMOLYTIC_BLOODLOSS_AMOUNT			= 500;
+	static const float HEMOLYTIC_RISK_SHOCK_THRESHOLD		= 75;	// amount of blood from transfusion causing player character going into shock
+	static const float HEMOLYTIC_REACTION_THRESHOLD			= 175;	// amount of blood from transfusion triggering hemolytic reaction
 	
 	static const float WATER_LOSS_THRESHOLD_HC_PLUS_LOW		= THRESHOLD_HEAT_COMFORT_PLUS_WARNING;
 	static const float WATER_LOSS_THRESHOLD_HC_PLUS_HIGH	= THRESHOLD_HEAT_COMFORT_MINUS_CRITICAL;
@@ -119,8 +123,8 @@ class PlayerConstants
 	static const float LOW_ENERGY_DAMAGE_PER_SEC			= 0.125;	//health loss per second while low on energy
 	static const float LOW_WATER_DAMAGE_PER_SEC				= 0.2;		//health loss per second while low on water
 	
-	static const float HEALTH_REGEN_MIN						= 0.01;	//health regen rate at BLOOD_THRESHOLD_FATAL blood level
-	static const float HEALTH_REGEN_MAX						= 0.07;		//health regen rate at MAXIMUM blood level
+	static const float HEALTH_REGEN_MIN						= 0.005;	//health regen rate at BLOOD_THRESHOLD_FATAL blood level
+	static const float HEALTH_REGEN_MAX						= 0.03;		//health regen rate at MAXIMUM blood level
 	
 	static const float UNCONSCIOUS_THRESHOLD				= 25.0;		//player goes unconscious when we get under this threshold
 	static const float CONSCIOUS_THRESHOLD					= 50.0;		//player regains consciousness when he gets above this threshold
@@ -131,16 +135,16 @@ class PlayerConstants
 	static const float SHOCK_DAMAGE_BLOOD_THRESHOLD_HIGH	= 3000;		// we start dealing shock damage over time when we get at this value or lower
 	static const float SHOCK_DAMAGE_BLOOD_THRESHOLD_LOW		= 2500; 	// the closer we get to this value, the higher the over time shock damage we deal
 	
-	static const float SHOCK_DAMAGE_HIGH					= 20; 		// shock damage per second when the blood is near the upper blood threshold
-	static const float SHOCK_DAMAGE_LOW						= 20; 		// shock damage per second when the blood is near the lower blood threshold
+	static const float SHOCK_DAMAGE_HIGH					= 5.5; 		// shock damage per second when the blood is near the upper blood threshold
+	static const float SHOCK_DAMAGE_LOW						= 6.25; 		// shock damage per second when the blood is near the lower blood threshold
 	
 	static const float SHOCK_REFILL_COOLDOWN_AFTER_HIT 		= 15; 		// duration of cooldown during which shock regeneration is paused
 	
 	static const float UNCONSCIOUS_IN_WATER_TIME_LIMIT_TO_DEATH	= 20;	// how long can player survive while unconscious when in water in secs 
 	//----------------------------------------------------------
-	static const float BLEEDING_SOURCE_BLOODLOSS_PER_SEC 	= -6; 		// amount of blood loss per second from one bleeding source 
-	static const float BLEEDING_SOURCE_FLOW_MODIFIER_MEDIUM = 0.6; 	// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
-	static const float BLEEDING_SOURCE_FLOW_MODIFIER_LOW	= 0.2; 	// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
+	static const float BLEEDING_SOURCE_BLOODLOSS_PER_SEC 	= -24; 		// amount of blood loss per second from one bleeding source 
+	static const float BLEEDING_SOURCE_FLOW_MODIFIER_MEDIUM = 0.6; 		// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
+	static const float BLEEDING_SOURCE_FLOW_MODIFIER_LOW	= 0.1; 	// modifier of the bloodloss given by BLEEDING_SOURCE_BLOODLOSS_PER_SEC, multiplying these two will give the resulting bloodloss
 	static const int BLEEDING_SOURCE_DURATION_NORMAL = 300; 	// in seconds, how long will bleeding source exist until disapearing
 	
 	 
@@ -167,4 +171,14 @@ class PlayerConstants
 
 	//!
 	static const int LAST_UA_MSG_LIFETIME = 30;						//! last User Action message lifetime [s] (default: 30s)
+	
+	//!
+	const int	 	VOMIT_THRESHOLD 			= 2000;
+	
+	static const float 	CORPSE_THRESHOLD_MEDIUM = 0.7; //0.7
+	static const float 	CORPSE_THRESHOLD_DECAYED = 0.3; //0.3
+	
+	static const int 	CORPSE_STATE_FRESH = 0;
+	static const int 	CORPSE_STATE_MEDIUM = 1;
+	static const int 	CORPSE_STATE_DECAYED = 2;
 }

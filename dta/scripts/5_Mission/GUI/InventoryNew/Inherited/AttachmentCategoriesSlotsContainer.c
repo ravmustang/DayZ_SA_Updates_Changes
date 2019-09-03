@@ -124,7 +124,7 @@ class AttachmentCategoriesSlotsContainer: Container
 			}
 		}
 
-		m_ItemsCont.GetSlotIcon( m_FocusedColumn ).GetCursorWidget().Show( true );
+		m_ItemsCont.SetFocus( m_FocusedColumn );
 		
 		EntityAI focused_item = GetFocusedEntity();
 		if( focused_item )

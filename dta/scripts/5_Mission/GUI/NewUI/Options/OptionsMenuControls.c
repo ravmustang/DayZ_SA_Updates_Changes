@@ -11,6 +11,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	protected GameOptions					m_Options;
 	protected OptionsMenu					m_Menu;
 	
+	protected ref SwitchOptionsAccess		m_KeyboardOption;
 	protected ref SwitchOptionsAccess		m_AimHelperOption;
 	protected ref NumericOptionsAccess		m_VSensitivityOption;
 	protected ref NumericOptionsAccess		m_HSensitivityOption;
@@ -19,6 +20,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	protected ref NumericOptionsAccess		m_ControllerHSensitivityOption;
 	protected ref SwitchOptionsAccess		m_ControllerInvertOption;
 	
+	protected ref OptionSelectorMultistate	m_KeyboardSelector;
 	protected ref OptionSelectorMultistate	m_AimHelperSelector;
 	protected ref OptionSelectorSlider		m_VSensitivitySelector;
 	protected ref OptionSelectorSlider		m_HSensitivitySelector;
@@ -49,6 +51,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		SetOptions( options );
 		
 		#ifdef PLATFORM_CONSOLE
+		m_Root.FindAnyWidget( "aimhelper_setting_option" ).SetUserID( AT_OPTIONS_MOUSE_AND_KEYBOARD );
 		m_Root.FindAnyWidget( "aimhelper_setting_option" ).SetUserID( AT_OPTIONS_AIM_HELPER );
 		#endif
 		
@@ -68,7 +71,9 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		ref array<string> opt						= { "#options_controls_disabled", "#options_controls_enabled" };
 		
 		#ifdef PLATFORM_CONSOLE
+		m_KeyboardSelector							= new OptionSelectorMultistate( m_Root.FindAnyWidget( "keyboard_setting_option" ), m_KeyboardOption.GetIndex(), this, false, opt );
 		m_AimHelperSelector							= new OptionSelectorMultistate( m_Root.FindAnyWidget( "aimhelper_setting_option" ), m_AimHelperOption.GetIndex(), this, false, opt );
+		m_KeyboardSelector.m_OptionChanged.Insert( UpdateKeyboard );
 		m_AimHelperSelector.m_OptionChanged.Insert( UpdateAimHelper );
 		#endif
 		
@@ -122,7 +127,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	void Focus()
 	{
 		#ifdef PLATFORM_CONSOLE
-			SetFocus( m_ControllerInvertSelector.GetParent() );
+			m_KeyboardSelector.Focus();
 		#endif
 	}
 	
@@ -249,12 +254,14 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	
 	void Apply()
 	{
-		
+		GetGame().GetInput().EnableMouseAndKeyboard( m_AimHelperSelector.IsEnabled() );
 	}
 	
 	void Revert()
 	{
 		#ifdef PLATFORM_CONSOLE
+		if( m_KeyboardSelector )
+			m_KeyboardSelector.SetValue( m_KeyboardOption.GetIndex(), false );
 		if( m_AimHelperSelector )
 			m_AimHelperSelector.SetValue( m_AimHelperOption.GetIndex(), false );
 		#endif
@@ -277,6 +284,14 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		#endif
 		#endif
 	}
+	
+#ifdef PLATFORM_CONSOLE
+	void UpdateKeyboard( int index )
+	{
+		m_KeyboardOption.Switch();
+		m_Menu.OnChanged();
+	}
+#endif
 	
 #ifdef PLATFORM_CONSOLE
 	void UpdateAimHelper( int index )
@@ -335,6 +350,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 	{
 		m_Options = options;
 		#ifdef PLATFORM_CONSOLE
+		m_KeyboardOption							= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_MOUSE_AND_KEYBOARD ) );
 		m_AimHelperOption							= SwitchOptionsAccess.Cast( m_Options.GetOptionByType( AT_OPTIONS_AIM_HELPER ) );
 		#endif
 		
@@ -367,6 +383,7 @@ class OptionsMenuControls extends ScriptedWidgetEventHandler
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "#ps4_options_controls_horizontal_sens_contr", "#ps4_options_controls_horizontal_sens_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_REVERSED_LOOK, new Param2<string, string>( "#ps4_options_controls_invert_vert_view_contr", "#ps4_options_controls_invert_vert_view_contr_desc" ) );
 		#else 
+		m_TextMap.Insert( AT_OPTIONS_MOUSE_AND_KEYBOARD, new Param2<string, string>( "#options_controls_aim_helper_contr", "#options_controls_aim_helper_contr_desc" ) );
 		m_TextMap.Insert( AT_OPTIONS_AIM_HELPER, new Param2<string, string>( "#options_controls_aim_helper_contr", "#options_controls_aim_helper_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_YAXIS, new Param2<string, string>( "#options_controls_vertical_sens_contr", "#options_controls_vertical_sens_contr_desc" ) );
 		m_TextMap.Insert( AT_CONFIG_CONTROLLER_XAXIS, new Param2<string, string>( "#options_controls_horizontal_sens_contr", "#options_controls_horizontal_sens_contr_desc" ) );

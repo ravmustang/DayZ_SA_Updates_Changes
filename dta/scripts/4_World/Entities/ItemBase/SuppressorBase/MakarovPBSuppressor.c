@@ -1,4 +1,4 @@
-class MakarovPBSuppressor extends Inventory_Base
+class MakarovPBSuppressor extends ItemSuppressor
 {
 	override bool CanPutAsAttachment( EntityAI parent )
 	{

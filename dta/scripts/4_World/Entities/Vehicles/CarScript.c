@@ -182,11 +182,13 @@ class CarScript extends Car
 	//here we should handle the damage dealt in OnContact event, but maybe we will react even in that event 
 	override void EEHitBy(TotalDamageResult damageResult, int damageType, EntityAI source, int component, string dmgZone, string ammo, vector modelPos)
 	{
+		string debugStr = "";
 		Print("CarScript>>> EEHitBy");
 		Print( dmgZone );
 		Print( damageResult );
 		Print( source );
-		Print( component );
+		debugStr = "Component" + component.ToString();
+		Print(  debugStr  );
 		Print( damageResult.GetDamage(dmgZone, "Health") );
 
 		//if ( dmgZone == "Engine" && GetHealth("Engine","") < 0.1 )
@@ -202,9 +204,8 @@ class CarScript extends Car
 		//		}
 		//	}
 		//}
-
 	}
-*/	
+*/
 
 	override void EEDelete(EntityAI parent)
 	{
@@ -291,6 +292,14 @@ class CarScript extends Car
 		{
 			m_HeadlightsState = CarHeadlightBulbsState.NONE;
 		}
+	}
+	
+	override void OnAttachmentRuined(EntityAI attachment)
+	{
+		super.OnAttachmentRuined(attachment);
+		
+		UpdateHeadlightState();
+		UpdateLights();
 	}
 
 	override void EEItemDetached(EntityAI item, string slot_name)
@@ -621,9 +630,12 @@ class CarScript extends Car
 									//deal shock to player
 									float shockTemp = Math.InverseLerp(dmgThreshold, dmgKillCrew, dmg);
 									float shock = Math.Lerp( 50, 100, shockTemp );
+									float hp = Math.Lerp( 2, 60, shockTemp );
 
 									player.AddHealth("", "Shock", -shock );
+									player.AddHealth("", "Health", -hp );
 									//Print( "SHOCK..........." + shock );
+									//Print( "HEALTH..........." + hp );
 								}
 							}
 						}
@@ -1044,6 +1056,17 @@ class CarScript extends Car
 						BrakeLightsShineOff();
 					}
 				}
+				else
+				{
+					BrakeLightsShineOff();
+					ReverseLightsShineOff();
+					
+					if (m_RearLight)
+					{
+						m_RearLight.FadeOut();
+						m_RearLight = null;
+					}
+				}
 			}
 			else
 			{
@@ -1323,7 +1346,7 @@ class CarScript extends Car
 	{
 		return "";
 	}
-
+	
 	string GetDoorConditionPointFromSelection( string selection )
 	{
 		switch( selection )
@@ -1342,6 +1365,16 @@ class CarScript extends Car
 			break;
 		}
 		
+		return "";
+	}
+	
+	string GetDoorSelectionNameFromSeatPos(int posIdx)
+	{
+		return "";
+	}
+	
+	string GetDoorInvSlotNameFromSeatPos(int posIdx)
+	{
 		return "";
 	}
 	
@@ -1447,6 +1480,7 @@ class CarScript extends Car
 	
 	string GetActionCompNameOil()
 	{
+		//return "refill";
 		return "carradiator";
 	}
 
@@ -1491,6 +1525,8 @@ class CarScript extends Car
 	void SetActions()
 	{
 		//AddAction(ActionAnimateCarSelection); not needed now
+		AddAction(ActionOpenCarDoors);
+		AddAction(ActionCloseCarDoors);
 		AddAction(ActionGetInTransport);
 		AddAction(ActionSwitchLights);
 	}
@@ -1540,5 +1576,27 @@ class CarScript extends Car
 	override bool IsInventoryVisible()
 	{
 		return ( GetGame().GetPlayer() && ( !GetGame().GetPlayer().GetCommand_Vehicle() || GetGame().GetPlayer().GetCommand_Vehicle().GetTransport() == this ) );
+	}
+	
+	override void EEHealthLevelChanged(int oldLevel, int newLevel, string zone)
+	{
+		if ( newLevel ==  GameConstants.STATE_RUINED )
+		{
+			EffectSound sound_plug;
+			switch( zone )
+			{
+				case "WindowLR":
+				case "WindowRR":
+					PlaySoundSet( sound_plug, "offroad_hit_window_small_SoundSet", 0, 0 );
+				break;
+				
+				case "WindowFront":
+				case "WindowBack":
+				case "WindowFrontLeft":
+				case "WindowFrontRight":
+					PlaySoundSet( sound_plug, "offroad_hit_window_large_SoundSet", 0, 0 );
+				break;
+			}
+		}
 	}
 };

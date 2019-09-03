@@ -109,7 +109,7 @@ class ActionTakeItem: ActionInteractBase
 			}
 			else
 			{
-				action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, il, 10000);
+				action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, il, GameInventory.c_InventoryReservationTimeoutMS);
 			}			
 		}	
 		

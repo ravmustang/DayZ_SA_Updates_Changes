@@ -17,6 +17,33 @@ class Headtorch_ColorBase extends Clothing
 	static string m_OffHeadLightPoint = "beamStart";
 	static string m_OffHeadLightTarget = "beamEnd";
 	
+	ref Timer m_Timer;
+	
+	void Headtorch_ColorBase()
+	{
+		if (!m_Timer)
+			m_Timer = new Timer( CALL_CATEGORY_SYSTEM );
+			
+		m_Timer.Run( 1 , this, "CheckParent", NULL, false);
+	}
+	
+	void CheckParent()
+	{
+		EntityAI owner = GetHierarchyParent();
+		
+		// Spawn a battery in the headtorch if it's attached on a zombie and switch it on
+		if (owner  &&  owner.IsZombie())
+		{
+			GetInventory().CreateAttachment("Battery9V");
+			GetCompEM().SwitchOn();
+		}
+		
+		if (m_Timer)
+			m_Timer.Stop();
+		
+		m_Timer = null;
+	}
+	
 	override void OnWorkStart()
 	{
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // Client side
@@ -70,23 +97,35 @@ class Headtorch_ColorBase extends Clothing
 		
 		OnLightCreated();
 		
-		bool is_on_head = false;
-		PlayerBase player = PlayerBase.Cast( GetHierarchyParent() );
+		EntityAI owner = GetHierarchyParent();
 		
-		if (player)
+		if (owner)
 		{
-			ItemBase att_item = player.GetItemOnHead();
-			
-			if (att_item == this)
+			if (owner.IsPlayer())
 			{
-				is_on_head = true;
+				PlayerBase owner_PB = PlayerBase.Cast(owner);
+				ItemBase att_item = owner_PB.GetItemOnHead();
+				
+				if (att_item == this)
+				{
+					AttachLightOnHead(owner_PB);
+				}
+				else
+				{
+					m_Light.AttachOnMemoryPoint(this, m_OffHeadLightPoint, m_OffHeadLightTarget);
+				}
 			}
-		}
-		
-		
-		if (is_on_head)
-		{
-			AttachLightOnHead(player);
+			else if (owner.IsZombie())
+			{
+				int slot_id = InventorySlots.GetSlotIdFromString( "Headgear" );
+				EntityAI item_EAI = owner.GetInventory().FindAttachment( slot_id );
+				ItemBase item_IB = ItemBase.Cast(item_EAI);
+				
+				if (item_IB == this)
+				{
+					AttachLightOnHead(owner);
+				}
+			}
 		}
 		else
 		{
@@ -94,11 +133,25 @@ class Headtorch_ColorBase extends Clothing
 		}
 	}
 	
-	void AttachLightOnHead(PlayerBase player)
+	void AttachLightOnHead(EntityAI person)
 	{
-		int boneIdx = player.GetBoneIndexByName("Head");
-		
-		if( boneIdx != -1 )
+		if (person.IsPlayer())
+		{
+			PlayerBase player = PlayerBase.Cast(person);
+			int boneIdx = player.GetBoneIndexByName("Head");
+			
+			if( boneIdx != -1 )
+			{
+				if ( m_Light.GetParent() )
+					m_Light.DetachFromParent();
+				
+				m_Light.SetPosition( m_OnHeadLocalPos );
+				m_Light.SetOrientation( m_OnHeadLocalOri );
+				
+				player.AddChild(m_Light, boneIdx);
+			}
+		}
+		else if (person.IsZombie())
 		{
 			if ( m_Light.GetParent() )
 				m_Light.DetachFromParent();
@@ -106,7 +159,7 @@ class Headtorch_ColorBase extends Clothing
 			m_Light.SetPosition( m_OnHeadLocalPos );
 			m_Light.SetOrientation( m_OnHeadLocalOri );
 			
-			player.AddChild(m_Light, boneIdx);
+			person.AddChild(m_Light, 17);
 		}
 	}
 	

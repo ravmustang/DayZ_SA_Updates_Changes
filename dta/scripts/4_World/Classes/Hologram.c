@@ -178,7 +178,7 @@ class Hologram
 			return
 		}
 		
-		if ( m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsRaised() )
+		if ( m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsRaised() || m_Player.IsClimbing() )
 		{
 			GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).Call(m_Player.TogglePlacingLocal);
 			

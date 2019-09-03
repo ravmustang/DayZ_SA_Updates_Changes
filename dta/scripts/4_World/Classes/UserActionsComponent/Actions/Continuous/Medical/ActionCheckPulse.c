@@ -7,6 +7,12 @@ class ActionCheckPulse: ActionInteractBase
 		m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT | DayZPlayerConstants.STANCEMASK_CROUCH;
 		m_HUDCursorIcon = CursorIcons.CloseHood;
 	}
+	
+	override void CreateConditionComponents()  
+	{
+		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
+		m_ConditionItem = new CCINone;
+	}
 
 	static string GetPulseMessage(EPulseType pulse_type, int blood_level)
 	{

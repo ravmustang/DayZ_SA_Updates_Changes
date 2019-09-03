@@ -4,6 +4,7 @@ class VicinityContainer: CollapsibleContainer
 	ref map<EntityAI, ref Container>	m_ShowedItems				= new ref map<EntityAI, ref Container>;
 	ref map<int, ref Container>			m_ShowedItemsIDs			= new ref map<int, ref Container>;
 	ref array<EntityAI>					m_ShowedItemIcons			= new array<EntityAI>;
+	ref map<CargoBase, ref Container>	m_ShowedCargos				= new ref map<CargoBase, ref Container>;
 	
 	const float DISTANCE_TO_ENTITIES 	= 1.0;
 	const float DISTANCE_TO_THE_REST 	= 0.5;
@@ -225,15 +226,6 @@ class VicinityContainer: CollapsibleContainer
 			name.Replace( "PanelWidget", "Render" );
 			ipw = ItemPreviewWidget.Cast( w.FindAnyWidget( name ) );
 		}
-		
-		if( !ipw && ItemPreviewWidget.Cast( w ) )
-		{
-			ipw = ItemPreviewWidget.Cast( w );
-		}
-		else
-		{
-			return;
-		}
 
 		if( !ItemBase.Cast( receiver_item ) || !ipw.GetItem() )
 		{
@@ -242,7 +234,7 @@ class VicinityContainer: CollapsibleContainer
 		
 		EntityAI item = ipw.GetItem();
 		bool equal_typed = item.GetType() == receiver_item.GetType();
-		if( !receiver_item.IsInherited( ItemBase ) || item == null || !equal_typed )
+		if( !receiver_item.IsInherited( ItemBase ) || item == null )
 		{
 			return;
 		}
@@ -258,7 +250,12 @@ class VicinityContainer: CollapsibleContainer
 		}
 		else if( GameInventory.CanSwapEntities( receiver_item, item ) )
 		{
-			if( !receiver_item.GetInventory().CanRemoveEntity() )
+			InventoryLocation il1 = new InventoryLocation;
+			InventoryLocation il2 = new InventoryLocation;
+			receiver_item.GetInventory().GetCurrentInventoryLocation( il1 );
+			item.GetInventory().GetCurrentInventoryLocation( il2 );
+			
+			if( !receiver_item.GetInventory().CanRemoveEntity() || ( il1.GetType() == InventoryLocationType.GROUND && il2.GetType() == InventoryLocationType.GROUND ) )
 				return;
 			player.PredictiveSwapEntities( item, receiver_item );
 		}
@@ -281,7 +278,7 @@ class VicinityContainer: CollapsibleContainer
 	override void SetNextActive()
 	{
 		super.SetNextActive();
-		if( m_ActiveIndex == 1 )
+		if( m_IsActive && m_ActiveIndex == 1 )
 			m_CollapsibleHeader.SetActive( true );
 		else
 			m_CollapsibleHeader.SetActive( false );
@@ -445,7 +442,7 @@ class VicinityContainer: CollapsibleContainer
 					else if( entity.GetInventory().GetCargo() )
 					{
 						ContainerWithCargo iwc = new ContainerWithCargo( this, -1 );
-						iwc.SetEntity( entity );
+						iwc.SetEntity( entity, 0 );
 						new_showed_items.Insert( entity, iwc );
 						showed_items_IDs.Insert( entity.GetID(), iwc );
 						iwc.UpdateInterval();
@@ -502,6 +499,31 @@ class VicinityContainer: CollapsibleContainer
 				}
 			}
 		}
+		
+		ref map<CargoBase, ref Container> new_showed_cargos = new ref map<CargoBase, ref Container>;
+		auto cargoes = VicinityItemManager.GetVicinityCargos();
+		for ( i = 0; i < cargoes.Count(); i++ )
+		{
+			CargoBase cgo = cargoes.Get( i );
+			if( cgo)
+			{
+				if (game_inventory && !m_ShowedCargos.Contains( cgo ) )
+				{
+					ContainerWithCargo pxc = new ContainerWithCargo( this, -1 );
+					pxc.SetEntity( cgo.GetCargoOwner(), cgo.GetOwnerCargoIndex() );
+					new_showed_cargos.Insert( cgo, pxc );
+					pxc.UpdateInterval();
+				}
+				else
+				{
+					if( m_ShowedCargos.Get( cgo ) )
+					{
+						new_showed_cargos.Insert( cgo, m_ShowedCargos.Get( cgo ) );
+					}
+				}
+			}
+		}
+
 
 //			Print(m_ShowedItems.Count());
 		
@@ -518,8 +540,22 @@ class VicinityContainer: CollapsibleContainer
 			}
 		}
 		
+		for ( int ic = 0; ic < m_ShowedCargos.Count(); ic++ )
+		{
+			CargoBase cgo2 = m_ShowedCargos.GetKey( ic );
+			m_ShowedCargos.GetElement( ic ).UpdateInterval();
+			if( !new_showed_cargos.Contains( cgo2 ) )
+			{
+				Container con2 = m_ShowedCargos.GetElement( ic );
+				GetMainWidget().Update();
+				Container.Cast( GetParent() ).Remove( con2 );
+				Remove( con2 );
+			}
+		}
+		
 		m_ShowedItems = new_showed_items;
 		m_ShowedItemsIDs = showed_items_IDs;
+		m_ShowedCargos = new_showed_cargos;
 		RecomputeOpenedContainers();
 		UpdateCollapseButtons();
 		m_VicinityIconsContainer.ShowItemsInContainers( m_ShowedItemIcons );

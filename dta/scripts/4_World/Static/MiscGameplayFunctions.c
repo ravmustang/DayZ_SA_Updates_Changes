@@ -656,8 +656,7 @@ class DestroyItemInCorpsesHandsAndCreateNewOnGndLambda : ReplaceAndDestroyLambda
 	{
 		InventoryLocation gnd = new InventoryLocation;
 		vector mtx[4];
-		Math3D.MatrixIdentity4(mtx);
-		mtx[3] = player.GetPosition();
+		old_item.GetTransform(mtx);
 		gnd.SetGround(NULL, mtx);
 		OverrideNewLocation(gnd);
 	}

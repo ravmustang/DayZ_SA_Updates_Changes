@@ -45,13 +45,23 @@ class DayZPlayerCamera3rdPerson extends DayZPlayerCameraBase
 	//	
 	override void 		OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
 	{
-		m_pPlayer.GetMovementState(m_MovementState);
 		
+		m_pPlayer.GetMovementState(m_MovementState);
+
 		//! update angles from input 
 		float 	udAngle 	= UpdateUDAngle(m_fUpDownAngle, m_fUpDownAngleAdd, CONST_UD_MIN, CONST_UD_MAX, pDt);
 		m_CurrentCameraPitch = udAngle;
 		m_fLeftRightAngle	= UpdateLRAngle(m_fLeftRightAngle, CONST_LR_MIN, CONST_LR_MAX, pDt);
 
+		if(m_CameraShake)
+		{
+			float x,y;
+			m_CameraShake.Update(pDt, x, y);
+			m_fLeftRightAngle += x;
+			m_fUpDownAngleAdd += y;
+			//Print(x);
+		}
+		
 		// update l/r offsets and set it as 
 		if (m_pInput.Camera3rdIsRightShoulder())
 		{
@@ -183,7 +193,7 @@ class DayZPlayerCamera3rdPersonJump extends DayZPlayerCamera3rdPersonErc
 		//! runtime values
 		m_fJumpStartY		= pPlayer.GetOrigin()[1];
 		m_fJumpOffset		= 0;
-		m_fDelayTimer		= 0;		
+		m_fDelayTimer		= 0;
 	}
 	
 	//	
@@ -219,6 +229,19 @@ class DayZPlayerCamera3rdPersonJump extends DayZPlayerCamera3rdPersonErc
 	float m_jumpOffsetVelocity[1];	
 }
 
+// *************************************************************************************
+// ! DayZPlayerCamera3rdPersonJump - 3rd person jump
+// *************************************************************************************
+class DayZPlayerCamera3rdPersonClimb extends DayZPlayerCamera3rdPersonErc
+{
+	void DayZPlayerCamera3rdPersonClimb(DayZPlayer pPlayer, HumanInputController pInput)
+	{
+		//Print("new camera: DayZPlayerCamera3rdPersonClimb");
+		m_fDistance 		= 1.0;
+		m_CameraOffsetMS	= "0.0 0.3 -0.6";
+		m_iBoneIndex		= pPlayer.GetBoneIndexByName("Spine");
+	}		
+}
 
 // *************************************************************************************
 // ! DayZPlayerCamera3rdPersonErc - 3rd person erected sprint
@@ -253,7 +276,6 @@ class DayZPlayerCamera3rdPersonErcSpr extends DayZPlayerCamera3rdPersonErc
 		vector 	tm[4];
 
 		m_pPlayer.GetBoneTransformLS(m_iPelvisBone, tm);
-
 		//! basically -> transform up vector (0,1,0) and read x coord -> and set is as roll
 		float 	xShift = tm[1][0];
 		m_fRoll = xShift * 3.0;	// 3 is just made up value i like :)

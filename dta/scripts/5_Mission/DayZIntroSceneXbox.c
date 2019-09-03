@@ -9,16 +9,16 @@ class DayZIntroSceneXbox: Managed
 	protected ref TStringArray 	m_CharShirtList;
 	protected ref TStringArray 	m_CharPantsList;
 	protected ref TStringArray 	m_CharShoesList;
-	protected ref TStringArray			m_AllCharacters;
+	protected ref TStringArray	m_AllCharacters;
 	
-	protected Camera		m_SceneCamera;
-	protected PlayerBase	m_SceneCharacter;
-	protected Weather		m_Weather;
-	protected vector		m_CharacterPos;
-	protected vector		m_CharacterDir;
-	protected ref TIntArray m_Date = new TIntArray;
+	protected ref IntroSceneCharacter	m_Character;
+	protected Camera					m_SceneCamera;
+	protected Weather					m_Weather;
+	protected vector					m_CharacterPos;
+	protected vector					m_CharacterDir;
+	protected ref TIntArray				m_Date = new TIntArray;
 
-	protected MenuData m_MenuData;
+	protected MenuData					m_MenuData;
 	
 	protected ref MenuCarEngineSmoke	m_FXParticleCarSmoke;
 	protected ref MenuEvaporation		m_FXParticleStreamLeft;
@@ -37,8 +37,6 @@ class DayZIntroSceneXbox: Managed
 		Print("DayZIntroSceneXbox Start");
 		
 		m_MenuData = g_Game.GetMenuData();
-		m_MenuData.LoadCharactersLocal();
-		
 		m_LastPlayedCharacterID = m_MenuData.GetLastPlayedCharacter();
 		m_CharacterPos = "0 0 0";
 		m_CharacterDir = "0 0 0";
@@ -81,8 +79,9 @@ class DayZIntroSceneXbox: Managed
 		m_CharacterPos[1] = GetGame().SurfaceY(m_CharacterPos[0], m_CharacterPos[2]);
 		m_CharacterDir = (camera_position - m_CharacterPos);
 		
-		Init();
-	
+		m_Character = new IntroSceneCharacter();
+		m_Character.LoadCharacterData(m_CharacterPos, m_CharacterDir);
+		
 		m_TimerParticle.Run(0.1, this, "SetupParticles", null, false);
 		//m_TimerDate.Run(2.0, this, "SetupDate", null, false);
 		m_TimerUpdate.Run(0.5, this, "SetupCharacter", null, true);
@@ -121,7 +120,6 @@ class DayZIntroSceneXbox: Managed
 		
 		CheckXboxClientUpdateLoopStop();
 		
-		GetGame().ObjectDelete( m_SceneCharacter );
 		GetGame().ObjectDelete( m_SceneCamera );
 		
 		if ( m_MenuData )
@@ -132,48 +130,17 @@ class DayZIntroSceneXbox: Managed
 		Material material = GetGame().GetWorld().GetMaterial("graphics/materials/postprocess/chromaber");
 		material.SetParam("PowerX", 0.0);
 		material.SetParam("PowerY", 0.0);
-	}
-	
-	//==================================
-	// Init
-	//==================================
-	void Init()
-	{
-		//fill default lists
-		m_genderList = new TStringArray;
-		m_CharPersonalityMaleList = new TStringArray;
-		m_CharPersonalityFemaleList = new TStringArray;
-		m_AllCharacters = new TStringArray;
-		m_CharShirtList = new TStringArray;
-		m_CharPantsList = new TStringArray;
-		m_CharShoesList = new TStringArray;
-		
-		string character_CfgName;
-		string root_path = "cfgCharacterCreation";
-		
-		g_Game.ConfigGetTextArray(root_path + " gender", m_genderList);
-		g_Game.ConfigGetTextArray(root_path + " top", m_CharShirtList);
-		g_Game.ConfigGetTextArray(root_path + " bottom", m_CharPantsList);
-		g_Game.ConfigGetTextArray(root_path + " shoe", m_CharShoesList);
-
-		m_AllCharacters = GetGame().ListAvailableCharacters();
-		for (int i = 0; i < m_AllCharacters.Count(); i++)
-		{
-			character_CfgName = m_AllCharacters.Get(i);
-			if (GetGame().IsKindOf(character_CfgName, "SurvivorMale_Base"))
-			{
-				m_CharPersonalityMaleList.Insert(character_CfgName);
-			}
-			else
-			{
-				m_CharPersonalityFemaleList.Insert(character_CfgName);
-			}
-		}
-		
-		ChangeCharacter(m_LastPlayedCharacterID);
 		
 		PPEffects.Init();
-		PPEffects.DisableBurlapSackBlindness(); //HOTFIX
+		PPEffects.DisableBurlapSackBlindness();
+	}
+	
+	//==============================================
+	// GetIntroSceneCharacter
+	//==============================================
+	IntroSceneCharacter GetIntroCharacter()
+	{
+		return m_Character;
 	}
 	
 	//==================================
@@ -181,11 +148,11 @@ class DayZIntroSceneXbox: Managed
 	//==================================
 	void SetupCharacter()
 	{
-		if ( m_SceneCharacter )
+		if ( m_Character.GetCharacterObj() )
 		{
-			vector v = m_SceneCharacter.GetOrientation();
+			vector v = m_Character.GetCharacterObj().GetOrientation();
 			v[0] = -75;
-			m_SceneCharacter.SetOrientation(v);
+			m_Character.GetCharacterObj().SetOrientation(v);
 		}
 	}
 	
@@ -302,14 +269,6 @@ class DayZIntroSceneXbox: Managed
 	}
 	
 	//==================================
-	// GetIntroSceneCharacter
-	//==================================
-	PlayerBase GetIntroSceneCharacter()
-	{
-		return m_SceneCharacter;
-	}
-	
-	//==================================
 	// CreateRandomCharacter
 	//==================================
 	void CreateRandomCharacter()
@@ -327,28 +286,8 @@ class DayZIntroSceneXbox: Managed
 		{
 			character_name = m_CharPersonalityMaleList.GetRandomElement();
 		}
-		CreateNewCharacter(character_name);
-		
-		if (m_SceneCharacter)
-		{
-			SetAttachment(m_CharShirtList.GetRandomElement(), InventorySlots.BODY);
-			SetAttachment(m_CharPantsList.GetRandomElement(), InventorySlots.LEGS);
-			SetAttachment(m_CharShoesList.GetRandomElement(), InventorySlots.FEET);
-		}
 		
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
-	}
-	
-	void SetAttachment(string type, int slot)
-	{
-		if (!m_SceneCharacter) return;
-		g_Game.ObjectDelete(m_SceneCharacter.GetInventory().FindAttachment(slot));
-		EntityAI entity;
-		Class.CastTo(entity, g_Game.CreateObject(type, "0 2000 0", true));
-		if (entity)
-		{
-			m_SceneCharacter.LocalTakeEntityAsAttachmentEx(entity, slot);
-		}
 	}
 	
 	void UpdateSelectedUserName()
@@ -367,80 +306,12 @@ class DayZIntroSceneXbox: Managed
 		g_Game.SetPlayerGameName(GameConstants.DEFAULT_CHARACTER_NAME);
 	}
 	
-	// ------------------------------------------------------------
-	void ChangeCharacter(int characterID)
-	{
-		string name;
-		if (m_SceneCharacter)
-		{
-			g_Game.ObjectDelete(m_SceneCharacter);
-			m_SceneCharacter = NULL;
-		}
-		m_LastPlayedCharacterID = characterID;
-		BiosUserManager user_manager;
-		
-		//random character
-		if(characterID == - 1)
-		{
-			UpdateSelectedUserName();
-
-			CreateRandomCharacter();
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
-			g_Game.SetNewCharacter(true);
-			return;
-		}
-		
-		m_SceneCharacter = PlayerBase.Cast(m_MenuData.CreateCharacterPerson(characterID));
-		
-		if (m_SceneCharacter)
-		{
-			g_Game.SetNewCharacter(false);
-			m_SceneCharacter.PlaceOnSurface();
-			m_SceneCharacter.SetDirection(m_CharacterDir);
-	
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
-		}
-		else
-		{
-			// random character
-			UpdateSelectedUserName();
-
-			CreateRandomCharacter();
-			GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(UpdateCharacterPos, 250);
-			g_Game.SetNewCharacter(true);
-			return;
-		}
-
-		UpdateSelectedUserName();
-
-		g_Game.SetPlayerGameName(name);
-	}
-	
-	// ------------------------------------------------------------
-	void CreateNewCharacter(string type)
-	{
-		if (m_SceneCharacter)
-		{
-			g_Game.ObjectDelete(m_SceneCharacter);
-			m_SceneCharacter = NULL;
-		}
-
-		g_Game.PreloadObject(type, 1.0);
-		Class.CastTo(m_SceneCharacter, g_Game.CreateObject(type, SnapToGround(Vector(m_CharacterPos[0],m_CharacterPos[1],m_CharacterPos[2]) + "0 0 333"), true));
-		
-		if (m_SceneCharacter)
-		{
-			m_SceneCharacter.PlaceOnSurface();
-			m_SceneCharacter.SetDirection(m_CharacterDir);
-		}
-	}
-	
 	void UpdateCharacterPos()
 	{
-		if (m_SceneCharacter)
+		if (m_Character.GetCharacterObj())
 		{
-			m_SceneCharacter.SetPosition(m_CharacterPos);
-			m_SceneCharacter.SetDirection(m_CharacterDir.Normalized() );
+			m_Character.GetCharacterObj().SetPosition(m_CharacterPos);
+			m_Character.GetCharacterObj().SetDirection(m_CharacterDir.Normalized() );
 		}
 	}
 	

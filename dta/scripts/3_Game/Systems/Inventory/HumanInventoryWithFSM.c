@@ -145,6 +145,8 @@ class HumanInventoryWithFSM : HumanInventory
 	 * @return		identifier of current stable state
 	 **/
 	int GetCurrentStateID () { return m_FSM.GetCurrentStateID(); }
+	
+	bool IsIdle () { return m_FSM.GetCurrentState().IsIdle(); }
 
 	/**@fn			NetSyncCurrentStateID
 	 * @brief		Engine callback - network synchronization of FSM's state. not intended to direct use.

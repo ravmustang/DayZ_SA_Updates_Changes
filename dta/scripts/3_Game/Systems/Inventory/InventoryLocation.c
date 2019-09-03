@@ -127,6 +127,17 @@ class InventoryLocation
 	 * @param[in]	slotId		slot id where the item will be attached
 	 **/
 	proto native void SetAttachment (notnull EntityAI parent, EntityAI e, int slotId);
+	
+	/**
+	 * @fn		SetCargoAuto
+	 * @brief	based on Cargo.IsProxyCargo uses SetProxyCargo or SetCargo respectively
+	 * @param[in]	cargo		cargo that will receive item <e> into cargo
+	 * @param[in]	e		entity with this inventory location (null for new spawns)
+	 * @param[in]	row		row of the cargo
+	 * @param[in]	col		column of the cargo
+	 **/
+	proto native void SetCargoAuto (notnull CargoBase cargo, EntityAI e, int row, int col, bool flip);
+
 	/**
 	 * @fn		SetCargo
 	 * @brief	sets current inventory location type to Cargo with coordinates (idx, row, col)

@@ -60,8 +60,10 @@ class ChatInputMenu extends UIScriptedMenu
 	{
 		super.OnHide();
 		GetGame().GetMission().HideChat();
+		
+		if (!GetGame().GetMission().IsVoNActive())
+			GetGame().GetMission().HideVoiceLevelWidgets();
 	}
-
 	
 	override void Refresh()
 	{	
@@ -69,6 +71,10 @@ class ChatInputMenu extends UIScriptedMenu
 	
 	override void Update(float timeslice)
 	{
+		if( GetGame().GetInput().LocalPress("UAUIBack", false ) )
+		{
+			Close();
+		}
 	}
 	
 	void UpdateChannel()

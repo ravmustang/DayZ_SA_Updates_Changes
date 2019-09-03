@@ -10,42 +10,17 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 
 	override void OnEntry (WeaponEventBase e)
 	{
-		wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + "  WeaponDetachingMag_Store, Detaching mag=" + m_magazine.ToString() +  "to loc=" + InventoryLocation.DumpToStringNullSafe(m_dst));
+		//wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + "  WeaponDetachingMag_Store, Detaching mag=" + m_magazine.ToString() +  "to loc=" + InventoryLocation.DumpToStringNullSafe(m_dst));
 		super.OnEntry(e);
 
-		if (m_magazine && m_dst)
+		if (!m_magazine || !m_dst)
 		{
-			InventoryLocation il = new InventoryLocation;
-			if (m_magazine.GetInventory().GetCurrentInventoryLocation(il))
-			{
-				InventoryLocation lhand = new InventoryLocation;
-				lhand.SetAttachment(e.m_player, m_magazine, InventorySlots.LEFTHAND);
-				if (GameInventory.LocationSyncMoveEntity(il, lhand))
-				{
-					wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - magazine removed from inv (inv->LHand)");
-				}
-				else
-					Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot remove mag from inv");
-			}
-			else
-				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot get curr location");
-		}
-		else
 			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - no magazine to load from (m_magazine=NULL)");
+		}
 	}
 
 	override void OnAbort (WeaponEventBase e)
 	{
-		if (m_magazine && m_dst)
-		{
-			if (DayZPlayerUtils.HandleDropMagazine(e.m_player, m_magazine))
-				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - aborting, detached magazine dropped to ground");
-			else
-				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot abort detaching of magazine");
-
-			m_weapon.HideMagazine(); // force hide on abort
-		}
-
 		m_magazine = NULL;
 		m_dst = NULL;
 
@@ -54,16 +29,23 @@ class WeaponDetachingMag_Store extends WeaponStateBase
 
 	override void OnExit (WeaponEventBase e)
 	{
-		InventoryLocation lhand = new InventoryLocation;
-		lhand.SetAttachment(e.m_player, m_magazine, InventorySlots.LEFTHAND);
-		if (GameInventory.LocationSyncMoveEntity(lhand, m_dst))
+		InventoryLocation il = new InventoryLocation;
+		if (m_magazine.GetInventory().GetCurrentInventoryLocation(il))
 		{
-			wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - stored detached magazine (LHand->dst)");
+			if (GameInventory.LocationSyncMoveEntity(il, m_dst))
+			{
+				m_weapon.HideMagazine();
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, ok - magazine removed from inv (inv->dst)");
+			}
+			else
+			{
+				// @TODO: drop on gnd
+				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot store detached magazine!");
+			}
 		}
 		else
 		{
-			// @TODO: drop on gnd
-			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot store detached magazine!");
+			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponDetachingMag_Store, error - cannot get curr location");
 		}
 
 		m_magazine = NULL;

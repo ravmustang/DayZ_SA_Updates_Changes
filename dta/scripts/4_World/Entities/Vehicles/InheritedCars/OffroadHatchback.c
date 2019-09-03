@@ -90,13 +90,7 @@ class OffroadHatchback extends CarScript
 
 		return true;
 	}
-	
-/*
-	override EEHealthLevelChanged(int oldLevel, int newLevel, string zone)
-	{
-		if ( newLevel == 4 )
-	}
-*/
+
 /*
 	int GetAnimationPhaseBySlot( string slotType )
 	{
@@ -207,6 +201,40 @@ class OffroadHatchback extends CarScript
 		}
 
 		return false;
+	}
+
+	override string GetDoorSelectionNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+		case 2:
+			return "doors_driver";
+		break;
+		case 1:
+		case 3:
+			return "doors_codriver";
+		break;
+		}
+		
+		return super.GetDoorSelectionNameFromSeatPos(posIdx);
+	}
+
+	override string GetDoorInvSlotNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+		case 2:
+			return "NivaDriverDoors";
+		break;
+		case 1:
+		case 3:
+			return "NivaCoDriverDoors";
+		break;
+		}
+		
+		return super.GetDoorInvSlotNameFromSeatPos(posIdx);
 	}
 	
 	// 0 full ambient and engine sound

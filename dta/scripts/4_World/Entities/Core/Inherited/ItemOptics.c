@@ -359,6 +359,7 @@ class ItemOptics extends InventoryItemSuper
 		return false;
 	}
 	
+	//! returns 'true' for non-magnifying optics
 	bool AllowsDOF()
 	{
 		return m_allowsDOF;

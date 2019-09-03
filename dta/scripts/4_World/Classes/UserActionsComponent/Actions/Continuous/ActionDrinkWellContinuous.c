@@ -62,7 +62,7 @@ class ActionDrinkWellContinuous: ActionContinuousBase
 		Param1<float> nacdata = Param1<float>.Cast( action_data.m_ActionComponent.GetACData() );
 		if(nacdata)
 		{
-			float amount = nacdata.param1 * UAQuantityConsumed.DRINK;
+			float amount = UAQuantityConsumed.DRINK;
 			action_data.m_Player.Consume(NULL,amount, EConsumeType.ENVIRO_WELL);
 		}
 	}

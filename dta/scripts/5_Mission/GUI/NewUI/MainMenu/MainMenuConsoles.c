@@ -8,6 +8,7 @@ class MainMenuConsole extends UIScriptedMenu
 	protected TextWidget			m_PlayerName;
 	protected TextWidget			m_Version;
 	
+	protected Widget				m_CustomizeCharacter;
 	protected Widget				m_PlayVideo;
 	protected Widget				m_Tutorials;
 	protected Widget				m_Options;
@@ -21,8 +22,9 @@ class MainMenuConsole extends UIScriptedMenu
 	{
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/main_menu_console.layout" );
 		
-		m_PlayerName			= TextWidget.Cast( layoutRoot.FindAnyWidget("character_name_xbox") );
+		m_PlayerName				= TextWidget.Cast( layoutRoot.FindAnyWidget("character_name_xbox") );
 		
+		m_CustomizeCharacter		= layoutRoot.FindAnyWidget( "customize_character" );
 		m_PlayVideo					= layoutRoot.FindAnyWidget( "play_video" );
 		m_Tutorials					= layoutRoot.FindAnyWidget( "tutorials" );
 		m_Options					= layoutRoot.FindAnyWidget( "options" );
@@ -96,6 +98,12 @@ class MainMenuConsole extends UIScriptedMenu
 			{
 				m_LastFocusedButton = m_Controls;
 				OpenMenuControls();
+				return true;
+			}
+			else if ( w == m_CustomizeCharacter )
+			{
+				m_LastFocusedButton = m_CustomizeCharacter;
+				OpenMenuCustomizeCharacter();
 				return true;
 			}
 		}
@@ -212,6 +220,11 @@ class MainMenuConsole extends UIScriptedMenu
 	void OpenMenuTutorials()
 	{
 		EnterScriptedMenu(MENU_TUTORIAL);
+	}
+	
+	void OpenMenuCustomizeCharacter()
+	{
+		EnterScriptedMenu(MENU_CHARACTER);
 	}
 	
 	void Exit()

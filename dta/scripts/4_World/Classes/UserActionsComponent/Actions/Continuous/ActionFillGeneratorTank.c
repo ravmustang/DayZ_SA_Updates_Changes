@@ -33,11 +33,10 @@ class ActionFillGeneratorTank: ActionContinuousBase
 	override bool ActionCondition( PlayerBase player, ActionTarget target, ItemBase item )
 	{
 		PowerGenerator pg;
+		
 		if ( Class.CastTo(pg,target.GetObject()) )
 		{
-			string selection = pg.GetActionComponentName(target.GetComponentIndex());
-			
-			if ( pg.CanAddFuel( item )  &&  selection == "fuel_tank" )
+			if ( pg.CanAddFuel( item ) )
 			{
 				return true;
 			}

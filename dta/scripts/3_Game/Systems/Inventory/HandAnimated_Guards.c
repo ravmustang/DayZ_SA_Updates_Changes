@@ -4,6 +4,9 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src, Inventory
 	InventoryLocation invloc1 = new InventoryLocation;
 	//InventoryLocation invloc2 = new InventoryLocation;
 	
+	if ( (dst && dst.GetParent() && !dst.GetParent().GetHierarchyRootPlayer()) || (src && src.GetParent() && !src.GetParent().GetHierarchyRootPlayer()) )
+		return -1;
+	
 	if (dst && (dst.GetType() == InventoryLocationType.ATTACHMENT || dst.GetType() == InventoryLocationType.CARGO))
 	{
 		invloc1.Copy(dst);
@@ -54,9 +57,12 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src, Inventory
 				Man owner;
 				if (parent_item)
 					owner = parent_item.GetHierarchyRootPlayer(); 		// player
+				if (!owner)
+					return -1;
+				
 				EntityAI item1 = owner.GetInventory().FindAttachment(InventorySlots.HIPS);
 				EntityAI item2 = parent_item.GetHierarchyParent();
-				if (owner && owner.GetInventory().FindAttachment(InventorySlots.HIPS) == parent_item.GetHierarchyParent()) // is the pistol in a belt holster?
+				if (owner && item1 == item2) // is the pistol in a belt holster?
 				{
 					return WeaponHideShowTypes.HIDESHOW_SLOT_PISTOLBELT;
 				}
@@ -65,15 +71,18 @@ int SlotToAnimType (notnull Man player, notnull InventoryLocation src, Inventory
 			case InventorySlots.KNIFE:
 				return WeaponHideShowTypes.HIDESHOW_SLOT_KNIFEBACK;
 			
-			case InventorySlots.VEST:
+			/*case InventorySlots.VEST:
 			case InventorySlots.FEET:
 			case InventorySlots.BODY:
 			case InventorySlots.LEGS:
 			case InventorySlots.BACK:
-				return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;
+			case InventorySlots.HIPS:
+			case InventorySlots.HEADGEAR:
+				return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;*/
 			
 			default:
-				Print("[hndfsm] SlotToAnimType -  not animated slot in src_loc=" + InventoryLocation.DumpToStringNullSafe(invloc1));
+				return WeaponHideShowTypes.HIDESHOW_SLOT_INVENTORY;
+				//Print("[hndfsm] SlotToAnimType -  not animated slot in src_loc=" + InventoryLocation.DumpToStringNullSafe(invloc1));
 		};
 		//
 		//if (InventorySlots.GetSlotIdFromString("Pistol"))
@@ -222,7 +231,7 @@ class HandSelectAnimationOfForceSwapInHandsEvent extends HandGuardBase
 			else if (es.m_Dst2)
 			{
 				if (!GameInventory.LocationTestAddEntity(es.m_Dst2, false, true, true, true, true))
-					Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - no room at dst=" + InventoryLocation.DumpToStringNullSafe(e.GetDst()));
+					Error("[hndfsm] HandSelectAnimationOfForceSwapInHandsEvent - no room at dst=" + InventoryLocation.DumpToStringNullSafe(es.m_Dst2));
 				allow = true;
 			}
 			

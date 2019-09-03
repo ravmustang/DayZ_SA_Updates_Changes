@@ -290,7 +290,7 @@ class SceneEditorMenu extends UIScriptedMenu
 
 			for ( i = 0; i < preset_array.Count(); i++)
 			{
-				float health = 100;
+				float health = -1;
 				int quantity = -1;
 				if ( is_preset_fixed )
 				{
@@ -498,7 +498,7 @@ class SceneEditorMenu extends UIScriptedMenu
 			}
 			else
 			{
-				float health = 100;
+				float health = -1;
 				int quantity = -1;
 				if(GetCurrentItemIndex() != -1)
 				{
@@ -575,7 +575,7 @@ class SceneEditorMenu extends UIScriptedMenu
 			SaveProfileSpawnDistance();
 
 			float distance = m_SpawnDistanceEditBox.GetText().ToFloat();
-			float health = 100;
+			float health = -1;
 			int quantity = -1;
 			if( GetCurrentItemIndex() != -1 )
 			{
@@ -593,7 +593,7 @@ class SceneEditorMenu extends UIScriptedMenu
 						;//SetPreset( true, m_SelectedObject, spawn_type, distance );
 					}
 					else
-						m_Developer.SpawnEntityOnCursorDir( PlayerBase.Cast( GetGame().GetPlayer() ), m_SelectedObject, health, quantity, distance );
+						m_Developer.SpawnEntityOnCursorDir( PlayerBase.Cast( GetGame().GetPlayer() ), m_SelectedObject, quantity, distance, health );
 					break;
 				}
 

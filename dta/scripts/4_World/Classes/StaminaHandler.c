@@ -47,16 +47,29 @@ class StaminaConsumers
 		{
 			StaminaConsumer sc = m_StaminaConsumers.Get(consumer);
 			
-			if( isDepleted && curStamina < sc.GetThreshold() )
+			if ( consumer != EStaminaConsumers.SPRINT )
 			{
-				sc.SetState(false);
-				return false;
+				if( (isDepleted || curStamina < sc.GetThreshold()) )
+				{
+					sc.SetState(false);
+					return false;
+				}
 			}
-
-			if( (curStamina >= sc.GetThreshold() && sc.GetState()) || (!isDepleted && sc.GetState()) )
+			else
 			{
-				sc.SetState(true);
-				return true;
+				if( !isDepleted )
+				{
+					if ( sc.GetState() )
+					{
+						sc.SetState(true);
+						return true;
+					}
+				}
+				else
+				{
+					sc.SetState(false);
+					return false;
+				}
 			}
 
 			if( curStamina > sc.GetThreshold() )
@@ -183,31 +196,10 @@ class StaminaHandler
 		m_IsInCooldown		= false;
 		m_Debug 			= false;
 
-		//m_StaminaSoundHandler = new StaminaSoundHandler(this, m_Player);
-		
-		Init();
+		RegisterStaminaConsumers();
+		RegisterStaminaModifiers();
 	}
-	
-	void Init()
-	{
-		//! stamina consumers registration
-		m_StaminaConsumers = new StaminaConsumers;
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.HOLD_BREATH, GameConstants.STAMINA_HOLD_BREATH_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.SPRINT, GameConstants.STAMINA_MIN_CAP - 1);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.JUMP, GameConstants.STAMINA_JUMP_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_HEAVY, GameConstants.STAMINA_MELEE_HEAVY_THRESHOLD);
-		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_EVADE, GameConstants.STAMINA_MELEE_EVADE_THRESHOLD);
-		
-		//! stamina modifiers registration
-		m_StaminaModifiers = new StaminaModifiers;
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.HOLD_BREATH, GameConstants.STAMINA_DRAIN_HOLD_BREATH);
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.JUMP, GameConstants.STAMINA_DRAIN_JUMP);
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.MELEE_LIGHT, GameConstants.STAMINA_DRAIN_MELEE_LIGHT);
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.MELEE_HEAVY, GameConstants.STAMINA_DRAIN_MELEE_HEAVY);
-		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.OVERALL_DRAIN, GameConstants.STAMINA_MAX, 5.0);
-		m_StaminaModifiers.RegisterRandomized(EStaminaModifiers.MELEE_EVADE, 3, GameConstants.STAMINA_DRAIN_MELEE_EVADE);
-	}
-	
+
 	void Update(float deltaT, int pCurrentCommandID)
 	{
 #ifdef DEVELOPER
@@ -217,19 +209,22 @@ class StaminaHandler
 		if( m_Player )
 		{
 			// Calculates actual max stamina based on player's load
-			if ( GetGame().IsServer() && GetGame().IsMultiplayer() )
+			if ( GetGame().IsServer() )
+			{
+				//! gets stamina from PlayerStat
 				m_Stamina = m_Player.GetStatStamina().Get();
+				//! gets the actual players load
+				m_PlayerLoad = m_Player.GetPlayerLoad();
 
-			m_PlayerLoad = m_Player.GetPlayerLoad();
-
-			//! StaminaCap calculation starts when PlayerLoad exceeds STAMINA_WEIGHT_LIMIT_THRESHOLD
-			if (m_PlayerLoad >= GameConstants.STAMINA_WEIGHT_LIMIT_THRESHOLD)
-			{
-				m_StaminaCap =  Math.Max((GameConstants.STAMINA_MAX - (((m_PlayerLoad - GameConstants.STAMINA_WEIGHT_LIMIT_THRESHOLD)/GameConstants.STAMINA_KG_TO_GRAMS) * GameConstants.STAMINA_KG_TO_STAMINAPERCENT_PENALTY)),GameConstants.STAMINA_MIN_CAP);
-			}
-			else
-			{
-				m_StaminaCap = GameConstants.STAMINA_MAX;
+				//! StaminaCap calculation starts when PlayerLoad exceeds STAMINA_WEIGHT_LIMIT_THRESHOLD
+				if (m_PlayerLoad >= GameConstants.STAMINA_WEIGHT_LIMIT_THRESHOLD)
+				{
+					m_StaminaCap =  Math.Max((GameConstants.STAMINA_MAX - (((m_PlayerLoad - GameConstants.STAMINA_WEIGHT_LIMIT_THRESHOLD)/GameConstants.STAMINA_KG_TO_GRAMS) * GameConstants.STAMINA_KG_TO_STAMINAPERCENT_PENALTY)),GameConstants.STAMINA_MIN_CAP);
+				}
+				else
+				{
+					m_StaminaCap = GameConstants.STAMINA_MAX;
+				}
 			}
 			
 			// Calculates stamina gain/loss based on movement and load
@@ -248,6 +243,7 @@ class StaminaHandler
 			break;
 			case DayZPlayerConstants.COMMANDID_FALL:	//! processed on event
 			case DayZPlayerConstants.COMMANDID_MELEE2:  //! processed on event
+			case DayZPlayerConstants.COMMANDID_CLIMB:  //! processed on event
 			break;
 			default:
 				if( !m_IsInCooldown )
@@ -305,6 +301,21 @@ class StaminaHandler
 			m_StaminaDelta = 0;
 			m_StaminaDepletion = 0; // resets depletion modifier
 		}
+	}
+
+	//! called from RPC on playerbase - syncs stamina values on server with client
+	void OnRPC(float stamina, float stamina_cap, bool cooldown)
+	{
+		if ( Math.AbsFloat(stamina - m_Stamina) > 5 )
+		{
+			m_Stamina = stamina;
+		}
+		if ( stamina_cap != m_StaminaCap )
+		{
+			m_StaminaCap = stamina_cap;
+		}
+
+		m_IsInCooldown = cooldown;
 	}
 	
 	protected void StaminaProcessor_Move(HumanMovementState pHumanMovementState)
@@ -422,21 +433,33 @@ class StaminaHandler
 		}
 	}
 	
-	//! called from RPC on playerbase - syncs stamina values on server with client
-	void OnRPC(float stamina, float stamina_cap, bool cooldown)
+	protected void RegisterStaminaConsumers()
 	{
-		if ( Math.AbsFloat(stamina - m_Stamina) > 5 )
-		{
-			m_Stamina = stamina;
-		}
-		if ( stamina_cap != m_StaminaCap )
-		{
-			m_StaminaCap = stamina_cap;
-		}
-
-		m_IsInCooldown = cooldown;
+		//! stamina consumers registration
+		m_StaminaConsumers = new StaminaConsumers;
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.HOLD_BREATH, GameConstants.STAMINA_HOLD_BREATH_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.SPRINT, GameConstants.STAMINA_MIN_CAP + 15);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.JUMP, GameConstants.STAMINA_JUMP_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.VAULT, GameConstants.STAMINA_VAULT_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.CLIMB, GameConstants.STAMINA_CLIMB_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_HEAVY, GameConstants.STAMINA_MELEE_HEAVY_THRESHOLD);
+		m_StaminaConsumers.RegisterConsumer(EStaminaConsumers.MELEE_EVADE, GameConstants.STAMINA_MELEE_EVADE_THRESHOLD);
 	}
-	
+
+	protected void RegisterStaminaModifiers()
+	{
+		//! stamina modifiers registration
+		m_StaminaModifiers = new StaminaModifiers;
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.HOLD_BREATH, GameConstants.STAMINA_DRAIN_HOLD_BREATH);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.JUMP, GameConstants.STAMINA_DRAIN_JUMP);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.VAULT, GameConstants.STAMINA_DRAIN_VAULT);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.CLIMB, GameConstants.STAMINA_DRAIN_CLIMB);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.MELEE_LIGHT, GameConstants.STAMINA_DRAIN_MELEE_LIGHT);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.MELEE_HEAVY, GameConstants.STAMINA_DRAIN_MELEE_HEAVY);
+		m_StaminaModifiers.RegisterFixed(EStaminaModifiers.OVERALL_DRAIN, GameConstants.STAMINA_MAX, 5.0);
+		m_StaminaModifiers.RegisterRandomized(EStaminaModifiers.MELEE_EVADE, 3, GameConstants.STAMINA_DRAIN_MELEE_EVADE);
+	}
+
 	protected float CalcStaminaGainBonus()// Calulates stamina regain bonus based on current stamina level (So it's better to wait for stamina to refill completely and avoid overloading)
 	{
 		if (m_StaminaDepletion > 0)

@@ -18,7 +18,7 @@ class WoundInfectionMdfr: ModifierBase
 	
 	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.WOUND_AGENT) > AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.WOUND_AGENT) >= AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -42,7 +42,7 @@ class WoundInfectionMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.WOUND_AGENT) < AGENT_THRESHOLD_DEACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.WOUND_AGENT) <= AGENT_THRESHOLD_DEACTIVATE) 
 		{
 			return true;
 		}

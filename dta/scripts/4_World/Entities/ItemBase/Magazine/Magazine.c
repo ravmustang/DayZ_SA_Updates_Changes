@@ -102,13 +102,6 @@ class Magazine : InventoryItemSuper
 	 * @return	true if index valid
 	 **/
 	proto bool SetCartridgeAtIndex (int cartIndex, out float dmg, out string cartTypeName);
-
-	override void SetUserActions()
-	{
-		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " ContinuousActions", m_ContinuousActions);
-		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " SingleUseActions", m_SingleUseActions);	
-		g_Game.ConfigGetIntArray("cfgMagazines " +GetType() + " InteractActions", m_InteractActions);	
-	}
 	
 	static AmmoData GetAmmoData( string classname )
 	{
@@ -276,7 +269,7 @@ class Magazine : InventoryItemSuper
 	}
 
 	//TODO add functionality for multiple ammo types (does not exist yet)
-	override int GetItemWeight()
+	override int GetWeight()
 	{
 		float item_wetness = GetWet();
 		int ConfWeight = ConfigGetInt("weight");

@@ -16,7 +16,7 @@ enum LifeSpanState
 class PluginLifespan extends PluginBase
 {
 	protected static const int LIFESPAN_MIN = 0;
-	protected static const int LIFESPAN_MAX = 60; // value in minutes when player achieved maximum age in order to have full beard
+	protected static const int LIFESPAN_MAX = 240; // value in minutes when player achieved maximum age in order to have full beard
 	protected int m_FakePlaytime;
 	
 	protected ref map<PlayerBase, ref LifespanLevel> m_PlayerCurrentLevel;
@@ -230,6 +230,9 @@ class PluginLifespan extends PluginBase
 
 	protected void UpdateLifespanLevel( PlayerBase player, float player_beard, bool force_update = false )
 	{
+		if ( !player.IsAlive() )
+			return;
+		
 		if ( m_PlayerCurrentLevel.Contains(player) )
 		{
 			LifespanLevel current_level = m_PlayerCurrentLevel.Get( player );

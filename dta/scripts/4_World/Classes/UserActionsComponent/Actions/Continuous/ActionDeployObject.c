@@ -190,6 +190,11 @@ class ActionDeployObject: ActionContinuousBase
 			
 	override void OnStartClient( ActionData action_data )
 	{		
+		PlaceObjectActionData poActionData;
+		poActionData = PlaceObjectActionData.Cast(action_data);
+		
+		if ( !poActionData ) { return; }
+		
 		action_data.m_Player.PlacingCompleteLocal();
 	}
 	
@@ -197,10 +202,12 @@ class ActionDeployObject: ActionContinuousBase
 	{
 		if( GetGame().IsMultiplayer() )
 		{
-			EntityAI entity_for_placing = action_data.m_MainItem;
 			PlaceObjectActionData poActionData;
 			poActionData = PlaceObjectActionData.Cast(action_data);
 			
+			if ( !poActionData ) { return; }
+			
+			EntityAI entity_for_placing = action_data.m_MainItem;
 			poActionData.m_Player.SetLocalProjectionPosition( poActionData.m_Position );
 			poActionData.m_Player.SetLocalProjectionOrientation( poActionData.m_Orientation );
 			poActionData.m_Player.PlacingStartServer();
@@ -220,6 +227,9 @@ class ActionDeployObject: ActionContinuousBase
 	{
 		PlaceObjectActionData poActionData;
 		poActionData = PlaceObjectActionData.Cast(action_data);
+		
+		if ( !poActionData ) { return; }
+		
 		EntityAI entity_for_placing = action_data.m_MainItem;
 		vector position = action_data.m_Player.GetLocalProjectionPosition();
 		vector orientation = action_data.m_Player.GetLocalProjectionOrientation();
@@ -233,6 +243,9 @@ class ActionDeployObject: ActionContinuousBase
 	{	
 		PlaceObjectActionData poActionData;
 		poActionData = PlaceObjectActionData.Cast(action_data);
+		
+		if ( !poActionData ) { return; }
+		
 		EntityAI entity_for_placing = action_data.m_MainItem;
 		vector position = action_data.m_Player.GetLocalProjectionPosition();
 		vector orientation = action_data.m_Player.GetLocalProjectionOrientation();

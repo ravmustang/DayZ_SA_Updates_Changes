@@ -5,7 +5,7 @@ class StuffedStomachMdfr: ModifierBase
 	{
 		m_TrackActivatedTime = false;
 		m_ID 					= eModifiers.MDF_STUFFED;
-		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
+		m_TickIntervalInactive 	= 1;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
 	}
 	

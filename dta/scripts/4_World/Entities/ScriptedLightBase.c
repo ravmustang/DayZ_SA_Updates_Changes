@@ -368,12 +368,13 @@ class ScriptedLightBase extends EntityLightSource
 				
 			}
 			
-			if (m_Parent)
+			if (m_Parent  &&  !m_Parent.ToDelete())
 			{
 				// In order to move with the light, it must be detached from its parent first
 				
 				m_Parent.RemoveChild(this);
 				SetPosition(m_LocalPos + m_DancingShadowsLocalPos);
+				
 				m_Parent.AddChild(this, -1);
 				m_Parent.Update();
 			}

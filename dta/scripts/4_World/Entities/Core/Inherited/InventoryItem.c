@@ -98,9 +98,17 @@ class CarWheel extends InventoryItemSuper
 			case "HatchbackWheel":
 				newWheel = "HatchbackWheel_Ruined";
 			break;
-			
+
+			case "CivSedanWheel":
+				newWheel = "CivSedanWheel_Ruined";
+			break;
+
 			case "Hatchback_02_Wheel":
 				newWheel = "Hatchback_02_Wheel_Ruined";
+			break;
+			
+			case "Sedan_02_Wheel":
+				newWheel = "Sedan_02_Wheel_Ruined";
 			break;
 
 			case "V3SWheel":
@@ -111,9 +119,7 @@ class CarWheel extends InventoryItemSuper
 				newWheel = "V3SWheelDouble_Ruined";
 			break;
 
-			case "CivSedanWheel":
-				newWheel = "CivSedanWheel_Ruined";
-			break;	
+
 		}
 
 		if ( newWheel != "" )
@@ -157,16 +163,16 @@ class ReplaceWheelLambda : TurnItemIntoItemLambda
 }
 
 class Hatchback_02_Wheel extends CarWheel {};
-class Hatchback_02_Wheel_Ruined extends ItemBase {};
+class Hatchback_02_Wheel_Ruined extends CarWheel {};
 
 class Sedan_02_Wheel extends CarWheel {};
-class Sedan_02_Wheel_Ruined extends ItemBase {};
+class Sedan_02_Wheel_Ruined extends CarWheel {};
 
 class HatchbackWheel extends CarWheel {};
-class HatchbackWheel_Ruined extends ItemBase {};
+class HatchbackWheel_Ruined extends CarWheel {};
 
 class CivSedanWheel extends CarWheel {};
-class CivSedanWheel_Ruined extends ItemBase {};
+class CivSedanWheel_Ruined extends CarWheel {};
 
 class CarDoor extends InventoryItemSuper
 {
@@ -193,8 +199,20 @@ class CarDoor extends InventoryItemSuper
 	{
 		return EMeleeTargetType.NONALIGNABLE;
 	}
-
-
+	
+	override void EEHealthLevelChanged(int oldLevel, int newLevel, string zone)
+	{
+		if ( newLevel ==  GameConstants.STATE_RUINED )
+		{
+			EffectSound sound_plug;
+			switch( zone )
+			{
+				case "Window":
+					PlaySoundSet( sound_plug, "offroad_hit_window_small_SoundSet", 0, 0 );
+				break;
+			}
+		}
+	}
 /*
 	override void OnWasAttached( EntityAI parent, int slot_name )
 	{
@@ -217,8 +235,6 @@ class CarDoor extends InventoryItemSuper
 	{
 		super.SetActions();
 
-		AddAction(ActionOpenCarDoors);
-		AddAction(ActionCloseCarDoors);
 		AddAction(ActionAttachOnSelection);
 		AddAction(ActionDetach);
 	}

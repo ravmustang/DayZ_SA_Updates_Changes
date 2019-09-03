@@ -134,7 +134,48 @@ class Hatchback_02 extends CarScript
 
 		return false;
 	}
-	
+
+	override string GetDoorSelectionNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+			return "doors_driver";
+		break;
+		case 1:
+			return "doors_codriver";
+		break;
+		case 2:
+			return "doors_cargo1";
+		break;
+		case 3:
+			return "doors_cargo2";
+		break;
+		}
+		
+		return super.GetDoorSelectionNameFromSeatPos(posIdx);
+	}
+
+	override string GetDoorInvSlotNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+			return "Hatchback_02_Door_1_1";
+		break;
+		case 1:
+			return "Hatchback_02_Door_2_1";
+		break;
+		case 2:
+			return "Hatchback_02_Door_1_2";
+		break;
+		case 3:
+			return "Hatchback_02_Door_2_2";
+		break;
+		}
+		
+		return super.GetDoorInvSlotNameFromSeatPos(posIdx);
+	}
 	
 	override float OnSound( CarSoundCtrl ctrl, float oldValue )
 	{

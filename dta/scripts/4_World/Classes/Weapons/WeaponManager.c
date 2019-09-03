@@ -35,6 +35,9 @@ class WeaponManager
 	protected float m_NewJamChance;
 	protected bool m_WaitToSyncJamChance;
 	
+	
+	protected int m_AnimationRefreshCooldown;
+	
 	void WeaponManager(PlayerBase player)
 	{
 		m_ForceEjectBulletTimestamp = -1;
@@ -52,6 +55,7 @@ class WeaponManager
 		m_IsEventSended = false;
 		m_canEnd = false;
 		m_readyToStart = false;
+		m_AnimationRefreshCooldown = 0;
 		
 		m_NewJamChance = -1;
 		m_WaitToSyncJamChance = false;
@@ -189,12 +193,13 @@ class WeaponManager
 		if ( reservationCheck && (m_player.GetInventory().HasInventoryReservation(wpn,null) || m_player.GetInventory().HasInventoryReservation(mag,null)))
 			return false;
 		
-		int muzzleIndex = wpn.GetCurrentMuzzle();
+		for( int i = 0; i < wpn.GetMuzzleCount(); i++)
+		{
+			if( wpn.CanChamberBullet( i, mag ) )
+				return true;
+		}
 		
-		if( !wpn.CanChamberBullet( muzzleIndex, mag ) )
-			return false;
-		
-		return true;
+		return false;
 	}
 //---------------------------------------------------------------------------	
 	bool CanUnjam(Weapon_Base wpn, bool reservationCheck = true)
@@ -740,10 +745,20 @@ class WeaponManager
 				SetSutableMagazines();
 				m_WeaponInHand.SetSyncJammingChance(0);
 			}
+			m_AnimationRefreshCooldown = 0;
 		}
 		
 		if (m_WeaponInHand)
 		{
+			if(m_AnimationRefreshCooldown)
+			{
+				m_AnimationRefreshCooldown--;
+			
+				if( m_AnimationRefreshCooldown == 0)
+				{
+					RefreshAnimationState();
+				}
+			}
 		
 			if (!GetGame().IsMultiplayer())
 			{
@@ -877,6 +892,35 @@ class WeaponManager
 		m_readyToStart = false;
 		m_WantContinue = true;
 		
+	}
+	
+	void DelayedRefreshAnimationState(int delay)
+	{	
+		if(m_WeaponInHand)
+		{
+			if(delay == 0)
+			{
+				RefreshAnimationState();
+			}
+			m_AnimationRefreshCooldown = delay;
+		}
+	}
+	
+	void RefreshAnimationState()
+	{
+		if(m_WeaponInHand)
+		{
+			WeaponStableState state = WeaponStableState.Cast( m_WeaponInHand.GetCurrentState() );
+		
+			if (state)
+			{
+				HumanCommandWeapons hcw = m_player.GetCommandModifier_Weapons();
+				if (hcw)
+				{
+					hcw.SetInitState(state.m_animState);
+				}
+			}
+		}
 	}
 	
 	bool WantContinue()

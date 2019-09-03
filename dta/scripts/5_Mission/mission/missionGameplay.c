@@ -20,6 +20,7 @@ class MissionGameplay extends MissionBase
 	
 	ref Timer						m_ChatChannelHideTimer;
 	ref WidgetFadeTimer				m_ChatChannelFadeTimer;
+	ref WidgetFadeTimer				m_MicFadeTimer;
 	
 	Widget							m_ChatChannelArea;
 	TextWidget						m_ChatChannelText;
@@ -33,6 +34,12 @@ class MissionGameplay extends MissionBase
 	protected bool 					m_ControlDisabled;
 	protected bool 					m_QuickbarHold;
 	
+	// von control info
+	protected bool					m_VoNActive;
+	protected Widget				m_VoiceLevels;
+	protected ref map<int,ImageWidget> m_VoiceLevelsWidgets;
+	protected ref map<int,ref WidgetFadeTimer> m_VoiceLevelTimers;
+	
 	void MissionGameplay()
 	{
 		DestroyAllMenus();
@@ -42,7 +49,9 @@ class MissionGameplay extends MissionBase
 		m_ActionMenu				= new ActionMenu;
 		m_LifeState					= -1;
 		m_Hud						= new IngameHud;
+		m_VoNActive					= false;
 		m_ChatChannelFadeTimer		= new WidgetFadeTimer;
+		m_MicFadeTimer				= new WidgetFadeTimer;
 		m_ChatChannelHideTimer		= new Timer(CALL_CATEGORY_GUI);
 		
 		m_ToggleHudTimer			= new Timer(CALL_CATEGORY_GUI);
@@ -99,9 +108,28 @@ class MissionGameplay extends MissionBase
 			
 			m_Hud.Init( m_HudRootWidget.FindAnyWidget("HudPanel") );
 			
+			// von enabled icon
 			m_MicrophoneIcon = ImageWidget.Cast( m_HudRootWidget.FindAnyWidget("mic") );
 			m_MicrophoneIcon.Show(false);
-
+			
+			// von voice level
+			m_VoiceLevels = m_HudRootWidget.FindAnyWidget("VoiceLevelsPanel");
+			m_VoiceLevelsWidgets = new map<int, ImageWidget>; // [key] voice level
+			m_VoiceLevelTimers = new map<int,ref WidgetFadeTimer>; // [key] voice level
+		
+			if( m_VoiceLevels )
+			{
+				m_VoiceLevelsWidgets.Set(VoiceLevelWhisper, m_VoiceLevels.FindAnyWidget("Whisper"));
+				m_VoiceLevelsWidgets.Set(VoiceLevelTalk, m_VoiceLevels.FindAnyWidget("Talk"));
+				m_VoiceLevelsWidgets.Set(VoiceLevelShout, m_VoiceLevels.FindAnyWidget("Shout"));
+				
+				m_VoiceLevelTimers.Set(VoiceLevelWhisper, new WidgetFadeTimer);
+				m_VoiceLevelTimers.Set(VoiceLevelTalk, new WidgetFadeTimer);
+				m_VoiceLevelTimers.Set(VoiceLevelShout, new WidgetFadeTimer);
+			}
+			
+			HideVoiceLevelWidgets();
+			
 			// chat channel
 			m_ChatChannelArea		= m_HudRootWidget.FindAnyWidget("ChatChannelPanel");
 			m_ChatChannelText		= TextWidget.Cast( m_HudRootWidget.FindAnyWidget("ChatChannelText") );
@@ -400,6 +428,16 @@ class MissionGameplay extends MissionBase
 				}
 			}
 			
+			if( input.LocalPress("UAVoiceLevel",false) )
+			{
+				int oldLevel = GetGame().GetVoiceLevel();
+				int newLevel = ( oldLevel + 1 ) % ( VoiceLevelShout + 1 );
+				
+				// update general voice icon
+				UpdateVoiceLevelWidgets(newLevel);
+				GetGame().SetVoiceLevel(newLevel);	
+			}
+			
 			if( input.LocalHold("UAUIQuickbarToggle",false) )
 			{
 				if( !m_QuickbarHold )
@@ -526,22 +564,25 @@ class MissionGameplay extends MissionBase
 					PlayerControlDisable(INPUT_EXCLUDE_MOUSE_RADIAL);
 					//GetUApi().GetInputByName("UAUIGesturesOpen")->Unlock();
 				}
-				else if( IsPaused() && !g_Game.GetUIManager().ScreenFadeVisible() )
+				else if( IsPaused() )
 				{
-					if( input.LocalPress("UAUIMenu",false) )
+					if( !g_Game.GetUIManager().ScreenFadeVisible() )
 					{
-						Continue();
+						if( input.LocalPress("UAUIMenu",false) )
+						{
+							Continue();
+						}
+						else if( input.LocalPress( "UAUIBack", false ) )
+						{
+							Continue();
+						}
 					}
-					if( input.LocalPress( "UAUIBack", false ) )
+					else if( input.LocalPress( "UAUIBack", false ) )
 					{
 						InGameMenuXbox	menu_xb	= InGameMenuXbox.Cast( GetGame().GetUIManager().GetMenu() );
 						if( menu_xb && menu_xb.IsOnlineOpen() )
 						{
 							menu_xb.CloseOnline();
-						}
-						else
-						{
-							Continue();
 						}
 					}
 				}
@@ -640,11 +681,21 @@ class MissionGameplay extends MissionBase
 			VONStateEventParams vonStateParams = VONStateEventParams.Cast( params );
 			if (vonStateParams.param1)
 			{
+				m_MicrophoneIcon.SetAlpha(1.0);
 				m_MicrophoneIcon.Show(true);
+				
+				m_VoNActive = true;
+				
+				int level = GetGame().GetVoiceLevel();
+				UpdateVoiceLevelWidgets(level);	
 			}
 			else
 			{
 				m_MicrophoneIcon.Show(false);
+				m_VoNActive = false;
+				
+				if( !GetUIManager().FindMenu(MENU_CHAT_INPUT) )
+					HideVoiceLevelWidgets();
 			}
 			break;
 		
@@ -833,6 +884,9 @@ class MissionGameplay extends MissionBase
 		m_ChatChannelArea.Show(false);
 		m_UIManager.EnterScriptedMenu(MENU_CHAT_INPUT, NULL);
 		
+		int level = GetGame().GetVoiceLevel();
+		UpdateVoiceLevelWidgets(level);
+		
 		PlayerControlDisable(INPUT_EXCLUDE_ALL);		
 	}
 
@@ -889,7 +943,7 @@ class MissionGameplay extends MissionBase
 		CloseAllMenus();
 		
 		// open ingame menu
-		GetUIManager().EnterScriptedMenu( MENU_INGAME, null );
+		GetUIManager().EnterScriptedMenu( MENU_INGAME, GetGame().GetUIManager().GetMenu() );
 		PlayerControlDisable(INPUT_EXCLUDE_ALL);
 	}
 	
@@ -1061,5 +1115,60 @@ class MissionGameplay extends MissionBase
 	        DbgUI.EndCleanupScope();
 		}
 #endif
+	}
+	
+	override void UpdateVoiceLevelWidgets(int level)
+	{
+		for( int n = 0; n < m_VoiceLevelsWidgets.Count(); n++ )
+		{
+			int voiceKey = m_VoiceLevelsWidgets.GetKey(n);
+			ImageWidget voiceWidget = m_VoiceLevelsWidgets.Get(n);
+			
+			// stop fade timer since it will be refreshed
+			ref WidgetFadeTimer timer = m_VoiceLevelTimers.Get(n);		
+			timer.Stop();
+		
+			// show widgets according to the level
+			if( voiceKey <= level )
+			{
+				voiceWidget.SetAlpha(1.0); // reset from possible previous fade out 
+				voiceWidget.Show(true);
+				
+				if( !m_VoNActive && !GetUIManager().FindMenu(MENU_CHAT_INPUT) ) 	
+					timer.FadeOut(voiceWidget, 3.0);	
+			}
+			else
+				voiceWidget.Show(false);
+		}
+		
+		// fade out microphone icon when switching levels without von on
+		if( !m_VoNActive )
+		{
+		  	if( !GetUIManager().FindMenu(MENU_CHAT_INPUT) )
+			{
+				m_MicrophoneIcon.SetAlpha(1.0); 
+				m_MicrophoneIcon.Show(true);
+				
+				m_MicFadeTimer.FadeOut(m_MicrophoneIcon, 3.0);
+			}
+		}
+		else
+		{
+			// stop mic icon fade timer when von is activated
+			m_MicFadeTimer.Stop();
+		}
+	}
+	override bool IsVoNActive()
+	{
+		return m_VoNActive;
+	}
+	
+	override void HideVoiceLevelWidgets()
+	{
+		for ( int n = 0; n < m_VoiceLevelsWidgets.Count(); n++ )
+		{
+			ImageWidget voiceWidget = m_VoiceLevelsWidgets.Get( n );
+			voiceWidget.Show(false);
+		}
 	}
 }

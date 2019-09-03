@@ -308,7 +308,7 @@ class PluginRecipesManager extends PluginRecipesManagerBase
 	
 	void GenerateHumanReadableRecipeList()
 	{
-		FileHandle file = OpenFile("RecipeDump.txt", FileMode.WRITE);
+		FileHandle file = OpenFile("$profile:RecipeDump.txt", FileMode.WRITE);
 		if( file == 0 )
 		{
 			//error message

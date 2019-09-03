@@ -41,6 +41,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	protected int											m_LastLoadedPage;
 	protected int											m_TotalPages;
 	protected bool											m_LoadingFinished;
+	protected int											m_CurrentPageNum;
 	
 	protected string										m_CurrentSelectedServer;
 	protected int											m_CurrentLoadedPage;
@@ -57,7 +58,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	protected TextWidget									m_LoadingText;
 	
 	protected ref map<ESortType, ref array<ref GetServersResultRow>> m_EntriesSorted;
-	protected ref map<ESortType, ESortOrder>		m_SortInverted;
+	protected ref map<ESortType, ESortOrder>				m_SortInverted;
 	
 	
 	void ServerBrowserTab( Widget parent, ServerBrowserMenuNew menu, TabType type )
@@ -85,6 +86,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	ServerBrowserMenuNew GetRootMenu()
 	{
 		return m_Menu;
+	}
+	
+	bool GetIsServerLoadingFinished()
+	{
+		return m_LoadingFinished;
 	}
 	
 	override bool OnClick( Widget w, int x, int y, int button )
@@ -226,7 +232,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	void PressSholderLeft(){}
 	void PressSholderRight(){}
 	void Left(){}
+	void LeftHold(){}
+	void LeftRelease(){}
 	void Right(){}
+	void RightHold(){}
+	void RightRelease(){}
 	void Up(){}
 	void Down(){}
 	
@@ -281,6 +291,16 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	
 	}
 	
+	void SetCurrentPage(int page_num)
+	{
+		m_CurrentPageNum = page_num;
+	}
+	
+	int GetCurrentPage()
+	{
+		return m_CurrentPageNum;
+	}
+	
 	bool IsNotInitialized()
 	{
 		return !m_Initialized;
@@ -294,6 +314,11 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 	void ApplyFilters()
 	{
 	
+	}
+	
+	void AddFavoritesToFilter( ref GetServersInput input )
+	{
+		m_Menu.AddFavoritesToFilter( input );
 	}
 	
 	void RefreshList()
@@ -314,16 +339,17 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 
 #ifndef PLATFORM_CONSOLE // PLATFORM_WINDOWS
 		m_CurrentFilterInput = m_Filters.GetFilterOptionsPC();
+		m_CurrentFilterInput.m_Page = 0;
 #else
 #ifdef PLATFORM_CONSOLE
 		m_CurrentFilterInput = m_Filters.GetFilterOptionsConsoles();
 		m_CurrentFilterInput.m_SortBy = GetSortOption();
 		m_CurrentFilterInput.m_SortOrder = m_SortOrder;
+		m_CurrentFilterInput.m_Page = GetCurrentPage();
 #endif
 #endif
 		
-		m_CurrentFilterInput.m_Page = 0;
-		
+		Print("RefreshList Start");
 		m_Loading = true;
 		switch( m_TabType )
 		{
@@ -346,6 +372,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				break;
 			}
 		}
+		
+		Print("RefreshList End");
 		//m_ServerListScroller.VScrollToPos01( 0 );
 	}
 	
@@ -412,14 +440,10 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 			}
 		}
 		
+		#ifndef PLATFORM_CONSOLE
 		if( m_Filters.FavoriteIsSet() )
 		{
-			#ifdef PLATFORM_CONSOLE
-			string server_id = result.m_HostIp + ":" + result.m_HostPort;
-			bool is_fav = m_Menu.IsFavorited( server_id );
-			#else
 			bool is_fav = result.m_Favorite;
-			#endif
 			
 			if ( !is_fav && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_show" )
 			{
@@ -431,7 +455,8 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				return false;
 			}
 		}
-		
+		#endif
+
 		if( m_Filters.PreviouslyIsSet() )
 		{
 			bool is_visited = g_Game.IsVisited( result.m_HostIp, result.m_HostPort );
@@ -441,7 +466,7 @@ class ServerBrowserTab extends ScriptedWidgetEventHandler
 				return false;
 			}
 			
-			if ( is_fav && m_Filters.m_Options["m_FavoritedFilter"] == "#server_browser_hide" )
+			if ( is_visited && m_Filters.m_Options["m_PreviouslyPlayedFilter"] == "#server_browser_hide" )
 			{
 				return false;
 			}

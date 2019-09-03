@@ -1,6 +1,6 @@
 class PluginConfigEmotesProfile extends PluginConfigHandler
 {	
-	protected const string EMOTE_1				= "emote_slot_1";
+	/*protected const string EMOTE_1				= "emote_slot_1";
 	protected const string EMOTE_2				= "emote_slot_2";
 	protected const string EMOTE_3				= "emote_slot_3";
 	protected const string EMOTE_4				= "emote_slot_4";
@@ -11,7 +11,7 @@ class PluginConfigEmotesProfile extends PluginConfigHandler
 	protected const string EMOTE_9				= "emote_slot_9";
 	protected const string EMOTE_10				= "emote_slot_10";
 	protected const string EMOTE_11				= "emote_slot_11";
-	protected const string EMOTE_12				= "emote_slot_12";
+	protected const string EMOTE_12				= "emote_slot_12";*/
 
 	protected ref map<string, ref CfgParam>		m_DefaultValues;
 	protected ref TStringArray 					m_PresetList;	
@@ -75,17 +75,17 @@ class PluginConfigEmotesProfile extends PluginConfigHandler
 		m_DefaultValues = new map<string, ref CfgParam>;
 		//Here you can configure default EMOTES
 
-		m_DefaultValues.Insert( EMOTE_1,  GetNewCfgParamInt(ID_EMOTE_GREETING) );
-		m_DefaultValues.Insert( EMOTE_2,  GetNewCfgParamInt(ID_EMOTE_SOS) );
-		m_DefaultValues.Insert( EMOTE_3,  GetNewCfgParamInt(ID_EMOTE_HEART) );
-		m_DefaultValues.Insert( EMOTE_4,  GetNewCfgParamInt(ID_EMOTE_TAUNT) );
-		m_DefaultValues.Insert( EMOTE_5,  GetNewCfgParamInt(ID_EMOTE_SURRENDER) );
-		m_DefaultValues.Insert( EMOTE_6,  GetNewCfgParamInt(ID_EMOTE_TAUNTKISS) );
-		m_DefaultValues.Insert( EMOTE_7,  GetNewCfgParamInt(ID_EMOTE_POINT) );
-		m_DefaultValues.Insert( EMOTE_8,  GetNewCfgParamInt(ID_EMOTE_TAUNTELBOW) );
-		m_DefaultValues.Insert( EMOTE_9,  GetNewCfgParamInt(ID_EMOTE_THUMB) );
-		m_DefaultValues.Insert( EMOTE_10, GetNewCfgParamInt(ID_EMOTE_THROAT) );
-		m_DefaultValues.Insert( EMOTE_11, GetNewCfgParamInt(ID_EMOTE_SUICIDE) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_1.ToString(),  GetNewCfgParamInt(ID_EMOTE_GREETING) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_2.ToString(),  GetNewCfgParamInt(ID_EMOTE_SOS) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_3.ToString(),  GetNewCfgParamInt(ID_EMOTE_HEART) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_4.ToString(),  GetNewCfgParamInt(ID_EMOTE_TAUNT) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_5.ToString(),  GetNewCfgParamInt(ID_EMOTE_SURRENDER) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_6.ToString(),  GetNewCfgParamInt(ID_EMOTE_TAUNTKISS) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_7.ToString(),  GetNewCfgParamInt(ID_EMOTE_POINT) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_8.ToString(),  GetNewCfgParamInt(ID_EMOTE_TAUNTELBOW) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_9.ToString(),  GetNewCfgParamInt(ID_EMOTE_THUMB) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_10.ToString(), GetNewCfgParamInt(ID_EMOTE_THROAT) );
+		m_DefaultValues.Insert( EmoteSlots.EMOTE_11.ToString(), GetNewCfgParamInt(ID_EMOTE_SUICIDE) );
 		//m_DefaultValues.Insert( EMOTE_12, GetNewCfgParamInt(ID_EMOTE_DANCE) );
 		//m_DefaultValues.Insert( EMOTE_12, GetNewCfgParamInt(ID_EMOTE_SOS) );
 	}
@@ -103,112 +103,112 @@ class PluginConfigEmotesProfile extends PluginConfigHandler
 	//========================================		
 	int GetEmoteSlot1()
 	{
-		return GetInt( EMOTE_1 );
+		return GetInt( EmoteSlots.EMOTE_1.ToString() );
 	}
 
 	void SetEmoteSlot1( int emoted_id )
 	{
-		SetInt( EMOTE_1, emoted_id );
+		SetInt( EmoteSlots.EMOTE_1.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot2()
 	{
-		return GetInt( EMOTE_2 );
+		return GetInt( EmoteSlots.EMOTE_2.ToString() );
 	}
 
 	void SetEmoteSlot2( int emoted_id )
 	{
-		SetInt( EMOTE_2, emoted_id );
+		SetInt( EmoteSlots.EMOTE_2.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot3()
 	{
-		return GetInt( EMOTE_3 );
+		return GetInt( EmoteSlots.EMOTE_3.ToString() );
 	}
 
 	void SetEmoteSlot3( int emoted_id )
 	{
-		SetInt( EMOTE_3, emoted_id );
+		SetInt( EmoteSlots.EMOTE_3.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot4()
 	{
-		return GetInt( EMOTE_4 );
+		return GetInt( EmoteSlots.EMOTE_4.ToString() );
 	}
 
 	void SetEmoteSlot4( int emoted_id )
 	{
-		SetInt( EMOTE_4, emoted_id );
+		SetInt( EmoteSlots.EMOTE_4.ToString(), emoted_id );
 	}
 
 	int GetEmoteSlot5()
 	{
-		return GetInt( EMOTE_5 );
+		return GetInt( EmoteSlots.EMOTE_5.ToString() );
 	}
 
 	void SetEmoteSlot5( int emoted_id )
 	{
-		SetInt( EMOTE_5, emoted_id );
+		SetInt( EmoteSlots.EMOTE_5.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot6()
 	{
-		return GetInt( EMOTE_6 );
+		return GetInt( EmoteSlots.EMOTE_6.ToString() );
 	}
 
 	void SetEmoteSlot6( int emoted_id )
 	{
-		SetInt( EMOTE_6, emoted_id );
+		SetInt( EmoteSlots.EMOTE_6.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot7()
 	{
-		return GetInt( EMOTE_7 );
+		return GetInt( EmoteSlots.EMOTE_7.ToString() );
 	}
 
 	void SetEmoteSlot7( int emoted_id )
 	{
-		SetInt( EMOTE_7, emoted_id );
+		SetInt( EmoteSlots.EMOTE_7.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot8()
 	{
-		return GetInt( EMOTE_8 );
+		return GetInt( EmoteSlots.EMOTE_8.ToString() );
 	}
 
 	void SetEmoteSlot8( int emoted_id )
 	{
-		SetInt( EMOTE_8, emoted_id );
+		SetInt( EmoteSlots.EMOTE_8.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot9()
 	{
-		return GetInt( EMOTE_9 );
+		return GetInt( EmoteSlots.EMOTE_9.ToString() );
 	}
 
 	void SetEmoteSlot9( int emoted_id )
 	{
-		SetInt( EMOTE_9, emoted_id );
+		SetInt( EmoteSlots.EMOTE_9.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot10()
 	{
-		return GetInt( EMOTE_10 );
+		return GetInt( EmoteSlots.EMOTE_10.ToString() );
 	}
 
 	void SetEmoteSlot10( int emoted_id )
 	{
-		SetInt( EMOTE_10, emoted_id );
+		SetInt( EmoteSlots.EMOTE_10.ToString(), emoted_id );
 	}
 	
 	int GetEmoteSlot11()
 	{
-		return GetInt( EMOTE_11 );
+		return GetInt( EmoteSlots.EMOTE_11.ToString() );
 	}
 
 	void SetEmoteSlot11( int emoted_id )
 	{
-		SetInt( EMOTE_11, emoted_id );
+		SetInt( EmoteSlots.EMOTE_11.ToString(), emoted_id );
 	}
 	
 	/*int GetEmoteSlot12()
@@ -220,4 +220,25 @@ class PluginConfigEmotesProfile extends PluginConfigHandler
 	{
 		SetInt( EMOTE_12, emoted_id );
 	}*/
+	
+	int GetEmoteFromSlot(string slot)
+	{
+		return GetInt( slot );
+	}
+}
+
+enum EmoteSlots
+{
+	EMOTE_1 = 1,
+	EMOTE_2,
+	EMOTE_3,
+	EMOTE_4,
+	EMOTE_5,
+	EMOTE_6,
+	EMOTE_7,
+	EMOTE_8,
+	EMOTE_9,
+	EMOTE_10,
+	EMOTE_11,
+	EMOTE_12
 }

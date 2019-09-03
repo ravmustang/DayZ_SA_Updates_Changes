@@ -92,6 +92,12 @@ class LeftArea: Container
 		return active_container.EquipItem();
 	}
 	
+	override bool InspectItem()
+	{
+		Container active_container = Container.Cast( m_Body.Get( m_ActiveIndex ) );
+		return active_container.InspectItem();
+	}
+	
 	override void UnfocusGrid()
 	{
 		Container active_container;

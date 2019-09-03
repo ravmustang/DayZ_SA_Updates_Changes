@@ -191,6 +191,7 @@ class GetServersInput
 	int 		m_FreeSlotsMax;
 	string		m_HostIp;
 	int			m_HostPort;
+	string		m_FavoriteServers;
 
 	bool m_UseAntiCheat;
 	bool m_UseName;
@@ -209,6 +210,7 @@ class GetServersInput
 	bool m_UseFreeSlotsMax;
 	bool m_UseHostIp;
 	bool m_UseHostPort;
+	bool m_UseHostIps;
 	
 	void SetAntiCheatFilter( bool anti_cheat )
 	{
@@ -396,6 +398,11 @@ class GetServersInput
 		else
 			m_SortBy += "-";
 	}
+	
+	void AddFavourite(string ip, int port)
+	{
+		m_FavoriteServers += ip + ";" + port + ";";
+	}
 };
 
 class BiosLobbyService
@@ -421,6 +428,7 @@ class BiosLobbyService
 	
 	proto native void AddServerFavorite(string ipAddress, int port, int steamQueryPort);
 	proto native void RemoveServerFavorite(string ipAddress, int port, int steamQueryPort);
+
 
 	//! Async callback for GetServers
 	/*!

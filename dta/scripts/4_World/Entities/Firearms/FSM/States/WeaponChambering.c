@@ -71,7 +71,7 @@ class WeaponChambering_Cartridge extends WeaponChambering_Base
 
 		if (m_srcMagazine)
 		{
-			if (m_srcMagazine.LocalAcquireCartridge(m_damage, m_type))
+			if (m_srcMagazine.ServerAcquireCartridge(m_damage, m_type))
 			{
 				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);
 				m_weapon.SelectionBulletShow();
@@ -154,10 +154,9 @@ class WeaponChambering_Cartridge_InnerMag extends WeaponChambering_Base
 
 		if (m_srcMagazine)
 		{
-			if (m_srcMagazine.LocalAcquireCartridge(m_damage, m_type))
+			if (m_srcMagazine.ServerAcquireCartridge(m_damage, m_type))
 			{
-				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);
-				m_weapon.SelectionBulletShow();
+				wpnDebugPrint("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, ok - cartridge acquired: dmg=" + m_damage + " type=" + m_type);		
 			}
 			else
 				Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, error - cannot take cartridge from magazine");
@@ -166,6 +165,7 @@ class WeaponChambering_Cartridge_InnerMag extends WeaponChambering_Base
 		{
 			Error("[wpnfsm] " + Object.GetDebugName(m_weapon) + " WeaponChambering_Cartridge_InnerMag, error - no magazine to load from (m_srcMagazine=NULL)");
 		}
+		m_weapon.SelectionBulletShow();
 	}
 
 	override void OnAbort (WeaponEventBase e)

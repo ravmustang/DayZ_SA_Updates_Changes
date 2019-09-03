@@ -90,8 +90,8 @@ class ClosableHeader: Header
 			GetGame().GetInventoryItemSize( InventoryItem.Cast( m_Entity ), ww, hh );
 			if( item_preview_drag )
 			{
-				InventoryItem.Cast( m_Entity ).GetOnItemFlipped().Insert( UpdateFlip );
-				if( InventoryItem.Cast( m_Entity ).GetInventory().GetFlipCargo() )
+				m_Entity.GetOnItemFlipped().Insert( UpdateFlip );
+				if( m_Entity.GetInventory().GetFlipCargo() )
 				{
 					item_preview_drag.SetSize( hh * m_SquareSize, ww * m_SquareSize );
 				}
@@ -165,7 +165,6 @@ class ClosableHeader: Header
 	
 	override void SetActive( bool active )
 	{
-		super.SetActive( active );
 		if( active )
 		{
 			GetMainWidget().FindAnyWidget( "PanelWidget" ).SetColor( ARGBF( 1, 1, 0, 0 ) );

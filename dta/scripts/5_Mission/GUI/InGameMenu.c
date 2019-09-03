@@ -1,10 +1,12 @@
 class InGameMenu extends UIScriptedMenu
 {
-	protected Widget m_ContinueButton;
-	protected Widget m_ExitButton;
-	protected Widget m_RestartButton;
-	protected Widget m_RestartDeadButton;
-	protected Widget m_OptionsButton;
+	protected Widget			m_ContinueButton;
+	protected Widget			m_ExitButton;
+	protected Widget			m_RestartButton;
+	protected Widget			m_RestartDeadButton;
+	protected Widget			m_OptionsButton;
+	
+	protected ref TextWidget	m_ModdedWarning;
 	
 	protected ref UiHintPanel m_HintPanel;
 	
@@ -22,6 +24,7 @@ class InGameMenu extends UIScriptedMenu
 		m_RestartButton		= layoutRoot.FindAnyWidget( "restartbtn" );
 		m_RestartDeadButton	= layoutRoot.FindAnyWidget( "restartdeadbtn" );
 		m_OptionsButton		= layoutRoot.FindAnyWidget( "optionsbtn" );
+		m_ModdedWarning		= TextWidget.Cast( layoutRoot.FindAnyWidget( "ModdedWarning" ) );
 		m_HintPanel			= new UiHintPanel(layoutRoot.FindAnyWidget( "hint_frame" ));
 		
 		
@@ -42,7 +45,7 @@ class InGameMenu extends UIScriptedMenu
 		
 		SetGameVersion();
 		
-		//m_Root.SetHandler( this );
+		m_ModdedWarning.Show( g_Game.IsModded() );
 		
 		return layoutRoot;
 	}

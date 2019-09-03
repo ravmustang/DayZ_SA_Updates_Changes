@@ -16,6 +16,11 @@ class CargoBase : Managed
 	 * @return		owner's index of this cargo
 	 **/
 	proto native int GetOwnerCargoIndex ();
+
+	/**@fn			IsProxyCargo
+	 * @return		true if cargo is in proxy object
+	 **/	
+	proto native bool IsProxyCargo ();
 	
 	/**@fn			GetItemCount
 	 * @return		number of items in cargo

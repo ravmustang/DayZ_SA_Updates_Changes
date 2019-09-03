@@ -9,17 +9,6 @@ class Transport extends EntityAI
 
 	void Transport()
 	{
-		m_SingleUseActions  = new TIntArray;
-		m_ContinuousActions = new TIntArray;
-		m_InteractActions   = new TIntArray;
-		SetUserActions();
-	}
-
-	void SetUserActions()
-	{
-		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " ContinuousActions", m_ContinuousActions);
-		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " SingleUseActions", m_SingleUseActions);
-		g_Game.ConfigGetIntArray("cfgVehicles " +GetType() + " InteractActions", m_InteractActions);
 	}
 
 	override int GetMeleeTargetType()

@@ -31,16 +31,22 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		ref array<string> sort_options = { "#server_browser_column_host A-Z", "#server_browser_column_host Z-A", "#server_browser_entry_empty - #server_details_popularity_full", "#server_details_popularity_full - #server_browser_entry_empty" };
 		ref array<string> ping_options = { "#server_browser_disabled", "<30", "<50", "<100", "<200", "<300", "<500" };
 		ref array<string> three_options = { "#server_browser_disabled", "#server_browser_show", "#server_browser_hide" };
+		ref array<string> two_options = { "#server_browser_disabled", "#server_browser_show" };
 		
 		m_SearchByName				= EditBoxWidget.Cast( root.FindAnyWidget( "search_name_setting_option" ) );
 		m_SearchByIP				= EditBoxWidget.Cast( root.FindAnyWidget( "search_ip_setting_option" ) );
 		
 		m_RegionFilter				= new OptionSelectorMultistate( root.FindAnyWidget( "region_setting_option" ), 0, this, false, region_options );
 		m_PingFilter				= new OptionSelectorMultistate( root.FindAnyWidget( "ping_setting_option" ), 0, this, false, ping_options );
+		#ifdef PLATFORM_CONSOLE
+		m_FavoritedFilter			= new OptionSelectorMultistate( root.FindAnyWidget( "favorites_setting_option" ), 0, this, false, two_options );
+		#else
 		m_FavoritedFilter			= new OptionSelector( root.FindAnyWidget( "favorites_setting_option" ), 0, this, false );
+		#endif
 		m_FriendsPlayingFilter		= new OptionSelector( root.FindAnyWidget( "friends_setting_option" ), 0, this, false );
 		m_PreviouslyPlayedFilter	= new OptionSelector( root.FindAnyWidget( "prev_played_setting_option" ), 0, this, false );
 		m_FullServerFilter			= new OptionSelector( root.FindAnyWidget( "full_server_setting_option" ), 0, this, false );
+		m_PasswordFilter			= new OptionSelector( root.FindAnyWidget( "password_setting_option" ), 0, this, false  );
 		
 		m_RegionFilter.m_OptionChanged.Insert( OnFilterChanged );
 		m_PingFilter.m_OptionChanged.Insert( OnFilterChanged );
@@ -48,6 +54,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		m_FriendsPlayingFilter.m_OptionChanged.Insert( OnFilterChanged );
 		m_PreviouslyPlayedFilter.m_OptionChanged.Insert( OnFilterChanged );
 		m_FullServerFilter.m_OptionChanged.Insert( OnFilterChanged );
+		m_PasswordFilter.m_OptionChanged.Insert( OnFilterChanged );
 		
 		#ifdef PLATFORM_CONSOLE
 			m_SortingFilter			= new OptionSelectorMultistate( root.FindAnyWidget( "sort_setting_option" ), 0, this, false, sort_options );
@@ -64,7 +71,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		
 				m_CharacterAliveFilter		= new OptionSelectorMultistate( root.FindAnyWidget( "restrict_char_setting_option" ), 0, this, false, character_name_options );
 				m_BattleyeFilter			= new OptionSelector( root.FindAnyWidget( "battleye_setting_option" ), 0, this, false );
-				m_PasswordFilter			= new OptionSelector( root.FindAnyWidget( "password_setting_option" ), 0, this, false  );
 				m_VersionMatchFilter		= new OptionSelector( root.FindAnyWidget( "ver_match_setting_option" ), 0, this, false );
 				m_ThirdPersonFilter			= new OptionSelector( root.FindAnyWidget( "tps_setting_option" ), 0, this, false );
 				m_PublicFilter				= new OptionSelector( root.FindAnyWidget( "public_setting_option" ), 0, this, false );
@@ -72,7 +78,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		
 				m_CharacterAliveFilter.m_OptionChanged.Insert( OnFilterChanged );
 				m_BattleyeFilter.m_OptionChanged.Insert( OnFilterChanged );
-				m_PasswordFilter.m_OptionChanged.Insert( OnFilterChanged );
 				m_VersionMatchFilter.m_OptionChanged.Insert( OnFilterChanged );
 				m_ThirdPersonFilter.m_OptionChanged.Insert( OnFilterChanged );
 				m_PublicFilter.m_OptionChanged.Insert( OnFilterChanged );
@@ -107,6 +112,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 			m_FriendsPlayingFilter.SetStringOption( m_Options.Get( "m_FriendsPlayingFilter" ), false );
 			m_PreviouslyPlayedFilter.SetStringOption( m_Options.Get( "m_PreviouslyPlayedFilter" ), false );
 			m_FullServerFilter.SetStringOption( m_Options.Get( "m_FullServerFilter" ), false );
+			m_PasswordFilter.SetStringOption( m_Options.Get( "m_PasswordFilter" ), false );
 			
 			#ifdef PLATFORM_CONSOLE
 				m_SortingFilter.SetStringOption( m_Options.Get( "m_SortingFilter" ), false );
@@ -120,7 +126,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 						m_SearchByIP.SetText( m_Options.Get( "m_SearchByIP" ) );
 						m_CharacterAliveFilter.SetStringOption( m_Options.Get( "m_CharacterAliveFilter" ), false );
 						m_BattleyeFilter.SetStringOption( m_Options.Get( "m_BattleyeFilter" ), false );
-						m_PasswordFilter.SetStringOption( m_Options.Get( "m_PasswordFilter" ), false );
 						m_VersionMatchFilter.SetStringOption( m_Options.Get( "m_VersionMatchFilter" ), false );
 						m_ThirdPersonFilter.SetStringOption( m_Options.Get( "m_ThirdPersonFilter" ), false );
 						m_PublicFilter.SetStringOption( m_Options.Get( "m_PublicFilter" ), false );
@@ -141,6 +146,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		m_Options.Insert( "m_FriendsPlayingFilter", m_FriendsPlayingFilter.GetStringValue() );
 		m_Options.Insert( "m_PreviouslyPlayedFilter", m_PreviouslyPlayedFilter.GetStringValue() );
 		m_Options.Insert( "m_FullServerFilter", m_FullServerFilter.GetStringValue() );
+		m_Options.Insert( "m_PasswordFilter", m_PasswordFilter.GetStringValue() );
 		
 		#ifdef PLATFORM_CONSOLE
 			m_Options.Insert( "m_SortingFilter", m_SortingFilter.GetStringValue() );
@@ -152,7 +158,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				m_Options.Insert( "m_SearchByIP", m_SearchByIP.GetText() );
 				m_Options.Insert( "m_CharacterAliveFilter", m_CharacterAliveFilter.GetStringValue() );
 				m_Options.Insert( "m_BattleyeFilter", m_BattleyeFilter.GetStringValue() );
-				m_Options.Insert( "m_PasswordFilter", m_PasswordFilter.GetStringValue() );
 				m_Options.Insert( "m_VersionMatchFilter", m_VersionMatchFilter.GetStringValue() );
 				m_Options.Insert( "m_ThirdPersonFilter", m_ThirdPersonFilter.GetStringValue() );
 				m_Options.Insert( "m_PublicFilter", m_PublicFilter.GetStringValue() );
@@ -171,6 +176,7 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		m_FriendsPlayingFilter.Reset();
 		m_PreviouslyPlayedFilter.Reset();
 		m_FullServerFilter.Reset();
+		m_PasswordFilter.Reset();
 		
 		#ifdef PLATFORM_CONSOLE
 			m_SortingFilter.Reset();
@@ -182,7 +188,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				m_SearchByIP.SetText( "" );
 				m_CharacterAliveFilter.Reset();
 				m_BattleyeFilter.Reset();
-				m_PasswordFilter.Reset();
 				m_VersionMatchFilter.Reset();
 				m_ThirdPersonFilter.Reset();
 				m_PublicFilter.Reset();
@@ -352,7 +357,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 	void Focus()
 	{
 		#ifdef PLATFORM_CONSOLE
-			
 			m_SortingFilter.Focus();
 		#else
 		#ifdef PLATFORM_WINDOWS
@@ -541,15 +545,9 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 		}
 		if( m_FavoritedFilter.IsSet() )
 		{
-			Print("m_FavoritedFilter: "+ m_FavoritedFilter.GetStringValue());
-			if ( m_FavoritedFilter.GetStringValue() == "Show" )
-			{
-				input.SetFavorited( true );
-			}
-			else
-			{
-				input.SetFavorited( false );
-			}
+			#ifdef PLATFORM_CONSOLE
+			m_Tab.AddFavoritesToFilter( input );
+			#endif
 		}
 		if( m_FriendsPlayingFilter.IsSet() )
 		{
@@ -574,6 +572,10 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 			{
 				input.SetFreeSlotsMin( 1 );
 			}
+		}
+		if( m_PasswordFilter.IsSet() )
+		{
+			input.SetIsPasswordProtectedFilter( m_PasswordFilter.IsEnabled() );
 		}
 		
 		#ifdef PLATFORM_WINDOWS
@@ -615,11 +617,6 @@ class ServerBrowserFilterContainer extends ScriptedWidgetEventHandler
 				if( m_VersionMatchFilter.IsSet() )
 				{
 					input.SetProperVersionMatch( m_VersionMatchFilter.IsEnabled() );
-				}
-				if( m_PasswordFilter.IsSet() )
-				{
-					//input.SetIsPasswordProtectedFilter( m_PasswordFilter.IsEnabled() );
-					input.SetPassworded( m_PasswordFilter.IsEnabled() );
 				}
 				if( m_BattleyeFilter.IsSet() )
 				{

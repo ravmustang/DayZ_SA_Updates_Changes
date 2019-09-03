@@ -204,7 +204,7 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 					} 
 					break;
 				
-				case DT_FIRE_ARM:		// Player ranged
+				case DT_FIRE_ARM:	// Player ranged
 				
 					if ( source.IsWeapon() )
 					{
@@ -223,12 +223,17 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 					}
 					break;
 				
-				case DT_EXPLOSION:		// Explosion
+				case DT_EXPLOSION:	// Explosion
 				
 					LogPrint( m_PlayerPrefix + " hit by explosion (" + ammo + ")" );
 					break;
+						
+				case DT_STUN: 		// unused atm
 				
-				case DT_CUSTOM:			// Others (Vehicle hit, fall, fireplace, barbed wire ...)
+					LogPrint( m_PlayerPrefix + " stunned by " + ammo );
+					break;
+						
+				case DT_CUSTOM:		// Others (Vehicle hit, fall, fireplace, barbed wire ...)
 								
 					if ( ammo == "FallDamage" )			// Fall
 					{
@@ -249,10 +254,10 @@ class PluginAdminLog extends PluginBase			// Class for admin log messages handle
 						LogPrint( m_PlayerPrefix + " hit by " + m_DisplayName + " with " + ammo );
 					}
 					break;
-							
+											
 				default:
 				
-					LogPrint("DEBUG: PlayerHitBy() unknown damageType");
+					LogPrint("DEBUG: PlayerHitBy() unknown damageType: " + ammo );
 					break;
 			}
 		}

@@ -616,7 +616,7 @@ class DropActionInput : NoIndicationActionInputBase
 	void DropActionInput(PlayerBase player)
 	{
 		SetInput("UADropitem");
-		m_InputType = ActionInputType.AIT_SINGLE;
+		m_InputType = ActionInputType.AIT_HOLDSINGLE;
 	}
 };
 

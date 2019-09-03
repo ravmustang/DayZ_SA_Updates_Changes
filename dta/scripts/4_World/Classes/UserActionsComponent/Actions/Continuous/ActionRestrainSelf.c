@@ -66,11 +66,17 @@ class ActionRestrainSelf: ActionContinuousBase
 	override void OnFinishProgressServer( ActionData action_data )
 	{	
 		PlayerBase player = PlayerBase.Cast( action_data.m_Player );
-		EntityAI item_in_hands = player.GetHumanInventory().GetEntityInHands();
+		EntityAI item_in_hands = action_data.m_MainItem;
 		if( item_in_hands )
 		{
+			//action_data.m_Player.RemoveQuickBarEntityShortcut(item_in_hands);
 			string new_item_name = MiscGameplayFunctions.ObtainRestrainItemTargetClassname(item_in_hands);
 			MiscGameplayFunctions.TurnItemIntoItemEx(player, new TurnItemIntoItemLambdaRestrainLambda(item_in_hands, new_item_name, action_data.m_Player));
 		}
+	}
+	
+	override void OnFinishProgressClient( ActionData action_data )
+	{	
+		//action_data.m_Player.RemoveQuickBarEntityShortcut(action_data.m_MainItem);
 	}
 };

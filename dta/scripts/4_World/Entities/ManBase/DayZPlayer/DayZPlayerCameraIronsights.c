@@ -25,11 +25,14 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 	float m_movementFrequencyX;
 	float m_movementFrequencyY;
 	
+
 	void 	DayZPlayerCameraIronsights(DayZPlayer pPlayer, HumanInputController pInput)
 	{
+		
 		if (!temp_array)
 			temp_array = new array<float>;
 		m_iBoneIndex = pPlayer.GetBoneIndexByName("RightHand_Dummy");
+		
 		if (m_iBoneIndex == -1)
 		{
 			Print("DayZPlayerCamera1stPerson: main bone not found");
@@ -65,7 +68,6 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 				if( m_opticsUsed )
 				{
 					m_opticsHasWeaponOverride = m_opticsUsed.HasWeaponIronsightsOverride();
-
 				}
 			}
 			else
@@ -158,10 +160,16 @@ class DayZPlayerCameraIronsights extends DayZPlayerCameraBase
 		// final offset matrix
 		Math3D.MatrixMultiply4(dynamics, aimingMatTM, dynamics);
 		Math3D.MatrixMultiply4(dynamics, matTM, pOutResult.m_CameraTM);
-	
 		AdjustCameraParameters(pDt, pOutResult);
 		UpdateBatteryOptics(GetCurrentSightEntity());
 		UpdateCameraNV(PlayerBase.Cast(m_pPlayer));
+		
+		if(m_CameraShake)
+		{
+			float x,y;
+			m_CameraShake.Update(pDt, x, y);
+			DayZPlayerImplement.Cast(m_pPlayer).GetAimingModel().SetCamShakeValues(x, y);
+		}
 	}
 
 	//

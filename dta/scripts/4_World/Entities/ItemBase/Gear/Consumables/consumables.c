@@ -1,5 +1,5 @@
 class Bait: ItemBase {};
-class Bandana_ColorBase: ItemBase
+class Bandana_ColorBase: Clothing
 {
 	override void SetActions()
 	{
@@ -11,9 +11,18 @@ class Bandana_ColorBase: ItemBase
 	
 	void Bandana_ColorBase()
 	{
-		InsertAgent(eAgents.WOUND_AGENT);
+
 	}
 };
+class Bandana_RedPattern: Bandana_ColorBase {};
+class Bandana_BlackPattern: Bandana_ColorBase {};
+class Bandana_PolkaPattern: Bandana_ColorBase {};
+class Bandana_Greenpattern: Bandana_ColorBase {};
+class Bandana_CamoPattern: Bandana_ColorBase {};
+class Bandana_Blue: Bandana_ColorBase {};
+class Bandana_Pink: Bandana_ColorBase {};
+class Bandana_Yellow: Bandana_ColorBase {};
+
 class BatteryD: ItemBase {};
 class Bone:  ItemBase {};
 class BoneBait: ItemBase {};

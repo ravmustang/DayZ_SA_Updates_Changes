@@ -57,7 +57,7 @@ class MainMenuStats extends ScriptedWidgetEventHandler
 			player = mission_main_menu.GetIntroScenePC().GetIntroCharacter().GetCharacterObj();
 		#endif
 		#ifdef PLATFORM_CONSOLE
-			player = mission_main_menu.GetIntroSceneXbox().GetIntroSceneCharacter();
+			player = mission_main_menu.GetIntroScenePC().GetIntroCharacter().GetCharacterObj();
 		#endif
 		
 		if ( player )

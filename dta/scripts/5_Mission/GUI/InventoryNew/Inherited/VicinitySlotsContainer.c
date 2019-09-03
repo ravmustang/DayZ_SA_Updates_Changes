@@ -171,7 +171,7 @@ class VicinitySlotsContainer: Container
 		}
 	}
 	
-	override bool EquipItem( )
+	override bool EquipItem()
 	{
 		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn ).FindAnyWidget( "Render" + m_FocusedColumn ) );
 		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
@@ -179,7 +179,21 @@ class VicinitySlotsContainer: Container
 		
 		if( ent && !ent.IsInherited( Magazine ))
 		{
-			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.ATTACHMENT, ent );
+			GetGame().GetPlayer().PredictiveTakeOrSwapAttachment( ent );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool InspectItem()
+	{
+		ItemPreviewWidget ipw = ItemPreviewWidget.Cast( m_Container.Get( m_FocusedRow ).GetMainWidget().FindAnyWidget( "Icon" + m_FocusedColumn ).FindAnyWidget( "Render" + m_FocusedColumn ) );
+		ItemManager.GetInstance().SetSelectedVicinityItem( ipw );
+		EntityAI ent = ipw.GetItem();
+		
+		if( ent )
+		{
+			InspectItem( ent );
 			return true;
 		}
 		return false;
@@ -192,8 +206,13 @@ class VicinitySlotsContainer: Container
 		EntityAI ent = ipw.GetItem();
 		if( ent )
 		{
-			GetGame().GetPlayer().PredictiveTakeEntityToInventory( FindInventoryLocationType.CARGO, ent );
-			return true;
+			InventoryLocation il = new InventoryLocation;
+			GetGame().GetPlayer().GetInventory().FindFreeLocationFor( ent, FindInventoryLocationType.CARGO, il );
+			if( il.IsValid() && GetGame().GetPlayer().GetInventory().LocationCanAddEntity( il ) )
+			{
+				SplitItemUtils.TakeOrSplitToInventoryLocation( PlayerBase.Cast( GetGame().GetPlayer() ), il );
+				return true;
+			}
 		}
 		return false;
 	}
@@ -516,17 +535,11 @@ class VicinitySlotsContainer: Container
 			}
 			else
 			{
-				InventoryLocation il = new InventoryLocation;
-				if( player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, il) )
+				InventoryLocation dst = new InventoryLocation;
+				player.GetInventory().FindFreeLocationFor( item, FindInventoryLocationType.ANY, dst );
+				if( dst.IsValid() && player.GetInventory().LocationCanAddEntity( dst ) )
 				{
-					if( item.ConfigGetFloat("varStackMax") )
-						item.SplitIntoStackMaxClient( player, -1, );
-					else
-						player.PredictiveTakeEntityToInventory( FindInventoryLocationType.ANY, item );
-				}
-				else if( GetGame().GetPlayer().GetHumanInventory().CanAddEntityInHands( item ) )
-				{
-					player.PredictiveTakeEntityToHands( item );
+					SplitItemUtils.TakeOrSplitToInventoryLocation( player, dst );
 				}
 			}
 			

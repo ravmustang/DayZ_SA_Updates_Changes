@@ -21,14 +21,19 @@ class FlashGrenade extends Grenade_Base
 				vector contactPos;
 				vector contactDir;
 				int contactComponent;
-
-				if (!DayZPhysics.RaycastRV(headPos, pos, contactPos, contactDir, contactComponent, NULL, player, source, false, false, ObjIntersectFire))
+				
+				// ignore collisions with parent if fireplace
+				InventoryItem invItem = InventoryItem.Cast( source );
+				EntityAI parent = invItem.GetHierarchyParent();
+				if (parent && !parent.IsFireplace())
+					parent = null;
+				
+				if (!DayZPhysics.RaycastRV(headPos, pos, contactPos, contactDir, contactComponent, NULL, player, parent, false, false, ObjIntersectFire))
 				{
 					if( MiscGameplayFunctions.IsPlayerOrientedTowardPos(player, pos, 60) )
 					{
 						visual = true;
 					}
-
 					player.OnPlayerReceiveFlashbangHitStart(visual);
 				}
 			}

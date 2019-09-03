@@ -10,8 +10,8 @@ class ItemBase extends InventoryItem
 	TInputActionMap m_InputActionMap;
 	bool	m_ActionsInitialize;
 	
-	static int		m_DebugActionsMask;
-	bool	m_RecipesInitialized;
+	static int	m_DebugActionsMask;
+	bool		m_RecipesInitialized;
 	// ============================================
 	// Variable Manipulation System
 	// ============================================
@@ -25,7 +25,6 @@ class ItemBase extends InventoryItem
 	float 	m_Absorbency; 
 	float 	m_ItemModelLength;
 	int 	m_VarLiquidType;
-	int		m_Item_Stage;
 	int 	m_ItemBehaviour = -1; // -1 = not specified; 0 = heavy item; 1= onehanded item; 2 = twohanded item
 	bool	m_IsBeingPlaced;
 	bool	m_IsHologram;
@@ -83,7 +82,6 @@ class ItemBase extends InventoryItem
 		m_SingleUseActions = new TIntArray;
 		m_ContinuousActions = new TIntArray;
 		m_InteractActions = new TIntArray;
-		SetUserActions();
 		
 		if (HasMuzzle())
 		{
@@ -126,8 +124,8 @@ class ItemBase extends InventoryItem
 		m_IsDeploySound = false;
 		m_IsTakeable = true;
 		m_IsSoundSynchRemote = false;
-		m_HeatIsolation = GetHeatIsolation();
-		m_Absorbency = GetAbsorbency();
+		m_HeatIsolation = GetHeatIsolationInit();
+		m_Absorbency = GetAbsorbencyInit();
 		m_ItemModelLength = GetItemModelLength();
 		if(ConfigIsExisting("itemBehaviour"))
 		{
@@ -147,6 +145,7 @@ class ItemBase extends InventoryItem
 		
 		RegisterNetSyncVariableBool("m_IsBeingPlaced");
 		RegisterNetSyncVariableBool("m_IsTakeable");
+		RegisterNetSyncVariableBool("m_IsHologram");
 	}
 
 	void InitializeActions()
@@ -545,26 +544,13 @@ class ItemBase extends InventoryItem
 	// -------------------------------------------------------------------------
 	void ~ItemBase()
 	{
-	}
-	
-	void SetUserActions()
-	{
-		string path;
-		int stage;
-		
-		if (IsItemStaged())
+		if( GetGame() && GetGame().GetPlayer() && ( !GetGame().IsMultiplayer() || GetGame().IsClient() ) )
 		{
-			GetItemStage(stage);
-			path = "cfgVehicles " + GetType() + " Staging Stage_" + stage;
+			GetGame().GetPlayer().GetHumanInventory().ClearUserReservedLocation( this );
+			GetOnReleaseLock().Invoke( this );
 		}
-		else
-		{
-			path = "cfgVehicles " + GetType();
-		}
-		g_Game.ConfigGetIntArray(path + " ContinuousActions", m_ContinuousActions);
-		g_Game.ConfigGetIntArray(path + " SingleUseActions", m_SingleUseActions);
-		g_Game.ConfigGetIntArray(path + " InteractActions", m_InteractActions);
 	}
+
 	// -------------------------------------------------------------------------
 	static int GetDebugActionsMask()
 	{
@@ -642,7 +628,7 @@ class ItemBase extends InventoryItem
 				{
 					InventoryLocation il = new InventoryLocation;
 					entity2.GetInventory().GetCurrentInventoryLocation(il);
-					GetGame().GetPlayer().GetInventory().AddInventoryReservation(entity2,il,5000);
+					GetGame().GetPlayer().GetInventory().AddInventoryReservation(entity2,il,GameInventory.c_InventoryReservationTimeoutShortMS);
 					//entity2.GetInventory().GetCurrentInventoryLocation
 				}
 			}
@@ -671,7 +657,7 @@ class ItemBase extends InventoryItem
 		return false;
 	}
 	
-	bool IsBeingPlaced()
+	override bool IsBeingPlaced()
 	{
 		return m_IsBeingPlaced;
 	}
@@ -682,7 +668,7 @@ class ItemBase extends InventoryItem
 		SetSynchDirty();
 	}
 	
-	bool IsHologram()
+	override bool IsHologram()
 	{
 		return m_IsHologram;
 	}
@@ -695,6 +681,7 @@ class ItemBase extends InventoryItem
 	void SetIsHologram( bool is_hologram )
 	{
 		m_IsHologram = is_hologram;
+		SetSynchDirty();
 	}
 	/*
 	protected float GetNutritionalEnergy()
@@ -739,16 +726,69 @@ class ItemBase extends InventoryItem
 	override void EEItemLocationChanged(notnull InventoryLocation oldLoc, notnull InventoryLocation newLoc)
 	{
 		super.EEItemLocationChanged(oldLoc,newLoc);
+		
+		PlayerBase new_player = null;
+		PlayerBase old_player = null;
+		
+		if( newLoc.GetParent() )
+			new_player = PlayerBase.Cast(newLoc.GetParent().GetHierarchyRootPlayer());
+		
+		if( oldLoc.GetParent() )
+			old_player = PlayerBase.Cast(oldLoc.GetParent().GetHierarchyRootPlayer());
+		
+		if(oldLoc.GetType() == InventoryLocationType.HANDS)
+		{
+			old_player.GetHumanInventory().ClearUserReservedLocation(this);
+			GetOnReleaseLock().Invoke(this);
+		}
+		
 		if(newLoc.GetType() == InventoryLocationType.HANDS)
 		{
-			if (!m_OldLocation)
-				m_OldLocation = new InventoryLocation;
-			//Print("is valid? "+m_OldLocation.IsValid());
-			m_OldLocation.Copy(oldLoc);
+			if(new_player == old_player)
+			{
+				if(new_player.GetHumanInventory().LocationGetEntity(oldLoc) == NULL )
+				{
+					new_player.GetHumanInventory().SetUserReservedLocation(this,oldLoc);
+				}
+				int type = oldLoc.GetType();
+				if( type == InventoryLocationType.CARGO || type == InventoryLocationType.PROXYCARGO )
+				{
+					oldLoc.GetParent().GetOnSetLock().Invoke( this );
+				}
+				
+				if (!m_OldLocation)
+				{
+					m_OldLocation = new InventoryLocation;
+				}
+				m_OldLocation.Copy(oldLoc);
+			}
+			else
+			{
+				if (m_OldLocation)
+				{
+					m_OldLocation.Reset();
+				}
+			}
 		}
-		else if (m_OldLocation)
+		else
 		{
-			m_OldLocation.Reset();
+			if(new_player)
+			{
+				int res_index = new_player.GetHumanInventory().FindCollidingUserReservedLocationIndex(this, newLoc );
+				if(res_index >= 0)
+				{
+					InventoryLocation il = new InventoryLocation;
+					new_player.GetHumanInventory().GetUserReservedLocation(res_index,il);
+					ItemBase it = ItemBase.Cast(il.GetItem());
+					new_player.GetHumanInventory().ClearUserReservedLocationAtIndex(res_index);
+					it.GetOnReleaseLock().Invoke(it);
+				}
+			}
+		
+			if (m_OldLocation)
+			{
+				m_OldLocation.Reset();
+			}
 		}
 	}
 	
@@ -775,6 +815,7 @@ class ItemBase extends InventoryItem
 				owner_player_old = Man.Cast( old_owner.GetHierarchyRootPlayer() );
 			}
 		}
+		
 		if (new_owner)
 		{
 			if ( new_owner.IsMan() )
@@ -786,6 +827,7 @@ class ItemBase extends InventoryItem
 				owner_player_new = Man.Cast( new_owner.GetHierarchyRootPlayer() );
 			}
 		}
+		
 		if ( owner_player_old != owner_player_new )
 		{
 			if ( owner_player_old )
@@ -797,10 +839,6 @@ class ItemBase extends InventoryItem
 					ItemBase item_exit = ItemBase.Cast(subItemsExit.Get(i));
 					item_exit.OnInventoryExit(owner_player_old);
 				}
-				
-				PlayerBase player_exit = PlayerBase.Cast(owner_player_old);
-				player_exit.OnItemInventoryExit(this);
-				// Debug.Log("Item dropped from inventory");
 			}
 
 			if ( owner_player_new )
@@ -812,24 +850,8 @@ class ItemBase extends InventoryItem
 					ItemBase item_enter = ItemBase.Cast(subItemsEnter.Get(j));
 					item_enter.OnInventoryEnter(owner_player_new);
 				}
-				
-				PlayerBase player_enter = PlayerBase.Cast(owner_player_new);
-				player_enter.OnItemInventoryEnter(this);
-				
 			}
-				// Debug.Log("Item taken to inventory");
 		}
-	//will not work, item location not yet specified
-	/*	if ( owner_player_new && owner_player_old && (owner_player_new == owner_player_old) )
-		{
-			PlayerBase playerOPN;
-			Class.CastTo(playerOPN, owner_player_new);
-			if (playerOPN && playerOPN.ItemToInventory)
-			{
-				playerOPN.ItemToInventory = false;
-				playerOPN.SwitchBandana(this);
-			}
-		}*/
 	}
 
 	// -------------------------------------------------------------------------------
@@ -844,6 +866,9 @@ class ItemBase extends InventoryItem
 		PlayerBase player = PlayerBase.Cast( GetHierarchyRootPlayer() );
 		if(player)
 		{
+			int index = player.GetHumanInventory().FindUserReservedLocationIndex(this);
+			if(index >= 0 )
+				player.GetHumanInventory().ClearUserReservedLocationAtIndex(index);
 			player.RemoveQuickBarEntityShortcut(this);
 			OnInventoryExit(player);
 		}
@@ -1158,6 +1183,27 @@ class ItemBase extends InventoryItem
 		}
 	}
 	
+	void SplitIntoStackMaxToInventoryLocationClient ( notnull InventoryLocation dst )
+	{
+		if( GetGame().IsClient() )
+		{
+			if (ScriptInputUserData.CanStoreInputUserData())
+			{
+				ScriptInputUserData ctx = new ScriptInputUserData;
+				ctx.Write(INPUT_UDT_ITEM_MANIPULATION);
+				ctx.Write(4);
+				ItemBase thiz = this; // @NOTE: workaround for correct serialization
+				ctx.Write(thiz);
+				dst.WriteToContext(ctx);
+				ctx.Send();
+			}
+		}
+		else if( !GetGame().IsMultiplayer() )
+		{
+			SplitIntoStackMaxToInventoryLocation( dst );
+		}
+	}
+	
 	void SplitIntoStackMaxCargoClient( EntityAI destination_entity, int idx, int row, int col )
 	{
 		if( GetGame().IsClient() )
@@ -1167,8 +1213,8 @@ class ItemBase extends InventoryItem
 				ScriptInputUserData ctx = new ScriptInputUserData;
 				ctx.Write(INPUT_UDT_ITEM_MANIPULATION);
 				ctx.Write(2);
-				ItemBase i1 = this; // @NOTE: workaround for correct serialization
-				ctx.Write(i1);
+				ItemBase dummy = this; // @NOTE: workaround for correct serialization
+				ctx.Write(dummy);
 				ctx.Write(destination_entity);
 				ctx.Write(true);
 				ctx.Write(idx);
@@ -1183,6 +1229,30 @@ class ItemBase extends InventoryItem
 		}
 	}
 
+	void SplitIntoStackMaxToInventoryLocation ( notnull InventoryLocation dst )
+	{
+		float quantity = GetQuantity();
+		float split_quantity_new;
+		ref ItemBase new_item;
+		if( dst.IsValid() )
+		{
+			float stackable = ConfigGetFloat("varStackMax");
+			if( quantity > stackable )
+				split_quantity_new = stackable;
+			else
+				split_quantity_new = quantity;
+			
+			new_item = ItemBase.Cast( GameInventory.LocationCreateEntity( dst, this.GetType(), ECE_IN_INVENTORY, RF_DEFAULT ) );
+			
+			if( new_item )
+			{			
+				MiscGameplayFunctions.TransferItemProperties(this,new_item);
+				AddQuantity( -split_quantity_new );
+				new_item.SetQuantity( split_quantity_new );
+			}
+		}
+	}
+	
 	void SplitIntoStackMaxCargo( EntityAI destination_entity, int idx, int row, int col )
 	{
 		float quantity = GetQuantity();
@@ -1544,7 +1614,7 @@ class ItemBase extends InventoryItem
 			
 			if( action_id == EActions.GET_TOTAL_WEIGHT ) //Prints total weight of item + its contents
 			{
-				Print(GetItemWeight());
+				Print(GetWeight());
 			}
 	
 			/*
@@ -2311,9 +2381,8 @@ class ItemBase extends InventoryItem
 		}
 		return Math.Round(Weight);
 	}
-
-	//calculates total weight of item
-	override int GetItemWeight()
+	
+	override void UpdateWeight()
 	{
 		int i = 0;
 		float totalWeight;
@@ -2330,7 +2399,7 @@ class ItemBase extends InventoryItem
 		{
 			for (i = 0; i < AttachmentsCount; i++)
 			{
-				totalWeight += GetInventory().GetAttachmentFromIndex(i).GetItemWeight();
+				totalWeight += GetInventory().GetAttachmentFromIndex(i).GetWeight();
 			}
 		}
 		
@@ -2339,7 +2408,7 @@ class ItemBase extends InventoryItem
 		{
 			for (i = 0; i < cargo.GetItemCount(); i++)
 			{
-				totalWeight += cargo.GetItem(i).GetItemWeight();
+				totalWeight += cargo.GetItem(i).GetWeight();
 			}
 		}
 
@@ -2360,20 +2429,28 @@ class ItemBase extends InventoryItem
 			}
 		}
 		
-		return Math.Round(totalWeight);
+		m_Weight = Math.Round(totalWeight);
 	}
 
-
-	// Returns the number of items in cargo, otherwise returns 0(non-cargo objects)
+	//! Returns the number of items in cargo, otherwise returns 0(non-cargo objects). Recursive.
 	int GetNumberOfItems()
 	{
+		int item_count = 0;
+		ItemBase item;
+		
 		if ( GetInventory().GetCargo() != NULL )
 		{
-			int item_count = GetInventory().GetCargo().GetItemCount();
-			return item_count;
+			item_count = GetInventory().GetCargo().GetItemCount();
 		}
-		return 0;
-	}	
+		
+		for ( int i = 0; i < GetInventory().AttachmentCount(); i++ )
+		{
+			Class.CastTo(item,GetInventory().GetAttachmentFromIndex(i));
+			if ( item )
+				item_count += item.GetNumberOfItems();
+		}
+		return item_count;
+	}
 	
 	void SetVariableMask(int variable)
 	{
@@ -2478,9 +2555,13 @@ class ItemBase extends InventoryItem
 		return ConfigGetFloat("varTemperatureMax");
 	}
 	//----------------------------------------------------------------
-	float GetHeatIsolation()
+	float GetHeatIsolationInit()
 	{
 		return ConfigGetFloat("heatIsolation");
+	}
+	float GetHeatIsolation()
+	{
+		return m_HeatIsolation;
 	}
 	//----------------------------------------------------------------
 	void SetWet(float value, bool allow_client = false)
@@ -2524,9 +2605,14 @@ class ItemBase extends InventoryItem
 		return ConfigGetFloat("varWetInit");
 	}
 	//----------------------------------------------------------------
-	float GetAbsorbency()
+	float GetAbsorbencyInit()
 	{
 		return ConfigGetFloat("absorbency");
+	}
+	
+	float GetAbsorbency()
+	{
+		return m_Absorbency;
 	}
 	//----------------------------------------------------------------
 	bool IsServerCheck(bool allow_client)
@@ -2967,62 +3053,7 @@ class ItemBase extends InventoryItem
 	{
 		return m_IsTakeable;
 	}
-	
-	
-	//----------------------------------------------------------------
-	//Has item stages in config?
-	bool IsItemStaged()
-	{
-		string path;
-		path = "cfgVehicles " + GetType() + " Staging";
-		if (!GetGame().ConfigIsExisting(path))
-		{
-			return false;
-		}
-		return true;
-	}
-	
-	//----------------------------------------------------------------
-	//Gets current item stage (+ returns true if staging is relevant)
-	bool GetItemStage(out int stage)
-	{
-		stage = m_Item_Stage;
-		return IsItemStaged();
-	}
-	
-	void SetItemStage(int stage)
-	{
-		string config_path;
-		m_Item_Stage = stage;
-		
-		if (IsItemStaged())
-		{
-			ref array<string> config_selections	= new array<string>;
-			
-			config_path = "CfgVehicles " + GetType() + " proxySelections"/*hiddenSelections*/;
-			GetGame().ConfigGetTextArray( config_path, config_selections );
-			
-			for ( int i = 0; i < config_selections.Count(); i++ )
-			{
-				if ( config_selections.Get( i ) != config_selections.Get( m_Item_Stage ) )
-				{
-					 SetAnimationPhase( config_selections.Get( i ), 1 ); //hides other selections on value 1 !!!
-				}
-			}
-			
-			SetAnimationPhase( config_selections.Get( m_Item_Stage ), 0 );
-		}
-		//TODO add event here!
-		//ItemStageChanged();
-		
-		//re-initializes useractions for the current stage
-		SetUserActions();
-	}
-	
-	/*event ItemStageChanged()
-	{
-	}*/
-	
+
 	//! Attachment Sound Type getting from config file
 	protected void PreLoadSoundAttachmentType()
 	{

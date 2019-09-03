@@ -181,11 +181,11 @@ class Environment
 					}
 
 					//! setting of wetness/dryiness of player
-					if( m_ItemsWetnessMax <= GameConstants.STATE_DAMP && m_Player.GetStatWet().Get() == 1 )
+					if( m_ItemsWetnessMax < GameConstants.STATE_DRENCHED && m_Player.GetStatWet().Get() == 1 )
 					{
 						m_Player.GetStatWet().Set(0);
 					}
-					else if( m_ItemsWetnessMax > GameConstants.STATE_DAMP && m_Player.GetStatWet().Get() == 0 )
+					else if( m_ItemsWetnessMax >= GameConstants.STATE_DRENCHED && m_Player.GetStatWet().Get() == 0 )
 					{
 						m_Player.GetStatWet().Set(1);
 					}
@@ -344,6 +344,11 @@ class Environment
 		float healthFactor;
 		float absorbency = pItem.GetAbsorbency();			//! item absorbency from config
 		float itemHealthLabel = pItem.GetHealthLevel();		//! item health (state)
+
+		if( absorbency == 0 )
+		{
+			return 0;
+		}
 
 		//! health factor selection
 		switch (itemHealthLabel)
@@ -571,8 +576,9 @@ class Environment
 			ApplyWetnessToItem(m_Player.GetItemInHands());
 		}
 
-		//! force recalc of player's load (for stamina)		
-		m_Player.CalculatePlayerLoad();
+		//! force recalc of player's load (for stamina)
+		m_Player.UpdateWeight();
+		m_Player.SetPlayerLoad( m_Player.GetWeight() );
 	}
 
 	protected void ProcessItemsDryness()
@@ -598,7 +604,8 @@ class Environment
 		}
 
 		//! force recalc of player's load (for stamina)		
-		m_Player.CalculatePlayerLoad();
+		m_Player.UpdateWeight();
+		m_Player.SetPlayerLoad( m_Player.GetWeight() );
 	}
 	
 	

@@ -10,6 +10,7 @@ class FlashbangEffect
 	protected float 		m_HitDuration;
 	protected float 		m_BreakPoint;
 	protected float 		m_TimeActive;
+	protected float			m_DayTimeToggle;
 	protected bool			m_Visual;
 	
 	protected PlayerBase 	m_Player;
@@ -27,9 +28,15 @@ class FlashbangEffect
 		
 		m_FlashbangEffectSound = null;
 
-		//PlaySound();
 		m_DeferAttenuation = new Timer;
 		m_DeferAttenuation.Run(SOUND_DEFER_TIME, this, "PlaySound", null, false);
+		
+		//! naive time of the day selector
+		m_DayTimeToggle = 5; //! -1: night; 1: day
+		if( g_Game.GetDayTime() >= 22.0 || g_Game.GetDayTime() < 7.0)
+		{
+			m_DayTimeToggle = 10;
+		}
 	}
 	
 	void ~FlashbangEffect()
@@ -43,9 +50,6 @@ class FlashbangEffect
 		{
 			m_Player.OnPlayerReceiveFlashbangHitEnd();
 		}
-		
-		//StopSound();
-		//ResetAttenuationFilter();
 		
 		if( m_DeferAttenuation.IsRunning() )
 		{
@@ -87,7 +91,10 @@ class FlashbangEffect
 	
 	protected void StopSound()
 	{
-		m_FlashbangEffectSound.SoundStop();
+		if(m_FlashbangEffectSound)
+		{
+			m_FlashbangEffectSound.SoundStop();
+		}
 	}
 	
 	protected void ClearVisual()
@@ -95,20 +102,24 @@ class FlashbangEffect
 		PPEffects.FlashbangEffect(0);
 		PPEffects.UpdateColor();
 		PPEffects.SetBlurFlashbang(0);
-		//PPEffects.ResetVignette();
+
 		g_Game.SetEVValue(0);
 	}
 	
 	protected void SetVisual(float val)
 	{
 		PPEffects.FlashbangEffect(val);
-		PPEffects.UpdateColor();
 		PPEffects.SetBlurFlashbang(val);
-		float daynight_toggle = 1; //! -1: night; 1: day
-		if( g_Game.GetDayTime() >= 22.0 || g_Game.GetDayTime() < 7.0)
-			daynight_toggle = -1;
-		g_Game.SetEVValue(val * 5 * daynight_toggle);
-		//PPEffects.SetVignette(val, 1, 1, 1);
+
+		if( m_DayTimeToggle <= 5 )
+		{
+			g_Game.SetEVValue(val * m_DayTimeToggle);
+			PPEffects.UpdateColor();
+		}
+		else
+		{
+			g_Game.SetEVValue(100);
+		}
 	}
 	
 	void Update(float deltatime)

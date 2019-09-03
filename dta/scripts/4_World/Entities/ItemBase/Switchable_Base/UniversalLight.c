@@ -96,7 +96,7 @@ class UniversalLight extends Switchable_Base
 	{
 		super.OnInventoryExit(player);
 		
-		if ( GetGame().IsServer()  &&  GetCompEM().IsWorking() )
+		if ( GetCompEM().IsWorking() )
 		{
 			if (player)
 			{

@@ -15,7 +15,7 @@ class CargoContainerRow: LayoutHolder
 	{
 		m_ParentContainer = CargoContainer.Cast( parent );
 		#ifdef PLATFORM_CONSOLE
-		m_MaxColumns = 1;
+		m_MaxColumns = 5;
 		#else
 		m_MaxColumns = 10;
 		#endif

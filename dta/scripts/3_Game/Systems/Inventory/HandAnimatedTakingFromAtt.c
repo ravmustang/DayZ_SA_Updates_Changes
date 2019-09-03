@@ -25,7 +25,7 @@ class HandTakingAnimated_Show extends HandStartAction
 			}
 			else
 			{
-				Error("[hndfsm] HandTakingAnimated_Show m_Src=invalid, item not in bubble?");
+				Error("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " HandTakingAnimated_Show m_Src=invalid, item not in bubble?");
 			}
 		}
 		else
@@ -84,7 +84,7 @@ class HandAnimatedTakingFromAtt extends HandStateBase
 		m_Hide.m_ActionType = e.GetAnimationID();
 		m_Show.m_ActionType = e.GetAnimationID();
 			
-		e.m_Player.GetHumanInventory().AddInventoryReservation(m_Dst.GetItem(), m_Dst, 3000);
+		e.m_Player.GetHumanInventory().AddInventoryReservation(m_Dst.GetItem(), m_Dst, GameInventory.c_InventoryReservationTimeoutShortMS);
 
 		super.OnEntry(e); // @NOTE: super at the end (prevent override from submachine start)
 	}

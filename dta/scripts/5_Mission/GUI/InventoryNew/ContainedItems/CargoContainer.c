@@ -4,11 +4,13 @@ class CargoContainer extends Container
 	
 	protected EntityAI												m_Entity;
 	protected CargoBase												m_Cargo;
+	protected int													m_CargoIndex = -1;
 	
 	protected int													m_FocusedItemPosition = -1;
 	protected ref array<ref CargoContainerRow>						m_Rows;
 	protected ref array<ref Icon>									m_Icons;
 	protected ref map<EntityAI, ref Param3<ref Icon, int, int>>		m_ShowedItemPositions;
+	protected ref map<EntityAI, ref Param3<ref Icon, int, int>>		m_ShowedLockPositions;
 	
 	protected float													m_IconSize;
 	protected float													m_SpaceSize;
@@ -26,6 +28,7 @@ class CargoContainer extends Container
 		m_Rows					= new array<ref CargoContainerRow>;
 		m_Icons					= new array<ref Icon>;
 		m_ShowedItemPositions	= new map<EntityAI, ref Param3<ref Icon, int, int>>;
+		m_ShowedLockPositions	= new map<EntityAI, ref Param3<ref Icon, int, int>>;
 		
 		m_CargoContainer		= m_RootWidget.FindAnyWidget( "grid_background" );
 		m_ItemsContainer		= m_RootWidget.FindAnyWidget( "grid_overlay" );
@@ -47,19 +50,19 @@ class CargoContainer extends Container
 			m_Entity.GetOnItemAddedIntoCargo().Remove( AddedToCargo );
 			m_Entity.GetOnItemRemovedFromCargo().Remove( RemovedFromCargo );
 			m_Entity.GetOnItemMovedInCargo().Remove( MovedInCargo );
+			m_Entity.GetOnSetLock().Remove( SetLock );
+			m_Entity.GetOnReleaseLock().Remove( ReleaseLock );
 		}
 	}
+	
+	int GetCargoIndex() { return m_CargoIndex; }
 	
 	void AddedToCargo( EntityAI item )
 	{
 		InventoryLocation il = new InventoryLocation;
 		item.GetInventory().GetCurrentInventoryLocation( il );
 		int x = il.GetCol();
-		#ifdef PLATFORM_CONSOLE
-		int y = il.GetRow() - 1;
-		#else
 		int y = il.GetRow();
-		#endif
 		
 		if( m_ShowedItemPositions.Contains( item ) )
 		{
@@ -75,7 +78,6 @@ class CargoContainer extends Container
 			InitIcon( icon, item, x, y );
 			m_ShowedItemPositions.Insert( item, new Param3<ref Icon, int, int>( icon, x, y ) );
 		}
-		
 		UpdateHeaderText();
 		
 		#ifdef PLATFORM_CONSOLE
@@ -99,17 +101,21 @@ class CargoContainer extends Container
 	
 	void RemovedFromCargo( EntityAI item )
 	{
-		Icon ic			= m_ShowedItemPositions.Get( item ).param1;
-		m_Icons.RemoveItem( ic );
-		m_ShowedItemPositions.Remove( item );
+		Param3<ref Icon, int, int> data = m_ShowedItemPositions.Get( item );
+		if( data )
+		{
+			m_Icons.RemoveItem( data.param1 );
+			m_ShowedItemPositions.Remove( item );
+		}
+		
 		UpdateHeaderText();
 		
 		#ifdef PLATFORM_CONSOLE
 		for( int i = 0; i < m_Cargo.GetItemCount(); i++ )
 		{
 			EntityAI item2 = m_Cargo.GetItem( i );
-			Param3<ref Icon, int, int> data = m_ShowedItemPositions.Get( item2 );
-			if( data )
+			data = m_ShowedItemPositions.Get( item2 );
+			if( data && data.param1 )
 			{
 				data.param1.SetCargoPos( i );
 				data.param1.SetPos();
@@ -127,7 +133,7 @@ class CargoContainer extends Container
 	{
 		InventoryLocation il = new InventoryLocation;
 		item.GetInventory().GetCurrentInventoryLocation( il );
-		Print( "Removing from cargo" );
+		Print( "Moved in cargo" );
 		int x = il.GetCol();
 		#ifdef PLATFORM_CONSOLE
 		int y = il.GetRow() - 1;
@@ -157,6 +163,36 @@ class CargoContainer extends Container
 		UpdateSelection();
 	}
 	
+	void SetLock( EntityAI item )
+	{
+		/*
+		if( GetGame().GetPlayer() )
+		{
+			InventoryLocation il = new InventoryLocation;
+			int index = GetGame().GetPlayer().GetHumanInventory().FindUserReservedLocationIndex( item );
+			GetGame().GetPlayer().GetHumanInventory().GetUserReservedLocation( index, il );
+			
+			ref Icon icon = new Icon( this );
+			m_Icons.Insert( icon );
+			icon.InitLock( m_Entity, item, il.GetCol(), il.GetRow(), il.GetFlip() );
+			m_ShowedLockPositions.Insert( item, new Param3<ref Icon, int, int>( icon, 1, 1 ) );
+			item.GetOnReleaseLock().Insert( ReleaseLock );
+		}*/
+	}
+	
+	void ReleaseLock( EntityAI item )
+	{
+		/*
+		if( m_ShowedLockPositions.Contains( item ) )
+		{
+			Icon ic	= m_ShowedLockPositions.Get( item ).param1;
+			m_Icons.RemoveItem( ic );
+			m_ShowedLockPositions.Remove( item );
+			item.GetOnReleaseLock().Remove( ReleaseLock );
+		}
+		*/
+	}
+	
 	override void SetLayoutName()
 	{
 		#ifdef PLATFORM_CONSOLE
@@ -184,16 +220,19 @@ class CargoContainer extends Container
 			
 	}
 	
-	void SetEntity( EntityAI item )
+	void SetEntity( EntityAI item, int cargo_index = 0 )
 	{
 		if( item )
 		{
 			m_Entity		= item;
-			m_Cargo			= item.GetInventory().GetCargo();
+			m_Cargo			= item.GetInventory().GetCargoFromIndex(cargo_index);
+			m_CargoIndex = cargo_index;
 			
 			m_Entity.GetOnItemAddedIntoCargo().Insert( AddedToCargo );
 			m_Entity.GetOnItemRemovedFromCargo().Insert( RemovedFromCargo );
 			m_Entity.GetOnItemMovedInCargo().Insert( MovedInCargo );
+			m_Entity.GetOnSetLock().Insert( SetLock );
+			m_Entity.GetOnReleaseLock().Insert( ReleaseLock );
 			UpdateHeaderText();
 
 			InitGridHeight();
@@ -228,7 +267,7 @@ class CargoContainer extends Container
 		string name = m_Entity.GetDisplayName();
 		name.ToUpper();
 		
-		if( m_Entity.GetInventory().GetCargo() )
+		if( m_Entity.GetInventory().GetCargoFromIndex(m_CargoIndex) )
 		{
 			name = name + " (" + GetCargoCapacity().ToString() + "/" + GetMaxCargoCapacity() + ")";
 			if( m_IsAttachment && m_CargoHeader )
@@ -257,7 +296,7 @@ class CargoContainer extends Container
 		#ifdef PLATFORM_CONSOLE
 		int cargo_height = 	1;
 		#else
-		int cargo_height = 	m_Entity.GetInventory().GetCargo().GetHeight();
+		int cargo_height = 	m_Entity.GetInventory().GetCargoFromIndex(m_CargoIndex).GetHeight();
 		#endif
 		
 		for ( int j = 0; j < cargo_height; j++ )
@@ -269,7 +308,7 @@ class CargoContainer extends Container
 			
 			#ifdef PLATFORM_WINDOWS
 			#ifndef PLATFORM_CONSOLE
-			row.SetWidth( m_Entity.GetInventory().GetCargo().GetWidth() );
+			row.SetWidth( m_Entity.GetInventory().GetCargoFromIndex(m_CargoIndex).GetWidth() );
 			#endif
 			#endif
 			
@@ -425,9 +464,9 @@ class CargoContainer extends Container
 				m_Rows.Insert( row );
 			}
 			m_MainWidget	= m_ItemsContainer;
-			m_Resizer2.ResizeParentToChild();
-			m_Resizer1.ResizeParentToChild();
 		}
+		m_Resizer2.ResizeParentToChild();
+		m_Resizer1.ResizeParentToChild();
 	}
 	
 	override void UpdateInterval()
@@ -494,7 +533,6 @@ class CargoContainer extends Container
 		
 		Unfocus();
 		UpdateSelection();
-
 	}
 	
 	void Unfocus()

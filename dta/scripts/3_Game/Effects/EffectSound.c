@@ -194,9 +194,20 @@ class EffectSound : Effect
 			
 			m_SoundObjectBuilder = new SoundObjectBuilder( m_SoundParams );
 			if(m_SetEnvVariables)
+			{
 				m_SoundObjectBuilder.UpdateEnvSoundControllers(GetPosition());
+			}
+			
 			m_SoundObject = m_SoundObjectBuilder.BuildSoundObject();
-			m_SoundObject.SetKind( m_SoundWaveKind );
+			
+			if ( m_SoundObject )
+			{
+				m_SoundObject.SetKind( m_SoundWaveKind );
+			}
+			else
+			{
+				Error("[Error][Sound]: SoundLoad() -> m_SoundObject is null -> m_SoundSetName: "+ m_SoundSetName);
+			}
 		}
 		else
 		{
@@ -234,34 +245,42 @@ class EffectSound : Effect
 					m_SoundObject = m_SoundObjectBuilder.BuildSoundObject();
 					m_SoundObject.SetKind( m_SoundWaveKind );
 				}
-				m_SoundObject.SetPosition( GetPosition() );
-				m_SoundWaveObject = GetGame().GetSoundScene().Play3D( m_SoundObject, m_SoundObjectBuilder );
-				m_SoundWaveLenght = m_SoundWaveObject.GetLength();
 				
-				if ( SoundWaveValidation() )
+				if ( m_SoundObject )
 				{
-					if ( m_SoundFadeInDuration > 0 )
+					m_SoundObject.SetPosition( GetPosition() );
+					m_SoundWaveObject = GetGame().GetSoundScene().Play3D( m_SoundObject, m_SoundObjectBuilder );
+					m_SoundWaveLenght = m_SoundWaveObject.GetLength();
+					
+					if ( SoundWaveValidation() )
 					{
-						m_SoundWaveObject.SetVolumeRelative( 0 );
-						m_SoundFadeOutStartTime = m_SoundWaveLenght - m_SoundFadeInDuration;
+						if ( m_SoundFadeInDuration > 0 )
+						{
+							m_SoundWaveObject.SetVolumeRelative( 0 );
+							m_SoundFadeOutStartTime = m_SoundWaveLenght - m_SoundFadeInDuration;
+						}
+						
+						SetSoundLoop( m_SoundLoop );
+						
+						m_SoundWaveStarting = true;
+						
+						AbstractWaveEvents events = AbstractWaveEvents.Cast(m_SoundWaveObject.GetUserData());
+						events.Event_OnSoundWaveStarted.Insert( Event_OnSoundWaveStarted );
+						events.Event_OnSoundWaveEnded.Insert( Event_OnSoundWaveEnded );
+						
+						UpdateEvents();
+						
+						return true;
 					}
-					
-					SetSoundLoop( m_SoundLoop );
-					
-					m_SoundWaveStarting = true;
-					
-					AbstractWaveEvents events = AbstractWaveEvents.Cast(m_SoundWaveObject.GetUserData());
-					events.Event_OnSoundWaveStarted.Insert( Event_OnSoundWaveStarted );
-					events.Event_OnSoundWaveEnded.Insert( Event_OnSoundWaveEnded );
-					
-					UpdateEvents();
-					
-					return true;
+					else
+					{
+						m_SoundWaveObject.Stop();
+					}
 				}
 				else
 				{
-					m_SoundWaveObject.Stop();
-				}		
+					Error("[Error][Sound]: SoundPlay() -> m_SoundObject is null -> m_SoundSetName: "+ m_SoundSetName);
+				}
 			}
 		}
 		

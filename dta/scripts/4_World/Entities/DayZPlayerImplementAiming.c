@@ -30,6 +30,8 @@ class DayZPlayerImplementAiming
 	protected float m_SwayWeight;
 	protected float m_MaxVelocity;
 	protected ref KuruShake m_KuruShake;
+	protected float m_CamShakeX;
+	protected float m_CamShakeY;
 	protected vector m_SwayModifier = "1 1 1";//"max_speed_noise radius_noise overall_speed"
 
 	protected static float	m_AimXClampRanges[] = { -180, -20, 90, 	0, -50, 90,  180, -20, 90 };
@@ -77,6 +79,12 @@ class DayZPlayerImplementAiming
 	void SetProceduralRecoilEnabled(bool state)
 	{
 		m_ProceduralRecoilEnabled = state;
+	}
+	
+	void SetCamShakeValues(float x_axis, float y_axis)
+	{
+		m_CamShakeX = x_axis;
+		m_CamShakeY = y_axis;
 	}
 
 	bool ProcessAimFilters(float pDt, SDayZPlayerAimingModel pModel, int stance_index)
@@ -136,8 +144,13 @@ class DayZPlayerImplementAiming
 		pModel.m_fAimYHandsOffset = breathing_offset_y + noise_offset_y + recoil_offset_hands_y + shake_offset_y + kuru_offset_y;
 
 		//! cam offset
-		pModel.m_fAimXCamOffset = -shake_offset_x - recoil_offset_hands_x - kuru_offset_x;
-		pModel.m_fAimYCamOffset	= -shake_offset_y - recoil_offset_hands_y - kuru_offset_y;
+		pModel.m_fAimXCamOffset = -shake_offset_x - recoil_offset_hands_x - kuru_offset_x + m_CamShakeX;
+		pModel.m_fAimYCamOffset	= -shake_offset_y - recoil_offset_hands_y - kuru_offset_y + m_CamShakeY;
+		
+		/*
+		if( m_CamShakeX != 0 ) Print(m_CamShakeX);
+		if( m_CamShakeX != 0 ) Print(m_CamShakeY);
+		*/
 		/*
 		pModel.m_fAimXCamOffset = -shake_offset_y - recoil_offset_hands_y;// + shake_offset_x;
 		pModel.m_fAimYCamOffset	= shake_offset_x + recoil_offset_hands_x;// + shake_offset_y;

@@ -209,4 +209,9 @@ class BleedingSourcesManagerServer extends BleedingSourcesManagerBase
 		return true;
 	}
 	
+	void ~BleedingSourcesManagerServer()
+	{
+		if (m_Player && !m_Player.IsAlive())
+			RemoveAllSources();
+	}
 }

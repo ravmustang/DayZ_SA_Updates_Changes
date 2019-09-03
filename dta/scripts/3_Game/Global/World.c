@@ -42,6 +42,7 @@ class World: Managed
 	proto native float	GetLongitude();
 	proto native float	GetMoonIntensity();
 	proto native float	GetSunOrMoon();
+	proto native bool	IsNight();
 		
 	proto native float	GetEyeAccom();
 	proto native void	SetEyeAccom(float eyeAccom);

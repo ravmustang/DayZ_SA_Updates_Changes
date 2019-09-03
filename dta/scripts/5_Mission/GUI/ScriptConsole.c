@@ -599,19 +599,19 @@ class ScriptConsole extends UIScriptedMenu
 				}
 				else
 				{
+					float distance = m_SpawnDistanceEditBox.GetText().ToFloat();
 					switch ( w )
 					{
+						
 						case m_SpawnGroundButton:
 						{
-							float distance = m_SpawnDistanceEditBox.GetText().ToFloat();
-							m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance );
+							m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, -1, distance );
 							break;
 						}
 						
 						case m_SpawnSpecial:
 						{
-							distance = m_SpawnDistanceEditBox.GetText().ToFloat();
-							m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance , true);
+							m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, -1, distance , -1, true);
 							break;
 						}
 
@@ -631,7 +631,7 @@ class ScriptConsole extends UIScriptedMenu
 
 						case m_SpawnInInvButton:
 						{
-							m_Developer.SpawnEntityInInventory(player, m_SelectedObject, 100, -1);
+							m_Developer.SpawnEntityInInventory(player, m_SelectedObject, -1, -1);
 							break;
 						}
 					}
@@ -800,17 +800,17 @@ class ScriptConsole extends UIScriptedMenu
 				
 				if ( button == 0 )		//LMB
 				{
-					m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance );
+					m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, distance);
 				}
 				else if ( button == 1 )		//RMB
 				{
 					if ( GetGame().IsMultiplayer() )
 					{
-						m_Developer.SpawnEntityInInventory(player, m_SelectedObject, 100, -1);
+						m_Developer.SpawnEntityInInventory(player, m_SelectedObject, -1, -1);
 					}
 					else
 					{
-						EntityAI spawned_entity = m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, 100, -1, distance );
+						EntityAI spawned_entity = m_Developer.SpawnEntityOnCursorDir(player, m_SelectedObject, -1, distance );
 						player.LocalTakeEntityToHands(spawned_entity);
 					}
 				}
@@ -996,7 +996,7 @@ class ScriptConsole extends UIScriptedMenu
 
 			for ( i = 0; i < preset_array.Count(); i++)
 			{
-				float health = 100;
+				float health = -1;
 				int quantity = -1;
 				if ( is_preset_fixed )
 				{
@@ -1008,7 +1008,7 @@ class ScriptConsole extends UIScriptedMenu
 					health = m_ConfigDebugProfile.GetItemHealth( preset_name, i );
 					quantity = m_ConfigDebugProfile.GetItemQuantity( preset_name, i );
 				}
-				m_Developer.SpawnEntityInInventory(PlayerBase.Cast( target ), preset_array.Get(i), health, quantity);
+				m_Developer.SpawnEntityInInventory(PlayerBase.Cast( target ), preset_array.Get(i), -1, quantity);
 			}
 		}
 	}

@@ -1,7 +1,7 @@
-const int MAX_FAVORITES = 50;
+const int MAX_FAVORITES = 25;
 
 #ifdef PLATFORM_CONSOLE
-const int SERVER_BROWSER_PAGE_SIZE = 50;
+const int SERVER_BROWSER_PAGE_SIZE = 22;
 #else
 const int SERVER_BROWSER_PAGE_SIZE = 5;
 #endif
@@ -39,8 +39,9 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 #ifdef PLATFORM_CONSOLE
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/xbox/server_browser.layout" );
-		m_OfficialTab	= new ServerBrowserTabConsole( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
-		m_CommunityTab	= new ServerBrowserTabConsole( layoutRoot.FindAnyWidget( "Tab_1" ), this, TabType.COMMUNITY );
+		m_OfficialTab	= new ServerBrowserTabConsolePages( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
+		m_CommunityTab	= new ServerBrowserTabConsolePages( layoutRoot.FindAnyWidget( "Tab_1" ), this, TabType.COMMUNITY );
+		LoadFavoriteServers();
 #else
 		layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/server_browser/pc/server_browser.layout" );
 		m_OfficialTab	= new ServerBrowserTabPc( layoutRoot.FindAnyWidget( "Tab_0" ), this, TabType.OFFICIAL );
@@ -107,7 +108,6 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		//Sort init
 		TextWidget sort_text = TextWidget.Cast( layoutRoot.FindAnyWidget( "SortText" ) );
 		sort_text.SetText( "#str_serverbrowserroot_toolbar_bg_consoletoolbar_sort_sorttext0" );
-		LoadFavoriteServers();
 #endif
 		
 		PPEffects.SetBlurMenu( 0.5 );
@@ -179,6 +179,21 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 	{
 		return m_IsRefreshing;
 	}
+	
+	void AddFavoritesToFilter( ref GetServersInput input )
+	{
+		foreach( string uid : m_Favorites )
+		{
+			array<string> output = new array<string>;
+			uid.Split( ":", output );
+			if( output.Count() == 2 )
+			{
+				string ip = output[0];
+				int port = output[1].ToInt();
+				input.AddFavourite( ip, port );
+			}
+		}
+	}
 
 	bool IsFavorited( string server_id )
 	{
@@ -195,7 +210,7 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 		{
 			if( favorite && m_Favorites.Find( server_id ) < 0 )
 			{
-				if( m_Favorites.Count() < MAX_FAVORITES )
+				if( m_Favorites.Count() <= MAX_FAVORITES )
 				{
 					m_Favorites.Insert( server_id );
 				}
@@ -366,9 +381,33 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 				GetSelectedTab().Left();
 			}
 			
+			// LEFT HOLD
+			if( GetGame().GetInput().LocalHold("UAUILeft",false) )
+			{
+				GetSelectedTab().LeftHold();
+			}
+			
+			// LEFT RELEASE
+			if( GetGame().GetInput().LocalRelease("UAUILeft",false) )
+			{
+				GetSelectedTab().LeftRelease();
+			}
+			
 			if( GetGame().GetInput().LocalPress("UAUIRight",false) )
 			{
 				GetSelectedTab().Right();
+			}
+			
+			// RIGHT HOLD
+			if( GetGame().GetInput().LocalHold("UAUIRight",false) )
+			{
+				GetSelectedTab().RightHold();
+			}
+			
+			// RIGHT RELEASE
+			if( GetGame().GetInput().LocalRelease("UAUIRight",false) )
+			{
+				GetSelectedTab().RightRelease();
 			}
 			
 			if( GetGame().GetInput().LocalPress("UAUIUp",false) )
@@ -385,6 +424,11 @@ class ServerBrowserMenuNew extends UIScriptedMenu
 			{
 				Back();
 			}
+		}
+		else
+		{
+			Print( "GetGame().GetUIManager().IsDialogVisible() = " + GetGame().GetUIManager().IsDialogVisible() );
+			Print( "GetDayZGame().IsConnecting() = " + GetDayZGame().IsConnecting() );
 		}
 		
 		super.Update( timeslice );

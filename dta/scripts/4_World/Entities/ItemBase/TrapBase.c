@@ -603,24 +603,24 @@ class TrapBase extends ItemBase
 			this.RefreshState();
 		}
 	}
-	
+	/*
 	// ITEM CANNOT BE TAKEN WHEN IN PROGRESS
 	override bool CanPutInCargo( EntityAI parent )
 	{
 		if( !super.CanPutInCargo(parent) ) {return false;}
 		return IsTakeable();
-	}
-	
-	override bool CanPutIntoHands ( EntityAI player ) 
+	}*/
+	/*
+	override bool CanPutIntoHands ( EntityAI parent ) 
 	{
 		if( !super.CanPutIntoHands( parent ) )
 		{
 			return false;
 		}
 		return IsTakeable();
-	}
+	}*/
 
-	override bool CanRemoveFromHands ( EntityAI player ) 
+	override bool CanRemoveFromHands ( EntityAI parent ) 
 	{
 		return IsTakeable();
 	}

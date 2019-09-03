@@ -61,10 +61,19 @@ class DayZPlayerCamera1stPerson extends DayZPlayerCameraBase
 		super.OnUpdate(pDt, pOutResult);
 		
 		pOutResult.m_fNearPlane = 0.04; //0.07 default
+		if(m_CameraShake)
+		{
+			float x,y;
+			m_CameraShake.Update(pDt, x, y);
+			m_fLeftRightAngle += x;
+			m_fUpDownAngleAdd += y;
+			//Print(x);
+		}
 		//Print("1st person near plane = " + pOutResult.m_fNearPlane);
 	}
 
 	//
+	
 	override vector GetBaseAngles()
 	{
 		vector a;

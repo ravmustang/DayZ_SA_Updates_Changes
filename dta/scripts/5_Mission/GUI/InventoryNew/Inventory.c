@@ -92,9 +92,9 @@ class Inventory: LayoutHolder
 
 	protected ref ContextMenu				m_ContextMenu;
 	protected static ref map<string, int>	m_PlayerAttachmentsIndexes;
-	protected static ref map<int, string>	m_SlotIDs;
 	
 	protected bool							m_HadFastTransferred;
+	protected bool							m_HadInspected;
 	
 	protected static Inventory				m_Instance;
 	
@@ -192,13 +192,12 @@ class Inventory: LayoutHolder
 	
 	static int GetPlayerAttachmentIndex( int slot_id )
 	{
-		return GetPlayerAttachmentIndex( m_SlotIDs[slot_id] );
+		return GetPlayerAttachmentIndex( InventorySlots.GetSlotName( slot_id ) );
 	}
 	
 	protected void LoadPlayerAttachmentIndexes()
 	{
 		m_PlayerAttachmentsIndexes	= new map<string, int>;
-		m_SlotIDs					= new map<int, string>;
 		
 		string data;
 		string slot_name;
@@ -223,19 +222,13 @@ class Inventory: LayoutHolder
 			}
 		}
 		
-		for( i = 0; i < m_PlayerAttachmentsIndexes.Count(); i++ )
-		{
-			slot_name = m_PlayerAttachmentsIndexes.GetKey( i );
-			m_SlotIDs.Insert( InventorySlots.GetSlotIdFromString( slot_name ), slot_name );
-		}
-		
 		data = JsonFileLoader<map<string, int>>.JsonMakeData( m_PlayerAttachmentsIndexes );
 		GetGame().SetProfileString( "INV_AttIndexes", data );
 	}
 	
 	static void MoveAttachmentUp( int slot_id )
 	{
-		int curr			= GetPlayerAttachmentIndex( m_SlotIDs[slot_id] );
+		int curr			= GetPlayerAttachmentIndex( slot_id );
 		
 		int next_offset		= 0;
 		string next_item	= "init";
@@ -254,7 +247,7 @@ class Inventory: LayoutHolder
 		if( next_item != "" && next_ent )
 		{
 			int next = GetPlayerAttachmentIndex( next_item );
-			m_PlayerAttachmentsIndexes.Set( m_SlotIDs[slot_id], next );
+			m_PlayerAttachmentsIndexes.Set( InventorySlots.GetSlotName( slot_id ), next );
 			m_PlayerAttachmentsIndexes.Set( next_item, curr );
 			if( m_Instance )
 				m_Instance.m_RightArea.SwapItemsInOrder( next_id, slot_id );
@@ -263,7 +256,7 @@ class Inventory: LayoutHolder
 	
 	static void MoveAttachmentDown( int slot_id )
 	{
-		int curr			= GetPlayerAttachmentIndex( m_SlotIDs[slot_id] );
+		int curr			= GetPlayerAttachmentIndex( slot_id );
 		
 		int next_offset		= 0;
 		string next_item	= "init";
@@ -282,7 +275,7 @@ class Inventory: LayoutHolder
 		if( next_item != "" && next_ent )
 		{
 			int next = GetPlayerAttachmentIndex( next_item );
-			m_PlayerAttachmentsIndexes.Set( m_SlotIDs[slot_id], next );
+			m_PlayerAttachmentsIndexes.Set( InventorySlots.GetSlotName( slot_id ), next );
 			m_PlayerAttachmentsIndexes.Set( next_item, curr );
 			if( m_Instance )
 				m_Instance.m_RightArea.SwapItemsInOrder( next_id, slot_id );
@@ -687,8 +680,38 @@ class Inventory: LayoutHolder
 			ItemManager.GetInstance().HideTooltip();
 		}
 		
+		if( GetGame().GetInput().LocalPress( "UAUIInspectItem", false ) )
+		{
+			if( m_HandsArea.IsActive() )
+			{
+				if( m_HandsArea.InspectItem() )
+				{
+					m_HadInspected = true;
+				}
+			}
+			else if( m_RightArea.IsActive() )
+			{
+				if( m_RightArea.InspectItem() )
+				{
+					m_HadInspected = true;
+				}
+			}
+			else if( m_LeftArea.IsActive() )
+			{
+				if( m_LeftArea.InspectItem() )
+				{
+					m_HadInspected = true;
+				}
+			}
+			
+			UpdateConsoleToolbar();
+		}
+		
 		if( GetGame().GetInput().LocalPress( "UAUIFastTransferItem", false ) )
 			m_HadFastTransferred = false;
+		
+		if( GetGame().GetInput().LocalPress( "UAUIInspectItem", false ) )
+			m_HadInspected = false;
 		
 		if( !m_HadFastTransferred && GetGame().GetInput().LocalRelease( "UAUIFastTransferItem", false ) )
 		{
@@ -930,7 +953,7 @@ class Inventory: LayoutHolder
 			}
 		}
 #endif
-		if( GetGame().GetInput().LocalPress( "UAUIBack", false ) )
+		if( !m_HadInspected && GetGame().GetInput().LocalRelease( "UAUIBack", false ) )
 		{
 			if( GetMainWidget().IsVisible() )
 			{
@@ -1113,7 +1136,9 @@ class Inventory: LayoutHolder
 		RefreshQuickbar();
 		UpdateInterval();
 		UpdateConsoleToolbar();
+		
 		m_HadFastTransferred = false;
+		m_HadInspected = false;
 	}
 
 	override void OnHide()
@@ -1328,7 +1353,7 @@ class Inventory: LayoutHolder
 		string combine = "<image set=\"playstation_buttons\" name=\"" + back + "\" /> " + "#ps4_dayz_context_menu_combine";
 		#endif
 		
-		if ( m_LeftArea.IsActive() )
+		if ( m_LeftArea && m_LeftArea.IsActive() )
 		{
 			VicinityContainer vicinity_container = m_LeftArea.GetVicinityContainer();
 			if( vicinity_container.IsVicinityContainerIconsActive() )
@@ -1612,7 +1637,7 @@ class Inventory: LayoutHolder
 				}
 			}
 		}
-		else if ( m_RightArea.IsActive() )
+		else if ( m_RightArea && m_RightArea.IsActive() )
 		{
 			PlayerContainer player_container = m_RightArea.GetPlayerContainer();
 			if ( m_RightArea.IsPlayerEquipmentActive() )
@@ -1714,16 +1739,17 @@ class Inventory: LayoutHolder
 				context_text = ConsoleToolbarTypeToString( ConsoleToolbarType.HANDS_ITEM_EMPTY );
 			}
 		}
+		
 		string general_text_left;
 		string general_text_right;
 		
-		if(m_TopConsoleToolbarVicinity)
+		if( m_TopConsoleToolbarVicinity )
 			m_TopConsoleToolbarVicinity.Show( m_LeftArea.IsActive() );
-		if (m_TopConsoleToolbarHands)
+		if( m_TopConsoleToolbarHands )
 			m_TopConsoleToolbarHands.Show( m_HandsArea.IsActive() );
-		if (m_TopConsoleToolbarEquipment)
+		if( m_TopConsoleToolbarEquipment )
 			m_TopConsoleToolbarEquipment.Show( m_RightArea.IsActive() );
-		if (m_BottomConsoleToolbar)
+		if( m_BottomConsoleToolbar )
 			m_BottomConsoleToolbar.SetText( context_text + " " );
 		
 		#endif

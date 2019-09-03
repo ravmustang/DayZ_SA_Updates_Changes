@@ -269,6 +269,14 @@ const int ID_EMOTE_SHRUG 		= 60;
 const int ID_EMOTE_SURRENDER 	= 61;
 const int ID_EMOTE_VOMIT 		= 62;
 
+/**
+ * \defgroup Custom animation events ID for emotes
+ * \desc used mainly in suicide emotes
+ * @{
+ */
+const int EMOTE_SUICIDE_DEATH 	= 1;
+const int EMOTE_SUICIDE_BLEED 	= 2;
+
 
 /**
  * \defgroup Configurations for ItemsGenerator class
@@ -467,7 +475,9 @@ class GameConstants
 	const int	STAMINA_DRAIN_LADDER_FAST_PER_SEC = 8; //in units (how much fast ladder climb depletes stamina)
 	
 	const float	STAMINA_DRAIN_HOLD_BREATH = 0.2; //in units (how much holding breath depletes stamina)
-	const float	STAMINA_DRAIN_JUMP = 20;		// in units (how much jumping depletes stamina)
+	const float	STAMINA_DRAIN_JUMP = 25;		// in units (how much jumping depletes stamina)
+	const float	STAMINA_DRAIN_VAULT = 20;		// in units (how much jumping depletes stamina)
+	const float	STAMINA_DRAIN_CLIMB = 42;		// in units (how much jumping depletes stamina)
 	const float	STAMINA_DRAIN_MELEE_LIGHT = 5; //in units (how much light melee punch depletes stamina)
 	const float	STAMINA_DRAIN_MELEE_HEAVY = 25; //in units (how much heavy melee punch depletes stamina)
 	const float	STAMINA_DRAIN_MELEE_EVADE = 8; // in units (how much evade depletes stamina)
@@ -482,7 +492,11 @@ class GameConstants
 	const float STAMINA_KG_TO_STAMINAPERCENT_PENALTY = 1.75; //in units (by how many  units is max stamina bar reduced for each 1 kg of load weight)
 	const float STAMINA_MIN_CAP = 5; //in units (overload won't reduce max stamina bar under this value)
 	const float STAMINA_HOLD_BREATH_THRESHOLD = 10; // in units
-	const float STAMINA_JUMP_THRESHOLD = 20; // in units
+	const float STAMINA_JUMP_THRESHOLD = 25; // in units
+	const float STAMINA_VAULT_THRESHOLD = 20; // in units
+	const float STAMINA_CLIMB_THRESHOLD = 42; // in units
+	
+	
 	const float STAMINA_MELEE_HEAVY_THRESHOLD = STAMINA_DRAIN_MELEE_HEAVY; // in units (how many units we need to make a heavy hit in melee)
 	const float STAMINA_MELEE_EVADE_THRESHOLD = 8; // in units
 	const float STAMINA_REGEN_COOLDOWN_DEPLETION = 0.45; // in secs (how much time we will spend in cooldown before the stamina will starts with regeneration)
@@ -602,4 +616,9 @@ class GameConstants
 	const string DEFAULT_CHARACTER_NAME = "#str_cfgvehicles_survivor0"; //experiment, used to be "Survivor"
 	
 	const int DEFAULT_CHARACTER_MENU_ID = -1;
+	
+	const float CLEAN_UNRESTRAIN_DAMAGE = 10;
+	
+	//! Camera shake
+	const int CAMERA_SHAKE_GRENADE_DISTANCE = 40;
 }

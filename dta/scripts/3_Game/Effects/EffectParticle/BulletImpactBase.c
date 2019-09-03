@@ -82,7 +82,7 @@ class EffBulletImpactBase : EffectParticle
 	{
 		if ( m_ImpactType == ImpactTypes.MELEE )
 		{
-			return Math.RandomFloat(50, 150);
+			return Math.RandomFloat(50, 100);
 		}
 		
 		float projectile_weight_coef = weight / DEFAULT_PROJECTILE_WEIGHT;

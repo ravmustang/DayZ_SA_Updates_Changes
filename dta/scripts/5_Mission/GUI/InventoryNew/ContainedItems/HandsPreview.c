@@ -11,10 +11,6 @@ class HandsPreview: LayoutHolder
 	{
 		GetGame().GetPlayer().GetOnItemAddedToHands().Insert( CreateNewIcon );
 		GetGame().GetPlayer().GetOnItemRemovedFromHands().Insert( DeleteIcon );
-		
-		m_Item = ItemBase.Cast( GetGame().GetPlayer().GetHumanInventory().GetEntityInHands() );
-		if( m_Item )
-			CreateNewIcon( ItemBase.Cast( m_Item ) );
 	}
 	
 	void ~HandsPreview()
@@ -104,9 +100,9 @@ class HandsPreview: LayoutHolder
 	void DeleteIcon()
 	{
 		RemoveItem();
-		( HandsContainer.Cast( m_Parent ) ).RemoveItem();
 		( HandsContainer.Cast( m_Parent ) ).DestroyAtt();
 		( HandsContainer.Cast( m_Parent ) ).DestroyCargo();
+		( HandsContainer.Cast( m_Parent ) ).RemoveItem();
 		m_AttachmentsInitialized = null;
 		m_RootWidget.SetColor( ARGB( 166, 80, 80, 80 ) );
 		m_Parent.GetParent().Refresh();

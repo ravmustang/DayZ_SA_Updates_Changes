@@ -45,3 +45,11 @@ class ActionMineRock: ActionContinuousBase
 		action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 	}
 };
+
+class ActionMineRock1H : ActionMineRock
+{
+	void ActionMineRock1H()
+	{
+		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_HACKTREE;
+	}
+}

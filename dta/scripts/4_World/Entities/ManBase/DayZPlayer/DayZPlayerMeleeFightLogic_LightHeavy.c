@@ -198,16 +198,26 @@ class DayZPlayerMeleeFightLogic_LightHeavy
 					//! kick from raised pne
 					else if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_RAISEDPRONE)
 					{
-						m_HitType = EMeleeHitType.KICK;
-						m_MeleeCombat.Update(itemInHands, m_HitType);
-
-						GetTargetData(target, targetType);
-						attackByDistance = GetAttackTypeByDistanceToTarget(target, targetType);
-
-						m_DZPlayer.StartCommand_Melee2(target, false, attackByDistance);
-						m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
-						DisableControls();
-						return true;
+						HumanCommandWeapons hcw = m_DZPlayer.GetCommandModifier_Weapons();
+						
+						float hcw_angle = hcw.GetBaseAimingAngleLR();
+						//! check if player is on back
+						//! (situation where the player is raised in prone and on back is not in anim graph)
+						if( hcw_angle < -90 || hcw_angle > 90 )
+						{
+							m_HitType = EMeleeHitType.KICK;
+							m_MeleeCombat.Update(itemInHands, m_HitType);
+	
+							GetTargetData(target, targetType);
+							attackByDistance = GetAttackTypeByDistanceToTarget(target, targetType);
+	
+							m_DZPlayer.StartCommand_Melee2(target, false, attackByDistance);
+							m_DZPlayer.DepleteStamina(EStaminaModifiers.MELEE_HEAVY);
+							DisableControls();
+							return true;
+						}
+						
+						return false;
 					}
 					//! sprint attack in erc stance
 					else if (pMovementState.m_iStanceIdx == DayZPlayerConstants.STANCEIDX_ERECT && m_DZPlayer.IsSprintFull())

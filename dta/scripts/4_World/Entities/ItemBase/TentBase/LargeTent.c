@@ -1,5 +1,13 @@
+enum SoundTypeTent
+{
+	REPACK		= 1,
+	NONE		= 0,	
+}
+
 class LargeTent extends TentBase
 {
+	ref protected EffectSound 	m_RepackingLoopSound;	
+	
 	void LargeTent()
 	{		
 		m_ToggleAnimations.Insert( new ToggleAnimations("EntranceO", "EntranceC"), 0 );
@@ -23,6 +31,56 @@ class LargeTent extends TentBase
 		m_ShowAnimationsWhenPitched.Insert( "Pack" );
 		
 		m_ShowAnimationsWhenPacked.Insert( "Inventory" );
+		
+		m_RepackingLoopSound  = new EffectSound;	
+	}
+	
+	void ~LargeTent()
+	{		
+		SEffectManager.DestroySound( m_RepackingLoopSound );		
+	}
+	
+	override void OnRPC(PlayerIdentity sender, int rpc_type,ParamsReadContext  ctx) 
+	{
+		super.OnRPC(sender, rpc_type, ctx);
+		
+		ref Param1<bool> p = new Param1<bool>(false);
+				
+		if (ctx.Read(p))
+		{
+			bool play = p.param1;
+		}
+		
+		switch(rpc_type)
+		{
+			case SoundTypeTent.REPACK:
+			
+				if ( play )
+				{
+					PlayRepackingLoopSound();
+				}
+				
+				if ( !play )
+				{
+					StopRepackingLoopSound();
+				}
+			
+			break;
+		}
+	}
+	
+	void PlayRepackingLoopSound()
+	{
+		if ( !m_RepackingLoopSound.IsSoundPlaying() )
+		{
+			m_RepackingLoopSound = SEffectManager.PlaySound( "largetent_deploy_SoundSet", GetPosition(), 0.5, 0.5 );
+		}
+	}
+	
+	void StopRepackingLoopSound()
+	{
+		m_RepackingLoopSound.SetSoundFadeOut(0.5);
+		m_RepackingLoopSound.SoundStop();
 	}
 	
 	override void EEInit()
@@ -93,5 +151,12 @@ class LargeTent extends TentBase
 	override string GetLoopDeploySoundset()
 	{
 		return "largetent_deploy_SoundSet";
+	}
+	
+	override void SetActions()
+	{
+		super.SetActions();
+		
+		//AddAction(ActionRepackTent);
 	}
 };

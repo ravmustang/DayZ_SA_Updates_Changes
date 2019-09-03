@@ -36,6 +36,7 @@ class UATimeSpent
 	const float DEFAULT_CRAFT = 6;
 	
 	const float BANDAGE = 4;
+	const float ADD_FUEL_TO_TORCH = 4;
 	const float APPLY_SPLINT = 10;
 	const float SEW_WOUNDS = 2;
 	const float SEW_CUTS = 8;
@@ -48,7 +49,7 @@ class UATimeSpent
 	const float COVER_HEAD = 0.5;
 	const float RESTRAIN = 10;
 	const float UNRESTRAIN = 20;
-	const float SHAVE = 6;
+	const float SHAVE = 12.75;
 	const float SKIN = 10;
 
 	const float DRINK_POND = 2.0;
@@ -71,7 +72,8 @@ class UATimeSpent
 	
 	const float FIREPLACE_IGNITE = 4;
 	//const float FIREPLACE_HANDDRILL = 8;
-	const float SALINE = 10;
+	const float SALINE = 2;
+	const float BLOOD = 2;
 	
 	const float START_ENGINE = 0.5;
 };

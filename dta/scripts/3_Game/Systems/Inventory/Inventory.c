@@ -464,13 +464,14 @@ class GameInventory
 	 *
 	 * @param [in]  item1     is the forced item (primary)
 	 * @param [in]  item2     second item that will be replaced by the item1. (secondary)
-	 * @param [out]  item2_dst     second item's potential destination (if null, search for item_dst2 is ommited)
+	 * @param [out]  item2_dst     second item's potential destination (if null, search for item_dst2 is ommited). if (NOT null AND IsValid()), then it is tried first, without search to inventory
 	 * @return    true if can be force swapped
 	 */
 	static proto native bool CanForceSwapEntities (notnull EntityAI item1, notnull EntityAI item2, out InventoryLocation item2_dst);
 
 	///@{ reservations
 	const int c_InventoryReservationTimeoutMS = 15000;
+	const int c_InventoryReservationTimeoutShortMS = 3000;
 	static proto native bool AddInventoryReservation (EntityAI item, InventoryLocation dst, int timeout_ms);
 	static proto native bool ExtendInventoryReservation (EntityAI item, InventoryLocation dst, int timeout_ms);
 	static proto native bool ClearInventoryReservation (EntityAI item, InventoryLocation dst);
@@ -634,7 +635,7 @@ class GameInventory
 	bool CanAddEntityInto (notnull EntityAI item, FindInventoryLocationType flags = FindInventoryLocationType.ANY)
 	{
 		InventoryLocation loc = new InventoryLocation;
-		return FindFreeLocationFor(item, flags, loc);
+		return FindFreeLocationFor(item, flags, loc)  &&  !item.IsHologram();
 	}
 	
 	/**
@@ -789,18 +790,18 @@ class GameInventory
 	}
 
 	/// Put item into into cargo on specific cargo location of another entity
-	bool TakeEntityToTargetCargoEx (InventoryMode mode, notnull EntityAI target, notnull EntityAI item, int idx, int row, int col)
+	bool TakeEntityToTargetCargoEx (InventoryMode mode, notnull CargoBase cargo, notnull EntityAI item, int row, int col)
 	{
-		Print("[inv] I::Take2TargetCgoEx(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item + "to cargo of target=" + target + " row=" + row + " col=" + col);
+		Print("[inv] I::Take2TargetCgoEx(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item + "to cargo of target=" + cargo.GetCargoOwner() + " row=" + row + " col=" + col);
 		InventoryLocation src = new InventoryLocation;
 		if (item.GetInventory().GetCurrentInventoryLocation(src))
 		{
 			InventoryLocation dst = new InventoryLocation;
-			dst.SetCargo(target, item, idx, row, col, item.GetInventory().GetFlipCargo());
+			dst.SetCargoAuto(cargo, item, row, col, item.GetInventory().GetFlipCargo());
 
 			return TakeToDst(mode, src, dst);
 		}
-		Error("[inv] I::Take2TargetCgoEx(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item + "to cargo of target=" + target + " row=" + row + " col=" + col);
+		Error("[inv] I::Take2TargetCgoEx(" + typename.EnumToString(InventoryMode, mode) + ") item=" + item + "to cargo of target=" + cargo.GetCargoOwner() + " row=" + row + " col=" + col);
 		return false;
 	}
 
@@ -918,7 +919,30 @@ class GameInventory
 
 	bool ForceSwapEntities (InventoryMode mode, notnull EntityAI item1, notnull EntityAI item2, notnull InventoryLocation item2_dst)
 	{
-		Error("I::ForceSwap TODO");
+		InventoryLocation src1, src2, dst1;
+		if (GameInventory.MakeSrcAndDstForForceSwap(item1, item2, src1, src2, dst1, item2_dst))
+		{
+			Print("[inv] I::FSwap(" + typename.EnumToString(InventoryMode, mode) + ") src1=" + InventoryLocation.DumpToStringNullSafe(src1) + " src2=" + InventoryLocation.DumpToStringNullSafe(src2) +  " dst1=" + InventoryLocation.DumpToStringNullSafe(dst1) + " dst2=" + InventoryLocation.DumpToStringNullSafe(item2_dst));
+
+			switch (mode)
+			{
+				case InventoryMode.PREDICTIVE:
+					InventoryInputUserData.SendInputUserDataSwap(src1, src2, dst1, item2_dst);
+					return LocationSwap(src1, src2, dst1, item2_dst);
+
+				case InventoryMode.JUNCTURE:
+					InventoryInputUserData.SendInputUserDataSwap(src1, src2, dst1, item2_dst);
+					return true;
+
+				case InventoryMode.LOCAL:
+					return LocationSwap(src1, src2, dst1, item2_dst);
+
+				default:
+					Error("ForceSwapEntities - HandEvent - Invalid mode");
+			}
+		}
+		else
+			Error("ForceSwapEntities - MakeSrcAndDstForForceSwap - no inv loc");
 		return false;
 	}
 
@@ -984,10 +1008,6 @@ class GameInventory
 	proto native void SetFlipCargo (bool flip);
 	proto native void FlipCargo ();
 	proto native void ResetFlipCargo ();
-	
-	proto native void SetUserReservedLocation ();
-	proto native void ClearUserReservedLocation (notnull EntityAI eai);
-
 ///@} script functions
 };
 

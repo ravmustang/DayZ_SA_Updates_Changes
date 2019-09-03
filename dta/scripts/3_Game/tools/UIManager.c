@@ -241,24 +241,7 @@ class UIManager
 	//UI cursor
 	void ShowUICursor( bool visible )
 	{
-#ifdef PLATFORM_CONSOLE
-		Hud hud;
-		if( GetGame() && GetGame().GetMission() )
-		{
-			hud = GetGame().GetMission().GetHud();
-		}
-		
-		if( hud && hud.IsXboxDebugCursorEnabled(  ) )
-		{
-			ShowCursor( true );
-		}
-		else
-		{
-			ShowCursor( false);
-		}
-#else
 		ShowCursor( visible );
-#endif
 	}
 };
 

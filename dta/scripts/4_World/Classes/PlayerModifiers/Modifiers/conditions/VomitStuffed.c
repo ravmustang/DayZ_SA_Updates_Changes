@@ -1,6 +1,5 @@
 class VomitStuffedMdfr: ModifierBase
 {
-	protected const int	 	VOMIT_THRESHOLD 			= 2000;
 	override void Init()
 	{
 		m_TrackActivatedTime = false;
@@ -17,7 +16,7 @@ class VomitStuffedMdfr: ModifierBase
 	override bool ActivateCondition(PlayerBase player)
 	{
 		float stomach = m_Player.m_PlayerStomach.GetStomachVolume();
-		if ( stomach >= VOMIT_THRESHOLD )
+		if ( stomach >= PlayerConstants.VOMIT_THRESHOLD )
 		{
 			return true;
 		}

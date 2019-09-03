@@ -104,16 +104,17 @@ class QuantityConversions
 	{
 		if ( item.IsInherited( InventoryItem ) )
 		{
-			ItemBase item_base;
-			Class.CastTo(item_base, item);
 			if ( item.IsInherited( Magazine) )
 			{
 				return QUANTITY_COUNT;
 			}
-			else if ( item.IsInherited( ItemBook ) )
+			
+			bool show_quantity = item.ConfigGetBool("quantityShow");
+			if(!show_quantity)
 			{
 				return QUANTITY_HIDDEN;
 			}
+			
 			int max = item.ConfigGetInt("varQuantityMax");
 			bool bar = item.ConfigGetBool("quantityBar");
 			if ( max > 0 )

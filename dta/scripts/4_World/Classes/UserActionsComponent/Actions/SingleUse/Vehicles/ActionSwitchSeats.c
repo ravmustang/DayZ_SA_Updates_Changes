@@ -84,7 +84,8 @@ class ActionSwitchSeats: ActionBase
 
 		if(action_data.m_State == UA_START)
 		{
-			if( !action_data.m_Player.GetCommand_Vehicle().IsSwitchSeat() )
+			HumanCommandVehicle hcv = action_data.m_Player.GetCommand_Vehicle();
+			if( !hcv || !action_data.m_Player.GetCommand_Vehicle().IsSwitchSeat() )
 			{
 				End(action_data);
 			}

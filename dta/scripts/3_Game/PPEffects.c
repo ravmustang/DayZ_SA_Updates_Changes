@@ -358,9 +358,9 @@ class PPEffects
 	static void FlashbangEffect(float value)
 	{
 		float hitEffectColor[4];
-		hitEffectColor[0] = 0.95;
-		hitEffectColor[1] = 0.95;
-		hitEffectColor[2] = 0.95;
+		hitEffectColor[0] = 1;
+		hitEffectColor[1] = 1;
+		hitEffectColor[2] = 1;
 		hitEffectColor[3] = Math.Lerp(Math.Clamp(m_ColorValueTotal[0],0,1), 1, value);
 
 		m_MatColors.SetParam("OverlayColor", hitEffectColor);

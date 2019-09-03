@@ -123,22 +123,6 @@ class InventoryMenu extends UIScriptedMenu
 	{
 		return m_IsOpened;
 	}
-	
-	override bool UseMouse()
-	{
-#ifdef PLATFORM_CONSOLE
-		return false;
-#endif
-		return true;
-	}
-	
-	override bool UseGamepad()
-	{
-#ifdef PLATFORM_CONSOLE
-		return true;
-#endif
-		return false;
-	}
 
 	override void OnHide()
 	{

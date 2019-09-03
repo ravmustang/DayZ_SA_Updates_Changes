@@ -11,6 +11,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	protected TextWidget				m_ServerPing;
 	protected ImageWidget				m_ServerTime;
 	protected ImageWidget				m_ServerLock;
+	protected ImageWidget				m_ServerModIcon;
 	
 	//Detailed info
 	protected TextWidget				m_ServerShard;
@@ -20,6 +21,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 	protected TextWidget				m_ServerBattleye;
 	protected TextWidget				m_ServerIP;
 	protected TextWidget				m_ServerAcceleration;
+	protected TextWidget				m_ServerMods;
+	protected ButtonWidget				m_ServerModsExpand;
 	
 	protected bool						m_IsExpanded;
 	protected bool						m_IsFavorited;
@@ -48,6 +51,7 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerPing			= TextWidget.Cast( m_Root.FindAnyWidget( "server_ping" ) );
 		m_ServerTime			= ImageWidget.Cast( m_Root.FindAnyWidget( "server_time" ) );
 		m_ServerLock			= ImageWidget.Cast( m_Root.FindAnyWidget( "lock_icon" ) );
+		m_ServerModIcon			= ImageWidget.Cast( m_Root.FindAnyWidget( "modded_icon" ) );
 		
 		m_ServerShard			= TextWidget.Cast( m_Root.FindAnyWidget( "shard_text" ) );
 		m_ServerCharacterAlive	= TextWidget.Cast( m_Root.FindAnyWidget( "character_alive_text" ) );
@@ -56,6 +60,8 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		m_ServerBattleye		= TextWidget.Cast( m_Root.FindAnyWidget( "battlleye_text" ) );
 		m_ServerIP				= TextWidget.Cast( m_Root.FindAnyWidget( "ip_text" ) );
 		m_ServerAcceleration	= TextWidget.Cast( m_Root.FindAnyWidget( "server_acceleration_text" ) );
+		m_ServerMods			= m_Root.FindAnyWidget( "mods_text" );
+		m_ServerModsExpand		= ButtonWidget.Cast( m_Root.FindAnyWidget( "mods_expand" ) );
 		
 		m_Root.FindAnyWidget( "basic_info" ).Show( true );
 		
@@ -98,6 +104,10 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 			return true;
 		}
 		#endif
+		if( w == m_ServerModsExpand )
+		{
+			
+		}
 		return false;
 	}
 	
@@ -239,13 +249,34 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 #ifdef PLATFORM_WINDOWS
 #ifndef PLATFORM_CONSOLE
 		SetExpand( server_info.m_IsExpanded );
-		SetShard( server_info.m_ShardId.ToInt() );
+		
+		int pp = 0; // private
+		if (server_info.m_ShardId.Length() == 3 && server_info.m_ShardId.ToInt() < 200)
+		{
+			pp = 1;	// official
+		}
+		
+		SetShard( pp );
+		
+		
 		SetCharacterAlive( server_info.m_CharactersAlive );
 		SetFriends( server_info.m_SteamFriends );
 		SetMode( server_info.m_Disable3rdPerson );
 		SetBattleye( server_info.m_AntiCheat );
 		SetIP( server_info.m_Id );
 		SetAcceleration( server_info.m_EnvironmentTimeMul );
+		if( server_info.m_Modded )
+		{
+			//SetMods( new array<string> );
+			//m_ServerModsExpand.Show( true );
+			m_ServerModIcon.Show( true );
+		}
+		else
+		{
+			//m_ServerMods.SetText( "" );
+			//m_ServerModsExpand.Show( false );
+			m_ServerModIcon.Show( false );
+		}
 #endif
 #endif
 	}
@@ -433,6 +464,22 @@ class ServerBrowserEntry extends ScriptedWidgetEventHandler
 		else
 		{
 			m_ServerAcceleration.Show( false );
+		}
+	}
+	
+	void SetMods( array<string> mods )
+	{
+		string mods_text;
+		
+		if( mods.Count() > 0 )
+		{
+			mods_text = mods[0];
+			for( int i = 1; i < mods.Count(); i++ )
+			{
+				mods_text += ", " + mods[i];
+			}
+			
+			m_ServerMods.SetText( mods_text );
 		}
 	}
 	

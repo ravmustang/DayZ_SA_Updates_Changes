@@ -1,47 +1,59 @@
 class CharacterCreationMenu extends UIScriptedMenu
 {
-	DayZIntroScenePC							m_Scene;
+	#ifdef PLATFORM_WINDOWS
+	DayZIntroScenePC										m_Scene;
+	#else
+	DayZIntroSceneXbox										m_Scene;
+	#endif
 	
-	protected Widget						m_CharacterRotationFrame;
-	protected Widget						m_Apply;
-	protected Widget						m_RandomizeCharacter;
-	protected Widget						m_BackButton;
-	protected Widget						m_GeneralName;
-	protected ButtonWidget					m_GeneralNameButton;
+	protected Widget										m_CharacterRotationFrame;
+	protected Widget										m_Apply;
+	protected Widget										m_RandomizeCharacter;
+	protected Widget										m_BackButton;
+	protected TextWidget									m_Version;
 	
-	protected EditBoxWidget					m_PlayerName;
-	protected TextWidget					m_Version;
-	
-	protected ref OptionSelectorMultistateCharacterMenu	m_GenderSelector;
-	protected ref OptionSelectorMultistateCharacterMenu	m_SkinSelector;
-	protected ref OptionSelectorMultistateCharacterMenu	m_TopSelector;
-	protected ref OptionSelectorMultistateCharacterMenu	m_BottomSelector;
-	protected ref OptionSelectorMultistateCharacterMenu	m_ShoesSelector;
+	protected ref OptionSelectorEditbox						m_NameSelector;
+	protected ref OptionSelectorMultistateCharacterMenu		m_GenderSelector;
+	protected ref OptionSelectorMultistateCharacterMenu		m_SkinSelector;
+	protected ref OptionSelectorMultistateCharacterMenu		m_TopSelector;
+	protected ref OptionSelectorMultistateCharacterMenu		m_BottomSelector;
+	protected ref OptionSelectorMultistateCharacterMenu		m_ShoesSelector;
 	
 	void CharacterCreationMenu()
 	{
 		MissionMainMenu mission = MissionMainMenu.Cast( GetGame().GetMission() );
 		
+		#ifdef PLATFORM_WINDOWS
 		m_Scene = mission.GetIntroScenePC();
-		//m_Scene.ResetIntroCamera();
+		#else
+		m_Scene = mission.GetIntroSceneXbox();
+		#endif
+		
+		m_Scene.ResetIntroCamera();
+	}
+	
+	PlayerBase GetPlayerObj()
+	{
+		#ifdef PLATFORM_WINDOWS
+		return m_Scene.GetIntroCharacter().GetCharacterObj();
+		#else
+		return m_Scene.GetIntroCharacter().GetCharacterObj();
+		#endif
 	}
 	
 	override Widget Init()
 	{
-		layoutRoot							= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/character_creation.layout" );
+		#ifdef PLATFORM_CONSOLE
+			layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/character_creation/xbox/character_creation.layout" );
+		#else
+			layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/character_creation/pc/character_creation.layout" );
+		#endif
 		
 		m_CharacterRotationFrame			= layoutRoot.FindAnyWidget( "character_rotation_frame" );
 		m_Apply								= layoutRoot.FindAnyWidget( "apply" );
 		m_RandomizeCharacter				= layoutRoot.FindAnyWidget( "randomize_character" );
 		m_BackButton						= layoutRoot.FindAnyWidget( "back" );
-		m_GeneralName						= layoutRoot.FindAnyWidget( "general_name_setting_text" );
-		m_GeneralNameButton					= ButtonWidget.Cast(layoutRoot.FindAnyWidget( "character_name_button" ));
-		
-		
-		m_PlayerName						= EditBoxWidget.Cast( layoutRoot.FindAnyWidget( "general_name_setting_text" ) );
 		m_Version							= TextWidget.Cast( layoutRoot.FindAnyWidget( "version" ) );
-		
-		Refresh();
 		
 		string version;
 		GetGame().GetVersion( version );
@@ -52,16 +64,17 @@ class CharacterCreationMenu extends UIScriptedMenu
 		#endif
 		m_Version.SetText( version );
 		
-		m_GenderSelector = new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_gender_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharGenderList() );
+		m_NameSelector		= new OptionSelectorEditbox( layoutRoot.FindAnyWidget( "character_name_setting_option" ), m_Scene.GetIntroCharacter().GetCharacterName(), null, false );
+		m_GenderSelector	= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_gender_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharGenderList() );
 		if ( m_Scene.GetIntroCharacter().IsCharacterFemale() )
 		{
 			m_GenderSelector.SetValue( "Female" );
-			m_SkinSelector = new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Female ) );
+			m_SkinSelector	= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Female ) );
 		}
 		else
 		{
 			m_GenderSelector.SetValue( "Male" );
-			m_SkinSelector = new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Male ) );
+			m_SkinSelector	= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_head_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharList( ECharGender.Male ) );
 		}
 		
 		m_TopSelector		= new OptionSelectorMultistateCharacterMenu( layoutRoot.FindAnyWidget( "character_top_setting_option" ), 0, null, false, m_Scene.GetIntroCharacter().GetCharShirtsList() );
@@ -70,21 +83,23 @@ class CharacterCreationMenu extends UIScriptedMenu
 		
 		if( m_Scene && m_Scene.GetIntroCharacter() )
 		{
-			PlayerBase scene_char = m_Scene.GetIntroCharacter().GetCharacterObj();
-			
-			Object obj = scene_char.GetInventory().FindAttachment(InventorySlots.BODY);
-			if( obj )
-				m_TopSelector.SetValue( obj.GetType() );
-			
-			obj = scene_char.GetInventory().FindAttachment(InventorySlots.LEGS);
-			if( obj )
-				m_BottomSelector.SetValue( obj.GetType() );
-			
-			obj = scene_char.GetInventory().FindAttachment(InventorySlots.FEET);
-			if( obj )
-				m_ShoesSelector.SetValue( obj.GetType() );
-			
-			m_SkinSelector.SetValue( scene_char.GetType() );
+			PlayerBase scene_char = GetPlayerObj();
+			if( scene_char )
+			{
+				Object obj = scene_char.GetInventory().FindAttachment(InventorySlots.BODY);
+				if( obj )
+					m_TopSelector.SetValue( obj.GetType() );
+				
+				obj = scene_char.GetInventory().FindAttachment(InventorySlots.LEGS);
+				if( obj )
+					m_BottomSelector.SetValue( obj.GetType() );
+				
+				obj = scene_char.GetInventory().FindAttachment(InventorySlots.FEET);
+				if( obj )
+					m_ShoesSelector.SetValue( obj.GetType() );
+				
+				m_SkinSelector.SetValue( scene_char.GetType() );
+			}
 		}
 		
 		m_GenderSelector.m_OptionChanged.Insert( GenderChanged );
@@ -117,9 +132,9 @@ class CharacterCreationMenu extends UIScriptedMenu
 			toolbar_y.LoadImageFile( 0, "set:playstation_buttons image:triangle" );
 		#endif
 		
+		Refresh();
 		SetCharacter();
 		CheckNewOptions();
-		
 		return layoutRoot;
 	}
 	
@@ -142,12 +157,11 @@ class CharacterCreationMenu extends UIScriptedMenu
 			m_Scene.GetIntroCharacter().SaveDefaultCharacter();
 			m_Scene.GetIntroCharacter().SetToDefaultCharacter();
 		}
-		string name = m_PlayerName.GetText();
+		string name = m_NameSelector.GetValue();
 		if( name == "" )
 			name = GameConstants.DEFAULT_CHARACTER_NAME;
 		
-		m_Scene.GetIntroCharacter().SaveCharName(m_PlayerName.GetText());
-		
+		m_Scene.GetIntroCharacter().SaveCharName(name);
 		
 		//SaveCharacters
 		
@@ -163,8 +177,6 @@ class CharacterCreationMenu extends UIScriptedMenu
 	{
 		if (m_Scene.GetIntroCharacter().IsDefaultCharacter())
 		{
-			m_PlayerName.SetText( m_Scene.GetIntroCharacter().GetCharacterName() );
-			
 			m_Scene.GetIntroCharacter().SetAttachment( m_TopSelector.GetStringValue(), InventorySlots.BODY );
 			m_Scene.GetIntroCharacter().SetAttachment( m_BottomSelector.GetStringValue(), InventorySlots.LEGS );
 			m_Scene.GetIntroCharacter().SetAttachment( m_ShoesSelector.GetStringValue(), InventorySlots.FEET );
@@ -262,25 +274,6 @@ class CharacterCreationMenu extends UIScriptedMenu
 		return false;
 	}
 	
-	override bool OnChange(Widget w, int x, int y, bool finished)
-	{
-		if ( w && w.IsInherited( EditBoxWidget ) )
-		{
-			EditBoxWidget edit_box = EditBoxWidget.Cast( w );
-			
-			string edit_box_text = edit_box.GetText();
-			
-			Print("Character Creation OnChange: "+ finished +" edit_box_text: "+ edit_box_text);
-			
-			if ( edit_box_text.Length() >= 16 )
-			{
-				edit_box.SetText( edit_box_text.Substring(0, 16) );
-			}
-		}
-		
-		return super.OnChange(w, x, y, finished);
-	}
-	
 	override bool OnClick( Widget w, int x, int y, int button )
 	{
 		if( w == m_Apply )
@@ -303,46 +296,34 @@ class CharacterCreationMenu extends UIScriptedMenu
 	
 	override bool OnMouseButtonDown( Widget w, int x, int y, int button )
 	{
+		#ifndef PLATFORM_CONSOLE
 		if ( w == m_CharacterRotationFrame )
 		{
 			if (m_Scene)
-				m_Scene.CharacterRotationStart();
+				DayZIntroScenePC.Cast( m_Scene ).CharacterRotationStart();
 			return true;
 		}
+		#endif
 		return false;
 	}
 	
 	override bool OnMouseButtonUp( Widget w, int x, int y, int button )
 	{
+		#ifndef PLATFORM_CONSOLE
 		if (m_Scene)
-			m_Scene.CharacterRotationStop();
+			DayZIntroScenePC.Cast( m_Scene ).CharacterRotationStop();
+		#endif
 		return false;
 	}
 	
 	override bool OnMouseEnter( Widget w, int x, int y )
-	{		
-		if ( w == m_GeneralNameButton )
-		{
-			m_GeneralNameButton.Enable( false );
-			SetFocus( m_GeneralName );
-			ColorHighlight( m_GeneralName.GetParent().GetParent().GetParent() );
-			return true;
-		}
-		
+	{
 		ColorHighlight( w );
-		
 		return true;
 	}
 	
 	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
 	{
-		if ( w == m_GeneralNameButton )
-		{
-			m_GeneralNameButton.Enable( true );
-			ColorNormal( m_GeneralName.GetParent().GetParent().GetParent() );
-			return true;
-		}
-		
 		ColorNormal( w );
 		SetFocus( null );
 		
@@ -389,9 +370,9 @@ class CharacterCreationMenu extends UIScriptedMenu
 	}
 	
 	override void OnShow()
-	{		
+	{
 #ifdef PLATFORM_CONSOLE
-		SetFocus( m_Apply );
+		m_GenderSelector.Focus();
 #endif
 		CheckNewOptions();
 		
@@ -422,7 +403,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 				name = GameConstants.DEFAULT_CHARACTER_NAME;
 		#endif
 		
-		m_PlayerName.SetText( name );
+		m_NameSelector.SetValue( name );
 		
 		string version;
 		GetGame().GetVersion( version );
@@ -440,6 +421,11 @@ class CharacterCreationMenu extends UIScriptedMenu
 		{
 			Back();
 		}
+		
+		if ( GetGame().GetInput().LocalPress("UAUICtrlX",false) )
+		{
+			RandomizeCharacter();
+		}
 	}
 	
 	override void OnHide()
@@ -448,7 +434,7 @@ class CharacterCreationMenu extends UIScriptedMenu
 	}
 	
 	//Coloring functions (Until WidgetStyles are useful)
-void ColorHighlight( Widget w )
+	void ColorHighlight( Widget w )
 	{
 		if( w.IsInherited( ButtonWidget ) )
 		{

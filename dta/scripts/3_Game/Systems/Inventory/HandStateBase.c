@@ -50,11 +50,19 @@ class HandStateBase
 	{
 		if (HasFSM() && !m_FSM.IsRunning())
 		{
+			if (e)
+				hndDebugPrint("[hndfsm] { " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " " + this.Type().ToString() + "  Has Sub-FSM! Starting submachine...");
+			else
 			hndDebugPrint("[hndfsm] { " + this.Type().ToString() + "  Has Sub-FSM! Starting submachine...");
 			m_FSM.Start(e);
 		}
 		else
+		{
+			if (e)
+				hndDebugPrint("[hndfsm] { " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " " + this.Type().ToString());
+		else
 			hndDebugPrint("[hndfsm] { " + this.Type().ToString());
+	}
 	}
 
 	/**@fn		OnUpdate
@@ -79,7 +87,7 @@ class HandStateBase
 			hndDebugPrint("[hndfsm] OnAbort " + this.Type().ToString() + "  Has Sub-FSM! Aborting submachine...");
 			m_FSM.Abort(e);
 		}
-		hndDebugPrint("[hndfsm] } ABORTED " + this.Type().ToString());
+		hndDebugPrint("[hndfsm] } " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " ABORTED " + this.Type().ToString());
 	}
 
 	/**@fn		OnExit
@@ -88,7 +96,7 @@ class HandStateBase
 	 **/
 	void OnExit (HandEventBase e)
 	{
-		hndDebugPrint("[hndfsm] } " + this.Type().ToString());
+		hndDebugPrint("[hndfsm] } " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " " + this.Type().ToString());
 	}
 
 	/**@fn			IsWaitingForActionFinish

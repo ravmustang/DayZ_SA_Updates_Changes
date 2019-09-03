@@ -1,4 +1,11 @@
-class CanvasPants_ColorBase extends Clothing {};
+class CanvasPants_ColorBase extends Clothing
+{
+	override void SetActions()
+	{
+		super.SetActions();
+		AddAction(ActionWringClothes);
+	}
+};
 class CanvasPants_Beige extends CanvasPants_ColorBase {};
 class CanvasPants_Blue extends CanvasPants_ColorBase {};
 class CanvasPants_Grey extends CanvasPants_ColorBase {};

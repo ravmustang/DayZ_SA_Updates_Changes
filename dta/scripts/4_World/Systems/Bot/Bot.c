@@ -130,8 +130,9 @@ class Bot
 		// basic states
 		BotStateBase BotIdle = new BotStateIdle(this, NULL);
 		// unstable (intermediate) states
+		m_BotTest = new BotTestSpamUserActions(this, NULL);
 		//m_BotTest = new BotTestAttachAndDropCycle(this, NULL);
-		m_BotTest = new BotTestItemMoveBackAndForth(this, NULL);
+		//m_BotTest = new BotTestItemMoveBackAndForth(this, NULL);
 		//m_BotTest = new Bot_TestSpawnOpen(this, NULL);
 		//m_BotTest = new Bot_TestSpawnOpenDestroy(this, NULL);
 		//m_BotTest = new Bot_TestSpawnOpenEat(this, NULL);
@@ -151,7 +152,8 @@ class Bot
 		m_FSM.AddTransition(new BotTransition(  BotIdle     , ___Bgn__,   m_BotTest));
 		m_FSM.AddTransition(new BotTransition(  BotIdle     , __Stop__,        NULL));
 
-		m_FSM.AddTransition(new BotTransition(m_BotTest     , __IChg__,   m_BotTest));
+		// causes restart of FSM
+		//m_FSM.AddTransition(new BotTransition(m_BotTest     , __IChg__,   m_BotTest));
 
 		//m_FSM.AddTransition(new BotTransition(m_BotTest     , ___OK___,     BotIdle));
 		m_FSM.AddTransition(new BotTransition(m_BotTest     , __Fail__,     BotIdle));
@@ -184,6 +186,6 @@ void botDebugPrint (string s)
 
 void botDebugSpam (string s)
 {
-	Print("" + s); // comment/uncomment to hide/see debug logs
+	//Print("" + s); // comment/uncomment to hide/see debug logs
 }
 

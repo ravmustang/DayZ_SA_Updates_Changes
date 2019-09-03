@@ -17,7 +17,6 @@ class PersonalLight extends PointLightBase
 		if ( GetGame()  &&  IsEnabled() )
 		{
 			vector pos = GetGame().GetCurrentCameraPosition();
-			vector dir = GetGame().GetCurrentCameraDirection();
 			
 			SetPosition(pos);
 		}

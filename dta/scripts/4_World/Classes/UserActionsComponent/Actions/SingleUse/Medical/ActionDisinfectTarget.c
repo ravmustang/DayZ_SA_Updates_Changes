@@ -27,9 +27,9 @@ class ActionDisinfectTarget: ActionSingleUseBase
 	void ActionDisinfectTarget()
 	{
 		m_CallbackClass = ActionDisinfectTargetCB;
-		m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CLEANWOUNDSTARGET;
+		//m_CommandUID = DayZPlayerConstants.CMD_ACTIONFB_CLEANWOUNDSTARGET;
 		m_StanceMask = DayZPlayerConstants.STANCEIDX_ERECT | DayZPlayerConstants.STANCEIDX_CROUCH;
-		m_FullBody = true;
+		//m_FullBody = true;
 		m_SpecialtyWeight = UASoftSkillsWeight.PRECISE_LOW;
 	}
 	

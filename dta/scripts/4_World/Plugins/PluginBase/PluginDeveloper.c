@@ -170,7 +170,7 @@ class PluginDeveloper extends PluginBase
 		ref Param5<string, float, float, float, bool> p = new Param5<string, float, float, float, bool>("", 0, 0, 0, false);
 		if ( ctx.Read(p) )
 		{
-			SpawnEntityOnCursorDir(player, p.param1, p.param2,  p.param3,  p.param4, p.param5);
+			SpawnEntityOnCursorDir(player, p.param1, p.param2, p.param3, p.param4, p.param5);
 		}
 	}
 	void OnRPCSpawnEntityOnGround(PlayerBase player, ParamsReadContext ctx)
@@ -253,14 +253,22 @@ class PluginDeveloper extends PluginBase
 	 * @param[in]	distance	\p	distance of the item from player
 	 * @return	entity if ok, null otherwise
 	 **/
-	EntityAI SpawnEntityOnCursorDir (PlayerBase player, string item_name, float health, float quantity, float distance, bool special = false)
+	EntityAI SpawnEntityOnCursorDir (PlayerBase player, string item_name, float quantity, float distance, float health = -1, bool special = false)
 	{
+
 		if ( GetGame().IsServer() )
 		{		
 			// Client -> Server Spawning: Server Side
 			EntityAI entity = player.SpawnEntityOnGroundOnCursorDir(item_name, distance);
+			
 			if (entity)
+			{
+				if( health < 0 )//check for default (-1)
+				{
+					health = entity.GetMaxHealth();
+				}
 				SetupSpawnedEntity(entity, health, quantity, special);
+			}
 			else
 				OnSpawnErrorReport(item_name);
 			return entity;
@@ -268,7 +276,7 @@ class PluginDeveloper extends PluginBase
 		else
 		{		
 			// Client -> Server Spawning: Client Side
-			ref Param5<string, float, float, float, bool> params = new Param5<string, float, float, float, bool>(item_name, health, quantity, distance, special);
+			ref Param5<string, float, float, float, bool> params = new Param5<string, float, float, float, bool>(item_name, quantity, distance, health, special);
 			player.RPCSingleParam(ERPCs.DEV_RPC_SPAWN_ITEM_ON_CURSOR, params, true);
 		}
 		return NULL;
@@ -310,6 +318,10 @@ class PluginDeveloper extends PluginBase
 						EntityAI eai = GetGame().SpawnEntity(item_name, il, ECE_IN_INVENTORY, RF_DEFAULT);
 						if ( eai && eai.IsInherited(ItemBase) )
 						{
+							if( health < 0 )//check for default (-1)
+							{
+								health = eai.GetMaxHealth();
+							}
 							ItemBase i = ItemBase.Cast( eai );
 							SetupSpawnedItem(i, health, quantity);
 						}

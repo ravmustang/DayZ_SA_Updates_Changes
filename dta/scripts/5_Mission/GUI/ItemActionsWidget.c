@@ -126,6 +126,8 @@ class ItemActionsWidget extends ScriptedWidgetEventHandler
 		else if( m_EntityInHands && m_EntityInHands.IsTransmitter() )
 		{
 			SetRadioFrequency(GetRadioFrequency(), "ia_item_subdesc", "ia_item_subdesc_up", "ia_item_subdesc_down", m_QuantityEnabled);
+			GetItemQuantity(q_type, q_cur, q_min, q_max);
+			SetItemQuantity(q_type, q_cur, q_min, q_max, "ia_item", "ia_item_quantity_pb", "ia_item_quantity_text", true);
 		}
 		else
 		{

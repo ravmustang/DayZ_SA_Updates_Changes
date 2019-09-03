@@ -47,4 +47,24 @@ class ActionSewSelf: ActionBandageBase
 			action_data.m_Player.GetSoftSkillsManager().AddSpecialty( m_SpecialtyWeight );
 		}
 	}
+	
+	override void ApplyBandage( ItemBase item, PlayerBase player )
+	{	
+		if (player.GetBleedingManagerServer() )
+		{
+			player.GetBleedingManagerServer().RemoveMostSignificantBleedingSource();	
+		}
+		
+		PluginTransmissionAgents m_mta = PluginTransmissionAgents.Cast(GetPlugin(PluginTransmissionAgents));
+		m_mta.TransmitAgents(item, player, AGT_ITEM_TO_FLESH);
+		
+		if (item.HasQuantity())
+		{
+			item.AddQuantity(-20,true);
+		}
+		else
+		{
+			item.Delete();
+		}
+	}
 };

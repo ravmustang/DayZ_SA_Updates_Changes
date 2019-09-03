@@ -13,6 +13,7 @@ class DayZPlayerCameras
 	static const int 	DAYZCAMERA_OPTICS					= 11;		//!< optics
 	static const int 	DAYZCAMERA_1ST_UNCONSCIOUS			= 12;		//!< unconscious
 	static const int	DAYZCAMERA_3RD_JUMP					= 13;		//!< jump
+	static const int	DAYZCAMERA_3RD_CLIMB				= 14;		//!< climb / vault
 	
 	static const int	DAYZCAMERA_1ST_VEHICLE				= 30;		//!< vehicle 1st person
 	static const int	DAYZCAMERA_3RD_VEHICLE				= 31;		//!< generic vehicle 3rd person
@@ -54,6 +55,7 @@ class DayZPlayerCameras
 		pType.RegisterCameraCreator(DAYZCAMERA_3RD_ERC_RAISED_MELEE, DayZPlayerCamera3rdPersonErcRaisedMelee);
 		pType.RegisterCameraCreator(DAYZCAMERA_1ST_UNCONSCIOUS, DayZPlayerCamera1stPersonUnconscious);
 		pType.RegisterCameraCreator(DAYZCAMERA_3RD_JUMP, DayZPlayerCamera3rdPersonJump);
+		pType.RegisterCameraCreator(DAYZCAMERA_3RD_CLIMB, DayZPlayerCamera3rdPersonClimb);
 		
 		pType.RegisterCameraCreator(DAYZCAMERA_1ST_VEHICLE, DayZPlayerCamera1stPersonVehicle);
 		pType.RegisterCameraCreator(DAYZCAMERA_3RD_VEHICLE, DayZPlayerCamera3rdPersonVehicle);
@@ -77,6 +79,8 @@ class DayZPlayerCameras
 		RegisterTransitionTime(DAYZCAMERA_3RD_JUMP, DAYZCAMERA_3RD_ERC_SPR, 0.2, false);
 		RegisterTransitionTime(DAYZCAMERA_3RD_ERC, DAYZCAMERA_3RD_JUMP, 0.05, false);
 		RegisterTransitionTime(DAYZCAMERA_3RD_JUMP, DAYZCAMERA_3RD_ERC, 0.3, false);
+		RegisterTransitionTime(DAYZCAMERA_3RD_ERC, DAYZCAMERA_3RD_CLIMB, 0.3, false);
+		RegisterTransitionTime(DAYZCAMERA_3RD_CLIMB, DAYZCAMERA_3RD_ERC, 0.3, false);
 
 		//! 3rd person crouch camera transitions
 		RegisterTransitionTime(DAYZCAMERA_3RD_CRO, DAYZCAMERA_3RD_ERC, 0.4, false);

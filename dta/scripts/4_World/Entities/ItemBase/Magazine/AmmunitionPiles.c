@@ -7,6 +7,11 @@ class Ammunition_Base: Magazine_Base
 		
 		AddAction(ActionSortAmmoPile);
 	}
+	
+	override bool IsAmmoPile()
+	{
+		return true;
+	}
 };
 
 class Ammo_45ACP: Ammunition_Base {};

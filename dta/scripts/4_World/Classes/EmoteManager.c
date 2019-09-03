@@ -4,6 +4,7 @@ class EmoteCB : HumanCommandActionCallback
 	bool 			m_IsFullbody;
 	int 			m_callbackID;
 	PlayerBase 		m_player;
+	EmoteManager 	m_Manager;
 	
 	bool CancelCondition()
 	{
@@ -17,18 +18,31 @@ class EmoteCB : HumanCommandActionCallback
 	
 	override void OnAnimationEvent(int pEventID)
 	{
-		if (pEventID == 1)
+		switch (pEventID)
 		{
-			m_player.GetEmoteManager().KillPlayer();
-		}
-		else if (GetGame().IsServer() && pEventID == UA_ANIM_EVENT)
-		{
-			if ( m_player.GetItemInHands() && SurrenderDummyItem.Cast(m_player.GetItemInHands()) )
-				m_player.GetItemInHands().Delete();
-			if ( m_player.GetItemInHands() )
-				m_player.DropItem(m_player.GetItemInHands());
-			else
-				m_player.GetHumanInventory().CreateInHands("SurrenderDummyItem");
+			case EMOTE_SUICIDE_DEATH :
+				if (GetGame().IsServer())
+					m_Manager.KillPlayer();
+			break;
+			
+			case UA_ANIM_EVENT :
+				if (GetGame().IsServer())
+				{
+					if ( m_player.GetItemInHands() && SurrenderDummyItem.Cast(m_player.GetItemInHands()) )
+						m_player.GetItemInHands().Delete();
+					
+					if ( m_player.GetItemInHands() )
+					{
+						m_player.DropItem(m_player.GetItemInHands());
+					}
+				}
+				m_Manager.m_ItemToBeCreated = true;
+			break;
+			
+			case EMOTE_SUICIDE_BLEED :
+				if (GetGame().IsServer())
+					m_Manager.CreateBleedingEffect(m_callbackID);
+			break;
 		}
 	}
 	
@@ -38,23 +52,15 @@ class EmoteCB : HumanCommandActionCallback
 	}
 };
 
-/*
-class EmoteSittingAndDoingSmthingCB : HumanCommandActionCallback //jtomasik - sem se daj asi dopsat nejaky dalsi callback extra burty pro sezeni se zbrani atp
-{	
-	bool IsEmoteCallback()
-	{
-		return true;
-	}
-};
-*/
-
-class EmoteFromMenu
+class EmoteLauncher
 {
+	bool m_InterruptsSameIDEmote;
 	int m_ID;
 	
-	void EmoteFromMenu(int emoteID)
+	void EmoteLauncher(int emoteID, bool interrupts_same)
 	{
 		m_ID = emoteID;
+		m_InterruptsSameIDEmote = interrupts_same;
 	}
 }
 
@@ -66,24 +72,27 @@ class EmoteManager
 	HumanInputController 	m_HIC;
 	ref array<string> 		m_InterruptInputs;
 	ref InventoryLocation 	m_HandInventoryLocation;
-	ref EmoteFromMenu 		m_MenuEmote;
+	ref EmoteLauncher 		m_MenuEmote;
 	bool					m_bEmoteIsPlaying;
 	bool 					m_IsSurrendered;
-	protected bool 			m_ItemToBeCreated;
-	protected bool			m_BelayedEmote;
+	bool 					m_ItemToBeCreated;
+	bool 					m_CancelEmote;
+	bool 					m_GestureInterruptInput;
 	protected bool			m_ItemToHands;
 	protected bool			m_ItemIsOn;
 	protected bool			m_MouseButtonPressed;
 	protected bool 			m_PlayerDies;
 	protected bool 			m_controllsLocked;
 	protected bool 			m_EmoteLockState;
-	protected int 			m_DeferredMenuEmoteLaunch;
+	protected int 			m_DeferredEmoteExecution;
 	protected int  			m_GestureID;
-	protected int			m_BelayedEmoteSlot;
 	protected int			m_PreviousGestureID;
 	protected int			m_CurrentGestureID;
 	protected int 			m_LastMask;
 	protected int 			m_RPSOutcome;
+	protected const int 	CALLBACK_CMD_INVALID = -1;
+	protected const int 	CALLBACK_CMD_END = -2;
+	protected const int 	CALLBACK_CMD_GESTURE_INTERRUPT = -3;
 	protected const float 	WATER_DEPTH = 0.15;
 	PluginAdminLog 			m_AdminLog;
 	ref Timer 				m_ReservationTimer;
@@ -94,7 +103,7 @@ class EmoteManager
 		m_HIC = m_Player.GetInputController();
 		m_ItemIsOn = false;
 		m_RPSOutcome = -1;
-		m_DeferredMenuEmoteLaunch = -1;
+		m_DeferredEmoteExecution = CALLBACK_CMD_INVALID;
 		
 		// new input-based interrupt actions
 		m_InterruptInputs = new array<string>;
@@ -104,25 +113,12 @@ class EmoteManager
 		m_InterruptInputs.Insert("UATurnRight");
 		m_InterruptInputs.Insert("UAMoveLeft");
 		m_InterruptInputs.Insert("UAMoveRight");
-		/*m_InterruptInputs.Insert("UAEvasiveForward");
-		m_InterruptInputs.Insert("UAEvasiveLeft");
-		m_InterruptInputs.Insert("UAEvasiveRight");
-		m_InterruptInputs.Insert("UAEvasiveBack");*/
 		m_InterruptInputs.Insert("UAStand");
 		m_InterruptInputs.Insert("UACrouch");
 		m_InterruptInputs.Insert("UAProne");
-		/*m_InterruptInputs.Insert("UALeanLeft");
-		m_InterruptInputs.Insert("UALeanRight");
-		m_InterruptInputs.Insert("UALeanIronsightLeft");
-		m_InterruptInputs.Insert("UALeanIronsightRight");
-		m_InterruptInputs.Insert("UALeanLeftToggle");
-		m_InterruptInputs.Insert("UALeanRightToggle");
-		m_InterruptInputs.Insert("UAPersonCamSwitchSide");
-		m_InterruptInputs.Insert("UAWalkRunToggle");
-		m_InterruptInputs.Insert("UAWalkRunTemp");*/
+		m_InterruptInputs.Insert("UAGetOver");
 		// end of new input-based interrupt actions
 		
-		//leave this here?
 		m_HandInventoryLocation = new InventoryLocation;
 		m_HandInventoryLocation.SetHands(m_Player,null);
 		
@@ -133,16 +129,12 @@ class EmoteManager
 		
 		m_ReservationTimer = new Timer();
 		m_ReservationTimer.Run(8,this,"CheckEmoteLockedState",NULL,true);
-		//GetGame().GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater( CheckEmoteLockedState, 10000, true );
 	}
 	
 	void ~EmoteManager() 
 	{
 		if (m_ReservationTimer && m_ReservationTimer.IsRunning())
 			m_ReservationTimer.Stop();
-		/*if (GetGame() && GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM )) //yes, we really need to ask for 'GetGame()' here, because of introscene character
-			GetGame().GetCallQueue( CALL_CATEGORY_SYSTEM ).Remove( CheckEmoteLockedState );*/
-		
 	}
 	
 	void SetGesture(int id)
@@ -168,47 +160,40 @@ class EmoteManager
 	//Called from players commandhandler each frame, checks input
 	void Update( float deltaT )
 	{
-		/*if (GetGame().GetInput())
-		{
-			//Print("---input is there --- ");
-			//Print("---action count? ---" + GetGame().GetInput().GetActionsCount());
-			
-			GetActionsCount() -- was removed !!!
-			
-			for (int i = 1; i < 350; i++)
-			{
-				if (GetGame().GetInput().LocalPress(i, false))
-					Print("---LocalPress--- " + i);
-			}
-		}*/
 		// no updates on restrained characters
 		if (m_Player.IsRestrained())
 			return;
 		
-		//CheckEmoteLockedState();
-		
-		// dummy item has been created, cancels the "soft reservation" bool
-		if (m_Player.GetItemInHands() && m_Player.GetItemInHands().GetType() == "SurrenderDummyItem" && m_ItemToBeCreated)
+		if (m_ItemToBeCreated)
 		{
+			if ( !m_Player.GetItemInHands() && GetGame().IsServer() )
+			{
+				m_Player.GetHumanInventory().CreateInHands("SurrenderDummyItem");
+			}
 			m_ItemToBeCreated = false;
 		}
 		
 		int gestureSlot = DetermineGestureIndex();
 
+		if ( m_DeferredEmoteExecution == CALLBACK_CMD_GESTURE_INTERRUPT )
+			m_GestureInterruptInput = true;
+		
 		if ( m_Callback ) 
 		{
 			bool uiGesture = false;
 			if( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 			{
 				uiGesture = GetGame().GetUIManager().IsMenuOpen(MENU_GESTURES);
+				
+				if (InterruptGestureCheck())
+				{
+					SendEmoteRequestSync(CALLBACK_CMD_GESTURE_INTERRUPT);
+				}
 			}
 			
-			//jtomasik - asi bych nemel checkovat jestli hrac klika v menu nebo ve scene tady, ale mel by to vedet input manager?
-			//HACK - handle differently with new input controller
-			if( (gestureSlot > 0 && gestureSlot != 12 ) || (InterruptGesture() && m_Callback.m_IsFullbody) || (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
+			if( (gestureSlot > 0 && gestureSlot != 12 ) || m_GestureInterruptInput || (m_HIC.IsSingleUse() && !uiGesture) || (m_HIC.IsContinuousUseStart() && !uiGesture) || (m_Callback.m_IsFullbody && !uiGesture && m_HIC.IsWeaponRaised()) ) 
 			{
-				//Print("gestureslot pressed: " + gestureSlot);
-				if (m_CurrentGestureID == ID_EMOTE_SUICIDE  && m_HIC.IsSingleUse() /*m_MouseButtonPressed*/)
+				if (m_CurrentGestureID == ID_EMOTE_SUICIDE  && m_HIC.IsSingleUse())
 				{
 					if (m_Callback.GetState() == m_Callback.STATE_LOOP_LOOP)
 					{
@@ -216,6 +201,7 @@ class EmoteManager
 					}
 					else
 					{
+						//m_Callback.Cancel();
 						return;
 					}
 				}
@@ -240,13 +226,12 @@ class EmoteManager
 				//HACK find a better solution
 				else if (m_CurrentGestureID != ID_EMOTE_SUICIDE || (m_CurrentGestureID == ID_EMOTE_SUICIDE && m_Callback.GetState() < 3))
 				{
-					EndCallback();
+					SendEmoteRequestSync(CALLBACK_CMD_END);
 				}
-
-				if ( gestureSlot && m_PreviousGestureID != gestureSlot )
+				else if (m_CurrentGestureID == ID_EMOTE_SUICIDE)
 				{
-					m_BelayedEmote = true;
-					m_BelayedEmoteSlot = gestureSlot;
+					//m_Callback.Cancel();
+					SendEmoteRequestSync(CALLBACK_CMD_END);
 				}
 			}
 			
@@ -258,8 +243,12 @@ class EmoteManager
 			
 			if ( m_MenuEmote && m_bEmoteIsPlaying )
 			{
-				//PlayEmoteFromMenu();
-				EndCallback();
+				SendEmoteRequestSync(CALLBACK_CMD_END);
+			}
+			
+			if ( m_DeferredEmoteExecution == CALLBACK_CMD_END )
+			{
+				EndCallbackCommand();
 			}
 		}	
 		//no m_Callback exists //TODO please future me, refactor into some sort of switch
@@ -278,7 +267,6 @@ class EmoteManager
 			// getting out of surrender state - hard cancel (TODO: refactor)
 			else if (m_IsSurrendered && (m_HIC.IsSingleUse() || m_HIC.IsContinuousUseStart() || m_HIC.IsWeaponRaised()))
 			{
-				//PlaySurrenderInOut(false);
 				if ( m_Player.GetItemInHands() )
 					m_Player.GetItemInHands().Delete();
 				return;
@@ -289,21 +277,20 @@ class EmoteManager
 			{
 				m_IsSurrendered = false;
 				SetEmoteLockState(false);
-				//m_Player.OnSurrenderEnd();
 				return;
 			}
-			//server-side deferred launch
-			else if (m_DeferredMenuEmoteLaunch != -1)
+			//actual emote launch
+			else if (m_DeferredEmoteExecution > CALLBACK_CMD_INVALID)
 			{
-				PlayEmote(m_DeferredMenuEmoteLaunch);
-				m_MenuEmote = NULL;
-				m_DeferredMenuEmoteLaunch = -1;
+				PlayEmote(m_DeferredEmoteExecution);
+				m_DeferredEmoteExecution = CALLBACK_CMD_INVALID;
 			}
+			//client-side emote launcher
 			else if (!m_bEmoteIsPlaying && m_MenuEmote && (GetGame().IsClient() || !GetGame().IsMultiplayer()))
 			{
-				PlayEmoteFromMenu();
+				SendEmoteRequestSync(m_MenuEmote.m_ID);
 			}
-			else if (gestureSlot > 0)
+			else if (!m_MenuEmote && gestureSlot > 0)
 			{
 				PickEmote(gestureSlot);
 			}
@@ -317,7 +304,6 @@ class EmoteManager
 			ShowItemInHands();
 		}
 		
-		//if suicide has been completed, kill player
 		if ( m_PlayerDies )
 		{
 			m_Player.SetHealth(0.0);
@@ -328,47 +314,23 @@ class EmoteManager
 		if ( m_CurrentGestureID == ID_EMOTE_SURRENDER )
 		{
 			m_IsSurrendered = !m_IsSurrendered;
-			if ( !m_IsSurrendered )
-			{
-				SetEmoteLockState(false);
-			}
-			else
-			{
-				SetEmoteLockState(true);
-				/*if ( m_Player.GetCommand_Move() && m_Player.GetCommand_Move().IsOnBack() )
-				{
-					m_IsSurrendered = !m_IsSurrendered; //invalid position, surrender state cannot proceed
-				}*/
-			}
+			SetEmoteLockState(m_IsSurrendered);
 		}
+		
+		m_CurrentGestureID = 0;
 		
 		if ( m_IsSurrendered )
 		{
-			if (m_BelayedEmote)
-			{
-				m_BelayedEmoteSlot = -1;
-				m_BelayedEmote = false;
-			}
 			return;
 		}
-		
+		m_GestureInterruptInput = false;
 		SetEmoteLockState(false);
-		
-		if ( m_BelayedEmote )
-		{
-			if ( /*m_PreviousGestureID != m_BelayedEmoteSlot &&*/ !m_IsSurrendered)
-			{
-				PickEmote(m_BelayedEmoteSlot);
-				//PlayEmote(m_BelayedEmoteSlot);
-			}
-			m_BelayedEmoteSlot = -1;
-			m_BelayedEmote = false;
-		}
 
 		//! back to the default - shoot from camera - if not set already
 		if (!m_Player.IsShootingFromCamera()) m_Player.OverrideShootFromCamera(true);
 	}
 	
+	//server-side
 	bool OnInputUserDataProcess(int userDataType, ParamsReadContext ctx)
 	{
 		if ( userDataType == INPUT_UDT_GESTURE)
@@ -383,20 +345,28 @@ class EmoteManager
 					m_RPSOutcome = random;
 				}
 				
-				if ( gestureID >= 0 )
+				//server-side check
+				if (CanPlayEmote(gestureID))
 				{
-					//PlayEmote(gestureID);
-					m_DeferredMenuEmoteLaunch = gestureID;
+					ScriptJunctureData pCtx = new ScriptJunctureData;
+					pCtx.Write(gestureID);
 					
-				}
-				else
-				{
-					EndCallback();
+					m_Player.SendSyncJuncture(DayZPlayerSyncJunctures.SJ_GESTURE_REQUEST, pCtx);
 				}
 			}
 			return true;
 		}
 		return false;
+	}
+	
+	//server and client
+	void OnSyncJuncture(int pJunctureID, ParamsReadContext pCtx)
+	{
+		if (!m_CancelEmote)
+			pCtx.Read(m_DeferredEmoteExecution);
+		else
+			m_CancelEmote = false;
+		//Print(m_DeferredEmoteExecution);
 	}
 	
 	//Configure Emote parameters for callback here
@@ -452,8 +422,7 @@ class EmoteManager
 				break;
 			
 				case ID_EMOTE_LYINGDOWN :
-					vector water_info = HumanCommandSwim.WaterLevelCheck( m_Player, m_Player.GetPosition() - (m_Player.GetDirection() * 0.9) ); //checks behind player, where the head ends up being
-					//Print("depth: " + water_info[0]);
+					vector water_info = HumanCommandSwim.WaterLevelCheck( m_Player, m_Player.GetPosition() - (m_Player.GetDirection() * 0.9) );
 					if ( water_info[0] < WATER_DEPTH ) //is player able to lay down without "drowning"?
 					{
 						CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_LYINGDOWN,DayZPlayerConstants.STANCEMASK_CROUCH,true);
@@ -481,7 +450,6 @@ class EmoteManager
 					{
 						CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_POINT,DayZPlayerConstants.STANCEMASK_PRONE,true);
 					}
-					//m_bEmoteIsPlaying = false;
 				break;
 				
 				case ID_EMOTE_TAUNTELBOW :
@@ -540,7 +508,6 @@ class EmoteManager
 						{
 							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_PISTOL;
 							m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-							//! switch to shoot from weapons instead of camera
 							m_Player.OverrideShootFromCamera(false);
 						}
 
@@ -548,7 +515,6 @@ class EmoteManager
 						{
 							suicideID = DayZPlayerConstants.CMD_SUICIDEFB_RIFLE;
 							m_StanceMask = DayZPlayerConstants.STANCEMASK_CROUCH;
-							//! switch to shoot from weapons instead of camera
 							m_Player.OverrideShootFromCamera(false);
 						}
 						
@@ -582,14 +548,13 @@ class EmoteManager
 							m_StanceMask = DayZPlayerConstants.STANCEMASK_ERECT;
 						}
 					
-						else //item in hands is not eligible for suicide
+						else
 							suicideID = -1;
 					}
 			
 					if (suicideID > -1)
 					{
 						CreateEmoteCallback(EmoteCB, suicideID, m_StanceMask, true);
-						//m_Callback.RegisterAnimationEvent("Death",1);
 					}
 				break;
 			
@@ -752,7 +717,6 @@ class EmoteManager
 					else if ( m_IsSurrendered )
 					{
 						if ( m_Player.GetItemInHands() )
-							//m_Player.GetHumanInventory().LocalDestroyEntity(m_Player.GetItemInHands());		
 							m_Player.GetItemInHands().Delete();
 					}
 				break;
@@ -852,65 +816,17 @@ class EmoteManager
 	
 	protected void PickEmote(int gestureslot)
 	{
-		if ( m_Player )
+		if ( m_Player && (GetGame().IsClient() || !GetGame().IsMultiplayer()))
 		{
-			//m_PreviousGestureID = gestureslot;
+			m_PreviousGestureID = gestureslot;
 			//HACK - to be removed with new input controller
 			if ( gestureslot == 12)
 			{
 				return;
 			}
 			
-			switch ( gestureslot )
-			{
-				case 1 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot1() );
-				break;
-				
-				case 2 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot2() );
-				break;
-				
-				case 3 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot3() );
-				break;
-				
-				case 4 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot4() );
-				break;
-				
-				case 5 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot5() );
-				break;
-				
-				case 6 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot6() );
-				break;
-				
-				case 7 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot7() );
-				break;
-				
-				case 8 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot8() );
-				break;
-				
-				case 9 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot9() );
-				break;
-				
-				case 10 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot10() );
-				break;
-				
-				case 11 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot11() );
-				break;
-				
-				/*case 12 :
-					PlayEmote( m_Player.m_ConfigEmotesProfile.GetEmoteSlot12() );
-				break;*/
-			}
+			int emote_id_from_slot = m_Player.m_ConfigEmotesProfile.GetEmoteFromSlot(gestureslot.ToString());
+			CreateEmoteCBFromMenu(emote_id_from_slot,true);
 		}
 	}
 	
@@ -937,14 +853,13 @@ class EmoteManager
 				m_bEmoteIsPlaying = true;
 				m_Callback.m_callbackID = id;
 				m_Callback.m_player = m_Player;
+				m_Callback.m_Manager = this;
 			}
 		}
 	}
 	
 	protected void HideItemInHands()
 	{
-		/*if (GetGame().IsMultiplayer() && !GetGame().IsClient())
-			return;*/
 		m_item = m_Player.GetItemInHands();
 		if(m_Callback && m_item)
 		{
@@ -955,8 +870,6 @@ class EmoteManager
 	
 	protected void ShowItemInHands()
 	{
-		/*if (GetGame().IsMultiplayer() && !GetGame().IsClient())
-			return;*/
 		if (m_item)
 		{
 			m_Player.GetItemAccessor().HideItemInHands(false);
@@ -969,7 +882,6 @@ class EmoteManager
 		Weapon_Base weapon;
 		WeaponEventBase weapon_event = new WeaponEventTrigger;
 		
-		//firearm suicide
 		if ( Weapon_Base.CastTo(weapon,m_Player.GetItemInHands()) )
 		{
 			//TODO : check multiple muzzles for shotguns, eventually
@@ -1000,17 +912,15 @@ class EmoteManager
 				m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END);
 			}
 		}
-		//melee weapon suicide
 		else if ( m_Player.GetItemInHands() && m_Player.GetItemInHands().ConfigIsExisting("suicideAnim") )
 		{
-			m_Callback.RegisterAnimationEvent("Death",1);
+			m_Callback.RegisterAnimationEvent("Death",EMOTE_SUICIDE_DEATH);
+			m_Callback.RegisterAnimationEvent("Bleed",EMOTE_SUICIDE_BLEED);
 			m_Player.SetSuicide(true);
 			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
 			
 			LogSuicide();
-			//GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(this.KillPlayer, 4000, false);
 		}
-		//unarmed "suicide" :)
 		else
 		{
 			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_FINISH);
@@ -1021,18 +931,27 @@ class EmoteManager
 	{
 		if (GetGame().IsServer())
 		{
-			m_Player.SetHealth(0);
-		}
-		
-		EntityAI itemInHands = m_Player.GetHumanInventory().GetEntityInHands();
-		if( itemInHands )
-		{
-			if( m_Player.CanDropEntity(itemInHands) )
+			EntityAI itemInHands = m_Player.GetHumanInventory().GetEntityInHands();
+			bool can_drop = itemInHands && m_Player.CanDropEntity(itemInHands);
+			if (!m_Player.IsAlive() && can_drop)
 			{
-				vector transform[4];
-				itemInHands.GetTransform(transform);
-				m_Player.PredictiveDropEntity(itemInHands);
-				itemInHands.SetTransform(transform);
+				syncDebugPrint("EmoteManager::KillPlayer - char already dead, using alternative drop method");
+				string item_name = itemInHands.GetType();
+				
+				m_Player.ServerReplaceItemInHandsWithNewElsewhere(new DestroyItemInCorpsesHandsAndCreateNewOnGndLambda(itemInHands, item_name, m_Player, false));
+			}
+			else
+			{
+				if( can_drop )
+				{
+					syncDebugPrint("EmoteManager::KillPlayer - trying to drop item");
+					ChainedDropAndKillPlayerLambda lambda = new ChainedDropAndKillPlayerLambda(itemInHands, "", m_Player);
+					m_Player.GetDayZPlayerInventory().ReplaceItemInHandsWithNew(InventoryMode.SERVER, lambda);
+				}
+				else
+				{
+					m_Player.SetHealth(0);
+				}
 			}
 		}
 	}
@@ -1049,33 +968,14 @@ class EmoteManager
 		}
 	}
 	
-	void CreateEmoteCBFromMenu(int id)
+	void CreateEmoteCBFromMenu(int id, bool interrupts_same = false)
 	{
-		m_MenuEmote = new EmoteFromMenu(id);
+		//if (CanPlayEmote(id))
+			m_MenuEmote = new EmoteLauncher(id,interrupts_same);
 	}
 	
-	void EndCallback()
+	void EndCallbackCommand()
 	{
-		if (!m_Callback)
-		{
-			//Print("no callback!");
-			return;
-		}
-		
-		ScriptInputUserData ctx = new ScriptInputUserData;
-		if (GetGame().IsMultiplayer() && GetGame().IsClient() && !ctx.CanStoreInputUserData())
-		{
-			//Print("ctx unavailable");
-			return;
-		}
-		else if (GetGame().IsMultiplayer() && GetGame().IsClient() && ctx.CanStoreInputUserData())
-		{
-			//Print("sending ECB cancel request");
-			ctx.Write(INPUT_UDT_GESTURE);
-			ctx.Write(-1);
-			ctx.Send();
-		}
-		
 		//Print("ending ECB - proper");
 		if (m_CurrentGestureID == ID_EMOTE_DANCE)
 		{
@@ -1085,43 +985,69 @@ class EmoteManager
 		{
 			m_Callback.InternalCommand(DayZPlayerConstants.CMD_ACTIONINT_END);
 		}
+		
+		if (m_MenuEmote)
+			m_MenuEmote = null;
+		m_DeferredEmoteExecution = CALLBACK_CMD_INVALID;
 	}
 	
-	void PlayEmoteFromMenu()
+	//sends request
+	void SendEmoteRequestSync(int id)
 	{
 		ScriptInputUserData ctx = new ScriptInputUserData;
-		if (GetGame().IsMultiplayer() && GetGame().IsClient() && ctx.CanStoreInputUserData())
+		if ( GetGame().IsMultiplayer() && GetGame().IsClient() )
 		{
-			ctx.Write(INPUT_UDT_GESTURE);
-			ctx.Write(m_MenuEmote.m_ID);
-			m_RPSOutcome = -1;
-			switch (m_MenuEmote.m_ID)
+			bool b1 = ctx.CanStoreInputUserData();
+			bool b2 = CanPlayEmote(id);
+			if ( ctx.CanStoreInputUserData() && CanPlayEmote(id) )
 			{
-				case ID_EMOTE_RPS :
-					m_RPSOutcome = Math.RandomInt(0,3);
-				break;
-				
-				case ID_EMOTE_RPS_R :
-					m_RPSOutcome = 0;
-				break;
-				
-				case ID_EMOTE_RPS_P :
-					m_RPSOutcome = 1;
-				break;
-				
-				case ID_EMOTE_RPS_S :
-					m_RPSOutcome = 2;
-				break;
+				ctx.Write(INPUT_UDT_GESTURE);
+				ctx.Write(id);
+				m_RPSOutcome = -1;
+				switch (id)
+				{
+					case ID_EMOTE_RPS :
+						m_RPSOutcome = Math.RandomInt(0,3);
+					break;
+					
+					case ID_EMOTE_RPS_R :
+						m_RPSOutcome = 0;
+					break;
+					
+					case ID_EMOTE_RPS_P :
+						m_RPSOutcome = 1;
+					break;
+					
+					case ID_EMOTE_RPS_S :
+						m_RPSOutcome = 2;
+					break;
+				}
+				if (m_RPSOutcome != -1) 	ctx.Write(m_RPSOutcome);
+				ctx.Send();
+				//m_DeferredEmoteExecution = m_MenuEmote.m_ID;
+				//PlayEmote(m_MenuEmote.m_ID);
 			}
-			if (m_RPSOutcome != -1) 	ctx.Write(m_RPSOutcome);
-			ctx.Send();
-			m_DeferredMenuEmoteLaunch = m_MenuEmote.m_ID;
-			//PlayEmote(m_MenuEmote.m_ID);
 			m_MenuEmote = NULL;
 		}
 		else if (!GetGame().IsMultiplayer())
 		{
-			PlayEmote(m_MenuEmote.m_ID);
+			if (id == CALLBACK_CMD_END )
+			{
+				EndCallbackCommand();
+			}
+			else if (id == CALLBACK_CMD_GESTURE_INTERRUPT)
+			{
+				m_DeferredEmoteExecution = CALLBACK_CMD_GESTURE_INTERRUPT;
+			}
+			else
+			{
+				PlayEmote(id);
+			}
+			m_MenuEmote = NULL;
+		}
+		else
+		{
+			EndCallbackCommand();
 			m_MenuEmote = NULL;
 		}
 	}
@@ -1133,12 +1059,13 @@ class EmoteManager
 	
 	bool CanPlayEmote(int id)
 	{
-		if (m_BelayedEmote && id == m_CurrentGestureID)
+		//special cases
+		if ( id == CALLBACK_CMD_END || id == CALLBACK_CMD_GESTURE_INTERRUPT)
 		{
-			return false;
+			return true;
 		}
 		
-		if ( !m_Player || m_Player.GetCommand_Action() || m_Player.GetCommandModifier_Action() || m_Player.GetThrowing().IsThrowingModeEnabled())
+		if ( !m_Player || (!IsEmotePlaying() && m_Player.GetCommand_Action() || m_Player.GetCommandModifier_Action()) || m_Player.GetThrowing().IsThrowingModeEnabled())
 		{	
 			return false;
 		}
@@ -1154,7 +1081,7 @@ class EmoteManager
 			return false;
 		}
 		
-		if ( m_HIC.IsWeaponRaised() || m_Player.IsFighting() || m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsFalling() || m_Player.IsUnconscious() ) 	// rework conditions into something better?
+		if ( m_HIC.IsWeaponRaised() || m_Player.IsClimbing() || m_Player.IsFighting() || m_Player.IsSwimming() || m_Player.IsClimbingLadder() || m_Player.IsFalling() || m_Player.IsUnconscious() || m_Player.IsJumpInProgress() ) 	// rework conditions into something better?
 		{
 			return false;
 		}
@@ -1177,16 +1104,8 @@ class EmoteManager
 			return false;
 		}
 		
-		if ( m_HandInventoryLocation && m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation) )
+		if ( m_Player.GetDayZPlayerInventory().IsProcessing() )
 		{
-			if ( m_IsSurrendered && (id == ID_EMOTE_SURRENDER) )
-			{
-				return true;
-			}
-			if ( m_Callback && m_Callback.m_IsFullbody )
-			{
-				return true;
-			}
 			return false;
 		}
 		return true;
@@ -1198,17 +1117,12 @@ class EmoteManager
 		m_CurrentGestureID = ID_EMOTE_SURRENDER;
 		if (state)
 		{
-			m_ItemToBeCreated = true;
-			/*if ((GetGame().IsMultiplayer() && !GetGame().IsServer()) || !GetGame().IsMultiplayer())
-			{*/
 			if (m_Player.GetItemInHands() && !m_Player.CanDropEntity(m_Player.GetItemInHands()))
 				return;
 			if (m_Player.GetItemInHands() && GetGame().IsClient())
 			{
 				m_Player.DropItem(m_Player.GetItemInHands());
-				//m_Player.LocalDropEntity(m_Player.GetItemInHands());
 			}
-			//}
 			CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_SURRENDERIN,DayZPlayerConstants.STANCEMASK_ALL,true);
 			if (m_Callback)
 				m_Callback.RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);
@@ -1216,8 +1130,6 @@ class EmoteManager
 		else
 		{
 			CreateEmoteCallback(EmoteCB,DayZPlayerConstants.CMD_GESTUREFB_SURRENDEROUT,DayZPlayerConstants.STANCEMASK_ALL,true);
-			/*if (m_Callback)
-				m_Callback.RegisterAnimationEvent("ActionExec", UA_ANIM_EVENT);*/
 		}
 	}
 	
@@ -1256,16 +1168,14 @@ class EmoteManager
 			//m_HandInventoryLocation.SetHands(m_Player,m_Player.GetItemInHands());
 			if (!m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation))
 			{
-				m_Player.GetInventory().AddInventoryReservation( null, m_HandInventoryLocation, 10000);
+				m_Player.GetInventory().AddInventoryReservation( null, m_HandInventoryLocation, GameInventory.c_InventoryReservationTimeoutMS);
 			}
 				
 			if ( m_Player.GetActionManager() )
 				m_Player.GetActionManager().EnableActions(false);
 			
-			//m_Player.SetInventorySoftLock(true);
-			
 			//Movement lock in fullbody anims
-			if (m_Callback && m_Callback.m_IsFullbody && !m_controllsLocked /*&& m_CurrentGestureID == ID_EMOTE_SURRENDER*/)
+			if (m_Callback && m_Callback.m_IsFullbody && !m_controllsLocked )
 			{
 				m_controllsLocked = true;
 				//m_Player.GetInputController().OverrideAimChangeX(true,0);
@@ -1279,19 +1189,11 @@ class EmoteManager
 	
 	void CheckEmoteLockedState()
 	{
-		//Print("LockCheckCalled");
 		if ( !m_Player.GetItemInHands() || (m_Player.GetItemInHands() && !SurrenderDummyItem.Cast(m_Player.GetItemInHands())) )
 			return;
 		
-		/*if ( !m_EmoteLockState && SurrenderDummyItem.Cast(m_Player.GetItemInHands()) )
-		{
-			m_IsSurrendered = true;
-			SetEmoteLockState(true);
-			return;
-		}*/
-		
 		//refreshes reservation in case of unwanted timeout
-		if ( m_EmoteLockState && m_HandInventoryLocation/* && !m_Player.GetInventory().HasInventoryReservation(null, m_HandInventoryLocation)*/ )
+		if ( m_EmoteLockState && m_HandInventoryLocation )
 		{
 			m_Player.GetInventory().ExtendInventoryReservation( null, m_HandInventoryLocation, 10000);
 		}
@@ -1312,8 +1214,11 @@ class EmoteManager
 		}
 	}
 	
-	bool InterruptGesture()
+	bool InterruptGestureCheck()
 	{
+		if (!m_Callback.m_IsFullbody)
+			return false;
+		
 		if ( GetUApi() )
 		{
 			for( int idx = 0; idx < m_InterruptInputs.Count(); idx++ )
@@ -1324,10 +1229,23 @@ class EmoteManager
 					
 					if( inp && inp.LocalPress() )
 					{
-						return true;
+						return true; //TODO
 					}
 			}
 		}
+		/*UAInterface input_interface = m_Player.GetInputInterface();
+		if ( input_interface )
+		{
+			for( int idx = 0; idx < m_InterruptInputs.Count(); idx++ )
+			{
+				string inputName = m_InterruptInputs[idx];
+				
+				if( input_interface.SyncedPress(inputName) )
+				{
+					return true;
+				}
+			}
+		}*/
 		return false;
 	}
 	
@@ -1335,10 +1253,102 @@ class EmoteManager
 	{
 		return m_bEmoteIsPlaying || m_IsSurrendered;
 	}
+	
+	void CreateBleedingEffect(int Callback_ID)
+	{
+		if (GetGame().IsServer() && m_Player.IsAlive())
+		{
+			switch (Callback_ID)
+			{
+				case DayZPlayerConstants.CMD_SUICIDEFB_1HD :
+					m_Player.GetBleedingManagerServer().AttemptAddBleedingSourceBySelection("Neck");
+				break;
+				
+				case DayZPlayerConstants.CMD_SUICIDEFB_FIREAXE :
+					m_Player.GetBleedingManagerServer().AttemptAddBleedingSourceBySelection("LeftForeArmRoll");
+				break;
+				
+				case DayZPlayerConstants.CMD_SUICIDEFB_PITCHFORK :
+					m_Player.GetBleedingManagerServer().AttemptAddBleedingSourceBySelection("Spine2");
+				break;
+				
+				case DayZPlayerConstants.CMD_SUICIDEFB_SWORD :
+					m_Player.GetBleedingManagerServer().AttemptAddBleedingSourceBySelection("Spine2");
+				break;
+				
+				case DayZPlayerConstants.CMD_SUICIDEFB_SPEAR :
+					m_Player.GetBleedingManagerServer().AttemptAddBleedingSourceBySelection("Head");
+				break;
+				
+				case DayZPlayerConstants.CMD_SUICIDEFB_WOODAXE :
+					m_Player.GetBleedingManagerServer().AttemptAddBleedingSourceBySelection("LeftForeArmRoll");
+				break;
+				
+				default :
+					Print("EmoteManager.c | CreateBleedingEffect | WRONG ID");
+				break;
+			}
+		}
+	}
+	
+	void CancelEmote()
+	{
+		if (m_Callback || m_MenuEmote || m_DeferredEmoteExecution != CALLBACK_CMD_INVALID)
+			m_CancelEmote = true;
+		if (m_Callback)
+			m_Callback.Cancel();
+		if (m_MenuEmote)
+			m_MenuEmote = null;
+		m_DeferredEmoteExecution = CALLBACK_CMD_END;
+	}
+	
+	void OnJumpStart()
+	{
+		//CancelEmote();
+	}
+	
+	void OnCommandClimbStart()
+	{
+		//CancelEmote();
+	}
 };
 
 class SurrenderData
 {
 	//!called on surrender end request end
 	void End();
+}
+
+/**@class		ChainedDropAndKillPlayerLambda
+ * @brief		drops weapon in hands to ground and then calls kill
+ **/
+class ChainedDropAndKillPlayerLambda : ReplaceItemWithNewLambdaBase
+{
+	PlayerBase m_Player;
+
+	void ChainedDropAndKillPlayerLambda (EntityAI old_item, string new_item_type, PlayerBase player)
+	{
+		m_Player = player;
+		InventoryLocation gnd = new InventoryLocation;
+		vector mtx[4];
+		old_item.GetTransform(mtx);
+		gnd.SetGround( old_item, mtx );
+		
+		OverrideNewLocation( gnd );
+	}
+		
+	override void Execute (HumanInventoryWithFSM fsm_to_notify = null)
+	{
+		if (PrepareLocations())
+		{
+			vector transform[4];
+		
+			m_Player.GetInventory().TakeToDst(InventoryMode.SERVER, m_OldLocation, m_NewLocation);
+			m_Player.OnItemInHandsChanged();			
+		}
+		
+		m_Player.SetHealth(0);
+		
+		hndDebugPrint("[syncinv] player=" + Object.GetDebugName(m_Player) + " STS=" + m_Player.GetSimulationTimeStamp() + " ChainedDropAndKillPlayerLambda");
+	}
 }

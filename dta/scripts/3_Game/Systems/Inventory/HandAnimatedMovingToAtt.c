@@ -41,7 +41,7 @@ class HandAnimatedMoveToDst_W4T extends HandStartAction
 				player.OnItemInHandsChanged();
 			}
 			else
-				Error("[hndfsm] HandAnimatedMoveToDst_W4T- item " + item + " has no Inventory or Location, inv=" + item.GetInventory());
+				Error("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " HandAnimatedMoveToDst_W4T- item " + item + " has no Inventory or Location, inv=" + item.GetInventory());
 		}
 		else
 			Error("[hndfsm] HandAnimatedMoveToDst_W4T - event has no valid m_Dst");
@@ -104,7 +104,7 @@ class HandAnimatedMovingToAtt extends HandStateBase
 
 			if( GetGame().IsClient() || !GetGame().IsMultiplayer() )
 			{
-				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Entity, m_ilEntity, 3000);
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Entity, m_ilEntity, GameInventory.c_InventoryReservationTimeoutShortMS);
 			}
 		}
 		

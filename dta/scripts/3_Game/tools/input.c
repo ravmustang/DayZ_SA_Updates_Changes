@@ -92,6 +92,11 @@ class Input
 	*/
 	proto native void	DisableKey(int key);
 	
+	//! Enable mouse and keyboard (on consoles)
+	proto native void	EnableMouseAndKeyboard(bool enable);
+	//! return state of support mouse and keyboard (on consoles)
+	proto native bool	IsEnabledMouseAndKeyboard();
+	
 	//! gets currently selected profile
 	proto native int	GetCurrentProfile();
 	// gets currently selected profile keys for action

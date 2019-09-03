@@ -234,6 +234,9 @@ class ParticleList
 	static const int HATCHBACK_ENGINE_OVERHEATED	= RegisterParticle("Hatchback_engine_failure");
 	static const int HATCHBACK_EXHAUST_SMOKE		= RegisterParticle("Hatchback_exhaust");
 	
+	// CORPSE DECAY
+	static const int ENV_SWARMING_FLIES 			= RegisterParticle("env_fly_swarm_01");
+	
 	static int RegisterParticle (string file_name)
 	{
 		return RegisterParticle( GetPathToParticles() , file_name);

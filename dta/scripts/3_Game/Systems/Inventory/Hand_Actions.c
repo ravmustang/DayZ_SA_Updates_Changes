@@ -16,7 +16,7 @@ class HandActionCreated extends HandActionBase
 {
 	override void Action (HandEventBase e)
 	{
-		hndDebugPrint("[hndfsm] action=created");
+		hndDebugPrint("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " action=created");
 
 		e.m_Player.OnItemInHandsChanged();
 	}
@@ -26,7 +26,7 @@ class HandActionTake extends HandActionBase
 {
 	override void Action (HandEventBase e)
 	{
-		hndDebugPrint("[hndfsm] action=take");
+		hndDebugPrint("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " action=take");
 
 		GameInventory.LocationSyncMoveEntity(e.GetSrc(), e.GetDst());
 		e.m_Player.OnItemInHandsChanged();
@@ -37,7 +37,7 @@ class HandActionDrop extends HandActionBase
 {
 	override void Action (HandEventBase e)
 	{
-		hndDebugPrint("[hndfsm] action=drop");
+		hndDebugPrint("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " action=drop");
 
 		GameInventory.LocationSyncMoveEntity(e.GetSrc(), e.GetDst());
 		e.m_Player.OnItemInHandsChanged();
@@ -48,7 +48,7 @@ class HandActionThrow extends HandActionBase
 {
 	override void Action (HandEventBase e)
 	{
-		hndDebugPrint("[hndfsm] action=throw");
+		hndDebugPrint("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " action=throw");
 		HandEventThrow throwEvent = HandEventThrow.Cast(e);
 
 		GameInventory.LocationSyncMoveEntity(e.GetSrc(), e.GetDst());
@@ -69,7 +69,7 @@ class HandActionMoveTo extends HandActionBase
 {
 	override void Action (HandEventBase e)
 	{
-		hndDebugPrint("[hndfsm] action=moveTo");
+		hndDebugPrint("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " action=moveTo");
 
 		HandEventMoveTo es = HandEventMoveTo.Cast(e);
 		if (es)
@@ -155,7 +155,7 @@ class HandActionSwap extends HandActionBase
 		HandEventSwap es = HandEventSwap.Cast(e);
 		if (es)
 		{
-			hndDebugPrint("[hndfsm] Swap src1=" + InventoryLocation.DumpToStringNullSafe(es.GetSrc()) + " src2=" + InventoryLocation.DumpToStringNullSafe(es.m_Src2) + " dst1=" + InventoryLocation.DumpToStringNullSafe(es.GetDst()) +  "dst2=" + InventoryLocation.DumpToStringNullSafe(es.m_Dst2));
+			hndDebugPrint("[hndfsm] " + Object.GetDebugName(e.m_Player) + " STS=" + e.m_Player.GetSimulationTimeStamp() + " Swap src1=" + InventoryLocation.DumpToStringNullSafe(es.GetSrc()) + " src2=" + InventoryLocation.DumpToStringNullSafe(es.m_Src2) + " dst1=" + InventoryLocation.DumpToStringNullSafe(es.GetDst()) +  "dst2=" + InventoryLocation.DumpToStringNullSafe(es.m_Dst2));
 
 			GameInventory.LocationSwap(es.GetSrc(), es.m_Src2, es.GetDst(), es.m_Dst2);
 			e.m_Player.OnItemInHandsChanged();

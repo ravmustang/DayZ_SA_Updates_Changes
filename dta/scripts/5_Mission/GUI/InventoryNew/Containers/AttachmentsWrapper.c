@@ -1,6 +1,6 @@
 class AttachmentsWrapper: Container
 {
-	ref Attachments m_Attachments;
+	Attachments m_Attachments;
 	
 	void SetParent( Attachments atts )
 	{
@@ -35,6 +35,11 @@ class AttachmentsWrapper: Container
 	override bool TransferItem()
 	{
 		return m_Attachments.TransferItem();
+	}
+	
+	override bool InspectItem()
+	{
+		return m_Attachments.InspectItem();
 	}
 	
 	override bool EquipItem()

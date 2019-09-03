@@ -394,6 +394,12 @@ class Object extends IEntity
 		return false;
 	}
 	
+	//! Returns if this entity is Ammo Pile
+	bool IsAmmoPile()
+	{
+		return false;
+	}
+	
 	//! Returns if this entity is InventoryItem
 	bool IsInventoryItem()
 	{

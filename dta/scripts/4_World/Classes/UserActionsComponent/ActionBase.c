@@ -564,6 +564,11 @@ class ActionBase : ActionBase_Basic
 					return false;
 				}
 			}
+			
+			if ( m_ConditionTarget && !m_ConditionTarget.Can(player, target))
+			{
+				return false;
+			}
 		}
 		
 		if ( m_ConditionItem && !m_ConditionItem.Can(player, item))
@@ -571,10 +576,6 @@ class ActionBase : ActionBase_Basic
 			return false;
 		}
 		
-		if ( m_ConditionTarget && !m_ConditionTarget.Can(player, target))
-		{
-			return false;
-		}
 		
 		if ( ActionCondition(player, target, item) )
 		{
@@ -646,7 +647,7 @@ class ActionBase : ActionBase_Basic
 				}
 				else
 				{
-					action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, targetInventoryLocation, 10000);
+					action_data.m_Player.GetInventory().AddInventoryReservation( targetItem, targetInventoryLocation, GameInventory.c_InventoryReservationTimeoutMS);
 				}
 			}
 		}	
@@ -660,7 +661,7 @@ class ActionBase : ActionBase_Basic
 		}
 		else
 		{
-			action_data.m_Player.GetInventory().AddInventoryReservation( action_data.m_Player.GetItemInHands(), handInventoryLocation, 10000);
+			action_data.m_Player.GetInventory().AddInventoryReservation( action_data.m_Player.GetItemInHands(), handInventoryLocation, GameInventory.c_InventoryReservationTimeoutMS);
 		}
 		
 		if ( success )

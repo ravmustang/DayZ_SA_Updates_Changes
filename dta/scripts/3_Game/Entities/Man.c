@@ -162,7 +162,7 @@ class Man extends EntityAI
 		{
 			InventoryLocation il = new InventoryLocation;
 			il.SetHands(this, item);
-			//GetInventory().AddInventoryReservation(item, il ,3000);
+			//GetInventory().AddInventoryReservation(item, il ,GameInventory.c_InventoryReservationTimeoutShortMS);
 		}
 			
 		syncDebugPrint("[inv] " + GetDebugName(this) + " STS=" + GetSimulationTimeStamp() + " ::Take2Hands(" + typename.EnumToString(InventoryMode, mode) + ") item=" + Object.GetDebugName(item));
@@ -568,6 +568,27 @@ class Man extends EntityAI
 		else
 			return TakeEntityToTargetInventoryImpl(InventoryMode.PREDICTIVE, target, flags, item);
 	}
+	
+	bool PredictiveTakeOrSwapAttachment( notnull EntityAI item )
+	{
+		if( GetInventory().CanAddAttachment( item ) )
+		{
+			return PredictiveTakeEntityAsAttachment( item );
+		}
+		else
+		{
+			for( int i = 0; i < item.GetInventory().GetSlotIdCount(); i++ )
+			{
+				int slot_id = item.GetInventory().GetSlotId(i);
+				EntityAI slot_item = GetInventory().FindAttachment( slot_id );
+				if( slot_item && GetInventory().CanSwapEntities( item, slot_item ) )
+				{
+					return PredictiveSwapEntities(item, slot_item);
+				}
+			}
+		}
+		return false;
+	}
 
 	override bool LocalTakeEntityToTargetInventory (notnull EntityAI target, FindInventoryLocationType flags, notnull EntityAI item)
 	{
@@ -584,12 +605,12 @@ class Man extends EntityAI
 	///@} to target inv juncture
 
 	///@{ to target cgo ex juncture
-	bool JunctureTakeEntityToTargetCargoEx (notnull EntityAI target, notnull EntityAI item, int idx, int row, int col)
+	bool JunctureTakeEntityToTargetCargoEx (notnull CargoBase cargo, notnull EntityAI item, int row, int col)
 	{
-		return TakeEntityToTargetCargoExImpl(InventoryMode.JUNCTURE, target, item, idx, row, col);
+		return TakeEntityToTargetCargoExImpl(InventoryMode.JUNCTURE, cargo, item, row, col);
 	}
 
-	override bool PredictiveTakeEntityToTargetCargoEx (notnull EntityAI target, notnull EntityAI item, int idx, int row, int col)
+	override bool PredictiveTakeEntityToTargetCargoEx (notnull CargoBase cargo, notnull EntityAI item, int row, int col)
 	{
 		if (!ScriptInputUserData.CanStoreInputUserData())
 		{
@@ -597,26 +618,26 @@ class Man extends EntityAI
 			return false;
 		}
 
-		if (NeedInventoryJunctureFromServer(item, item.GetHierarchyParent(), target))
-			return JunctureTakeEntityToTargetCargoEx(target, item, idx, row, col);
+		if (NeedInventoryJunctureFromServer(item, item.GetHierarchyParent(), cargo.GetCargoOwner()))
+			return JunctureTakeEntityToTargetCargoEx(cargo, item, row, col);
 		else
-			return TakeEntityToTargetCargoExImpl(InventoryMode.PREDICTIVE, target, item, idx, row, col);
+			return TakeEntityToTargetCargoExImpl(InventoryMode.PREDICTIVE, cargo, item, row, col);
 	}
 
-	override bool LocalTakeEntityToTargetCargoEx (notnull EntityAI target, notnull EntityAI item, int idx, int row, int col)
+	override bool LocalTakeEntityToTargetCargoEx (notnull CargoBase cargo, notnull EntityAI item, int row, int col)
 	{
-		return TakeEntityToTargetCargoExImpl(InventoryMode.LOCAL, target, item, idx, row, col);
+		return TakeEntityToTargetCargoExImpl(InventoryMode.LOCAL, cargo, item, row, col);
 	}
 	
-	override bool ServerTakeEntityToTargetCargoEx (notnull EntityAI target, notnull EntityAI item, int idx, int row, int col)
+	override bool ServerTakeEntityToTargetCargoEx (notnull CargoBase cargo, notnull EntityAI item, int row, int col)
 	{
-		return TakeEntityToTargetCargoExImpl(InventoryMode.SERVER, target, item, idx, row, col);
+		return TakeEntityToTargetCargoExImpl(InventoryMode.SERVER, cargo, item, row, col);
 	}
 
-	protected bool TakeEntityToTargetCargoExImpl (InventoryMode mode, notnull EntityAI target, notnull EntityAI item, int idx, int row, int col)
+	protected bool TakeEntityToTargetCargoExImpl (InventoryMode mode, notnull CargoBase cargo, notnull EntityAI item, int row, int col)
 	{
 		syncDebugPrint("[inv] " + GetDebugName(this) + " STS=" + GetSimulationTimeStamp() + " ::Take2TargetCgoEx(" + typename.EnumToString(InventoryMode, mode) + ") item=" + Object.GetDebugName(item));
-		bool code = GetInventory().TakeEntityToTargetCargoEx(mode, target, item, idx, row, col);
+		bool code = GetInventory().TakeEntityToTargetCargoEx(mode, cargo, item, row, col);
 		UpdateInventoryMenu();
 		return code;
 	}

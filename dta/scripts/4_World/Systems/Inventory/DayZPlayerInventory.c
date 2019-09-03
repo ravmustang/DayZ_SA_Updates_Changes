@@ -590,7 +590,16 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 			{
 				hndDebugPrint("[inv] DZPI::HandEvent(" + typename.EnumToString(InventoryMode, mode) + ")");
 				if (!e.IsServerSideOnly())
-                	SendServerHandEventViaJuncture(GetDayZPlayerOwner(), e);
+				{
+					if (GetDayZPlayerOwner().IsAlive())
+					{
+						SendServerHandEventViaJuncture(GetDayZPlayerOwner(), e);
+					}
+					else
+					{
+						InventoryInputUserData.SendServerHandEventViaInventoryCommand(GetDayZPlayerOwner(), e);
+					}
+				}
                 PostHandEvent(e);
                 return;
 			}
@@ -737,13 +746,36 @@ class DayZPlayerInventory : HumanInventoryWithFSM
 		}
 	}
 	
+	override void OnHandsExitedStableState (HandStateBase src, HandStateBase dst)
+	{
+		super.OnHandsExitedStableState(src, dst);
+
+		hndDebugPrint("[hndfsm] hand fsm exit stable src=" + src.Type().ToString());
+	}
+	
+	override void OnHandsEnteredStableState (HandStateBase src, HandStateBase dst)
+	{
+		super.OnHandsEnteredStableState(src, dst);
+
+		hndDebugPrint("[hndfsm] hand fsm entered stable dst=" + dst.Type().ToString());
+	}
+	
 	override void OnHandsStateChanged (HandStateBase src, HandStateBase dst)
 	{
+		super.OnHandsStateChanged(src, dst);
+
+		hndDebugPrint("[hndfsm] hand fsm changed state src=" + src.Type().ToString() + " ---> dst=" + dst.Type().ToString());
+
+		if (src.IsIdle())
+			OnHandsExitedStableState(src, dst);
+		
+		if (dst.IsIdle())
+			OnHandsEnteredStableState(src, dst);
+
 #ifdef BOT
 		PlayerBase p = PlayerBase.Cast(GetDayZPlayerOwner());
-		if (p)
+		if (p && p.m_Bot)
 		{
-			botDebugPrint("[bot] hand fsm changed state src=" + src + " ---> dst=" + dst);
 			p.m_Bot.ProcessEvent(new BotEventOnItemInHandsChanged(p));
 		}
 #endif

@@ -106,17 +106,17 @@ class ActionWorldCraft: ActionContinuousBase
 	override void Start( ActionData action_data ) //Setup on start of action
 	{
 		super.Start(action_data);
-		if ( action_data.m_MainItem ) action_data.m_MainItem.SetInvisible(true);
+		if ( action_data.m_Player ) action_data.m_Player.GetItemAccessor().HideItemInHands(true);
 	}
 	
 	override void OnEndServer( ActionData action_data )
 	{
-		if ( action_data.m_MainItem ) action_data.m_MainItem.SetInvisible(false);
+		if ( action_data.m_Player ) action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}
 	
 	override void OnEndClient( ActionData action_data )
 	{
-		if ( action_data.m_MainItem ) action_data.m_MainItem.SetInvisible(false);
+		if ( action_data.m_Player ) action_data.m_Player.GetItemAccessor().HideItemInHands(false);
 	}	
 	
 	override void OnFinishProgressServer( ActionData action_data )

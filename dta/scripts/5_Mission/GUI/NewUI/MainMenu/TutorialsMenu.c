@@ -3,6 +3,8 @@ class TutorialsMenu extends UIScriptedMenu
 	
 	protected string 		m_BackButtonTextID;
 	
+	protected ButtonWidget 	m_Back;
+	
 	protected ImageWidget 	m_ControlsLayoutImage;
 	protected const int 	TABS_COUNT = 4;
 	protected ImageWidget 	m_tab_images[TABS_COUNT];
@@ -13,9 +15,15 @@ class TutorialsMenu extends UIScriptedMenu
 	//============================================
 	override Widget Init()
 	{
-		layoutRoot = GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/tutorials.layout" );
+		#ifdef PLATFORM_CONSOLE
+		layoutRoot	= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/tutorials/xbox/tutorials.layout" );
+		#else
+		layoutRoot	= GetGame().GetWorkspace().CreateWidgets( "gui/layouts/new_ui/tutorials/pc/tutorials.layout" );
+		#endif
 		
+		m_Back		= layoutRoot.FindAnyWidget( "back" );
 		layoutRoot.FindAnyWidget("Tabber").GetScript( m_TabScript );
+		m_TabScript.m_OnTabSwitch.Insert( DrawConnectingLines );
 		
 		m_tab_images[0] = ImageWidget.Cast( layoutRoot.FindAnyWidget("MovementTabBackdropImageWidget") );
 		m_tab_images[1] = ImageWidget.Cast( layoutRoot.FindAnyWidget("WeaponsAndActionsBackdropImageWidget") );
@@ -47,6 +55,7 @@ class TutorialsMenu extends UIScriptedMenu
 	
 	void ~TutorialsMenu()
 	{
+		m_TabScript.m_OnTabSwitch.Remove( DrawConnectingLines );
 		PPEffects.SetBlurMenu( 0 );
 	}
 
@@ -246,9 +255,14 @@ class TutorialsMenu extends UIScriptedMenu
 	protected array<ref JsonControlMappingInfo> GetControlMappingInfo()
 	{
 		array<ref JsonControlMappingInfo> control_mapping_info = new array<ref JsonControlMappingInfo>;
+		string file_path;
 		
-		
-		string file_path =	"Xbox/PageDataTutorials.json";
+		#ifdef PLATFORM_WINDOWS
+			file_path =	"Scripts/data/PageDataTutorials.json";
+		#endif
+		#ifdef PLATFORM_XBOX
+			file_path =	"Xbox/PageDataTutorials.json";
+		#endif
 		#ifdef PLATFORM_PS4
 			file_path =	"Ps4/PageDataTutorials.json";
 		#endif
@@ -319,5 +333,164 @@ class TutorialsMenu extends UIScriptedMenu
 		#else 
 			m_BackButtonTextID = "STR_rootFrame_toolbar_bg_ConsoleToolbar_Back_BackText0";	
 		#endif
+	}
+	
+	override bool OnClick( Widget w, int x, int y, int button )
+	{
+		if( button == MouseState.LEFT )
+		{
+			if( w == m_Back )
+			{
+				Back();
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	override bool OnMouseEnter( Widget w, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorHighlight( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnMouseLeave( Widget w, Widget enterW, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorNormal( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocus( Widget w, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorHighlight( w );
+			return true;
+		}
+		return false;
+	}
+	
+	override bool OnFocusLost( Widget w, int x, int y )
+	{
+		if( IsFocusable( w ) )
+		{
+			ColorNormal( w );
+			return true;
+		}
+		return false;
+	}
+	
+	bool IsFocusable( Widget w )
+	{
+		return ( w && w == m_Back );
+	}
+	
+	//Coloring functions (Until WidgetStyles are useful)
+	void ColorHighlight( Widget w )
+	{
+		if( !w )
+			return;
+		
+		//SetFocus( w );
+		
+		int color_pnl = ARGB(255, 0, 0, 0);
+		int color_lbl = ARGB(255, 255, 0, 0);
+		int color_img = ARGB(255, 200, 0, 0);
+		
+		#ifdef PLATFORM_CONSOLE
+			color_pnl = ARGB(255, 200, 0, 0);
+			color_lbl = ARGB(255, 255, 255, 255);
+		#endif
+		
+		ButtonSetColor(w, color_pnl);
+		ButtonSetTextColor(w, color_lbl);
+		ImagenSetColor(w, color_img);
+	}
+	
+	void ColorNormal( Widget w )
+	{
+		if( !w )
+			return;
+		
+		int color_pnl = ARGB(0, 0, 0, 0);
+		int color_lbl = ARGB(255, 255, 255, 255);
+		int color_img = ARGB(255, 255, 255, 255);
+		
+		ButtonSetColor(w, color_pnl);
+		ButtonSetTextColor(w, color_lbl);
+		ImagenSetColor(w, color_img);
+	}
+	
+	void ButtonSetText( Widget w, string text )
+	{
+		if( !w )
+			return;
+				
+		TextWidget label = TextWidget.Cast(w.FindWidget( w.GetName() + "_label" ) );
+		
+		if( label )
+		{
+			label.SetText( text );
+		}
+		
+	}
+	
+	void ButtonSetColor( Widget w, int color )
+	{
+		if( !w )
+			return;
+		
+		Widget panel = w.FindWidget( w.GetName() + "_panel" );
+		
+		if( panel )
+		{
+			panel.SetColor( color );
+		}
+	}
+	
+	void ImagenSetColor( Widget w, int color )
+	{
+		if( !w )
+			return;
+		
+		Widget panel = w.FindWidget( w.GetName() + "_image" );
+		
+		if( panel )
+		{
+			panel.SetColor( color );
+		}
+	}
+	
+	void ButtonSetTextColor( Widget w, int color )
+	{
+		if( !w )
+			return;
+
+		TextWidget label	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_label" ) );
+		TextWidget text		= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text" ) );
+		TextWidget text2	= TextWidget.Cast(w.FindAnyWidget( w.GetName() + "_text_1" ) );
+				
+		if( label )
+		{
+			label.SetColor( color );
+		}
+		
+		if( text )
+		{
+			text.SetColor( color );
+		}
+		
+		if( text2 )
+		{
+			text2.SetColor( color );
+		}
 	}
 }

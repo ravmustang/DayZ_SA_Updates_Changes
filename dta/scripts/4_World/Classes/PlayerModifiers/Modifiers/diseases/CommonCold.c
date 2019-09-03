@@ -17,7 +17,7 @@ class CommonColdMdfr: ModifierBase
 	
 	override bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.INFLUENZA) > AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.INFLUENZA) >= AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -42,7 +42,7 @@ class CommonColdMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		return (player.GetSingleAgentCount(eAgents.INFLUENZA) < AGENT_THRESHOLD_DEACTIVATE);
+		return (player.GetSingleAgentCount(eAgents.INFLUENZA) <= AGENT_THRESHOLD_DEACTIVATE);
 	}
 
 	override protected void OnTick(PlayerBase player, float deltaT)

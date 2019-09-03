@@ -2,7 +2,7 @@ class Sedan_02 extends CarScript
 {
 	void Sedan_02()
 	{
-		m_dmgContactCoef = 0.070;
+		m_dmgContactCoef = 0.130;
 	}
 	override int GetAnimInstance()
 	{
@@ -25,8 +25,47 @@ class Sedan_02 extends CarScript
 
 		return 0;
 	}
+
+	// Override for car-specific light type
+	override CarLightBase CreateFrontLight()
+	{
+		return CarLightBase.Cast( ScriptedLightBase.CreateLight(Sedan_02FrontLight) );
+	}
 	
+	// Override for car-specific light type
+	override CarRearLightBase CreateRearLight()
+	{
+		return CarRearLightBase.Cast( ScriptedLightBase.CreateLight(Sedan_02RearLight) );
+	}
 	
+	override bool CanReleaseAttachment( EntityAI attachment )
+	{
+		if( !super.CanReleaseAttachment( attachment ) )
+			return false;
+		
+		string attType = attachment.GetType();
+		
+		switch( attType )
+		{
+			case "CarBattery": 
+				if ( GetCarDoorsState("Sedan_02_Trunk") == CarDoorState.DOORS_CLOSED || EngineIsOn() )
+					return false;
+			break;
+			
+			case "SparkPlug":
+				if ( GetCarDoorsState("Sedan_02_Trunk") == CarDoorState.DOORS_CLOSED || EngineIsOn() )
+					return false;
+			break;
+
+			case "CarRadiator":
+				if ( GetCarDoorsState("Sedan_02_Hood") == CarDoorState.DOORS_CLOSED || EngineIsOn() )
+					return false;
+			break;
+		}
+
+		return true;
+	}
+
 	override int GetCarDoorsState( string slotType )
 	{
 		CarDoor carDoor;
@@ -121,7 +160,48 @@ class Sedan_02 extends CarScript
 
 		return false;
 	}
-	
+
+	override string GetDoorSelectionNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+			return "doors_driver";
+		break;
+		case 1:
+			return "doors_codriver";
+		break;
+		case 2:
+			return "doors_cargo1";
+		break;
+		case 3:
+			return "doors_cargo2";
+		break;
+		}
+		
+		return super.GetDoorSelectionNameFromSeatPos(posIdx);
+	}
+
+	override string GetDoorInvSlotNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+			return "Sedan_02_Door_1_1";
+		break;
+		case 1:
+			return "Sedan_02_Door_2_1";
+		break;
+		case 2:
+			return "Sedan_02_Door_1_2";
+		break;
+		case 3:
+			return "Sedan_02_Door_2_2";
+		break;
+		}
+		
+		return super.GetDoorInvSlotNameFromSeatPos(posIdx);
+	}
 	
 	override float OnSound( CarSoundCtrl ctrl, float oldValue )
 	{

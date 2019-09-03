@@ -102,6 +102,7 @@ class ActionConstructor
 		actions.Insert(ActionMineTree);
 		actions.Insert(ActionMineBush);
 		actions.Insert(ActionMineRock);
+		actions.Insert(ActionMineRock1H);
 		actions.Insert(ActionDrinkDisinfectant);
 		actions.Insert(ActionForceDrinkDisinfectant);	
 		actions.Insert(ActionDrinkDisinfectant2);
@@ -148,6 +149,7 @@ class ActionConstructor
 		actions.Insert(ActionDrinkAlcohol);
 		actions.Insert(ActionFishing);
 		actions.Insert(ActionFillBottleBase);
+		actions.Insert(ActionUpgradeTorchFromGasPump);
 		actions.Insert(ActionTuneFrequency);
 		actions.Insert(ActionTuneRadioStation);
 		actions.Insert(ActionIgniteFireplaceByAir);
@@ -241,6 +243,7 @@ class ActionConstructor
 		actions.Insert(ActionTuneFrequencyOnGround);
 		actions.Insert(ActionToggleTentOpen);
 		actions.Insert(ActionPackTent);
+		//actions.Insert(ActionRepackTent);
 		actions.Insert(ActionOpenBarrel);
 		actions.Insert(ActionCloseBarrel);
 		actions.Insert(ActionOpenBarrelHoles);
@@ -294,14 +297,8 @@ class ActionConstructor
 		actions.Insert(FirearmActionDetachMagazine);		
 		//actions.Insert(ActionAdvancedDetachMagazine);
 		
-		#ifdef SERVER_FOR_CONSOLE
-			actions.Insert(FirearmActionLoadBulletQuick);
-			actions.Insert(FirearmActionLoadMultiBulletQuick);
-		#endif
-		#ifdef PLATFORM_CONSOLE
-			actions.Insert(FirearmActionLoadBulletQuick);
-			actions.Insert(FirearmActionLoadMultiBulletQuick);
-		#endif
+		actions.Insert(FirearmActionLoadBulletQuick);
+		actions.Insert(FirearmActionLoadMultiBulletQuick);
 		
 	}
 };

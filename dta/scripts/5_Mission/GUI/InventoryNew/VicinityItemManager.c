@@ -14,6 +14,7 @@ class VicinityItemManager
 	static private const float CONE_HEIGHT_MAX 				= 3.0;
 	
 	static private ref 	array<ref EntityAI> m_VicinityItems = new ref array<ref EntityAI>;
+	static private ref 	array<ref CargoBase> m_VicinityCargos = new ref array<ref CargoBase>;
 	static private 		int m_RefreshCounter;
 	
 	static void Init()
@@ -36,6 +37,19 @@ class VicinityItemManager
 			{
 				m_VicinityItems.Insert( inventory_item );
 			}
+		}
+	}
+
+	static array<ref CargoBase> GetVicinityCargos()
+	{
+		return m_VicinityCargos;
+	}
+	
+	static void AddVicinityCargos( CargoBase object )
+	{
+		if ( m_VicinityCargos.Find( object ) == INDEX_NOT_FOUND /*&& GameInventory.CheckManipulatedObjectsDistances( inventory_item, GetGame().GetPlayer(), VICINITY_CONE_REACH_DISTANCE ) */ )
+		{
+			m_VicinityCargos.Insert( object );
 		}
 	}
 	
@@ -72,16 +86,24 @@ class VicinityItemManager
 		vector raycast_start;
 		int contact_component;
 		EntityAI entity_ai;
+		ItemBase item;
 		PlayerBase player = PlayerBase.Cast( GetGame().GetPlayer() );
 		
 		if ( m_VicinityItems ) 
 		{
 			m_VicinityItems.Clear();
 		}
+		
+		if (m_VicinityCargos)
+			m_VicinityCargos.Clear();
 
 		//1. GetAll actors in VICINITY_ACTOR_DISTANCE
 //		DebugActorsSphereDraw( VICINITY_ACTOR_DISTANCE );
 		GetGame().GetObjectsAtPosition3D( player.GetPosition(), VICINITY_ACTOR_DISTANCE, objects_in_vicinity, proxyCargos );		
+		
+		// no filtering for cargo (initial implementation)		
+		for ( int ic = 0; ic < proxyCargos.Count(); ic++ )
+			AddVicinityCargos( proxyCargos[ic] );
 
 		//filter unnecessary objects beforehand
 		for ( int i = 0; i < objects_in_vicinity.Count(); i++ )
@@ -92,6 +114,8 @@ class VicinityItemManager
 			if ( entity_ai == player ){continue;}			
 			if ( entity_ai.IsParticle() ){continue;}			
 			if ( entity_ai.IsScriptedLight() ){continue;}
+			if ( entity_ai.IsBeingPlaced() ){continue;}
+			if ( entity_ai.IsHologram() ){continue;}
 			
 			if ( entity_ai.IsMan() || entity_ai.IsZombie() || entity_ai.IsZombieMilitary() )
 			{
@@ -139,8 +163,10 @@ class VicinityItemManager
 			if ( entity_ai == player ){continue;}	
 			if ( entity_ai.IsParticle() ){continue;}			
 			if ( entity_ai.IsScriptedLight() ){continue;}
-			
-			
+			if ( entity_ai.IsBeingPlaced() ){continue;}
+			if ( entity_ai.IsHologram() ){continue;}
+			if ( !Class.CastTo( item, object_in_radius) ){continue;}
+			if ( !item.IsTakeable() ){continue;}
 			if ( filtered_objects.Find( object_in_radius ) == INDEX_NOT_FOUND )
 			{
 				//Print("+1+filtered_objects in radius inserting: " + object_in_radius);
@@ -164,12 +190,14 @@ class VicinityItemManager
 		{
 			Object object_in_cone = objects_in_vicinity.Get(k);
 			//Print("---object in cone: " + object_in_cone);
-			
 			if ( !Class.CastTo( entity_ai, object_in_cone) ){continue;}
 			if ( entity_ai == player ){continue;}	
 			if ( entity_ai.IsParticle() ){continue;}			
 			if ( entity_ai.IsScriptedLight() ){continue;}
-			
+			if ( entity_ai.IsBeingPlaced() ){continue;}
+			if ( entity_ai.IsHologram() ){continue;}
+			if ( !Class.CastTo( item, object_in_cone) && !object_in_cone.IsTransport() && !PASBroadcaster.Cast( object_in_cone ) ){continue;}
+			if ( item && !item.IsTakeable() ){continue;}
 			if ( filtered_objects.Find( object_in_cone ) == INDEX_NOT_FOUND )
 			{
 				//Print("+2+filtered_objects in cone inserting: " + object_in_cone);
@@ -268,14 +296,14 @@ class VicinityItemManager
 			}
 			else
 			{
+				if ( hit_objects ) 
+				{
+					hit_objects.Clear();
+				}
+				
 				//Print(" ===>>> pouzij standardny raycast s fire geometriou koli domom a basebuildingu <<<=== ");
 				DayZPhysics.RaycastRV( raycast_start, object_center_pos, object_contact_pos, object_contact_dir, contact_component, hit_objects, null, GetGame().GetPlayer(), false, false, ObjIntersectFire, 0.0, CollisionFlags.ALLOBJECTS );
 			}	
-				
-			if ( hit_objects ) 
-			{
-				hit_objects.Clear();
-			}
 				
 			//4.2. ignore items if they are obstructed
 			for ( int m = 0; m < hit_objects.Count(); m++ )
@@ -300,7 +328,8 @@ class VicinityItemManager
 				EntityAI eai;
 				if ( Class.CastTo( eai, hit_object ) )
 				{
-					if ( eai.GetItemWeight() >= OBJECT_OBSTRUCTION_WEIGHT )
+					
+					if ( eai.GetWeight() >= OBJECT_OBSTRUCTION_WEIGHT )
 					{
 						if ( eai != filtered_object )
 						{
@@ -321,7 +350,7 @@ class VicinityItemManager
 		}	
 	}
 	
-	//Debug funciions
+	//Debug functions
 	
 	static ref array<Shape> rayShapes = new array<Shape>();
 	

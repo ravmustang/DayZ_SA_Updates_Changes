@@ -34,7 +34,7 @@ class Colors
 	const int COLOR_BOILED			= 0x00AF9442;
 	const int COLOR_DRIED			= 0x00FFEB48;
 	const int COLOR_BURNED			= 0x00888888;
-	const int COLOR_ROTTEN			= 0x0075BB2F;
+	const int COLOR_ROTTEN			= 0x00A93F15;
 }
 
 class FadeColors

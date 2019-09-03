@@ -1,8 +1,9 @@
 class HescoBox extends Inventory_Base
 {
-	static const int FOLDED 		= 0;
-	static const int UNFOLDED 		= 1;
-	static const int FILLED 		= 2;
+	static const int FOLDED            = 0;
+	static const int UNFOLDED 		   = 1;
+	static const int FILLED 		   = 2;
+	static const int PERCENTUAL_DAMAGE = 1;
 	
 	static ref array<string> 		m_SurfaceForSetup;
 	ref Timer 						m_Timer;
@@ -35,6 +36,11 @@ class HescoBox extends Inventory_Base
 		}
 	}
 
+	override bool HasProxyParts()
+	{
+		return true;
+	}
+	
 	override bool CanPutIntoHands( EntityAI parent )
 	{
 		if( !super.CanPutIntoHands( parent ) )
@@ -128,7 +134,8 @@ class HescoBox extends Inventory_Base
 		{
 			SetAllowDamage(true);
 			Synchronize();
-			DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+			float fold_damage = ( GetMaxHealth( "", "" ) / 100 ) * PERCENTUAL_DAMAGE;
+			DecreaseHealth( "", "", fold_damage );
 		}
 	}
 
@@ -146,7 +153,8 @@ class HescoBox extends Inventory_Base
 		{
 			SetAllowDamage(true);
 			Synchronize();
-			DecreaseHealth( "", "", 5 ); //TODO Daniel implement soft skill bonus via useraction
+			float unfold_damage = ( GetMaxHealth( "", "" ) / 100 ) * PERCENTUAL_DAMAGE;
+			DecreaseHealth( "", "", unfold_damage );	
 		}
 	}
 

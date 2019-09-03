@@ -5,7 +5,7 @@ class Container extends LayoutHolder
 	protected int							m_ActiveIndex = 1;
 	protected bool							m_LastIndex;
 	protected Container 					m_FocusedContainer;
-	
+	protected float							m_PrevAlpha;
 	const int ITEMS_IN_ROW = 8;
 	
 	protected int							m_FocusedRow = 0;
@@ -23,6 +23,7 @@ class Container extends LayoutHolder
 	{
 		m_Body = new array<ref LayoutHolder>;
 		m_OpenedContainers = new array<ref LayoutHolder>;
+		m_PrevAlpha = m_RootWidget.GetAlpha();
 	}
 	
 	Container GetFocusedContainer()
@@ -34,8 +35,6 @@ class Container extends LayoutHolder
 	{
 		m_FocusedContainer = cont;
 	}
-	
-	
 	
 	float GetFocusedContainerHeight( bool contents = false )
 	{
@@ -104,6 +103,13 @@ class Container extends LayoutHolder
 	{
 		if( GetFocusedContainer() )
 			return GetFocusedContainer().TransferItem();
+		return false;
+	}
+	
+	bool InspectItem()
+	{
+		if( GetFocusedContainer() )
+			return GetFocusedContainer().InspectItem();
 		return false;
 	}
 	
@@ -187,7 +193,6 @@ class Container extends LayoutHolder
 			GetFocusedContainer().SetLastActive();
 	}
 	
-	float m_PrevAlpha;
 	override void SetActive( bool active )
 	{
 		m_IsActive = active;
@@ -195,18 +200,6 @@ class Container extends LayoutHolder
 		if( m_MainWidget.FindAnyWidget("SelectedContainer") )
 		{
 			m_MainWidget.FindAnyWidget("SelectedContainer").Show(active);
-		}
-		else
-		{
-			m_PrevAlpha = m_RootWidget.GetAlpha();
-			if( active )
-			{
-				m_MainWidget.SetAlpha( m_PrevAlpha + 0.2 );
-			}
-			else
-			{
-				m_MainWidget.SetAlpha( m_PrevAlpha - 0.2 );
-			}
 		}
 		
 		if( active )
@@ -372,7 +365,7 @@ class Container extends LayoutHolder
 			if( m_ActiveIndex < m_OpenedContainers.Count() )
 			{
 				next = Container.Cast( m_OpenedContainers[m_ActiveIndex] );
-				if( m_ActiveIndex == m_OpenedContainers.Count() - 1 )
+				if( m_ActiveIndex == m_OpenedContainers.Count() )
 				{
 					m_LastIndex = true;
 				}
@@ -459,6 +452,7 @@ class Container extends LayoutHolder
 		{
 			active.SetActive( false );
 			prev.SetActive( true );
+			prev.SetLastActive();
 			SetFocusedContainer( prev );
 		}
 		else

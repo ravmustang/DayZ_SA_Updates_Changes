@@ -112,11 +112,9 @@ class ActionUnrestrainTarget: ActionContinuousBase
 		PlayerBase player_target = PlayerBase.Cast(action_data.m_Target.GetObject());
 		PlayerBase player_source = PlayerBase.Cast(action_data.m_Player);
 		
-		player_target.GetItemInHands();
-		
 		EntityAI unrestraining_tool = action_data.m_MainItem;
 		EntityAI restraining_item = player_target.GetItemInHands();
-		
+
 		player_target.SetRestrained(false);
 		
 		MiscGameplayFunctions.TransformRestrainItem(restraining_item, unrestraining_tool, player_source, player_target);

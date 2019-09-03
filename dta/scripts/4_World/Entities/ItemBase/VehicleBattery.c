@@ -46,19 +46,23 @@ class VehicleBattery : ItemBase
 	{
 		super.OnInventoryEnter(player);
 		
-		if ( HasEnergyManager() )
+		if (GetHierarchyParent() == player)
 		{
-			ItemBase powered_device = ItemBase.Cast( GetCompEM().GetPluggedDevice() ); // Should return metal wire or barbed wire attachment
-			
-			if ( powered_device )
+		
+			if ( HasEnergyManager() )
 			{
-				if ( powered_device.IsInherited( MetalWire ) )
+				ItemBase powered_device = ItemBase.Cast( GetCompEM().GetPluggedDevice() ); // Should return metal wire or barbed wire attachment
+			
+				if ( powered_device )
 				{
-					powered_device.GetCompEM().UnplugAllDevices();
-				}
-				else
-				{
-					this.GetCompEM().UnplugAllDevices();
+					if ( powered_device.IsInherited( MetalWire ) )
+					{
+						powered_device.GetCompEM().UnplugAllDevices();
+					}
+					else
+					{
+						this.GetCompEM().UnplugAllDevices();
+					}
 				}
 			}
 		}

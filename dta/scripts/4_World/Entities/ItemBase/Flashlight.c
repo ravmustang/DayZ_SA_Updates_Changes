@@ -63,7 +63,7 @@ class Flashlight extends ItemBase
 	{
 		super.OnInventoryExit(player);
 		
-		if ( GetGame().IsServer()  &&  GetCompEM().IsWorking() )
+		if ( GetCompEM().IsWorking() )
 		{
 			if (player)
 			{

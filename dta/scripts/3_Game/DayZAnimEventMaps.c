@@ -75,7 +75,7 @@ class SoundLookupTable
 }
 
 
-class StepSoundLookupTable extends SoundLookupTable<StepSoundTraits>
+class StepSoundLookupTable extends SoundLookupTable
 {
 	void StepSoundLookupTable()
 	{
@@ -108,6 +108,15 @@ class PlayerVoiceLookupTable extends SoundLookupTable
 	NoiseParams GetNoiseParam()
 	{
 		return m_NoiseParams;
+	}
+}
+
+
+class ImpactSoundLookupTable extends SoundLookupTable
+{
+	void ImpactSoundLookupTable()
+	{
+		InitTable("CfgImpactSoundTables", "surface");
 	}
 }
 
@@ -187,14 +196,14 @@ class AnimSoundLookupTableBank
 		return table;
 	}
 	
-	SoundLookupTable GetAttachmentTable(string tableName)
+	SoundLookupTable GetImpactTable(string tableName)
 	{
 		int tableNameHash = tableName.Hash();
 
 		SoundLookupTable table = m_pTables.Get(tableNameHash);
 		if(table == NULL)
 		{
-			table = new AttachmentSoundLookupTable();
+			table = new ImpactSoundLookupTable();
 			table.LoadTable(tableName);
 			m_pTables.Insert(tableNameHash, table);
 		}

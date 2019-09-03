@@ -19,6 +19,10 @@ class IngameHud extends Hud
 	protected float								m_TemperatureTimer;
 	protected float								m_TemperatureShowTime = 30;
 	
+	protected bool								m_IsStaminaVisible;
+	protected float								m_StaminaTimer;
+	protected float								m_StaminaShowTime = 0.15;
+	
 	protected ref map<int,string>				m_VehicleGearTable;
 
 	protected Widget							m_HudPanelWidget;
@@ -622,6 +626,25 @@ class IngameHud extends Hud
 		m_TemperatureTimer = 0;
 	}
 	
+	override void SetStaminaBarVisibility( bool show )
+	{
+		//m_StaminaBackground.Show( show );
+		//m_Stamina.Show( show );
+		if ( show )
+		{
+			m_Stamina.SetAlpha( 1 );
+			//m_Stamina.SetTextColor( ColorManager.COLOR_NORMAL_TEXT );
+		}
+		else
+		{
+			m_Stamina.SetAlpha( 0.3 );
+			//m_Stamina.SetTextColor( ColorManager.RED_COLOR );
+		}
+
+		m_IsStaminaVisible = show;
+		m_StaminaTimer = 0;
+	}
+	
 	// state 0 = empty
 	// state 1 = digesting
 	// state 2 = full
@@ -875,7 +898,7 @@ class IngameHud extends Hud
 		{
 			HumanCommandVehicle hcv = player.GetCommand_Vehicle();
 			
-			if ( hcv && hcv.GetVehicleSeat() == DayZPlayerConstants.VEHICLESEAT_DRIVER )
+			if ( hcv )
 			{
 				CarScript car = CarScript.Cast( hcv.GetTransport() );
 				if( car )
@@ -1352,6 +1375,16 @@ class IngameHud extends Hud
 			{
 				HideTemperature();
 			}
+		}
+		
+		if ( !m_IsStaminaVisible )
+		{
+			m_StaminaTimer += timeslice;
+			if ( m_StaminaTimer > m_StaminaShowTime )
+			{
+				SetStaminaBarVisibility( true );
+			}
+			
 		}
 		
 		RefreshVehicleHud( timeslice );

@@ -2,7 +2,7 @@ class Rag extends ItemBase
 {
 	void Rag()
 	{
-		InsertAgent(eAgents.WOUND_AGENT);
+
 	}
 	
 	

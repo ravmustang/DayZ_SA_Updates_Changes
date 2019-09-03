@@ -19,30 +19,37 @@ class SalineMdfr: ModifierBase
 	override bool DeactivateCondition(PlayerBase player)
 	{
 		float attached_time = GetAttachedTime();
-		
-		if(attached_time > m_RegenTime )
+
+		if ( attached_time > m_RegenTime )
 		{
-			return true;	
+			return true;
 		}
 		else
 		{
-			return false;	
+			return false;
 		}
 	}
 
 	override void OnReconnect(PlayerBase player)
 	{
-
+		OnActivate(player);
 	}
 	
 	override void OnActivate(PlayerBase player)
 	{
-
+		if( player.GetNotifiersManager() )
+			player.GetNotifiersManager().ActivateByType(eNotifiers.NTF_PILLS);
 	}
 	
+	override void OnDeactivate(PlayerBase player)
+	{
+		if( player.GetNotifiersManager() )
+			player.GetNotifiersManager().DeactivateByType(eNotifiers.NTF_PILLS);
+	}
+
 	override void OnTick(PlayerBase player, float deltaT)
 	{
-		
+		player.AddHealth("", "Blood", PlayerConstants.SALINE_BLOOD_REGEN_PER_SEC * deltaT);
 	}
 	
 	float CalculateRegenTime()

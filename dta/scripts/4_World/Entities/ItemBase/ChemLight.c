@@ -36,6 +36,13 @@ class Chemlight_ColorBase : ItemBase
 		}
 	}
 	
+	override void EEHealthLevelChanged(int oldLevel, int newLevel, string zone)
+	{
+		super.EEHealthLevelChanged(oldLevel,newLevel,zone);
+		
+		SetObjectMaterial( 0, GetMaterialForDamageState(GetCompEM().IsWorking(),newLevel) );
+	}
+	
 	void Chemlight_ColorBase()
 	{
 		//materials
@@ -61,7 +68,7 @@ class Chemlight_ColorBase : ItemBase
 	
 	void CreateLight()
 	{
-		SetObjectMaterial( 0, m_GlowMaterial ); // must be server side!
+		SetObjectMaterial( 0, GetMaterialForDamageState(true) ); // must be server side!
 		
 		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
 		{
@@ -117,7 +124,7 @@ class Chemlight_ColorBase : ItemBase
 	
 	override void OnWorkStop()
 	{
-		SetObjectMaterial( 0, m_DefaultMaterial );
+		SetObjectMaterial( 0, GetMaterialForDamageState(false) );
 		
 		if (m_Light)
 		{
@@ -152,6 +159,42 @@ class Chemlight_ColorBase : ItemBase
 		super.SetActions();
 		
 		AddAction(ActionTurnOnWhileInHands);
+	}
+	
+	string GetMaterialForDamageState(bool glowing,int healthLevel = -1)
+	{
+		int currentHealthLevel;
+		int suffixIndex;
+		string base;
+		
+		if (healthLevel == -1)
+			currentHealthLevel = GetHealthLevel();
+		else
+			currentHealthLevel = healthLevel;
+		
+		if (glowing)
+			base = m_GlowMaterial;
+		else
+			base = m_DefaultMaterial;
+		
+		suffixIndex = base.IndexOf(".rvmat");
+		if (suffixIndex == -1)
+		{
+			Error("Error - no valid rvmat found for chemlight");
+			return "";
+		}
+		base = base.Substring(0,suffixIndex);
+		
+		if (currentHealthLevel == GameConstants.STATE_BADLY_DAMAGED || currentHealthLevel == GameConstants.STATE_DAMAGED)
+		{
+			base = base + "_damage";
+		}
+		else if (currentHealthLevel == GameConstants.STATE_RUINED)
+		{
+			base = base + "_destruct";
+		}
+		
+		return base + ".rvmat";
 	}
 };
 

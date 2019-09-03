@@ -65,4 +65,13 @@ class WaterBottle extends Bottle_Base
 	{
 		return true;
 	}
+	
+	override void EEOnCECreate()
+	{
+		int rand = Math.RandomInt(0, 10);
+		if (rand > 5)
+		{
+			InsertAgent(eAgents.CHOLERA, 1);
+		}
+	}
 }

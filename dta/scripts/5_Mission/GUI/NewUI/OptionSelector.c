@@ -52,12 +52,7 @@ class OptionSelector extends OptionSelectorBase
 		
 		m_SelectedOption.SetText( m_Options.Get( m_SelectedOptionIndex ) );
 		
-		#ifdef PLATFORM_CONSOLE
 		m_Parent.SetHandler( this );
-		#endif
-		
-		m_PreviousOption.SetHandler( this );		
-		m_NextOption.SetHandler( this );
 	}
 	
 	void ~OptionSelector()

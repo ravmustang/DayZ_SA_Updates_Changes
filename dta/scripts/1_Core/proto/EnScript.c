@@ -713,6 +713,26 @@ class map<Class TKey,Class TValue>
 	proto bool Insert(TKey key, TValue value);
 	proto int Copy(map<TKey,TValue> from);
 	
+	array<TKey> GetKeyArray()
+	{
+		ref array<TKey> keys = new array<TKey>;
+		for (int i = 0; i < Count(); i++)
+		{
+			keys.Insert( GetKey( i ) );
+		}
+		return keys;
+	}
+	
+	array<TValue> GetValueArray()
+	{
+		ref array<TValue> elements = new array<TValue>;
+		for (int i = 0; i < Count(); i++)
+		{
+			elements.Insert( GetElement( i ) );
+		}
+		return elements;
+	}
+	
 	bool ReplaceKey(TKey old_key, TKey new_key)
 	{
 		if (Contains(old_key))

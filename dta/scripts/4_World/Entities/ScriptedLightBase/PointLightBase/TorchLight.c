@@ -13,7 +13,7 @@ class TorchLight extends PointLightBase
 		SetDiffuseColor(1.0, 0.45, 0.25);
 		SetAmbientColor(1.0, 0.45, 0.25);
 		SetFlareVisible(false);
-		SetFlickerAmplitude(0.3);
+		SetFlickerAmplitude(0.55);
 		SetFlickerSpeed(0.75);
 		SetDancingShadowsMovementSpeed(0.1);
 		SetDancingShadowsAmplitude(0.03);

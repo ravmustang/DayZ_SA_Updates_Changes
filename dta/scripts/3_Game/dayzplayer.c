@@ -89,6 +89,13 @@ class DayZPlayerCamera
 	{
 		return true;
 	}
+
+	void SpawnCameraShake(float strength = 1, float radius = 2, float smoothness = 5, float radius_decay_speed = 6)
+	{
+		SpawnCameraShakeProper(strength, radius, smoothness, radius_decay_speed);//done this way in order to avoid duplicating default params which could cause issues under certain circumstances
+	}
+	
+	void SpawnCameraShakeProper(float strength, float radius, float smoothness, float radius_decay_speed);
 	
 	//! data 
 	protected 	DayZPlayer 				m_pPlayer;		//!< player camera is attached to
@@ -341,6 +348,21 @@ class DayZPlayerType
 		return m_pNoiseLandHeavy;
 	}
 	
+	NoiseParams GetNoiseParamsWhisper()
+	{
+		return m_pNoiseWhisper;	
+	}
+	
+	NoiseParams GetNoiseParamsTalk()
+	{
+		return m_pNoiseTalk;	
+	}
+	
+	NoiseParams GetNoiseParamsShout()
+	{
+		return m_pNoiseShout;	
+	}
+	
 	void LoadSoundWeaponEvent()
 	{
 		string cfgPath = "CfgVehicles SurvivorBase AnimEvents SoundWeapon ";
@@ -469,6 +491,15 @@ class DayZPlayerType
 		m_pNoiseLandHeavy = new NoiseParams();
 		m_pNoiseLandHeavy.LoadFromPath(cfgPath + "NoiseLandHeavy");
 		
+		m_pNoiseWhisper = new NoiseParams();
+		m_pNoiseWhisper.LoadFromPath(cfgPath + "NoiseWhisper");
+		
+		m_pNoiseTalk = new NoiseParams();
+		m_pNoiseTalk.LoadFromPath(cfgPath + "NoiseTalk");
+		
+		m_pNoiseShout = new NoiseParams();
+		m_pNoiseShout.LoadFromPath(cfgPath + "NoiseShout");
+		
 		LoadSoundWeaponEvent();
 		LoadVegetationSounds();
 	}
@@ -507,6 +538,11 @@ class DayZPlayerType
 	ref NoiseParams m_pNoiseStepProne;
 	ref NoiseParams m_pNoiseLandLight;
 	ref NoiseParams m_pNoiseLandHeavy;
+	
+	// von noises
+	ref NoiseParams m_pNoiseWhisper;
+	ref NoiseParams m_pNoiseTalk;
+	ref NoiseParams m_pNoiseShout;
 
 	ref array<ref VegetationSound> m_pVegetationSounds;
 
@@ -607,6 +643,7 @@ enum DayZPlayerConstants
 	COMMANDID_UNCONSCIOUS,	// type is int (overridden from C++) - unconscious
 	COMMANDID_SWIM,			// type is int (overridden from C++) - swimming
 	COMMANDID_VEHICLE,		// type is int (overridden from C++) - vehicle
+	COMMANDID_CLIMB,		// type is int (overridden from C++) - climb
 
 
 	//! modifier commands - additive behaviour 

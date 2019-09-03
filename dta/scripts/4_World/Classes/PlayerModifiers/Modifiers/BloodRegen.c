@@ -1,7 +1,5 @@
 class BloodRegenMdfr: ModifierBase
 {
-	private const float	BLOOD_INCREMENT_PER_SEC = 5;
-	
 	override void Init()
 	{
 		m_TrackActivatedTime = false;

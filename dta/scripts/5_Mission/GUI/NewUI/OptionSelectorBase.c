@@ -37,17 +37,28 @@ class OptionSelectorBase extends ScriptedWidgetEventHandler
 		if( m_ParentClass )
 		{
 			m_ParentClass.OnFocus( m_Root.GetParent(), -1, m_SelectorType );
+			#ifdef PLATFORM_WINDOWS
 			m_ParentClass.OnMouseEnter( m_Root.GetParent().GetParent(), x, y );
+			#endif
 		}
 		
 		UIScriptedMenu menu = GetGame().GetUIManager().GetMenu();
 		
 		if ( menu && menu.IsInherited( CharacterCreationMenu ) )
 		{
+			menu.OnFocus( m_Root.GetParent(), -1, m_SelectorType );
 			menu.OnMouseEnter( m_Root.GetParent().GetParent(), x, y );
 		}
 		
+		#ifdef PLATFORM_WINDOWS
 		ColorHighlight( w );
+		#else
+		ColorHighlightConsole( w );
+		if( m_ParentClass )
+		{
+			m_ParentClass.OnFocus( m_Root.GetParent(), -1, m_SelectorType );
+		}
+		#endif
 		
 		return true;
 	}
@@ -57,18 +68,29 @@ class OptionSelectorBase extends ScriptedWidgetEventHandler
 		if( m_ParentClass )
 		{
 			m_ParentClass.OnFocus( null, x, y );
+			#ifdef PLATFORM_WINDOWS
 			m_ParentClass.OnMouseLeave( m_Root.GetParent().GetParent(), enterW, x, y );
+			#endif
 		}
 		
 		UIScriptedMenu menu = GetGame().GetUIManager().GetMenu();
 		
 		if ( menu && menu.IsInherited( CharacterCreationMenu ) )
 		{
+			menu.OnFocus( null, x, y );
 			menu.OnMouseLeave( m_Root.GetParent().GetParent(), enterW, x, y );
 		}
 		
+		#ifdef PLATFORM_WINDOWS
 		ColorNormal( w );
-			
+		#else
+		ColorNormalConsole( w );
+		if( m_ParentClass )
+		{
+			m_ParentClass.OnFocusLost( w, x, y );
+		}
+		#endif
+	
 		return true;
 	}
 	
@@ -196,16 +218,6 @@ class OptionSelectorBase extends ScriptedWidgetEventHandler
 			option.SetColor( color );
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	void ColorHighlightConsole( Widget w )
 	{

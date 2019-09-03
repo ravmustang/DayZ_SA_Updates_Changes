@@ -88,6 +88,7 @@ class LogoutMenu extends UIScriptedMenu
 		}
 		else if (w == m_bCancel)
 		{
+			Hide();
 			Cancel();
 			return true;
 		}

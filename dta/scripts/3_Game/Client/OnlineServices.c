@@ -129,6 +129,16 @@ class OnlineServices
 				DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Bad script linking." );
 				return true;
 			}
+			case EBiosError.UPDATE_REQUIRED:
+			{
+				DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Update required." );
+				return true;
+			}
+			case EBiosError.UPDATE_REQUIRED_AND_DOWNLOADED:
+			{
+				DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Mandatory update is ready for install." );
+				return true;
+			}
 		}
 		DebugPrint.LogErrorAndTrace( "BiosClientServices Error: Unknown error." );
 		return true;

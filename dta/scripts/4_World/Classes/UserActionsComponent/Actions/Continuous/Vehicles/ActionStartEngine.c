@@ -122,10 +122,12 @@ class ActionStartEngine: ActionContinuousBase
 					if (  fuel > 0 )
 						m_FuelCon = true;
 
+					
 					if ( !GetGame().IsMultiplayer() || GetGame().IsClient() )
 					{
+						//Now we can play the proper sound
 						EffectSound effectSound = NULL;
-
+	
 						if ( m_FuelCon && m_BeltCon && m_SparkCon && m_BatteryCon )
 						{
 							effectSound = SEffectManager.CreateSound("offroad_engine_start_SoundSet", car.GetPosition() );
@@ -139,10 +141,10 @@ class ActionStartEngine: ActionContinuousBase
 							else if ( !m_FuelCon )
 								effectSound = SEffectManager.CreateSound("offroad_engine_failed_start_fuel_SoundSet", car.GetPosition() );
 						}
-						
+
 						WaveKind waveKind = WaveKind.WAVEEFFECT;
-						
-						if (GetGame().GetPlayer().GetParent() == NULL || !GetGame().GetPlayer().IsCameraInsideVehicle())
+					
+						if ( action_data.m_Player.GetParent() == NULL || !action_data.m_Player.IsCameraInsideVehicle() )
 						{
 							waveKind = WaveKind.WAVEEFFECTEX;
 						}
@@ -156,6 +158,11 @@ class ActionStartEngine: ActionContinuousBase
 				}
 			}
 		}
+	}
+	
+	override void OnStartClient( ActionData action_data )
+	{
+		OnStartServer( action_data );
 	}
 
 	override void OnFinishProgressServer( ActionData action_data )

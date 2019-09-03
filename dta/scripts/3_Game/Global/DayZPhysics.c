@@ -181,6 +181,11 @@ class DayZPhysics
 	@endcode
 	*/
 	proto static bool	RaycastRV(vector begPos, vector endPos, out vector contactPos, out vector contactDir, out int contactComponent, /*out*/ set<Object> results = NULL, Object with = NULL, Object ignore = NULL,  bool sorted = false,  bool ground_only = false,  int iType = ObjIntersectView, float radius = 0.0, CollisionFlags flags = CollisionFlags.NEARESTCONTACT);
+	
+	//I am so sorry about this, I am unable to change RaycastRV above without breaking rest of DZ
+	//proto static bool	RaycastRVExt(vector begPos, vector endPos, out vector contactPos, out vector contactDir, out int contactComponent, /*out*/ array<string> resultSurfaces = NULL, /*out*/ array<Object> resultObjects = NULL, Object with = NULL, Object ignore = NULL,  bool sorted = false,  bool ground_only = false,  int iType = ObjIntersectView, float radius = 0.0, CollisionFlags flags = CollisionFlags.NEARESTCONTACT);
+	
+	proto static bool	GetHitSurface(Object other, vector begPos, vector endPos, string surface);
 
 	proto static bool	RaycastRVProxy( notnull RaycastRVParams in, out notnull array< ref RaycastRVResult> results );
 

@@ -5,6 +5,7 @@ typedef Param2<int, string> LogoutInfo;
 class MissionServer extends MissionBase
 {
 	ref array<Man> m_Players;
+	ref array<ref CorpseData> m_DeadPlayersArray;
 	ref map<PlayerBase, ref LogoutInfo> m_LogoutPlayers;
 	const int SCHEDULER_PLAYERS_PER_TICK = 5;
 	int m_currentPlayer;
@@ -20,8 +21,7 @@ class MissionServer extends MissionBase
 	ref TStringArray topsArray;
 	ref TStringArray pantsArray;
 	ref TStringArray shoesArray;
-	ref TStringArray backpackArray  = {"TaloonBag_Blue","TaloonBag_Green","TaloonBag_Orange","TaloonBag_Violet"}; //only for testing equips, will remove eventually
-	
+		
 	void MissionServer()
 	{
 		GetGame().GetCallQueue(CALL_CATEGORY_GAMEPLAY).CallLater(this.UpdatePlayersStats, 30000, true);
@@ -29,6 +29,7 @@ class MissionServer extends MissionBase
 		int debugMonitorEnable = GetGame().ServerConfigGetInt("enableDebugMonitor");
 		GetGame().SetDebugMonitorEnabled(debugMonitorEnable);
 		
+		m_DeadPlayersArray = new array<ref CorpseData>;
 		UpdatePlayersStats();
 		m_Players = new array<Man>;
 		m_LogoutPlayers = new map<PlayerBase, ref LogoutInfo>;
@@ -109,6 +110,8 @@ class MissionServer extends MissionBase
 				module_lifespan.UpdateLifespan( player );
 			}
 		}
+		
+		UpdateCorpseStatesServer();
 	}
 	
 	// check if logout finished for some players
@@ -128,7 +131,7 @@ class MissionServer extends MissionBase
 				}
 				
 				// disable reconnecting to old char
-				GetGame().RemoveFromReconnectCache(info.param2);
+				// GetGame().RemoveFromReconnectCache(info.param2);
 	
 				PlayerDisconnected(player, identity, info.param2);
 					
@@ -150,7 +153,7 @@ class MissionServer extends MissionBase
 			ClientPrepareEventParams clientPrepareParams;
 			Class.CastTo(clientPrepareParams, params);
 			
-			OnClientPrepareEvent(clientPrepareParams.param1, clientPrepareParams.param2, clientPrepareParams.param3, clientPrepareParams.param4);
+			OnClientPrepareEvent(clientPrepareParams.param1, clientPrepareParams.param2, clientPrepareParams.param3, clientPrepareParams.param4, clientPrepareParams.param5);
 			break;
 
 		case ClientNewEventTypeID:
@@ -237,14 +240,14 @@ class MissionServer extends MissionBase
 			
 		case LogoutCancelEventTypeID:
 			LogoutCancelEventParams logoutCancelParams;
-				
+			
 			Class.CastTo(logoutCancelParams, params);				
 			Class.CastTo(player, logoutCancelParams.param1);
 			identity = player.GetIdentity();
 			if (identity)
 			{
 				// disable reconnecting to old char
-				GetGame().RemoveFromReconnectCache(identity.GetId());
+				// GetGame().RemoveFromReconnectCache(identity.GetId());
 				Print("[Logout]: Player " + identity.GetId() + " cancelled"); 
 			}
 			else
@@ -268,7 +271,7 @@ class MissionServer extends MissionBase
 		if( player ) player.OnDisconnect();
 	}
 
-	void OnClientPrepareEvent(PlayerIdentity identity, out bool useDB, out vector pos, out float yaw)
+	void OnClientPrepareEvent(PlayerIdentity identity, out bool useDB, out vector pos, out float yaw, out int preloadTimeout)
 	{
 		if (GetHive())
 		{
@@ -370,7 +373,7 @@ class MissionServer extends MissionBase
 	{
 		string characterName;
 		// get login data for new character
-		// note: ctx can be filled on client in GetLoginData()
+		// note: ctx can be filled on client in StoreLoginData()
 		ProcessLoginData(ctx, m_top, m_bottom, m_shoes, m_skin);
 				
 		if (m_top == -1 || m_bottom == -1 || m_shoes == -1 || m_skin == -1)
@@ -436,9 +439,11 @@ class MissionServer extends MissionBase
 					LogoutInfo params = new LogoutInfo(GetGame().GetTime() + logoutTime * 1000, identity.GetId());
 					m_LogoutPlayers.Insert(player, params);
 					
-					// allow reconnecting to old char
-					GetGame().AddToReconnectCache(identity);
-					
+					// allow reconnecting to old char only if not in cars, od ladders etc. as they cannot be properly synchronized for reconnect
+					//if (!player.GetCommand_Vehicle() && !player.GetCommand_Ladder())
+					//{
+					//	GetGame().AddToReconnectCache(identity);
+					//}
 					// wait until logout timer runs out
 					disconnectNow = false;		
 				}
@@ -467,7 +472,7 @@ class MissionServer extends MissionBase
 		}
 		
 		// disable reconnecting to old char
-		GetGame().RemoveFromReconnectCache(uid);
+		//GetGame().RemoveFromReconnectCache(uid);
 
 		// now player can't cancel logout anymore, so call everything needed upon disconnect
 		InvokeOnDisconnect(player);
@@ -507,7 +512,6 @@ class MissionServer extends MissionBase
 		}
 	}
 	
-	
 	void TickScheduler(float timeslice)
 	{
 		GetGame().GetWorld().GetPlayerList(m_Players);
@@ -525,4 +529,42 @@ class MissionServer extends MissionBase
 			m_currentPlayer++;
 		}
 	}
+	
+	//--------------------------------------------------
+	override bool InsertCorpse(Man player)
+	{
+		ref CorpseData corpse_data = new CorpseData(PlayerBase.Cast(player),GetGame().GetTime());
+		return m_DeadPlayersArray.Insert(corpse_data) >= 0;
+	}
+	
+	void UpdateCorpseStatesServer()
+	{
+		int current_time = GetGame().GetTime();
+		array<int> invalid_corpses = new array<int>;
+		CorpseData corpse_data;
+		
+		for (int i = 0; i < m_DeadPlayersArray.Count(); i++)
+		{
+			corpse_data = m_DeadPlayersArray.Get(i);
+			if( !corpse_data || (corpse_data && !corpse_data.m_Player) )
+			{
+				invalid_corpses.Insert(i);
+			}
+			else if( corpse_data.m_bUpdate && current_time - corpse_data.m_iLastUpdateTime >= 30000 )
+			{
+				corpse_data.UpdateCorpseState();
+				corpse_data.m_iLastUpdateTime = current_time;
+			}
+		}
+		
+		//cleanup
+		if (invalid_corpses.Count() > 0)
+		{
+			for (i = invalid_corpses.Count() - 1; i > -1; i--)
+			{
+				m_DeadPlayersArray.Remove(invalid_corpses.Get(i));
+			}
+		}
+	}
+	//--------------------------------------------------
 }

@@ -96,7 +96,7 @@ class LoginQueueBase extends UIScriptedMenu
 		g_Game.SetGameState( DayZGameState.MAIN_MENU );
 		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
 		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
-		g_Game.SetConnecting(false);
+		
 		Close();
 	}
 };
@@ -128,11 +128,13 @@ class LoginTimeBase extends UIScriptedMenu
 	protected TextWidget m_txtLabel;
 	protected ButtonWidget m_btnLeave;
 	protected bool m_IsStatic;
+	protected bool m_IsRespawn;
 	
 	void LoginTimeBase()
 	{
 		g_Game.SetKeyboardHandle(this);
 		m_IsStatic = false;	
+		m_IsRespawn = false;
 	}
 
 	void ~LoginTimeBase()
@@ -200,7 +202,10 @@ class LoginTimeBase extends UIScriptedMenu
 	
 	void SetTime(int time)
 	{
-		m_txtLabel.SetText("#menu_loading_in " + time.ToString() + " #dayz_game_seconds");
+		if (!m_IsRespawn)
+			m_txtLabel.SetText("#menu_loading_in " + time.ToString() + " #dayz_game_seconds");
+		else
+			m_txtLabel.SetText("#dayz_game_spawning_in " + time.ToString() + " #dayz_game_seconds");
 	}
 		
 	void SetStatus(string status)
@@ -208,9 +213,19 @@ class LoginTimeBase extends UIScriptedMenu
 		m_txtDescription.SetText(status);
 	}
 	
+	void SetRespawn(bool value)
+	{
+		m_IsRespawn = value;
+	}
+	
 	bool IsStatic()
 	{
 		return m_IsStatic;
+	}
+	
+	bool IsRespawn()
+	{
+		return m_IsRespawn;
 	}
 	
 	void Leave()
@@ -218,7 +233,7 @@ class LoginTimeBase extends UIScriptedMenu
 		g_Game.SetGameState( DayZGameState.MAIN_MENU );
 		g_Game.SetLoadState( DayZLoadState.MAIN_MENU_START );
 		g_Game.GetCallQueue(CALL_CATEGORY_SYSTEM).Call(GetGame().DisconnectSessionForce);
-		g_Game.SetConnecting(false);
+		
 		Close();
 	}
 };
@@ -250,6 +265,7 @@ class LoadingScreen
 	//ProgressBarWidget m_ProgressBar;
 	TextWidget m_TextWidgetTitle;
 	TextWidget m_TextWidgetStatus;
+	TextWidget m_ModdedWarning;
 	ImageWidget m_ImageWidgetBackground;
 	DayZGame m_DayZGame;
 	float m_LastProgressUpdate;
@@ -284,6 +300,7 @@ class LoadingScreen
 		Class.CastTo(m_TextWidgetStatus, m_WidgetRoot.FindAnyWidget("StatusText"));
 		Class.CastTo(m_ImageWidgetBackground, m_WidgetRoot.FindAnyWidget("ImageBackground"));
 		Class.CastTo(m_ImageLoadingIcon, m_WidgetRoot.FindAnyWidget("ImageLoadingIcon"));
+		Class.CastTo(m_ModdedWarning, m_WidgetRoot.FindAnyWidget("ModdedWarning"));
 		
 		m_ImageBackground = ImageWidget.Cast( m_WidgetRoot.FindAnyWidget("ImageBackground") );
 		m_ProgressLoading = ProgressBarWidget.Cast( m_WidgetRoot.FindAnyWidget("LoadingBar") );
@@ -296,7 +313,7 @@ class LoadingScreen
 		}
 		
 		
-			
+		m_ModdedWarning.Show( DayZGame.IsModded() );
 		m_ImageLogoMid.Show(true);
 		m_ImageLogoCorner.Show(false);
 		
@@ -692,6 +709,7 @@ class DayZGame extends CGame
 	private bool	m_IsLeftAltHolding;
 	private bool	m_IsRightAltHolding;
 	
+	static bool		m_IsModded;
 	private bool	m_IsStressTest;
 	int 			m_OriginalCharactersCount;
 	private string 	m_PlayerName;
@@ -753,6 +771,10 @@ class DayZGame extends CGame
 		// initialize backlit effects
 		m_Backlit = new Backlit();
 		m_Backlit.OnInit(this);
+		
+		array<ref ModInfo> mods = new array<ref ModInfo>;
+		GetModInfos( mods );
+		m_IsModded = (mods.Count() > 1);
 		
 	#ifndef NO_GUI
 		if (m_loading == null)
@@ -867,6 +889,7 @@ class DayZGame extends CGame
 	{
 		m_MissionState = state;
 	}
+	
 	// ------------------------------------------------------------
 	bool GetProfileOption(EDayZProfilesOptions option)
 	{
@@ -906,6 +929,11 @@ class DayZGame extends CGame
 	DayZLoadState GetLoadState()
 	{
 		return m_LoadState;
+	}
+	
+	static bool IsModded()
+	{
+		return m_IsModded;
 	}
 	
 	Backlit GetBacklit()
@@ -1015,6 +1043,7 @@ class DayZGame extends CGame
 		{
 			LoadingHide();
 			CancelLoginTimeCountdown();
+			SetConnecting( false );
 			m_FirstConnect = true;
 			#ifdef PLATFORM_CONSOLE
 				if( GetUserManager().GetSelectedUser() )
@@ -1162,6 +1191,15 @@ class DayZGame extends CGame
 			}
 			break;
 		}	
+		case RespawnEventTypeID:
+		{
+			RespawnEventParams respawnParams;
+			if (Class.CastTo(respawnParams, params))
+			{
+				OnRespawnEvent(respawnParams.param1);
+			}	
+			break;
+		}
 		case PreloadEventTypeID:
 		{
 			PreloadEventParams preloadParams;
@@ -1251,7 +1289,7 @@ class DayZGame extends CGame
 		
 		//! Display login queue position dialog
 		if (!m_LoginQueue && pos > 0)
-		{		
+		{	
 			GetUIManager().CloseAll();
 			
 			if(GetMission())
@@ -1284,7 +1322,6 @@ class DayZGame extends CGame
 		// remove login queue if exits	
 		CancelLoginQueue();	
 		
-		// timer for spawning screen
 		GetUserManager().GetUserDatabaseIdAsync();
 		
 		m_LoginTime = loginTime;
@@ -1319,23 +1356,58 @@ class DayZGame extends CGame
 	void LoginTimeCountdown()
 	{
 		// countdown on the login screen
-		if (m_LoginTimeScreen && m_LoginTime > 0)
+		if (m_LoginTimeScreen)
 		{
+			if (m_LoginTime > 0)
+			{
+				m_LoginTimeScreen.SetTime(m_LoginTime);
+				m_LoginTime--;
+			}
+			else
+			{
+				// stop the call loop
+				CancelLoginTimeCountdown();
+			}
+		}
+	}
+	
+	// ------------------------------------------------------------
+	void OnRespawnEvent(int time)
+	{	
+		// use login time screen for respawn timer
+		if (time > 0)
+		{	
+			m_LoginTime = time;
+			if (!m_LoginTimeScreen)
+			{
+				GetUIManager().CloseAll();
+				
+				UIScriptedMenu parent = GetUIManager().GetMenu();
+				EnterLoginTime(parent);
+			}
+			
+			m_LoginTimeScreen.SetRespawn(true);
 			m_LoginTimeScreen.SetTime(m_LoginTime);
-			m_LoginTime--;
+			m_LoginTimeScreen.Show();
+			
+			GetCallQueue(CALL_CATEGORY_SYSTEM).CallLater(this.LoginTimeCountdown, 1000, true);
 		}
 	}
 	
 	// ------------------------------------------------------------
 	void OnPreloadEvent(vector pos)
 	{
-		// stop the call loop
-		CancelLoginTimeCountdown();
+		// cancel only login time (respawn time is parallel with preload, but login time is not)
+		if (m_LoginTimeScreen && !m_LoginTimeScreen.IsRespawn())
+			CancelLoginTimeCountdown();
+		
+		// tell game to continue
+		StoreLoginData();
 	}
 	
 	// ------------------------------------------------------------
-	// send additional information about your character to the server
- 	ref array<ref Param> GetLoginData(  )
+	// send additional information to server (must be called)
+	void StoreLoginData()
 	{
 		int top = -1;
 		int bottom = -1;
@@ -1349,7 +1421,7 @@ class DayZGame extends CGame
 			shoes = demounit.Get(2);
 			skin = demounit.Get(3);
 		}
-			
+		
 		ref array<ref Param> params = new array<ref Param>;
 			
 		ref Param topParam = new Param1<int>(top);
@@ -1364,7 +1436,7 @@ class DayZGame extends CGame
 		ref Param skinParam = new Param1<int>(skin);
 		params.Insert(skinParam);
 		
-		return params;
+		StoreLoginData(params);
 	}
 	
 	// ------------------------------------------------------------
@@ -1878,6 +1950,7 @@ class DayZGame extends CGame
 			{
 				OnlineServices.SetBiosUser(selected_user);
 				SetPlayerName( selected_user.GetName() );
+				m_UserFOV = GetUserFOVFromConfig();
 				#ifdef PLATFORM_CONSOLE
 				SetPlayerGameName( selected_user.GetName() );
 				user_manager.GetUserDatabaseIdAsync();
@@ -2199,6 +2272,15 @@ class DayZGame extends CGame
 	}
 	
 	// ------------------------------------------------------------
+	override void OnDeviceReset()
+	{
+		m_IsCtrlHolding = false;
+		m_IsWinHolding = false;
+		m_IsLeftAltHolding = false;
+		m_IsRightAltHolding  = false;
+	}
+	
+	// ------------------------------------------------------------
 	override void OnUpdate(bool doSim, float timeslice)
 	{
 		Mission mission = GetMission();
@@ -2308,7 +2390,7 @@ class DayZGame extends CGame
 		Mission mission = GetMission();
 		if (mission && !m_loading.IsLoading() && GetUIManager().IsDialogQueued())
 		{
-			//mission.Pause();
+			mission.Pause();
 			GetUIManager().ShowQueuedDialog();
 		}
 		#endif
@@ -2457,7 +2539,21 @@ class DayZGame extends CGame
 			if( source )
 			{
 				source.OnExplosionEffects(source, directHit, componentIndex, surface, pos, surfNormal, energyFactor, explosionFactor, isWater, ammoType);
+				
+				float distance_to_player = vector.Distance(pos, GetGame().GetPlayer().GetPosition());
+				
+				if(distance_to_player < GameConstants.CAMERA_SHAKE_GRENADE_DISTANCE)
+				{
+					float strength_factor = Math.InverseLerp(GameConstants.CAMERA_SHAKE_GRENADE_DISTANCE, 0, distance_to_player);
+					/*
+					Print(">>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<");
+					Print(strength_factor);
+					Print(ammoType);
+					*/
+					GetGame().GetPlayer().GetCurrentCamera().SpawnCameraShake(strength_factor * 4);
+				}
 			}
+			
 		}
 		/*
 		Print("ExplosionEffects");
@@ -2518,10 +2614,14 @@ class DayZGame extends CGame
 			if (directHit && player && directHit == player)
 			{
 				player.OnPlayerRecievedHit();
+				float shake_strenght = Math.InverseLerp(0, 500, inSpeed.Length());
+				//Print(shake_strenght);
+				//GetGame().GetPlayer().GetCurrentCamera().SpawnCameraShake(shake_strenght,3,5,30);
+				GetGame().GetPlayer().GetCurrentCamera().SpawnCameraShake(shake_strenght);
 			}
 			
 			ImpactMaterials.EvaluateImpactEffect(directHit, componentIndex, surface, pos, ImpactTypes.UNKNOWN, surfNormal, exitPos, inSpeed, outSpeed, deflected, ammoType, isWater);
-		}	
+		}
 		
 		// add hit noise
 		if ( IsServer() )
@@ -2530,7 +2630,11 @@ class DayZGame extends CGame
 			npar.LoadFromPath("cfgAmmo " + ammoType + " NoiseHit");
 			
 			float surfaceCoef = SurfaceGetNoiseMultiplier(pos[0], pos[2]);
-			GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
+			float coefAdjusted = surfaceCoef * inSpeed.Length() / ConfigGetFloat("cfgAmmo " + ammoType + " initSpeed");
+			GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, coefAdjusted);
+			
+			//float noiseCfg = ConfigGetFloat("cfgAmmo " + ammoType + " NoiseHit strength");
+			//Print("noiseCfg: " + noiseCfg + "| surface: " + surface + "| surfaceCoef: " + surfaceCoef + "| coefAdjusted: " + coefAdjusted + "| total noise generated: " + (coefAdjusted * noiseCfg * 1.7) );
 		}
 	}
 	
@@ -2547,7 +2651,7 @@ class DayZGame extends CGame
 				player.SpawnDamageDealtEffect();
 			}
 			
-			ImpactMaterials.EvaluateImpactEffect(directHit, componentIndex, surface, pos, ImpactTypes.MELEE, "0 0 0", "0 0 0", "0 0 0", "0 0 0", false, ammoType, isWater);
+			ImpactMaterials.EvaluateImpactEffect(directHit, componentIndex, surface, pos, ImpactTypes.MELEE, Vector(Math.RandomFloat(-1,1), Math.RandomFloat(-1,1), Math.RandomFloat(-1,1)), "0 0 0", "0 0 0", "0 0 0", false, ammoType, isWater);
 		}
 		
 		// add hit noise
@@ -2559,6 +2663,11 @@ class DayZGame extends CGame
 			float surfaceCoef = SurfaceGetNoiseMultiplier(pos[0], pos[2]);
 			GetNoiseSystem().AddNoisePos(EntityAI.Cast(source), pos, npar, surfaceCoef);
 		}
+	}
+	
+	void UpdateVoiceLevel(int level)
+	{
+		GetMission().UpdateVoiceLevelWidgets(level);	
 	}
 	
 	void InitCharacterMenuDataInfo(int menudata_count)

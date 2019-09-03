@@ -60,10 +60,12 @@ enum NVTypes
 	MAX
 }
 
+
 class DayZPlayerCameraBase extends DayZPlayerCamera
 {
 	protected 	Weapon_Base		m_weaponUsed;
 	protected 	ItemOptics 		m_opticsUsed;
+	protected	ref CameraShake		m_CameraShake;
 	
 	//! constructor must be same 
 	void 	DayZPlayerCameraBase(DayZPlayer pPlayer, HumanInputController pInput)
@@ -147,7 +149,6 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		return Limit(pAngle + pAngleAdd, pMin, pMax);
 	}
 
-
 	float UpdateLRAngle(float pAngle, float pMin, float pMax, float pDt)
 	{
 		//! lr angle
@@ -203,11 +204,14 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 		}
 	}
 
+	override void SpawnCameraShakeProper(float strength, float radius, float smoothness, float radius_decay_speed)
+	{
+		m_CameraShake = new CameraShake(strength, radius, smoothness, radius_decay_speed);
+	}	
 
 	override void OnUpdate(float pDt, out DayZPlayerCameraResult pOutResult)
 	{
 		super.OnUpdate(pDt, pOutResult);
-
 		StdFovUpdate(pDt, pOutResult);
 		UpdateCameraNV(PlayerBase.Cast(m_pPlayer));
 	}
@@ -301,6 +305,7 @@ class DayZPlayerCameraBase extends DayZPlayerCamera
 	{
 		m_bForceFreeLook = state;
 	}
+	
 	
 	void SetNVPostprocess(int NVtype)
 	{

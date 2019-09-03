@@ -78,6 +78,11 @@ class RightArea: Container
 		return m_PlayerContainer.TransferItem();
 	}
 	
+	override bool InspectItem()
+	{
+		return m_PlayerContainer.InspectItem();
+	}
+	
 	override bool TransferItemToVicinity()
 	{
 		return m_PlayerContainer.TransferItemToVicinity();

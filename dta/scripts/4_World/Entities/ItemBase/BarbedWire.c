@@ -312,52 +312,70 @@ class BarbedWire extends ItemBase
 	// ---------------------------------------------------------
 	void SoundCut()
 	{
-		int random_index = Math.RandomInt(0, SOUNDS_CUT_COUNT);
-		string sound_type = m_SoundsCut[random_index];
-		PlaySound(sound_type, 50);
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
+		{
+			int random_index = Math.RandomInt(0, SOUNDS_CUT_COUNT);
+			string sound_type = m_SoundsCut[random_index];
+			PlaySound(sound_type, 50);
+		}
 	}
 
 	// Plays sound
 	void SoundSpark()
 	{
-		int random_index = Math.RandomInt(0, SOUNDS_SPARK_COUNT);
-		string sound_type = m_SoundsSpark[random_index];
-		PlaySound(sound_type, 50);
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
+		{
+			int random_index = Math.RandomInt(0, SOUNDS_SPARK_COUNT);
+			string sound_type = m_SoundsSpark[random_index];
+			PlaySound(sound_type, 50);
+		}
 	}
 
 	// Plays sound
 	void SoundBuzzLoopStart()
 	{
-		if (!m_BuzzSoundLoop)
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
 		{
-			m_BuzzSoundLoop = PlaySoundLoop(m_SoundBuzzLoop, 50);
+			if (!m_BuzzSoundLoop)
+			{
+				m_BuzzSoundLoop = PlaySoundLoop(m_SoundBuzzLoop, 50);
+			}
 		}
 	}
 
 	// Stops sound
 	void SoundBuzzLoopStop()
 	{
-		if (m_BuzzSoundLoop)
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
 		{
-			GetGame().ObjectDelete(m_BuzzSoundLoop);
-			m_BuzzSoundLoop = NULL;
+			if (m_BuzzSoundLoop)
+			{
+				GetGame().ObjectDelete(m_BuzzSoundLoop);
+				m_BuzzSoundLoop = NULL;
+			}
 		}
 	}
 	
 	// Plays an electric shock sound
 	void SoundElectricShock()
 	{
-		int random_index = Math.RandomInt(0, SOUNDS_SHOCK_COUNT);
-		string sound_type = m_SoundsShock[random_index];
-		PlaySound(sound_type, 50);
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
+		{
+			int random_index = Math.RandomInt(0, SOUNDS_SHOCK_COUNT);
+			string sound_type = m_SoundsShock[random_index];
+			PlaySound(sound_type, 50);
+		}
 	}
 	
 	// Plays a collision sound
 	void SoundCollision()
 	{
-		int random_index = Math.RandomInt(0, SOUNDS_COLLISION_COUNT);
-		string sound_type = m_SoundsCollision[random_index];
-		PlaySound(sound_type, 50);
+		if ( !GetGame().IsServer()  ||  !GetGame().IsMultiplayer() ) // client side
+		{
+			int random_index = Math.RandomInt(0, SOUNDS_COLLISION_COUNT);
+			string sound_type = m_SoundsCollision[random_index];
+			PlaySound(sound_type, 50);
+		}
 	}
 	// ---------------------------------------------------------
 

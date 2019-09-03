@@ -503,6 +503,11 @@ class PluginDayzPlayerDebug extends PluginBase
 			a += "Swimming:";
 			a += " st:" + state.m_iStanceIdx.ToString();
 		}
+		else if (state.m_CommandTypeId == DayZPlayerConstants.COMMANDID_CLIMB)
+		{
+			a += "Climbing:";
+			a += " st:" + state.m_iStanceIdx.ToString();
+		}
 		else
 		{
 			a += "UNKNOWN";

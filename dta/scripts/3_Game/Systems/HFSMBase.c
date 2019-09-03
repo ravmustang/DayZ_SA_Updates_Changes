@@ -234,18 +234,20 @@ class HFSMBase<Class FSMStateBase, Class FSMEventBase, Class FSMActionBase, Clas
 				case ProcessEventResult.FSM_ABORTED:
 				{
 					fsmDebugPrint("[hfsm] aborted sub machine=" + m_State.ToString());
+					
+					m_State.OnAbort(e); // 1.2) submachine aborted, abort submachine owner (i.e. this)
 
 					if (GetOwnerState() == abort_dst.GetParentState())
 					{
 						fsmDebugPrint("[hfsm] aborted sub machine=" + m_State.ToString() + " & abort destination reached.");
 						m_State = abort_dst;
-						m_State.OnEntry(e);		// 1.2) submachine aborted, call onEntry on new state (cross-hierarchy transition)
+						m_State.OnEntry(e);		// 1.3) submachine aborted, call onEntry on new state (cross-hierarchy transition)
 						result = ProcessEventResult.FSM_OK;
 						return NULL;
 					}
 					else
 					{
-						result = ProcessEventResult.FSM_ABORTED; // 1.3) submachine has aborted, look for destination state in parent
+						result = ProcessEventResult.FSM_ABORTED; // 1.4) submachine has aborted, look for destination state in parent
 						return NULL;
 					}
 

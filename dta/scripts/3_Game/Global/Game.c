@@ -87,6 +87,13 @@ class CGame
 	}
 	
 	/**
+	\brief Called when inputs is not possible (Steam overlay active or something), all internal script variables should be reset here!
+	*/
+	void OnDeviceReset()
+	{
+	}
+	
+	/**
   \brief Called on World update
   @param doSim False when simulation is paused, True otherwise
 	@param timeslice time elapsed from last call
@@ -668,13 +675,16 @@ class CGame
 	proto native DayZPlayer		GetPlayer();
 	proto native void		GetPlayers( out array<Man> players );
 	
+	//! Stores login userdata as parameters which are sent to server	
+	proto native void		StoreLoginData(notnull array<ref Param> params);
+	
 	//! Returns the direction where the mouse points, from the camera view
 	proto native vector		GetPointerDirection();
 	//! Transforms position in world to position in screen in pixels as x, y component of vector, z parameter represents distance between camera and world_pos
 	proto native vector		GetScreenPos(vector world_pos);
 	//! Transforms position in world to position in screen in percentage (0.0 - 1.0) as x, y component of vector, z parameter represents distance between camera and world_pos
 	proto native vector		GetScreenPosRelative(vector world_pos);
-			
+	
 	//! Return singleton of MenuData class - at main menu contains characters played with current profile.
 	proto native MenuData	GetMenuData();
 	/**
@@ -747,10 +757,10 @@ class CGame
 	proto native void		ChatPlayer(string text);
 	/**
 	 \brief Mutes voice of source player to target player
-	@param sourceVoice uid of source player
-	@param targetVoice uid of target player
+	@param muteUID 		uid of player you want to mute
+	@param playerUID 	uid of player that (doesnt't) want to hear muteUID
 	*/
-	proto native void		MutePlayer(string sourceVoice, string targetVoice, bool mute);
+	proto native void		MutePlayer(string muteUID, string playerUID, bool mute);
 	
 	/**
 	 \brief Mute all players for listenerId
@@ -773,6 +783,17 @@ class CGame
 	@param enable or disable effect
 	*/
 	proto native void		SetVoiceEffect(Object player, int effect, bool enable);
+	
+	/**
+	 \brief Set voice level of VoN (only on client) (VoiceLevelWhisper = 0, VoiceLevelNormal = 1, VoiceLevelShout = 2)
+	@param level of voice
+	*/
+	proto native void		SetVoiceLevel(int level);
+	
+	/**
+	 \brief Get voice level of VoN (on both client and server) (VoiceLevelWhisper = 0, VoiceLevelNormal = 1, VoiceLevelShout = 2)
+	*/
+	proto native int		GetVoiceLevel(Object player = null);
 
 	// mission
 	proto native Mission 	GetMission();

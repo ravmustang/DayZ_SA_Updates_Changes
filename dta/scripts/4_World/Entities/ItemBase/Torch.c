@@ -6,7 +6,9 @@ class Torch : ItemBase
 	
 	static float 			m_BurnTimePerRag;
 	static float 			m_BurnTimePerFullLard;
+	static float 			m_BurnTimePerFullFuelDose;
 	static float 			m_MaxConsumableLardQuantity;
+	static float 			m_MaxConsumableFuelQuantity;
 	static float 			m_WaterEvaporationByFireIntensity = 0.001;
 	static int 				m_StartFadeOutOfLightAtQuantity = 3;
 	vector 					m_ParticleLocalPos = Vector(0, 0.50, 0);
@@ -16,12 +18,14 @@ class Torch : ItemBase
 	
 	void Torch()
 	{
-		if ( m_BurnTimePerRag == 0  ||  m_BurnTimePerFullLard == 0  ||  m_MaxConsumableLardQuantity == 0 )
+		if ( m_BurnTimePerRag == 0  ||  m_BurnTimePerFullLard == 0  ||  m_MaxConsumableLardQuantity == 0  ||  m_MaxConsumableFuelQuantity == 0 )
 		{
 			string cfg_path = "CfgVehicles " + GetType();
 			m_BurnTimePerRag = GetGame().ConfigGetFloat( cfg_path + " burnTimePerRag" );
 			m_BurnTimePerFullLard = GetGame().ConfigGetFloat( cfg_path + " burnTimePerFullLardDose" );
+			m_BurnTimePerFullFuelDose = GetGame().ConfigGetFloat( cfg_path + " burnTimePerFullFuelDose" );
 			m_MaxConsumableLardQuantity = GetGame().ConfigGetFloat( cfg_path + " maxConsumableLardDose" );
+			m_MaxConsumableFuelQuantity = GetGame().ConfigGetFloat( cfg_path + " maxConsumableFuelDose" );
 		}
 		
 		RegisterNetSyncVariableBool("m_CanReceiveUpgrade");
@@ -158,7 +162,7 @@ class Torch : ItemBase
 		return false;
 	}
 	
-	bool ConsumeLard(Lard lard)
+	void ConsumeLard(Lard lard)
 	{
 		if (lard)
 		{
@@ -189,11 +193,59 @@ class Torch : ItemBase
 			CalculateQuantity();
 			
 			UpdateCheckForReceivingUpgrade();
+		}
+	}
+	
+	void ConsumeFuelFromBottle(ItemBase vessel)
+	{
+		if (vessel)
+		{
+			float vessel_quant = vessel.GetQuantity();
 			
-			return true;
+			float available_vessel_quant = vessel_quant;
+			
+			if ( available_vessel_quant > m_MaxConsumableFuelQuantity )
+				available_vessel_quant = m_MaxConsumableFuelQuantity;
+			
+			float available_vessel_coef = available_vessel_quant / m_MaxConsumableFuelQuantity;
+			
+			float add_energy = m_BurnTimePerFullFuelDose * available_vessel_coef;
+			float add_energy_coef = 1;
+			
+			float energy_limit = GetCompEM().GetEnergyMax() - GetCompEM().GetEnergy();
+			
+			if (add_energy > energy_limit )
+			{
+				add_energy_coef = energy_limit / add_energy;
+				add_energy = energy_limit;
+				available_vessel_quant = available_vessel_quant * add_energy_coef;
+			}
+			
+			GetCompEM().AddEnergy( add_energy );
+			vessel.AddQuantity(-available_vessel_quant);
+			
+			CalculateQuantity();
+			
+			UpdateCheckForReceivingUpgrade();
+		}
+	}
+	
+	void ConsumeFuelFromGasStation()
+	{
+		float add_energy = m_BurnTimePerFullFuelDose;
+		float add_energy_coef = 1;
+		
+		float energy_limit = GetCompEM().GetEnergyMax() - GetCompEM().GetEnergy();
+		
+		if (add_energy > energy_limit )
+		{
+			add_energy_coef = energy_limit / add_energy;
+			add_energy = energy_limit;
 		}
 		
-		return false;
+		GetCompEM().AddEnergy( add_energy );
+		CalculateQuantity();
+		UpdateCheckForReceivingUpgrade();
 	}
 	
 	void RuinRags()
@@ -546,6 +598,7 @@ class Torch : ItemBase
 		super.SetActions();
 		
 		AddAction(ActionLightItemOnFire);
+		AddAction(ActionUpgradeTorchFromGasPump);
 	}
 	
 	override void OnAttachmentQuantityChanged(ItemBase item)

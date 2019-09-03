@@ -22,4 +22,20 @@ class MushroomBase : Edible_Base
 		AddAction(ActionForceFeed);
 		AddAction(ActionEatSmall);
 	}
+	
+	override void EEOnCECreate()
+	{
+		int rand = Math.RandomInt(0,10);
+		
+		if ( rand > 6 )
+		{
+			ChangeFoodStage( FoodStageType.ROTTEN );
+			SetHealth( "", "", GetMaxHealth()*0.1 );
+		}
+		else if ( rand > 2 )
+		{
+			ChangeFoodStage( FoodStageType.DRIED );
+			SetHealth( "", "", GetMaxHealth()*0.4 );
+		}
+	}
 };

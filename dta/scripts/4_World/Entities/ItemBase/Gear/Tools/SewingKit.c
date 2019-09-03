@@ -4,7 +4,7 @@ class SewingKit: Inventory_Base
 	{
 		super.SetActions();
 		
-		AddAction(ActionBandageSelf);
-		AddAction(ActionBandageTarget);
+		AddAction(ActionSewTarget);
+		AddAction(ActionSewSelf);
 	}
 };

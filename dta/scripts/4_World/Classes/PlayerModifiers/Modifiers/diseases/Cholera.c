@@ -1,13 +1,16 @@
 class CholeraMdfr: ModifierBase
 {
 	static const int AGENT_THRESHOLD_ACTIVATE = 100;
-	static const int AGENT_THRESHOLD_DEACTIVATE = 20;
+	static const int AGENT_THRESHOLD_DEACTIVATE = 0;
 	
-	float m_Time = 0;
-	bool m_IsVomiting;
+	static const int CHANCE_OF_VOMIT = 33;
+	static const int WATER_DRAIN_FROM_VOMIT = 450;
+	static const int ENERGY_DRAIN_FROM_VOMIT = 310;
+	static const float WATER_LOSS_CHOLERA = 0.5;
+
 	override void Init()
 	{
-		m_TrackActivatedTime = false;
+		m_TrackActivatedTime 	= false;
 		m_ID 					= eModifiers.MDF_CHOLERA;
 		m_TickIntervalInactive 	= DEFAULT_TICK_TIME_INACTIVE;
 		m_TickIntervalActive 	= DEFAULT_TICK_TIME_ACTIVE;
@@ -20,7 +23,7 @@ class CholeraMdfr: ModifierBase
 	
 	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.CHOLERA) > AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.CHOLERA) >= AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -32,8 +35,6 @@ class CholeraMdfr: ModifierBase
 
 	override protected void OnActivate(PlayerBase player)
 	{
-		m_IsVomiting = false;
-		//if( player.m_NotifiersManager ) player.m_NotifiersManager.ActivateByType(eNotifiers.NTF_SICK);
 		player.IncreaseDiseaseCount();
 	}
 
@@ -44,7 +45,7 @@ class CholeraMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.CHOLERA) < AGENT_THRESHOLD_DEACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.CHOLERA) <= AGENT_THRESHOLD_DEACTIVATE) 
 		{
 			return true;
 		}
@@ -56,20 +57,27 @@ class CholeraMdfr: ModifierBase
 
 	override protected void OnTick(PlayerBase player, float deltaT)
 	{
-		
+		float water_loss = deltaT * WATER_LOSS_CHOLERA;	// could be replaced by fever in future
+		player.GetStatWater().Add(-water_loss);
+
 		float stomach_volume = player.m_PlayerStomach.GetStomachVolume();
-		if( stomach_volume > 300 )
+		if( stomach_volume > 200 )
 		{
-			float chance_of_vomit = Math.RandomFloat01() / 10;
-			if( Math.RandomFloat01() < chance_of_vomit && !m_IsVomiting )
+			int roll = Math.RandomInt(0, 100);
+			if( roll < CHANCE_OF_VOMIT )
 			{
 				SymptomBase symptom = player.GetSymptomManager().QueueUpPrimarySymptom(SymptomIDs.SYMPTOM_VOMIT);
 				
 				if( symptom )
 				{ 
 					symptom.SetDuration(Math.RandomIntInclusive(4,8));
+
+					// figure something more clever
+					if (m_Player.GetStatWater().Get() > (WATER_DRAIN_FROM_VOMIT))
+						m_Player.GetStatWater().Add(-1 * WATER_DRAIN_FROM_VOMIT);
+					if (m_Player.GetStatEnergy().Get() > (ENERGY_DRAIN_FROM_VOMIT))
+						m_Player.GetStatEnergy().Add(-1 * ENERGY_DRAIN_FROM_VOMIT);
 				}
-				m_IsVomiting = true;
 			}
 		}
 	}

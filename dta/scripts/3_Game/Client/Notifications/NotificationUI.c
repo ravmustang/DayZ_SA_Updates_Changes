@@ -111,7 +111,7 @@ class NotificationUI
 	
 	void ClearVoiceNotifications()
 	{
-		for( int i = 0; i < m_VoiceNotifications.Count(); )
+		for( int i = 0; i < m_VoiceNotifications.Count(); i++ )
 		{
 			Widget w = m_VoiceNotifications.GetElement( i );
 			delete w;

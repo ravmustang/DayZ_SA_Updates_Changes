@@ -2,7 +2,7 @@ class ActionGiveBloodTargetCB : ActionContinuousBaseCB
 {
 	override void CreateActionComponent()
 	{
-		m_ActionData.m_ActionComponent = new CAContinuousQuantityRepeat(UAQuantityConsumed.BLOOD, UATimeSpent.DEFAULT);
+		m_ActionData.m_ActionComponent = new CAContinuousQuantityBloodTransfer(UAQuantityConsumed.BLOOD, UATimeSpent.BLOOD);
 	}
 };
 
@@ -23,7 +23,7 @@ class ActionGiveBloodTarget: ActionContinuousBase
 		m_ConditionTarget = new CCTMan(UAMaxDistances.DEFAULT);
 		m_ConditionItem = new CCINonRuined;
 	}
-		
+
 	override string GetText()
 	{
 		return "#give_blood_person";
@@ -41,6 +41,7 @@ class ActionGiveBloodTarget: ActionContinuousBase
 		{
 			ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
 			action_data_b.m_ItemBloodType = action_data.m_MainItem.GetLiquidType();
+			action_data_b.m_BloodAmount = action_data.m_MainItem.GetQuantity();
 			return true;
 		}
 		return false;
@@ -64,23 +65,23 @@ class ActionGiveBloodTarget: ActionContinuousBase
 	{
 		ActionGiveBloodData action_data_b = ActionGiveBloodData.Cast( action_data );
 		
-		Param1<float> nacdata = Param1<float>.Cast( action_data_b.m_ActionComponent.GetACData() );
-		float delta = 0;
+		PlayerBase player_target = PlayerBase.Cast(action_data_b.m_Target.GetObject());
+		int bloodtypetarget = player_target.GetStatBloodType().Get();
+		bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);
 		
-		if ( nacdata )
+		if ( !bloodmatch )
 		{
-			delta = nacdata.param1;
-		}
-		if ( delta > 0 )
-		{
-			action_data_b.m_Player.AddHealth("","Blood",delta);
-
-			int bloodtypetarget = action_data_b.m_Player.GetStatBloodType().Get();
-			bool bloodmatch = BloodTypes.MatchBloodCompatibility(action_data_b.m_ItemBloodType, bloodtypetarget);
-
-			if ( !bloodmatch )
+			float blood_obtained = action_data_b.m_BloodAmount - action_data_b.m_MainItem.GetQuantity();
+			
+			if (blood_obtained > PlayerConstants.HEMOLYTIC_RISK_SHOCK_THRESHOLD)
 			{
-				action_data_b.m_Player.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+				player_target.m_UnconsciousEndTime = -60;
+				player_target.SetHealth("","Shock",0);
+
+				if (blood_obtained > PlayerConstants.HEMOLYTIC_REACTION_THRESHOLD)
+				{
+					player_target.m_ModifiersManager.ActivateModifier(eModifiers.MDF_HEMOLYTIC_REACTION);
+				}
 			}
 		}
 		

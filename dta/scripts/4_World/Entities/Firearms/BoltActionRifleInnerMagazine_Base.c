@@ -204,14 +204,10 @@ class BoltActionRifle_InnerMagazine_Base extends BoltActionRifle_Base
 	{
 		super.SetActions();
 		AddAction(FirearmActionLoadMultiBullet);
-		#ifdef SERVER_FOR_CONSOLE
-			RemoveAction(FirearmActionLoadBulletQuick); // Easy reload
-			AddAction(FirearmActionLoadMultiBulletQuick); // Easy reload
-		#endif
-		#ifdef PLATFORM_CONSOLE
-			RemoveAction(FirearmActionLoadBulletQuick); // Easy reload
-			AddAction(FirearmActionLoadMultiBulletQuick); // Easy reload
-		#endif
+
+		RemoveAction(FirearmActionLoadBulletQuick); // Easy reload
+		AddAction(FirearmActionLoadMultiBulletQuick); // Easy reload
+
 	}
 };
 

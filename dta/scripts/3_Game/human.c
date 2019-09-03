@@ -76,6 +76,9 @@ class HumanInputController
 	//! returns true if change of throwing mode has been requested
 	proto native bool			IsThrowingModeChange();
 
+	//! resets Throwing mode
+	proto native void			ResetThrowingMode();
+	
 	//! returns true if Walk set to toggle
 	proto native bool			IsWalkToggled();
 
@@ -412,6 +415,9 @@ class HumanCommandMelee
 
 	//! cancels command melee and goes to HumanCommandMove
 	proto native void		Cancel();
+	
+	//! is on back in prone stance?
+	proto native bool		IsOnBack();
 }
 
 
@@ -431,6 +437,9 @@ class HumanCommandMelee2
 
 	//! cancels command melee and goes to HumanCommandMove
 	proto native void		Cancel();
+
+	//! is on back in prone stance?
+	proto native bool		IsOnBack();
 }
 
 
@@ -561,17 +570,43 @@ class SHumanCommandClimbResult
 {
 	bool		m_bIsClimb;	
 	bool		m_bIsClimbOver;
+	bool		m_bFinishWithFall;
 
-	vector 		m_ClimbGrabPoint;		//! grab point for climb && climb over
-	vector 		m_ClimbStandPoint;		//! where climb ends
-	vector 		m_ClimbOverStandPoint;	//! where climb over ends
+	float		m_fClimbHeight;
+	
+	vector 		m_ClimbGrabPoint;		//! grab point for climb && climb over (in local space of it's parent)
+	vector 		m_ClimbGrabPointNormal;	//! normal to grabpoint position (used for character orientation)
+	vector 		m_ClimbStandPoint;		//! where climb ends (in local space of it's parent)
+	vector 		m_ClimbOverStandPoint;	//! where climb over ends (in local space of it's parent)
+	
+	IEntity		m_GrabPointParent;		//! parent of grabpoint
+	IEntity		m_ClimbStandPointParent;
+	IEntity		m_ClimbOverStandPointParent;
 };
 
 
+//! state of climb command
+enum ClimbStates
+{
+	STATE_MOVE,
+	STATE_TAKEOFF,
+	STATE_ONTOP,
+	STATE_FALLING,
+	STATE_FINISH
+};
 
 //! command itself
 class HumanCommandClimb
 {	
+	//! returns the state of climb (enum value of ClimbStates);
+	proto native int				GetState();
+	
+	//! returns world space position of climbing grab point
+	proto native vector				GetGrabPointWS();
+	
+	//! returns world space position of landspot after climbing over
+	proto native vector				GetClimbOverStandPointWS();
+	
 	//! debug draws climb heauristics
 	//! pDebugDrawLevel viz DebugDrawClimb
 	proto native static bool		DoClimbTest(Human pHuman, SHumanCommandClimbResult pResult, int pDebugDrawLevel);
@@ -656,6 +691,7 @@ enum WeaponActionMechanismTypes
 
 enum WeaponActionChamberingTypes
 {
+	CHAMBERING_END = -1,
 	//! chambering action types
 	CHAMBERING_ONEBULLET_OPENED 				= 0,		// CMD_Reload_Chambering
 	CHAMBERING_ONEBULLET_CLOSED  				= 1,		//
@@ -1064,6 +1100,13 @@ class Human extends Man
 	proto native 	HumanCommandVehicle			GetCommand_Vehicle();
 
 
+	//!----- CLIMB -----
+
+	//! starts command - climb
+	proto native 	HumanCommandClimb			StartCommand_Climb(SHumanCommandClimbResult pClimbResult, int pType);
+
+	proto native 	HumanCommandClimb			GetCommand_Climb();
+
 	//!----- Death -----
 
 	//! starts command - death
@@ -1159,4 +1202,48 @@ class Human extends Man
 	proto native   owned string  						DebugGetItemAnimInstance();
 
 
+	//--------------------------------------------------------
+	// commands start/finish events
+	
+	void	OnCommandMoveStart();
+	void	OnCommandMoveFinish();
+
+	void	OnCommandMeleeStart();
+	void	OnCommandMeleeFinish();
+
+	void	OnCommandMelee2Start();
+	void	OnCommandMelee2Finish();
+
+	void	OnCommandFallStart();
+	void	OnCommandFallFinish();
+
+	void	OnCommandClimbStart();
+	void	OnCommandClimbFinish();
+
+	void	OnCommandDeathStart();
+	void	OnCommandDeathFinish();
+
+	void	OnCommandUnconsciousStart();
+	void	OnCommandUnconsciousFinish();
+
+	void	OnCommandDamageFullbodyStart();
+	void	OnCommandDamageFullbodyFinish();
+
+	void	OnCommandDamageAdditiveStart();
+	void	OnCommandDamageAdditiveFinish();
+
+	void	OnCommandLadderStart();
+	void	OnCommandLadderFinish();
+
+	void	OnCommandSwimStart();
+	void	OnCommandSwimFinish();
+
+	void	OnCommandVehicleStart();
+	void	OnCommandVehicleFinish();
+
+	void	OnCommandActionFullbodyStart();
+	void	OnCommandActionFullbodyFinish();
+
+	void	OnCommandActionAdditiveStart();
+	void	OnCommandActionAdditiveFinish();
 }

@@ -51,8 +51,8 @@ class HandAnimatedSwapping extends HandStateBase
 			
 			if (GetGame().IsClient() || !GetGame().IsMultiplayer())
 			{
-				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Src2.GetItem(), m_Src2, 3000);
-				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Src1.GetItem(), m_Src1, 3000);
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Src2.GetItem(), m_Src2, GameInventory.c_InventoryReservationTimeoutShortMS);
+				e.m_Player.GetHumanInventory().AddInventoryReservation(m_Src1.GetItem(), m_Src1, GameInventory.c_InventoryReservationTimeoutShortMS);
 			}
 		}
 

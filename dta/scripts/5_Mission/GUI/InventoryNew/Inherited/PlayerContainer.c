@@ -677,6 +677,25 @@ class PlayerContainer: CollapsibleContainer
 		return false;
 	}
 	
+	override bool InspectItem()
+	{
+		if( GetFocusedContainer().IsInherited( ContainerWithCargo ) || GetFocusedContainer().IsInherited( ContainerWithCargoAndAttachments ) )
+		{
+			return GetFocusedContainer().InspectItem();
+		}
+		else
+		{
+			Man player = GetGame().GetPlayer();
+			EntityAI item = GetSlotsIcon( m_FocusedRow, m_FocusedColumn ).GetEntity();
+			if( item )
+			{
+				InspectItem( item );
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	int GetRecipeCount( bool recipe_anywhere, EntityAI entity1, EntityAI entity2 )
 	{
 		PluginRecipesManager plugin_recipes_manager = PluginRecipesManager.Cast( GetPlugin( PluginRecipesManager ) );

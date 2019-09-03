@@ -6,4 +6,6 @@ enum EStaminaModifiers
 	MELEE_HEAVY,
 	MELEE_EVADE,
 	OVERALL_DRAIN,
+	VAULT,
+	CLIMB,
 }

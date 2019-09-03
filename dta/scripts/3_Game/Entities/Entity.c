@@ -29,6 +29,11 @@ class Entity extends ObjectTyped
 	proto        void MoveInTime(vector targetTransform[4], float deltaT);
 	
 	/**
+	\brief callback called when entity is moved to world and creating its physics representation
+	*/
+	void OnCreatePhysics();
+	
+	/**
 	\brief Client event on transformation update from network
 	@param pos, world space position
 	@param ypr, world space orientation in radians in form of Yaw/Pitch/Roll

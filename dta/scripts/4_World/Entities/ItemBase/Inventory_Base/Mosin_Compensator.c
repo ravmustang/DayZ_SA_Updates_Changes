@@ -1,4 +1,4 @@
-class Mosin_Compensator extends Inventory_Base
+class Mosin_Compensator extends ItemSuppressor
 {
 	override bool CanPutAsAttachment( EntityAI parent )
 	{

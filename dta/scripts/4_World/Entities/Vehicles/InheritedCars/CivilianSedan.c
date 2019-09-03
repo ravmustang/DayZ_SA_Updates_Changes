@@ -153,6 +153,48 @@ class CivilianSedan extends CarScript
 		return false;
 	}
 
+	override string GetDoorSelectionNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+			return "doors_driver";
+		break;
+		case 1:
+			return "doors_codriver";
+		break;
+		case 2:
+			return "doors_cargo1";
+		break;
+		case 3:
+			return "doors_cargo2";
+		break;
+		}
+		
+		return super.GetDoorSelectionNameFromSeatPos(posIdx);
+	}
+
+	override string GetDoorInvSlotNameFromSeatPos(int posIdx)
+	{
+		switch( posIdx )
+		{
+		case 0:
+			return "CivSedanDriverDoors";
+		break;
+		case 1:
+			return "CivSedanCoDriverDoors";
+		break;
+		case 2:
+			return "CivSedanCargo1Doors";
+		break;
+		case 3:
+			return "CivSedanCargo2Doors";
+		break;
+		}
+		
+		return super.GetDoorInvSlotNameFromSeatPos(posIdx);
+	}
+
 	// 0 full ambient and engine sound
 	// 1 zero ambient and engine sound
 	override float OnSound( CarSoundCtrl ctrl, float oldValue )

@@ -40,8 +40,8 @@ class PowerGenerator extends ItemBase
 		
 		
 		UpdateFuelMeter();
-	}
-	
+		}
+		
 	/*override bool IsHeavyBehaviour()
 	{
 		return true;
@@ -208,7 +208,7 @@ class PowerGenerator extends ItemBase
 		{
 			SetAnimationPhase("dial_fuel", m_FuelPercentage * 0.01);
 		}
-	}
+		}
 	
 	// Adds energy to the generator
 	void SetFuel(float fuel_amount)
@@ -327,7 +327,6 @@ class PowerGenerator extends ItemBase
 	{
 		super.SetActions();
 
-		AddAction(ActionPlugIn);
 		AddAction(ActionTogglePlaceObject);
 		AddAction(ActionPullOutPlug);
 		AddAction(ActionTurnOnPowerGenerator);

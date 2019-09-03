@@ -477,7 +477,7 @@ class InspectMenuNew extends UIScriptedMenu
 				weight=Math.Round( (wetness + 1) * confweight );
 			}
 			*/
-			int weight = item_IB.GetItemWeight();
+			int weight = item_IB.GetWeight();
 			
 			if (root_widget.GetName() != "BackPanelWidget")
 			{

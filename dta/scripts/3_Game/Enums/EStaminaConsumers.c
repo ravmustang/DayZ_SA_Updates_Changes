@@ -5,4 +5,6 @@ enum EStaminaConsumers
 	MELEE_EVADE,
 	SPRINT,
 	JUMP,
+	VAULT,
+	CLIMB,
 }

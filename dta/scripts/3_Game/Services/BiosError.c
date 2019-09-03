@@ -12,10 +12,13 @@ enum EBiosError
 	BAD_PARAMETER,		//!< Atleast one of the input parameters is incorrect
 	NOT_FOUND,			//!< The call could not find some data. See individual calls for details.
 	NOT_IMPLEMENTED,	//!< The call is not supported for the current platform. Can be returned from any call.
-	PURCHASE_REQUIRED	//!< The action cannot be performed because the user is banned.
-	NOT_ALLOWED			//!< The action is not allowed.
-	BANNED				//!< The user is banned from some action.
-	LOGICAL				//!< API usage error. For example, usage of objects whos native lifetime ended. Can be returned from any call.
+	PURCHASE_REQUIRED,	//!< The action cannot be performed because the user is banned.
+	NOT_ALLOWED,		//!< The action is not allowed.
+	BANNED,				//!< The user is banned from some action.
+	LOGICAL,				//!< API usage error. For example, usage of objects whos native lifetime ended. Can be returned from any call.
+	COMUNICATION_ERROR,
+	UPDATE_REQUIRED,	//!< mandatory update exist and is required (PS4).
+	UPDATE_REQUIRED_AND_DOWNLOADED,		//!< mandatory update exist and is ready to install (PS4).
 	UNKNOWN,			//!< Any other error. Can be returned from any call.
 	
 	BAD_SCRIPT,			//!< Extended error. Script not properly linked with engine. May be removed in future.

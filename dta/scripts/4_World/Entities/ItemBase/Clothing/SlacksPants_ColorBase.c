@@ -1,4 +1,11 @@
-class SlacksPants_ColorBase extends Clothing {};
+class SlacksPants_ColorBase extends Clothing
+{
+	override void SetActions()
+	{
+		super.SetActions();
+		AddAction(ActionWringClothes);
+	}
+};
 class SlacksPants_Beige extends SlacksPants_ColorBase {};
 class SlacksPants_Black extends SlacksPants_ColorBase {};
 class SlacksPants_Blue extends SlacksPants_ColorBase {};

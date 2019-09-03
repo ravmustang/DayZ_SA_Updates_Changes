@@ -86,8 +86,15 @@ class NVGoggles extends PoweredOptic_Base
 	override void OnWorkStart()
 	{
 		PlayerBase player;
+		EntityAI headgear;
+		EntityAI glasses;
 		if ( PlayerBase.CastTo(player, GetHierarchyRootPlayer()) && m_Strap )
-			player.SetNVGWorking(true);
+		{
+			headgear = player.FindAttachmentBySlotName("Headgear");
+			glasses = player.FindAttachmentBySlotName("Eyewear");
+			if (headgear == m_Strap || glasses == m_Strap)
+				player.SetNVGWorking(true);
+		}
 	}
 	
 	override void OnWorkStop()

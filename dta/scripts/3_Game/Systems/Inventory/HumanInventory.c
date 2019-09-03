@@ -41,6 +41,14 @@ class HumanInventory : GameInventory
 	 **/
 	proto native EntityAI CreateInHands (string typeName);
 
+	proto native int GetUserReservedLocationCount ();
+	proto native int FindUserReservedLocationIndex (notnull EntityAI e);
+	proto native int FindCollidingUserReservedLocationIndex (notnull EntityAI e, notnull InventoryLocation dst);
+	proto native void GetUserReservedLocation (int index, out notnull InventoryLocation dst);
+	proto native void SetUserReservedLocation (notnull EntityAI eai, notnull InventoryLocation dst);
+	proto native void ClearUserReservedLocation (notnull EntityAI eai);
+	proto native bool ClearUserReservedLocationAtIndex (int index);
+
 	/**
 	 * @fn		CreateInInventory
 	 * @brief	creates entity somewhere in inventory
@@ -64,6 +72,8 @@ class HumanInventory : GameInventory
 	bool ProcessHandEvent (HandEventBase e) { }
 
 	void OnHandsStateChanged (HandStateBase src, HandStateBase dst) { }
+	void OnHandsExitedStableState (HandStateBase src, HandStateBase dst) { }
+	void OnHandsEnteredStableState (HandStateBase src, HandStateBase dst) { }
 	
 	void OnEntityInHandsCreated (InventoryLocation src)
 	{
@@ -441,7 +451,7 @@ class HumanInventory : GameInventory
 			{
 				case InventoryLocationType.HANDS:
 				{
-					if (GetInventoryOwner().IsAlive())
+					if ((mode != InventoryMode.SERVER) && GetInventoryOwner().IsAlive())
 					{
 						hndDebugPrint("[inv] HumanInventory::ReplaceItemInHandsWithNewImpl event=" + e);
 						HandEvent(mode, e);
@@ -449,8 +459,9 @@ class HumanInventory : GameInventory
 					}
 
 					hndDebugPrint("[inv] HumanInventory::ReplaceItemInHandsWithNewImpl DEAD_owner=" + GetInventoryOwner().GetName() +"="+ GetInventoryOwner());
-					Error("HumanInventory::ReplaceItemInHandsWithNewImpl TODO"); // replace-with-new in corpse's hands, not implemented
-					return false;
+					//Error("HumanInventory::ReplaceItemInHandsWithNewImpl TODO"); // replace-with-new in corpse's hands, not implemented
+					HandEvent(mode, e);
+					return true;
 				}
 				default:
 					Error("[inv] HumanInventory::ReplaceItemInHandsWithNewImpl src has to be hands");

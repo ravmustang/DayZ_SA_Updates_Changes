@@ -24,7 +24,7 @@ class BrainDiseaseMdfr: ModifierBase
 	
 	override protected bool ActivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.BRAIN) > AGENT_THRESHOLD_ACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.BRAIN) >= AGENT_THRESHOLD_ACTIVATE) 
 		{
 			return true;
 		}
@@ -46,7 +46,7 @@ class BrainDiseaseMdfr: ModifierBase
 
 	override protected bool DeactivateCondition(PlayerBase player)
 	{
-		if(player.GetSingleAgentCount(eAgents.BRAIN) < AGENT_THRESHOLD_DEACTIVATE) 
+		if(player.GetSingleAgentCount(eAgents.BRAIN) <= AGENT_THRESHOLD_DEACTIVATE) 
 		{
 			return true;
 		}
